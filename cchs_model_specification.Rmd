@@ -1,0 +1,35 @@
+---
+title: "1 - Specifying your model"
+author: "Warsame Yusuf"
+date: '2019-08-06'
+output:
+  html_document:
+    df_print: paged
+vignette: |
+  %\VignetteIndexEntry{1 - Specifying your model}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The Model Specification Workbook (MSW) is used to specify your model. The MSW is 
+a series of two worksheets (CSV files) that describe different model components. 
+
+You can use __cchsflow__ without a MSW but we recommend using the 
+`variablesCCHSFlow` and `cchsVariableDetails` worksheets. 
+
+## Two worksheets in the Model Specification Workbook
+1) `variablesCCHSFlow` --- all model variables, including data cleaning and transformations. `variablesCCHSFlow` is the most important sheet and is helpful even if you don't use other parts of _cchsflow_ 
+2) `cchsVariableDetails` --- information on factors (categories) and how to transform final variables from their starting variables. 
+
+## Getting started with the Model Specification Workbook
+You have your study data. Great. The first step is specifying which variables you need in your model, as well as variables for study cohort creation, data cleaning and variable transformation.
+
