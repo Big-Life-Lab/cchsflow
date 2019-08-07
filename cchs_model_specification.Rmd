@@ -1,6 +1,6 @@
 ---
-title: "1 - Specifying your model"
-date: 'Last updated: 2019-08-06'
+title: "1 - Specifying the variables to be transformed"
+date: 'Last updated: 2019-08-07'
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1 - Specifying your model}     
@@ -15,21 +15,108 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Introduction
-The Model Specification Workbook (MSW) is used to specify your model. The MSW is 
-a series of two worksheets (CSV files) that describe different model components. 
+## **Introduction**
+The Model Specification Workbook (MSW) is a series of worksheets (CSV files) that describe different model components. The MSW is used to specify the model to transform and harmonize CCHS variables between surveys.
 
-You can use __cchsflow__ without a MSW but we recommend using the 
-`variablesCCHSFlow` and `cchsVariableDetails` worksheets. 
 
-## Two worksheets in the Model Specification Workbook
-1) `variablesCCHSFlow` --- all model variables, including data cleaning and transformations. `variablesCCHSFlow` is the most important sheet and is helpful even if you don't use other parts of _cchsflow_ 
-2) `cchsVariableDetails` --- information on factors (categories) and how to transform final variables from their starting variables. 
+## **Two worksheets in the Model Specification Workbook**
+1) `cchsVariableDetails` --- information on factors (categories) and how to transform final variables from their starting variables. 
+2) `variablesCCHSFlow` --- information on transformed variables, including labels, section, variable type, and units.
 
-## How to create the Model Specification Workbook
-There are two approaches to creating the Model Specification Workbook. We usually start the Model Specification Workbook as a CSV file to facilate collaboration between study colloborators. Alternatively, you can create the MSW as an R dataframe.
+## Creating the cchsVariableDetails worksheet
+The `cchsVariableDetails` worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `recode-with-table` function to harmonize CCHS variables between surveys. The `recode-with-table` function will use this worksheet to transform variable. The two components of this worksheets are the **rows** and the **columns.**
 
-## Creating the `cchsVariableDetails` worksheet
+###Rows
+Each unique variable will have its own row. Furthermore, each distinct category in a unique variable will have its own row. The only exception to this rule are the "don't know", "refusal", and "not stated" categories, which are lumped together as a single category named as missing. For each unique variable, an else row will also be added to account for improperly coded values.
 
-## Creating the `variablesCCHSFlow` worksheet
+If a categorical variable has 4 distinct categories, along with a not applicable category and the 3 missing categories, there will be 7 rows: 
+
++ 4 for each distinct category
+
++ 1 for the not appliacble category
+
++ 1 for the missing categories
+
++ 1 else row.
+
+### Columns
+The following are the columns needed to be specified in order for the function to be operational:
+
+1. **variable:** the name of the final transformed variable of between all CCHS cycles. We recommend using a variable name that is most consistent between CCHS cycles. In our `cchsVariableDetails` worksheet, we have designated the variable names used in CCHS cycles from 2007 to 2014 as the final transformed variable name.
+
+2. **toType:** the variable type of the final transformed variable. In this column, a transformed variable that is categorical will be specified as `cat`; while a transformed variable that is continuous will be specified as `cont`.
+
+3. **databaseStart:** the CCHS surveys that contain the variable of interest, separated by commas. Each CCHS survey contains a unique identifier that is consistent with practices from the Data Documentation Initiative (DDI). 
+
++ The identifier for the 2001 CCHS survey is `cchs-82M0013-E-2001-c1-1-general-file`. This identifier would be specified in this column.
+
+4. **variableStart:** the original names of the variables as they are listed in each respective CCHS cycle, separated by commas. If the variable name in a particular CCHS survey is different from the transformed variable name, write out the CCHS survey identifier, add two colons, and write out the original variable name for that cycle. If the variable name in a particular CCHS survey is the same as the transformed variable name, the variable name is written out surrounded by square brackets. Note: this only needs to be written out **once**.
+
++ The grouped age variable in the 2001 CCHS survey is `DHHAGAGE`. If the final variable name for grouped age in the **variable** column is `DHHGAGE`, you would write the following in this column: `cchs-82M0013-E-2001-c1-1-general-file::DHHAGAGE`
+
++ The grouped age variable in the CCHS surveys from 2007 to 2014 is `DHHGAGE`. Since it is the same as the final variable name, you would write in this column `[DHHGAGE]` **once**.
+
+5. **fromType:** the variable type as indicated in the CCHS surveys. As indicated in the **toType** column, categorical variables are denoted as `cat` and continuous variables are denoted as `cont`.
+
+6. **recTo:** the value you would like to recode each category value to. For continuous variables that are not transformed in type, you would write in this column `copy` so that the function copies the values without any transformations. For the not applicable category, write `N/A`. For missing & else categories, write `NA` 
+
++ For categorical variables that are not changing variable types (i.e. cat to cat), it is ideal to retain the same values as indicated in each CCHS survey. But for transformed categorical variables that have changed in type (i.e cat to cont), you will have to develop values that make the most sense to your analysis. In the cchsflow, variables that have gone from cat to cont have used midpoints of each category.
+
+7. **numValidCat:** the number of categories a variable has. This only applies to variables in which the **toType** is cat. For continuous variables, write `N/A`. Not applicable, missing, and else categories are not included in the category count.
+
+8. **catLabel:** short form label describing the category of a particular variable.
+
+9. **catLabelLong:** more detailed label describing the category of a particular variable. This label should be identical to what is shown in the CCHS data documentation.
+
+10. **units:** the units of a particular variable. If there are no units for the variable, write `N/A`. Note, the function will not work if there different units between the rows of a variable.
+
+11. **recFrom:** the range of values for a particular category in a variable as indicated in the CCHS. For categorical variables, it will be a single range value (i.e. category 1 of variable X will have a recFrom range of 1:1); but for continuous variables it will be a range of values captured in the CCHS survey. See CCHS data documentation for each survey cycle and use the smallest and large values as your range to capture all values between the survey years. The recFrom range for the missing categories will be the range of values of the three categories. The else row will have its recFrom listed as `else`.
+
+12. **variableStartShortLabel:** short form label describing the variable.
+
+13. **variableStartLabel:** more detailed label describing the variable. This label should be identical to what is shown in the CCHS data documentation.
+
+14. **notes: **any relevant notes to inform the user running the `recode-with-table` function. Things to include here would be changes in wording between CCHS surveys, missing/changes in categories, and changes in variable type between CCHS surveys.
+
+###Example: Body mass index (BMI)
+
+Rows
+
+* There should 4 rows, 1 for the continuous "category", 1 for not applicable, 1 for missing, and 1 for else
+
+Columns
+
+1. **variable:** the most common variable name for BMI is `HWTGBMI`. This should be written for each row.
+
+2. **toType:** BMI was captured in the CCHS as a continuous variable. It does not make much sense to transform it into a categorical variable, so the the toType should be `cont` in each row.
+
+3. **databaseStart:** BMI was captured in all CCHS surveys between 2001 and 2014, so in each row, the CCHS identifers will be listed this column:
+
+      `cchs-82M0013-E-2001-c1-1-general-file, cchs-82M0013-E-2003-c2-1-General File, cchs-82M0013-E-2005-c3-1-main-file, cchs-E-2007-2008-AnnualComponent, CCHS-82M0013-E-2009-2010-Annualcomponent, CCHS-82M0013-E-2010-AnnualComponent, cchs-82M0013-E-2011-2012-Annual-component, cchs-82M0013-E-2012-Annual-component, cchs-82M0013-E-2013-2014-Annual-component, cchs-82M0013-E-2014-Annual-component`
+
+4. **variableStart:** In the 2001, 2003, and 2005 CCHS surveys the BMI variable differs from the common name, while in the CCHS surveys from 2007-2014, the BMI variable is the same as the common name. Therefore for each row, the variableStart column will look like this:
+
+      `cchs-82M0013-E-2001-c1-1-general-file::HWTAGBMI, cchs-82M0013-E-2003-c2-1-General File::HWTCGBMI,     cchs-82M0013-E-2005-c3-1-main-file::HWTEGBMI, [HWTGBMI]`
+
+5. **fromType:** As mentioned previously, BMI was measured as a continuous variable in the CCHS, so in each row write `cont`.
+
+6. **recTo:** Since this is a continuous variable, the first row (the main "category") should have `copy` written. For the not applicable row, write `N/A`. For the missing and else rows, write `NA`.
+
+7. **numValidCat:** Since this is a continuous variable, there are no actual categories; so write `N/A` in each row.
+
+8. **catLabel:** For the first row, write `BMI`. Not applicable row write `not applicable`. Missing row: `missing`. Else row: `else`
+
+9. **catLabelLong:** For the first row, write `body mass index` to give further detail on what BMI is. The other rows can remain the same. For the other variables, more detail can be written as necessary.
+
+10. **units:** BMI is measured in kg/m^2^, so write `kg/m2` in each row. 
+
+11. **recFrom:** Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row should be written as `11.91:57.9`. In each CCHS survey, not applicable was coded as 999.96 so the recFrom for this row would be `999.96:999.96`. Similarly, in each CCHS survey don't know was coded as 999.97, refusal was coded as 999.98, and not stated was coded as 999.99. Therefore the recFrom for the missing row would be `999.97:999.99`. For the else row, just write `else`.
+
+12. **variableStartShortLabel:** Writing `BMI` for each row would be sufficient for this variable.
+
+13. **variableStartLabel:** As per CCHS documentation, the label for this variable is `BMI / self-report - (D,G)`. This indicates that this variable pertains to self reported BMI.
+
+14. **notes: ** In the 2001 CCHS survey, this variable was restricted to participants aged 20-64. This can be noted in the first row. As well, don't know (999.97) and refusal (999.98) were not asked in this survey. This can be noted in the missing row.
+
+## Creating the variablesCCHSFlow worksheet
 
