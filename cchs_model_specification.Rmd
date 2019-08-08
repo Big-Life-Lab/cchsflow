@@ -82,7 +82,7 @@ The following are the columns needed to be specified in order for the function t
 
 ####Rows
 
-* There should 4 rows, 1 for the continuous "category", 1 for not applicable, 1 for missing, and 1 for else
+* There should be 4 rows, 1 for the continuous "category", 1 for not applicable, 1 for missing, and 1 for else. However, CCHS 2001 and 2003 code not applicable and the missing categories differently from other cycles so two extra rows will be created to account for this. In many instances there are changes in how variable categories are coded between CCHS cycles. But since the overall variable structure remains intact, extra rows can be used to help rectify this issue to make sure all values feed into the newly transformed variable.
 
 ####Columns
 
@@ -90,33 +90,41 @@ The following are the columns needed to be specified in order for the function t
 
 2. **toType:** BMI was captured in the CCHS as a continuous variable. It does not make much sense to transform it into a categorical variable, so the the toType should be `cont` in each row.
 
-3. **databaseStart:** BMI was captured in all CCHS surveys between 2001 and 2014, so in each row, the CCHS identifers will be listed this column:
+3. **databaseStart:** BMI was captured in all CCHS surveys between 2001 and 2014, so in the first row with the continuous "category", the CCHS identifers will be listed this column:
 
       `cchs-82M0013-E-2001-c1-1-general-file, cchs-82M0013-E-2003-c2-1-General File, cchs-82M0013-E-2005-c3-1-main-file, cchs-E-2007-2008-AnnualComponent, CCHS-82M0013-E-2009-2010-Annualcomponent, CCHS-82M0013-E-2010-AnnualComponent, cchs-82M0013-E-2011-2012-Annual-component, cchs-82M0013-E-2012-Annual-component, cchs-82M0013-E-2013-2014-Annual-component, cchs-82M0013-E-2014-Annual-component`
+      
++ This should also be written in the else row.
 
-4. **variableStart:** In the 2001, 2003, and 2005 CCHS surveys the BMI variable differs from the common name, while in the CCHS surveys from 2007-2014, the BMI variable is the same as the common name. Therefore for each row, the variableStart column will look like this:
++ For the not applicable and missing rows that pertain to the 2001 and 2003 CCHS surveys, only write the 2001 and 2003 identifiers in this column; for the not applicable and missing rows that pertain to the 2005 CCHS survey and onwards, write the identifiers for CCHS 2005 onwards.
+
+4. **variableStart:** In the 2001, 2003, and 2005 CCHS surveys the BMI variable differs from the common name, while in the CCHS surveys from 2007-2014, the BMI variable is the same as the common name. Therefore for the first & else rows, the variableStart column will look like this:
 
       `cchs-82M0013-E-2001-c1-1-general-file::HWTAGBMI, cchs-82M0013-E-2003-c2-1-General File::HWTCGBMI,     cchs-82M0013-E-2005-c3-1-main-file::HWTEGBMI, [HWTGBMI]`
+      
++ For the not applicable and missing rows that pertain to the 2001 and 2003 CCHS surveys, write in this row `cchs-82M0013-E-2001-c1-1-general-file::HWTAGBMI, cchs-82M0013-E-2003-c2-1-General File::HWTCGBMI`
+
++ For the not applicable and missing rows that pertain to the 2005 CCHS surveys onwards, write in this row `cchs-82M0013-E-2005-c3-1-main-file::HWTEGBMI, [HWTGBMI]`
 
 5. **fromType:** As mentioned previously, BMI was measured as a continuous variable in the CCHS, so in each row write `cont`.
 
-6. **recTo:** Since this is a continuous variable, the first row (the main "category") should have `copy` written. For the not applicable row, write `N/A`. For the missing and else rows, write `NA`.
+6. **recTo:** Since this is a continuous variable, the first row (the main "category") should have `copy` written. For the not applicable rows, write `N/A`. For the missing and else rows, write `NA`.
 
 7. **numValidCat:** Since this is a continuous variable, there are no actual categories; so write `N/A` in each row.
 
-8. **catLabel:** For the first row, write `BMI`. Not applicable row write `not applicable`. Missing row: `missing`. Else row: `else`
+8. **catLabel:** For the first row, write `BMI`. Not applicable rows write `not applicable`. Missing rows: `missing`. Else row: `else`
 
 9. **catLabelLong:** For the first row, write `body mass index` to give further detail on what BMI is. The other rows can remain the same. For the other variables, more detail can be written as necessary.
 
 10. **units:** BMI is measured in kg/m^2^, so write `kg/m2` in each row. 
 
-11. **recFrom:** Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row should be written as `11.91:57.9`. In each CCHS survey, not applicable was coded as 999.96 so the recFrom for this row would be `999.96:999.96`. Similarly, in each CCHS survey don't know was coded as 999.97, refusal was coded as 999.98, and not stated was coded as 999.99. Therefore the recFrom for the missing row would be `999.97:999.99`. For the else row, just write `else`.
+11. **recFrom:** Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row should be written as `11.91:57.9`. In the 2001 and 2003 CCHS surveys not applicable was coded as 999.6 so the recFrom for this row would be `999.6:999.6`. Similarly, in the 2001 and 2003 CCHS surveys don't know was coded as 999.7, refusal was coded as 999.8, and not stated was coded as 999.9. Therefore the recFrom for the missing row for CCHS 2001 and 2003 would be `999.7:999.9`. In the not applicable row for the 2005 CCHS survey onwards, the recFrom is `999.96:999.96`. In the missing row for CCHS 2005 onwards, the recFrom is `999.97:999.99`. For the else row, just write `else`.
 
 12. **variableStartShortLabel:** Writing `BMI` for each row would be sufficient for this variable.
 
 13. **variableStartLabel:** As per CCHS documentation, the label for this variable is `BMI / self-report - (D,G)`. This indicates that this variable pertains to self reported BMI.
 
-14. **notes: ** In the 2001 CCHS survey, this variable was restricted to participants aged 20-64. This can be noted in the first row. As well, don't know (999.97) and refusal (999.98) were not asked in this survey. This can be noted in the missing row.
+14. **notes: ** As described previously, there are significant differences between CCHS surveys with regards to coding the not applicable and missing categories. These should be documented in this section. Aside from this, there are other changes and differences that should also be documented. In the 2001 CCHS survey, this variable was restricted to participants aged 20-64. As well, don't know (999.97) and refusal (999.98) were not asked in this survey.
 
 ## Creating the variablesCCHSFlow worksheet
 
