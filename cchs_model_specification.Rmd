@@ -120,7 +120,7 @@ The following are the columns needed to be specified in order for the function t
 
 ## Creating the variablesCCHSFlow worksheet
 
-The **variablesCCHSFlow** worksheet lists all the variables that have been used in the transformations between the CCHS surveys from 2001 to 2014. Each variable will have its own row. In each row there are 7 columns in this worksheet and they are as follows:
+The **variablesCCHSFlow** worksheet lists all the variables that have been transformed in the **cchsVariableDetails** worksheet. Each variable will have its own row. In each row there are 7 columns in this worksheet and they are as follows:
 
 1. **variable:** the name of the final transformed variable.
 
