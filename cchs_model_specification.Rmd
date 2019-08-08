@@ -1,6 +1,6 @@
 ---
 title: "1 - Specifying the variables to be transformed"
-date: 'Last updated: 2019-08-07'
+date: 'Last updated: 2019-08-08'
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1 - Specifying your model}     
@@ -24,7 +24,7 @@ The Model Specification Workbook (MSW) is a series of worksheets (CSV files) tha
 2) `variablesCCHSFlow` --- information on transformed variables, including labels, section, variable type, and units.
 
 ## Creating the cchsVariableDetails worksheet
-The `cchsVariableDetails` worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `recode-with-table` function to harmonize CCHS variables between surveys. The `recode-with-table` function will use this worksheet to transform variable. The two components of this worksheets are the **rows** and the **columns.**
+The **cchsVariableDetails** worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `recode-with-table` function to harmonize CCHS variables between surveys. The `recode-with-table` function will use this worksheet to transform variable. The two components of this worksheets are the **rows** and the **columns.**
 
 ###Rows
 Each unique variable will have its own row. Furthermore, each distinct category in a unique variable will have its own row. The only exception to this rule are the "don't know", "refusal", and "not stated" categories, which are lumped together as a single category named as missing. For each unique variable, an else row will also be added to account for improperly coded values.
@@ -80,11 +80,11 @@ The following are the columns needed to be specified in order for the function t
 
 ###Example: Body mass index (BMI)
 
-Rows
+####Rows
 
 * There should 4 rows, 1 for the continuous "category", 1 for not applicable, 1 for missing, and 1 for else
 
-Columns
+####Columns
 
 1. **variable:** the most common variable name for BMI is `HWTGBMI`. This should be written for each row.
 
@@ -120,3 +120,18 @@ Columns
 
 ## Creating the variablesCCHSFlow worksheet
 
+The **variablesCCHSFlow** worksheet lists all the variables that have been used in the transformations between the CCHS surveys from 2001 to 2014. Each variable will have its own row. In each row there are 7 columns in this worksheet and they are as follows:
+
+1. **variable:** the name of the final transformed variable.
+
+2. **label:** the shorthand label for the variable.
+
+3. **labelLong:** a more detailed label for the variable.
+
+4. **section:** the section where this variable could be found (i.e. demographic, health behaviour, chronic diseases).
+
+5. **subject:** what the variable pertains to (i.e. age, smoking, sex).
+
+6. **variableType:** whether the final variable is categorical or continuous.
+
+7. **units:** any units for the final variable.
