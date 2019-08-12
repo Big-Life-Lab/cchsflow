@@ -94,5 +94,5 @@ combinedAge_cont <- rbind(age2001_cont, age2013_cont)
 print(combinedAge_cont)
 ```
 
-With this option, you combine all CCHS cycles into a single dataset.
+With this option, you can combine all CCHS cycles into a single dataset.
 
