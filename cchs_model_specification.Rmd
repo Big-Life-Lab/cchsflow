@@ -1,6 +1,6 @@
 ---
-title: "1 - Specifying the variables to be transformed"
-date: 'Last updated: 2019-08-08'
+title: "The MSW worksheets used in cchsFlow and how to contribute to them"
+date: 'Last updated: 2019-08-12'
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1 - Specifying your model}     
@@ -19,15 +19,15 @@ knitr::opts_chunk$set(
 The Model Specification Workbook (MSW) is a series of worksheets (CSV files) that describe different model components. The MSW is used to specify the model to transform and harmonize CCHS variables between surveys.
 
 
-## **Two worksheets in the Model Specification Workbook**
+## **Two worksheets in the Model Specification Workbook for cchsFlow**
 1) `cchsVariableDetails` --- information on factors (categories) and how to transform final variables from their starting variables. 
 2) `variablesCCHSFlow` --- information on transformed variables, including labels, section, variable type, and units.
 
-## Creating the cchsVariableDetails worksheet
-The **cchsVariableDetails** worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `recode-with-table` function to harmonize CCHS variables between surveys. The `recode-with-table` function will use this worksheet to transform variable. The two components of this worksheets are the **rows** and the **columns.**
+##cchsVariableDetails worksheet
+The **cchsVariableDetails** worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `recode-with-table` function to harmonize CCHS variables between surveys. The `recode-with-table` function will be used in this worksheet to transform variable. The two components of this worksheets are the **rows** and the **columns.**
 
 ###Rows
-Each unique variable will have its own row. Furthermore, each distinct category in a unique variable will have its own row. The only exception to this rule are the "don't know", "refusal", and "not stated" categories, which are lumped together as a single category named as missing. For each unique variable, an else row will also be added to account for improperly coded values.
+Each unique variable will have its own row. Furthermore, each distinct category in a unique variable will have its own row. The only exception to this rule are the "don't know", "refusal", and "not stated" categories, which are lumped together as a single category named as missing. For each unique variable, an else row will also be added to account for improperly coded values. If a variable changes significantly between CCHS surveys (different categories), we recommend creating separate variables. 
 
 If a categorical variable has 4 distinct categories, along with a not applicable category and the 3 missing categories, there will be 7 rows: 
 
@@ -126,7 +126,7 @@ The following are the columns needed to be specified in order for the function t
 
 14. **notes: ** As described previously, there are significant differences between CCHS surveys with regards to coding the not applicable and missing categories. These should be documented in this section. Aside from this, there are other changes and differences that should also be documented. In the 2001 CCHS survey, this variable was restricted to participants aged 20-64. As well, don't know (999.97) and refusal (999.98) were not asked in this survey.
 
-## Creating the variablesCCHSFlow worksheet
+## How to create the variablesCCHSFlow worksheet
 
 The **variablesCCHSFlow** worksheet lists all the variables that have been transformed in the **cchsVariableDetails** worksheet. Each variable will have its own row. In each row there are 7 columns in this worksheet and they are as follows:
 
