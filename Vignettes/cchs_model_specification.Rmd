@@ -24,7 +24,22 @@ At the heart of `cchsflow` are  worksheets (CSV files) that describe how to tran
 
 ## `variablesCCHSFlow` (Suggest renaming this to `variables.csv`). 
 
+Read `variables.csv`
 
+```{r Read variables.csv, echo=FALSE, message=FALSE}
+library(readr)
+dt <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
+
+cat("There are", nrow(dt), "variables, grouped in", sum(!duplicated(dt$subject)), "subjects and ", sum(!duplicated(dt$section)), "sections that can be available for transformation in CCHS cycles from 2001 to 2013.", "\n\n")
+
+```
+
+You can search for variables in the following table:
+
+```{r echo=FALSE, results='asis'}
+library(DT)
+datatable(variables, options = list(pageLength = 5))
+```
 
 ## cchsVariableDetails worksheet
 The **cchsVariableDetails** worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `recode-with-table` function to harmonize CCHS variables between surveys. The `recode-with-table` function will be used in this worksheet to transform variable. The two components of this worksheets are the **rows** and the **columns.**
