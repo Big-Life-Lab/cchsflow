@@ -1,5 +1,5 @@
 ---
-title: "How to use the cchsFlow package to transform CCHS variables"
+title: "Transform CCHS variables"
 author: "Warsame Yusuf"
 date: 'Last updated: 2019-08-14'
 output: rmarkdown::html_vignette

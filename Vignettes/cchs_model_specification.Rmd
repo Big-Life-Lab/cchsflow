@@ -1,5 +1,5 @@
 ---
-title: "The MSW worksheets used in cchsFlow and how to contribute to them"
+title: "Variable worksheets"
 date: 'Last updated: 2019-08-12'
 output: rmarkdown::html_vignette
 vignette: >
@@ -16,17 +16,20 @@ knitr::opts_chunk$set(
 ```
 
 ## **Introduction**
-The Model Specification Workbook (MSW) is a series of worksheets (CSV files) that describe different model components. The MSW is used to specify the model to transform and harmonize CCHS variables between surveys.
+At the heart of `cchsflow` are  worksheets (CSV files) that describe how to transform variables different CCHS cycles into common variables. The following describes how the worksheets are organized. See `Tranform CCHS variables` for examples of how to use the worksheeets with the `bllflow` pabckage to transform variables.
+
+## **Two worksheets in cchsFlow**
+1) `variablesCCHSFlow` --- a list of all variable transformation that are currently included in `cchsflow`. Also included labels, sections (groups of variables in common themes), variable type, and units.
+2) `cchsVariableDetails` --- details of all variables that are transformed. Included is information on factors (categories) for all variables for all CCHS cycles from 2001 to 2013. Also included are factor labels for both the new transformed variable and also the original variables. Notes are included when variables cannot be easily combined together because categories are not identical between surveys. 
+
+## `variablesCCHSFlow` (Suggest renaming this to `variables.csv`). 
 
 
-## **Two worksheets in the Model Specification Workbook for cchsFlow**
-1) `cchsVariableDetails` --- information on factors (categories) and how to transform final variables from their starting variables. 
-2) `variablesCCHSFlow` --- information on transformed variables, including labels, section, variable type, and units.
 
-##cchsVariableDetails worksheet
+## cchsVariableDetails worksheet
 The **cchsVariableDetails** worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `recode-with-table` function to harmonize CCHS variables between surveys. The `recode-with-table` function will be used in this worksheet to transform variable. The two components of this worksheets are the **rows** and the **columns.**
 
-###Rows
+### Rows
 Each unique variable will have its own row. Furthermore, each distinct category in a unique variable will have its own row. The only exception to this rule are the "don't know", "refusal", and "not stated" categories, which are lumped together as a single category named as missing. For each unique variable, an else row will also be added to account for improperly coded values. If a variable changes significantly between CCHS surveys (different categories), we recommend creating separate variables. 
 
 If a categorical variable has 4 distinct categories, along with a not applicable category and the 3 missing categories, there will be 7 rows: 
@@ -78,13 +81,13 @@ The following are the columns needed to be specified in order for the function t
 
 14. **notes: **any relevant notes to inform the user running the `recode-with-table` function. Things to include here would be changes in wording between CCHS surveys, missing/changes in categories, and changes in variable type between CCHS surveys.
 
-###Example: Body mass index (BMI)
+### Example: Body mass index (BMI)
 
-####Rows
+#### Rows
 
 * There should be 4 rows, 1 for the continuous "category", 1 for not applicable, 1 for missing, and 1 for else. However, CCHS 2001 and 2003 code not applicable and the missing categories differently from other cycles so two extra rows will be created to account for this. In many instances there are changes in how variable categories are coded between CCHS cycles. But since the overall variable structure remains intact, extra rows can be used to help rectify this issue to make sure all values feed into the newly transformed variable.
 
-####Columns
+#### Columns
 
 1. **variable:** the most common variable name for BMI is `HWTGBMI`. This should be written for each row.
 
