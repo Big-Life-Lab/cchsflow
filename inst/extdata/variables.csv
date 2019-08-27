@@ -115,7 +115,3 @@ SMKG01C_cont,agec1,Age smoked first cigarette,health behaviour,Smoking,Continuou
 SMKG207_A,agecigd,Age started to smoke daily,health behaviour,Smoking,Categorical,Years
 SMKG207_B,agecigd,Age started to smoke daily,health behaviour,Smoking,Categorical,Years
 SMKG207_cont,agecigd,Age started to smoke daily,health behaviour,Smoking,Continuous,Years
-,,,,,,
-,,,,,,
-Categorical,92,,,,,
-Continuous,24,,,,,
