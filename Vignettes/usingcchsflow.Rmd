@@ -1,7 +1,6 @@
 ---
 title: "Transform CCHS variables"
-author: "Warsame Yusuf"
-date: 'Last updated: 2019-08-14'
+date: 'Last updated: 2019-08-27'
 output: rmarkdown::html_vignette
 ---
 
@@ -12,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Getting Started
 ### Loading the necessary packages
 
-The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://bllflow.projectbiglife.ca/index.html) package. You must install & load the package onto your environment in order to do any transformations. To be able to combine datasets with minimal issues, we recommend using the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package. 
+The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://bllflow.projectbiglife.ca/index.html) package. `RecWTable` is used to transform CCHS variables to a common name, while `SetDataLabels` reapplies labels that are lost during the transformation process. You must install & load the package onto your environment in order to do any transformations. To be able to combine datasets with minimal issues, we recommend using the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package. 
 
 ```{r results = 'hide', message = FALSE, warning =FALSE}
 library(bllflow)
@@ -25,13 +24,13 @@ library(DT)
 ```
 
 ## Steps
-### Step 1. Loading the CCHS datasets, `variables.csv`, and `variableDetails.csv`
+### Step 1. Loading the CCHS datasets, variables.csv, and variableDetails.csv
 
-You will need to load the variable details worksheet and the CCHS datasets before you are able to do any transformations. Since CCHS datasets cannot be shared publicly, we will create mock CCHS datasets for the years 2001 and 2013 which will be used in examples later on. 
+You will need to load the CCHS datasets as well as the two variable worksheets before you are able to do any transformations. Since CCHS datasets cannot be shared publicly, we will create mock CCHS datasets for the years 2001 and 2013 which will be used in examples later on. 
 
 ```{r}
 varSheet <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
-varDetails <- read.csv("~/Documents/Masters/Research project/Git files BLL/PoRT MSW - cchsVariableDetails.csv")
+varDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
 cchsMock2001 <- data.frame(DHHA_SEX = c(2, 1, 1, 6), DHHAGAGE = c(3, 4, 6, 6), FVCADTOT = c(12, 4, 20, 9))
 cchsMock2013 <- data.frame(DHH_SEX = c(1, 2, 1), DHHGAGE = c(2, 1, 1), FVCDTOT = c(25, 15, 6))
 ```
@@ -41,13 +40,24 @@ cchsMock2013 <- data.frame(DHH_SEX = c(1, 2, 1), DHHGAGE = c(2, 1, 1), FVCDTOT =
 To call the `RecWTable` function to transform the variables of a CCHS dataset:
 
 1. Create a name for your transformed dataset (e.g. cchsYear1)
-2. Indicate the database of the CCHS dataset
-3. Indicate the names of `variables.csv` and `variableDetails.csv`
-4. Indicate the full name of the CCHS dataset (this can be found in the data documentation of the CCHS dataset)
+2. Indicate the database of the CCHS dataset in the `dataSource` argument
+3. Indicate the name of `variableDetails.csv` in the `variableDetails` argument
+4. Indicate the full name of the CCHS dataset (this can be found in the data documentation of the CCHS dataset) in the `datasetName` argument.
 
 Your R command when calling the function should look like this:
 
-`cchsTransformedYear1 <- RecWTable(dataSource = cchsYear, variableDetails = varDetails, datasetName = "cchs-Year1-general-file", log = TRUE, variables = varSheet)`
+`cchsTransformedYear1 <- RecWTable(dataSource = cchsYear, variableDetails = varDetails, datasetName = "cchs-Year1-general-file")`
+
+### Default arguments
+
+With `RecWTable` there are also default arguments that do not need to be called unless you would like to modify them.
+
+  + `elseValue` is set to NA. Else values (values out of range) will be set to NA.
+  + `appendToData` is set to FALSE. Transformed variables will not be appended to the original CCHS dataset.
+  + `log` is set to FALSE. Logs of the variable tranformations will not be displayed. 
+  + `printNote` is set to TRUE. Any information in the Notes column from `variableDetails.csv` will be displayed
+  + `variables` is set to NULL. This argument can be used to add labels to the transformed dataset by setting it to the name of `variables.csv` or by specifying particular variables from `variables.csv` to transform.
+  + `varLabels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`.
 
 ### Step 3. Combining transformed datasets into a single dataset 
 
@@ -57,7 +67,7 @@ Use the `bind_rows` function to combine datasets and create a new dataset name
 
 ### Step 4. Labelling your final dataset
 
-Use the `SetDataLabels` function to label the variables in your final combined dataset.
+Use the `SetDataLabels` function to label the variables in your final dataset.
 
 `labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)`
 
@@ -66,11 +76,10 @@ Using the steps outlined above, below are examples of how to transform CCHS vari
 
 ### Example 1. Transforming a single variable from a single database
 
-Along with transforming entire CCHS datasets, `RecWTable` can also transform a single variable or multiple variables. This example shows how the sex variable in the 2001 CCHS cycle is transformed.
+In this example, the sex variable in the 2001 CCHS cycle is transformed.
 
 ```{r, warning=FALSE}
 sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", appendToData = FALSE, log = TRUE, variables = c("DHH_SEX"), varLabels = c(DHH_SEX = "Sex"))
-#View(sex2001)
 datatable(sex2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
@@ -87,9 +96,8 @@ datatable(sex2013, options = list(columnDefs = list(list(className = 'dt-center'
 
 combinedSex <- bind_rows(sex2001, sex2013)
 labelledCombinedSex <- SetDataLabels(dataToLabel = combinedSex, variableDetails = varDetails, variablesSheet = varSheet)
-datatable(combinedSex, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
+datatable(labelledCombinedSex, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
-
 
 ### Example 3. Transforming a single variable from multiple databases that changes categories between cycles.
 
@@ -100,10 +108,10 @@ There are many variables in the CCHS that changes in categories between cycles, 
 The grouped age variable has been transformed into two grouped age variables. `DHHGAGE_A` is the grouped age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the grouped age variable for CCHS cycles 2005-2014.
 
 ```{r, warning=FALSE}
-age2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", appendToData = FALSE, log = TRUE, variables = c("DHHGAGE_A"), varLabels = c(DHHGAGE_A = "Age"))
+age2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHHGAGE_A"), varLabels = c(DHHGAGE_A = "Age"))
 datatable(age2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 
-age2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", appendToData = FALSE, log = TRUE, variables = c("DHHGAGE_B"), varLabels = c(DHHGAGE_B = "Age"))
+age2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", log = TRUE, variables = c("DHHGAGE_B"), varLabels = c(DHHGAGE_B = "Age"))
 datatable(age2013, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
@@ -114,14 +122,15 @@ With this option, you cannot combine `DHHGAGE_A` and `DHHGAGE_B` into a single d
 The grouped age variable has also been transformed into a single continuous age variable which takes the midpoint of each category for all CCHS cycles.
 
 ```{r, warning=FALSE}
-age2001_cont <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", appendToData = FALSE, log = TRUE, variables = c("DHHGAGE_cont"))
+age2001_cont <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHHGAGE_cont"), varLabels = c(DHHGAGE_cont = "Age"))
 datatable(age2001_cont, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 
-age2013_cont <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", appendToData = FALSE, log = TRUE, variables = c("DHHGAGE_cont"))
+age2013_cont <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", log = TRUE, variables = c("DHHGAGE_cont"), varLabels = c(DHHGAGE_cont = "Age"))
 datatable(age2013_cont, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 
 combinedAge_cont <- bind_rows(age2001_cont, age2013_cont)
-datatable(combinedAge_cont, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
+labelledCombinedAge_cont <- SetDataLabels(dataToLabel = combinedAge_cont, variableDetails = varDetails, variablesSheet = varSheet)
+datatable(labelledCombinedAge_cont, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
 With this option, you can combine all CCHS cycles into a single dataset.
@@ -131,28 +140,31 @@ With this option, you can combine all CCHS cycles into a single dataset.
 The variables argument in `RecWTable` is able to handle multiple variables to be transformed from a CCHS dataset. In this example, the age and sex variables from the 2001 and 2013 CCHS datasets will be transformed and combined into a single dataset.
 
 ```{r, warning=FALSE}
-agesex_2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", appendToData = FALSE, log = TRUE, variables = c("DHHGAGE_cont", "DHH_SEX"))
+agesex_2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHHGAGE_cont", "DHH_SEX"), varLabels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
 datatable(agesex_2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:2)), dom = 't'))
 
-agesex_2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", appendToData = FALSE, log = TRUE, variables = c("DHHGAGE_cont", "DHH_SEX"))
+agesex_2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", log = TRUE, variables = c("DHHGAGE_cont", "DHH_SEX"), varLabels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
 datatable(agesex_2013, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:2)), dom = 't'))
 
 combinedAgeSex <- bind_rows(agesex_2001, agesex_2013)
-datatable(combinedAgeSex, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:2)), dom = 't'))
+labelledCombinedAgeSex <- SetDataLabels(dataToLabel = combinedAgeSex, variableDetails = varDetails, variablesSheet = varSheet)
+datatable(labelledCombinedAgeSex, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:2)), dom = 't'))
 ```
 
 ### Example 5. Transforming all variables in the variable details sheet
 
-If the variables argument in `RecWTable` is not specified, it will transform all the variables listed in the variable details sheet. In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed and combined.
+If the variables argument in `RecWTable` is not specified, it will transform all the variables listed in `varDetails.csv`. In the transformed dataset In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
 
 ```{r, warning=FALSE}
-transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", appendToData = FALSE, log = TRUE)
+transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE)
 datatable(transformed2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:4)), dom = 't'))
 
-transformed2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", appendToData = FALSE, log = TRUE)
+transformed2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", log = TRUE)
 datatable(transformed2013, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:4)), dom = 't'))
 
 combinedCCHS <- bind_rows(transformed2001, transformed2013)
-datatable(combinedCCHS, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:5)), dom = 't'))
+#labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)
+#datatable(combinedCCHS, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:5)), dom = 't'))
 ```
+
 
