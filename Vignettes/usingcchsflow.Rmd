@@ -79,7 +79,7 @@ Using the steps outlined above, below are examples of how to transform CCHS vari
 In this example, the sex variable in the 2001 CCHS cycle is transformed.
 
 ```{r, warning=FALSE}
-sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", appendToData = FALSE, log = TRUE, variables = c("DHH_SEX"), varLabels = c(DHH_SEX = "Sex"))
+sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHH_SEX"), varLabels = c(DHH_SEX = "Sex"))
 datatable(sex2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
@@ -153,7 +153,7 @@ datatable(labelledCombinedAgeSex, options = list(columnDefs = list(list(classNam
 
 ### Example 5. Transforming all variables in the variable details sheet
 
-If the variables argument in `RecWTable` is not specified, it will transform all the variables listed in `varDetails.csv`. In the transformed dataset In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
+If the variables argument in `RecWTable` is not specified, it will transform all the variables listed in `variables.csv` and `varDetails.csv`. In the transformed dataset In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
 
 ```{r, warning=FALSE}
 transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE)
@@ -163,8 +163,14 @@ transformed2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDet
 datatable(transformed2013, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:4)), dom = 't'))
 
 combinedCCHS <- bind_rows(transformed2001, transformed2013)
-#labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)
-#datatable(combinedCCHS, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:5)), dom = 't'))
+labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)
+datatable(combinedCCHS, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:5)), dom = 't'))
 ```
 
+### Warning messages.
 
+When the variables in your dataset do not match the variables in your two worksheets, warning messages will appear. In our example, our mock CCHS datasets only contain a handful of variables from `variables.csv` and `varDetails.csv`. As such, warning messages about variables not included in our datasets will be printed. 
+
+```{r, echo=FALSE, results="hide", warning=2}
+transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE)
+```

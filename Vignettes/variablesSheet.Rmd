@@ -1,0 +1,61 @@
+---
+title: "Variables worksheet"
+date: 'Last updated: 2019-08-30'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1 - Specifying your model}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## **Introduction**
+At the heart of `cchsflow` are worksheets (CSV files) that describe how to transform variables different CCHS cycles into common variables. The following describes how the worksheets are organized. See `Transform CCHS variables` for examples of how to use the worksheeets with the `bllflow` pabckage to transform variables.
+
+## **Two worksheets in cchsFlow**
+1) `variables.csv` --- a list of all variable transformation that are currently included in `cchsflow`. Also included labels, sections (groups of variables in common themes), variable type, and units.
+2) `variableDetails.csv` --- details of all variables that are transformed. Included is information on factors (categories) for all variables for all CCHS cycles from 2001 to 2013. Also included are factor labels for both the new transformed variable and also the original variables. Notes are included when variables cannot be easily combined together because categories are not identical between surveys. 
+
+## `variables.csv` 
+
+Read `variables.csv`
+
+```{r Read variables.csv, echo=FALSE, message=FALSE, warning=FALSE}
+library(readr)
+variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
+
+cat("There are", nrow(variables), "variables, grouped in", sum(!duplicated(variables$subject)), "subjects and", sum(!duplicated(variables$section)), "sections that can be available for transformation in CCHS cycles from 2001 to 2014.", "\n\n")
+
+```
+
+You can search for variables in the following table:
+
+```{r echo=FALSE, results='asis', warning=FALSE}
+library(DT)
+datatable(variables, options = list(pageLength = 5))
+```
+
+
+## How to contribute to the worksheet
+
+In each row there are 7 columns in this worksheet and they are as follows:
+
+1. **variable:** the name of the final transformed variable.
+
+2. **label:** the shorthand label for the variable.
+
+3. **labelLong:** a more detailed label for the variable.
+
+4. **section:** the section where this variable could be found (i.e. demographic, health behaviour, chronic diseases).
+
+5. **subject:** what the variable pertains to (i.e. age, smoking, sex).
+
+6. **variableType:** whether the final variable is categorical or continuous.
+
+7. **units:** any units for the final variable.
