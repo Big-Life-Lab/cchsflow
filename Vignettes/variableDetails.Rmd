@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ## `variableDetails.csv`
-The **variableDetails** worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `RecWTable` function of the `bllflow` package to harmonize CCHS variables between surveys. The two components of this worksheets are the **rows** and the **columns.**
+The **variableDetails** worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `RecWTable` function of the `bllflow` package to harmonize CCHS variables between cycles. The two components of this worksheets are the **rows** and the **columns.**
 
 ```{r Read variables.csv, echo=FALSE, message=FALSE, warning=FALSE}
 library(readr)
@@ -38,7 +38,7 @@ If a categorical variable has 4 distinct categories, along with a not applicable
 + 1 else row.
 
 ### Columns
-The following are the columns needed to be specified in order for the function to be operational:
+The following are the columns that are listed in `variableDetails.csv`. Many of these columns need to be specified in order for `RecWTable` to be functional:
 
 1. **variable:** the name of the final transformed variable of between all CCHS cycles. In `variableDetails.csv`, we have designated the variable names used in CCHS cycles from 2007 to 2014 as the final transformed variable name.
 
@@ -46,7 +46,7 @@ The following are the columns needed to be specified in order for the function t
 library(DT)
 datatable(varDetails, filter = 'top', options=list(columnDefs = list(list(visible=FALSE, targets=c(2:16)), list(className = 'dt-center', targets = 0:1)), pageLength = 5))
 ```
-2. **dummyVariable:** the dummy variable for each category in a transformed categorical variable. This is only applicable for categorical variables; for continuous variables it is set as `N/A`. The name of a dummy variable consists of the final variable name, the number of categories in the variable, and the category level for each category.
+2. **dummyVariable:** the dummy variable for each category in a transformed categorical variable. This is only applicable for categorical variables; for continuous variables it is set as `N/A`. The name of a dummy variable consists of the final variable name, the number of categories in the variable, and the category level for each category. Note that this column is not necessary for `RecWTable`.
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
@@ -94,7 +94,7 @@ datatable(varDetails, options=list(columnDefs = list(list(visible=FALSE, targets
 
 + For categorical variables that are not changing variable types (i.e. cat to cat), it is ideal to retain the same values as indicated in each CCHS survey. But for transformed categorical variables that have changed in type (i.e cat to cont), you will have to develop values that make the most sense to your analysis. In `variableDetails.csv`, variables that have gone from cat to cont have used midpoints of each category.
 
-8. **numValidCat:** the number of categories a variable has. This only applies to variables in which the **toType** is cat. For continuous variables, write `N/A`. Not applicable, missing, and else categories are not included in the category count.
+8. **numValidCat:** the number of categories a variable has. This only applies to variables in which the **toType** is cat. For continuous variables, write `N/A`. Not applicable, missing, and else categories are not included in the category count. Note that this column is not necessary for `RecWTable`.
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
@@ -108,7 +108,7 @@ library(DT)
 datatable(varDetails, options=list(columnDefs = list(list(visible=FALSE, targets=c(10:16)), list(className = 'dt-center', targets = 0:9)), pageLength = 5, scrollX = TRUE))
 ```
 
-10. **catLabelLong:** more detailed label describing the category of a particular variable. This label should be identical to what is shown in the CCHS data documentation.
+10. **catLabelLong:** more detailed label describing the category of a particular variable. This label should be identical to what is shown in the CCHS data documentation, unless you are creating derived variables and would like to create your own label for it.
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
@@ -181,7 +181,7 @@ library(DT)
 datatable(varDetails[c(338:343), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(3:16)), list(className = 'dt-center', targets = 0:2)), dom = 't'))
 ```
 
-3. **toType:** BMI was captured in the CCHS as a continuous variable. It does not make much sense to transform it into a categorical variable, so the the toType should be `cont` in each row.
+3. **toType:** BMI was captured in the CCHS as a continuous variable. It does not make much sense to transform it into a categorical variable, so the toType should be `cont` in each row of BMI.
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
@@ -223,7 +223,7 @@ library(DT)
 datatable(varDetails[c(341:342), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(6:16)), list(className = 'dt-center', targets = 0:5)), dom = 't'))
 ```
 
-6. **fromType:** As mentioned previously, BMI was measured as a continuous variable in the CCHS, so in each row `cont` is written.
+6. **fromType:** As mentioned previously, BMI was measured as a continuous variable in the CCHS, so the fromType should be `cont` in each row of BMI.
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)

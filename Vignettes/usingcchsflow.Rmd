@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Getting Started
 ### Loading the necessary packages
 
-The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://bllflow.projectbiglife.ca/index.html) package. `RecWTable` is used to transform CCHS variables to a common name, while `SetDataLabels` reapplies labels that are lost during the transformation process. You must install & load the package onto your environment in order to do any transformations. To be able to combine datasets with minimal issues, we recommend using the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package. 
+The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://bllflow.projectbiglife.ca/index.html) package. `RecWTable` is used to transform CCHS variables to a common name, while `SetDataLabels` reapplies labels that are lost during the combination process after transforming each CCHS dataset. You must install & load the package onto your environment in order to do any transformations. To be able to combine datasets with minimal issues, we recommend using the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package. 
 
 ```{r results = 'hide', message = FALSE, warning =FALSE}
 library(bllflow)
@@ -57,11 +57,11 @@ With `RecWTable` there are also default arguments that do not need to be called 
   + `log` is set to FALSE. Logs of the variable tranformations will not be displayed. 
   + `printNote` is set to TRUE. Any information in the Notes column from `variableDetails.csv` will be displayed
   + `variables` is set to NULL. This argument can be used to add labels to the transformed dataset by setting it to the name of `variables.csv` or by specifying particular variables from `variables.csv` to transform.
-  + `varLabels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`.
+  + `varLabels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`. The format to add labels to a subset of variables is `c(variable = "Label")`.
 
 ### Step 3. Combining transformed datasets into a single dataset 
 
-Use the `bind_rows` function to combine datasets and create a new dataset name 
+Use the `bind_rows` function to combine datasets and create a new dataset name. NOTE: `bind_rows` along with other R functions will likely remove labels in your newly combined dataset. Step 4 explains how to add labels to your final dataset. 
 
 `combinedCCHS <- bind_rows(cchsTransformedYear1, cchsTransformedYear2, ...)`
 
@@ -72,7 +72,7 @@ Use the `SetDataLabels` function to label the variables in your final dataset.
 `labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)`
 
 ## Examples
-Using the steps outlined above, below are examples of how to transform CCHS variables in multiple scenarios:
+Using the steps outlined above, here are examples of how to transform CCHS variables in multiple scenarios:
 
 ### Example 1. Transforming a single variable from a single database
 
@@ -101,11 +101,11 @@ datatable(labelledCombinedSex, options = list(columnDefs = list(list(className =
 
 ### Example 3. Transforming a single variable from multiple databases that changes categories between cycles.
 
-There are many variables in the CCHS that changes in categories between cycles, such as. There are two options in using variables like age.
+There are many variables in the CCHS that changes in categories between cycles, such as age. There are two options in using variables like age.
 
 #### Option 1: Using the transformed grouped age variable
 
-The grouped age variable has been transformed into two grouped age variables. `DHHGAGE_A` is the grouped age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the grouped age variable for CCHS cycles 2005-2014.
+The grouped age variable can be transformed into two grouped age variables. `DHHGAGE_A` is the grouped age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the grouped age variable for CCHS cycles 2005-2014.
 
 ```{r, warning=FALSE}
 age2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHHGAGE_A"), varLabels = c(DHHGAGE_A = "Age"))
@@ -119,7 +119,7 @@ With this option, you cannot combine `DHHGAGE_A` and `DHHGAGE_B` into a single d
 
 #### Option 2: Using the transformed continuous age variable
 
-The grouped age variable has also been transformed into a single continuous age variable which takes the midpoint of each category for all CCHS cycles.
+The grouped age variable can also be transformed into a single continuous age variable. This variable would take the midpoint of each category for all CCHS cycles.
 
 ```{r, warning=FALSE}
 age2001_cont <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHHGAGE_cont"), varLabels = c(DHHGAGE_cont = "Age"))
@@ -133,7 +133,7 @@ labelledCombinedAge_cont <- SetDataLabels(dataToLabel = combinedAge_cont, variab
 datatable(labelledCombinedAge_cont, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
-With this option, you can combine all CCHS cycles into a single dataset.
+With this option, the age category variable from all CCHS cycles can be combined into a single dataset.
 
 ### Example 4. Transforming multiple variables from multiple datasets
 
@@ -153,7 +153,7 @@ datatable(labelledCombinedAgeSex, options = list(columnDefs = list(list(classNam
 
 ### Example 5. Transforming all variables in the variable details sheet
 
-If the variables argument in `RecWTable` is not specified, it will transform all the variables listed in `variables.csv` and `varDetails.csv`. In the transformed dataset In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
+If the variables argument in `RecWTable` is not specified, it will transform all the variables listed in `varDetails.csv`. In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
 
 ```{r, warning=FALSE}
 transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE)

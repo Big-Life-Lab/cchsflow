@@ -20,7 +20,7 @@ At the heart of `cchsflow` are worksheets (CSV files) that describe how to trans
 
 ## **Two worksheets in cchsFlow**
 1) `variables.csv` --- a list of all variable transformation that are currently included in `cchsflow`. Also included labels, sections (groups of variables in common themes), variable type, and units.
-2) `variableDetails.csv` --- details of all variables that are transformed. Included is information on factors (categories) for all variables for all CCHS cycles from 2001 to 2013. Also included are factor labels for both the new transformed variable and also the original variables. Notes are included when variables cannot be easily combined together because categories are not identical between surveys. 
+2) `variableDetails.csv` --- details on how all variables are transformed. Included is information on categories for all variables for all CCHS cycles from 2001 to 2014. Also included are category labels for both the new transformed variable and also the original variables. Notes are included when variables cannot be easily combined together because categories are not identical between surveys. 
 
 ## `variables.csv` 
 
