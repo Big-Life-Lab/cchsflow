@@ -16,3 +16,5 @@ The transformations that are described in this repository have been used in seve
 
 ## Contributing
 
+Please follow [this guide](CONTRIBUTING.md) if you like to contribute to
+the *cchsflow* package.
