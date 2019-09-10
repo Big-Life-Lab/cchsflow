@@ -22,3 +22,5 @@ Care must be taken by you to understand how specific variable transformation and
 ## Contributing
 
 Feel free to contribute to this repository. We encourage PRs for additional variable transformations and derived variables that you believe may be helpul to the broad CCHS community. 
+
+Currently, *cchsflow* supports the use of `variables.csv` and `variableDetails.csv` with R. SAS, Stata and other statistical packages are commonly used by the CCHS community. Please feel free to contribute to `cchsflow` by making a PR that creates verions of `RecWTable()` for other statistical and programming languages.
