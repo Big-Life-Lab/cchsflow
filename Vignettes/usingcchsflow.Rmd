@@ -11,10 +11,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Getting Started
 ### Loading the necessary packages
 
-The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://bllflow.projectbiglife.ca/index.html) package. `RecWTable` is used to transform CCHS variables to a common name, while `SetDataLabels` reapplies labels that are lost during the combination process after transforming each CCHS dataset. You must install & load the package onto your environment in order to do any transformations. To be able to combine datasets with minimal issues, we recommend using the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package. 
+The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://bllflow.projectbiglife.ca/index.html) package. `RecWTable` is used to transform CCHS variables to a common name, while `SetDataLabels` reapplies labels that are lost during the combination process after transforming each CCHS dataset. You must install & load the package onto your environment in order to do any transformations. Since `bllflow` is still under development and is not on CRAN, you must install the package from Github using the `devtools` package.
 
 ```{r results = 'hide', message = FALSE, warning =FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("Big-Life-Lab/bllflow")
 library(bllflow)
+```
+
+To be able to combine datasets with minimal issues, we recommend using the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package. 
+
+```{r results = 'hide', message = FALSE, warning =FALSE}
 library(dplyr)
 ```
 
@@ -59,21 +67,6 @@ With `RecWTable` there are also default arguments that do not need to be called 
   + `variables` is set to NULL. This argument can be used to add labels to the transformed dataset by setting it to the name of `variables.csv` or by specifying particular variables from `variables.csv` to transform.
   + `varLabels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`. The format to add labels to a subset of variables is `c(variable = "Label")`.
 
-### Step 3. Combining transformed datasets into a single dataset 
-
-Use the `bind_rows` function to combine datasets and create a new dataset name. NOTE: `bind_rows` along with other R functions will likely remove labels in your newly combined dataset. Step 4 explains how to add labels to your final dataset. 
-
-`combinedCCHS <- bind_rows(cchsTransformedYear1, cchsTransformedYear2, ...)`
-
-### Step 4. Labelling your final dataset
-
-Use the `SetDataLabels` function to label the variables in your final dataset.
-
-`labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)`
-
-## Examples
-Using the steps outlined above, here are examples of how to transform CCHS variables in multiple scenarios:
-
 ### Example 1. Transforming a single variable from a single database
 
 In this example, the sex variable in the 2001 CCHS cycle is transformed.
@@ -82,6 +75,12 @@ In this example, the sex variable in the 2001 CCHS cycle is transformed.
 sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHH_SEX"), varLabels = c(DHH_SEX = "Sex"))
 datatable(sex2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
+
+### Step 3. Combining transformed datasets into a single dataset 
+
+Use the `bind_rows` function to combine datasets and create a new dataset name. NOTE: `bind_rows` along with other R functions will likely remove labels in your newly combined dataset. Step 4 explains how to add labels to your final dataset. 
+
+`combinedCCHS <- bind_rows(cchsTransformedYear1, cchsTransformedYear2, ...)`
 
 ### Example 2. Transforming a single variable from multiple CCHS datasets
 
@@ -95,8 +94,7 @@ sex2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, da
 datatable(sex2013, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 
 combinedSex <- bind_rows(sex2001, sex2013)
-labelledCombinedSex <- SetDataLabels(dataToLabel = combinedSex, variableDetails = varDetails, variablesSheet = varSheet)
-datatable(labelledCombinedSex, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
+datatable(combinedSex, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
 ### Example 3. Transforming a single variable from multiple databases that changes categories between cycles.
@@ -129,11 +127,16 @@ age2013_cont <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetail
 datatable(age2013_cont, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 
 combinedAge_cont <- bind_rows(age2001_cont, age2013_cont)
-labelledCombinedAge_cont <- SetDataLabels(dataToLabel = combinedAge_cont, variableDetails = varDetails, variablesSheet = varSheet)
-datatable(labelledCombinedAge_cont, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
+datatable(combinedAge_cont, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
 With this option, the age category variable from all CCHS cycles can be combined into a single dataset.
+
+### Step 4. Labelling your final dataset
+
+Use the `SetDataLabels` function to label the variables in your final dataset.
+
+`labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)`
 
 ### Example 4. Transforming multiple variables from multiple datasets
 
@@ -167,7 +170,7 @@ labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetail
 datatable(combinedCCHS, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:5)), dom = 't'))
 ```
 
-### Warning messages.
+## Warning messages.
 
 When the variables in your dataset do not match the variables in your two worksheets, warning messages will appear. In our example, our mock CCHS datasets only contain a handful of variables from `variables.csv` and `varDetails.csv`. As such, warning messages about variables not included in our datasets will be printed. 
 
