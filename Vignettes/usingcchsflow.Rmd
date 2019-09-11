@@ -13,10 +13,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://bllflow.projectbiglife.ca/index.html) package. `RecWTable` is used to transform CCHS variables to a common name, while `SetDataLabels` reapplies labels that are lost during the combination process after transforming each CCHS dataset. You must install & load the package onto your environment in order to do any transformations. Since `bllflow` is still under development and is not on CRAN, you must install the package from Github using the `devtools` package.
 
-```{r eval= FALSE, message = FALSE, warning =FALSE}
-#install.packages("devtools")
+```{r eval= FALSE}
+install.packages("devtools")
 library(devtools)
-#install_github("Big-Life-Lab/bllflow", ref = "recode-with-table")
+install_github("Big-Life-Lab/bllflow", ref = "recode-with-table")
+```
+```{r results= 'hide', message = FALSE, warning=FALSE}
 library(bllflow)
 ```
 
@@ -170,7 +172,7 @@ labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetail
 datatable(combinedCCHS, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:5)), dom = 't'))
 ```
 
-## Warning messages.
+### Warning messages.
 
 When the variables in your dataset do not match the variables in your two worksheets, warning messages will appear. In our example, our mock CCHS datasets only contain a handful of variables from `variables.csv` and `varDetails.csv`. As such, warning messages about variables not included in our datasets will be printed. 
 
