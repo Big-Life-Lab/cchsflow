@@ -10,7 +10,7 @@ Documents include:
 
 ## Important notes
 
-Across the lifetime of the CCHS, most variables have had some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses. Care must be taken to understand how your specific use of variable transformation and harmonization may result in misclassfication error and other forms of bias. 
+Care must be taken to understand how your specific use of variable transformation and harmonization may result in misclassfication error and other forms of bias. Most variables have had some change in wording and category responses across the lifetime of the CCHS from 2001 to 2013. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses.  
 
 The transformations that are described in this repository have been used in several research projects (see reference list) but no guarantees are made regarding the accuracy or appropriate uses.
 

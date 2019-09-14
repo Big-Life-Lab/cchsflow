@@ -45,6 +45,10 @@ cchsMock2001 <- data.frame(DHHA_SEX = c(2, 1, 1, 6), DHHAGAGE = c(3, 4, 6, 6), F
 cchsMock2013 <- data.frame(DHH_SEX = c(1, 2, 1), DHHGAGE = c(2, 1, 1), FVCDTOT = c(25, 15, 6))
 ```
 
+Did you notice that the names for the variables are slightly different in the two mock databases? That isn't a mistake: in the cchs2001 the variable for sex is `DHHA_SEX` and in CCHS2013 the variable is `DHH_SEX`. 
+
+Don't worry, `cchsflow` is here to help! `variableDetails.csv` contains the rules to harmonize those two variables into a common variable name. In the CCHS, the categories for `sex` are consistient: 1 = males, 2 = females, 6 = ...  If the category values or labels changed, `variableDetails.csv` would provide instructions for how to harmonize them. You can learn more about `variables.csv` and `variableDetails.csv` in later vignettes. see ... and ...
+
 ### Step 2. Creating a transformed dataset for each CCHS cycle
 
 To call the `RecWTable` function to transform the variables of a CCHS dataset:
@@ -58,9 +62,19 @@ Your R command when calling the function should look like this:
 
 `cchsTransformedYear1 <- RecWTable(dataSource = cchsYear, variableDetails = varDetails, datasetName = "cchs-Year1-general-file")`
 
+### Example 1. Transforming a single variable from a single database
+
+In this example, the sex variable in the 2001 CCHS cycle is transformed.
+
+```{r, warning=FALSE}
+sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHH_SEX"), varLabels = c(DHH_SEX = "Sex"))
+
+datatable(sex2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
+```
+
 ### Default arguments
 
-With `RecWTable` there are also default arguments that do not need to be called unless you would like to modify them.
+With `RecWTable()` there are also default arguments that do not need to be called unless you would like to modify them.
 
   + `elseValue` is set to NA. Else values (values out of range) will be set to NA.
   + `appendToData` is set to FALSE. Transformed variables will not be appended to the original CCHS dataset.
@@ -68,15 +82,8 @@ With `RecWTable` there are also default arguments that do not need to be called 
   + `printNote` is set to TRUE. Any information in the Notes column from `variableDetails.csv` will be displayed
   + `variables` is set to NULL. This argument can be used to add labels to the transformed dataset by setting it to the name of `variables.csv` or by specifying particular variables from `variables.csv` to transform.
   + `varLabels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`. The format to add labels to a subset of variables is `c(variable = "Label")`.
-
-### Example 1. Transforming a single variable from a single database
-
-In this example, the sex variable in the 2001 CCHS cycle is transformed.
-
-```{r, warning=FALSE}
-sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHH_SEX"), varLabels = c(DHH_SEX = "Sex"))
-datatable(sex2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
-```
+  
+See the `bllflow::RecWTable()` [documentation](weblink) for more details about how to use this function.
 
 ### Step 3. Combining transformed datasets into a single dataset 
 
