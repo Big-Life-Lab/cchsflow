@@ -110,7 +110,7 @@ datatable(combinedSex, options = list(columnDefs = list(list(className = 'dt-cen
 
 There are many variables in the CCHS that changes in categories between cycles in a way that the variable cannot perserve all categories for all CCHS cycles. An example is the categorical variable for `age`. `cchsflow` offer several options to facilitate the use of these variables with inconsisten categories across cycles.
 
-#### Option 1: transform category `age` variable into a common variable for only cycles with the same category responses
+#### Example 3.1: transform category `age` variable into a common variable for only cycles with the same category responses
 
 The categories in `age` variable in the CCHS changed in 2005 and therefore it is not possible to have the same `age` categories across all CCHS cycels. `cchsflow` offers two optins. The first option is to transform the `age` variable into two variables. `DHHGAGE_A` is the age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the age variable for CCHS cycles 2005-2014. With this option, you cannot combine `DHHGAGE_A` and `DHHGAGE_B` into a single dataset.
 
@@ -123,7 +123,7 @@ datatable(age2013, options = list(columnDefs = list(list(className = 'dt-center'
 ```
 
 
-#### Option 2: transform the categorical `age` variable into a continuous `age` variable
+#### Example 3.2: transform the categorical `age` variable into a continuous `age` variable
 
 The categorical `age` variable can also be transformed into a single continuous `age` variable. This variable takes the midpoint age of each category for all CCHS cycles. With this option, the age category variable from all CCHS cycles can be combined into a single dataset.
 
@@ -141,13 +141,13 @@ datatable(combinedAge_cont, options = list(columnDefs = list(list(className = 'd
 
 ### Step 4. Label variables your final dataset
 
-Use the `SetDataLabels` function to label the variables in your final dataset.
+Use the `SetDataLabels()` function to label the variables in your final dataset.
 
 `labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)`
 
-### Example 4. Transforming multiple variables from multiple datasets
+### Example 4. Transform multiple variables from multiple datasets
 
-The variables argument in `RecWTable` is able to handle multiple variables to be transformed from a CCHS dataset. In this example, the age and sex variables from the 2001 and 2013 CCHS datasets will be transformed and combined into a single dataset.
+The variables argument in `RecWTable()` is able to handle multiple variables to be transformed from a CCHS dataset. In this example, the age and sex variables from the 2001 and 2013 CCHS datasets will be transformed and combined into a single dataset.
 
 ```{r, warning=FALSE}
 agesex_2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHHGAGE_cont", "DHH_SEX"), varLabels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
@@ -161,9 +161,9 @@ labelledCombinedAgeSex <- SetDataLabels(dataToLabel = combinedAgeSex, variableDe
 datatable(labelledCombinedAgeSex, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:2)), dom = 't'))
 ```
 
-### Example 5. Transform all variables in the variable details sheet
+### Example 5. Transform all variables in the variableDetails sheet
 
-If the variables argument in `RecWTable` is not specified, it will transform all the variables listed in `varDetails.csv`. In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
+All the variables listed in `varDetails.csv` will be transformed if the variables argument in `RecWTable()` is not specified. In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
 
 ```{r, warning=FALSE}
 transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE)
@@ -179,7 +179,7 @@ datatable(combinedCCHS, options = list(columnDefs = list(list(className = 'dt-ce
 
 ### Warning messages.
 
-When the variables in your dataset do not match the variables in your two worksheets, warning messages will appear. In our example, our mock CCHS datasets only contain a handful of variables from `variables.csv` and `varDetails.csv`. As such, warning messages about variables not included in our datasets will be printed. 
+Warning messages will appear when the variables in your dataset do not match the variables in your two worksheets. In our example, our mock CCHS datasets only contain a two of variables from `variables.csv` and `varDetails.csv`. As such, warning messages about variables not included in our datasets will be printed. 
 
 ```{r, echo=FALSE, results="hide", warning=2}
 transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE)
