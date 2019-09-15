@@ -25,9 +25,11 @@ cat("In the `variableDetails.csv` worksheet there are", nrow(varDetails), "rows 
 ```
 
 ### Rows
-Each row in `variableDetails.csv` holds the recode rules for transforming a single category for a variable in `variables.csv`. An exception to this rule are the "don't know", "refusal", and "not stated" categories, which are combined as a single missing category. For each unique variable, an `else` row is used to assign values not identified in other rows. We recommend nor combining variables across the CCHS if variable has an important change between CCHS surveys. `variableDetails$notes` is used to identify issues that may be relevant when transforming the variable or category.  
+Each row in `variableDetails.csv` holds the recode rules for transforming a single category for a variable in `variables.csv`. An exception to this rule are the "don't know", "refusal", and "not stated" categories, which are combined as a single missing category. For each unique variable, an `else` row is used to assign values not identified in other rows. We recommend not combining variables across the CCHS if variable has an important change between CCHS cycles `variableDetails$notes` is used to identify issues that may be relevant when transforming the variable or category.
 
-If a categorical variable has 4 distinct categories, along with a not applicable category and the 3 missing categories, there will be 7 rows: 
+Additional information how to create and use `variableDetails.csv` is in the `bllflow` package. The `bllflow` package includes additional helper functions for creating `variableDetails.csv` using the CCHS Data Document Initiative (DDI) files located in `..\cchsflow\inst\extdata\CCHS_DDI`. 
+
+If a categorical variable has 4 distinct categories, along with a "not applicable" category and the 3 missing categories, there will be 7 rows: 
 
 + 4 for each distinct category
 
@@ -40,7 +42,7 @@ If a categorical variable has 4 distinct categories, along with a not applicable
 ### Columns
 The following are the columns that are listed in `variableDetails.csv`. Many of these columns need to be specified in order for `RecWTable` to be functional:
 
-1. **variable:** the name of the final transformed variable of between all CCHS cycles. In `variableDetails.csv`, we have designated the variable names used in CCHS cycles from 2007 to 2014 as the final transformed variable name.
+1. **variable:** the name of the final transformed variable. In `variableDetails.csv`, we have designated the variable names used in CCHS cycles from 2007 to 2014 as the final transformed variable name.
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
@@ -60,7 +62,16 @@ library(DT)
 datatable(varDetails, filter = 'top', options=list(columnDefs = list(list(visible=FALSE, targets=c(4:16)), list(className = 'dt-center', targets = 0:3)), pageLength = 5))
 ```
 
-4. **databaseStart:** the CCHS surveys that contain the variable of interest, separated by commas. Each CCHS survey contains a unique identifier that is consistent with practices from the Data Documentation Initiative (DDI). 
+4. **databaseStart:** the CCHS surveys that contain the variable of interest, separated by commas. Each CCHS survey contains a unique identifier in DDI document.
+
+The CCHS database identifier and other infomation can be extracted using `bllflow::ReadDDI()`
+
+```{r, echo=TRUE, warning=FALSE}
+CCHS2001_DDI <- bllflow::ReadDDI(file.path(getwd(), "../inst/extdata/CCHS_DDI"), "cchs-82M0013-E-2001-c1-1-general-file.xml")
+cat('Dataset name: ', unlist(CCHS2001_DDI$ddiObject$codeBook$docDscr$citation$titlStmt$titl)) 
+cat('ID No: ', unlist(CCHS2001_DDI$ddiObject$codeBook$docDscr$citation$titlStmt$IDNo))
+cat('abstract: ', unlist(CCHS2001_DDI$ddiObject$codeBook$stdyDscr$stdyInfo$abstract))
+```
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
@@ -74,9 +85,9 @@ library(DT)
 datatable(varDetails, options=list(columnDefs = list(list(visible=FALSE, targets=c(6:16)), list(className = 'dt-center', targets = 0:5)), pageLength = 5))
 ```
 
-+ The grouped age variable in the 2001 CCHS survey is `DHHAGAGE`. If the final variable name for grouped age in the **variable** column is `DHHGAGE`, you would write the following in this column: `cchs-82M0013-E-2001-c1-1-general-file::DHHAGAGE`
++ The categorical `age` variable in the 2001 CCHS survey is `DHHAGAGE`. If the final variable name for categorical age in the **variable** column is `DHHGAGE`, you would write the following in this column: `cchs-82M0013-E-2001-c1-1-general-file::DHHAGAGE`
 
-+ The grouped age variable in the CCHS surveys from 2007 to 2014 is `DHHGAGE`. Since it is the same as the final variable name, you would write in this column `[DHHGAGE]` **once**. The variable name that is denoted within the square brackets is the default variable name.
++ The categorical age variable in the CCHS surveys from 2007 to 2014 is `DHHGAGE`. Since it is the same as the final variable name, you would write in this column `[DHHGAGE]` **once**. The variable name that is denoted within the square brackets is the default variable name.
 
 6. **fromType:** the variable type as indicated in the CCHS surveys. As indicated in the **toType** column, categorical variables are denoted as `cat` and continuous variables are denoted as `cont`.
 
@@ -94,7 +105,7 @@ datatable(varDetails, options=list(columnDefs = list(list(visible=FALSE, targets
 
 + For categorical variables that are not changing variable types (i.e. cat to cat), it is ideal to retain the same values as indicated in each CCHS survey. But for transformed categorical variables that have changed in type (i.e cat to cont), you will have to develop values that make the most sense to your analysis. In `variableDetails.csv`, variables that have gone from cat to cont have used midpoints of each category.
 
-8. **numValidCat:** the number of categories a variable has. This only applies to variables in which the **toType** is cat. For continuous variables, write `N/A`. Not applicable, missing, and else categories are not included in the category count. Note that this column is not necessary for `RecWTable`.
+8. **numValidCat:** the number of categories for a variable. This only applies to variables in which the **toType** is cat. For continuous variables, `numValidCat = N/A`. Not applicable, missing, and else categories are not included in the category count. Note that this column is not necessary for `RecWTable()`.
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
@@ -122,14 +133,23 @@ library(DT)
 datatable(varDetails, options=list(columnDefs = list(list(visible=FALSE, targets=c(12:16)), list(className = 'dt-center', targets = 0:11)), pageLength = 5, scrollX = TRUE))
 ```
 
-12. **recFrom:** the range of values for a particular category in a variable as indicated in the CCHS. For categorical variables, it will be a single range value (i.e. category 1 of variable X will have a recFrom range of 1:1); but for continuous variables it will be a range of values captured in the CCHS survey. See CCHS data documentation for each survey cycle and use the smallest and large values as your range to capture all values between the survey years. The recFrom range for the missing categories will be the range of values of the three categories. The else row will have its recFrom listed as `else`.
+12. **recFrom:** the range of values for a particular category in a variable as indicated in the CCHS. See CCHS data documentation for each survey cycle and use the smallest and large values as your range to capture all values between the survey years. 
+
+The rules for each category of a new variable are a string in `recFrom` and value in `recTo`. These recode pairs are the same syntax as `{sjmisc::rec()` -- for more details see [bllflow::RecWTable()](). Recode pairs are obtained from the RecFrom and RecTo columns
+  *multiple values* that are recoded into a new single value are separated with comma, e.g. `recFrom = "1,2"; recTo = 1`
+  *value range* is indicated by a colon, e.g. `recFrom= "1:4"; recTo = 1` (recodes all values from 1 to 4 into 1}
+  *value range* for double vectors (with fractional part), all values within the specified range are recoded; e.g. `recFrom = "1:2.5"; recTo = 1` recodes 1 to 2.5 into 1, but 2.55 would not be recoded (since it's not included in the specified range)
+  *minimum and maximum values* are indicates by `min` (or `lo`) and `max` (or `hi`), e.g. `recFrom = "min:4"; recTo = 1` (recodes all values from minimum values to 4 into 1)
+  *else* is used all other values, which have not been specified yet, are indicated by `else`, e.g. `recFrom = "else"; recTo = NA` (recode all other values (not specified in other rows) to "NA")}
+  *copy* the `else` token can be combined with `copy`, indicating that all remaining, not yet recoded values should stay the same (are copied from the original value), e.g. `recFrom = "else"; recTo = "copy"`
+  *NA* ..... Warsame....
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
 datatable(varDetails, options=list(columnDefs = list(list(visible=FALSE, targets=c(13:16)), list(className = 'dt-center', targets = 0:12)), pageLength = 5, scrollX = TRUE))
 ```
 
-13. **catStartLabel:** label describing each category. This label should be identical to what is shown in the CCHS data documentation. For the missing row, each missing category is described along with their coded values.
+13. **catStartLabel:** label describing each category. This label should be identical to what is shown in the CCHS data documentation. For the missing row, each missing category is described along with their coded values. You can import labels from the CCHS DDI files using `bllflow` helper functions. See [bllflow documentation](http://bllflow.projectbiglife.ca).
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
