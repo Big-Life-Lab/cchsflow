@@ -1,6 +1,6 @@
 ---
-title: "Variable details worksheet"
-date: 'Last updated: 2019-08-30'
+title: "`variableDetails.csv` worksheet"
+date: 'Last updated: 2019-09-14'
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1 - Specifying your model}     
@@ -16,16 +16,16 @@ knitr::opts_chunk$set(
 ```
 
 ## `variableDetails.csv`
-The **variableDetails** worksheet is the starting point in transforming variables. Information from this worksheet will be used by the `RecWTable` function of the `bllflow` package to harmonize CCHS variables between cycles. The two components of this worksheets are the **rows** and the **columns.**
+The **variableDetails** worksheet contain details for the variables in `variables.csv`. Information from `variableDetails.csv` worksheet is used by the `RecWTable()` function of the `bllflow` package to transform variables identifed in `variableDetails$variableFrom` to the newly transformed variable in `variableDetails$variable`. 
 
 ```{r Read variables.csv, echo=FALSE, message=FALSE, warning=FALSE}
 library(readr)
 varDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
-cat("In this worksheet there are", nrow(varDetails), "rows, and", ncol(varDetails), "columns", "\n\n")
+cat("In the `variableDetails.csv` worksheet there are", nrow(varDetails), "rows and", ncol(varDetails), "columns", "\n\n")
 ```
 
 ### Rows
-Each unique variable has its own row. Furthermore, each distinct category in a unique variable will have its own row. The only exception to this rule are the "don't know", "refusal", and "not stated" categories, which are lumped together as a single category named as missing. For each unique variable, an else row will also be added to account for improperly coded values. If a variable changes significantly between CCHS surveys (different categories), we recommend creating separate variables. 
+Each row in `variableDetails.csv` holds the recode rules for transforming a single category for a variable in `variables.csv`. An exception to this rule are the "don't know", "refusal", and "not stated" categories, which are combined as a single missing category. For each unique variable, an `else` row is used to assign values not identified in other rows. We recommend nor combining variables across the CCHS if variable has an important change between CCHS surveys. `variableDetails$notes` is used to identify issues that may be relevant when transforming the variable or category.  
 
 If a categorical variable has 4 distinct categories, along with a not applicable category and the 3 missing categories, there will be 7 rows: 
 
