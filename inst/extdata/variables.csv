@@ -112,6 +112,9 @@ SMKDSTY,Smoking status,Type of smoker,health behaviour,Smoking,Categorical,N/A
 SMKG01C_A,agec1 ,Age smoked first cigarette,health behaviour,Smoking,Categorical,Years
 SMKG01C_B,agec1 ,Age smoked first cigarette,health behaviour,Smoking,Categorical,Years
 SMKG01C_cont,agec1,Age smoked first cigarette,health behaviour,Smoking,Continuous,Years
+SMKG203_A,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Categorical,Years
+SMKG203_B,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Categorical,Years
+SMKG203_cont,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Continuous,Years
 SMKG207_A,agecigd,Age started to smoke daily,health behaviour,Smoking,Categorical,Years
 SMKG207_B,agecigd,Age started to smoke daily,health behaviour,Smoking,Categorical,Years
 SMKG207_cont,agecigd,Age started to smoke daily,health behaviour,Smoking,Continuous,Years
