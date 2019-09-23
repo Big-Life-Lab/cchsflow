@@ -1,7 +1,11 @@
 ---
-title: "Transform CCHS variables"
+title: "Using cchsflow"
 date: 'Last updated: 2019-08-27'
 output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1 - using cchsflow}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -9,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Getting Started
+
 ### Loading the necessary packages
 
 The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://bllflow.projectbiglife.ca/index.html) package. `RecWTable` is used to transform CCHS variables to a common name, while `SetDataLabels` reapplies labels that are lost during the combination process after transforming each CCHS dataset. You must install & load the package onto your environment in order to do any transformations. Since `bllflow` is still under development and is not on CRAN, you must install the package from Github using the `devtools` package.
@@ -34,6 +39,7 @@ library(DT)
 ```
 
 ## Steps
+
 ### Step 1. Load the CCHS datasets, variables.csv, and variableDetails.csv
 
 You will need to load the CCHS datasets as well as the two variable worksheets before you are able to do any transformations. Since CCHS datasets cannot be shared publicly, we will create mock CCHS datasets for the years 2001 and 2013 which will be used in examples later on. 

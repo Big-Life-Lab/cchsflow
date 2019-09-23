@@ -3,7 +3,7 @@ title: "`variableDetails.csv` worksheet"
 date: 'Last updated: 2019-09-14'
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{1 - Specifying your model}     
+  %\VignetteIndexEntry{3 - variableDetails.csv}     
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---

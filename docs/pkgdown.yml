@@ -1,0 +1,8 @@
+pandoc: 1.19.2.1
+pkgdown: 1.4.1
+pkgdown_sha: ~
+articles:
+  usingcchsflow: ../vignettes/usingcchsflow.html
+  variableDetails: ../vignettes/variableDetails.html
+  variablesSheet: ../vignettes/variablesSheet.html
+
