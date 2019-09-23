@@ -14,7 +14,7 @@ Authors@R: c(
            email = "waryusuf@ohri.ca"),
     person(given = "Rostyslav", 
            family = "Vyuha",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "rostikvyuha@gmail.com"))
 Description: What the package does (one paragraph).
 License: What license it uses
