@@ -36,13 +36,13 @@ EDUDR04,Edu2,Highest level/education,Sociodemographic,Education,Categorical,N/A
 FINF1,FoodInsecurity12M,Some food insecurity in past 12 months,Sociodemographic,Food security,Categorical,N/A
 FSCDHFS,FoodSecurity,Household food security status - (D),Sociodemographic,Food security,Categorical,N/A
 FSCDHFS2,HCFoodSecurity,Household food security status - (HC),Sociodemographic,Food security,Categorical,N/A
-FVCDCAR,car,Daily consumption - carrots (D),health behaviour,Fruits/vegetables,Continuous,N/A
-FVCDFRU,frt,Daily consumption - fruit - (D),health behaviour,Fruits/vegetables,Continuous,N/A
-FVCDJUI,jui,Daily consumption - fruit juice (D),health behaviour,Fruits/vegetables,Continuous,N/A
-FVCDPOT,pot,Daily consumption - potatoes (D),health behaviour,Fruits/vegetables,Continuous,N/A
-FVCDSAL,sal,Daily consumption - green salad - (D),health behaviour,Fruits/vegetables,Continuous,N/A
-FVCDTOT,fvtot,Daily consumptoin - total fruits and veg. - (D),health behaviour,Fruits/vegetables,Continuous,N/A
-FVCDVEG,veg,Daily consumption other vegetables - (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDCAR,Carrot consump,Daily consumption - carrots (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDFRU,Fruit consump,Daily consumption - fruit - (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDJUI,Juice consump,Daily consumption - fruit juice (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDPOT,Potato consump,Daily consumption - potatoes (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDSAL,Salad consump,Daily consumption - green salad - (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDTOT,Total fruit/veg consumption,Daily consumptoin - total fruits and veg. - (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDVEG,Other veg consump,Daily consumption other vegetables - (D),health behaviour,Fruits/vegetables,Continuous,N/A
 GEN_01,SelfPerceivedHealth_cat,Self perceived health,health behaviour,Self-perceived health,Categorical,N/A
 GEN_02A,LifeSatisfaction_cat,Satisfaction with life,health behaviour,Satisfaction with life,Categorical,N/A
 GEN_02A2,LifeSatisfaction_cont,Satisfaction with life in general,health behaviour,Satisfaction with life,Continuous,N/A
