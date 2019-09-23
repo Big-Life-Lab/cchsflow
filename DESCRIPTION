@@ -1,0 +1,24 @@
+Package: cchsflow
+Type: Package
+Title: Transforming and harmonizing CCHS variables
+Version: 0.1.0
+Authors@R: 
+    person(given = "Doug",
+           family = "Manuel",
+           role = c("aut"),
+           email = "dmanuel@ohri.ca",
+           comment = c(ORCID = "0000-0003-0912-0845")),
+    person(given = "Warsame",
+           family = "Yusuf",
+           role = c("aut"),
+           email = "waryusuf@ohri.ca"),
+    person(given = "Rostyslav", 
+           family = "Vyuha",
+           role c("aut", "cre"),
+           email = "rostikvyuha@gmail.com")
+Description: What the package does (one paragraph).
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+URL: https://github.com/Big-Life-Lab/cchsflow
+BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
