@@ -1,6 +1,5 @@
 ---
-title: "`Variables.csv` worksheet"
-date: 'Last updated: 2019-08-30'
+title: "variables.csv"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{2 - variables.csv}     
@@ -15,16 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-## **Introduction**
-At the heart of `cchsflow` are two worksheets (CSV files) that describe how to transform variables different CCHS cycles into common variables: `variables.csv` and `variableDetails.csv`.
+## Introduction
 
-## **Two worksheets in cchsFlow**
-1) `variables.csv` --- a list of all variable transformation that are currently included in `cchsflow`. Also included labels, sections (groups of variables in common themes), variable type, and units.
-2) `variableDetails.csv` --- details on how all variables are transformed. Included is information on categories for all variables for all CCHS cycles from 2001 to 2014. Also included are category labels for both the new transformed variable and also the original variables. Notes are included when variables cannot be easily combined together because categories are not identical between surveys. 
-
-This vignette describes `variables.csv` worksheet. See also the vignette `variableDetails.csv`. The vig `Transform CCHS variables` provides examples of how to use the two worksheeets with the [`bllflow` package](http://bllflow.projectbiglife.ca) to transform variables.
-
-## `variables.csv` 
+This vignette describes `variables.csv` worksheet. See also the vignette `variableDetails.csv`. The vignette `Transform CCHS variables` provides examples of how to use the two worksheeets with the [`bllflow` package](http://bllflow.projectbiglife.ca) to transform variables.
 
 Read `variables.csv`
 
