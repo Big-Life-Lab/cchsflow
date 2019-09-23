@@ -1,0 +1,9 @@
+destination: docs
+
+template:
+  params:
+    bootswatch: cosmo
+
+development:
+  mode: auto
+
