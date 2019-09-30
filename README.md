@@ -11,7 +11,7 @@ The CCHS is Canada's main population health survey. The survey is adminstered by
 3. Vignettes that describe how use R to transform or generate new derived variables that are listed in `variables.csv`. Transfomations are performed using `RecWTable()` from the `bllflow` R package. 
 3. Codebooks (metadata documents) for the original CCHS surveys -- see CCHS_DDI folder. The PDF and DDI documents are a resource to examine how variables change across survey cycles. 
 
-This repository does not include the CCHS data. Information for how to access the CCHS data can be found [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). Canadian university community can also access the CCCHS through [Odesi](http://odesi2.scholarsportal.info/webview/) -- See health/Canada/Canadian Community Health Survey.
+This repository does not include the CCHS data. Information for how to access the CCHS data can be found [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). Canadian university community can also access the CCHS through [Odesi](http://odesi2.scholarsportal.info/webview/) -- See health/Canada/Canadian Community Health Survey.
 
 ## Important notes
 
