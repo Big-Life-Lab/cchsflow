@@ -1,0 +1,120 @@
+variable,label,labelLong,section,subject,variableType,units
+ADL_01,HelpPreparingMeals,Needs help - preparing meals,health behaviour,Assistance/Difficulty,Categorical,N/A
+ADL_02,HelpApptsErrands,Needs help - getting to appointments/errands,health behaviour,Assistance/Difficulty,Categorical,N/A
+ADL_03,HelpHousework,Needs help - doing housework,Health behaviour,Assistance/Difficulty,Categorical,N/A
+ADL_04,HelpPersonalCare,Needs help - personal care,Health behaviour,Assistance/Difficulty,Categorical,N/A
+ADL_05,HelpMoveInsideHouse,Needs help - moving about inside house,Health behaviour,Assistance/Difficulty,Categorical,N/A
+ADL_06,HelpPersFinances,Needs help - looking after finances,Health behaviour,Assistance/Difficulty,Categorical,N/A
+ADLF6R,HelpTasks,Needs help with at least one task - (F),Health behaviour,Assistance/Difficulty,Categorical,N/A
+ALC_1,d12,"Past year, have you drank alcohol",health behaviour,Alcohol,Categorical,N/A
+ALCDTTM,DrinkType12M,Type of drinker (12 months),health behaviour,Alcohol,Categorical,N/A
+ALCDTYP,DrinkerType,Type of drinker - (D),health behaviour,Alcohol,Categorical,N/A
+ALW_1,dany,"Past week, had any alcohol",health behaviour,Alcohol,Categorical,N/A
+ALWDDLY,AverageDailyConsumption,Average daily alcohol consumption,health behaviour,Alcohol,Continuous,drinks/day
+ALWDWKY,DrinksLastWeek,Weekly consumption of alcohol,health behaviour,Alcohol,Continuous,drinks/week
+CCC_031,Asthma_cat,Do you have asthma?,chronic disease,Asthma,Categorical,N/A
+CCC_051,ArthritisRheum_cat,Do you have arthritis or rheumatism?,chronic disease,Arthritis/Rheumatism,Categorical,N/A
+CCC_071,Hypertension_cat,Do you have high blood pressure,chronic disease,Hypertension,Categorical,N/A
+CCC_091,COPDEmphys_cat,"Do you have COPD (eg bronchitis, emphysema)",chronic disease,COPD/emphysema,Categorical,N/A
+CCC_101,Diabetes_cat,Do you have diabetes,chronic disease,Diabetes,Categorical,N/A
+CCC_111,Epilepsy_cat,Do you have epilepsy?,chronic disease,Epilepsy,Categorical,N/A
+CCC_121,HeartDis_cat,Do you have heart disease,chronic disease,Heart Disease,Categorical,N/A
+CCC_131,ActiveCancer_cat,Do you have cancer,chronic disease,Cancer,Categorical,N/A
+CCC_151,Stroke_cat,Do you suffer from effects of stroke,chronic disease,Stroke,Categorical,N/A
+CCC_171,BowelDisorder_cat,Do you have a bowel disorder such as Crohn's disease or colitis?,chronic disease,Bowel disorder,Categorical,N/A
+CCC_251,ChronicFatigue_cat,Do you have chronic fatigue syndrome?,chronic disease,Chronic fatigue syndrome,Categorical,N/A
+CCC_280,Mood_cat,Do you have a mood disorder,chronic disease,Mood disorder,Categorical,N/A
+CCC_91E,Emphys_cat,Do you have emphysema?,chronic disease,Emphysema,Categorical,N/A
+CCC_91F,COPD_cat,Do you have COPD?,chronic disease,COPD,Categorical,N/A
+DHH_OWN,HomeOwnership,Dwelling - owned by a member of hsld,Sociodemographic,Home ownership,Categorical,N/A
+DHH_SEX,Sex,Sex,demographic,Sex,Categorical,N/A
+DHHGAGE_A,Age,Age,demographic,Age,Categorical,Years
+DHHGAGE_B,Age,Age,demographic,Age,Categorical,Years
+DHHGAGE_cont,Age,Converted categorical age,demographic,Age,Continuous,Years
+DHHGMS,MaritalStatus,Marital status - (G),Sociodemographic,Marital Status,Categorical,N/A
+EDUDR04,Edu2,Highest level/education,Sociodemographic,Education,Categorical,N/A
+FINF1,FoodInsecurity12M,Some food insecurity in past 12 months,Sociodemographic,Food security,Categorical,N/A
+FSCDHFS,FoodSecurity,Household food security status - (D),Sociodemographic,Food security,Categorical,N/A
+FSCDHFS2,HCFoodSecurity,Household food security status - (HC),Sociodemographic,Food security,Categorical,N/A
+FVCDCAR,Carrot consump,Daily consumption - carrots (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDFRU,Fruit consump,Daily consumption - fruit - (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDJUI,Juice consump,Daily consumption - fruit juice (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDPOT,Potato consump,Daily consumption - potatoes (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDSAL,Salad consump,Daily consumption - green salad - (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDTOT,Total fruit/veg consumption,Daily consumptoin - total fruits and veg. - (D),health behaviour,Fruits/vegetables,Continuous,N/A
+FVCDVEG,Other veg consump,Daily consumption other vegetables - (D),health behaviour,Fruits/vegetables,Continuous,N/A
+GEN_01,SelfPerceivedHealth_cat,Self perceived health,health behaviour,Self-perceived health,Categorical,N/A
+GEN_02A,LifeSatisfaction_cat,Satisfaction with life,health behaviour,Satisfaction with life,Categorical,N/A
+GEN_02A2,LifeSatisfaction_cont,Satisfaction with life in general,health behaviour,Satisfaction with life,Continuous,N/A
+GEN_02B,SelfPerceivedMH_cat,Self-perceived mental health,health behaviour,Mental health,Categorical,N/A
+GEN_07,SelfPerceivedLifeStress_cat,Self perceived life stress,health behaviour,Mental health,Categorical,N/A
+GEN_09,SelfPerceivedWorkStress_cat,Self perceived work stress,health behaviour,Mental health,Categorical,N/A
+GEN_10,SenseBelongingComm_cat,Sense of belonging in the community,health behaviour,Mental health,Categorical,N/A
+GEOGPRV,Province,Province of residence of respondent (G),Demographics,Province,Categorical,N/A
+HUIDCOG,HUICognition,Cognition prob. - function code - (D),Health behaviour,Health utility index,Categorical,N/A
+HUIDEMO,HUIEmotion,Emotional problems - function code - (D),Health behaviour,Health utility index,Categorical,N/A
+HUIDHSI,OverallHUI,Health Utility Index (HUI3) - (D),Health behaviour,Health utility index,Continuous,N/A
+HUIGDEX,HUIDexterity,"Dexterity trouble - function code (D, G)",Health behaviour,Health utility index,Categorical,N/A
+HUIGHER,HUIHearing,"Hearing problems - function code (D, G)",Health behaviour,Health utility index,Categorical,N/A
+HUIGMOB,HUIMobility,"Mobility trouble - function code (D, G)",Health behaviour,Health utility index,Categorical,N/A
+HUIGSPE,HUISpeech,"Speech trouble - function code - (D, G)",Health behaviour,Health utility index,Categorical,N/A
+HUIGVIS,HUIVision,"Vision trouble - function code - (D, G)",Health behaviour,Health utility index,Categorical,N/A
+HUPDPAD,HUIPain,Act. prevent/pain - function code - (D),Health behaviour,Health utility index,Categorical,N/A
+HWTGBMI,BMI_cont,"BMI / self-report - (D,G)",health behaviour,BMI,Continuous,kg/m2
+INCDRCA,Household income distribution,Household income distribution - (D),Sociodemographic,Income,Categorical,N/A
+INCDRPR,Household income distribution provincial level,Hhld inc. distribution-prov. level - (D),Sociodemographic,Income,Categorical,N/A
+INCDRRS,Household income distribution health region level,Hhld inc. distribution- hr level - (D),Sociodemographic,Income,Categorical,N/A
+INCGPER,PersonalIncome,"Total pers. inc. from all sources (D, G)",Sociodemographic,Income,Categorical,N/A
+MED_1P,SleepingPills,"In the past month, did you take sleeping pills",Health behaviour,Sleep,Categorical,N/A
+PAC_4A,TimeWalkWorkSchool_Week,"In a typical week in the past 3 months, how many hours did you usually spend walking to work or to school or while doing errands",Health behaviour,Exercise,Categorical,hours/week
+PAC_4B,TimeBikeWorkSchool_Week,"In a typical week in the past 3 months, how many hours did you usually spend walking to work or to school or while doing errands",Health behaviour,Exercise,Categorical,hours/week
+PAC_7,WalkToWorkSchool,Walked to work or school / last 3 mo.,Health behaviour,Exercise,Categorical,N/A
+PAC_7A,NumTimesWalkWorkSchool,No. of times/3 mo./walking work/school,Health behaviour,Exercise,Continuous,N/A
+PAC_7B,TimeWalkWorkSchool,Time spent - walking to go work/school,Health behaviour,Exercise,Categorical,mins
+PAC_8,BikeToWorkSchool,Bicycled to work or school / last 3 mo.,Health behaviour,Exercise,Categorical,N/A
+PAC_8A,NumTimesBikeWorkSchool,No. of times/3 mo./bicycl. work/school,Health behaviour,Exercise,Continuous,times/3 mos.
+PAC_8B,TimeBikeWorkSchool,Time spent - walking to go work/school,Health behaviour,Exercise,Categorical,N/A
+PACDEE,PhysicalActivity_cont,Daily energy expenditure - (D),health behaviour,Exercise,Continuous,METS
+RAC_1,DifficultyActivities,Has difficulty with activities,Health behaviour,Assistance/Difficulty,Categorical,N/A
+RAC_2A,ReducActivitiesHome,Reduction - activities at home,Health behaviour,Assistance/Difficulty,Categorical,N/A
+RAC_2B1,ReducActivitiesSchool,Long-term cond. reduces act. - school,Health behaviour,Assistance/Difficulty,Categorical,N/A
+RAC_2B2,ReducActivitiesWork,Reduction kind/amount act. - at work,Health behaviour,Assistance/Difficulty,Categorical,N/A
+RAC_2C,ReducOtherActivities,Reduction - other activities,Health behaviour,Assistance/Difficulty,Categorical,N/A
+RACAG5,CauseHealthProb1,Cause of Health problem,Health behaviour,Health problems,Categorical,N/A
+RACDIMP,ImpactHealthProb,Impact of health problems,Health behaviour,Health problems,Categorical,N/A
+RACDPAL,ParticpActivityLimit,Participation and activity limitation,Health behaviour,Health problems,Categorical,N/A
+RACG5,CauseHealthProb,Cause of Health problem,Health behaviour,Health problems,Categorical,N/A
+SDCFIMM,ImmigrantStatus,Immigrant Status (D),Sociodemographic,Migration,Categorical,N/A
+SDCGCBG ,CountryBirth,Country of birth - (G),Sociodemographic,Migration,Categorical,N/A
+SDCGCGT,Ethnicity,"Cultural or racial origin - (D, G)",Sociodemographic,Ethnicity,Categorical,N/A
+SDCGRES ,TimeinCanada,"Length/time in Canada since imm. (D, G)",Sociodemographic,Migration,Categorical,N/A
+SLP_02,TroubleSleeping,Freq. - trouble sleeping,Health behaviour,Sleep,Categorical,N/A
+SLP_02_A,TroubleSleeping,Freq. - trouble sleeping,Health behaviour,Sleep,Categorical,N/A
+SLP_03,SleepRefreshing,Freq. - find sleep refreshing,Health behaviour,Sleep,Categorical,N/A
+SLP_03_A,SleepRefreshing,Freq. - find sleep refreshing,Health behaviour,Sleep,Categorical,N/A
+SLP_04,DifficultyAwake,Freq. - diffficult to stay awake,Health behaviour,Sleep,Categorical,N/A
+SLP_04_A,DifficultyAwake,Freq. - diffficult to stay awake,Health behaviour,Sleep,Categorical,N/A
+SLPG01,HoursSleep,No./hours spent sleeping each night,Health behaviour,Sleep,Categorical,N/A
+SLPG01_A,HoursSleep,No./hours spent sleeping each night,Health behaviour,Sleep,Categorical,N/A
+SLPG01_cont,HoursSleep,No./hours spent sleeping each night,Health behaviour,Sleep,Continuous,N/A
+SMK_01A,s100,"In lifetime, smoked 100 or more cigarettes",health behaviour,Smoking,Categorical,N/A
+SMK_05B,cigdayo,# of cigarettes smoked daily - occasional smoker,health behaviour,Smoking,Continuous,cigarettes
+SMK_05D,evd,Ever smoked cigarettes daily - occasional smoker,health behaviour,Smoking,Categorical,N/A
+SMK_06A_A,stpn,When did you stop smoking daily - occasional,health behaviour,Smoking,Categorical,Years
+SMK_06A_B,stpn,When did you stop smoking daily - occasional,health behaviour,Smoking,Categorical,Years
+SMK_06A_cont,stpn,When did you stop smoking daily - occasional,health behaviour,Smoking,Continuous,Years
+SMK_09A_A,stpo,When did you stop smoking daily - occasional,health behaviour,Smoking,Categorical,Years
+SMK_09A_B,stpo,When did you stop smoking daily - occasional,health behaviour,Smoking,Categorical,Years
+SMK_09A_cont,stpo,When did you stop smoking daily - occasional,health behaviour,Smoking,Continuous,Years
+SMK_204,cigdayd,# of cigarettes smoked daily - daily smoker,health behaviour,Smoking,Continuous,cigarettes
+SMK_208,cigdayf,# of cigarettes smoke each day - former daily,health behaviour,Smoking,Continuous,cigarettes
+SMKDSTY,Smoking status,Type of smoker,health behaviour,Smoking,Categorical,N/A
+SMKG01C_A,agec1 ,Age smoked first cigarette,health behaviour,Smoking,Categorical,Years
+SMKG01C_B,agec1 ,Age smoked first cigarette,health behaviour,Smoking,Categorical,Years
+SMKG01C_cont,agec1,Age smoked first cigarette,health behaviour,Smoking,Continuous,Years
+SMKG203_A,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Categorical,Years
+SMKG203_B,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Categorical,Years
+SMKG203_cont,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Continuous,Years
+SMKG207_A,agecigd,Age started to smoke daily,health behaviour,Smoking,Categorical,Years
+SMKG207_B,agecigd,Age started to smoke daily,health behaviour,Smoking,Categorical,Years
+SMKG207_cont,agecigd,Age started to smoke daily,health behaviour,Smoking,Continuous,Years

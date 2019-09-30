@@ -1,0 +1,29 @@
+destination: docs
+
+template:
+  params:
+    bootswatch: cosmo
+
+development:
+  mode: auto
+
+home:
+  links:
+    - text: Calculators
+      href: https://www.projectbiglife.ca 
+      
+navbar:
+  structure:
+    left: [home, articles, reference]
+    right: github
+  components:
+    articles:
+      text: Worksheets
+      menu:
+      - text: Using cchsflow
+        href: articles/usingcchsflow.html
+      - text: variables.csv sheet
+        href: articles/variablesSheet.html
+      - text: variableDetails.csv sheet
+        href: articles/variableDetails.html
+

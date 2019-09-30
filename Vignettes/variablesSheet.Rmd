@@ -1,0 +1,63 @@
+---
+title: "variables.csv"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{2 - variables.csv}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+This vignette describes `variables.csv` worksheet. See also the vignette `variableDetails.csv`. The vignette `Transform CCHS variables` provides examples of how to use the two worksheeets with the [`bllflow` package](http://bllflow.projectbiglife.ca) to transform variables.
+
+Read `variables.csv`
+
+```{r Read variables.csv, echo=FALSE, message=FALSE, warning=FALSE}
+library(readr)
+variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
+
+cat("There are", nrow(variables), "variables, grouped in", sum(!duplicated(variables$subject)), "subjects and", sum(!duplicated(variables$section)), "sections that  are available for transformation in CCHS cycles from 2001 to 2014.", "\n\n")
+
+```
+
+```{r, echo=FALSE}
+cat("You can search for variables in the table below. Try searching for the", sum(variables$subject == "Age"), "age variables that are used in the Transform CCHS variables vignette. All", sum(variables$subject == "Age"), "variables are in the age subject. Try sorting the subject column by clicking the up beside the `subject` heading: the top", sum(variables$subject == "Age"), "rows of the table should show the age variables:") 
+
+as.character(variables[variables$subject == "Age", "variable"])
+```
+
+```{r echo=FALSE, results='asis', warning=FALSE}
+library(DT)
+datatable(variables, filter = 'top', options = list(pageLength = 5))
+```
+
+
+## How the `variables.csv` sheet is organized
+
+In each row there are 7 columns in this worksheet and they are as follows:
+
+1. **variable:** the name of the final transformed variable.
+
+2. **label:** the shorthand label for the variable.
+
+3. **labelLong:** a more detailed label for the variable.
+
+4. **section:** the section where this variable could be found (i.e. demographic, health behaviour, chronic diseases).
+
+5. **subject:** what the variable pertains to (i.e. age, smoking, sex).
+
+6. **variableType:** whether the final variable is categorical or continuous.
+
+7. **units:** any units for the final variable.
+
+## Contributing or customizing `variables.csv`
+
+We recommend that you copy `variables.csv` with the variables that you use for your project. You can create your own transformed or derived variables by using the cchsflow `variables.csv` as a template. We welcome [issues](https://github.com/Big-Life-Lab/cchsflow/issues) for comments to existing variables in `variables.csv. Also welcomed are PR for new transformations that you feel are helpful for others who use the CCHS data. See [Contributing]().
