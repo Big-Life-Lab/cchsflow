@@ -22,6 +22,7 @@ install.packages("devtools")
 library(devtools)
 install_github("Big-Life-Lab/bllflow", ref = "recode-with-table-patch")
 ```
+
 ```{r results= 'hide', message = FALSE, warning=FALSE}
 library(bllflow)
 ```
@@ -93,6 +94,7 @@ In this example, the sex variable in the 2001 CCHS cycle is transformed.
 ```{r, warning=FALSE}
 sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHH_SEX"))
 ```
+
 ```{r, echo=FALSE}
 datatable(sex2001, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
@@ -118,6 +120,7 @@ datatable(sex2001, options = list(columnDefs = list(list(className = 'dt-center'
 ```{r, warning=FALSE}
 sex2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", appendToData = FALSE, log = TRUE, variables = c("DHH_SEX"))
 ```
+
 ```{r, echo=FALSE}
 datatable(sex2013, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
@@ -132,11 +135,11 @@ datatable(combinedSex, options = list(columnDefs = list(list(className = 'dt-cen
 
 ### Example 3. Transform a single variable from multiple databases that changes categories between cycles.
 
-There are many variables in the CCHS that changes in categories between cycles in a way that the variable cannot perserve all categories for all CCHS cycles. An example is the categorical variable for `age`. `cchsflow` offer several options to facilitate the use of these variables with inconsisten categories across cycles.
+There are many variables in the CCHS that changes in categories between cycles in a way that the variable cannot perserve all categories for all CCHS cycles. An example is the categorical variable for `age`. `cchsflow` offer several options to facilitate the use of these variables with inconsistent categories across cycles.
 
 #### Example 3.1: transform category `age` variable into a common variable for only cycles with the same category responses
 
-The categories in `age` variable in the CCHS changed in 2005 and therefore it is not possible to have the same `age` categories across all CCHS cycels. `cchsflow` offers two optins. The first option is to transform the `age` variable into two variables. `DHHGAGE_A` is the age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the age variable for CCHS cycles 2005-2014. With this option, you cannot combine `DHHGAGE_A` and `DHHGAGE_B` into a single dataset.
+The categories in `age` variable in the CCHS changed in 2005 and therefore it is not possible to have the same `age` categories across all CCHS cycles. `cchsflow` offers two options The first option is to transform the `age` variable into two variables. `DHHGAGE_A` is the age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the age variable for CCHS cycles 2005-2014. With this option, you cannot combine `DHHGAGE_A` and `DHHGAGE_B` into a single dataset.
 
 ```{r, warning=FALSE}
 age2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", variables = c("DHHGAGE_A"))
@@ -195,9 +198,11 @@ The variables argument in `RecWTable()` is able to handle multiple variables to 
 
 ```{r, warning=FALSE}
 agesex_2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", variables = c("DHHGAGE_cont", "DHH_SEX"), varLabels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
+
 get_label(agesex_2001)
 
 agesex_2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2013-2014-Annual-component", variables = c("DHHGAGE_cont", "DHH_SEX"), varLabels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
+
 get_label(agesex_2013)
 ```
 
@@ -212,7 +217,7 @@ labelledCombinedAgeSex <- SetDataLabels(dataToLabel = combinedAgeSex, variableDe
 datatable(labelledCombinedAgeSex, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:2)), dom = 't'))
 ```
 
-In the above code, `SetDataLabels()` is used to labelled the combined age and sex dataset. Similar to before, you can check if labels have been added using `get_label()`.
+In the above code, `SetDataLabels()` is used to label the combined age and sex dataset. Similar to before, you can check if labels have been added using `get_label()`.
 
 ```{r, warning=FALSE}
 get_label(labelledCombinedAgeSex)
@@ -259,7 +264,11 @@ get_label(labelledCombinedCCHS)
 
 ### Step 4. Warning messages
 
-Warning messages will appear when the variables in your dataset do not match the variables in your two worksheets. In our example, our mock CCHS datasets only contain a two of variables from `variables.csv` and `varDetails.csv`. As such, warning messages about variables not included in our datasets will be printed. 
+Warning messages will appear when the variables in your dataset do not match the variables in your two worksheets. 
+
+In our example, our mock CCHS datasets only contain a two of variables from `variables.csv` and `varDetails.csv`. 
+
+As such, warning messages about variables not included in our datasets will be printed. 
 
 ```{r, echo=FALSE, results="hide", warning=2}
 transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file")

@@ -16,8 +16,8 @@ Authors@R: c(
            family = "Vyuha",
            role = c("aut"),
            email = "rostikvyuha@gmail.com"))
-Description: What the package does (one paragraph).
-License: What license it uses
+Description: 
+License: MIT
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/Big-Life-Lab/cchsflow

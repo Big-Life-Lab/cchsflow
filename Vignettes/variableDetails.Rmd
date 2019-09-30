@@ -30,7 +30,7 @@ cat("In the `variableDetails.csv` worksheet there are", nrow(varDetails), "rows 
 ### Rows
 Each row in `variableDetails.csv` holds the recode rules for transforming a single category for a variable in `variables.csv`. An exception to this rule are the "don't know", "refusal", and "not stated" categories, which are combined as a single missing category. For each unique variable, an `else` row is used to assign values not identified in other rows. We recommend not combining variables across the CCHS if variable has an important change between CCHS cycles `variableDetails$notes` is used to identify issues that may be relevant when transforming the variable or category.
 
-Additional information how to create and use `variableDetails.csv` is in the `bllflow` package. The `bllflow` package includes additional helper functions for creating `variableDetails.csv` using the CCHS Data Document Initiative (DDI) files located in `..\cchsflow\inst\extdata\CCHS_DDI`. 
+Additional information how to create and use `variableDetails.csv` is in the `bllflow` package. The `bllflow` package includes additional helper functions for creating `variableDetails.csv` using the CCHS Data Document Initiative (DDI) files located in `..inst\extdata\CCHS_DDI`. 
 
 If a categorical variable has 4 distinct categories, along with a "not applicable" category and the 3 missing categories, there will be 7 rows: 
 
@@ -148,9 +148,10 @@ The rules for each category of a new variable are a string in `recFrom` and valu
   *value range* is indicated by a colon, e.g. `recFrom= "1:4"; recTo = 1` (recodes all values from 1 to 4 into 1}
   *value range* for double vectors (with fractional part), all values within the specified range are recoded; e.g. `recFrom = "1:2.5"; recTo = 1` recodes 1 to 2.5 into 1, but 2.55 would not be recoded (since it's not included in the specified range)
   *minimum and maximum values* are indicates by `min` (or `lo`) and `max` (or `hi`), e.g. `recFrom = "min:4"; recTo = 1` (recodes all values from minimum values to 4 into 1)
+  *NA* is used for missing values (don't know, refusal, not stated)
   *else* is used all other values, which have not been specified yet, are indicated by `else`, e.g. `recFrom = "else"; recTo = NA` (recode all other values (not specified in other rows) to "NA")}
   *copy* the `else` token can be combined with `copy`, indicating that all remaining, not yet recoded values should stay the same (are copied from the original value), e.g. `recFrom = "else"; recTo = "copy"`
-  *NA* ..... Warsame....
+  
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)

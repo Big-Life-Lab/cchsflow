@@ -26,7 +26,7 @@ bug, you may also create an associated issue. If possible, try to illustrate you
 
 ## Pull request
 
-*  Please create a Git branch for each pull request (PR).
+*  Please create a Git branch for each pull request (PR). [Click here](https://help.github.com/en/articles/creating-a-pull-request-from-a-fork) for information on how to create a PR.
 *  Your contributed code should roughly follow the tidyverse [style guide](http://style.tidyverse.org). _Exceptions_ from this guide: function names in PascalCase (e.g. NewFunction()) and variable names as camelCase (e.g newVariable <- "hi").
 *  cchsflow uses [roxygen2](https://cran.r-project.org/package=roxygen2), with
 [Markdown syntax](https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html),
