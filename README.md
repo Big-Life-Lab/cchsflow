@@ -2,7 +2,7 @@
 
 *cchsflow* supports the use of the Canadian Community Health Survey (CCHS) through common transformation of harmonized variables across survey cycles from 2001 to 2014. 
 
-The CCHS is Canada's main population health survey. The survey is adminstered by Statistics Canada. Information about the survey can be found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226).
+The CCHS is Canada's main population health survey. The survey is adminstered by Statistics Canada. Information about the survey can be found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). The CCHS has a [Statistic Canada Open Licence](https://www.statcan.gc.ca/eng/reference/licence).
 
 *cchsflow* package includes:
 
