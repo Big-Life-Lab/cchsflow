@@ -60,7 +60,10 @@ HUIGMOB,HUI Mobility,"Mobility trouble - function code (D, G)",Health behaviour,
 HUIGSPE,HUI Speech,"Speech trouble - function code - (D, G)",Health behaviour,Health utility index,Categorical,N/A
 HUIGVIS,HUI Vision,"Vision trouble - function code - (D, G)",Health behaviour,Health utility index,Categorical,N/A
 HUPDPAD,HUI Pain,Act. prevent/pain - function code - (D),Health behaviour,Health utility index,Categorical,N/A
+HWTGHTM,Height,"Height (metres)/self-reported - (D,G)",Sociodemographic,Height,Continuous,meters
+HWTGWTK,Weight,"Weight - kilograms (D, G)",Sociodemographic,Weight,Continuous,kg
 HWTGBMI,BMI,"BMI / self-report - (D,G)",health behaviour,BMI,Continuous,kg/m2
+HWTGBMI_derived,Derived BMI,Derived Body Mass Index,health behaviour,BMI,Continuous,kg/m2
 INCDRCA,Household income distribution,Household income distribution - (D),Sociodemographic,Income,Categorical,N/A
 INCDRPR,Household income distribution provincial level,Hhld inc. distribution-prov. level - (D),Sociodemographic,Income,Categorical,N/A
 INCDRRS,Household income distribution health region level,Hhld inc. distribution- hr level - (D),Sociodemographic,Income,Categorical,N/A
