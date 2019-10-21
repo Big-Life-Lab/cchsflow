@@ -15,8 +15,16 @@ Authors@R: c(
     person(given = "Rostyslav", 
            family = "Vyuha",
            role = c("aut"),
-           email = "rostikvyuha@gmail.com"))
-Description: 
+           email = "rostikvyuha@gmail.com"),
+    person(given = "Bennett", 
+           family = "Carol",
+           role = c("aut"),
+           email = "cbennett@ohri.ca"),
+    person(given = "Yulric", 
+          family = "Sequeira",
+          role = c("ctb"),
+          email = "ysequeira@ohri.ca"))
+Description: Variable transformation and harmonization for the Canadian Community Health Survey from 2001 to 2013.
 License: MIT
 Encoding: UTF-8
 LazyData: true
