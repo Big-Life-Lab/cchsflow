@@ -22,7 +22,7 @@ You want to use BMI (body mass index) for a study that spans CCHS 2001 to 2014. 
 
 Searching `BMI` in variables.csv shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
 
-    # calculate BMK for each CCHS cycle
+    # calculate BMI for each CCHS cycle
     cchs2001 <- RecWTable(dataSource = cchs2001, 
                 variableDetails = varDetails, 
                 datasetName = "cchs-82M0013-E-2001-c1-1-general-file", 
