@@ -30,29 +30,29 @@ PackYears_fun <-
     tsq_ds_fun <- function(stpd, stpdy) {
       stpdy <-
         ifelse(stpdy==1, 4,
-               ifelse(stpdy==2, 8,
-                      ifelse(stpdy==3, 12, NA)))
+        ifelse(stpdy==2, 8,
+        ifelse(stpdy==3, 12, NA)))
       tsq_ds <-
         ifelse(stpd==1, 0.5,
-               ifelse(stpd==2, 1.5,
-                      ifelse(stpd==3, 2.5,
-                             ifelse(stpd==4, stpdy, NA))))
+        ifelse(stpd==2, 1.5,
+        ifelse(stpd==3, 2.5,
+        ifelse(stpd==4, stpdy, NA))))
     }
     tsq_ds<-tsq_ds_fun(stpd, stpdy)
     # PackYears for Daily Smoker
     ifelse(TypeOfSmoker==1, pmax(((Age_cont - agecigd)*(cigdayd/20)), 0.0137),
-           # PackYears for Occasional Smoker (former daily)     
-           ifelse(TypeOfSmoker==2, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137) + (pmax((cigdayo*dayocc/30), 1)*tsq_ds),
-                  # PackYears for Occasional Smoker (never daily)      
-                  ifelse(TypeOfSmoker==3, (pmax((cigdayo*dayocc/30), 1)/20)*(Age_cont - agec1),
-                         # PackYears for former daily smoker (non-smoker now)      
-                         ifelse(TypeOfSmoker==4, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137),
-                                # PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      
-                                ifelse(TypeOfSmoker==5 & s100==1, 0.0137,
-                                       # PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      
-                                       ifelse(TypeOfSmoker==5 & s100==2, 0.007,
-                                              # Non-smoker      
-                                              ifelse(TypeOfSmoker==6, 0, NA)))))))
+    # PackYears for Occasional Smoker (former daily)     
+    ifelse(TypeOfSmoker==2, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137) + (pmax((cigdayo*dayocc/30), 1)*tsq_ds),
+    # PackYears for Occasional Smoker (never daily)      
+    ifelse(TypeOfSmoker==3, (pmax((cigdayo*dayocc/30), 1)/20)*(Age_cont - agec1),
+    # PackYears for former daily smoker (non-smoker now)      
+    ifelse(TypeOfSmoker==4, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137),
+    # PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      
+    ifelse(TypeOfSmoker==5 & s100==1, 0.0137,
+    # PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      
+    ifelse(TypeOfSmoker==5 & s100==2, 0.007,
+    # Non-smoker      
+    ifelse(TypeOfSmoker==6, 0, NA)))))))
   }
 
 # Percent time in Canada
