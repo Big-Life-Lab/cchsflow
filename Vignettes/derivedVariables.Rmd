@@ -1,0 +1,193 @@
+---
+title: "Derived variables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1 - using cchsflow}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In _cchsflow_, derived variables are based on CCHS variables listed in `variables.csv`. Derived variables can be used for your own particular research project when individual CCHS variables are not sufficient, and further transformations are needed.
+
+## Creating a derived variable
+
+### Step 1. Creating a custom function
+
+You will first need to create a custom function that will carry out the necessary transformations needed for your derived variable. In the custom function, you will need to specify the CCHS variables used. The names of the CCHS variables will be the transformed variables as described in `variables.csv`
+
+```
+# creating custom function for derived variable
+derivedFunction <- function(var1, var2, var3) {
+  derivedVariable <-  ifelse2(var1 = 1, (var2*var3)/var1,
+                      ifelse2(var1 = 2, 0, NA))
+}
+```
+
+### Step 2. Specifying the derived variable in `variableDetails.csv`
+
+For `RecWTable()` to implement your derived variable during the transformation process, you will need to specify it in `variableDetails.csv`. The same naming convention as described in the [variableDetails](https://big-life-lab.github.io/cchsflow/articles/variableDetails.html) article applies to derived variables with the exception of two columns:
+
+1. In **variableStart**, instead of listing of the database names, write **DerivedVar::** followed with the list of CCHS variables used inside square brackets. 
++ In our sample derived variable it would look like this: `DerivedVar::[var1, var2, var3]`
+
+2. In **recTo**, write **Func::** followed with the name of the custom function used to create the derived variable.
++ In our sample derived variable it would look like this: `Func::derivedFunction`
+
+Once completed, your derived variable should look like this in `variableDetails.csv`
+
+```{r, echo=FALSE, warning=FALSE}
+library(DT)
+sampleVariableDetails <- read.csv(file.path(getwd(), '../inst/extdata/sampleVariableDetails.csv'))
+datatable(sampleVariableDetails[1,], options = list(dom='t'))
+```
+
+### Step 4. Specifying your derived variable in `variables.csv`
+
+Derived variables follow the same conventions as CCHS variables when being listed in `variables.csv`. For more information on this, [see here](https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html)
+
+### Step 5. Transforming derived variables across CCHS cycles
+
+Once specified on both `variables.csv` and `variableDetails.csv`, derived variables are transformed in the same manner as regular CCHS variables. For more information on how to transform variables, [see here](https://big-life-lab.github.io/cchsflow/articles/usingcchsflow.html)
+
+## Example 1: BMI
+
+While BMI is calculated across all CCHS cycles, the method in which it is calculated varies across CCHS cycles, leading to misclassification error that might affect your study. As such, a derived variable for BMI has been created that uses harmonized height (HWTGHTM) and weight (HWTGWTK) variables across all CCHS cycles.
+
+### Step 1. Creating a BMI function
+
+```{r}
+#BMI derived variable
+BMI_derived <- 
+  function(HWTGHTM, 
+           HWTGWTK) {
+    ifelse2((!is.na(HWTGHTM)) & (!is.na(HWTGWTK)), 
+            (HWTGWTK/(HWTGHTM*HWTGHTM)), NA)
+  }
+```
+
+### Steps 2 and 3. Specifying the derived BMI variable in `variableDetails.csv` and `variables.csv`
+
+This is how the `variableDetails.csv` sheet would look for the derived BMI row
+```{r, echo=FALSE, warning=FALSE}
+datatable(sampleVariableDetails[2,], options = list(dom='t'))
+```
+
+And this is how the `variable.csv` sheet would look for the derived BMI row
+
+```{r, echo=FALSE, warning=FALSE}
+sampleVariables <- read.csv(file.path(getwd(), '../inst/extdata/sampleVariables.csv'))
+datatable(sampleVariables[1,], options = list(dom='t'))
+```
+
+### Step 4. Transforming the derived BMI variable across multiple cycles
+
+```{r, eval=FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("Big-Life-Lab/bllflow")
+install_github("Big-Life-Lab/cchs2003")
+install_github("Big-Life-Lab/cchs2010")
+
+library(bllflow)
+library(cchs2003)
+library(cchs2010)
+library(dplyr)
+
+variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
+variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
+
+BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("HWTGHTM", "HWTGWTK"), varLabels = c(HWTGHTM = "Height", HWTGWTK = "Weight"))
+
+BMI2010 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("HWTGHTM", "HWTGWTK"), varLabels = c(HWTGHTM = "Height", HWTGWTK = "Weight"))
+
+combinedBMI <- bind_rows(BMI2003, BMI2010)
+
+get_label(combinedBMI)
+```
+
+## Example 2: Smoking pack-years
+
+Pack-years is a complex derived variable often used by researchers to quantify the amount of cigarette use over a period of time. This derived variable incorporates numerous CCHS smoking variables, along with age.
+
+### Step 1. Creating a pack-years function
+
+When creating a derived variable like pack-years that uses many complex variables, it might be easier to create shorthand names that can be referenced when creating the function.
+
+```{r, eval=FALSE}
+#Smoking variables
+TypeOfSmoker <- SMKDSTY 
+Age_cont <- DHHGAGE_cont
+stpn <- SMK_06A_B #never daily (quit <3 years ago)
+stpd <- SMK_09A_B #former daily (quit <3 years ago)
+stpny <- SMKG06C #never daily (quit >=3 years ago)
+stpdy <- SMKG09C #former daily (quit >=3 years ago)
+agec1 <- SMKG01C_cont #age smoked first cigarette
+agecigd <- SMKG203_cont #age started smoking daily
+agecigfd <- SMKG207_cont #age started smoking daily (former daily)
+cigdayd <- SMK_204 # number of cigarettes smoked per day (daily smoker)
+cigdayo <- SMK_05B # number of cigarettes smoked per day (occasional smoker)
+cigdayf <- SMK_208 # number of cigarettes smoked per day (former daily)
+dayocc <- SMK_05C # number of days smoked at least one cigarette
+s100 <- SMK_01A # smoked 100 cigarettes in lifetime (y/n)
+```
+
+With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.
+
+```{r, eval=FALSE}
+#Smoking pack-years
+PackYears_fun <-
+  function(TypeOfSmoker, Age_cont, stpd, stpdy, agecigd, agecigfd, cigdayd, cigdayo, cigdayf, dayocc, agec1, s100) {
+    #Time since quit for former daily smokers
+    tsq_ds_fun <- function(stpd, stpdy) {
+      stpdy <-
+        ifelse2(stpdy==1, 4,
+        ifelse2(stpdy==2, 8,
+        ifelse2(stpdy==3, 12, NA)))
+      tsq_ds <-
+        ifelse2(stpd==1, 0.5,
+        ifelse2(stpd==2, 1.5,
+        ifelse2(stpd==3, 2.5,
+        ifelse2(stpd==4, stpdy, NA))))
+    }
+    tsq_ds<-tsq_ds_fun(stpd, stpdy)
+    # PackYears for Daily Smoker
+    ifelse2(TypeOfSmoker==1, pmax(((Age_cont - agecigd)*(cigdayd/20)), 0.0137),
+    # PackYears for Occasional Smoker (former daily)     
+    ifelse2(TypeOfSmoker==2, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137) + (pmax((cigdayo*dayocc/30), 1)*tsq_ds),
+    # PackYears for Occasional Smoker (never daily)      
+    ifelse2(TypeOfSmoker==3, (pmax((cigdayo*dayocc/30), 1)/20)*(Age_cont - agec1),
+    # PackYears for former daily smoker (non-smoker now)      
+    ifelse2(TypeOfSmoker==4, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137),
+    # PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      
+    ifelse2(TypeOfSmoker==5 & s100==1, 0.0137,
+    # PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      
+    ifelse2(TypeOfSmoker==5 & s100==2, 0.007,
+    # Non-smoker      
+    ifelse2(TypeOfSmoker==6, 0, NA)))))))
+  }
+```
+
+### Steps 2 and 3. Specifying pack-years in `variableDetails.csv` and `variables.csv`
+
+This is how the `variableDetails.csv` sheet would look for the derived pack-years row
+```{r, echo=FALSE, warning=FALSE}
+datatable(sampleVariableDetails[3,], options = list(dom='t'))
+```
+
+And this is how the `variable.csv` sheet would look for the derived pack-years row
+
+```{r, echo=FALSE, warning=FALSE}
+sampleVariables <- read.csv(file.path(getwd(), '../inst/extdata/sampleVariables.csv'))
+datatable(sampleVariables[2,], options = list(dom='t'))
+```
+
+### Step 4. Transforming pack-years across multiple cycles
+
+```{r, eval=FALSE}
+```

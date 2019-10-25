@@ -101,23 +101,28 @@ SLPG01,Hours sleep,No./hours spent sleeping each night,Health behaviour,Sleep,Ca
 SLPG01_A,Hours sleep,No./hours spent sleeping each night,Health behaviour,Sleep,Categorical,N/A
 SLPG01_cont,Hours sleep,No./hours spent sleeping each night,Health behaviour,Sleep,Continuous,N/A
 SMK_01A,s100,"In lifetime, smoked 100 or more cigarettes",health behaviour,Smoking,Categorical,N/A
-SMK_05B,cigdayo,# of cigarettes smoked daily - occasional smoker,health behaviour,Smoking,Continuous,cigarettes
+SMK_05C,dayocc,# days smoked at least 1 cigarette,health behaviour,Smoking,Continuous,days
 SMK_05D,evd,Ever smoked cigarettes daily - occasional smoker,health behaviour,Smoking,Categorical,N/A
-SMK_06A_A,stpn,When did you stop smoking daily - occasional,health behaviour,Smoking,Categorical,Years
+SMK_06A_A,stpn,When did you stop smoking daily - never daily,health behaviour,Smoking,Categorical,Years
 SMK_06A_B,stpn,When did you stop smoking daily - occasional,health behaviour,Smoking,Categorical,Years
 SMK_06A_cont,stpn,When did you stop smoking daily - occasional,health behaviour,Smoking,Continuous,Years
-SMK_09A_A,stpo,When did you stop smoking daily - occasional,health behaviour,Smoking,Categorical,Years
-SMK_09A_B,stpo,When did you stop smoking daily - occasional,health behaviour,Smoking,Categorical,Years
-SMK_09A_cont,stpo,When did you stop smoking daily - occasional,health behaviour,Smoking,Continuous,Years
+SMK_09A_A,stpd,When did you stop smoking daily - former daily,health behaviour,Smoking,Categorical,Years
+SMK_09A_B,stpd,When did you stop smoking daily - former daily,health behaviour,Smoking,Categorical,Years
+SMK_09A_cont,stpd,When did you stop smoking daily - former daily,health behaviour,Smoking,Continuous,Years
 SMK_204,cigdayd,# of cigarettes smoked daily - daily smoker,health behaviour,Smoking,Continuous,cigarettes
+SMK_05B,cigdayo,# of cigarettes smoked daily - occasional smoker,health behaviour,Smoking,Continuous,cigarettes
 SMK_208,cigdayf,# of cigarettes smoke each day - former daily,health behaviour,Smoking,Continuous,cigarettes
 SMKDSTY,Smoking status,Type of smoker,health behaviour,Smoking,Categorical,N/A
 SMKG01C_A,agec1 ,Age smoked first cigarette,health behaviour,Smoking,Categorical,Years
 SMKG01C_B,agec1 ,Age smoked first cigarette,health behaviour,Smoking,Categorical,Years
 SMKG01C_cont,agec1,Age smoked first cigarette,health behaviour,Smoking,Continuous,Years
-SMKG203_A,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Categorical,Years
-SMKG203_B,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Categorical,Years
-SMKG203_cont,agecigo,Age started to smoke daily - occasional smoker (G),health behaviour,Smoking,Continuous,Years
-SMKG207_A,agecigd,Age started to smoke daily,health behaviour,Smoking,Categorical,Years
-SMKG207_B,agecigd,Age started to smoke daily,health behaviour,Smoking,Categorical,Years
-SMKG207_cont,agecigd,Age started to smoke daily,health behaviour,Smoking,Continuous,Years
+SMKG06C,stpny,Years since stopped smoking daily - never daily,health behaviour,Smoking,Categorical,Years
+SMKG09C,stpdy,Years since stopped smoking daily - former daily,health behaviour,Smoking,Categorical,Years
+SMKG203_A,agecigd,Age started to smoke daily - daily smoker (G),health behaviour,Smoking,Categorical,Years
+SMKG203_B,agecigd,Age started to smoke daily - daily smoker (G),health behaviour,Smoking,Categorical,Years
+SMKG203_cont,agecigd,Age started to smoke daily - daily smoker (G),health behaviour,Smoking,Continuous,Years
+SMKG207_A,agecigfd,Age started to smoke daily - former daily smoker,health behaviour,Smoking,Categorical,Years
+SMKG207_B,agecigfd,Age started to smoke daily - former daily smoker,health behaviour,Smoking,Categorical,Years
+SMKG207_cont,agecigfd,Age started to smoke daily - former daily smoker,health behaviour,Smoking,Continuous,Years
+PackYears_derived,PackYears,Smoking pack-years,health behaviour,Smoking,Continuous,Years
+Pct_time_derived,PctTime,Percentage of time in Canada,Sociodemographic,Migration,Continuous,%
