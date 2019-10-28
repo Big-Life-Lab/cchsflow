@@ -62,6 +62,14 @@ While BMI is calculated across all CCHS cycles, the method in which it is calcul
 ### Step 1. Creating a BMI function
 
 ```{r}
+# Custom ifelse for evaluating NA
+ifelse2 <- function(x, a, b) {
+  falseifNA <- function(x) {
+    ifelse(is.na(x), FALSE, x)
+  }
+  ifelse(falseifNA(x), a, b)
+}
+
 #BMI derived variable
 BMI_derived <- 
   function(HWTGHTM, 
