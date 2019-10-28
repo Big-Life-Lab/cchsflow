@@ -1,3 +1,11 @@
+# Custom ifelse for evaluating NA
+ifelse2 <- function(x, a, b) {
+  falseifNA <- function(x) {
+    ifelse(is.na(x), FALSE, x)
+  }
+  ifelse(falseifNA(x), a, b)
+}
+
 #BMI derived variable
 BMI_derived <- 
   function(HWTGHTM, 
@@ -55,15 +63,14 @@ PackYears_fun <-
 # Percent time in Canada
 Age_cont <- DHHGAGE_cont
 BirthCountry <- SDCGCBG
-Immigrant <- SDCFIMM
 TimeCanada <- SDCGRES
 Pct_time_fun <-
-  function(Age_cont, BirthCountry, Immigrant, TimeCanada) {
+  function(Age_cont, BirthCountry, TimeCanada) {
     TimeCanada_fun <- function(TimeCanada) {
       ifelse2(TimeCanada == 1, 4.5,
-             ifelse(TimeCanada == 2, 15, NA))
+              ifelse2(TimeCanada == 2, 15, NA))
     }
-    TimeCanada<-TimeCanada_fun(TimeCanada)
-    ifelse2(BirthCountry == 1 | Immigrant == 1, 100,
-           ifelse(BirthCountry == 2 | Immigrant == 2, (TimeCanada/Age_cont)*100, NA))
+    TimeCanada <- TimeCanada_fun(TimeCanada)
+    ifelse2(BirthCountry == 1, 100,
+            ifelse2(BirthCountry == 2, (TimeCanada/Age_cont)*100, NA))
   }

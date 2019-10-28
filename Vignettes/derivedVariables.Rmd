@@ -87,28 +87,27 @@ datatable(sampleVariables[1,], options = list(dom='t'))
 
 ### Step 4. Transforming the derived BMI variable across multiple cycles
 
-```{r, eval=FALSE}
-install.packages("devtools")
-library(devtools)
-install_github("Big-Life-Lab/bllflow")
-install_github("Big-Life-Lab/cchs2003")
-install_github("Big-Life-Lab/cchs2010")
+```{r, warning=FALSE}
+#install.packages("devtools")
+#library(devtools)
+#install_github("Big-Life-Lab/bllflow", ref = "derived-variable-creation")
 
 library(bllflow)
-library(cchs2003)
-library(cchs2010)
 library(dplyr)
+load('../data/cchs2003.Rdata')
+load('../data/cchs2010.Rdata')
 
 variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
 variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
 
-BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("HWTGHTM", "HWTGWTK"), varLabels = c(HWTGHTM = "Height", HWTGWTK = "Weight"))
+BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
 
-BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE, variables = c("HWTGHTM", "HWTGWTK"), varLabels = c(HWTGHTM = "Height", HWTGWTK = "Weight"))
+BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
 
 combinedBMI <- bind_rows(BMI2003, BMI2010)
 
-get_label(combinedBMI)
+datatable(combinedBMI)
+
 ```
 
 ## Example 2: Smoking pack-years
@@ -188,12 +187,10 @@ datatable(sampleVariables[2,], options = list(dom='t'))
 ### Step 4. Transforming pack-years across multiple cycles
 
 ```{r, eval=FALSE}
-PackYears2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "SMKG01C_cont", "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A"), varLabels = c(SMKDSTY = "Type of smoker", DHHGAGE_cont = "Converted categorical age", SMK_09A_B = "When did you stop smoking daily - former daily", SMKG09C = "Years since stopped smoking daily - former daily", SMKG01C_cont = "Age smoked first cigarette", SMKG203_cont = "Age started to smoke daily - daily smoker", SMKG207_cont = "Age started to smoke daily - former daily smoker", SMK_204 = "# of cigarettes smoked daily - daily smoker", SMK_05C = "# days smoked at least 1 cigarette", SMK_01A = "In lifetime, smoked 100 or more cigarettes"))
+PackYears2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE)
 
-PackYears2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE, variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "SMKG01C_cont", "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A"), varLabels = c(SMKDSTY = "Type of smoker", DHHGAGE_cont = "Converted categorical age", SMK_09A_B = "When did you stop smoking daily - former daily", SMKG09C = "Years since stopped smoking daily - former daily", SMKG01C_cont = "Age smoked first cigarette", SMKG203_cont = "Age started to smoke daily - daily smoker", SMKG207_cont = "Age started to smoke daily - former daily smoker", SMK_204 = "# of cigarettes smoked daily - daily smoker", SMK_05C = "# days smoked at least 1 cigarette", SMK_01A = "In lifetime, smoked 100 or more cigarettes"))
+PackYears2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE)
 
 combinedPackYears <- bind_rows(PackYears2003, PackYears2010)
-
-get_label(combinedPackYears)
 
 ```
