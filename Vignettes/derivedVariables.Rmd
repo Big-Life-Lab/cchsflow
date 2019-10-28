@@ -88,9 +88,9 @@ datatable(sampleVariables[1,], options = list(dom='t'))
 ### Step 4. Transforming the derived BMI variable across multiple cycles
 
 ```{r, warning=FALSE}
-#install.packages("devtools")
-#library(devtools)
-#install_github("Big-Life-Lab/bllflow", ref = "derived-variable-creation")
+install.packages("devtools")
+library(devtools)
+install_github("Big-Life-Lab/bllflow", ref = "derived-variable-creation")
 
 library(bllflow)
 library(dplyr)
@@ -106,7 +106,7 @@ BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, d
 
 combinedBMI <- bind_rows(BMI2003, BMI2010)
 
-datatable(combinedBMI)
+#datatable(combinedBMI)
 
 ```
 
