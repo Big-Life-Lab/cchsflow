@@ -9,9 +9,7 @@ BMI_derived <-
 #Smoking variables
 TypeOfSmoker <- SMKDSTY 
 Age_cont <- DHHGAGE_cont
-stpn <- SMK_06A_B #never daily (quit <3 years ago)
 stpd <- SMK_09A_B #former daily (quit <3 years ago)
-stpny <- SMKG06C #never daily (quit >=3 years ago)
 stpdy <- SMKG09C #former daily (quit >=3 years ago)
 agec1 <- SMKG01C_cont #age smoked first cigarette
 agecigd <- SMKG203_cont #age started smoking daily
