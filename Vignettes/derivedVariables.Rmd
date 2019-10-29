@@ -95,15 +95,22 @@ datatable(sampleVariables[1,], options = list(dom='t'))
 
 ### Step 4. Transforming the derived BMI variable across multiple cycles
 
-```{r, warning=FALSE}
+Using `RecWTable()` you can now transform your derived variable across multiple CCHS cycles and create a transformed dataset.
+
+```{r, eval = FALSE}
 install.packages("devtools")
 library(devtools)
-install_github("Big-Life-Lab/bllflow", ref = "derived-variable-creation")
+install_github("Big-Life-Lab/bllflow", ref = "dev")
+```
 
+```{r, warning=FALSE, message = FALSE}
 library(bllflow)
-library(dplyr)
-load('../data/cchs2003.Rdata')
-load('../data/cchs2010.Rdata')
+library(cchsflow)
+```
+
+```{r, warning=FALSE}
+data(cchs2003)
+data(cchs2010)
 
 variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
 variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
@@ -111,40 +118,72 @@ variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.
 BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
 
 BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+```
 
+Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `RecWTable()` as shown above. 
+
+Using `bind_rows()`, you can then combine your transformed datasets.
+
+```{r, warning = FALSE}
+library(dplyr)
+library(DT)
 combinedBMI <- bind_rows(BMI2003, BMI2010)
 
-#datatable(combinedBMI)
-
+datatable(combinedBMI)
 ```
 
 ## Example 2: Smoking pack-years
 
 Pack-years is a complex derived variable often used by researchers to quantify the amount of cigarette use over a period of time. This derived variable incorporates numerous CCHS smoking variables, along with age.
 
-### Step 1. Creating a pack-years function
+### Step 1a. Developing shorthand names for derived variable function
 
-When creating a derived variable like pack-years that uses many complex variables, it might be easier to create shorthand names that can be referenced when creating the function.
+When creating a derived variable like pack-years that uses many complex variables, it might be easier to create shorthand names you can be reference when creating the function. 
 
-```{r, eval=FALSE}
+```{r}
 #Smoking variables
-TypeOfSmoker <- SMKDSTY 
-Age_cont <- DHHGAGE_cont
-stpd <- SMK_09A_B #former daily (quit <3 years ago)
-stpdy <- SMKG09C #former daily (quit >=3 years ago)
-agec1 <- SMKG01C_cont #age smoked first cigarette
-agecigd <- SMKG203_cont #age started smoking daily
-agecigfd <- SMKG207_cont #age started smoking daily (former daily)
-cigdayd <- SMK_204 # number of cigarettes smoked per day (daily smoker)
-cigdayo <- SMK_05B # number of cigarettes smoked per day (occasional smoker)
-cigdayf <- SMK_208 # number of cigarettes smoked per day (former daily)
-dayocc <- SMK_05C # number of days smoked at least one cigarette
-s100 <- SMK_01A # smoked 100 cigarettes in lifetime (y/n)
+#TypeOfSmoker <- SMKDSTY 
+#Age_cont <- DHHGAGE_cont
+#stpd <- SMK_09A_B #former daily (quit <3 years ago)
+#stpdy <- SMKG09C #former daily (quit >=3 years ago)
+#agec1 <- SMKG01C_cont #age smoked first cigarette
+#agecigd <- SMKG203_cont #age started smoking daily
+#agecigfd <- SMKG207_cont #age started smoking daily (former daily)
+#cigdayd <- SMK_204 # number of cigarettes smoked per day (daily smoker)
+#cigdayo <- SMK_05B # number of cigarettes smoked per day (occasional smoker)
+#cigdayf <- SMK_208 # number of cigarettes smoked per day (former daily)
+#dayocc <- SMK_05C # number of days smoked at least one cigarette
+#s100 <- SMK_01A # smoked 100 cigarettes in lifetime (y/n)
 ```
+
+**NOTE:** R will **not** read the above transformations. However, the shorthand names can be used in the custom function **if** they are listed in the same order as how their corresponding CCHS variables are listed in `variableDetails.csv`.
+
+For example, let's say you want create a derived variable using age as a continuous variable, height and weight. Shorthand names for the 3 variables can look like this:
+
+```{r}
+#Age_cont <- DHHGAGE_cont
+#Height <- HWTGHTM
+#Weight <- HWTGWTK
+```
+
+In the variableStart column of `variableDetails.csv`, the CCHS variables will be listed in this order:
+
+`DerivedVar::[DHHGAGE_cont, HWTGHTM, HWTGWTK]`
+
+With your custom function following the same order as the variableStart column, you are able to use the shorthand names in your function
+
+```
+derivedFunction <- function(Age_cont, Height, Weight) {
+}
+```
+
+Shorthand names is way to keep track of variables and not run into errors when creating a derived variable.
+
+### Step 1b. Creating derived variable function
 
 With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.
 
-```{r, eval=FALSE}
+```{r, warning=FALSE}
 #Smoking pack-years
 PackYears_fun <-
   function(TypeOfSmoker, Age_cont, stpd, stpdy, agecigd, agecigfd, cigdayd, cigdayo, cigdayf, dayocc, agec1, s100) {
@@ -194,11 +233,14 @@ datatable(sampleVariables[2,], options = list(dom='t'))
 
 ### Step 4. Transforming pack-years across multiple cycles
 
-```{r, eval=FALSE}
-PackYears2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE)
+Just as in the BMI example, you can use `RecWTable()` and `bind_rows()` to transform and combine pack-years across multiple cycles.
 
-PackYears2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE)
+```{r, warning=FALSE}
+PackYears2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "SMKG01C_cont", "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A", "PackYears_derived"))
+
+PackYears2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE, variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "SMKG01C_cont", "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A", "PackYears_derived"))
 
 combinedPackYears <- bind_rows(PackYears2003, PackYears2010)
 
+datatable(combinedPackYears)
 ```

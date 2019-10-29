@@ -15,18 +15,18 @@ BMI_derived <-
   }
 
 #Smoking variables
-TypeOfSmoker <- SMKDSTY 
-Age_cont <- DHHGAGE_cont
-stpd <- SMK_09A_B #former daily (quit <3 years ago)
-stpdy <- SMKG09C #former daily (quit >=3 years ago)
-agec1 <- SMKG01C_cont #age smoked first cigarette
-agecigd <- SMKG203_cont #age started smoking daily
-agecigfd <- SMKG207_cont #age started smoking daily (former daily)
-cigdayd <- SMK_204 # number of cigarettes smoked per day (daily smoker)
-cigdayo <- SMK_05B # number of cigarettes smoked per day (occasional smoker)
-cigdayf <- SMK_208 # number of cigarettes smoked per day (former daily)
-dayocc <- SMK_05C # number of days smoked at least one cigarette
-s100 <- SMK_01A # smoked 100 cigarettes in lifetime (y/n)
+# TypeOfSmoker <- SMKDSTY 
+# Age_cont <- DHHGAGE_cont
+# stpd <- SMK_09A_B #former daily (quit <3 years ago)
+# stpdy <- SMKG09C #former daily (quit >=3 years ago)
+# agecigd <- SMKG203_cont #age started smoking daily
+# agecigfd <- SMKG207_cont #age started smoking daily (former daily)
+# cigdayd <- SMK_204 # number of cigarettes smoked per day (daily smoker)
+# cigdayo <- SMK_05B # number of cigarettes smoked per day (occasional smoker)
+# cigdayf <- SMK_208 # number of cigarettes smoked per day (former daily)
+# dayocc <- SMK_05C # number of days smoked at least one cigarette
+# s100 <- SMK_01A # smoked 100 cigarettes in lifetime (y/n)
+# agec1 <- SMKG01C_cont #age smoked first cigarette
 
 #Smoking pack-years
 PackYears_fun <-
@@ -61,9 +61,9 @@ PackYears_fun <-
   }
 
 # Percent time in Canada
-Age_cont <- DHHGAGE_cont
-BirthCountry <- SDCGCBG
-TimeCanada <- SDCGRES
+# Age_cont <- DHHGAGE_cont
+# BirthCountry <- SDCGCBG
+# TimeCanada <- SDCGRES
 Pct_time_fun <-
   function(Age_cont, BirthCountry, TimeCanada) {
     TimeCanada_fun <- function(TimeCanada) {
