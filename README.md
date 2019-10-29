@@ -18,11 +18,11 @@ This repository does not include the CCHS data. Information for how to access th
 
 ## Usage
 
-You want to use BMI (body mass index) for a study that spans CCHS 2001 to 2014. You find the variable `HWTAGBMI` in the CCHS 2001 corresponds to `Body mass index`, but that in other cycles the variable name chages to `HWTCGBMI`, `HWTDGBMI`, `HWTEGBMI`, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other round to two digits. Furthermore, some cycles don't calculate BMI for respondents < age 20 or > 64. Furthermore, calculate BMI only if height and weight are within certain ranges. These types of changes occur for almost all CCHS variables. Sometime the changes are subtle and difficult to find in the docuementation, even for seemingly straightforward variables such as BMI.
+You want to use BMI (body mass index) for a study that spans CCHS 2001 to 2014. You find the variable `HWTAGBMI` in the CCHS 2001 corresponds to `body mass index`, but that in other cycles the variable name chages to `HWTCGBMI`, `HWTDGBMI`, `HWTEGBMI`, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other round to two digits. Furthermore, some cycles don't calculate BMI for respondents < age 20 or > 64. Furthermore, calculate BMI only if height and weight are within certain ranges. These types of changes occur for almost all CCHS variables. Sometime the changes are subtle and difficult to find in the docuementation, even for seemingly straightforward variables such as BMI.
 
-Searching `BMI` in variables.csv shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
+`cchsflow` creates harmonized variables (where possible) between CCHS cycles. Searching BMI in `variables.csv` shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
 
-    # calculate BMK for each CCHS cycle
+    # calculate BMI variable for the 2001 CCHS cycle
     cchs2001 <- RecWTable(dataSource = cchs2001, 
                 variableDetails = varDetails, 
                 datasetName = "cchs-82M0013-E-2001-c1-1-general-file", 
