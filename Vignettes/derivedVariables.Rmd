@@ -61,6 +61,8 @@ While BMI is calculated across all CCHS cycles, the method in which it is calcul
 
 ### Step 1. Creating a BMI function
 
+For all derived variables in _cchsflow_, we have developed a custom ifelse function that evaluates missing (NA) values.
+
 ```{r}
 # Custom ifelse for evaluating NA
 ifelse2 <- function(x, a, b) {
@@ -69,7 +71,9 @@ ifelse2 <- function(x, a, b) {
   }
   ifelse(falseifNA(x), a, b)
 }
+```
 
+```{r}
 #BMI derived variable
 BMI_derived <- 
   function(HWTGHTM, 
