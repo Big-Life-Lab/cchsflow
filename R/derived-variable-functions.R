@@ -74,3 +74,26 @@ Pct_time_fun <-
     ifelse2(BirthCountry == 1, 100,
             ifelse2(BirthCountry == 2, (TimeCanada/Age_cont)*100, NA))
   }
+
+# Respiratory condition
+# COPD_Emphys < - CCC_091
+# Emphys <- CCC_91E
+# COPD <- CCC_91F
+
+RespCondition_fun1 <-
+  # 1 - subject has a respiratory condition
+  # 2 - subject does not have a respiratory condition
+  function(COPD_Emphys) {
+    ifelse2(COPD_Emphys == 1, 1, 
+    ifelse2(COPD_Emphys == 2, 2, NA))
+  }
+
+RespCondition_fun2 <-
+  # 1 - subject has a respiratory condition
+  # 2 - subject does not have a respiratory condition
+  function(Emphys, COPD) {
+    ifelse2(Emphys == 1, 1, 
+    ifelse2(COPD == 1, 1, 
+    ifelse2((Emphys == 2 & COPD == 2), 2, NA)))
+  }
+
