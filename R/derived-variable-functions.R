@@ -76,24 +76,43 @@ Pct_time_fun <-
   }
 
 # Respiratory condition
+# Age_cont <- DHHGAGE_cont - restricting to respondents over the age of 35
 # COPD_Emphys < - CCC_091
 # Emphys <- CCC_91E
 # COPD <- CCC_91F
+# Bronch <- CCC_91A
 
 RespCondition_fun1 <-
-  # 1 - subject has a respiratory condition
-  # 2 - subject does not have a respiratory condition
-  function(COPD_Emphys) {
-    ifelse2(COPD_Emphys == 1, 1, 
-    ifelse2(COPD_Emphys == 2, 2, NA))
+  # function for cycles that use CCC_091 (COPD and Emphysema as a single variable)
+  # 1 - subject is over the age of 35 and has a respiratory condition
+  # 2 - subject is under the age of 35 and has a respiratory condition
+  # 3 - subject does not have a respiratory condition
+  function(Age_cont, COPD_Emphys) {
+    ifelse2((Age_cont>35 & COPD_Emphys == 1), 1, 
+    ifelse2((Age_cont<35 & COPD_Emphys == 1), 2, 
+    ifelse2(COPD_Emphys == 2, 3, NA)))
   }
 
 RespCondition_fun2 <-
-  # 1 - subject has a respiratory condition
-  # 2 - subject does not have a respiratory condition
-  function(Emphys, COPD) {
-    ifelse2(Emphys == 1, 1, 
-    ifelse2(COPD == 1, 1, 
-    ifelse2((Emphys == 2 & COPD == 2), 2, NA)))
+  # function for cycles that use CCC_91E and CCC_91F (COPD and Emphysema as separate variables)
+  # 1 - subject is over the age of 35 and has a respiratory condition
+  # 2 - subject is under the age of 35 and has a respiratory condition
+  # 3 - subject does not have a respiratory condition
+  function(Age_cont, Emphys, COPD) {
+    ifelse2((Age_cont>35 & Emphys == 1), 1, 
+    ifelse2((Age_cont>35 & COPD == 1), 1,
+    ifelse2((Age_cont<35 & Emphys == 1), 2,
+    ifelse2((Age_cont<35 & COPD == 1), 2,        
+    ifelse2((Emphys == 2 & COPD == 2), 3, NA)))))
   }
 
+RespCondition_fun3 <-
+  # function for cycles that use CCC_91A (Bronchitis)
+  # 1 - subject is over the age of 35 and has a respiratory condition
+  # 2 - subject is under the age of 35 and has a respiratory condition
+  # 3 - subject does not have a respiratory condition
+  function(Age_cont, Bronch) {
+    ifelse2((Age_cont > 35 & Bronch == 1), 1,
+    ifelse2((Age_cont < 35 & Bronch == 1), 2,
+    ifelse2(Bronch == 2, 3, NA)))
+  }
