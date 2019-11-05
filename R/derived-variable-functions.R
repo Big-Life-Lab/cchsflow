@@ -99,13 +99,9 @@ RespCondition_fun2 <-
   # 2 - subject is under the age of 35 and has a respiratory condition
   # 3 - subject does not have a respiratory condition
   function(Age_cont, Emphys, COPD, Bronch) {
-    ifelse2((Age_cont>35 & Emphys == 1), 1, 
-    ifelse2((Age_cont>35 & COPD == 1), 1,
-    ifelse2((Age_cont>35 & Bronch == 1), 1,
-    ifelse2((Age_cont<35 & Emphys == 1), 2,
-    ifelse2((Age_cont<35 & COPD == 1), 2,
-    ifelse2((Age_cont<35 & Bronch == 1), 2,
-    ifelse2((Emphys == 2 & COPD == 2 & Bronch == 2), 3, NA)))))))
+    ifelse2((Age_cont>35 & (Emphys == 1 | COPD == 1 | Bronch == 1)), 1, 
+    ifelse2((Age_cont<35 & Emphys == 1 | COPD == 1 | Bronch == 1), 2,
+    ifelse2((Emphys == 2 & COPD == 2 & Bronch == 2), 3, NA)))
   }
 
 RespCondition_fun3 <-
@@ -114,9 +110,7 @@ RespCondition_fun3 <-
   # 2 - subject is under the age of 35 and has a respiratory condition
   # 3 - subject does not have a respiratory condition
   function(Age_cont, COPD_Emphys, Bronch) {
-    ifelse2((Age_cont > 35 & COPD_Emphys == 1), 1,
-    ifelse2((Age_cont > 35 & Bronch == 1), 1,
-    ifelse2((Age_cont < 35 & COPD_Emphys == 1), 2,
-    ifelse2((Age_cont < 35 & Bronch == 1), 2,
-    ifelse2((COPD_Emphys == 2 & Bronch == 2), 3, NA)))))
+    ifelse2((Age_cont > 35 & (COPD_Emphys == 1 | Bronch == 1)), 1,
+    ifelse2((Age_cont < 35 & (COPD_Emphys == 1 | Bronch == 1)), 2,
+    ifelse2((COPD_Emphys == 2 & Bronch == 2), 3, NA)))
   }
