@@ -3,18 +3,18 @@
 [![Lifecycle:
 development](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
-*cchsflow* supports the use of the Canadian Community Health Survey (CCHS) through harmonization of variables across survey cycles from 2001 to 2014. 
+*cchsflow* supports the use of the Canadian Community Health Survey (CCHS) through transformation of variables for harmonization across the survey cycles (currently, 2001 to 2014).
 
-The CCHS is Canada's primary population health survey. Statistics Canada administers the survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). The CCHS has a [Statistic Canada Open Licence](https://www.statcan.gc.ca/eng/reference/licence).
+The CCHS, administered by Statistics Canada, is Canada's primary population health survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). The CCHS has a [Statistic Canada Open Licence](https://www.statcan.gc.ca/eng/reference/licence).
 
 *cchsflow* package includes:
 
 1. `variables.csv` - a list of variables that can be transformed across CCHS surveys.  
 2. `variableDetails.csv` - information that describes how the variables are recoded.
-3. Vignettes describe how to use R to transform or generate new derived variables that are listed in `variables.csv`. Transformations are performed using `RecWTable()` from the `bllflow` R package. `variables.csv` and `variableDetails.csv` can be used with other stats programs. see [issue](https://github.com/Big-Life-Lab/cchsflow/issues).
-3. Codebooks (metadata documents) for the original CCHS surveys -- see [CCHS_DDI](https://github.com/Big-Life-Lab/cchsflow/tree/master/inst/extdata/CCHS_DDI) folder. The PDF and DDI documents are a resource to examine how variables change across survey cycles. 
+3. Vignettes describe how to use R to transform or generate new derived variables that are listed in `variables.csv`. Transformations are performed using `RecWTable()` from the `bllflow` R package. `variables.csv` and `variableDetails.csv` can be used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
+3. Codebooks (metadata documents) for the original CCHS surveys (see [CCHS_DDI](https://github.com/Big-Life-Lab/cchsflow/tree/master/inst/extdata/CCHS_DDI) folder). The PDF and DDI documents are a resource to examine how variables change across survey cycles. 
 
-This repository does not include the CCHS data. Information on how to access the CCHS data can is [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). The Canadian university community can also access the CCHS through [Odesi](http://odesi2.scholarsportal.info/webview/) -- See health/Canada/Canadian Community Health Survey.
+This repository does not include the CCHS data. Information on how to access the CCHS data can is [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). The Canadian university community can also access the CCHS through [ODESI](http://odesi2.scholarsportal.info/webview/) (see health/Canada/Canadian Community Health Survey).
 
 ## Usage
 
