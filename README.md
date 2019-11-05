@@ -3,7 +3,7 @@
 [![Lifecycle:
 development](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
-*cchsflow* supports the use of the Canadian Community Health Survey (CCHS) through harmonizatoin of variables across survey cycles from 2001 to 2014. 
+*cchsflow* supports the use of the Canadian Community Health Survey (CCHS) through harmonization of variables across survey cycles from 2001 to 2014. 
 
 The CCHS is Canada's primary population health survey. Statistics Canada administers the survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). The CCHS has a [Statistic Canada Open Licence](https://www.statcan.gc.ca/eng/reference/licence).
 
