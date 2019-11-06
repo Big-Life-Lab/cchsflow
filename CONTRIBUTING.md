@@ -1,6 +1,16 @@
-# Contributing to bllflow
+# Contributing to cchsflow
 
-This outlines how to propose a change to cchsflow. 
+This page outlines how to contribute to the `cchsflow` package. 
+
+## Adding variables to cchsflow
+
+### Transforming existing CCHS variables
+
+Using the naming conventions described in the [`variables.csv`](https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html) and [`variableDetails.csv`](https://big-life-lab.github.io/cchsflow/articles/variableDetails.html) you can add more CCHS variables that can be transformed and harmonized across cycles.
+
+### Creating a derived variable
+
+You will first need to create a custom function that will carry out the necessary transformations needed for your derived variable. You will then need to specify your derived variable on `variables.csv` and `variableDetails.csv`. For more information, [click here]('~../Vignettes/howtoaddvariables.html').
 
 ## Documentation
 
