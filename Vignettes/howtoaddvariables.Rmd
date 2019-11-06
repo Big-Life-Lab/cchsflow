@@ -1,0 +1,282 @@
+---
+title: "How to add variables to cchsflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3 - variableDetails.csv}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction 
+
+This vignette explains how you can add variables to the _cchsflow_ package. There are two types of variables that can be added:
+
+1. Existing CCHS variables to be harmonized across cycles.
+2. Derived variables based on harmonized CCHS cycles.
+
+## How to harmonize existing CCHS variables and add them to cchsflow
+
+### Example: Body mass index (BMI)
+
+This example will show how the existing BMI variable was developed using `variableDetails.csv`. 
+
+### Rows
+
+* For this variable, there are 4 rows, 1 for the continuous "category", 1 for not applicable, 1 for missing, and 1 for else. However, CCHS 2001 and 2003 code not applicable and the missing categories differently from other cycles so two extra rows will be created to account for this. In many instances there are changes in how variable categories are coded between CCHS cycles. But since the overall variable structure remains intact, extra rows can be used to help rectify this issue to make sure all values feed into the newly transformed variable.
+
+### Columns
+
+1. **variable:** the most common variable name for BMI is `HWTGBMI`. This should be written for each row.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(2:16)), list(className = 'dt-center', targets = 0:1)), dom = 't'))
+```
+
+2. **dummyVariable:** BMI is a continuous variable, so it does not have dummy variables.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(3:16)), list(className = 'dt-center', targets = 0:2)), dom = 't'))
+```
+
+3. **toType:** BMI was captured in the CCHS as a continuous variable. It does not make much sense to transform it into a categorical variable, so the toType should be `cont` in each row of BMI.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(4:16)), list(className = 'dt-center', targets = 0:3)), dom = 't'))
+```
+
+4. **databaseStart:** BMI was captured in all CCHS surveys between 2001 and 2014, so in the first row with the continuous "category" and the else row, the CCHS identifers will be listed this column:
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392, 397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(5:16)), list(className = 'dt-center', targets = 0:4)), dom = 't'))
+```
+
++ For the not applicable and missing rows that pertain to the 2001 and 2003 CCHS surveys, only write the 2001 and 2003 identifiers in this column. For the not applicable and missing rows that pertain to the 2005 CCHS survey and onwards, write the identifiers for CCHS 2005 onwards. This is because the not applicable category and the missing categories are coded differently.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(393:396), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(5:16)), list(className = 'dt-center', targets = 0:4)), dom = 't'))
+```
+
+5. **variableStart:** In the 2001, 2003, and 2005 CCHS surveys the BMI variable differs from the common name, while in the CCHS surveys from 2007-2014, the BMI variable is the same as the common name. However, the values for not applicable and missing categories changes after 2003. Therefore for the first & else rows, the variableStart column will look like this:
+      
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392, 397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(6:16)), list(className = 'dt-center', targets = 0:5)), dom = 't'))
+```
+      
++ For the not applicable and missing rows that pertain to the 2001 and 2003 CCHS surveys, the variable names for those two cycles will be written.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(393:394), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(6:16)), list(className = 'dt-center', targets = 0:5)), dom = 't'))
+```
+
++ For the not applicable and missing rows that pertain to the 2005 CCHS surveys onwards, the column will look like this:
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(395:396), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(6:16)), list(className = 'dt-center', targets = 0:5)), dom = 't'))
+```
+
+6. **fromType:** As mentioned previously, BMI was measured as a continuous variable in the CCHS, so the fromType should be `cont` in each row of BMI.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(7:16)), list(className = 'dt-center', targets = 0:6)), dom = 't', scrollX = TRUE))
+```
+
+7. **recTo:** Since this is a continuous variable, the first row (the main "category") has `copy` written. For the not applicable rows `NA::a` is written. For the missing and else rows `NA::b` is written.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(8:16)), list(className = 'dt-center', targets = 0:7)), dom = 't', scrollX = TRUE))
+```
+
+8. **numValidCat:** Since this is a continuous variable, there are no actual categories; so `N/A` is written in each row.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(9:16)), list(className = 'dt-center', targets = 0:8)), dom = 't', scrollX = TRUE))
+```
+
+9. **catLabel:** For the first row `BMI` is written. Not applicable rows `not applicable` is written. Missing rows: `missing`. Else row: `else`
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(10:16)), list(className = 'dt-center', targets = 0:9)), dom = 't', scrollX = TRUE))
+```
+
+10. **catLabelLong:** For the first row, `body mass index` is written to give further detail on what BMI is. The other rows remain the same.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(11:16)), list(className = 'dt-center', targets = 0:10)), dom = 't', scrollX = TRUE))
+```
+
+11. **units:** BMI is measured in kg/m^2^, so `kg/m2` is written in each row. 
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(12:16)), list(className = 'dt-center', targets = 0:11)), dom = 't', scrollX = TRUE))
+```
+
+12. **recFrom:** Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row is written as `11.91:57.9`. In the 2001 and 2003 CCHS surveys not applicable was coded as 999.6 so the recFrom for this row would be `999.6:999.6`. Similarly, in the 2001 and 2003 CCHS surveys don't know was coded as 999.7, refusal was coded as 999.8, and not stated was coded as 999.9. Therefore the recFrom for the missing row for CCHS 2001 and 2003 would be `999.7:999.9`. In the not applicable row for the 2005 CCHS survey onwards, the recFrom is `999.96:999.96`. In the missing row for CCHS 2005 onwards, the recFrom is `999.97:999.99`. For the else row, just write `else`.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(13:16)), list(className = 'dt-center', targets = 0:12)), dom = 't', scrollX = TRUE))
+```
+
+13. **catStartLabel:** For the first row, `BMI / self-report (D,G)` is written as it is written in CCHS documentation. The other rows  remain the same, and the values for each missing category are stated in the missing rows.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(14:16)), list(className = 'dt-center', targets = 0:13)), dom = 't', scrollX = TRUE))
+```
+
+14. **variableStartShortLabel:** Writing `BMI` for each row is sufficient for this variable.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(15:16)), list(className = 'dt-center', targets = 0:14)), dom = 't', scrollX = TRUE))
+```
+
+15. **variableStartLabel:** As per CCHS documentation, the label for this variable is `BMI / self-report - (D,G)`.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(16)), list(className = 'dt-center', targets = 0:15)), dom = 't', scrollX = TRUE))
+```
+
+16. **notes: ** As described previously, there are differences between CCHS surveys with regards to coding the not applicable and missing categories. These are documented in this section. Aside from this, there are other changes and differences that should also be documented. In the 2001 CCHS survey, this variable was restricted to participants aged 20-64. As well, don't know (999.97) and refusal (999.98) were not asked in this survey.
+
+```{r, eval=FALSE, warning=FALSE}
+library(DT)
+datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(className = 'dt-center', targets = 0:16)), pageLength = 5, scrollX = TRUE))
+```
+
+## How to create derived variables and add them to cchsflow
+
+## Example: Smoking pack-years
+
+Pack-years is a complex derived variable often used by researchers to quantify the amount of cigarette use over a period of time. This derived variable incorporates numerous CCHS smoking variables, along with age.
+
+### Step 1a. Developing shorthand names for derived variable function
+
+When creating a derived variable like pack-years that uses many complex variables, it might be easier to create shorthand names you can be reference when creating the function. 
+
+```{r}
+#Smoking variables
+#TypeOfSmoker <- SMKDSTY 
+#Age_cont <- DHHGAGE_cont
+#stpd <- SMK_09A_B #former daily (quit <3 years ago)
+#stpdy <- SMKG09C #former daily (quit >=3 years ago)
+#agec1 <- SMKG01C_cont #age smoked first cigarette
+#agecigd <- SMKG203_cont #age started smoking daily
+#agecigfd <- SMKG207_cont #age started smoking daily (former daily)
+#cigdayd <- SMK_204 # number of cigarettes smoked per day (daily smoker)
+#cigdayo <- SMK_05B # number of cigarettes smoked per day (occasional smoker)
+#cigdayf <- SMK_208 # number of cigarettes smoked per day (former daily)
+#dayocc <- SMK_05C # number of days smoked at least one cigarette
+#s100 <- SMK_01A # smoked 100 cigarettes in lifetime (y/n)
+```
+
+**NOTE:** R will **not** read the above transformations. However, the shorthand names can be used in the custom function **if** they are listed in the same order as how their corresponding CCHS variables are listed in `variableDetails.csv`.
+
+For example, let's say you want create a derived variable using age as a continuous variable, height and weight. Shorthand names for the 3 variables can look like this:
+
+```{r}
+#Age_cont <- DHHGAGE_cont
+#Height <- HWTGHTM
+#Weight <- HWTGWTK
+```
+
+In the variableStart column of `variableDetails.csv`, the CCHS variables will be listed in this order:
+
+`DerivedVar::[DHHGAGE_cont, HWTGHTM, HWTGWTK]`
+
+With your custom function following the same order as the variableStart column, you are able to use the shorthand names in your function
+
+```
+derivedFunction <- function(Age_cont, Height, Weight) {
+}
+```
+
+Shorthand names is way to keep track of variables and not run into errors when creating a derived variable.
+
+### Step 1b. Creating derived variable function
+
+With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.
+
+```{r, warning=FALSE}
+#Smoking pack-years
+PackYears_fun <-
+  function(TypeOfSmoker, Age_cont, stpd, stpdy, agecigd, agecigfd, cigdayd, cigdayo, cigdayf, dayocc, agec1, s100) {
+    #Time since quit for former daily smokers
+    tsq_ds_fun <- function(stpd, stpdy) {
+      stpdy <-
+        ifelse2(stpdy==1, 4,
+        ifelse2(stpdy==2, 8,
+        ifelse2(stpdy==3, 12, NA)))
+      tsq_ds <-
+        ifelse2(stpd==1, 0.5,
+        ifelse2(stpd==2, 1.5,
+        ifelse2(stpd==3, 2.5,
+        ifelse2(stpd==4, stpdy, NA))))
+    }
+    tsq_ds<-tsq_ds_fun(stpd, stpdy)
+    # PackYears for Daily Smoker
+    ifelse2(TypeOfSmoker==1, pmax(((Age_cont - agecigd)*(cigdayd/20)), 0.0137),
+    # PackYears for Occasional Smoker (former daily)     
+    ifelse2(TypeOfSmoker==2, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137) + (pmax((cigdayo*dayocc/30), 1)*tsq_ds),
+    # PackYears for Occasional Smoker (never daily)      
+    ifelse2(TypeOfSmoker==3, (pmax((cigdayo*dayocc/30), 1)/20)*(Age_cont - agec1),
+    # PackYears for former daily smoker (non-smoker now)      
+    ifelse2(TypeOfSmoker==4, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137),
+    # PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      
+    ifelse2(TypeOfSmoker==5 & s100==1, 0.0137,
+    # PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      
+    ifelse2(TypeOfSmoker==5 & s100==2, 0.007,
+    # Non-smoker      
+    ifelse2(TypeOfSmoker==6, 0, NA)))))))
+  }
+```
+
+### Steps 2 and 3. Specifying pack-years in `variableDetails.csv` and `variables.csv`
+
+This is how the `variableDetails.csv` sheet would look for the derived pack-years row
+```{r, eval=FALSE, warning=FALSE}
+datatable(sampleVariableDetails[3,], options = list(dom='t'))
+```
+
+And this is how the `variable.csv` sheet would look for the derived pack-years row
+
+```{r, eval=FALSE, warning=FALSE}
+sampleVariables <- read.csv(file.path(getwd(), '../inst/extdata/sampleVariables.csv'))
+datatable(sampleVariables[2,], options = list(dom='t'))
+```
+
+### Step 4. Transforming pack-years across multiple cycles
+
+Just as in the BMI example, you can use `RecWTable()` and `bind_rows()` to transform and combine pack-years across multiple cycles.
+
+```{r, eval=FALSE, warning=FALSE}
+PackYears2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "SMKG01C_cont", "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A", "PackYears_derived"))
+
+PackYears2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE, variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "SMKG01C_cont", "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A", "PackYears_derived"))
+
+combinedPackYears <- bind_rows(PackYears2003, PackYears2010)
+
+datatable(combinedPackYears)
+```
