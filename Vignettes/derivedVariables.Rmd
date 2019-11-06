@@ -13,11 +13,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-Derived variables in CCHS are created from existing, original variables that are transformed into a new variable. An example is body mass index (BMI). Respondents are not asked to report their BMI, but rather they are asked to report their height and weight. BMI is then dereived (calculated) using variables for height and weight.Harmonizing derived variables across CCHS surveys usually required first harmonizing their underlying initial variables. For this reason, `cchsflow` includes variables such as height (`HWTGHTM`) and weight (`HWTGWTK`). 
+CCHS surveys include derived variables that have additional harmonization considerations. Derived variables in CCHS are created from existing, original variables that are transformed into a new variable. An example is body mass index (BMI). Respondents are asked to report their height and weight. BMI is then dereived (calculated) using variables for height and weight. 
 
-Transforming derived variables usually requires variable mapping (mapping two or more variables into a single variable) and math (e.g. BMI = weight/height*height). For this reason, variableDetails.csv supports functions, in addition to simple variable recoding. The functions are referenced in `variableDetails.csv` within `variableStart` with the prefix 'DerivedVar::'. For example,  For BMI (`HWTGBMI_derived`) includes `DerivedVar::[HWTGHTM, HWTGWTK]`, which indicates a function with two startting variables (`HWTGHTM, HWTGWTK`).
+`cchsflow` harmonizing derived variables across CCHS surveys. Usually, dervived variables such as `BMI` require first harmonizing their underlying initial variables. For this reason, `cchsflow` includes variables such as height (`HWTGHTM`) and weight (`HWTGWTK`). 
 
-You can either use existing dervied variable or derive new variables. 
+There are two types derived variables of derived variables in the CCHS surveys. Both types of dervived variables are supported in `cchsflow`. 
+
+- Variable mapping - mapping two or more variables into a single variable.
+- Variables that derived using math equations - BMI is an example. where BMI = weight / height*height. 
+
+You harmonize CCHS derived variables using `recWTable()` and `variables.csv` just as you do for other CCHS `cchsflow` variables. However, `cchsflow` calculates these more complex variables using functions that  are referenced in `variableDetails.csv` within `variableStart` with the prefix 'DerivedVar::'. For example,  For BMI (`HWTGBMI_derived`) includes `DerivedVar::[HWTGHTM, HWTGWTK]`, which indicates a function with two startting variables (`HWTGHTM, HWTGWTK`).
 
 ## Example - Using an existing variable - Body Mass Index (BMI)
 

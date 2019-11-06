@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-This vignette describes `variables.csv` worksheet. See also the vignette `variableDetails.csv`. The vignette `Transform CCHS variables` provides examples of how to use the two worksheeets with the [`bllflow` package](http://bllflow.projectbiglife.ca) to transform variables.
+This vignette describes how the `variables.csv` worksheet is organized and how to find variables that you can transform. See also the vignette `variableDetails.csv`. The vignette `Using cchsflow` provides examples of how to use the two worksheeets with the [`bllflow` package](http://bllflow.projectbiglife.ca). 
 
 Read `variables.csv`
 
@@ -24,7 +24,7 @@ Read `variables.csv`
 library(readr)
 variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
 
-cat("There are", nrow(variables), "variables, grouped in", sum(!duplicated(variables$subject)), "subjects and", sum(!duplicated(variables$section)), "sections that  are available for transformation in CCHS cycles from 2001 to 2014.", "\n\n")
+cat("There are", nrow(variables), "variables, grouped in", sum(!duplicated(variables$subject)), "subjects and", sum(!duplicated(variables$section)), "sections that are available for transformation in CCHS cycles from 2001 to 2014.", "\n\n")
 
 ```
 
@@ -60,4 +60,6 @@ In each row there are 7 columns in this worksheet and they are as follows:
 
 ## Contributing or customizing `variables.csv`
 
-We recommend that you copy `variables.csv` with the variables that you use for your project. You can create your own transformed or derived variables by using the cchsflow `variables.csv` as a template. We welcome [issues](https://github.com/Big-Life-Lab/cchsflow/issues) for comments to existing variables in `variables.csv. Also welcomed are PR for new transformations that you feel are helpful for others who use the CCHS data. See [Contributing]().
+We recommend that you copy `variables.csv` with the variables that you use for your project. You can include only the variables that you use for your project, thereby providing a reference for your project. `variables.csv` is a CSV file to allow use `cchsflow` within a teams that do not use R or have programming experience. `variables.csv` can also be used with `bllflow` for further data cleaning and preprocessing.
+
+You can create your own transformed or derived variables by using the cchsflow `variables.csv` as a template. We welcome [issues](https://github.com/Big-Life-Lab/cchsflow/issues) for comments to existing variables in `variables.csv. Also welcomed are PR for new transformations that you feel are helpful for others who use the CCHS data. See [Contributing]().
