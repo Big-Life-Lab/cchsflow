@@ -1,6 +1,6 @@
 #' 2003 CCHS data
 #' 
-#' This is a subset of the 2003 cycle of the Canadian Community Health Survey (CCHS) 
+#' This is a subset of 200 observations from the 2003 cycle of the Canadian Community Health Survey (CCHS) 
 #' Public Use Microdata file (PUMF) dataset.This survey is conducted by Statistics Canada. The CCHS 
 #' has a [Statistics Canada Open License](https://www.statcan.gc.ca/eng/reference/licence).
 #' 
@@ -19,7 +19,7 @@ NULL
 
 #' 2010 CCHS data
 #' 
-#' This is a subset of the 2010 cycle of the CCHS PUMF dataset.
+#' This is a subset of 200 observations from the 2010 cycle of the CCHS PUMF dataset. 
 #' 
 #' @name cchs2010
 #' @aliases cchs2010

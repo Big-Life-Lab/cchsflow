@@ -7,6 +7,8 @@ ifelse2 <- function(x, a, b) {
 }
 
 #BMI derived variable
+# HWTGHTM: height (in meters)
+# HWTGWTK: weight (in kilograms)
 BMI_derived <- 
   function(HWTGHTM, 
            HWTGWTK) {
