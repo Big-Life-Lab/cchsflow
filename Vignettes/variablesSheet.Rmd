@@ -58,6 +58,10 @@ In each row there are 7 columns in this worksheet and they are as follows:
 
 7. **units:** any units for the final variable.
 
+## Derived Variables
+
+Derived variables follow the same conventions as CCHS variables when being listed in `variables.csv`. For more information on this, [see here](https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html)
+
 ## Contributing or customizing `variables.csv`
 
 We recommend that you copy `variables.csv` with the variables that you use for your project. You can create your own transformed or derived variables by using the cchsflow `variables.csv` as a template. We welcome [issues](https://github.com/Big-Life-Lab/cchsflow/issues) for comments to existing variables in `variables.csv. Also welcomed are PR for new transformations that you feel are helpful for others who use the CCHS data. See [Contributing]().

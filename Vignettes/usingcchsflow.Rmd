@@ -157,7 +157,6 @@ age2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, da
 datatable(age2013, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
-
 #### Example 3.2: transform the categorical `age` variable into a continuous `age` variable
 
 The categorical `age` variable can also be transformed into a single continuous `age` variable. This variable takes the midpoint age of each category for all CCHS cycles. With this option, the age category variable from all CCHS cycles can be combined into a single dataset.
@@ -273,6 +272,11 @@ As such, warning messages about variables not included in our datasets will be p
 ```{r, echo=FALSE, results="hide", warning=2}
 transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file")
 ```
+
+## Transforming derived variables across cycles
+
+Once specified on both `variables.csv` and `variableDetails.csv`, derived variables are transformed in the same manner as regular CCHS variables through `RecWTable()`. 
+
 
 ## Using your own CCHS dataset to transform variables
 
