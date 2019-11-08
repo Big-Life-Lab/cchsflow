@@ -285,6 +285,22 @@ combinedBMI <- bind_rows(BMI2003, BMI2010)
 head(combinedBMI)
 ```
 
+## Notes
+
+`notes` provide context for the decisions that informed harmonization that may affect your decision to use a harmonized variable. 
+
+```{r}
+cat("`cchsflow` includes", length(unique(varDetails$notes)), "variables with notes.")
+```
+
+For example, for `DHHGAGE_A` the category `NA::b` has the following `note`:
+
+`Not applicable, don't know, refusal, not stated (96-99) were options only in CCHS 2003, but had zero responses`.
+
+This note informs the decision to combine values 96 to 99 in `DHHGAGE_A` for CCHS2003 into one common missing value `NA::b`. The label for the `NA::b` category is, "`don't know (97); refusal (98); not stated (99)`".
+
+By default, `recWTable()` prints notes to the console.
+
 ## Label variables and categories.
 
 Use the `SetDataLabels()` function to label the variables in your final dataset. `RecWTable()` labels individual datasets. `SetDataLabels()` labels combined dataset that loose labels when datatables are combined. 
