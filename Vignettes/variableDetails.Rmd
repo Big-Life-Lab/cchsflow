@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ## Introduction
+
 The **variableDetails.csv** worksheet contain details for the variables in `variables.csv`. Information from `variableDetails.csv` worksheet is used by the `RecWTable()` function of the `bllflow` package to transform variables identifed in `variableDetails$variableStart` to the newly transformed variable in `variableDetails$variable`. 
 
 ```{r Read variables.csv, echo=FALSE, message=FALSE, warning=FALSE}
@@ -28,6 +29,7 @@ cat("In the `variableDetails.csv` worksheet there are", nrow(varDetails), "rows 
 ## Structure of variableDetails.csv
 
 ### Rows
+
 Each row in `variableDetails.csv` holds the recode rules for transforming a single category for a variable in `variables.csv`. An exception to this rule are the "don't know", "refusal", and "not stated" categories, which are combined as a single missing category. For each unique variable, an `else` row is used to assign values not identified in other rows. We recommend not combining variables across the CCHS if variable has an important change between CCHS cycles `variableDetails$notes` is used to identify issues that may be relevant when transforming the variable or category.
 
 Additional information how to create and use `variableDetails.csv` is in the `bllflow` package. The `bllflow` package includes additional helper functions for creating `variableDetails.csv` using the CCHS Data Document Initiative (DDI) files located in `..inst\extdata\CCHS_DDI`. 

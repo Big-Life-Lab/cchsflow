@@ -272,6 +272,14 @@ datatable(labelledCombinedCCHS, options = list(columnDefs = list(list(className 
 get_label(labelledCombinedCCHS)
 ```
 
+### Example 5. Transform CCHS derived variables such as Body Mass Index (BMI)
+
+CCHS surveys include derived variables that have one additional harmonization considerations. Derived variables in CCHS are created from existing, original variables that are transformed into a new variable. An example is body mass index (BMI). Respondents are asked to report their height and weight. BMI is then dereived (calculated) using variables for height and weight. 
+
+You harmonize CCHS derived variables using `recWTable()` and `variables.csv` just as you do for other CCHS `cchsflow` variables. The only additional consideration is dervived variables such as `BMI` usually require first harmonizing their underlying initial variables (height and weight). This first step of harmonizing underlying variables is completed for you but you must have the underlying variables in your dataset. For this reason, `cchsflow` includes variables such as height (`HWTGHTM`) and weight (`HWTGWTK`) -- these variables are the hamonized versions of height and weight.
+
+------- Example here -----
+
 ### Warning messages
 
 Warning messages will appear when the variables in your dataset do not match the variables in your two worksheets. 

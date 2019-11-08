@@ -96,8 +96,8 @@
 <a href="#cchsflow" class="anchor"></a>cchsflow <img src="reference/figures/logo.svg" align="right" alt="" width="180">
 </h1></div>
 
-<p><em>cchsflow</em> supports the use of the Canadian Community Health Survey (CCHS) through common transformation of harmonized variables across survey cycles from 2001 to 2014.</p>
-<p>The CCHS is Canada’s main population health survey. The survey is adminstered by Statistics Canada. Information about the survey can be found <a href="http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&amp;SDDS=3226">here</a>. The CCHS has a <a href="https://www.statcan.gc.ca/eng/reference/licence">Statistic Canada Open Licence</a>.</p>
+<p><em>cchsflow</em> supports the use of the Canadian Community Health Survey (CCHS) through the common transformation of harmonized variables across survey cycles from 2001 to 2014.</p>
+<p>The CCHS is Canada’s primary population health survey. Statistics Canada administers the survey. Information about the survey is found <a href="http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&amp;SDDS=3226">here</a>. The CCHS has a <a href="https://www.statcan.gc.ca/eng/reference/licence">Statistic Canada Open Licence</a>.</p>
 <p><em>cchsflow</em> package includes:</p>
 <ol>
 <li>
@@ -105,17 +105,17 @@
 </li>
 <li>
 <code>variableDetails.csv</code> - information that describes how the variables are recoded.</li>
-<li>Vignettes that describe how use R to transform or generate new derived variables that are listed in <code>variables.csv</code>. Transfomations are performed using <code>RecWTable()</code> from the <code>bllflow</code> R package. <code>variables.csv</code> and <code>variableDetails.csv</code> can be used with other stats programs. see <a href="https://github.com/Big-Life-Lab/cchsflow/issues">issue</a>.</li>
+<li>Vignettes describe how to use R to transform or generate new derived variables that are listed in <code>variables.csv</code>. Transformations are performed using <code>RecWTable()</code> from the <code>bllflow</code> R package. <code>variables.csv</code> and <code>variableDetails.csv</code> can be used with other stats programs. see <a href="https://github.com/Big-Life-Lab/cchsflow/issues">issue</a>.</li>
 <li>Codebooks (metadata documents) for the original CCHS surveys – see <a href="https://github.com/Big-Life-Lab/cchsflow/tree/master/inst/extdata/CCHS_DDI">CCHS_DDI</a> folder. The PDF and DDI documents are a resource to examine how variables change across survey cycles.</li>
 </ol>
-<p>This repository does not include the CCHS data. Information for how to access the CCHS data can be found <a href="https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm">here</a>. Canadian university community can also access the CCHS through <a href="http://odesi2.scholarsportal.info/webview/">Odesi</a> – See health/Canada/Canadian Community Health Survey.</p>
+<p>This repository does not include the CCHS data. Information on how to access the CCHS data can is <a href="https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm">here</a>. The Canadian university community can also access the CCHS through <a href="http://odesi2.scholarsportal.info/webview/">Odesi</a> – See health/Canada/Canadian Community Health Survey.</p>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p>You want to use BMI (body mass index) for a study that spans CCHS 2001 to 2014. You find the variable <code>HWTAGBMI</code> in the CCHS 2001 corresponds to <code>Body mass index</code>, but that in other cycles the variable name chages to <code>HWTCGBMI</code>, <code>HWTDGBMI</code>, <code>HWTEGBMI</code>, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other round to two digits. Furthermore, some cycles don’t calculate BMI for respondents &lt; age 20 or &gt; 64. Furthermore, calculate BMI only if height and weight are within certain ranges. These types of changes occur for almost all CCHS variables. Sometime the changes are subtle and difficult to find in the docuementation, even for seemingly straightforward variables such as BMI.</p>
+<p>You want to use BMI (body mass index) for a study that spans CCHS 2001 to 2014. You find the variable <code>HWTAGBMI</code> in the CCHS 2001 corresponds to <code>Body mass index</code>, but that in other cycles, the variable name changes to <code>HWTCGBMI</code>, <code>HWTDGBMI</code>, <code>HWTEGBMI</code>, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don’t calculate BMI for respondents &lt; age 20 or &gt; 64. Also, calculate BMI only if height and weight are within specific ranges. These types of changes occur for almost all CCHS variables. Sometimes the changes are subtle and difficult to find in the documentation, even for seemingly straightforward variables such as BMI.</p>
 <p>Searching <code>BMI</code> in variables.csv shows <code>HWTGBMI</code> calculates BMI with two decimal places for all cycles for all respondents using the respondents’ untruncated height and weight.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># calculate BMK for each CCHS cycle</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">cchs2001 &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2001, </a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># calculate BMI for each CCHS cycle</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">cchs2001_BMI &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2001, </a>
 <a class="sourceLine" id="cb1-3" data-line-number="3">            <span class="dt">variableDetails =</span> varDetails, </a>
 <a class="sourceLine" id="cb1-4" data-line-number="4">            <span class="dt">datasetName =</span> <span class="st">"cchs-82M0013-E-2001-c1-1-general-file"</span>, </a>
 <a class="sourceLine" id="cb1-5" data-line-number="5">            <span class="dt">appendToData =</span> <span class="ot">TRUE</span>,  </a>
@@ -124,8 +124,8 @@
 <div id="important-notes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#important-notes" class="anchor"></a>Important notes</h2>
-<p><em>Combining CCHS across survey cycles will result in misclassfication error and other forms of bias that affects studies in different ways.</em> The transformations that are described in this repository have been used in several research projects (see reference list) but no guarantees are made regarding the accuracy or appropriate uses.</p>
-<p>Care must be taken by you to understand how specific variable transformation and harmonization with <code>cchsflow</code> affects your study or use of CCHS data. Across survey cycles, CCHS variables have had at least some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses.</p>
+<p><em>Combining CCHS across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.</em> The transformations that are described in this repository have been used in several research projects (see reference list), but there are no guarantees regarding the accuracy or appropriate uses.</p>
+<p>Care must be taken by you to understand how specific variable transformation and harmonization with <code>cchsflow</code> affect your study or use of CCHS data. Across survey cycles, CCHS variables have had at least some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses.</p>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -140,8 +140,8 @@
 <h2 class="hasAnchor">
 <a href="#contributing" class="anchor"></a>Contributing</h2>
 <p>Please follow <a href="CONTRIBUTING.html">this guide</a> if you would like to contribute to the <em>cchsflow</em> package.</p>
-<p>We encourage PRs for additional variable transformations and derived variables that you believe may be helpul to the broad CCHS community.</p>
-<p>Currently, <em>cchsflow</em> supports the use of <code>variables.csv</code> and <code>variableDetails.csv</code> with R. SAS, Stata and other statistical packages are commonly used by the CCHS community. Please feel free to contribute to <code>cchsflow</code> by making a PR that creates verions of <code>RecWTable()</code> for other statistical and programming languages.</p>
+<p>We encourage PRs for additional variable transformations and derived variables that you believe may be helpful to the broad CCHS community.</p>
+<p>Currently, <em>cchsflow</em> supports R through the <code>RecWTable()</code> function. The CCHS community commonly uses SAS, Stata and other statistical packages. Please feel free to contribute to <code>cchsflow</code> by making a PR that creates versions of <code>RecWTable()</code> for other statistical and programming languages.</p>
 </div>
 </div>
   </div>

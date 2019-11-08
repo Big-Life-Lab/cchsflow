@@ -2,6 +2,7 @@ pandoc: 2.3.1
 pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
+  derivedVariables: ../vignettes/derivedVariables.html
   usingcchsflow: ../vignettes/usingcchsflow.html
   variableDetails: ../vignettes/variableDetails.html
   variablesSheet: ../vignettes/variablesSheet.html
