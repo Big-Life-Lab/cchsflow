@@ -4,6 +4,9 @@
 #' Public Use Microdata file (PUMF) dataset.This survey is conducted by Statistics Canada. The CCHS 
 #' has a [Statistics Canada Open License](https://www.statcan.gc.ca/eng/reference/licence).
 #' 
+#' Long name: cchs-82M0013-E-2003-c2-1-General File
+#' 
+#' DDI: '~/inst/extdata/CCHS_DDI/cchs-82M0013-E-2003-c2-1-GeneralFile.xml
 #' @name cchs2003
 #' @aliases cchs2003
 #' @docType data
@@ -21,6 +24,10 @@ NULL
 #' 
 #' This is a subset of 200 observations from the 2010 cycle of the CCHS PUMF dataset. 
 #' 
+#' Long name: CCHS-82M0013-E-2010-AnnualComponent
+#' 
+#' DDI: '~/inst/extdata/CCHS_DDI/CCHS-82M0013-E-2010-AnnualComponent.xml
+#'
 #' @name cchs2010
 #' @aliases cchs2010
 #' @docType data
