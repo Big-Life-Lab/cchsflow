@@ -93,6 +93,8 @@ In this example, the `sex` variable in the 2001 CCHS cycle is transformed a harm
 
 ```{r, warning=FALSE}
 sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", log = TRUE, variables = c("DHH_SEX"))
+
+sex2001
 ```
 
 ```{r, echo=FALSE}
@@ -139,7 +141,7 @@ There are many variables in the CCHS that changes in categories between cycles i
 
 #### Option 1: transform category `age` variable into a common variable for only cycles with the same category responses
 
-Option 1 transforms the `age` variable into two variables that cannoot be combined across cycles. The categories in `age` variable in the CCHS changed in 2005 and therefore it is not possible to have the same `age` categories across all CCHS cycles. 
+Transform the `age` variable into variables that cannoot be combined across cycles. The categories in `age` variable in the CCHS changed in 2005 and therefore it is not possible to have the same `age` categories across all CCHS cycles. 
 
 `DHHGAGE_A` is the age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the age variable for CCHS cycles 2005-2014. 
 
@@ -159,14 +161,9 @@ age2013 <- RecWTable(dataSource = cchsMock2013, variableDetails = varDetails, da
 datatable(age2013, options = list(columnDefs = list(list(className = 'dt-center', targets = 0:1)), dom = 't'))
 ```
 
-<<<<<<< HEAD
-#### Example 3.2: transform the categorical `age` variable into a continuous `age` variable
-=======
-
 #### Option 2: transform the categorical `age` variable into a continuous `age_cont` variable
->>>>>>> c13084e2bcef32634748a59523b0caa617bc32a9
 
-Option 2 transforms categorical variables such as `age` into a single harmonized `age_cont` variable. This variable takes the midpoint age of each category for all CCHS cycles. With this option, the age category variable from all CCHS cycles can be combined into a single dataset.
+Transform categorical variables such as `age` into a single harmonized `age_cont` variable. This variable takes the midpoint age of each category for all CCHS cycles. With this option, the age category variable from all CCHS cycles can be combined into a single dataset.
 
 ```{r, warning=FALSE}
 age2001_cont <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file", variables = c("DHHGAGE_cont"))
@@ -195,12 +192,6 @@ datatable(combinedAge_cont, options = list(columnDefs = list(list(className = 'd
 #### Option 3: transform the categorical `age` variable into a harmonized categorical variable
 
 `cchsflow` often includes a common harmonized categorical variable that has new, consistent variables across all cycles. These new categorical variables generally have few category levels than the original variables, reflecting the need to combine categories. Read the `Notes` variable for details.
-
-### Step 3. Label variables and categories.
-
-Use the `SetDataLabels()` function to label the variables in your final dataset. `RecWTable()` labels individual datasets. `SetDataLabels()` labels combined dataset that loose labels when datatables are combined. 
-
-`labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)`
 
 ### Example 4. Transform multiple variables from multiple datasets
 
@@ -274,37 +265,15 @@ get_label(labelledCombinedCCHS)
 
 ### Example 5. Transform CCHS derived variables such as Body Mass Index (BMI)
 
-CCHS surveys include derived variables that have one additional harmonization considerations. Derived variables in CCHS are created from existing, original variables that are transformed into a new variable. An example is body mass index (BMI). Respondents are asked to report their height and weight. BMI is then dereived (calculated) using variables for height and weight. 
+CCHS derived variables are recoded (harmonized) using the same method as other CCHS `cchsflow` variables, with one additional considerations.
 
-You harmonize CCHS derived variables using `recWTable()` and `variables.csv` just as you do for other CCHS `cchsflow` variables. The only additional consideration is dervived variables such as `BMI` usually require first harmonizing their underlying initial variables (height and weight). This first step of harmonizing underlying variables is completed for you but you must have the underlying variables in your dataset. For this reason, `cchsflow` includes variables such as height (`HWTGHTM`) and weight (`HWTGWTK`) -- these variables are the hamonized versions of height and weight.
+Derived variables in CCHS are created from existing, original variables that are transformed into a new variable. An example is body mass index (BMI). Respondents are asked to report their height and weight. BMI is then dereived (calculated) using variables for height and weight. 
 
-------- Example here -----
-
-### Warning messages
-
-Warning messages will appear when the variables in your dataset do not match the variables in your two worksheets. 
-
-In our example, our mock CCHS datasets only contain a two of variables from `variables.csv` and `varDetails.csv`. 
-
-As such, warning messages about variables not included in our datasets will be printed. 
-
-```{r, echo=FALSE, results="hide", warning=2}
-transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file")
-```
-
-## Using your own CCHS dataset to transform variables
-
-At this time, the CCHS datasets cannot be shared publicly. But that does not mean you cannot use a saved CCHS dataset on your computer to transform variables. However, we have included a sample of 200 respondents in the CCHS 2003 and 2010 that you can use to try `cchsflow`.
-
-```{r, eval=FALSE}
-head(cchs2003)
-```
-
-## Transforming derived variables across cycles
-
-Once specified on both `variables.csv` and `variableDetails.csv`, derived variables are transformed in the same manner as regular CCHS variables through `RecWTable()`. Since derived variables are based on transformed CCHS variables, if you want to only transform a derived variable, you will have to also transform its corresponding CCHS variables that it is derived from.
+Recoding `BMI` into a harmonized variable requires their underlying initial variables (height and weight). This first step of harmonizing underlying variables is completed for you, but you must have the underlying variables in your dataset. 
 
 Using the BMI example illustrated in the [derivedVariables]('~../Vignettes/derivedVariables.html') article, `RecWTable()` is able to transform BMI across multiple cycles provided that height (`HWTGHTM`) and weight (`HWTGWTK`) are specified.
+
+For this example, we will use a sample CCHS2003 and 2010 data.
 
 ```{r, eval=FALSE}
 BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
@@ -314,4 +283,22 @@ BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, d
 combinedBMI <- bind_rows(BMI2003, BMI2010)
 
 head(combinedBMI)
+```
+
+## Label variables and categories.
+
+Use the `SetDataLabels()` function to label the variables in your final dataset. `RecWTable()` labels individual datasets. `SetDataLabels()` labels combined dataset that loose labels when datatables are combined. 
+
+`labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)`
+
+## Warning messages
+
+Warning messages will appear when the variables in your dataset do not match the variables in your two worksheets. 
+
+In our example, our mock CCHS datasets only contain a two of variables from `variables.csv` and `varDetails.csv`. 
+
+As such, warning messages about variables not included in our datasets will be printed. 
+
+```{r, echo=FALSE, results="hide", warning=2}
+transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file")
 ```
