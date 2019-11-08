@@ -63,4 +63,4 @@ datatable(combinedBMI)
 
 ## Creating a derived variable
 
-Creating a derived requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here]('~../Vignettes/howtoaddvariables.html')
+Creating a derived requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here]('~../docs/articles/howtoaddvariables.html')

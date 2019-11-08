@@ -26,4 +26,8 @@ navbar:
         href: articles/variablesSheet.html
       - text: variableDetails.csv sheet
         href: articles/variableDetails.html
+      - text: Derived variables
+        href: articles/derivedVariables.html
+      - text: How to add variables
+        href: articles/howtoaddvariables.html
 

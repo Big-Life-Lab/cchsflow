@@ -1,8 +1,9 @@
-pandoc: 2.3.1
+pandoc: 1.19.2.1
 pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
   derivedVariables: ../vignettes/derivedVariables.html
+  howtoaddvariables: ../vignettes/howtoaddvariables.html
   usingcchsflow: ../vignettes/usingcchsflow.html
   variableDetails: ../vignettes/variableDetails.html
   variablesSheet: ../vignettes/variablesSheet.html

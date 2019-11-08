@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Contributing to bllflow • cchsflow</title>
+<title>Contributing to cchsflow • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Contributing to bllflow" />
+<meta property="og:title" content="Contributing to cchsflow" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -101,6 +101,12 @@
     <li>
       <a href="articles/variableDetails.html">variableDetails.csv sheet</a>
     </li>
+    <li>
+      <a href="articles/derivedVariables.html">Derived variables</a>
+    </li>
+    <li>
+      <a href="articles/howtoaddvariables.html">How to add variables</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -128,12 +134,26 @@
 <div class="row">
   <div class="contents col-md-9">
     <div class="page-header">
-      <h1>Contributing to bllflow</h1>
+      <h1>Contributing to cchsflow</h1>
     </div>
 
-<div id="contributing-to-bllflow" class="section level1">
+<div id="contributing-to-cchsflow" class="section level1">
 
-<p>This outlines how to propose a change to cchsflow.</p>
+<p>This page outlines how to contribute to the <code>cchsflow</code> package.</p>
+<div id="adding-variables-to-cchsflow" class="section level2">
+<h2 class="hasAnchor">
+<a href="#adding-variables-to-cchsflow" class="anchor"></a>Adding variables to cchsflow</h2>
+<div id="transforming-existing-cchs-variables" class="section level3">
+<h3 class="hasAnchor">
+<a href="#transforming-existing-cchs-variables" class="anchor"></a>Transforming existing CCHS variables</h3>
+<p>Using the naming conventions described in the <a href="https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html"><code>variables.csv</code></a> and <a href="https://big-life-lab.github.io/cchsflow/articles/variableDetails.html"><code>variableDetails.csv</code></a> you can add more CCHS variables that can be transformed and harmonized across cycles.</p>
+</div>
+<div id="creating-a-derived-variable" class="section level3">
+<h3 class="hasAnchor">
+<a href="#creating-a-derived-variable" class="anchor"></a>Creating a derived variable</h3>
+<p>You will first need to create a custom function that will carry out the necessary transformations needed for your derived variable. You will then need to specify your derived variable on <code>variables.csv</code> and <code>variableDetails.csv</code>. For more information, <a href="'~../Vignettes/howtoaddvariables.html'">click here</a>.</p>
+</div>
+</div>
 <div id="documentation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#documentation" class="anchor"></a>Documentation</h2>
@@ -141,8 +161,8 @@
 <h3 class="hasAnchor">
 <a href="#linking-to-images" class="anchor"></a>Linking to Images</h3>
 <p>When linking to images in .Rmd files, make sure to add the relative path to the image in the resource_files section of the .Rmd file. An example is given below,</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="fu">resource_files:</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">  <span class="kw"><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></span> ../man/figures/coding.png</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">resource_files:</span>
+  <span class="kw"><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></span> ../man/figures/coding.png</code></pre></div>
 </div>
 <div id="linking-to-other--rmd-files" class="section level3">
 <h3 class="hasAnchor">
@@ -181,7 +201,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Bennett Carol.</p>
+  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Carol Bennett.</p>
 </div>
 
 <div class="pkgdown">
