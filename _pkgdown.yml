@@ -14,7 +14,7 @@ home:
       
 navbar:
   structure:
-    left: [home, articles, reference]
+    left: [home, articles, reference, news]
     right: github
   components:
     articles:
@@ -30,4 +30,7 @@ navbar:
         href: articles/derivedVariables.html
       - text: How to add variables
         href: articles/howtoaddvariables.html
+    news:
+      text: Changelog
+      href: news/index.html
 
