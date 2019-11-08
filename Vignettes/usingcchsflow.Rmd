@@ -309,12 +309,5 @@ Use the `SetDataLabels()` function to label the variables in your final dataset.
 
 ## Warning messages
 
-Warning messages will appear when the variables in your dataset do not match the variables in your two worksheets. 
+Warning messages will appear when your dataset is missing variables in your `variables` worksheet or `recWTable()` call.
 
-In our example, our mock CCHS datasets only contain a two of variables from `variables.csv` and `varDetails.csv`. 
-
-As such, warning messages about variables not included in our datasets will be printed. 
-
-```{r, echo=FALSE, results="hide", warning=2}
-transformed2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = varDetails, datasetName = "cchs-82M0013-E-2001-c1-1-general-file")
-```
