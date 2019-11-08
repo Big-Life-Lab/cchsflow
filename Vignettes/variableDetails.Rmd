@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ## Introduction
+
 The **variableDetails.csv** worksheet contain details for the variables in `variables.csv`. Information from `variableDetails.csv` worksheet is used by the `RecWTable()` function of the `bllflow` package to transform variables identifed in `variableDetails$variableStart` to the newly transformed variable in `variableDetails$variable`. 
 
 ```{r Read variables.csv, echo=FALSE, message=FALSE, warning=FALSE}
@@ -28,6 +29,7 @@ cat("In the `variableDetails.csv` worksheet there are", nrow(varDetails), "rows 
 ## Structure of variableDetails.csv
 
 ### Rows
+
 Each row in `variableDetails.csv` holds the recode rules for transforming a single category for a variable in `variables.csv`. An exception to this rule are the "don't know", "refusal", and "not stated" categories, which are combined as a single missing category. For each unique variable, an `else` row is used to assign values not identified in other rows. We recommend not combining variables across the CCHS if variable has an important change between CCHS cycles `variableDetails$notes` is used to identify issues that may be relevant when transforming the variable or category.
 
 Additional information how to create and use `variableDetails.csv` is in the `bllflow` package. The `bllflow` package includes additional helper functions for creating `variableDetails.csv` using the CCHS Data Document Initiative (DDI) files located in `..inst\extdata\CCHS_DDI`. 
@@ -74,7 +76,7 @@ datatable(varDetails[c(75:79), ], options=list(columnDefs = list(list(visible=FA
 
 The CCHS database identifier and other infomation can be extracted using `bllflow::ReadDDI()`
 
-```{r, echo=TRUE, warning=FALSE}
+```{r, eval = FALSE, echo=TRUE, warning=FALSE}
 CCHS2001_DDI <- bllflow::ReadDDI(file.path(getwd(), "../inst/extdata/CCHS_DDI"), "cchs-82M0013-E-2001-c1-1-general-file.xml")
 cat('Dataset name: ', unlist(CCHS2001_DDI$ddiObject$codeBook$docDscr$citation$titlStmt$titl)) 
 cat('ID No: ', unlist(CCHS2001_DDI$ddiObject$codeBook$docDscr$citation$titlStmt$IDNo))
@@ -186,145 +188,20 @@ library(DT)
 datatable(varDetails[c(75:79), ], options=list(columnDefs = list(list(className = 'dt-center', targets = 0:16)), pageLength = 5, scrollX = TRUE))
 ```
 
-## Example: Body mass index (BMI)
+## Derived Variables
 
-This example will show how the transformed BMI variable was developed using `variableDetails.csv`. This is a continuous variable that has remained fairly constant in CCHS cycles between 2001 and 2014.
+The same naming convention applies to derived variables with the exception of two columns:
 
-### Rows
+1. In **variableStart**, instead of database names being listed, **DerivedVar::** is written followed with the list of CCHS variables used inside square brackets. 
++ `DerivedVar::[var1, var2, var3]`
 
-* For this variable, there are 4 rows, 1 for the continuous "category", 1 for not applicable, 1 for missing, and 1 for else. However, CCHS 2001 and 2003 code not applicable and the missing categories differently from other cycles so two extra rows will be created to account for this. In many instances there are changes in how variable categories are coded between CCHS cycles. But since the overall variable structure remains intact, extra rows can be used to help rectify this issue to make sure all values feed into the newly transformed variable.
+2. In **recTo**, write **Func::** followed with the name of the custom function used to create the derived variable.
++ `Func::derivedFunction`
 
-### Columns
-
-1. **variable:** the most common variable name for BMI is `HWTGBMI`. This should be written for each row.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(2:16)), list(className = 'dt-center', targets = 0:1)), dom = 't'))
-```
-
-2. **dummyVariable:** BMI is a continuous variable, so it does not have dummy variables.
+A derived variable looks like this in `variableDetails.csv`
 
 ```{r, echo=FALSE, warning=FALSE}
 library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(3:16)), list(className = 'dt-center', targets = 0:2)), dom = 't'))
-```
-
-3. **toType:** BMI was captured in the CCHS as a continuous variable. It does not make much sense to transform it into a categorical variable, so the toType should be `cont` in each row of BMI.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(4:16)), list(className = 'dt-center', targets = 0:3)), dom = 't'))
-```
-
-4. **databaseStart:** BMI was captured in all CCHS surveys between 2001 and 2014, so in the first row with the continuous "category" and the else row, the CCHS identifers will be listed this column:
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392, 397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(5:16)), list(className = 'dt-center', targets = 0:4)), dom = 't'))
-```
-
-+ For the not applicable and missing rows that pertain to the 2001 and 2003 CCHS surveys, only write the 2001 and 2003 identifiers in this column. For the not applicable and missing rows that pertain to the 2005 CCHS survey and onwards, write the identifiers for CCHS 2005 onwards. This is because the not applicable category and the missing categories are coded differently.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(393:396), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(5:16)), list(className = 'dt-center', targets = 0:4)), dom = 't'))
-```
-
-5. **variableStart:** In the 2001, 2003, and 2005 CCHS surveys the BMI variable differs from the common name, while in the CCHS surveys from 2007-2014, the BMI variable is the same as the common name. However, the values for not applicable and missing categories changes after 2003. Therefore for the first & else rows, the variableStart column will look like this:
-      
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392, 397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(6:16)), list(className = 'dt-center', targets = 0:5)), dom = 't'))
-```
-      
-+ For the not applicable and missing rows that pertain to the 2001 and 2003 CCHS surveys, the variable names for those two cycles will be written.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(393:394), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(6:16)), list(className = 'dt-center', targets = 0:5)), dom = 't'))
-```
-
-+ For the not applicable and missing rows that pertain to the 2005 CCHS surveys onwards, the column will look like this:
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(395:396), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(6:16)), list(className = 'dt-center', targets = 0:5)), dom = 't'))
-```
-
-6. **fromType:** As mentioned previously, BMI was measured as a continuous variable in the CCHS, so the fromType should be `cont` in each row of BMI.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(7:16)), list(className = 'dt-center', targets = 0:6)), dom = 't', scrollX = TRUE))
-```
-
-7. **recTo:** Since this is a continuous variable, the first row (the main "category") has `copy` written. For the not applicable rows `NA::a` is written. For the missing and else rows `NA::b` is written.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(8:16)), list(className = 'dt-center', targets = 0:7)), dom = 't', scrollX = TRUE))
-```
-
-8. **numValidCat:** Since this is a continuous variable, there are no actual categories; so `N/A` is written in each row.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(9:16)), list(className = 'dt-center', targets = 0:8)), dom = 't', scrollX = TRUE))
-```
-
-9. **catLabel:** For the first row `BMI` is written. Not applicable rows `not applicable` is written. Missing rows: `missing`. Else row: `else`
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(10:16)), list(className = 'dt-center', targets = 0:9)), dom = 't', scrollX = TRUE))
-```
-
-10. **catLabelLong:** For the first row, `body mass index` is written to give further detail on what BMI is. The other rows remain the same.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(11:16)), list(className = 'dt-center', targets = 0:10)), dom = 't', scrollX = TRUE))
-```
-
-11. **units:** BMI is measured in kg/m^2^, so `kg/m2` is written in each row. 
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(12:16)), list(className = 'dt-center', targets = 0:11)), dom = 't', scrollX = TRUE))
-```
-
-12. **recFrom:** Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row is written as `11.91:57.9`. In the 2001 and 2003 CCHS surveys not applicable was coded as 999.6 so the recFrom for this row would be `999.6:999.6`. Similarly, in the 2001 and 2003 CCHS surveys don't know was coded as 999.7, refusal was coded as 999.8, and not stated was coded as 999.9. Therefore the recFrom for the missing row for CCHS 2001 and 2003 would be `999.7:999.9`. In the not applicable row for the 2005 CCHS survey onwards, the recFrom is `999.96:999.96`. In the missing row for CCHS 2005 onwards, the recFrom is `999.97:999.99`. For the else row, just write `else`.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(13:16)), list(className = 'dt-center', targets = 0:12)), dom = 't', scrollX = TRUE))
-```
-
-13. **catStartLabel:** For the first row, `BMI / self-report (D,G)` is written as it is written in CCHS documentation. The other rows  remain the same, and the values for each missing category are stated in the missing rows.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(14:16)), list(className = 'dt-center', targets = 0:13)), dom = 't', scrollX = TRUE))
-```
-
-14. **variableStartShortLabel:** Writing `BMI` for each row is sufficient for this variable.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(15:16)), list(className = 'dt-center', targets = 0:14)), dom = 't', scrollX = TRUE))
-```
-
-15. **variableStartLabel:** As per CCHS documentation, the label for this variable is `BMI / self-report - (D,G)`.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(visible=FALSE, targets=c(16)), list(className = 'dt-center', targets = 0:15)), dom = 't', scrollX = TRUE))
-```
-
-16. **notes: ** As described previously, there are differences between CCHS surveys with regards to coding the not applicable and missing categories. These are documented in this section. Aside from this, there are other changes and differences that should also be documented. In the 2001 CCHS survey, this variable was restricted to participants aged 20-64. As well, don't know (999.97) and refusal (999.98) were not asked in this survey.
-
-```{r, echo=FALSE, warning=FALSE}
-library(DT)
-datatable(varDetails[c(392:397), ], options=list(columnDefs = list(list(className = 'dt-center', targets = 0:16)), pageLength = 5, scrollX = TRUE))
+sampleVariableDetails <- read.csv(file.path(getwd(), '../inst/extdata/sampleVariableDetails.csv'))
+datatable(sampleVariableDetails[1,], options = list(dom='t'))
 ```

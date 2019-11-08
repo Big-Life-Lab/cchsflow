@@ -1,0 +1,66 @@
+---
+title: "Derived variables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1 - using cchsflow}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+There are two types derived variables in the CCHS surveys. Both types of dervived variables are supported in `cchsflow`. 
+
+- Variable mapping - mapping two or more variables into a single variable.
+- Variables that derived using math equations - BMI is an example. where BMI = weight / height*height. 
+
+`cchsflow` calculates these more complex dervived variables using functions that are referenced in `variableDetails.csv` within `variableStart` with the prefix 'DerivedVar::'. For example,  For BMI (`HWTGBMI_derived`) includes `DerivedVar::[HWTGHTM, HWTGWTK]`, which indicates a function with two starting variables (`HWTGHTM, HWTGWTK`).
+
+## Example - Body Mass Index (BMI)
+
+While BMI is calculated across all CCHS cycles, the method in which it is calculated varies across CCHS cycles, leading to misclassification error that might affect your study. As such, a derived variable for BMI has been created in `cchsflow` that uses harmonized height (HWTGHTM) and weight (HWTGWTK) variables across all CCHS cycles.
+
+Using `RecWTable()` you can transform the derived BMI variable across multiple CCHS cycles and create a transformed dataset.
+
+```{r, eval = FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("Big-Life-Lab/bllflow", ref = "dev")
+```
+
+```{r, eval=FALSE, message = FALSE}
+library(bllflow)
+library(cchsflow)
+```
+
+```{r, eval = FALSE, warning=FALSE}
+data(cchs2003)
+data(cchs2010)
+
+variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
+variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
+
+BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+
+BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+```
+
+Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `RecWTable()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.
+
+Using `bind_rows()`, you can then combine your transformed datasets.
+
+```{r, eval = FALSE}
+library(dplyr)
+library(DT)
+combinedBMI <- bind_rows(BMI2003, BMI2010)
+
+datatable(combinedBMI)
+```
+
+## Creating a derived variable
+
+Creating a derived requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here]('~../Vignettes/howtoaddvariables.html')
