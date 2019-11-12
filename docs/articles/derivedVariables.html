@@ -77,6 +77,9 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -122,10 +125,10 @@
 <h2 class="hasAnchor">
 <a href="#example---body-mass-index-bmi" class="anchor"></a>Example - Body Mass Index (BMI)</h2>
 <p>While BMI is calculated across all CCHS cycles, the method in which it is calculated varies across CCHS cycles, leading to misclassification error that might affect your study. As such, a derived variable for BMI has been created in <code>cchsflow</code> that uses harmonized height (HWTGHTM) and weight (HWTGWTK) variables across all CCHS cycles.</p>
-<p>Using <code><a href="https://rdrr.io/pkg/bllflow/man/RecWTable.html">RecWTable()</a></code> you can transform the derived BMI variable across multiple CCHS cycles and create a transformed dataset.</p>
+<p>Using <code>RecWTable()</code> you can transform the derived BMI variable across multiple CCHS cycles and create a transformed dataset.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(devtools)
-<span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"Big-Life-Lab/bllflow"</span>, <span class="dt">ref =</span> <span class="st">"dev"</span>)</code></pre></div>
+<span class="kw">install_github</span>(<span class="st">"Big-Life-Lab/bllflow"</span>, <span class="dt">ref =</span> <span class="st">"dev"</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(bllflow)
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(cchsflow)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(cchs2003)
@@ -134,16 +137,16 @@
 variables &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span>(), <span class="st">'../inst/extdata/variables.csv'</span>))
 variableDetails &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span>(), <span class="st">'../inst/extdata/variableDetails.csv'</span>))
 
-BMI2003 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/bllflow/man/RecWTable.html">RecWTable</a></span>(<span class="dt">dataSource =</span> cchs2003, <span class="dt">variableDetails =</span> variableDetails, <span class="dt">datasetName =</span> <span class="st">"cchs-82M0013-E-2003-c2-1-General File"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_derived"</span>))
+BMI2003 &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2003, <span class="dt">variableDetails =</span> variableDetails, <span class="dt">datasetName =</span> <span class="st">"cchs-82M0013-E-2003-c2-1-General File"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_derived"</span>))
 
-BMI2010 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/bllflow/man/RecWTable.html">RecWTable</a></span>(<span class="dt">dataSource =</span> cchs2010, <span class="dt">variableDetails =</span> variableDetails, <span class="dt">datasetName =</span> <span class="st">"CCHS-82M0013-E-2010-AnnualComponent"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_derived"</span>))</code></pre></div>
-<p>Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in <code><a href="https://rdrr.io/pkg/bllflow/man/RecWTable.html">RecWTable()</a></code> as shown above. So for the derived BMI variable, you will have to also specify the height (<code>HWTGHTM</code>) and weight (<code>HWTGWTK</code>) variables.</p>
-<p>Using <code><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows()</a></code>, you can then combine your transformed datasets.</p>
+BMI2010 &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2010, <span class="dt">variableDetails =</span> variableDetails, <span class="dt">datasetName =</span> <span class="st">"CCHS-82M0013-E-2010-AnnualComponent"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_derived"</span>))</code></pre></div>
+<p>Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in <code>RecWTable()</code> as shown above. So for the derived BMI variable, you will have to also specify the height (<code>HWTGHTM</code>) and weight (<code>HWTGWTK</code>) variables.</p>
+<p>Using <code>bind_rows()</code>, you can then combine your transformed datasets.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(DT)
-combinedBMI &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>(BMI2003, BMI2010)
+combinedBMI &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(BMI2003, BMI2010)
 
-<span class="kw"><a href="https://rdrr.io/pkg/DT/man/datatable.html">datatable</a></span>(combinedBMI)</code></pre></div>
+<span class="kw">datatable</span>(combinedBMI)</code></pre></div>
 </div>
 <div id="creating-a-derived-variable" class="section level2">
 <h2 class="hasAnchor">
@@ -153,6 +156,7 @@ combinedBMI &lt;-<span class="st"> </span><span class="kw"><a href="https://dply
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
