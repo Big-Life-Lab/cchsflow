@@ -20,7 +20,7 @@ This repository does not include the CCHS data. Information on how to access the
 
 You want to use BMI (body mass index) for a study that spans CCHS 2001 to 2014. You find the variable `HWTAGBMI` in the CCHS 2001 corresponds to `Body mass index`, but that in other cycles, the variable name changes to `HWTCGBMI`, `HWTDGBMI`, `HWTEGBMI`, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don't calculate BMI for respondents < age 20 or > 64. Also, calculate BMI only if height and weight are within specific ranges. These types of changes occur for almost all CCHS variables. Sometimes the changes are subtle and difficult to find in the documentation, even for seemingly straightforward variables such as BMI.
 
-Searching `BMI` in variables.csv shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
+`cchsflow` creates harmonized variables (where possible) between CCHS cycles. Searching BMI in `variables.csv` shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
 
     # calculate BMI for each CCHS cycle
     cchs2001_BMI <- RecWTable(dataSource = cchs2001, 
