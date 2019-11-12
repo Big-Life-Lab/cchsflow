@@ -1,4 +1,5 @@
-# Custom ifelse for evaluating NA
+#' Custom ifelse for evaluating NA
+#' 
 ifelse2 <- function(x, a, b) {
   falseifNA <- function(x) {
     ifelse(is.na(x), FALSE, x)
