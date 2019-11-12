@@ -57,7 +57,8 @@ Did you notice that the names for the variables are slightly different in the tw
 Don't worry, `cchsflow` is here to help! `variableDetails.csv` contains the rules to harmonize those two variables into a common variable name. In the CCHS, the categories for `sex` are consistient: 1 = males, 2 = females. `variableDetails.csv` provides instructions for how to harmonizecategory values or labels, if they change across survey cycles. Variable labes are discussed in later vignettes.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-kable(varSheet)
+library(DT)
+datatable(varSheet, options = list(pageLength = 5))
 cat("`variables.csv` includes", length(unique(varSheet$variable)), "variables that can be transformed. The variables are divided into", length(unique(varSheet$section)), "sections, and", length(unique(varSheet$subject)), "subjects.")
 ```
 
