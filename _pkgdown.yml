@@ -30,7 +30,21 @@ navbar:
         href: articles/derivedVariables.html
       - text: How to add variables
         href: articles/howtoaddvariables.html
+    reference:
+      text: Reference
+      href: reference/index.html
     news:
       text: Changelog
       href: news/index.html
 
+reference:
+  - title: "Derived variables"
+    desc: Functions for deriving CCHS variables
+    contents:
+    - ifelse2
+    - BMI_derived
+    - PackYears_fun
+    - Pct_time_fun
+    - RespCondition_fun1
+    - RespCondition_fun2
+    - RespCondition_fun3

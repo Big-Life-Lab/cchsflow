@@ -30,3 +30,4 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
+RoxygenNote: 7.0.0
