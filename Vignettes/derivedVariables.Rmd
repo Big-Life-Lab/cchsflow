@@ -32,33 +32,58 @@ library(devtools)
 install_github("Big-Life-Lab/bllflow", ref = "dev")
 ```
 
-```{r, eval=FALSE, message = FALSE}
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
 library(bllflow)
-library(cchsflow)
 ```
 
-```{r, eval = FALSE, warning=FALSE}
+In order derive variables, you must load the existing custom function associated with the derived variable
+```{r, warning=FALSE, message=FALSE}
+# Custom ifelse for evaluating NA
+ifelse2 <- function(x, a, b) {
+  falseifNA <- function(x) {
+    ifelse(is.na(x), FALSE, x)
+  }
+  ifelse(falseifNA(x), a, b)
+}
+
+#BMI derived variable
+# HWTGHTM: height (in meters)
+# HWTGWTK: weight (in kilograms)
+BMI_derived <- 
+  function(HWTGHTM, 
+           HWTGWTK) {
+    ifelse2((!is.na(HWTGHTM)) & (!is.na(HWTGWTK)), 
+            (HWTGWTK/(HWTGHTM*HWTGHTM)), NA)
+  }
+```
+
+```{r, warning=FALSE}
+library(cchsflow)
 data(cchs2003)
 data(cchs2010)
 
 variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
 variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
 
-BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs-82M0013-E-2003-c2-1-General File", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
 
-BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "CCHS-82M0013-E-2010-AnnualComponent", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
 ```
 
 Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `RecWTable()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.
 
 Using `bind_rows()`, you can then combine your transformed datasets.
 
-```{r, eval = FALSE}
+```{r, echo= FALSE, warning = FALSE, message= FALSE}
 library(dplyr)
-library(DT)
+library(knitr)
+library(kableExtra)
+```
+
+```{r, echo=FALSE, message=FALSE}
 combinedBMI <- bind_rows(BMI2003, BMI2010)
 
-datatable(combinedBMI)
+kable(combinedBMI[1:10, ])
 ```
 
 ## Creating a derived variable
