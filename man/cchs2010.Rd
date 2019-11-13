@@ -16,7 +16,7 @@ This is a subset of 200 observations from the 2010 cycle of the CCHS PUMF datase
 \details{
 Long name: CCHS-82M0013-E-2010-AnnualComponent
 
-DDI: '~/inst/extdata/CCHS_DDI/CCHS-82M0013-E-2010-AnnualComponent.xml
+DDI: '~/inst/extdata/CCHS_DDI/CCHS_2010_DDI.xml
 }
 \examples{
 data(cchs2010)
