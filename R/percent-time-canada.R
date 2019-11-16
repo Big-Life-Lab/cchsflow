@@ -1,6 +1,7 @@
 #' Percent time in Canada
 #' 
-#' This function creates a derived variable that provides a percentage of the time a person's life was spent in Canada
+#' This function creates a derived variable that provides a percentage of the time a person's life was spent in 
+#' Canada.
 #' 
 #' @param Age_cont continuous age variable. 
 #' cchsflow variable name: DHHGAGE_cont
@@ -11,7 +12,7 @@
 #' @param TimeCanada how long someone has lived in Canada
 #' cchsflow variable name: SDCGRES
 #' 
-#' @return value of percentage of time spent living in Canada in the Pct_time_derived variable
+#' @return value of percentage of life spent living in Canada
 #' 
 #' @export
 Pct_time_fun <-

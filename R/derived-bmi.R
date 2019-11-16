@@ -22,12 +22,13 @@ ifelse2 <- function(x, a, b) {
 
 #' Body Mass Index (BMI) derived variable
 #' 
-#' This function creates a derived BMI variable independent from the BMI variable provided by the CCHS. Within the CCHS, 
-#' the method in calculating BMI varies across cycles, leading to measurement error. Therefore, if you would like to 
-#' examine BMI across CCHS cycles it is recommended to use this derived BMI variable. If looking at BMI data in one
-#' CCHS year, it is appropriate to use the CCHS BMI variable (HWTGBMI) that is also available on cchsflow.
+#' This function creates a harmonized BMI variable. The BMI variable provided by the CCHS calculates BMI using methods
+#' that varies across cycles, leading to measurement error when using multiple CCHS cycles. HWTGBMI_derived is recommended when 
+#' using multiple survey cycles.  
 #' 
-#' This variable uses the CCHS variables for height and weight that have been transformed by cchsflow. In order to 
+#' For any single CCHS survey year, it is appropriate to use the CCHS BMI variable (HWTGBMI) that is also available on cchsflow.
+#' 
+#' HWTGBMI_derived uses the CCHS variables for height and weight that have been transformed by cchsflow. In order to 
 #' generate a value for BMI across CCHS cycles, height and weight must be transformed and harmonized.
 #' 
 #' In earlier CCHS cycles (2001 and 2003), height was collected in inches; while in later CCHS cycles (2005+) 
@@ -38,7 +39,7 @@ ifelse2 <- function(x, a, b) {
 #' 
 #' @param HWTGWTK CCHS variable for weight (in kilograms)
 #' 
-#' @return a value for BMI in the HWTGBMI_derived variable
+#' @return numeric value for BMI in the HWTGBMI_derived variable
 #' 
 #' @examples 
 #' # Using BMI_derived to create BMI values across cycles
