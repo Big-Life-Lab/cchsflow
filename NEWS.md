@@ -3,6 +3,7 @@
 ## Features:
 
 - Documentation for derived variable functions now available
+- Documentation for derived alcohol variables now available
 
 # cchsflow 0.2.0 
 

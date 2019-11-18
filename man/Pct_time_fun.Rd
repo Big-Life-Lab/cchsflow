@@ -4,21 +4,19 @@
 \alias{Pct_time_fun}
 \title{Percent time in Canada}
 \usage{
-Pct_time_fun(Age_cont, BirthCountry, TimeCanada)
+Pct_time_fun(DHHGAGE_cont, SDCGCBG, SDCGRES)
 }
 \arguments{
-\item{Age_cont}{continuous age variable. 
-cchsflow variable name: DHHGAGE_cont}
+\item{DHHGAGE_cont}{continuous age variable.}
 
-\item{BirthCountry}{whether or not someone was born in Canada 
-cchsflow variable name: SDCGCBG}
+\item{SDCGCBG}{whether or not someone was born in Canada}
 
-\item{TimeCanada}{how long someone has lived in Canada
-cchsflow variable name: SDCGRES}
+\item{SDCGRES}{how long someone has lived in Canada}
 }
 \value{
-value of percentage of time spent living in Canada in the Pct_time_derived variable
+numeric value that is a fraction between 0 and 1 that represents percentage of a respondent's time in Canada
 }
 \description{
-This function creates a derived variable that provides a percentage of the time a person's life was spent in Canada
+This function creates a derived variable that provides a percentage of the time a person's life was spent in 
+ Canada.
 }

@@ -11,12 +11,14 @@ http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=164081
 \item{cchs2014}{a data frame}
 }
 \description{
-This is a subset of 200 observations from the 2014 cycle of the CCHS PUMF dataset.
+This is a subset of 200 observations from the 2014 cycle of the Canadian Community Health Survey (CCHS) 
+Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. See the [Statistics Canada Open License](https://www.statcan.gc.ca/eng/reference/licence).
 }
 \details{
 Long name: cchs-82M0013-E-2014-Annual-component
 
 DDI: '~/inst/extdata/CCHS_DDI/CCHS_2014_DDI.xml
+Additional documentation (PDFs): https://osf.io/hkuy3/
 }
 \examples{
 data(cchs2014)
