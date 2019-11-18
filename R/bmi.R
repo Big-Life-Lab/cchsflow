@@ -2,7 +2,7 @@
 #' 
 #' @description Custom ifelse function that evaluates missing (NA) values
 #' 
-#' @details If the logical argument compares to a value that is NA, it will set `x` to `FALSE`  
+#' @details If the logical argument (x) compares to a value that is `NA`, it is set to `FALSE`  
 #' 
 #' @param x A logical argument
 #' 
@@ -10,7 +10,7 @@
 #' 
 #' @param b value if `x` is `FALSE`
 #' 
-#' @return None
+#' @return a or b based on the evaluation of x
 #' 
 #' @examples ifelse2((age<18),"child", "adult")
 #' 
@@ -25,25 +25,25 @@ ifelse2 <- function(x, a, b) {
 #' @title Body Mass Index (BMI) derived variable
 #' 
 #' @description This function creates a harmonized BMI variable. The BMI variable provided by the CCHS calculates BMI using methods
-#' that varies across cycles, leading to measurement error when using multiple CCHS cycles. In certain CCHS cycles (2001-2003, 2007+),
-#' there are age restrictions in which respondents under the age of 20 and over the age of 64 were not included. Across all CCHS cycles
-#' female respondents who identifed as being pregnant were excluded; and in certain CCHS cycles (2003-2007, 2013-2014), females who did not
-#' answer the pregnancy question were coded as NS (not stated) for HWTGBMI. As well, in certain CCHS cycles (2001-2003, 2009-2014),
-#' respondents outside certain height and weight ranges (0.914-2.108m for height, 0-260kg for weight) were excluded from HWTGBMI. 
+#'  that varies across cycles, leading to measurement error when using multiple CCHS cycles. In certain CCHS cycles (2001-2003, 2007+),
+#'  there are age restrictions in which respondents under the age of 20 and over the age of 64 were not included. Across all CCHS cycles
+#'  female respondents who identifed as being pregnant were excluded; and in certain CCHS cycles (2003-2007, 2013-2014), females who did not
+#'  answer the pregnancy question were coded as NS (not stated) for HWTGBMI. As well, in certain CCHS cycles (2001-2003, 2009-2014),
+#'  respondents outside certain height and weight ranges (0.914-2.108m for height, 0-260kg for weight) were excluded from HWTGBMI. 
 #' 
 #' @details For HWTGBMI_derived, there are no restrictions to age, height, weight, or pregnancy status. While pregnancy was consistent across 
-#' all CCHS cycles, its variable (MAM_037) was not available in the PUMF CCHS datasets so it could not be harmonized and included into 
-#' the function.
+#'  all CCHS cycles, its variable (MAM_037) was not available in the PUMF CCHS datasets so it could not be harmonized and included into 
+#'  the function.
 #' 
-#' For any single CCHS survey year, it is appropriate to use the CCHS BMI variable (HWTGBMI) that is also available on cchsflow.
-#' HWTGBMI_derived is recommended when using multiple survey cycles.  
+#'  For any single CCHS survey year, it is appropriate to use the CCHS BMI variable (HWTGBMI) that is also available on cchsflow.
+#'  HWTGBMI_derived is recommended when using multiple survey cycles.  
 #' 
-#' HWTGBMI_derived uses the CCHS variables for height and weight that have been transformed by cchsflow. In order to 
-#' generate a value for BMI across CCHS cycles, height and weight must be transformed and harmonized.
+#'  HWTGBMI_derived uses the CCHS variables for height and weight that have been transformed by cchsflow. In order to 
+#'  generate a value for BMI across CCHS cycles, height and weight must be transformed and harmonized.
 #' 
 #' @note In earlier CCHS cycles (2001 and 2003), height was collected in inches; while in later CCHS cycles (2005+) 
-#' it was collected in meters. To harmonize values across cycles, height was converted to meters (to 3 decimal points). 
-#' Weight was collected in kilograms across all CCHS cycles, so no transformations were required in the harmonization process.
+#'  it was collected in meters. To harmonize values across cycles, height was converted to meters (to 3 decimal points). 
+#'  Weight was collected in kilograms across all CCHS cycles, so no transformations were required in the harmonization process.
 #' 
 #' @param HWTGHTM CCHS variable for height (in meters)
 #' 

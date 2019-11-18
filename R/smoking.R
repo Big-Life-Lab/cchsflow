@@ -1,6 +1,7 @@
 #' @title Smoking pack-years
 #' 
-#' @details Measures an individual smoking pack-years based on various CCHS smoking variables
+#' @description Measures an individual smoking pack-years based on various CCHS smoking variables. This is a popular variable
+#'  used by researchers to quantify lifetime exposure to cigarette use.
 #' 
 #' @param SMKDSTY derived variable that classifies an individual's smoking status. 
 #' 
