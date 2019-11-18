@@ -1,6 +1,6 @@
-#' Smoking pack-years
+#' @title Smoking pack-years
 #' 
-#' Measures an individual smoking pack-years based on various CCHS smoking variables
+#' @details Measures an individual smoking pack-years based on various CCHS smoking variables
 #' 
 #' @param SMKDSTY derived variable that classifies an individual's smoking status. 
 #' 

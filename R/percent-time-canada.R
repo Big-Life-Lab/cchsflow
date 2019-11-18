@@ -1,6 +1,6 @@
-#' Percent time in Canada
+#' @title Percent time in Canada
 #' 
-#' This function creates a derived variable that provides a percentage of the time a person's life was spent in 
+#' @description This function creates a derived variable that provides a percentage of the time a person's life was spent in 
 #' Canada. 
 #' 
 #' @param DHHGAGE_cont continuous age variable. 
