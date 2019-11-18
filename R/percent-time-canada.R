@@ -1,7 +1,7 @@
 #' Percent time in Canada
 #' 
 #' This function creates a derived variable that provides a percentage of the time a person's life was spent in 
-#' Canada.
+#' Canada. 
 #' 
 #' @param DHHGAGE_cont continuous age variable. 
 #' 
@@ -9,7 +9,7 @@
 #' 
 #' @param SDCGRES how long someone has lived in Canada
 #' 
-#' @return value of percentage of life spent living in Canada
+#' @return numeric value that is a fraction between 0 and 1 that represents percentage of a respondent's time in Canada
 #' 
 #' @export
 Pct_time_fun <-
@@ -19,6 +19,6 @@ Pct_time_fun <-
       ifelse2(SDCGRES == 2, 15, NA))
     }
     SDCGRES <- SDCGRES_fun(SDCGRES)
-    ifelse2(SDCGCBG == 1, 100,
-    ifelse2(SDCGCBG == 2, (SDCGRES/DHHGAGE_cont)*100, NA))
+    ifelse2(SDCGCBG == 1, 1,
+    ifelse2(SDCGCBG == 2, (SDCGRES/DHHGAGE_cont), NA))
   }
