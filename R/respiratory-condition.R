@@ -1,80 +1,80 @@
-#' Respiratory condition variable
+#' @title RespCondition_fun1
 #' 
-#' This function creates a derived variable that determines if a subject has a respiratory condition
+#' @description This is one of 3 functions used to create a derived variable (RespCondition_derived) that determines if a respondents has a respirtory condition.
+#' 3 different functions have been created to account for the fact that different respiratory variables are used across CCHS cycles.
+#' This function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as a combined variable. 
 #' 
-#' This function is for CCHS cycles that only use COPD and Emphysema as a combined variable
+#' @param DHHGAGE_cont continuous age variable. 
 #' 
-#' @param Age_cont continuous age variable. 
-#' cchsflow variable name: DHHGAGE_cont
-#' 
-#' @param COPD_Emphys variable indicating if subject has either COPD or Emphysema
-#' cchsflow variable name: CCC_091
+#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
 #' 
 #' @return a categorical variable (RespCondition_derived) with 3 levels:
-#' 1 - subject is over the age of 35 and has a respiratory condition
-#' 2 - subject is under the age of 35 and has a respiratory condition
-#' 3 - subject does not have a respiratory condition
+#' 1 - respondent is over the age of 35 and has a respiratory condition
+#' 2 - respondent is under the age of 35 and has a respiratory condition
+#' 3 - respondent does not have a respiratory condition
+#' 
+#' @seealso RespCondition_fun2, RespCondition_fun3
 #' 
 #' @export
 RespCondition_fun1 <-
-  function(Age_cont, COPD_Emphys) {
-    ifelse2((Age_cont>35 & COPD_Emphys == 1), 1, 
-            ifelse2((Age_cont<35 & COPD_Emphys == 1), 2, 
-                    ifelse2(COPD_Emphys == 2, 3, NA)))
+  function(DHHGAGE_cont, CCC_091) {
+    ifelse2((DHHGAGE_cont>35 & CCC_091 == 1), 1, 
+    ifelse2((DHHGAGE_cont<35 & CCC_091 == 1), 2, 
+    ifelse2(CCC_091 == 2, 3, NA)))
   }
 
 
-#' Respiratory condition variable
+#' @title RespCondition_fun2
 #' 
-#' This function for CCHS cycles that use COPD & Emphysema as separate variables, as well as Bronchitis
+#' @description This is one of 3 functions used to create a derived variable (RespCondition_derived) that determines if a respondents has a respirtory condition. 
+#' This function is for CCHS cycles (2005-2007) that use COPD & Emphysema as separate variables, as well as Bronchitis.
 #' 
-#' @param Age_cont continuous age variable. 
-#' cchsflow variable name: DHHGAGE_cont
+#' @param DHHGAGE_cont continuous age variable. 
 #' 
-#' @param Emphys variable indicating if subject has emphysema
-#' cchsflow variable name: CCC_91E 
+#' @param CCC_91E variable indicating if respondent has emphysema
 #' 
-#' @param COPD variable indicating if subject has COPD
-#' cchsflow variable name: CCC_91F 
+#' @param CCC_91F variable indicating if respondent has COPD
 #' 
-#' @param Bronc variable indicating if subject has chronic bronchitis
-#' cchsflow variable name: CCC_91A
+#' @param CCC_91A variable indicating if respondent has chronic bronchitis
 #' 
 #' @return a categorical variable (RespCondition_derived) with 3 levels:
-#' 1 - subject is over the age of 35 and has a respiratory condition
-#' 2 - subject is under the age of 35 and has a respiratory condition
-#' 3 - subject does not have a respiratory condition
+#' 1 - respondent is over the age of 35 and has a respiratory condition
+#' 2 - respondent is under the age of 35 and has a respiratory condition
+#' 3 - respondent does not have a respiratory condition
+#' 
+#' @seealso RespCondition_fun1, RespCondition_fun3
 #' 
 #' @export
 RespCondition_fun2 <-
-  function(Age_cont, Emphys, COPD, Bronch) {
-    ifelse2((Age_cont>35 & (Emphys == 1 | COPD == 1 | Bronch == 1)), 1, 
-            ifelse2((Age_cont<35 & Emphys == 1 | COPD == 1 | Bronch == 1), 2,
-                    ifelse2((Emphys == 2 & COPD == 2 & Bronch == 2), 3, NA)))
+  function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A) {
+    ifelse2((DHHGAGE_cont>35 & (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 1, 
+    ifelse2((DHHGAGE_cont<35 & (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 2,
+    ifelse2((CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2), 3, NA)))
   }
 
-#' Respiratory condition variable
+#' @title RespCondition_fun3
 #' 
-#' This function for CCHS cycles that use COPD and Emphysema as a combined variable, as well as Bronchitis
+#' @description This is one of 3 functions used to create a derived variable (RespCondition_derived) that determines if a respondents has a respirtory condition.
+#' This function for CCHS cycles (2001-2003) that use COPD and Emphysema as a combined variable, as well as Bronchitis
 #' 
-#' @param Age_cont continuous age variable. 
-#' cchsflow variable name: DHHGAGE_cont
+#' @param DHHGAGE_cont continuous age variable. 
 #' 
-#' @param COPD_Emphys variable indicating if subject has either COPD or Emphysema
-#' cchsflow variable name: CCC_091
+#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
 #' 
-#' @param Bronc variable indicating if subject has chronic bronchitis
+#' @param CCC_91A variable indicating if respondent has chronic bronchitis
 #' cchsflow variable name: CCC_91A
 #' 
 #' @return a categorical variable (RespCondition_derived) with 3 levels:
-#' 1 - subject is over the age of 35 and has a respiratory condition
-#' 2 - subject is under the age of 35 and has a respiratory condition
-#' 3 - subject does not have a respiratory condition
+#' 1 - respondent is over the age of 35 and has a respiratory condition
+#' 2 - respondent is under the age of 35 and has a respiratory condition
+#' 3 - respondent does not have a respiratory condition
+#' 
+#' @seealso RespCondition_fun1, RespCondition_fun2
 #' 
 #' @export
 RespCondition_fun3 <-
-  function(Age_cont, COPD_Emphys, Bronch) {
-    ifelse2((Age_cont > 35 & (COPD_Emphys == 1 | Bronch == 1)), 1,
-            ifelse2((Age_cont < 35 & (COPD_Emphys == 1 | Bronch == 1)), 2,
-                    ifelse2((COPD_Emphys == 2 & Bronch == 2), 3, NA)))
+  function(DHHGAGE_cont, CCC_091, CCC_91A) {
+    ifelse2((DHHGAGE_cont > 35 & (CCC_091 == 1 | CCC_91A == 1)), 1,
+    ifelse2((DHHGAGE_cont < 35 & (CCC_091 == 1 | CCC_91A == 1)), 2,
+    ifelse2((CCC_091 == 2 & CCC_91A == 2), 3, NA)))
   }
