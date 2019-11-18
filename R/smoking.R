@@ -2,70 +2,59 @@
 #' 
 #' Measures an individual smoking pack-years based on various CCHS smoking variables
 #' 
-#' @param TypeOfSmoker derived variable that classifies an individual's smoking status. 
-#' cchsflow variable name: SMKDSTY 
+#' @param SMKDSTY derived variable that classifies an individual's smoking status. 
 #' 
-#' @param Age_cont continuous age variable. 
-#' cchsflow variable name: DHHGAGE_cont
+#' @param DHHGAGE_cont continuous age variable. 
 #' 
-#' @param stpd number of years since quitting smoking. Variable asked to former daily smokers who quit <3 years ago. 
-#' cchsflow variable name: SMK_09A_B
+#' @param SMK_09A_B number of years since quitting smoking. Variable asked to former daily smokers who quit <3 years ago. 
 #' 
-#' @param stpdy number of years since quitting smoking. Variable asked to former daily smokers who quit >=3 years ago. 
-#' cchsflow variable name: SMKG09C 
+#' @param SMKG09C number of years since quitting smoking. Variable asked to former daily smokers who quit >=3 years ago. 
 #' 
-#' @param agecigd age started smoking daily. Variable asked to daily smokers. cchsflow variable name: SMKG203_cont 
+#' @param SMKG203_cont age started smoking daily. Variable asked to daily smokers. 
 #' 
-#' @param agecigfd age started smoking daily. Variable asked to former daily smokers. 
-#' cchsflow variable name: SMKG207_cont 
+#' @param SMKG207_cont age started smoking daily. Variable asked to former daily smokers. 
 #' 
-#' @param cigdayd number of cigarettes smoked per day. Variable asked to daily smokers.
-#' cchsflow variable name: SMK_204 
+#' @param SMK_204 number of cigarettes smoked per day. Variable asked to daily smokers.
 #' 
-#' @param cigdayo number of cigarettes smoked per day. Variable asked to occasional smokers
-#' cchsflow variable name: SMK_05B
+#' @param SMK_05B number of cigarettes smoked per day. Variable asked to occasional smokers
 #' 
-#' @param cigdayf number of cigarettes smoked per day. Variable asked to former daily smokers
-#' cchsflow variable name: SMK_208
+#' @param SMK_208 number of cigarettes smoked per day. Variable asked to former daily smokers
 #' 
-#' @param dayocc number of days smoked at least one cigarette
-#' cchsflow variable name: SMK_05C
+#' @param SMK_05C number of days smoked at least one cigarette
 #' 
-#' @param s100 smoked 100 cigarettes in lifetime (y/n)
-#' cchsflow variable name: SMK_01A
+#' @param SMK_01A smoked 100 cigarettes in lifetime (y/n)
 #' 
-#' @param agec1 age smoked first cigarette
-#' cchsflow variable name: SMKG01C_cont
+#' @param SMKG01C_cont age smoked first cigarette
 #' 
 #' @return value for smoking pack-years in the PackYears_derived variable
 #' @export
 PackYears_fun <-
-  function(TypeOfSmoker, Age_cont, stpd, stpdy, agecigd, agecigfd, cigdayd, cigdayo, cigdayf, dayocc, agec1, s100) {
+  function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
     #Time since quit for former daily smokers
-    tsq_ds_fun <- function(stpd, stpdy) {
-      stpdy <-
-        ifelse2(stpdy==1, 4,
-        ifelse2(stpdy==2, 8,
-        ifelse2(stpdy==3, 12, NA)))
+    tsq_ds_fun <- function(SMK_09A_B, SMKG09C) {
+      SMKG09C <-
+        ifelse2(SMKG09C==1, 4,
+        ifelse2(SMKG09C==2, 8,
+        ifelse2(SMKG09C==3, 12, NA)))
       tsq_ds <-
-        ifelse2(stpd==1, 0.5,
-        ifelse2(stpd==2, 1.5,
-        ifelse2(stpd==3, 2.5,
-        ifelse2(stpd==4, stpdy, NA))))
+        ifelse2(SMK_09A_B==1, 0.5,
+        ifelse2(SMK_09A_B==2, 1.5,
+        ifelse2(SMK_09A_B==3, 2.5,
+        ifelse2(SMK_09A_B==4, SMKG09C, NA))))
     }
-    tsq_ds<-tsq_ds_fun(stpd, stpdy)
+    tsq_ds<-tsq_ds_fun(SMK_09A_B, SMKG09C)
     # PackYears for Daily Smoker
-    ifelse2(TypeOfSmoker==1, pmax(((Age_cont - agecigd)*(cigdayd/20)), 0.0137),
+    ifelse2(SMKDSTY==1, pmax(((DHHGAGE_cont - SMKG203_cont)*(SMK_204/20)), 0.0137),
     # PackYears for Occasional Smoker (former daily)     
-    ifelse2(TypeOfSmoker==2, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137) + (pmax((cigdayo*dayocc/30), 1)*tsq_ds),
+    ifelse2(SMKDSTY==2, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds)*(SMK_208/20)), 0.0137) + (pmax((SMK_05B*SMK_05C/30), 1)*tsq_ds),
     # PackYears for Occasional Smoker (never daily)      
-    ifelse2(TypeOfSmoker==3, (pmax((cigdayo*dayocc/30), 1)/20)*(Age_cont - agec1),
+    ifelse2(SMKDSTY==3, (pmax((SMK_05B*SMK_05C/30), 1)/20)*(DHHGAGE_cont - SMKG01C_cont),
     # PackYears for former daily smoker (non-smoker now)      
-    ifelse2(TypeOfSmoker==4, pmax(((Age_cont - agecigfd - tsq_ds)*(cigdayf/20)), 0.0137),
+    ifelse2(SMKDSTY==4, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds)*(SMK_208/20)), 0.0137),
     # PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      
-    ifelse2(TypeOfSmoker==5 & s100==1, 0.0137,
+    ifelse2(SMKDSTY==5 & SMK_01A==1, 0.0137,
     # PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      
-    ifelse2(TypeOfSmoker==5 & s100==2, 0.007,
+    ifelse2(SMKDSTY==5 & SMK_01A==2, 0.007,
     # Non-smoker      
-    ifelse2(TypeOfSmoker==6, 0, NA)))))))
+    ifelse2(SMKDSTY==6, 0, NA)))))))
   }

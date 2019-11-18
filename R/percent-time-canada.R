@@ -3,25 +3,22 @@
 #' This function creates a derived variable that provides a percentage of the time a person's life was spent in 
 #' Canada.
 #' 
-#' @param Age_cont continuous age variable. 
-#' cchsflow variable name: DHHGAGE_cont
+#' @param DHHGAGE_cont continuous age variable. 
 #' 
-#' @param BirthCountry whether or not someone was born in Canada 
-#' cchsflow variable name: SDCGCBG
+#' @param SDCGCBG whether or not someone was born in Canada 
 #' 
-#' @param TimeCanada how long someone has lived in Canada
-#' cchsflow variable name: SDCGRES
+#' @param SDCGRES how long someone has lived in Canada
 #' 
 #' @return value of percentage of life spent living in Canada
 #' 
 #' @export
 Pct_time_fun <-
-  function(Age_cont, BirthCountry, TimeCanada) {
-    TimeCanada_fun <- function(TimeCanada) {
-      ifelse2(TimeCanada == 1, 4.5,
-      ifelse2(TimeCanada == 2, 15, NA))
+  function(DHHGAGE_cont, SDCGCBG, SDCGRES) {
+    SDCGRES_fun <- function(SDCGRES) {
+      ifelse2(SDCGRES == 1, 4.5,
+      ifelse2(SDCGRES == 2, 15, NA))
     }
-    TimeCanada <- TimeCanada_fun(TimeCanada)
-    ifelse2(BirthCountry == 1, 100,
-    ifelse2(BirthCountry == 2, (TimeCanada/Age_cont)*100, NA))
+    SDCGRES <- SDCGRES_fun(SDCGRES)
+    ifelse2(SDCGCBG == 1, 100,
+    ifelse2(SDCGCBG == 2, (SDCGRES/DHHGAGE_cont)*100, NA))
   }
