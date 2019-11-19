@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -3836,72 +3836,43 @@ cchs2001::HWTAGBMI, cchs2003::HWTCGBMI, cchs2005::HWTEGBMI, [HWTGBMI]
 <div id="example-of-a-derived-variable-smoking-pack-years" class="section level3">
 <h3 class="hasAnchor">
 <a href="#example-of-a-derived-variable-smoking-pack-years" class="anchor"></a>Example of a derived variable: Smoking pack-years</h3>
-<p>Pack-years is a complex derived variable often used by researchers to quantify the amount of cigarette use over a period of time. This derived variable incorporates numerous CCHS smoking variables, along with age.</p>
+<p>Pack-years is a complex derived variable often used by researchers to quantify the amount of cigarette use over a period of time. Even given its complex nature, pack-years can still be calculated. This derived variable incorporates numerous CCHS smoking variables, along with age.</p>
 </div>
-<div id="step-1a--developing-shorthand-names-for-derived-variable-function" class="section level3">
+<div id="step-1--creating-a-derived-function" class="section level3">
 <h3 class="hasAnchor">
-<a href="#step-1a--developing-shorthand-names-for-derived-variable-function" class="anchor"></a>Step 1a. Developing shorthand names for derived variable function</h3>
-<p>When creating a derived variable like pack-years that uses many complex variables, it might be easier to create shorthand names you can be reference when creating the function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Smoking variables</span>
-<span class="co">#TypeOfSmoker &lt;- SMKDSTY </span>
-<span class="co">#Age_cont &lt;- DHHGAGE_cont</span>
-<span class="co">#stpd &lt;- SMK_09A_B #former daily (quit &lt;3 years ago)</span>
-<span class="co">#stpdy &lt;- SMKG09C #former daily (quit &gt;=3 years ago)</span>
-<span class="co">#agec1 &lt;- SMKG01C_cont #age smoked first cigarette</span>
-<span class="co">#agecigd &lt;- SMKG203_cont #age started smoking daily</span>
-<span class="co">#agecigfd &lt;- SMKG207_cont #age started smoking daily (former daily)</span>
-<span class="co">#cigdayd &lt;- SMK_204 # number of cigarettes smoked per day (daily smoker)</span>
-<span class="co">#cigdayo &lt;- SMK_05B # number of cigarettes smoked per day (occasional smoker)</span>
-<span class="co">#cigdayf &lt;- SMK_208 # number of cigarettes smoked per day (former daily)</span>
-<span class="co">#dayocc &lt;- SMK_05C # number of days smoked at least one cigarette</span>
-<span class="co">#s100 &lt;- SMK_01A # smoked 100 cigarettes in lifetime (y/n)</span></code></pre></div>
-<p><strong>NOTE:</strong> R will <strong>not</strong> read the above transformations. However, the shorthand names can be used in the custom function <strong>if</strong> they are listed in the same order as how their corresponding CCHS variables are listed in <code>variableDetails.csv</code>.</p>
-<p>For example, let’s say you want create a derived variable using age as a continuous variable, height and weight. Shorthand names for the 3 variables can look like this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Age_cont &lt;- DHHGAGE_cont</span>
-<span class="co">#Height &lt;- HWTGHTM</span>
-<span class="co">#Weight &lt;- HWTGWTK</span></code></pre></div>
-<p>In the variableStart column of <code>variableDetails.csv</code>, the CCHS variables will be listed in this order:</p>
-<p><code>DerivedVar::[DHHGAGE_cont, HWTGHTM, HWTGWTK]</code></p>
-<p>With your custom function following the same order as the variableStart column, you are able to use the shorthand names in your function</p>
-<pre><code>derivedFunction &lt;- function(Age_cont, Height, Weight) {
-}</code></pre>
-<p>Shorthand names is way to keep track of variables and not run into errors when creating a derived variable.</p>
-</div>
-<div id="step-1b--creating-derived-variable-function" class="section level3">
-<h3 class="hasAnchor">
-<a href="#step-1b--creating-derived-variable-function" class="anchor"></a>Step 1b. Creating derived variable function</h3>
+<a href="#step-1--creating-a-derived-function" class="anchor"></a>Step 1. Creating a derived function</h3>
 <p>With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Smoking pack-years</span>
-PackYears_fun &lt;-
-<span class="st">  </span><span class="cf">function</span>(TypeOfSmoker, Age_cont, stpd, stpdy, agecigd, agecigfd, cigdayd, cigdayo, cigdayf, dayocc, agec1, s100) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Pack_years_fun &lt;-
+<span class="st">  </span><span class="cf">function</span>(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont, SMK_<span class="dv">204</span>, SMK_05B, SMK_<span class="dv">208</span>, SMK_05C, SMKG01C_cont, SMK_01A) {
     <span class="co">#Time since quit for former daily smokers</span>
-    tsq_ds_fun &lt;-<span class="st"> </span><span class="cf">function</span>(stpd, stpdy) {
-      stpdy &lt;-
-<span class="st">        </span><span class="kw">ifelse2</span>(stpdy<span class="op">==</span><span class="dv">1</span>, <span class="dv">4</span>,
-        <span class="kw">ifelse2</span>(stpdy<span class="op">==</span><span class="dv">2</span>, <span class="dv">8</span>,
-        <span class="kw">ifelse2</span>(stpdy<span class="op">==</span><span class="dv">3</span>, <span class="dv">12</span>, <span class="ot">NA</span>)))
+    tsq_ds_fun &lt;-<span class="st"> </span><span class="cf">function</span>(SMK_09A_B, SMKG09C) {
+      SMKG09C &lt;-
+<span class="st">        </span><span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKG09C<span class="op">==</span><span class="dv">1</span>, <span class="dv">4</span>,
+        <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKG09C<span class="op">==</span><span class="dv">2</span>, <span class="dv">8</span>,
+        <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKG09C<span class="op">==</span><span class="dv">3</span>, <span class="dv">12</span>, <span class="ot">NA</span>)))
       tsq_ds &lt;-
-<span class="st">        </span><span class="kw">ifelse2</span>(stpd<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.5</span>,
-        <span class="kw">ifelse2</span>(stpd<span class="op">==</span><span class="dv">2</span>, <span class="fl">1.5</span>,
-        <span class="kw">ifelse2</span>(stpd<span class="op">==</span><span class="dv">3</span>, <span class="fl">2.5</span>,
-        <span class="kw">ifelse2</span>(stpd<span class="op">==</span><span class="dv">4</span>, stpdy, <span class="ot">NA</span>))))
+<span class="st">        </span><span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMK_09A_B<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.5</span>,
+        <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMK_09A_B<span class="op">==</span><span class="dv">2</span>, <span class="fl">1.5</span>,
+        <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMK_09A_B<span class="op">==</span><span class="dv">3</span>, <span class="fl">2.5</span>,
+        <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMK_09A_B<span class="op">==</span><span class="dv">4</span>, SMKG09C, <span class="ot">NA</span>))))
     }
-    tsq_ds&lt;-<span class="kw">tsq_ds_fun</span>(stpd, stpdy)
+    tsq_ds&lt;-<span class="kw">tsq_ds_fun</span>(SMK_09A_B, SMKG09C)
     <span class="co"># PackYears for Daily Smoker</span>
-    <span class="kw">ifelse2</span>(TypeOfSmoker<span class="op">==</span><span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((Age_cont <span class="op">-</span><span class="st"> </span>agecigd)<span class="op">*</span>(cigdayd<span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),
+    <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKDSTY<span class="op">==</span><span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG203_cont)<span class="op">*</span>(SMK_<span class="dv">204</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),
     <span class="co"># PackYears for Occasional Smoker (former daily)     </span>
-    <span class="kw">ifelse2</span>(TypeOfSmoker<span class="op">==</span><span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((Age_cont <span class="op">-</span><span class="st"> </span>agecigfd <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(cigdayf<span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>) <span class="op">+</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((cigdayo<span class="op">*</span>dayocc<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">*</span>tsq_ds),
+    <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKDSTY<span class="op">==</span><span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>) <span class="op">+</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">*</span>tsq_ds),
     <span class="co"># PackYears for Occasional Smoker (never daily)      </span>
-    <span class="kw">ifelse2</span>(TypeOfSmoker<span class="op">==</span><span class="dv">3</span>, (<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((cigdayo<span class="op">*</span>dayocc<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">/</span><span class="dv">20</span>)<span class="op">*</span>(Age_cont <span class="op">-</span><span class="st"> </span>agec1),
+    <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKDSTY<span class="op">==</span><span class="dv">3</span>, (<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">/</span><span class="dv">20</span>)<span class="op">*</span>(DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG01C_cont),
     <span class="co"># PackYears for former daily smoker (non-smoker now)      </span>
-    <span class="kw">ifelse2</span>(TypeOfSmoker<span class="op">==</span><span class="dv">4</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((Age_cont <span class="op">-</span><span class="st"> </span>agecigfd <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(cigdayf<span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),
+    <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKDSTY<span class="op">==</span><span class="dv">4</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),
     <span class="co"># PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      </span>
-    <span class="kw">ifelse2</span>(TypeOfSmoker<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>s100<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.0137</span>,
+    <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.0137</span>,
     <span class="co"># PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      </span>
-    <span class="kw">ifelse2</span>(TypeOfSmoker<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>s100<span class="op">==</span><span class="dv">2</span>, <span class="fl">0.007</span>,
+    <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">2</span>, <span class="fl">0.007</span>,
     <span class="co"># Non-smoker      </span>
-    <span class="kw">ifelse2</span>(TypeOfSmoker<span class="op">==</span><span class="dv">6</span>, <span class="dv">0</span>, <span class="ot">NA</span>)))))))
+    <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>(SMKDSTY<span class="op">==</span><span class="dv">6</span>, <span class="dv">0</span>, <span class="ot">NA</span>)))))))
   }</code></pre></div>
+<p>More information on what each smoking variable means can be found in the Reference section.</p>
 </div>
 <div id="steps-2-and-3--specifying-pack-years-in-variabledetails-csv-and-variables-csv" class="section level3">
 <h3 class="hasAnchor">
@@ -3966,7 +3937,7 @@ notes
 1065
 </td>
 <td style="text-align:left;">
-PackYears_derived
+Pack_years_der
 </td>
 <td style="text-align:left;">
 N/A
@@ -3984,7 +3955,7 @@ DerivedVar::[SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_co
 N/A
 </td>
 <td style="text-align:left;">
-Func::PackYears_fun
+Func::Pack_years_fun
 </td>
 <td style="text-align:left;">
 N/A
@@ -4053,7 +4024,7 @@ variableStart
 133
 </td>
 <td style="text-align:left;">
-PackYears_derived
+PackYears_der
 </td>
 <td style="text-align:left;">
 PackYears

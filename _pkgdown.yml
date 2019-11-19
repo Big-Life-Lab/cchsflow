@@ -38,8 +38,15 @@ navbar:
       href: news/index.html
 
 reference:
+  - title: "Alcohol CCHS variables"
+    desc: Derived alcohol variables in cchsflow that users may run into issues with
+    contents:
+    - ALWDWKY
+    - ALWDDLY
+    - ALCDTYP
+    - ALCDTTM
   - title: "Derived variable functions"
-    desc: Functions for deriving CCHS variables
+    desc: Functions for deriving custom CCHS variables
     contents:
     - ifelse2
     - BMI_fun

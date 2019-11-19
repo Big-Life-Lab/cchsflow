@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • cchsflow</title>
+<title>Smoking pack-years — PackYears_fun • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -39,7 +39,10 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Smoking pack-years — PackYears_fun" />
+
+<meta property="og:description" content="This function creates a derived variable (Pack_years_der) that measures an individual smoking pack-years 
+ based on various CCHS smoking variables. This is a popular variable used by researchers to quantify lifetime exposure to cigarette use." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -60,7 +63,7 @@
   </head>
 
   <body>
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -73,7 +76,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -137,21 +140,100 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Smoking pack-years</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/smoking.R'><code>R/smoking.R</code></a></small>
+    <div class="hidden name"><code>PackYears_fun.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <ul>
-        <li><a href="derivedVariables.html">Derived variables</a></li>
-        <li><a href="howtoaddvariables.html">How to add variables to cchsflow</a></li>
-        <li><a href="usingcchsflow.html">Using cchsflow</a></li>
-        <li><a href="variableDetails.html">variableDetails.csv</a></li>
-        <li><a href="variablesSheet.html">variables.csv</a></li>
-      </ul>
+    <div class="ref-description">
+    
+    <p>This function creates a derived variable (Pack_years_der) that measures an individual smoking pack-years 
+ based on various CCHS smoking variables. This is a popular variable used by researchers to quantify lifetime exposure to cigarette use.</p>
+    
     </div>
+
+    <pre class="usage"><span class='fu'>PackYears_fun</span>(
+  <span class='no'>SMKDSTY</span>,
+  <span class='no'>DHHGAGE_cont</span>,
+  <span class='no'>SMK_09A_B</span>,
+  <span class='no'>SMKG09C</span>,
+  <span class='no'>SMKG203_cont</span>,
+  <span class='no'>SMKG207_cont</span>,
+  <span class='no'>SMK_204</span>,
+  <span class='no'>SMK_05B</span>,
+  <span class='no'>SMK_208</span>,
+  <span class='no'>SMK_05C</span>,
+  <span class='no'>SMKG01C_cont</span>,
+  <span class='no'>SMK_01A</span>
+)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>SMKDSTY</th>
+      <td><p>derived variable that classifies an individual's smoking status.</p></td>
+    </tr>
+    <tr>
+      <th>DHHGAGE_cont</th>
+      <td><p>continuous age variable.</p></td>
+    </tr>
+    <tr>
+      <th>SMK_09A_B</th>
+      <td><p>number of years since quitting smoking. Variable asked to former daily smokers who quit &lt;3 years ago.</p></td>
+    </tr>
+    <tr>
+      <th>SMKG09C</th>
+      <td><p>number of years since quitting smoking. Variable asked to former daily smokers who quit &gt;=3 years ago.</p></td>
+    </tr>
+    <tr>
+      <th>SMKG203_cont</th>
+      <td><p>age started smoking daily. Variable asked to daily smokers.</p></td>
+    </tr>
+    <tr>
+      <th>SMKG207_cont</th>
+      <td><p>age started smoking daily. Variable asked to former daily smokers.</p></td>
+    </tr>
+    <tr>
+      <th>SMK_204</th>
+      <td><p>number of cigarettes smoked per day. Variable asked to daily smokers.</p></td>
+    </tr>
+    <tr>
+      <th>SMK_05B</th>
+      <td><p>number of cigarettes smoked per day. Variable asked to occasional smokers</p></td>
+    </tr>
+    <tr>
+      <th>SMK_208</th>
+      <td><p>number of cigarettes smoked per day. Variable asked to former daily smokers</p></td>
+    </tr>
+    <tr>
+      <th>SMK_05C</th>
+      <td><p>number of days smoked at least one cigarette</p></td>
+    </tr>
+    <tr>
+      <th>SMKG01C_cont</th>
+      <td><p>age smoked first cigarette</p></td>
+    </tr>
+    <tr>
+      <th>SMK_01A</th>
+      <td><p>smoked 100 cigarettes in lifetime (y/n)</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>value for smoking pack-years in the Pack_years_der variable</p>
+    
+
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
+
   </div>
 </div>
 

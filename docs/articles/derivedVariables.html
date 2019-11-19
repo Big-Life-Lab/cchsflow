@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -144,11 +144,16 @@ ifelse2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, a, b) 
 BMI_derived &lt;-<span class="st"> </span>
 <span class="st">  </span><span class="cf">function</span>(HWTGHTM, 
            HWTGWTK) {
-    <span class="kw">ifelse2</span>((<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(HWTGHTM)) <span class="op">&amp;</span><span class="st"> </span>(<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(HWTGWTK)), 
+    <span class="kw"><a href="../reference/ifelse2.html">ifelse2</a></span>((<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(HWTGHTM)) <span class="op">&amp;</span><span class="st"> </span>(<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(HWTGWTK)), 
             (HWTGWTK<span class="op">/</span>(HWTGHTM<span class="op">*</span>HWTGHTM)), <span class="ot">NA</span>)
   }</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(cchsflow)
-<span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(cchs2003)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(cchsflow)</code></pre></div>
+<pre><code>## 
+## Attaching package: 'cchsflow'</code></pre>
+<pre><code>## The following object is masked _by_ '.GlobalEnv':
+## 
+##     ifelse2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(cchs2003)
 <span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(cchs2010)
 
 variables &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span>(), <span class="st">'../inst/extdata/variables.csv'</span>))
@@ -219,9 +224,6 @@ HWTGHTM
 <th style="text-align:right;">
 HWTGWTK
 </th>
-<th style="text-align:right;">
-HWTGBMI_derived
-</th>
 </tr></thead>
 <tbody>
 <tr>
@@ -231,9 +233,6 @@ HWTGBMI_derived
 <td style="text-align:right;">
 81
 </td>
-<td style="text-align:right;">
-29.71604
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -241,9 +240,6 @@ HWTGBMI_derived
 </td>
 <td style="text-align:right;">
 81
-</td>
-<td style="text-align:right;">
-26.35853
 </td>
 </tr>
 <tr>
@@ -253,9 +249,6 @@ HWTGBMI_derived
 <td style="text-align:right;">
 77
 </td>
-<td style="text-align:right;">
-31.04056
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -263,9 +256,6 @@ HWTGBMI_derived
 </td>
 <td style="text-align:right;">
 106
-</td>
-<td style="text-align:right;">
-31.68681
 </td>
 </tr>
 <tr>
@@ -275,9 +265,6 @@ HWTGBMI_derived
 <td style="text-align:right;">
 72
 </td>
-<td style="text-align:right;">
-24.14059
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -285,9 +272,6 @@ HWTGBMI_derived
 </td>
 <td style="text-align:right;">
 81
-</td>
-<td style="text-align:right;">
-33.75843
 </td>
 </tr>
 <tr>
@@ -297,16 +281,10 @@ HWTGBMI_derived
 <td style="text-align:right;">
 81
 </td>
-<td style="text-align:right;">
-27.15816
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
 1.651
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -319,9 +297,6 @@ NA
 <td style="text-align:right;">
 77
 </td>
-<td style="text-align:right;">
-25.81702
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -329,9 +304,6 @@ NA
 </td>
 <td style="text-align:right;">
 68
-</td>
-<td style="text-align:right;">
-24.20811
 </td>
 </tr>
 </tbody>
