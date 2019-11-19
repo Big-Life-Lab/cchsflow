@@ -23,6 +23,12 @@ Custom ifelse function that evaluates missing (NA) values
 If the logical argument (x) compares to a value that is `NA`, it is set to `FALSE`
 }
 \examples{
-ifelse2((age<18),"child", "adult")
+age <- 12
+status <- ifelse2((age<18),"child", "invalid age")
+print(status)
+
+age <- NA
+status <- ifelse2((age<18), "child", "invalid age")
+print(status)
 
 }

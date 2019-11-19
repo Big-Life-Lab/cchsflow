@@ -5,20 +5,22 @@
 \alias{cchs2003}
 \title{2003 CCHS data}
 \source{
-http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=4995
+\url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=4995}
 }
 \value{
 \item{cchs2003}{a data frame}
 }
 \description{
 This is a subset of 200 observations from the 2003 cycle of the Canadian Community Health Survey (CCHS) 
-Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. See the [Statistics Canada Open License](https://www.statcan.gc.ca/eng/reference/licence).
+Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 }
 \details{
 Long name: cchs-82M0013-E-2003-c2-1-General File
 
-DDI: '~/inst/extdata/CCHS_DDI/CCHS_2003_DDI.xml
-Additional documentation (PDFs): https://osf.io/hkuy3/
+DDI: \url{https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/CCHS_DDI/cchs-82M0013-E-2003-c2-1-GeneralFile.xml}
+
+Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
 }
 \examples{
 data(cchs2003)

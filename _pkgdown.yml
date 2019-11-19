@@ -38,13 +38,26 @@ navbar:
       href: news/index.html
 
 reference:
-  - title: "Derived variables"
+  - title: "Derived variable functions"
     desc: Functions for deriving CCHS variables
     contents:
     - ifelse2
-    - BMI_derived
-    - PackYears_fun
+    - BMI_fun
+    - Pack_years_fun
     - Pct_time_fun
-    - RespCondition_fun1
-    - RespCondition_fun2
-    - RespCondition_fun3
+    - Resp_condition_fun1
+    - Resp_condition_fun2
+    - Resp_condition_fun3
+  - title: "CCHS datasets"
+    desc: Datasets for each CCHS cycle
+    contents:
+    - cchs2001
+    - cchs2003
+    - cchs2005
+    - cchs2007_2008
+    - cchs2009_2010
+    - cchs2010
+    - cchs2011_2012
+    - cchs2012
+    - cchs2013_2014
+    - cchs2014 

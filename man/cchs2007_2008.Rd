@@ -5,20 +5,22 @@
 \alias{cchs2007_2008}
 \title{2007-2008 CCHS data}
 \source{
-http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539
+\url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
 }
 \value{
 \item{cchs2007_2008}{a data frame}
 }
 \description{
 This is a subset of 200 observations from the 2007-2008 cycle of the Canadian Community Health Survey (CCHS) 
-Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. See the [Statistics Canada Open License](https://www.statcan.gc.ca/eng/reference/licence).
+Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 }
 \details{
 Long name: cchs-E-2007-2008-AnnualComponent
 
-DDI: '~/inst/extdata/CCHS_DDI/CCHS_2007_2008_DDI.xml
-Additional documentation (PDFs): https://osf.io/hkuy3/
+DDI: \url{https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/CCHS_DDI/cchs-E-2007-2008-AnnualComponent.xml}
+
+Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
 }
 \examples{
 data(cchs2007_2008)

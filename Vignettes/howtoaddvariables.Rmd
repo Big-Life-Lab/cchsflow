@@ -186,14 +186,14 @@ CustomFunctionName <- function(Vars from variableStart following same order){
 
 ### Example of a derived variable: Smoking pack-years
 
-Pack-years is a complex derived variable often used by researchers to quantify the amount of cigarette use over a period of time. This derived variable incorporates numerous CCHS smoking variables, along with age.
+Pack-years is a complex derived variable often used by researchers to quantify the amount of cigarette use over a period of time. Even given its complex nature, pack-years can still be calculated. This derived variable incorporates numerous CCHS smoking variables, along with age.
 
 ### Step 1. Creating a derived function
 
 With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.
 
 ```{r, warning=FALSE}
-PackYears_fun <-
+Pack_years_fun <-
   function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
     #Time since quit for former daily smokers
     tsq_ds_fun <- function(SMK_09A_B, SMKG09C) {

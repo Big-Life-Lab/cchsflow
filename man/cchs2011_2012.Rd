@@ -5,20 +5,22 @@
 \alias{cchs2011_2012}
 \title{2011-2012 CCHS data}
 \source{
-http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=114112
+\url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=114112}
 }
 \value{
 \item{cchs2011_2012}{a data frame}
 }
 \description{
 This is a subset of 200 observations from the 2011-2012 cycle of the Canadian Community Health Survey (CCHS) 
-Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. See the [Statistics Canada Open License](https://www.statcan.gc.ca/eng/reference/licence).
+Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 }
 \details{
 Long name: cchs-82M0013-E-2011-2012-Annual-component
 
-DDI: '~/inst/extdata/CCHS_DDI/CCHS_2011_2012_DDI.xml
-Additional documentation (PDFs): https://osf.io/hkuy3/
+DDI: \url{https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/CCHS_DDI/cchs-82M0013-E-2011-2012-Annual-component.xml}
+
+Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
 }
 \examples{
 data(cchs2011_2012)

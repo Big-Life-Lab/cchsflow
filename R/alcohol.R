@@ -1,6 +1,6 @@
-#' @title Number of drinks consumed in the past week
+#' Number of drinks consumed in the past week
 #' 
-#' @description This is a continuous variable derived by Statistics Canada that quantifies the amount of alcohol that is consumed in a week.
+#'  This is a continuous variable derived by Statistics Canada that quantifies the amount of alcohol that is consumed in a week.
 #'  This is calculated by adding the number of drinks consumed during each day in the past week. Respondents of each CCHS
 #'  cycle are asked how much alcohol they have consumed each day in the past week (ie. how much alcohol did you consume on Sunday,
 #'  how much did you consume on Monday etc.). Each day in considered an individual variable and `ALWDWKY` takes the sum of
@@ -8,20 +8,20 @@
 #' 
 #' @details This variable is used in all CCHS cycles in cchsflow and how it was derived remains consistent from 2001 to 2014.
 #' 
-#' @param ALWDWKY
+#' @param ALWDWKY cchsflow variable name for number of drinks consumed in the past week
 NULL
 
-#' @title Average daily alcohol consumption
+#' Average daily alcohol consumption
 #' 
 #' @description This is a continuous variable derived by Statistics Canada that quantifies the mean daily consumption of alcohol.
 #'  This takes the value of `ALWDWKY` and divides it by 7.
 #' 
 #' @details This variable is used in all CCHS cycles in cchsflow and how it was derived remains consistent from 2001 to 2014.
 #' 
-#' @param ALWDDLY
+#' @param ALWDDLY cchsflow variable name for average daily alcohol consumption
 NULL
 
-#' @title Type of drinker
+#' Type of drinker
 #' 
 #' @description This is a categorical variable derived by Statistics Canada that uses various intermediate alcohol variables
 #'  to categorize individuals into 4 distinct groups:
@@ -37,10 +37,10 @@ NULL
 #'  This new derived variable did not distinguish between former and never drinkers. If your research requires you 
 #'  to differentiate between former and never drinkers, we recommend using earlier cycles fo the CCHS.
 #' 
-#' @param ALCDTYP
+#' @param ALCDTYP cchsflow variable name for type of drinker
 NULL
 
-#' @title Type of drinker (12 months)
+#' Type of drinker (12 months)
 #' 
 #' @description This is a categorical variable derived by Statistics Canada that uses various intermediate alcohol variables
 #'  to categorize individuals into 3 distinct groups:
@@ -53,5 +53,5 @@ NULL
 #'  people into various drinker types from 2009 onwards. Unlike `ALCDTYP`, this variable does not distinguish between 
 #'  former and never drinkers.
 #' 
-#' @param ALCDTTM
+#' @param ALCDTTM cchsflow variable name for type of drinker (12 months)
 NULL
