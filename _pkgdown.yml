@@ -30,7 +30,41 @@ navbar:
         href: articles/derivedVariables.html
       - text: How to add variables
         href: articles/howtoaddvariables.html
+    reference:
+      text: Reference
+      href: reference/index.html
     news:
       text: Changelog
       href: news/index.html
 
+reference:
+  - title: "Alcohol CCHS variables"
+    desc: Derived alcohol variables in cchsflow that users may run into issues with
+    contents:
+    - ALWDWKY
+    - ALWDDLY
+    - ALCDTYP
+    - ALCDTTM
+  - title: "Derived variable functions"
+    desc: Functions for deriving custom CCHS variables
+    contents:
+    - ifelse2
+    - BMI_fun
+    - Pack_years_fun
+    - Pct_time_fun
+    - Resp_condition_fun1
+    - Resp_condition_fun2
+    - Resp_condition_fun3
+  - title: "CCHS datasets"
+    desc: Datasets for each CCHS cycle
+    contents:
+    - cchs2001
+    - cchs2003
+    - cchs2005
+    - cchs2007_2008
+    - cchs2009_2010
+    - cchs2010
+    - cchs2011_2012
+    - cchs2012
+    - cchs2013_2014
+    - cchs2014 

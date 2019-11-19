@@ -1,0 +1,156 @@
+#' @title Resp_condition_fun1
+#' 
+#' @description This is one of 3 functions used to create a derived variable (Resp_condition_der) that determines if a respondents has a respirtory condition.
+#'  3 different functions have been created to account for the fact that different respiratory variables are used across CCHS cycles.
+#'  This function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as a combined variable. 
+#' 
+#' @param DHHGAGE_cont continuous age variable. 
+#' 
+#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
+#' 
+#' @return a categorical variable (Resp_condition_der) with 3 levels:
+#'  
+#'  1 - respondent is over the age of 35 and has a respiratory condition
+#'  
+#'  2 - respondent is under the age of 35 and has a respiratory condition
+#'  
+#'  3 - respondent does not have a respiratory condition
+#'  
+#' @examples 
+#' # Using Resp_condition_fun1() to create pack-years values across CCHS cycles (2009-2014)
+#' # Resp_condition_fun1() is specified in variableDetails.csv along with the CCHS variables and cycles included.
+#' 
+#' # To transform Resp_condition_der, use RecWTable() for each CCHS cycle and specify Resp_condition_der, 
+#' # along with the various respiratory variables. Then by using bind_rows(), you can combined Resp_condition_der
+#' # across cycles.
+#' 
+#' suppressMessages(library(bllflow))
+#' library(cchsflow)
+#' resp2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", 
+#' variables = c("DHHGAGE_cont", "CCC_091", "Resp_condition_der"))
+#' head(resp2010)
+#' 
+#' resp2012 <- RecWTable(dataSource = cchs2012, variableDetails = variableDetails, datasetName = "cchs2012", 
+#' variables = c("DHHGAGE_cont", "CCC_091", "Resp_condition_der"))
+#' tail(resp2012)
+#' 
+#' combined_resp <- bind_rows(resp2010, resp2012)
+#' head(combined_resp)
+#' tail(combined_resp)
+#' 
+#' @seealso \code{\link{Resp_condition_fun2}}, \code{\link{Resp_condition_fun3}}
+#' 
+#' @export
+Resp_condition_fun1 <-
+  function(DHHGAGE_cont, CCC_091) {
+    ifelse2((DHHGAGE_cont>35 & CCC_091 == 1), 1, 
+    ifelse2((DHHGAGE_cont<35 & CCC_091 == 1), 2, 
+    ifelse2(CCC_091 == 2, 3, NA)))
+  }
+
+
+#' @title Resp_condition_fun2
+#' 
+#' @description This is one of 3 functions used to create a derived variable (Resp_condition_der) that determines if a respondents has a respirtory condition. 
+#'  This function is for CCHS cycles (2005-2007) that use COPD & Emphysema as separate variables, as well as Bronchitis.
+#' 
+#' @param DHHGAGE_cont continuous age variable. 
+#' 
+#' @param CCC_91E variable indicating if respondent has emphysema
+#' 
+#' @param CCC_91F variable indicating if respondent has COPD
+#' 
+#' @param CCC_91A variable indicating if respondent has chronic bronchitis
+#' 
+#' @return a categorical variable (Resp_condition_der) with 3 levels:
+#'  
+#'  1 - respondent is over the age of 35 and has a respiratory condition
+#'  
+#'  2 - respondent is under the age of 35 and has a respiratory condition
+#'  
+#'  3 - respondent does not have a respiratory condition
+#' 
+#' @examples 
+#' 
+#' # Using Resp_condition_fun2() to create pack-years values across CCHS cycles (2005-2007)
+#' # Resp_condition_fun2() is specified in variableDetails.csv along with the CCHS variables and cycles included.
+#' 
+#' # To transform Resp_condition_der, use RecWTable() for each CCHS cycle and specify Resp_condition_der, 
+#' # along with the various respiratory variables. Then by using bind_rows(), you can combined Resp_condition_der
+#' # across cycles.
+#' 
+#' suppressMessages(library(bllflow))
+#' library(cchsflow)
+#' resp2005 <- RecWTable(dataSource = cchs2005, variableDetails = variableDetails, datasetName = "cchs2005", 
+#' variables = c("DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "Resp_condition_der"))
+#' head(resp2005)
+#' 
+#' resp2007_2008 <- RecWTable(dataSource = cchs2007_2008, variableDetails = variableDetails, datasetName = "cchs2007_2008", 
+#' variables = c("DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "Resp_condition_der"))
+#' tail(resp2007_2008)
+#' 
+#' combined_resp <- bind_rows(resp2005, resp2007_2008)
+#' head(combined_resp)
+#' tail(combined_resp)
+#' 
+#' @seealso \code{\link{Resp_condition_fun1}}, \code{\link{Resp_condition_fun3}}
+#' 
+#' @export
+Resp_condition_fun2 <-
+  function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A) {
+    ifelse2((DHHGAGE_cont>35 & (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 1, 
+    ifelse2((DHHGAGE_cont<35 & (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 2,
+    ifelse2((CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2), 3, NA)))
+  }
+
+#' @title Resp_condition_fun3
+#' 
+#' @description This is one of 3 functions used to create a derived variable (Resp_condition_der) that determines if a respondents has a respirtory condition.
+#'  This function for CCHS cycles (2001-2003) that use COPD and Emphysema as a combined variable, as well as Bronchitis
+#' 
+#' @param DHHGAGE_cont continuous age variable. 
+#' 
+#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
+#' 
+#' @param CCC_91A variable indicating if respondent has chronic bronchitis
+#'  cchsflow variable name: CCC_91A
+#' 
+#' @return a categorical variable (Resp_condition_der) with 3 levels:
+#'  
+#'  1 - respondent is over the age of 35 and has a respiratory condition
+#'  
+#'  2 - respondent is under the age of 35 and has a respiratory condition
+#'  
+#'  3 - respondent does not have a respiratory condition
+#' 
+#' @examples 
+#' # Using Resp_condition_fun3() to create pack-years values across CCHS cycles (2001-2003)
+#' # Resp_condition_fun3() is specified in variableDetails.csv along with the CCHS variables and cycles included.
+#' 
+#' # To transform Resp_condition_der, use RecWTable() for each CCHS cycle and specify Resp_condition_der, 
+#' # along with the various respiratory variables. Then by using bind_rows(), you can combined Resp_condition_der
+#' # across cycles.
+#' 
+#' suppressMessages(library(bllflow))
+#' library(cchsflow)
+#' resp2001 <- RecWTable(dataSource = cchs2001, variableDetails = variableDetails, datasetName = "cchs2001", 
+#' variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", "Resp_condition_der"))
+#' head(resp2001)
+#' 
+#' resp2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", 
+#' variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", "Resp_condition_der"))
+#' tail(resp2003)
+#' 
+#' combined_resp <- bind_rows(resp2001, resp2003)
+#' head(combined_resp)
+#' tail(combined_resp)
+#' 
+#' @seealso \code{\link{Resp_condition_fun1}}, \code{\link{Resp_condition_fun2}}
+#' 
+#' @export
+Resp_condition_fun3 <-
+  function(DHHGAGE_cont, CCC_091, CCC_91A) {
+    ifelse2((DHHGAGE_cont > 35 & (CCC_091 == 1 | CCC_91A == 1)), 1,
+    ifelse2((DHHGAGE_cont < 35 & (CCC_091 == 1 | CCC_91A == 1)), 2,
+    ifelse2((CCC_091 == 2 & CCC_91A == 2), 3, NA)))
+  }

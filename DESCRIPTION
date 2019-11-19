@@ -1,7 +1,7 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and harmonizing CCHS variables
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -30,3 +30,4 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
+RoxygenNote: 7.0.0

@@ -1,4 +1,11 @@
-# cchsflow 0.2.0 (Latest build)
+# cchsflow 0.2.1 (Latest build)
+
+## Features:
+
+- Documentation for derived variable functions now available
+- Documentation for derived alcohol variables now available
+
+# cchsflow 0.2.0 
 
 ## Features: 
 
