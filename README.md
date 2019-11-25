@@ -19,7 +19,7 @@ Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 t
 
 ## Usage
 
-Searching `BMI` in variables.csv shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
+`cchsflow` creates harmonized variables (where possible) between CCHS cycles. Searching BMI in `variables.csv` shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
 
     # calculate BMI for each CCHS cycle
     cchs2001_BMI <- RecWTable(dataSource = cchs2001, 
