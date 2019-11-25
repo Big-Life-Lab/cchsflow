@@ -65,9 +65,9 @@ data(cchs2010)
 variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
 variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
 
-BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 
-BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 ```
 
 Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `RecWTable()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.
