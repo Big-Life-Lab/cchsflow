@@ -1,4 +1,13 @@
-# cchsflow 0.2.1 (Latest build)
+# cchsflow 0.2.2 (Latest build)
+
+## Features:
+
+- Updated ref branch of bllflow to match latest version of `RecWTable()`
+- Minor formatting changes in data, function, and derived variable documentation to improve 
+  readability
+- Minor corrections to derived variables article
+
+# cchsflow 0.2.1 
 
 ## Features:
 
