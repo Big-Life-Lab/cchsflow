@@ -1,10 +1,8 @@
 #' 2001 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2001 cycle of the Canadian Community Health Survey 
-#' (CCHS) Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics 
-#' Canada. 
-#' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2001 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' Long name: cchs-82M0013-E-2001-c1-1-general-file
 #' 
@@ -27,11 +25,9 @@ NULL
 
 #' 2003 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2003 cycle of the Canadian Community 
-#' Health Survey (CCHS) Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by 
-#' Statistics Canada. 
-#' 
-#' See the open license\href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2003 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' 
 #' Long name: cchs-82M0013-E-2003-c2-1-General File
@@ -55,11 +51,9 @@ NULL
 
 #' 2005 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2005 cycle of the Canadian Community Health Survey 
-#' (CCHS) Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by 
-#' Statistics Canada. 
-#' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2005 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' 
 #' Long name: cchs-82M0013-E-2005-c3-1-main-file
@@ -83,11 +77,9 @@ NULL
 
 #' 2007-2008 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2007-2008 cycle of the Canadian Community Health 
-#' Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
-#' The CCHS survey is conducted by Statistics Canada. 
-#' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2007-2008 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' Long name: cchs-E-2007-2008-AnnualComponent
 #' 
@@ -110,11 +102,10 @@ NULL
 
 #' 2009-2010 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2009-2010 cycle of the Canadian Community 
-#' Health Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
-#' The CCHS survey is conducted by Statistics Canada. 
+#' This is a subset of 200 observations from the 2009-2010 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
 #' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' Long name: CCHS-82M0013-E-2009-2010-Annualcomponent
 #' 
@@ -137,11 +128,9 @@ NULL
 
 #' 2010 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2010 cycle of the Canadian Community Health Survey 
-#' (CCHS) Public Use Microdata file (PUMF) dataset. 
-#' The CCHS survey is conducted by Statistics Canada. 
-#' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2010 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' Long name: CCHS-82M0013-E-2010-AnnualComponent
 #' 
@@ -164,11 +153,9 @@ NULL
 
 #' 2011-2012 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2011-2012 cycle of the Canadian Community Health 
-#' Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
-#' The CCHS survey is conducted by Statistics Canada. 
-#' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2011-2012 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' 
 #' Long name: cchs-82M0013-E-2011-2012-Annual-component
@@ -192,11 +179,9 @@ NULL
 
 #' 2012 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2012 cycle of the Canadian Community Health Survey 
-#' (CCHS) Public Use Microdata file (PUMF) dataset. 
-#' The CCHS survey is conducted by Statistics Canada. 
-#' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2012 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' Long name: cchs-82M0013-E-2012-Annual-component
 #' 
@@ -219,11 +204,9 @@ NULL
 
 #' 2013-2014 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2013-2014 cycle of the Canadian Community Health 
-#' Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
-#' The CCHS survey is conducted by Statistics Canada. 
-#' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2013-2014 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' Long name: cchs-82M0013-E-2013-2014-Annual-component
 #' 
@@ -246,11 +229,9 @@ NULL
 
 #' 2014 CCHS data
 #' 
-#' This is a subset of 200 observations from the 2014 cycle of the Canadian Community Health Survey 
-#' (CCHS) Public Use Microdata file (PUMF) dataset. 
-#' The CCHS survey is conducted by Statistics Canada. 
-#' 
-#' See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+#' This is a subset of 200 observations from the 2014 cycle of the Canadian Community Health Survey (CCHS) 
+#' Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada. 
+#' See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 #' 
 #' Long name: cchs-82M0013-E-2014-Annual-component
 #' 
