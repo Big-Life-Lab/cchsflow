@@ -20,7 +20,7 @@ The `RecWTable` and `SetDataLabels` functions are part of the [bllflow](https://
 ```{r eval= FALSE}
 install.packages("devtools")
 library(devtools)
-install_github("Big-Life-Lab/bllflow", ref = "derived-variable-creation")
+install_github("Big-Life-Lab/bllflow", ref = "dev")
 ```
 
 ```{r results= 'hide', message = FALSE, warning=FALSE}
