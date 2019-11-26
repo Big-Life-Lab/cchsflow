@@ -18,7 +18,7 @@ There are two types derived variables in the CCHS surveys. Both types of dervive
 - Variable mapping - mapping two or more variables into a single variable.
 - Variables that derived using math equations - BMI is an example. where BMI = weight / height*height. 
 
-`cchsflow` calculates these more complex dervived variables using functions that are referenced in `variableDetails.csv` within `variableStart` with the prefix 'DerivedVar::'. For example,  For BMI (`HWTGBMI_derived`) includes `DerivedVar::[HWTGHTM, HWTGWTK]`, which indicates a function with two starting variables (`HWTGHTM, HWTGWTK`).
+`cchsflow` calculates these more complex dervived variables using functions that are referenced in `variableDetails.csv` within `variableStart` with the prefix 'DerivedVar::'. For example,  For BMI (`HWTGBMI_der`) includes `DerivedVar::[HWTGHTM, HWTGWTK]`, which indicates a function with two starting variables (`HWTGHTM, HWTGWTK`).
 
 ## Example - Body Mass Index (BMI)
 
@@ -65,9 +65,9 @@ data(cchs2010)
 variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
 variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
 
-BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 
-BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"))
+BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 ```
 
 Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `RecWTable()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.

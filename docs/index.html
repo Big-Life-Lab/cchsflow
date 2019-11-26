@@ -119,7 +119,7 @@
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p>Searching <code>BMI</code> in variables.csv shows <code>HWTGBMI</code> calculates BMI with two decimal places for all cycles for all respondents using the respondents’ untruncated height and weight.</p>
+<p><code>cchsflow</code> creates harmonized variables (where possible) between CCHS cycles. Searching BMI in <code>variables.csv</code> shows <code>HWTGBMI</code> calculates BMI with two decimal places for all cycles for all respondents using the respondents’ untruncated height and weight.</p>
 <div class="sourceCode"><pre class="sourceCode R"><code class="sourceCode r"><span class="co"># calculate BMI for each CCHS cycle</span>
 cchs2001_BMI &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2001, 
             <span class="dt">variableDetails =</span> varDetails, 

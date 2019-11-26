@@ -119,7 +119,7 @@
 <li>Variable mapping - mapping two or more variables into a single variable.</li>
 <li>Variables that derived using math equations - BMI is an example. where BMI = weight / height*height.</li>
 </ul>
-<p><code>cchsflow</code> calculates these more complex dervived variables using functions that are referenced in <code>variableDetails.csv</code> within <code>variableStart</code> with the prefix ‘DerivedVar::’. For example, For BMI (<code>HWTGBMI_derived</code>) includes <code>DerivedVar::[HWTGHTM, HWTGWTK]</code>, which indicates a function with two starting variables (<code>HWTGHTM, HWTGWTK</code>).</p>
+<p><code>cchsflow</code> calculates these more complex dervived variables using functions that are referenced in <code>variableDetails.csv</code> within <code>variableStart</code> with the prefix ‘DerivedVar::’. For example, For BMI (<code>HWTGBMI_der</code>) includes <code>DerivedVar::[HWTGHTM, HWTGWTK]</code>, which indicates a function with two starting variables (<code>HWTGHTM, HWTGWTK</code>).</p>
 </div>
 <div id="example---body-mass-index-bmi" class="section level2">
 <h2 class="hasAnchor">
@@ -159,7 +159,7 @@ BMI_derived &lt;-<span class="st"> </span>
 variables &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span>(), <span class="st">'../inst/extdata/variables.csv'</span>))
 variableDetails &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span>(), <span class="st">'../inst/extdata/variableDetails.csv'</span>))
 
-BMI2003 &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2003, <span class="dt">variableDetails =</span> variableDetails, <span class="dt">datasetName =</span> <span class="st">"cchs2003"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_derived"</span>))</code></pre></div>
+BMI2003 &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2003, <span class="dt">variableDetails =</span> variableDetails, <span class="dt">datasetName =</span> <span class="st">"cchs2003"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_der"</span>))</code></pre></div>
 <pre><code>## [1] "NOTE: 2001 and 2003 CCHS use inches, values converted to meters to 3 decimal points"
 ## [1] "NOTE: 74+ inches converted to 76 inches"
 ## [1] "The variable HWTCGHT was recoded into HWTGHTM for the database cchs2003 the following recodes were made:"
@@ -202,7 +202,7 @@ BMI2003 &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span cl
 ## 1    copy 27.0:135.0         192
 ## 2   NA::a        996           0
 ## 3   NA::b    997:999           0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">BMI2010 &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2010, <span class="dt">variableDetails =</span> variableDetails, <span class="dt">datasetName =</span> <span class="st">"cchs2010"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_derived"</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">BMI2010 &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2010, <span class="dt">variableDetails =</span> variableDetails, <span class="dt">datasetName =</span> <span class="st">"cchs2010"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_der"</span>))</code></pre></div>
 <pre><code>## [1] "NOTE: Height is a reported in meters from 2005 CCHS onwards"
 ## [1] "The variable HWTGHTM was recoded into HWTGHTM for the database cchs2010 the following recodes were made:"
 ##   valueTo        From rowsRecoded
@@ -224,6 +224,9 @@ HWTGHTM
 <th style="text-align:right;">
 HWTGWTK
 </th>
+<th style="text-align:right;">
+HWTGBMI_der
+</th>
 </tr></thead>
 <tbody>
 <tr>
@@ -233,6 +236,9 @@ HWTGWTK
 <td style="text-align:right;">
 81
 </td>
+<td style="text-align:right;">
+29.71604
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -240,6 +246,9 @@ HWTGWTK
 </td>
 <td style="text-align:right;">
 81
+</td>
+<td style="text-align:right;">
+26.35853
 </td>
 </tr>
 <tr>
@@ -249,6 +258,9 @@ HWTGWTK
 <td style="text-align:right;">
 77
 </td>
+<td style="text-align:right;">
+31.04056
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -256,6 +268,9 @@ HWTGWTK
 </td>
 <td style="text-align:right;">
 106
+</td>
+<td style="text-align:right;">
+31.68681
 </td>
 </tr>
 <tr>
@@ -265,6 +280,9 @@ HWTGWTK
 <td style="text-align:right;">
 72
 </td>
+<td style="text-align:right;">
+24.14059
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -272,6 +290,9 @@ HWTGWTK
 </td>
 <td style="text-align:right;">
 81
+</td>
+<td style="text-align:right;">
+33.75843
 </td>
 </tr>
 <tr>
@@ -281,10 +302,16 @@ HWTGWTK
 <td style="text-align:right;">
 81
 </td>
+<td style="text-align:right;">
+27.15816
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
 1.651
+</td>
+<td style="text-align:right;">
+NA
 </td>
 <td style="text-align:right;">
 NA
@@ -297,6 +324,9 @@ NA
 <td style="text-align:right;">
 77
 </td>
+<td style="text-align:right;">
+25.81702
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -304,6 +334,9 @@ NA
 </td>
 <td style="text-align:right;">
 68
+</td>
+<td style="text-align:right;">
+24.20811
 </td>
 </tr>
 </tbody>
