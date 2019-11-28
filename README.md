@@ -19,14 +19,31 @@ Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 t
 
 ## Usage
 
-`cchsflow` creates harmonized variables (where possible) between CCHS cycles. Searching BMI in `variables.csv` shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
+`cchsflow` creates harmonized variables (where possible) between CCHS cycles. Searching BMI in `variables` (described in the variableDetails.csv [vignette](articles/variableDetails.html)
+Introduction)) shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
 
-    # calculate BMI for each CCHS cycle
-    cchs2001_BMI <- RecWTable(dataSource = cchs2001, 
+*Calculate a harmonized BMI variable for CCHS 2001 cycle*
+
+```
+    # load test cchs data - included in cchsflow
+    cchs2001test <- cchs2001
+    
+    # `variableDetails` is a database in cchsflow that contain the instructions how to transform variables.
+    varDetails <- variableDetails
+    
+    cchs2001_BMI <- RecWTable(dataSource = cchs2001test, 
                 variableDetails = varDetails, 
-                datasetName = "cchs-82M0013-E-2001-c1-1-general-file", 
+                datasetName = "cchs2001", 
                 appendToData = TRUE,  
                 variables = "HWTGBMI")
+```
+
+Notes printed to console indicate issues that may affect BMI classification for your study.
+```
+[1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
+[1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable and missing variables as 999.96 and 999.7-999.99 respectively"
+[1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"
+```
 
 ## Important notes
 
