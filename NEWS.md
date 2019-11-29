@@ -4,6 +4,7 @@
 ## Features
 
 - Updated example in the introduction (README.MD) to reflect data that is now included in the cchsflow package.
+- Updates to vignettes to reflect latest version of package
 
 ### Variables
 
