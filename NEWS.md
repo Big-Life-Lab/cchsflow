@@ -5,10 +5,15 @@
 
 - Updated example in the introduction (README.MD) to reflect data that is now included in the cchsflow package.
 - Updates to vignettes to reflect latest version of package
+- Updates to variables.csv & variableDetails.csv
 
 ### Variables
 
 -  <font color="green">**New**</font> [`DHHGAGE_C`](reference/DHHGAGE_cat_fun.html) - categorical age variable that groups various age categories across all CCHS cycles. Based on the continuous age variable (`DHHGAGE_cont`) that is also harmonious across all CCHS cycles.
+-  <font color = "green">**New**</font> WTS_M - sampling weight variable
+-  <font color = "green">**New**</font> DHHGHSZ - household size
+-  <font color = "green">**New**</font> INCGHH_A, INCGHH_B, INCGHH_C, INCGHH_cont - household income. The categories for
+household income vary across CCHS cycles so three categorical variables were added along with a continuous variable that harmonizes household income across all CCHS cycles by taking the midpoint of each category.
 
 # cchsflow 0.2.2 
 
