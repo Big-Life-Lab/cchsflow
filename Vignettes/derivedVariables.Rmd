@@ -62,9 +62,6 @@ library(cchsflow)
 data(cchs2003)
 data(cchs2010)
 
-variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
-variableDetails <- read.csv(file.path(getwd(), '../inst/extdata/variableDetails.csv'))
-
 BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 
 BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
@@ -88,4 +85,4 @@ kable(combinedBMI[1:10, ])
 
 ## Creating a derived variable
 
-Creating a derived requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here]('~../docs/articles/howtoaddvariables.html')
+Creating a derived requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here](articles/howtoaddvariables.html)
