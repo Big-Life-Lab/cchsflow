@@ -46,7 +46,6 @@
 #' @param DHHGAGE_cont continuous age variable
 #' 
 #' @export
-
 DHHGAGE_cat_fun <- function(DHHGAGE_cont) {
   ifelse2((DHHGAGE_cont %in% 12:14), 1,
   ifelse2((DHHGAGE_cont %in% 15:17), 2,
