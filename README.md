@@ -19,8 +19,7 @@ Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 t
 
 ## Usage
 
-`cchsflow` creates harmonized variables (where possible) between CCHS cycles. Searching BMI in `variables` (described in the variableDetails.csv [vignette](articles/variableDetails.html)
-Introduction)) shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
+`cchsflow` creates harmonized variables (where possible) between CCHS cycles. Searching BMI in `variables` (described in the Introduction section of variableDetails.csv [vignette](articles/variableDetails.html)) shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
 
 *Calculate a harmonized BMI variable for CCHS 2001 cycle*
 
