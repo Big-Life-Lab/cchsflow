@@ -12,11 +12,11 @@
 #' 
 #' @return a categorical variable (Resp_condition_der) with 3 levels:
 #'  
-#'  1 - respondent is over the age of 35 and has a respiratory condition
-#'  
-#'  2 - respondent is under the age of 35 and has a respiratory condition
-#'  
-#'  3 - respondent does not have a respiratory condition
+#'  \enumerate{
+#'  \item respondent is over the age of 35 and has a respiratory condition
+#'  \item respondent is under the age of 35 and has a respiratory condition
+#'  \item respondent does not have a respiratory condition
+#'  }
 #'  
 #' @examples 
 #' # Using Resp_condition_fun1() to create pack-years values across CCHS cycles (2009-2014)
@@ -72,11 +72,11 @@ Resp_condition_fun1 <-
 #' 
 #' @return a categorical variable (Resp_condition_der) with 3 levels:
 #'  
-#'  1 - respondent is over the age of 35 and has a respiratory condition
-#'  
-#'  2 - respondent is under the age of 35 and has a respiratory condition
-#'  
-#'  3 - respondent does not have a respiratory condition
+#'  \enumerate{
+#'  \item respondent is over the age of 35 and has a respiratory condition
+#'  \item respondent is under the age of 35 and has a respiratory condition
+#'  \item respondent does not have a respiratory condition
+#'  }
 #' 
 #' @examples 
 #' 
@@ -133,11 +133,11 @@ Resp_condition_fun2 <-
 #' 
 #' @return a categorical variable (Resp_condition_der) with 3 levels:
 #'  
-#'  1 - respondent is over the age of 35 and has a respiratory condition
-#'  
-#'  2 - respondent is under the age of 35 and has a respiratory condition
-#'  
-#'  3 - respondent does not have a respiratory condition
+#'  \enumerate{
+#'  \item respondent is over the age of 35 and has a respiratory condition
+#'  \item respondent is under the age of 35 and has a respiratory condition
+#'  \item respondent does not have a respiratory condition
+#'  }
 #' 
 #' @examples 
 #' # Using Resp_condition_fun3() to create pack-years values across CCHS cycles (2001-2003)

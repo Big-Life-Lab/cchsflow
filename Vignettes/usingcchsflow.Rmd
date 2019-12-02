@@ -111,7 +111,7 @@ Use the `bind_rows` function to combine datasets and create a new dataset name. 
 
 ### Example 2. Transform a single variable from multiple CCHS datasets
 
-This example shows how you can transform and combine a variable across multiple CCHS cycles. The sex variable in CCHS 2001 (`DHHA_SEX`) and CCHS 2013 (`DHH_SEX`) is transformed a common variable (`DHH_SEX`) and combined into a single dataset. In `cchsflow` the CCHS 2007 variable name is used as the common variable name. See the [variableDetails vignette](articles/variableDetails.html) for more information.
+This example shows how you can transform and combine a variable across multiple CCHS cycles. The sex variable in CCHS 2001 (`DHHA_SEX`) and CCHS 2013 (`DHH_SEX`) is transformed a common variable (`DHH_SEX`) and combined into a single dataset. In `cchsflow` the CCHS 2007 variable name is used as the common variable name. See the [variableDetails vignette](variableDetails.html) for more information.
 
 ```{r, warning = FALSE}
 sex2001 <- RecWTable(dataSource = cchsMock2001, variableDetails = variableDetails, datasetName = "cchs2001", appendToData = FALSE, log = TRUE, variables = c("DHH_SEX"))
@@ -251,7 +251,7 @@ Derived variables in CCHS are created from existing, original variables that are
 
 Recoding `BMI` into a harmonized variable requires their underlying initial variables (height and weight). This first step of harmonizing underlying variables is completed for you, but you must have the underlying variables in your dataset. 
 
-Using the BMI example illustrated in the [derivedVariables](articles/derivedVariables.html) article, `RecWTable()` is able to transform BMI across multiple cycles provided that height (`HWTGHTM`) and weight (`HWTGWTK`) are specified.
+Using the BMI example illustrated in the [derived variables](derivedVariables.html) article, `RecWTable()` is able to transform BMI across multiple cycles provided that height (`HWTGHTM`) and weight (`HWTGWTK`) are specified.
 
 For this example, we will use a subset of CCHS 2003 and 2010 data.
 

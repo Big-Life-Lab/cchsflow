@@ -17,37 +17,24 @@ This is a derived categorical age variable that groups various age categories
  The categories of this variable are based on the age groupings seen in CCHS cycles from 2007 to
  2014. The age breakdown is as follows:
  
- 1 - 12 to 14 years
- 
- 2 - 15 to 17 years
- 
- 3 - 18 to 19 years
- 
- 4 - 20 to 24 years
- 
- 5 - 25 to 29 years
- 
- 6 - 30 to 34 years
- 
- 7 - 35 to 39 years
- 
- 8 - 40 to 44 years
- 
- 9 - 45 to 49 years
- 
- 10 - 50 to 54 years
- 
- 11 - 55 to 59 years
- 
- 12 - 60 to 64 years
- 
- 13 - 65 to 69 years
- 
- 14 - 70 to 74 years
- 
- 15 - 75 to 79 years
- 
- 16 - 80 years or more
+ \enumerate{
+   \item 12 to 14 years
+   \item 15 to 17 years
+   \item 18 to 19 years
+   \item 20 to 24 years
+   \item 25 to 29 years
+   \item 30 to 34 years
+   \item 35 to 39 years
+   \item 40 to 44 years
+   \item 45 to 49 years
+   \item 50 to 54 years
+   \item 55 to 59 years
+   \item 60 to 64 years
+   \item 65 to 69 years
+   \item 70 to 74 years
+   \item 75 to 79 years
+   \item 80 years or more
+ }
 }
 \details{
 The categories in the grouped age variable (DHHGAGE) vary between CCHS cycles. As such,

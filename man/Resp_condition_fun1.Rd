@@ -14,11 +14,11 @@ Resp_condition_fun1(DHHGAGE_cont, CCC_091)
 \value{
 a categorical variable (Resp_condition_der) with 3 levels:
  
- 1 - respondent is over the age of 35 and has a respiratory condition
- 
- 2 - respondent is under the age of 35 and has a respiratory condition
- 
- 3 - respondent does not have a respiratory condition
+ \enumerate{
+ \item respondent is over the age of 35 and has a respiratory condition
+ \item respondent is under the age of 35 and has a respiratory condition
+ \item respondent does not have a respiratory condition
+ }
 }
 \description{
 This is one of 3 functions used to create a derived variable (Resp_condition_der) 
