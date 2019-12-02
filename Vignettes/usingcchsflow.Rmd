@@ -208,7 +208,7 @@ For more information on `get_label()` and other label helper functions, please r
 
 ### Example 5. Transform all variables in the variableDetails sheet
 
-All the variables listed in `varDetails.csv` will be transformed if the variables argument in `RecWTable()` is not specified. In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
+All the variables listed in `variableDetails.csv` will be transformed if the variables argument in `RecWTable()` is not specified. In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
 
 ```{r, echo=FALSE}
 options(htmlwidgets.TOJSON_ARGS = list(na = 'string'))
@@ -285,7 +285,7 @@ By default, `recWTable()` prints notes to the console.
 
 Use the `SetDataLabels()` function to label the variables in your final dataset. `RecWTable()` labels individual datasets. `SetDataLabels()` labels combined dataset that loose labels when datatables are combined. 
 
-`labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = varDetails, variablesSheet = varSheet)`
+`labelledCombinedCCHS <- SetDataLabels(dataToLabel = combinedCCHS, variableDetails = variableDetails, variablesSheet = varSheet)`
 
 ## Warning messages
 
