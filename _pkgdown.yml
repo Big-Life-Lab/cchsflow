@@ -55,6 +55,7 @@ reference:
     - Resp_condition_fun1
     - Resp_condition_fun2
     - Resp_condition_fun3
+    - DHHGAGE_cat_fun
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:

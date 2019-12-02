@@ -11,11 +11,12 @@
 \item{cchs2009_2010}{a data frame}
 }
 \description{
-This is a subset of 200 observations from the 2009-2010 cycle of the Canadian Community Health Survey (CCHS) 
-Public Use Microdata file (PUMF) dataset. The CCHS survey is conducted by Statistics Canada.
+This is a subset of 200 observations from the 2009-2010 cycle of the Canadian Community 
+Health Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
+The CCHS survey is conducted by Statistics Canada.
 }
 \details{
-See the Statistics Canada Open License \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
 
 Long name: CCHS-82M0013-E-2009-2010-Annualcomponent
 

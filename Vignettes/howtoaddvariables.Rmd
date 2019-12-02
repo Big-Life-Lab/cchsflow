@@ -225,19 +225,17 @@ Pack_years_fun <-
   }
 ```
 
-More information on what each smoking variable means can be found in the Reference section.
+More information on what each smoking variable means can be found in the [Reference](Pack_years_fun.html) section.
 
 ### Steps 2 and 3. Specifying pack-years in `variableDetails.csv` and `variables.csv`
 
 This is how the `variableDetails.csv` sheet would look for the derived pack-years row
 ```{r, echo=FALSE, warning=FALSE}
-#sampleVariableDetails <- read.csv(file.path(getwd(), '../inst/extdata/sampleVariableDetails.csv'))
 kable(variableDetails[1065,])
 ```
 
 And this is how the `variable.csv` sheet would look for the derived pack-years row
 
 ```{r, echo=FALSE, warning=FALSE}
-#sampleVariables <- read.csv(file.path(getwd(), '../inst/extdata/sampleVariables.csv'))
 kable(variables[133,])
 ```

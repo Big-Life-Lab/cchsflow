@@ -17,35 +17,43 @@ cchsflow variable name: CCC_91A}
 \value{
 a categorical variable (Resp_condition_der) with 3 levels:
  
- 1 - respondent is over the age of 35 and has a respiratory condition
- 
- 2 - respondent is under the age of 35 and has a respiratory condition
- 
- 3 - respondent does not have a respiratory condition
+ \enumerate{
+ \item respondent is over the age of 35 and has a respiratory condition
+ \item respondent is under the age of 35 and has a respiratory condition
+ \item respondent does not have a respiratory condition
+ }
 }
 \description{
-This is one of 3 functions used to create a derived variable (Resp_condition_der) that determines if a respondents has a respirtory condition.
- This function for CCHS cycles (2001-2003) that use COPD and Emphysema as a combined variable, as well as Bronchitis
+This is one of 3 functions used to create a derived variable (Resp_condition_der) 
+ that determines if a respondents has a respirtory condition. This function for CCHS cycles 
+ (2001-2003) that use COPD and Emphysema as a combined variable, as well as Bronchitis
 }
 \examples{
 # Using Resp_condition_fun3() to create pack-years values across CCHS cycles (2001-2003)
-# Resp_condition_fun3() is specified in variableDetails.csv along with the CCHS variables and cycles included.
+# Resp_condition_fun3() is specified in variableDetails.csv along with the CCHS variables and 
+# cycles included.
 
-# To transform Resp_condition_der, use RecWTable() for each CCHS cycle and specify Resp_condition_der, 
-# along with the various respiratory variables. Then by using bind_rows(), you can combined Resp_condition_der
-# across cycles.
+# To transform Resp_condition_der, use RecWTable() for each CCHS cycle and specify 
+# Resp_condition_der, along with the various respiratory variables. Then by using bind_rows(), 
+# you can combined Resp_condition_der across cycles.
 
 suppressMessages(library(bllflow))
 library(cchsflow)
-resp2001 <- RecWTable(dataSource = cchs2001, variableDetails = variableDetails, datasetName = "cchs2001", 
-variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", "Resp_condition_der"))
+
+resp2001 <- RecWTable(dataSource = cchs2001, variableDetails = variableDetails, 
+datasetName = "cchs2001",  variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", 
+"Resp_condition_der"))
+
 head(resp2001)
 
-resp2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", 
-variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", "Resp_condition_der"))
+resp2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, 
+datasetName = "cchs2003",  variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", 
+"Resp_condition_der"))
+
 tail(resp2003)
 
 combined_resp <- bind_rows(resp2001, resp2003)
+
 head(combined_resp)
 tail(combined_resp)
 

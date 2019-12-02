@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
       </span>
     </div>
 
@@ -107,30 +107,39 @@
 </h1></div>
 
 <p><em>cchsflow</em> supports the use of the Canadian Community Health Survey (CCHS) by transforming variables from each cycle into harmonized, consistent versions that span survey cycles (currently, 2001 to 2014).</p>
-<p>The CCHS, administered by Statistics Canada, is Canada’s primary population health survey. Information about the survey is found <a href="http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&amp;SDDS=3226">here</a>. The CCHS has a <a href="https://www.statcan.gc.ca/eng/reference/licence">Statistic Canada Open Licence</a>.</p>
-<p>The CCHS is a population-based cross-sectional survey of Canadians that is administered every two years since 2001. There are approximately 130,000 respondents per cycle. Studies use multiple CCHS cycles to examine trends over time and increase sample to examine sub-groups that are too small to examine in a single cycle. Combined together, the CCHS is one of the largest and most robust population health surveys worldwide.</p>
+<p>The CCHS is a population-based cross-sectional survey of Canadians that is administered every two years since 2001. There are approximately 130,000 respondents per cycle. Studies use multiple CCHS cycles to examine trends over time and increase sample to examine sub-groups that are too small to examine in a single cycle.</p>
+<p>The CCHS is one of the largest and most robust ongoing population health surveys worldwide. The CCHS, administered by Statistics Canada, is Canada’s main general population health survey. Information about the survey is found <a href="http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&amp;SDDS=3226">here</a>. The CCHS has a <a href="https://www.statcan.gc.ca/eng/reference/licence">Statistic Canada Open Licence</a>.</p>
 <div id="concept" class="section level2">
 <h2 class="hasAnchor">
 <a href="#concept" class="anchor"></a>Concept</h2>
-<p>Each cycle of the CCHS contains over 1000 variables that cover the same concepts, including sociodemographic measures, health behaviours, health status and health care use. The <em>seemingly</em> consistent questions in the CCHS entice you; however, you quickly realize a challenge…</p>
-<p>Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 to 2014. BMI <em>seems</em> like a straightforward measure that is routinely-collected worldwide. Indeed, BMI is included in all CCHS cycles. You examine the documentation and find the variable <code>HWTAGBMI</code> in the CCHS 2001 corresponds to <code>Body mass index</code>, but that in other cycles, the variable name changes to <code>HWTCGBMI</code>, <code>HWTDGBMI</code>, <code>HWTEGBMI</code>, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don’t calculate BMI for respondents &lt; age 20 or &gt; 64 years. Also, some cycles calculate BMI only if height and weight are within specific ranges. These types of changes occur for almost all CCHS variables. Sometimes the changes are subtle and difficult to find in the documentation, even for seemingly straightforward variables such as BMI.</p>
-<p><code>cchsflow</code> harmonizes the BMI variable across different cycles.</p>
+<p>Each cycle of the CCHS contains over 1000 variables that cover the same topics, including sociodemographic measures, health behaviours, health status and health care use. The <em>seemingly</em> consistent questions in the CCHS entice you; however, you quickly realize a challenge…</p>
+<p>Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 to 2014. BMI <em>seems</em> like a straightforward measure that is routinely-collected worldwide. Indeed, BMI is included in all CCHS cycles. You examine the documentation and find the variable <code>HWTAGBMI</code> in the CCHS 2001 corresponds to body mass index, but that in other cycles, the variable name changes to <code>HWTCGBMI</code>, <code>HWTDGBMI</code>, <code>HWTEGBMI</code>, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don’t calculate BMI for respondents &lt; age 20 or &gt; 64 years. Also, some cycles calculate BMI only if height and weight are within specific ranges. These types of changes occur for almost all CCHS variables. Sometimes the changes are subtle and difficult to find in the documentation, even for seemingly straightforward variables such as BMI. <code>cchsflow</code> harmonizes the BMI variable across different cycles.</p>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p><code>cchsflow</code> creates harmonized variables (where possible) between CCHS cycles. Searching BMI in <code>variables.csv</code> shows <code>HWTGBMI</code> calculates BMI with two decimal places for all cycles for all respondents using the respondents’ untruncated height and weight.</p>
-<div class="sourceCode"><pre class="sourceCode R"><code class="sourceCode r"><span class="co"># calculate BMI for each CCHS cycle</span>
-cchs2001_BMI &lt;-<span class="st"> </span><span class="kw">RecWTable</span>(<span class="dt">dataSource =</span> cchs2001, 
-            <span class="dt">variableDetails =</span> varDetails, 
-            <span class="dt">datasetName =</span> <span class="st">"cchs-82M0013-E-2001-c1-1-general-file"</span>, 
-            <span class="dt">appendToData =</span> <span class="ot">TRUE</span>,  
-            <span class="dt">variables =</span> <span class="st">"HWTGBMI"</span>)</code></pre></div>
+<p><code>cchsflow</code> creates harmonized variables (where possible) between CCHS cycles. Searching BMI in <code>variables</code> (described in the Introduction section of variableDetails.csv <a href="articles/variableDetails.html">vignette</a>) shows <code>HWTGBMI</code> calculates BMI with two decimal places for all cycles for all respondents using the respondents’ untruncated height and weight.</p>
+<p><em>Calculate a harmonized BMI variable for CCHS 2001 cycle</em></p>
+<pre><code>    # load test cchs data - included in cchsflow
+    cchs2001test &lt;- cchs2001
+    
+    # `variableDetails` is a database in cchsflow that contain the instructions how to transform variables.
+    varDetails &lt;- variableDetails
+    
+    cchs2001_BMI &lt;- RecWTable(dataSource = cchs2001test, 
+                variableDetails = varDetails, 
+                datasetName = "cchs2001", 
+                appendToData = TRUE,  
+                variables = "HWTGBMI")</code></pre>
+<p>Notes printed to console indicate issues that may affect BMI classification for your study.</p>
+<pre><code>[1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
+[1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable and missing variables as 999.96 and 999.7-999.99 respectively"
+[1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"</code></pre>
 </div>
 <div id="important-notes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#important-notes" class="anchor"></a>Important notes</h2>
-<p><em>Combining CCHS across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.</em> The transformations that are described in this repository have been used in several research projects (see reference list), but there are no guarantees regarding the accuracy or appropriate uses.</p>
+<p><em>Combining CCHS across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.</em> The transformations that are described in this repository have been used in several research projects, but there are no guarantees regarding the accuracy or appropriate uses.</p>
 <p>Care must be taken to understand how specific variable transformation and harmonization with <code>cchsflow</code> affect your study or use of CCHS data. Across survey cycles, almost all CCHS variables have had at least some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses.</p>
 </div>
 <div id="installation" class="section level2">

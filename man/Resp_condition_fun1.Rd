@@ -14,36 +14,43 @@ Resp_condition_fun1(DHHGAGE_cont, CCC_091)
 \value{
 a categorical variable (Resp_condition_der) with 3 levels:
  
- 1 - respondent is over the age of 35 and has a respiratory condition
- 
- 2 - respondent is under the age of 35 and has a respiratory condition
- 
- 3 - respondent does not have a respiratory condition
+ \enumerate{
+ \item respondent is over the age of 35 and has a respiratory condition
+ \item respondent is under the age of 35 and has a respiratory condition
+ \item respondent does not have a respiratory condition
+ }
 }
 \description{
-This is one of 3 functions used to create a derived variable (Resp_condition_der) that determines if a respondents has a respirtory condition.
- 3 different functions have been created to account for the fact that different respiratory variables are used across CCHS cycles.
- This function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as a combined variable.
+This is one of 3 functions used to create a derived variable (Resp_condition_der) 
+ that determines if a respondents has a respirtory condition. 3 different functions have been 
+ created to account for the fact that different respiratory variables are used across 
+ CCHS cycles. This function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as a 
+ combined variable.
 }
 \examples{
 # Using Resp_condition_fun1() to create pack-years values across CCHS cycles (2009-2014)
-# Resp_condition_fun1() is specified in variableDetails.csv along with the CCHS variables and cycles included.
+# Resp_condition_fun1() is specified in variableDetails.csv along with the CCHS variables and 
+# cycles included.
 
-# To transform Resp_condition_der, use RecWTable() for each CCHS cycle and specify Resp_condition_der, 
-# along with the various respiratory variables. Then by using bind_rows(), you can combined Resp_condition_der
-# across cycles.
+# To transform Resp_condition_der, use RecWTable() for each CCHS cycle and specify 
+# Resp_condition_der,along with the various respiratory variables. Then by using bind_rows(), 
+# you can combined Resp_condition_der across cycles.
 
 suppressMessages(library(bllflow))
 library(cchsflow)
-resp2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", 
-variables = c("DHHGAGE_cont", "CCC_091", "Resp_condition_der"))
+
+resp2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, 
+datasetName = "cchs2010", variables = c("DHHGAGE_cont", "CCC_091", "Resp_condition_der"))
+
 head(resp2010)
 
-resp2012 <- RecWTable(dataSource = cchs2012, variableDetails = variableDetails, datasetName = "cchs2012", 
-variables = c("DHHGAGE_cont", "CCC_091", "Resp_condition_der"))
+resp2012 <- RecWTable(dataSource = cchs2012, variableDetails = variableDetails, 
+datasetName = "cchs2012", variables = c("DHHGAGE_cont", "CCC_091", "Resp_condition_der"))
+
 tail(resp2012)
 
 combined_resp <- bind_rows(resp2010, resp2012)
+
 head(combined_resp)
 tail(combined_resp)
 
