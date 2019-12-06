@@ -28,14 +28,13 @@
 #' # (SDCGCBG), how long someone has lived in Canada (SDCGRES). Then by using bind_rows(), 
 #' # you can combine Pct_time_der across cycles
 #' 
-#' suppressMessages(library(bllflow))
 #' library(cchsflow)
-#' pct_time2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, 
-#' datasetName = "cchs2010", variables = c("DHHGAGE_cont", "SDCGCBG", "SDCGRES", "Pct_time_der"))
+#' pct_time2010 <- rec_with_table(data_source = cchs2010, variable_details = variableDetails, 
+#' dataset_name = "cchs2010", variables = c("DHHGAGE_cont", "SDCGCBG", "SDCGRES", "Pct_time_der"))
 #' head(pct_time2010)
 #' 
-#' pct_time2012 <- RecWTable(dataSource = cchs2012, variableDetails = variableDetails, 
-#' datasetName = "cchs2012", variables = c("DHHGAGE_cont", "SDCGCBG", "SDCGRES", "Pct_time_der"))
+#' pct_time2012 <- rec_with_table(data_source = cchs2012, variable_details = variableDetails, 
+#' dataset_name = "cchs2012", variables = c("DHHGAGE_cont", "SDCGCBG", "SDCGRES", "Pct_time_der"))
 #' tail(pct_time2012)
 #' 
 #' combined_pct_time <- bind_rows(pct_time2010, pct_time2012)

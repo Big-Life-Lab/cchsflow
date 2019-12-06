@@ -55,14 +55,13 @@ In earlier CCHS cycles (2001 and 2003), height was collected in inches; while in
 # HWTGBMI_der, along with height (HWTGHTM) and weight (HWTGWTK). Then by using bind_rows(), you 
 # can combined HWTGBMI_der across cycles.
 
-suppressMessages(library(bllflow))
 library(cchsflow)
-bmi2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, 
-datasetName = "cchs2010", variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+bmi2010 <- rec_with_table(data_source = cchs2010, variable_details = variableDetails, 
+dataset_name = "cchs2010", variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 head(bmi2010)
 
-bmi2012 <- RecWTable(dataSource = cchs2012, variableDetails = variableDetails, datasetName = 
-"cchs2012", variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+bmi2012 <- rec_with_table(data_source = cchs2012, variable_details = variableDetails, 
+dataset_name = "cchs2012", variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 tail(bmi2012)
 
 combined_bmi <- bind_rows(bmi2010, bmi2012)

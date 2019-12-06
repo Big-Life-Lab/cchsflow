@@ -71,18 +71,17 @@ pack-years is calculated by multiplying the number of cigarette packs per day
 # Pack_years_der, along with each smoking variable. Then by using bind_rows(), you can combine 
 # Pack_years_der across cycles
 
-suppressMessages(library(bllflow))
 library(cchsflow)
 
-pack_years2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, 
-datasetName = "cchs2010", variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", 
+pack_years2010 <- rec_with_table(data_source = cchs2010, variable_details = variableDetails, 
+dataset_name = "cchs2010", variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", 
 "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A", 
 "SMKG01C_cont", "Pack_years_der"))
 
 head(pack_years2010)
 
-pack_years2012 <- RecWTable(dataSource = cchs2012, variableDetails = variableDetails, 
-datasetName = "cchs2012", variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", 
+pack_years2012 <- rec_with_table(data_source = cchs2012, variable_details = variableDetails, 
+dataset_name = "cchs2012", variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", 
 "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A", 
 "SMKG01C_cont", "Pack_years_der"))
 

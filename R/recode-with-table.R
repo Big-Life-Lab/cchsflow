@@ -57,7 +57,7 @@
 #' @importFrom stringr str_match
 #' @importFrom dplyr rowwise select do
 #' @export
-rec_w_table <-
+rec_with_table <-
   function(data_source,
            variable_details,
            dataset_name,

@@ -37,17 +37,16 @@ This is one of 3 functions used to create a derived variable (Resp_condition_der
 # Resp_condition_der, along with the various respiratory variables. Then by using bind_rows(), 
 # you can combined Resp_condition_der across cycles.
 
-suppressMessages(library(bllflow))
 library(cchsflow)
 
-resp2001 <- RecWTable(dataSource = cchs2001, variableDetails = variableDetails, 
-datasetName = "cchs2001",  variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", 
+resp2001 <- rec_with_table(data_source = cchs2001, variable_details = variableDetails, 
+dataset_name = "cchs2001",  variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", 
 "Resp_condition_der"))
 
 head(resp2001)
 
-resp2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, 
-datasetName = "cchs2003",  variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", 
+resp2003 <- rec_with_table(data_source = cchs2003, variable_details = variableDetails, 
+dataset_name = "cchs2003",  variables = c("DHHGAGE_cont", "CCC_091", "CCC_91A", 
 "Resp_condition_der"))
 
 tail(resp2003)
