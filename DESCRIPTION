@@ -24,11 +24,16 @@ Authors@R: c(
           family = "Sequeira",
           role = c("ctb"),
           email = "ysequeira@ohri.ca"))
+Depends: 
+  haven,
+  dplyr,
+  sjlabelled,
+  stringr
 Description: Variable transformation and harmonization for the Canadian Community Health Survey from
             2001 to 2014.
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
-RoxygenNote: 7.0.0
+RoxygenNote: 7.0.2
