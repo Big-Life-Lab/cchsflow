@@ -95,7 +95,7 @@ Resp_condition_fun1 <-
 #' "Resp_condition_der"))
 #' head(resp2005)
 #' 
-#' resp2007_2008 <- RecWTable(data_source = cchs2007_2008, variable_details = variableDetails, 
+#' resp2007_2008 <- rec_with_table(data_source = cchs2007_2008, variable_details = variableDetails, 
 #' dataset_name = "cchs2007_2008", variables = c("DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", 
 #' "Resp_condition_der"))
 #' 

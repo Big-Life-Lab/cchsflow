@@ -1,3 +1,20 @@
+#' @title is equal
+#' @description Function to compare even with NA present
+#' This function returns TRUE wherever elements are the same, including NA's,
+#' and false everywhere else.
+#' 
+#' @param v1 variable 1
+#' @param v2 variable 2
+#' @export
+is_equal <- function(v1, v2) {
+  same <- (v1 == v2)  |  (is.na(v1) & is.na(v2))
+  # anything compared to NA equals NA
+  # replaces all instanses of NA with FALSE
+  same[is.na(same)] <- FALSE
+  
+  return(same)
+}
+
 # #' @title Recode with Table
 # #'
 # #' @description \code{\link{rec_w_table}} recodes values of variable, where vaiable selection and recoding rules are describe
@@ -57,6 +74,7 @@
 #' @importFrom stringr str_match
 #' @importFrom dplyr rowwise select do
 #' @export
+
 rec_with_table <-
   function(data_source,
            variable_details,
