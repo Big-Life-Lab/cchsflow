@@ -1,3 +1,9 @@
+#' @title Set Data Labels
+#' @description sets labels for transformed datasets
+#' 
+#' @param data_to_label newly transformed dataset
+#' @param variable_details variableDetails.csv
+#' @param variables_sheet variables.csv
 #' @export
 set_data_labels <-
   function(data_to_label,
@@ -99,9 +105,9 @@ create_label_list_element <- function(variable_rows) {
   return(ret_list)
 }
 
-#' label_data
+#' @title label_data
 #'
-#' Attaches labels to the DataToLabel to preserve metadata
+#' @description Attaches labels to the DataToLabel to preserve metadata
 #'
 #' @param label_list the label list object that contains extracted labels from variable details
 #' @param data_to_label The data that is to be labeled

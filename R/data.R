@@ -1,3 +1,38 @@
+#' variables.csv
+#' 
+#' This dataset lists all the variables that are present in cchsflow. 
+#' 
+#' See \href{https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html}{here} for more
+#' details about how the worksheet is structured
+#' 
+#' @name variables
+#' @aliases variables
+#' @docType data
+#' @return \item{variables}{a data frame}
+#' 
+#' @keywords datasets
+#' @examples 
+#' data(variables)
+#' str(variables)
+NULL
+
+#' variableDetails.csv
+#' 
+#' This dataset provides details on how variables are specified in cchsflow.
+#' 
+#' See \href{https://big-life-lab.github.io/cchsflow/articles/variablesDetails.html}{here} for more
+#' details about how the worksheet is structured
+#' @name variableDetails
+#' @aliases variableDetails
+#' @docType data
+#' @return \item{variableDetails}{a data frame}
+#' 
+#' @keywords datasets
+#' @examples 
+#' data(variableDetails)
+#' str(variableDetails)
+NULL
+
 #' 2001 CCHS data
 #' 
 #' This is a subset of 200 observations from the 2001 cycle of the Canadian Community Health Survey 
