@@ -5,3 +5,4 @@
 ^pkgdown$
 ^Vignettes$
 ^CONTRIBUTING.md
+^cran-comments\.md$
