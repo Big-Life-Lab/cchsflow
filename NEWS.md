@@ -1,4 +1,21 @@
-# cchsflow 0.2.3 (Latest build) 
+# cchsflow 0.3.0 (Latest build)
+2019-12-11
+
+## News
+
+- Submitted package to CRAN
+
+## Features
+
+- Switched formatting to snake_cake
+- Dependency lowered to R 3.1
+- Corrections to usingcchsflow article
+- Removed DDI files 
+- Added [bllflow](https://bllflow.projectbiglife.ca/) functions to package to avoid dependency to 
+  package 
+
+
+# cchsflow 0.2.3
 2019-11-29
 
 ## Features
