@@ -23,7 +23,7 @@ set_data_labels <-
     if (!is.null(variables_sheet)) {
       variables_sheet <-
         variables_sheet[variables_sheet[[pkg.globals$argument.Variables]] %in% variable_names,]
-      variable_details <- UpdateVariableDetailsBasedOnVariableSheet(variableSheet = variables_sheet, variable_details = variable_details)
+      variable_details <- update_variable_details_based_on_variable_sheet(variable_sheet = variables_sheet, variable_details = variable_details)
     }
     label_list <- NULL
     for (variable_name in variable_names) {
@@ -111,7 +111,7 @@ create_label_list_element <- function(variable_rows) {
 #'
 #' @param label_list the label list object that contains extracted labels from variable details
 #' @param data_to_label The data that is to be labeled
-#' @importFrom sjlabelled set_labels
+#' @importFrom sjlabelled set_labels set_label set_label<- 
 #'
 #' @return Returns labeled data
 label_data <- function(label_list, data_to_label) {

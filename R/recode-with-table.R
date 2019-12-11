@@ -1,3 +1,5 @@
+#Removing Note
+. <- NULL
 #' @title is equal
 #' @description Function to compare even with NA present
 #' This function returns TRUE wherever elements are the same, including NA's,
@@ -72,7 +74,8 @@ is_equal <- function(v1, v2) {
 #' @return a dataframe that is recoded according to rules in variable_details.
 #' @importFrom haven tagged_na
 #' @importFrom stringr str_match
-#' @importFrom dplyr rowwise select do
+#' @importFrom dplyr rowwise select do 
+#' @importFrom magrittr %>% 
 #' @export
 
 rec_with_table <-
@@ -764,7 +767,7 @@ recode_derived_variables <-
         as.list(strsplit(func_cell, "::"))[[1]][[2]]
       
       column_value <-
-        recoded_data %>% rowwise(.) %>% select(used_feeder_vars) %>%
+        recoded_data %>% rowwise() %>% select(used_feeder_vars) %>%
         do(
           column_being_added = calculate_custom_function_row_value(
             .,
