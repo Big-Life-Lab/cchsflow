@@ -1,6 +1,6 @@
 #' @title Set Data Labels
 #' @description sets labels for transformed datasets
-#' 
+#'
 #' @param data_to_label newly transformed dataset
 #' @param variable_details variableDetails.csv
 #' @param variables_sheet variables.csv
@@ -14,24 +14,24 @@ set_data_labels <-
     # extract only relevant variable info
     if (!is.null(variable_details)) {
       variable_details <-
-        variable_details[variable_details[[pkg.globals$argument.Variables]] %in% variable_names,]
-      if (is.null(variables_sheet)){
+        variable_details[variable_details[[pkg.globals$argument.Variables]] %in% variable_names, ]
+      if (is.null(variables_sheet)) {
         variable_details[[pkg.globals$MSW.Variables.Columns.Label]] <- NA
         variable_details[[pkg.globals$MSW.Variables.Columns.LabelLong]] <- NA
       }
     }
     if (!is.null(variables_sheet)) {
       variables_sheet <-
-        variables_sheet[variables_sheet[[pkg.globals$argument.Variables]] %in% variable_names,]
+        variables_sheet[variables_sheet[[pkg.globals$argument.Variables]] %in% variable_names, ]
       variable_details <- update_variable_details_based_on_variable_sheet(variable_sheet = variables_sheet, variable_details = variable_details)
     }
     label_list <- NULL
     for (variable_name in variable_names) {
-      rows_to_process <- variable_details[variable_details[[pkg.globals$argument.Variables]] == variable_name,]
+      rows_to_process <- variable_details[variable_details[[pkg.globals$argument.Variables]] == variable_name, ]
       label_list[[variable_name]] <- create_label_list_element(rows_to_process)
     }
     data_to_label <- label_data(label_list, data_to_label)
-    
+
     return(data_to_label)
   }
 
@@ -79,8 +79,10 @@ create_label_list_element <- function(variable_rows) {
         )
       }
       # Verify variable label is identical
-      if (!is_equal(ret_list$label_long,
-                   as.character(single_row[[pkg.globals$argument.VariableLabel]]))) {
+      if (!is_equal(
+        ret_list$label_long,
+        as.character(single_row[[pkg.globals$argument.VariableLabel]])
+      )) {
         stop(
           paste(
             as.character(single_row[[pkg.globals$argument.Variables]]),
@@ -101,7 +103,7 @@ create_label_list_element <- function(variable_rows) {
         value_being_labeled
     }
   }
-  
+
   return(ret_list)
 }
 
@@ -111,7 +113,7 @@ create_label_list_element <- function(variable_rows) {
 #'
 #' @param label_list the label list object that contains extracted labels from variable details
 #' @param data_to_label The data that is to be labeled
-#' @importFrom sjlabelled set_labels set_label set_label<- 
+#' @importFrom sjlabelled set_labels set_label set_label<-
 #'
 #' @return Returns labeled data
 label_data <- function(label_list, data_to_label) {
@@ -124,11 +126,11 @@ label_data <- function(label_list, data_to_label) {
         set_labels(data_to_label[[variable_name]], labels = label_list[[variable_name]]$values)
       attr(data_to_label[[variable_name]], "labels_long") <-
         label_list[[variable_name]]$values_long
-    } else{
+    } else {
       if (class(data_to_label[[variable_name]]) == "factor") {
         data_to_label[[variable_name]] <-
           as.numeric(levels(data_to_label[[variable_name]])[data_to_label[[variable_name]]])
-      } else{
+      } else {
         data_to_label[[variable_name]] <-
           as.numeric(data_to_label[[variable_name]])
       }
@@ -140,6 +142,6 @@ label_data <- function(label_list, data_to_label) {
     attr(data_to_label[[variable_name]], "label_long") <-
       label_list[[variable_name]]$label_long
   }
-  
+
   return(data_to_label)
 }

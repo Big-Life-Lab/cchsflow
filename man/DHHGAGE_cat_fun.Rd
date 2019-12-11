@@ -10,13 +10,13 @@ DHHGAGE_cat_fun(DHHGAGE_cont)
 \item{DHHGAGE_cont}{continuous age variable}
 }
 \description{
-This is a derived categorical age variable that groups various age categories 
+This is a derived categorical age variable that groups various age categories
  across all CCHS cycles. This is based on the continuous age variable (DHHGAGE_cont) that is
  harmonious across all CCHS cycles.
- 
+
  The categories of this variable are based on the age groupings seen in CCHS cycles from 2007 to
  2014. The age breakdown is as follows:
- 
+
  \enumerate{
    \item 12 to 14 years
    \item 15 to 17 years

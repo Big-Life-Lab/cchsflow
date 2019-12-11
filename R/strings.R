@@ -9,12 +9,12 @@ pkg.globals$columnNames.Variable <- "variable"
 # Variable Details Sheet Column Names
 pkg.globals$argument.Data <- "data"
 pkg.globals$argument.Variables <- "variable"
-pkg.globals$argument.VariableDetailsSheet <- "variableDetailsSheet" 
-pkg.globals$argument.VariableStart <- "variableStart" 
+pkg.globals$argument.VariableDetailsSheet <- "variableDetailsSheet"
+pkg.globals$argument.VariableStart <- "variableStart"
 pkg.globals$argument.VariableStartType <- "variableStartType"
 pkg.globals$argument.DatabaseStart <- "databaseStart"
-pkg.globals$argument.VariableStartHigh <- "high" 
-pkg.globals$argument.VariableStartLow <- "low" 
+pkg.globals$argument.VariableStartHigh <- "high"
+pkg.globals$argument.VariableStartLow <- "low"
 pkg.globals$argument.CatStartValue <- "value"
 pkg.globals$argument.CatStartLabel <- "valueLabelStart"
 pkg.globals$argument.VariableStartLabel <- "label"
@@ -29,7 +29,7 @@ pkg.globals$argument.VariableLabelShort <- "label"
 pkg.globals$argument.CatLabelLong <- "catLabelLong"
 pkg.globals$argument.CatLabel <- "catLabel"
 pkg.globals$argument.CatType <- "cat"
-pkg.globals$argument.VariableStartHighLow <- "from" 
+pkg.globals$argument.VariableStartHighLow <- "from"
 pkg.globals$argument.Role <- "role"
 
 # DDI object names
@@ -37,7 +37,7 @@ pkg.globals$ddiValue.Min <- "min"
 pkg.globals$ddiValue.Max <- "max"
 pkg.globals$ddiValueName.Cont <- "cont"
 pkg.globals$ddiValueName.Cat <- "cat"
-pkg.globals$ddiValueName.Categorical <- "Categorical" 
+pkg.globals$ddiValueName.Categorical <- "Categorical"
 
 # BLLFlow object content
 pkg.globals$bllFlowContent.Data <- "data"
@@ -53,7 +53,7 @@ pkg.globals$bllFlowContent.WorkingData <- "workingData"
 pkg.globals$MSW.Variables.Columns.Variable <- "variable"
 pkg.globals$MSW.Variables.Columns.VariableType <- "variableType"
 pkg.globals$MSW.Variables.Columns.Label <- "label"
-  pkg.globals$MSW.Variables.Columns.LabelLong <- "labelLong"
+pkg.globals$MSW.Variables.Columns.LabelLong <- "labelLong"
 pkg.globals$MSW.Variables.Columns.Units <- "units"
 
 # Table one variable names
@@ -93,9 +93,9 @@ pkg.globals$LongTable.LongTable <- "summaryData"
 pkg.globals$Modules.DefaultOrder <- "DefaultOrder"
 
 # WorkingData contents
-pkg.globals$WorkingData.ModuleSequenceNumber <- "moduleSequenceNumber" 
+pkg.globals$WorkingData.ModuleSequenceNumber <- "moduleSequenceNumber"
 pkg.globals$WorkingData.ModuleOperations <- "ModuleOperations"
 
-#FunctionList contents
+# FunctionList contents
 pkg.globals$FunctionList.Arguments <- "arguments"
 pkg.globals$FunctionList.VariableArguments <- "variablesArguments"

@@ -24,7 +24,7 @@ Pack_years_fun(
 
 \item{DHHGAGE_cont}{continuous age variable.}
 
-\item{SMK_09A_B}{number of years since quitting smoking. Variable asked to former daily smokers 
+\item{SMK_09A_B}{number of years since quitting smoking. Variable asked to former daily smokers
 who quit <3 years ago.}
 
 \item{SMKG09C}{number of years since quitting smoking. Variable asked to former daily smokers who
@@ -50,40 +50,48 @@ quit >=3 years ago.}
 value for smoking pack-years in the Pack_years_der variable
 }
 \description{
-This function creates a derived variable (Pack_years_der) that measures an 
- individual's smoking pack-years based on various CCHS smoking variables. This is a popular 
+This function creates a derived variable (Pack_years_der) that measures an
+ individual's smoking pack-years based on various CCHS smoking variables. This is a popular
  variable used by researchers to quantify lifetime exposure to cigarette use.
 }
 \details{
-pack-years is calculated by multiplying the number of cigarette packs per day 
+pack-years is calculated by multiplying the number of cigarette packs per day
  (20 cigarettes per pack) by the number of years. Example 1: a respondent who is a current smoker
- who smokes 1 package of cigarettes for the last 10 years has smoked 10 pack-years. 
- Pack-years is also calculated for former smokers. Example 2: a respondent who started smoking 
- at age 20 years and smoked half a pack of cigarettes until age 40 years smoked for 
+ who smokes 1 package of cigarettes for the last 10 years has smoked 10 pack-years.
+ Pack-years is also calculated for former smokers. Example 2: a respondent who started smoking
+ at age 20 years and smoked half a pack of cigarettes until age 40 years smoked for
  10 pack-years.
 }
 \examples{
 # Using Pack_years_fun() to create pack-years values across CCHS cycles
-# Pack_years_fun() is specified in variableDetails.csv along with the CCHS variables and cycles 
-# included. 
+# Pack_years_fun() is specified in variableDetails.csv along with the CCHS variables and cycles
+# included.
 
-# To transform Pack_years_der across cycles, use RecWTable() for each CCHS cycle and specify 
-# Pack_years_der, along with each smoking variable. Then by using bind_rows(), you can combine 
+# To transform Pack_years_der across cycles, use RecWTable() for each CCHS cycle and specify
+# Pack_years_der, along with each smoking variable. Then by using bind_rows(), you can combine
 # Pack_years_der across cycles
 
 library(cchsflow)
 
-pack_years2010 <- rec_with_table(data_source = cchs2010, variable_details = variableDetails, 
-dataset_name = "cchs2010", variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", 
-"SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A", 
-"SMKG01C_cont", "Pack_years_der"))
+pack_years2010 <- rec_with_table(
+  data_source = cchs2010, variable_details = variableDetails,
+  dataset_name = "cchs2010", variables = c(
+    "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
+    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A",
+    "SMKG01C_cont", "Pack_years_der"
+  )
+)
 
 head(pack_years2010)
 
-pack_years2012 <- rec_with_table(data_source = cchs2012, variable_details = variableDetails, 
-dataset_name = "cchs2012", variables = c("SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", 
-"SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A", 
-"SMKG01C_cont", "Pack_years_der"))
+pack_years2012 <- rec_with_table(
+  data_source = cchs2012, variable_details = variableDetails,
+  dataset_name = "cchs2012", variables = c(
+    "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
+    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A",
+    "SMKG01C_cont", "Pack_years_der"
+  )
+)
 
 tail(pack_years2012)
 

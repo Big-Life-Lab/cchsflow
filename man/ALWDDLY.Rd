@@ -10,12 +10,12 @@ ALWDDLY(ALWDDLY)
 \item{ALWDDLY}{cchsflow variable name for average daily alcohol consumption}
 }
 \description{
-\strong{NOTE:} this is not a function. 
- 
- This is a continuous variable derived by Statistics Canada that quantifies the mean daily 
+\strong{NOTE:} this is not a function.
+
+ This is a continuous variable derived by Statistics Canada that quantifies the mean daily
  consumption of alcohol. This takes the value of ALWDWKY and divides it by 7.
 }
 \details{
-This variable is used in all CCHS cycles in cchsflow and how it was derived remains 
+This variable is used in all CCHS cycles in cchsflow and how it was derived remains
 consistent from 2001 to 2014.
 }

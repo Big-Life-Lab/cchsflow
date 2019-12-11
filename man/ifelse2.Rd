@@ -24,11 +24,10 @@ If the logical argument (x) compares to a value that is `NA`, it is set to `FALS
 }
 \examples{
 age <- 12
-status <- ifelse2((age<18),"child", "invalid age")
+status <- ifelse2((age < 18), "child", "invalid age")
 print(status)
 
 age <- NA
-status <- ifelse2((age<18), "child", "invalid age")
+status <- ifelse2((age < 18), "child", "invalid age")
 print(status)
-
 }
