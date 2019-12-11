@@ -31,8 +31,6 @@ Depends:
   sjlabelled,
   stringr,
   magrittr
-Suggests: 
-  sjmisc
 Description: Variable transformation and harmonization for the Canadian Community Health Survey from
             2001 to 2014.
 License: MIT + file LICENSE

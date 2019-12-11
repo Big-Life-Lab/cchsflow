@@ -45,8 +45,8 @@ is_equal <- function(v1, v2) {
 #'   \item{recFrom}{Value/range being recoded from}
 #'  }
 #'  Each row in \emph{variable_details} comprises one category in a newly transformed variable. The rules for each category the new variable
-#'  are a string in \emph{recFrom} and value in \emph{recTo}. These recode pairs are the same syntax as \code{\link[sjmisc]{rec}},
-#'  except in \code{\link[sjmisc]{rec}} the pairs are a string for the function attibute \emph{rec =}, separated by '\emph{=}'.
+#'  are a string in \emph{recFrom} and value in \emph{recTo}. These recode pairs are the same syntax as \emph{sjmisc::rec()},
+#'  except in \emph{sjmisc::rec()} the pairs are a string for the function attibute \emph{rec =}, separated by '\emph{=}'.
 #'  For example in \emph{rec_w_table} \emph{variable_details$recFrom = 2; variable_details$recTo = 4} is the same as \emph{sjmisc::rec(rec = "2=4")}.
 #'  the pairs are obtained from the RecFrom and RecTo columns
 #'   \describe{
