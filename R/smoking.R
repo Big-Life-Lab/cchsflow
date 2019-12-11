@@ -1,6 +1,6 @@
 #' @title Smoking pack-years
 #'
-#' @description This function creates a derived variable (Pack_years_der) that measures an
+#' @description This function creates a derived variable (pack_years_der) that measures an
 #'  individual's smoking pack-years based on various CCHS smoking variables. This is a popular
 #'  variable used by researchers to quantify lifetime exposure to cigarette use.
 #'
@@ -40,13 +40,13 @@
 #' @return value for smoking pack-years in the Pack_years_der variable
 #'
 #' @examples
-#' # Using Pack_years_fun() to create pack-years values across CCHS cycles
-#' # Pack_years_fun() is specified in variableDetails.csv along with the CCHS variables and cycles
+#' # Using pack_years_fun() to create pack-years values across CCHS cycles
+#' # pack_years_fun() is specified in variableDetails.csv along with the CCHS variables and cycles
 #' # included.
 #'
-#' # To transform Pack_years_der across cycles, use RecWTable() for each CCHS cycle and specify
-#' # Pack_years_der, along with each smoking variable. Then by using bind_rows(), you can combine
-#' # Pack_years_der across cycles
+#' # To transform pack_years_der across cycles, use rec_with_table() for each CCHS cycle and specify
+#' # pack_years_der, along with each smoking variable. Then by using bind_rows(), you can combine
+#' # pack_years_der across cycles
 #'
 #' library(cchsflow)
 #'
@@ -76,8 +76,9 @@
 #'
 #' head(combined_pack_years)
 #' tail(combined_pack_years)
+#' 
 #' @export
-Pack_years_fun <-
+pack_years_fun <-
   function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont, SMK_204, SMK_05B,
            SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
     # Time since quit for former daily smokers
