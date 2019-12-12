@@ -61,7 +61,6 @@ resp_condition_fun1 <-
     if_else2(CCC_091 == 2, 3, NA)))
   }
 
-
 #' @title resp_condition_fun2
 #'
 #' @description This is one of 3 functions used to create a derived variable 

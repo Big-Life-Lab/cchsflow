@@ -16,7 +16,7 @@ ALCDTYP(ALCDTYP)
  various intermediate alcohol variables to categorize individuals into 4 
  distinct groups:
 
- \enumerate {
+ \enumerate{
   \item Regular Drinker
   \item Occasional Drinker
   \item Former Drinker
