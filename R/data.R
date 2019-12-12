@@ -4,7 +4,7 @@
 #'
 #' See the below link for more details about how the worksheet is structured
 #' \url{https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html}
-#' 
+#'
 #'
 #' @name variables
 #' @aliases variables
@@ -23,7 +23,7 @@ NULL
 #'
 #' See the below link for more details about how the worksheet is structured
 #' \url{https://big-life-lab.github.io/cchsflow/articles/variablesDetails.html}
-#' 
+#'
 #' @name variableDetails
 #' @aliases variableDetails
 #' @docType data
@@ -37,8 +37,8 @@ NULL
 
 #' 2001 CCHS data
 #'
-#' This is a subset of 200 observations from the 2001 cycle of the Canadian 
-#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
+#' This is a subset of 200 observations from the 2001 cycle of the Canadian
+#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
@@ -55,7 +55,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2001}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=3359}
 #'
 #' @keywords datasets
@@ -66,8 +66,8 @@ NULL
 
 #' 2003 CCHS data
 #'
-#' This is a subset of 200 observations from the 2003 cycle of the Canadian 
-#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
+#' This is a subset of 200 observations from the 2003 cycle of the Canadian
+#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
@@ -85,7 +85,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2003}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=4995}
 #'
 #' @keywords datasets
@@ -96,8 +96,8 @@ NULL
 
 #' 2005 CCHS data
 #'
-#' This is a subset of 200 observations from the 2005 cycle of the Canadian 
-#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
+#' This is a subset of 200 observations from the 2005 cycle of the Canadian
+#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
@@ -115,7 +115,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2005}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=22642}
 #'
 #' @keywords datasets
@@ -144,7 +144,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2007_2008}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
 #'
 #' @keywords datasets
@@ -173,7 +173,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2009_2010}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=67251}
 #'
 #' @keywords datasets
@@ -184,7 +184,7 @@ NULL
 
 #' 2010 CCHS data
 #'
-#' This is a subset of 200 observations from the 2010 cycle of the Canadian 
+#' This is a subset of 200 observations from the 2010 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
@@ -202,7 +202,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2010}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=81424}
 #'
 #' @keywords datasets
@@ -232,7 +232,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2011_2012}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=114112}
 #'
 #' @keywords datasets
@@ -243,7 +243,7 @@ NULL
 
 #' 2012 CCHS data
 #'
-#' This is a subset of 200 observations from the 2012 cycle of the Canadian 
+#' This is a subset of 200 observations from the 2012 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
@@ -261,7 +261,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2012}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=135927}
 #'
 #' @keywords datasets
@@ -290,7 +290,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2013_2014}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=144170}
 #'
 #' @keywords datasets
@@ -301,7 +301,7 @@ NULL
 
 #' 2014 CCHS data
 #'
-#' This is a subset of 200 observations from the 2014 cycle of the Canadian 
+#' This is a subset of 200 observations from the 2014 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
@@ -319,7 +319,7 @@ NULL
 #' @docType data
 #' @return \item{cchs2014}{a data frame}
 #'
-#' @source 
+#' @source
 #'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=164081}
 #'
 #' @keywords datasets
