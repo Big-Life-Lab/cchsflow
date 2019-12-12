@@ -48,14 +48,14 @@ reference:
   - title: "Derived variable functions"
     desc: Functions for deriving custom CCHS variables
     contents:
-    - ifelse2
-    - BMI_fun
-    - Pack_years_fun
-    - Pct_time_fun
-    - Resp_condition_fun1
-    - Resp_condition_fun2
-    - Resp_condition_fun3
-    - DHHGAGE_cat_fun
+    - if_else2
+    - bmi_fun
+    - pack_years_fun
+    - pct_time_fun
+    - resp_condition_fun1
+    - resp_condition_fun2
+    - resp_condition_fun3
+    - age_cat_fun
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:

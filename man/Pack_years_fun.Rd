@@ -20,25 +20,31 @@ pack_years_fun(
 )
 }
 \arguments{
-\item{SMKDSTY}{derived variable that classifies an individual's smoking status.}
+\item{SMKDSTY}{derived variable that classifies an individual's smoking 
+status.}
 
 \item{DHHGAGE_cont}{continuous age variable.}
 
-\item{SMK_09A_B}{number of years since quitting smoking. Variable asked to former daily smokers
-who quit <3 years ago.}
+\item{SMK_09A_B}{number of years since quitting smoking. Variable asked to 
+former daily smokers who quit <3 years ago.}
 
-\item{SMKG09C}{number of years since quitting smoking. Variable asked to former daily smokers who
-quit >=3 years ago.}
+\item{SMKG09C}{number of years since quitting smoking. Variable asked to 
+former daily smokers who quit >=3 years ago.}
 
-\item{SMKG203_cont}{age started smoking daily. Variable asked to daily smokers.}
+\item{SMKG203_cont}{age started smoking daily. Variable asked to daily 
+smokers.}
 
-\item{SMKG207_cont}{age started smoking daily. Variable asked to former daily smokers.}
+\item{SMKG207_cont}{age started smoking daily. Variable asked to former 
+daily smokers.}
 
-\item{SMK_204}{number of cigarettes smoked per day. Variable asked to daily smokers.}
+\item{SMK_204}{number of cigarettes smoked per day. Variable asked to 
+daily smokers.}
 
-\item{SMK_05B}{number of cigarettes smoked per day. Variable asked to occasional smokers}
+\item{SMK_05B}{number of cigarettes smoked per day. Variable asked to 
+occasional smokers}
 
-\item{SMK_208}{number of cigarettes smoked per day. Variable asked to former daily smokers}
+\item{SMK_208}{number of cigarettes smoked per day. Variable asked to former 
+daily smokers}
 
 \item{SMK_05C}{number of days smoked at least one cigarette}
 
@@ -50,26 +56,28 @@ quit >=3 years ago.}
 value for smoking pack-years in the Pack_years_der variable
 }
 \description{
-This function creates a derived variable (pack_years_der) that measures an
- individual's smoking pack-years based on various CCHS smoking variables. This is a popular
- variable used by researchers to quantify lifetime exposure to cigarette use.
+This function creates a derived variable (pack_years_der) that 
+ measures an individual's smoking pack-years based on various CCHS smoking 
+ variables. This is a popular variable used by researchers to quantify 
+ lifetime exposure to cigarette use.
 }
 \details{
-pack-years is calculated by multiplying the number of cigarette packs per day
- (20 cigarettes per pack) by the number of years. Example 1: a respondent who is a current smoker
- who smokes 1 package of cigarettes for the last 10 years has smoked 10 pack-years.
- Pack-years is also calculated for former smokers. Example 2: a respondent who started smoking
- at age 20 years and smoked half a pack of cigarettes until age 40 years smoked for
+pack-years is calculated by multiplying the number of cigarette 
+ packs per day (20 cigarettes per pack) by the number of years. Example 1: 
+ a respondent who is a current smoker who smokes 1 package of cigarettes for 
+ the last 10 years has smoked 10 pack-years. Pack-years is also calculated 
+ for former smokers. Example 2: a respondent who started smoking at age 
+ 20 years and smoked half a pack of cigarettes until age 40 years smoked for
  10 pack-years.
 }
 \examples{
 # Using pack_years_fun() to create pack-years values across CCHS cycles
-# pack_years_fun() is specified in variableDetails.csv along with the CCHS variables and cycles
-# included.
+# pack_years_fun() is specified in variableDetails.csv along with the CCHS 
+# variables and cycles included.
 
-# To transform pack_years_der across cycles, use rec_with_table() for each CCHS cycle and specify
-# pack_years_der, along with each smoking variable. Then by using bind_rows(), you can combine
-# pack_years_der across cycles
+# To transform pack_years_der across cycles, use rec_with_table() for each 
+# CCHS cycle and specify pack_years_der, along with each smoking variable. 
+# Then by using bind_rows(), you can combine pack_years_der across cycles
 
 library(cchsflow)
 
@@ -77,8 +85,8 @@ pack_years2010 <- rec_with_table(
   data_source = cchs2010, variable_details = variableDetails,
   dataset_name = "cchs2010", variables = c(
     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
-    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A",
-    "SMKG01C_cont", "Pack_years_der"
+    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", 
+    "SMK_05C", "SMK_01A", "SMKG01C_cont", "Pack_years_der"
   )
 )
 
@@ -88,8 +96,8 @@ pack_years2012 <- rec_with_table(
   data_source = cchs2012, variable_details = variableDetails,
   dataset_name = "cchs2012", variables = c(
     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
-    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", "SMK_05C", "SMK_01A",
-    "SMKG01C_cont", "Pack_years_der"
+    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208", 
+    "SMK_05C", "SMK_01A", "SMKG01C_cont", "Pack_years_der"
   )
 )
 

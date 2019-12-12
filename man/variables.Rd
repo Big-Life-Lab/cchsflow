@@ -11,8 +11,8 @@
 This dataset lists all the variables that are present in cchsflow.
 }
 \details{
-See \href{https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html}{here} for more
-details about how the worksheet is structured
+See the below link for more details about how the worksheet is structured
+\url{https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html}
 }
 \examples{
 data(variables)
