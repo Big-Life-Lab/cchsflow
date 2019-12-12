@@ -1,10 +1,10 @@
 #' @title Derived categorical age
 #'
-#' @description This is a derived categorical age variable that groups various 
-#'  age categories across all CCHS cycles. This is based on the continuous age 
+#' @description This is a derived categorical age variable that groups various
+#'  age categories across all CCHS cycles. This is based on the continuous age
 #'  variable (DHHGAGE_cont) that is harmonious across all CCHS cycles.
 #'
-#'  The categories of this variable are based on the age groupings seen in CCHS 
+#'  The categories of this variable are based on the age groupings seen in CCHS
 #'  cycles from 2007 to 2014. The age breakdown is as follows:
 #'
 #'  \enumerate{
@@ -26,9 +26,9 @@
 #'    \item 80 years or more
 #'  }
 #'
-#' @details The categories in the grouped age variable (DHHGAGE) vary between 
-#'  CCHS cycles. As such, a continous age variable (DHHGAGE_cont) was created 
-#'  that harmonized age across all CCHS cycle by taking the midpoint of each 
+#' @details The categories in the grouped age variable (DHHGAGE) vary between
+#'  CCHS cycles. As such, a continous age variable (DHHGAGE_cont) was created
+#'  that harmonized age across all CCHS cycle by taking the midpoint of each
 #'  age category.
 #'
 #' @param DHHGAGE_cont continuous age variable
