@@ -12,48 +12,52 @@ pct_time_fun(DHHGAGE_cont, SDCGCBG, SDCGRES)
 \item{SDCGCBG}{whether or not someone was born in Canada (1 - born in Canada,
 2 - born outside Canada)}
 
-\item{SDCGRES}{how long someone has lived in Canada. Note in the PUMF CCHS 
+\item{SDCGRES}{how long someone has lived in Canada. Note in the PUMF CCHS
 datasets, this is a categorical variable with two categories (1 - 0-9 years;
 2 - 10+ years).}
 }
 \value{
-Numeric value that is a fraction between 0 and 1 that represents 
+Numeric value that is a fraction between 0 and 1 that represents
  percentage of a respondent's time in Canada
 }
 \description{
-This function creates a derived variable (pct_time_der) that 
- provides an estimated percentage of the time a person's life was spent in 
+This function creates a derived variable (pct_time_der) that
+ provides an estimated percentage of the time a person's life was spent in
  Canada.
 }
 \note{
 Since SDCGRES is a categorical variable measuring length of time, we've
- set midpoints in the function. A respondent identified as being in Canada 
- for 0-9 years is assigned a value of 4.5 years, and someone who has been in 
+ set midpoints in the function. A respondent identified as being in Canada
+ for 0-9 years is assigned a value of 4.5 years, and someone who has been in
  Canada for over 10 years is assigned a value of 15 years.
 }
 \examples{
 # Using pct_time_fun() to create percent time values across CCHS cycles
-# pct_time_fun() is specified in variableDetails.csv along with the CCHS 
+# pct_time_fun() is specified in variableDetails.csv along with the CCHS
 # variables and cycles included.
 
-# To transform Pct_time_der across cycles, use RecWTable() for each CCHS 
-# cycle and specify Pct_time_der, along with age (DHHGAGE_cont), whether or 
-# not someone was born in Canada (SDCGCBG), how long someone has lived in 
-# Canada (SDCGRES). Then by using bind_rows(), you can combine Pct_time_der 
+# To transform Pct_time_der across cycles, use RecWTable() for each CCHS
+# cycle and specify Pct_time_der, along with age (DHHGAGE_cont), whether or
+# not someone was born in Canada (SDCGCBG), how long someone has lived in
+# Canada (SDCGRES). Then by using bind_rows(), you can combine Pct_time_der
 # across cycles
 
 library(cchsflow)
 pct_time2010 <- rec_with_table(
   data_source = cchs2010, variable_details = variableDetails,
-  dataset_name = "cchs2010", variables = c("DHHGAGE_cont", "SDCGCBG", 
-  "SDCGRES", "Pct_time_der")
+  dataset_name = "cchs2010", variables = c(
+    "DHHGAGE_cont", "SDCGCBG",
+    "SDCGRES", "Pct_time_der"
+  )
 )
 head(pct_time2010)
 
 pct_time2012 <- rec_with_table(
   data_source = cchs2012, variable_details = variableDetails,
-  dataset_name = "cchs2012", variables = c("DHHGAGE_cont", "SDCGCBG", 
-  "SDCGRES", "Pct_time_der")
+  dataset_name = "cchs2012", variables = c(
+    "DHHGAGE_cont", "SDCGCBG",
+    "SDCGRES", "Pct_time_der"
+  )
 )
 tail(pct_time2012)
 
@@ -61,9 +65,9 @@ combined_pct_time <- bind_rows(pct_time2010, pct_time2012)
 head(combined_pct_time)
 tail(combined_pct_time)
 
-# Using pct_time_fun() to generate a value for percent time spent in Canada 
-# with user inputted values Let's say you are 27 years old who was born 
-# outside of Canada and have been living in Canada for less than 10 years. 
+# Using pct_time_fun() to generate a value for percent time spent in Canada
+# with user inputted values Let's say you are 27 years old who was born
+# outside of Canada and have been living in Canada for less than 10 years.
 # Your estimated percent time spent in Canada can be calculated as follows:
 
 pct_time <- pct_time_fun(DHHGAGE_cont = 27, SDCGCBG = 2, SDCGRES = 1)

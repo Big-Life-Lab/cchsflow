@@ -25,20 +25,20 @@ a categorical variable (resp_condition_der) with 3 levels:
  }
 }
 \description{
-This is one of 3 functions used to create a derived variable 
- (resp_condition_der) that determines if a respondents has a respirtory 
- condition. This function is for CCHS cycles (2005-2007) that use COPD & 
+This is one of 3 functions used to create a derived variable
+ (resp_condition_der) that determines if a respondents has a respirtory
+ condition. This function is for CCHS cycles (2005-2007) that use COPD &
  Emphysema as separate variables, as well as Bronchitis.
 }
 \examples{
 
-# Using resp_condition_fun2() to create pack-years values across CCHS cycles 
+# Using resp_condition_fun2() to create pack-years values across CCHS cycles
 # (2005-2007) resp_condition_fun2() is specified in variableDetails.csv along
 # with the CCHS variables and cycles included.
 
-# To transform resp_condition_der, use rec_with_table() for each CCHS cycle 
-# and specify resp_condition_der, along with the various respiratory 
-# variables. Then by using bind_rows() you can combine resp_condition_der 
+# To transform resp_condition_der, use rec_with_table() for each CCHS cycle
+# and specify resp_condition_der, along with the various respiratory
+# variables. Then by using bind_rows() you can combine resp_condition_der
 # across cycles.
 
 library(cchsflow)
@@ -46,8 +46,9 @@ library(cchsflow)
 resp2005 <- rec_with_table(
   data_source = cchs2005, variable_details = variableDetails,
   dataset_name = "cchs2005", variables = c(
- "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
- "resp_condition_der")
+    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
+    "resp_condition_der"
+  )
 )
 
 head(resp2005)
@@ -55,8 +56,9 @@ head(resp2005)
 resp2007_2008 <- rec_with_table(
   data_source = cchs2007_2008, variable_details = variableDetails,
   dataset_name = "cchs2007_2008", variables = c(
-  "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
-  "resp_condition_der")
+    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
+    "resp_condition_der"
+  )
 )
 
 tail(resp2007_2008)

@@ -24,10 +24,47 @@ a categorical variable (resp_condition_der) with 3 levels:
  }
 }
 \description{
-This is one of 3 functions used to create a derived variable 
- (resp_condition_der) that determines if a respondents has a respirtory 
- condition. This function for CCHS cycles (2001-2003) that use COPD and 
+This is one of 3 functions used to create a derived variable
+ (resp_condition_der) that determines if a respondents has a respirtory
+ condition. This function for CCHS cycles (2001-2003) that use COPD and
  Emphysema as a combined variable, as well as Bronchitis
+}
+\examples{
+# Using resp_condition_fun3() to create pack-years values across CCHS cycles
+# (2001-2003) resp_condition_fun3() is specified in variableDetails.csv along
+# with the CCHS variables and cycles included.
+
+# To transform resp_condition_der, use rec_with_table() for each CCHS cycle
+# and specify resp_condition_der, along with the various respiratory
+# variables. Then by using bind_rows() you can combine resp_condition_der
+# across cycles.
+
+library(cchsflow)
+
+resp2001 <- rec_with_table(
+  data_source = cchs2001, variable_details = variableDetails,
+  dataset_name = "cchs2001", variables = c(
+    "DHHGAGE_cont", "CCC_091", "CCC_91A",
+    "resp_condition_der"
+  )
+)
+
+head(resp2001)
+
+resp2003 <- rec_with_table(
+  data_source = cchs2003, variable_details = variableDetails,
+  dataset_name = "cchs2003", variables = c(
+    "DHHGAGE_cont", "CCC_091", "CCC_91A",
+    "resp_condition_der"
+  )
+)
+
+tail(resp2003)
+
+combined_resp <- bind_rows(resp2001, resp2003)
+
+head(combined_resp)
+tail(combined_resp)
 }
 \seealso{
 \code{\link{resp_condition_fun1}}, \code{\link{resp_condition_fun2}}

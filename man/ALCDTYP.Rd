@@ -12,8 +12,8 @@ ALCDTYP(ALCDTYP)
 \description{
 \strong{NOTE:} this is not a function.
 
- This is a categorical variable derived by Statistics Canada that uses 
- various intermediate alcohol variables to categorize individuals into 4 
+ This is a categorical variable derived by Statistics Canada that uses
+ various intermediate alcohol variables to categorize individuals into 4
  distinct groups:
 
  \enumerate{
@@ -24,12 +24,12 @@ ALCDTYP(ALCDTYP)
  }
 }
 \details{
-This variable is used in CCHS cycles from 2001 to 2007. How it was 
+This variable is used in CCHS cycles from 2001 to 2007. How it was
  derived remained consistent during these years.
 
- Starting in 2007, Statistics Canada created a derived variable that looked 
- at drinking type in the last 12 months. This new derived variable did not 
+ Starting in 2007, Statistics Canada created a derived variable that looked
+ at drinking type in the last 12 months. This new derived variable did not
  distinguish between former and never drinkers. If your research requires you
- to differentiate between former and never drinkers, we recommend using 
+ to differentiate between former and never drinkers, we recommend using
  earlier cycles of the CCHS.
 }

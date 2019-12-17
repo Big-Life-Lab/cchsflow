@@ -7,7 +7,7 @@
 
 ## Features
 
-- Switched formatting to snake_cake
+- Switched formatting to snake_case
 - Dependency lowered to R 3.1
 - Corrections to usingcchsflow article
 - Removed DDI files 

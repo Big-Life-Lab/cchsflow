@@ -12,8 +12,8 @@ ALCDTTM(ALCDTTM)
 \description{
 \strong{NOTE:} this is not a function.
 
- This is a categorical variable derived by Statistics Canada that uses 
- various intermediate alcohol variables to categorize individuals into 3 
+ This is a categorical variable derived by Statistics Canada that uses
+ various intermediate alcohol variables to categorize individuals into 3
  distinct groups:
 
  \enumerate{
@@ -23,8 +23,8 @@ ALCDTTM(ALCDTTM)
   }
 }
 \details{
-This variable was introuced in the 2007-2008 cycle of the CCHS, and 
- became the sole derived variable that categorized people into various 
- drinker types from 2009 onwards. Unlike ALCDTYP, this variable does not 
+This variable was introuced in the 2007-2008 cycle of the CCHS, and
+ became the sole derived variable that categorized people into various
+ drinker types from 2009 onwards. Unlike ALCDTYP, this variable does not
  distinguish between former and never drinkers.
 }

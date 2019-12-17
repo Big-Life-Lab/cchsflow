@@ -11,8 +11,8 @@
 \item{cchs2001}{a data frame}
 }
 \description{
-This is a subset of 200 observations from the 2001 cycle of the Canadian 
-Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset. 
+This is a subset of 200 observations from the 2001 cycle of the Canadian
+Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 The CCHS survey is conducted by Statistics Canada.
 }
 \details{

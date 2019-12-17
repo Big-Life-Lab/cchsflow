@@ -21,11 +21,11 @@ a categorical variable (resp_condition_der) with 3 levels:
  }
 }
 \description{
-This is one of 3 functions used to create a derived variable 
- (resp_condition_der) that determines if a respondents has a respirtory 
- condition. 3 different functions have been created to account for the fact 
- that different respiratory variables are used across CCHS cycles. This 
- function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as 
+This is one of 3 functions used to create a derived variable
+ (resp_condition_der) that determines if a respondents has a respirtory
+ condition. 3 different functions have been created to account for the fact
+ that different respiratory variables are used across CCHS cycles. This
+ function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as
  a combined variable.
 }
 \examples{
@@ -33,25 +33,29 @@ This is one of 3 functions used to create a derived variable
 # (2009-2014) resp_condition_fun1() is specified in variableDetails.csv along
 # with the CCHS variables and cycles included.
 
-# To transform resp_condition_der, use rec_with_table() for each CCHS cycle 
-# and specify resp_condition_der, along with the various respiratory 
-# variables. Then by using bind_rows() you can combine resp_condition_der 
+# To transform resp_condition_der, use rec_with_table() for each CCHS cycle
+# and specify resp_condition_der, along with the various respiratory
+# variables. Then by using bind_rows() you can combine resp_condition_der
 # across cycles.
 
 library(cchsflow)
 
 resp2010 <- rec_with_table(
   data_source = cchs2010, variable_details = variableDetails,
-  dataset_name = "cchs2010", variables = c("DHHGAGE_cont", "CCC_091", 
-  "resp_condition_der")
+  dataset_name = "cchs2010", variables = c(
+    "DHHGAGE_cont", "CCC_091",
+    "resp_condition_der"
+  )
 )
 
 head(resp2010)
 
 resp2012 <- rec_with_table(
   data_source = cchs2012, variable_details = variableDetails,
-  dataset_name = "cchs2012", variables = c("DHHGAGE_cont", "CCC_091", 
-  "resp_condition_der")
+  dataset_name = "cchs2012", variables = c(
+    "DHHGAGE_cont", "CCC_091",
+    "resp_condition_der"
+  )
 )
 
 tail(resp2012)
