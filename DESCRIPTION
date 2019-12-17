@@ -25,11 +25,11 @@ Authors@R: c(
           role = c("ctb"),
           email = "ysequeira@ohri.ca"))
 Depends:
-  R (>= 3.1),
-  haven,
-  dplyr,
-  sjlabelled,
-  stringr,
+  R (>= 3.2),
+  haven (>= 1.1.2),
+  dplyr (>= 0.8.2),
+  sjlabelled (>= 1.0.17),
+  stringr (>= 1.2.0),
   magrittr
 Description: Variable transformation and harmonization for the Canadian Community Health Survey from
             2001 to 2014.
