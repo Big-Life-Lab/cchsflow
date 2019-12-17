@@ -1,34 +1,3 @@
-#' @title if_else2
-#'
-#' @description Custom ifelse function that evaluates missing (NA) values
-#'
-#' @details If the logical argument (x) compares to a value that is `NA`, it is
-#'  set to `FALSE`
-#'
-#' @param x A logical argument
-#'
-#' @param a value if `x` is `TRUE`
-#'
-#' @param b value if `x` is `FALSE`
-#'
-#' @return a or b based on the evaluation of x
-#'
-#' @examples
-#' age <- 12
-#' status <- if_else2((age < 18), "child", "invalid age")
-#' print(status)
-#'
-#' age <- NA
-#' status <- if_else2((age < 18), "child", "invalid age")
-#' print(status)
-#' @export
-if_else2 <- function(x, a, b) {
-  falseifNA <- function(x) {
-    ifelse(is.na(x), FALSE, x)
-  }
-  ifelse(falseifNA(x), a, b)
-}
-
 #' @title Body Mass Index (BMI) derived variable
 #'
 #' @description This function creates a harmonized BMI variable. The BMI
@@ -76,7 +45,7 @@ if_else2 <- function(x, a, b) {
 #' # bmi_fun() is specified in variableDetails.csv along with the CCHS variables
 #' # and cycles included.
 #'
-#' # To transform the derived BMI variable, use RecWTable() for each CCHS cycle
+#' # To transform the derived BMI variable, use rec_with_table() for each cycle
 #' # and specify HWTGBMI_der, along with height (HWTGHTM) and weight (HWTGWTK).
 #' # Then by using bind_rows(), you can combined HWTGBMI_der across cycles.
 #'
@@ -106,7 +75,7 @@ if_else2 <- function(x, a, b) {
 #' tail(combined_bmi)
 #'
 #' # Using bmi_fun() to generate a BMI value with user inputted height and
-#' # weight values bmi_fun() can also generate a value for BMI if you input a
+#' # weight values. bmi_fun() can also generate a value for BMI if you input a
 #' # value for height and weight. Let's say your height is 170cm (1.7m) and
 #' # your weight is 50kg, your BMI can be calculated as follows:
 #'

@@ -38,6 +38,10 @@ navbar:
       href: news/index.html
 
 reference:
+  - title: "Utility functions"
+    desc: Utility functions that are used in other cchsflow functions
+    contents:
+    - if_else2
   - title: "Alcohol CCHS variables"
     desc: Derived alcohol variables in cchsflow that users may run into issues with
     contents:
@@ -48,7 +52,6 @@ reference:
   - title: "Derived variable functions"
     desc: Functions for deriving custom CCHS variables
     contents:
-    - if_else2
     - bmi_fun
     - pack_years_fun
     - pct_time_fun

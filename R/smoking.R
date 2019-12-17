@@ -119,7 +119,7 @@ pack_years_fun <-
       # PackYears for Occasional Smoker (former daily)
       if_else2(
         SMKDSTY == 2, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds) *
-          (SMK_208 / 20)), 0.0137) + (pmax((SMK_05B * SMK_05C / 30), 1) * tsq_ds),
+        (SMK_208 / 20)), 0.0137) + (pmax((SMK_05B * SMK_05C / 30), 1) * tsq_ds),
         # PackYears for Occasional Smoker (never daily)
         if_else2(
           SMKDSTY == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) *
@@ -132,8 +132,8 @@ pack_years_fun <-
             # smoked at least 100 cigarettes lifetime
             if_else2(
               SMKDSTY == 5 & SMK_01A == 1, 0.0137,
-              # PackYears for former occasional smoker (non-smoker now) who have not
-              # smoked at least 100 cigarettes lifetime
+              # PackYears for former occasional smoker (non-smoker now) who have 
+              # not smoked at least 100 cigarettes lifetime
               if_else2(
                 SMKDSTY == 5 & SMK_01A == 2, 0.007,
                 # Non-smoker
