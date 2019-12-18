@@ -1,7 +1,7 @@
 #' @title resp_condition_fun1
 #'
 #' @description This is one of 3 functions used to create a derived variable
-#'  (resp_condition_der) that determines if a respondents has a respirtory
+#'  (resp_condition_der) that determines if a respondents has a respiratory
 #'  condition. 3 different functions have been created to account for the fact
 #'  that different respiratory variables are used across CCHS cycles. This
 #'  function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as
@@ -72,7 +72,7 @@ resp_condition_fun1 <-
 #' @title resp_condition_fun2
 #'
 #' @description This is one of 3 functions used to create a derived variable
-#'  (resp_condition_der) that determines if a respondents has a respirtory
+#'  (resp_condition_der) that determines if a respondents has a respiratory
 #'  condition. This function is for CCHS cycles (2005-2007) that use COPD &
 #'  Emphysema as separate variables, as well as Bronchitis.
 #'
@@ -146,7 +146,7 @@ resp_condition_fun2 <-
 #' @title resp_condition_fun3
 #'
 #' @description This is one of 3 functions used to create a derived variable
-#'  (resp_condition_der) that determines if a respondents has a respirtory
+#'  (resp_condition_der) that determines if a respondents has a respiratory
 #'  condition. This function for CCHS cycles (2001-2003) that use COPD and
 #'  Emphysema as a combined variable, as well as Bronchitis
 #'

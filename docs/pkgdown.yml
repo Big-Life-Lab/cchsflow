@@ -5,6 +5,6 @@ articles:
   derived_variables: ../vignettes/derived_variables.html
   how_to_add_variables: ../vignettes/how_to_add_variables.html
   using_cchsflow: ../vignettes/using_cchsflow.html
-  variables_sheet: ../vignettes/variables_sheet.html
   variable_details: ../vignettes/variable_details.html
+  variables_sheet: ../vignettes/variables_sheet.html
 

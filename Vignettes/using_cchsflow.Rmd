@@ -52,7 +52,7 @@ cchs_mock2013 <- data.frame(DHH_SEX = c(1, 2, 1), DHHGAGE = c(2, 1, 1), FVCDTOT 
 
 Did you notice that the names for the variables are slightly different in the two mock databases? That isn't a mistake: in the 2001 CCHS the variable for sex is `DHHA_SEX` and in 2013 CCHS the variable is `DHH_SEX`. 
 
-Don't worry, `cchsflow` is here to help! `variable_details.csv` contains the rules on how to harmonize those two variables into a common variable name. In the CCHS, the categories for `sex` are consistient: 1 = males, 2 = females. `variable_details.csv` provides instructions for how to harmonize category values and labels, if they change across survey cycles. Variable labels are discussed in later vignettes.
+Don't worry, `cchsflow` is here to help! `variable_details.csv` contains the rules on how to harmonize those two variables into a common variable name. In the CCHS, the categories for `sex` are consistent: 1 = males, 2 = females. `variable_details.csv` provides instructions for how to harmonize category values and labels, if they change across survey cycles. Variable labels are discussed in later vignettes.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(DT)
@@ -79,7 +79,7 @@ With `rec_with_table()` there are also default arguments that do not need to be 
 
   + `else_value` default to NA. Values out of range set to NA.
   + `append_to_data` default to FALSE. Transformed variables will not be appended to the original CCHS dataset.
-  + `log` default to FALSE. Logs of the variable tranformations will not be displayed. 
+  + `log` default to FALSE. Logs of the variable transformations will not be displayed. 
   + `print_note` default to TRUE. Information in the `Notes` column from `variable_details.csv` will be displayed
   + `variables` default to NULL. This argument can be used to add labels to the transformed dataset by setting it to the name of `variables.csv` or by specifying particular variables from `variables.csv` to transform.
   + `var_labels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`. The format to add labels to a subset of variables is `c(variable = "Label")`.
@@ -126,7 +126,7 @@ There are many variables in the CCHS that changes in categories between cycles i
 
 #### Option 1: transform category `age` variable into a common variable for only cycles with the same category responses
 
-Transform the `age` variable into variables that cannoot be combined across cycles. The categories in `age` variable in the CCHS changed in 2005 and therefore it is not possible to have the same `age` categories across all CCHS cycles. 
+Transform the `age` variable into variables that cannot be combined across cycles. The categories in `age` variable in the CCHS changed in 2005 and therefore it is not possible to have the same `age` categories across all CCHS cycles. 
 
 `DHHGAGE_A` is the age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the age variable for CCHS cycles 2005-2014. 
 
@@ -168,13 +168,13 @@ kable(combined_age_cont)
 
 ## Label variables and categories.
 
-Use the `set_data_labels()` function to label the variables in your final dataset. `rec_with_table()` labels individual datasets. `set_data_labels()` labels combined dataset that loose labels when datatables are combined. 
+Use the `set_data_labels()` function to label the variables in your final dataset. `rec_with_table()` labels individual datasets. `set_data_labels()` labels combined dataset that lose labels when datasets are combined. 
 
-`labelled_combined_cchs <- set_data_labels(data_to_label = combined_cchs, variable_details = variable_details, variables_sheet = variables)`
+`labeled_combined_cchs <- set_data_labels(data_to_label = combined_cchs, variable_details = variable_details, variables_sheet = variables)`
 
 ### Example 4. Transform multiple variables from multiple datasets
 
-The variables argument in `rec_with_table()` allows multiple variables to be transformed from a CCHS dataset. In this example, the age and sex variables from the 2001 and 2013 CCHS datasets will be transformed and labelled using `rec_with_table()`. They will then be combined into a single dataset and labelled using `set_data_labels()`.
+The variables argument in `rec_with_table()` allows multiple variables to be transformed from a CCHS dataset. In this example, the age and sex variables from the 2001 and 2013 CCHS datasets will be transformed and labeled using `rec_with_table()`. They will then be combined into a single dataset and labeled using `set_data_labels()`.
 
 ```{r, warning=FALSE}
 age_sex_2001 <- rec_with_table(data_source = cchs_mock2001, variable_details = variable_details, dataset_name = "cchs2001", variables = c("DHHGAGE_cont", "DHH_SEX"), var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
@@ -190,24 +190,24 @@ In the above example, `var_labels` is called in `rec_with_table()` to label the 
 
 ```{r, warning=FALSE}
 combined_age_sex <- bind_rows(age_sex_2001, age_sex_2013)
-labelled_combined_age_sex <- set_data_labels(data_to_label = combined_age_sex, variable_details = variable_details, variables_sheet = variables)
+labeled_combined_age_sex <- set_data_labels(data_to_label = combined_age_sex, variable_details = variable_details, variables_sheet = variables)
 ```
 
 ```{r, echo=FALSE}
-kable(labelled_combined_age_sex)
+kable(labeled_combined_age_sex)
 ```
 
 In the above code, `set_data_labels()` is used to label the combined age and sex dataset. Similar to before, you can check if labels have been added using `get_label()`.
 
 ```{r, warning=FALSE}
-get_label(labelled_combined_age_sex)
+get_label(labeled_combined_age_sex)
 ```
 
 For more information on `get_label()` and other label helper functions, please refer to the [sjlabelled](https://strengejacke.github.io/sjlabelled/reference/) package.
 
 ### Example 5. Transform all variables in the variable_details sheet
 
-All the variables listed in `variable_details.csv` will be transformed if the variables argument in `rec_with_table()` is not specified. In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labelled.
+All the variables listed in `variable_details.csv` will be transformed if the variables argument in `rec_with_table()` is not specified. In this example, all of the variables in our mock 2001 and 2013 datasets will be transformed, combined, and labeled.
 
 ```{r, echo=FALSE}
 options(htmlwidgets.TOJSON_ARGS = list(na = 'string'))
@@ -231,15 +231,15 @@ kable(transformed2013)
 
 ```{r, warning=FALSE}
 combined_cchs <- bind_rows(transformed2001, transformed2013)
-labelled_combined_cchs <- set_data_labels(data_to_label = combined_cchs, variable_details = variable_details, variables_sheet = variables)
+labeled_combined_cchs <- set_data_labels(data_to_label = combined_cchs, variable_details = variable_details, variables_sheet = variables)
 ```
 
 ```{r, echo=FALSE}
-kable(labelled_combined_cchs)
+kable(labeled_combined_cchs)
 ```
 
 ```{r, warning=FALSE}
-get_label(labelled_combined_cchs)
+get_label(labeled_combined_cchs)
 ```
 
 ### Example 5. Transform CCHS derived variables such as Body Mass Index (BMI)

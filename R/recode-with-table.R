@@ -39,7 +39,7 @@ is_equal <- function(v1, v2) {
 #'  are a string in \emph{recFrom} and value in \emph{recTo}.
 #'  These recode pairs are the same syntax as \emph{sjmisc::rec()},
 #'  except in \emph{sjmisc::rec()} the pairs are a string for the function
-#'  attibute \emph{rec =}, separated by '\emph{=}'.
+#'  attribute \emph{rec =}, separated by '\emph{=}'.
 #'  For example in \emph{rec_w_table}
 #'  \emph{variable_details$recFrom = 2; variable_details$recTo = 4}
 #'  is the same as \emph{sjmisc::rec(rec = "2=4")}.
@@ -88,7 +88,7 @@ is_equal <- function(v1, v2) {
 #' @param log Logical, if \code{FALSE} (default), a log of recoding will
 #' not be printed.
 #' @param print_note Logical, if \code{FALSE} (default), will not print the
-#' content inside the `Note`` column of the variable beinng recoded.
+#' content inside the `Note`` column of the variable being recoded.
 #' @param variables character vector containing variable names to recode or
 #' a variables csv containing additional variable info
 #' @param var_labels labels vector to attach to variables in variables
@@ -294,7 +294,7 @@ recode_call <-
 #' information on this variables
 #' @param variable_being_checked the name of the recoded variable
 #'
-#' @return the data_source equivalant of variable_being_checked
+#' @return the data_source equivalent of variable_being_checked
 get_data_variable_name <-
   function(data_name,
            data,

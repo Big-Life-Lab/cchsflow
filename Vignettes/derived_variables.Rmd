@@ -13,12 +13,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-There are two types derived variables in the CCHS surveys. Both types of dervived variables are supported in `cchsflow`. 
+There are two types derived variables in the CCHS surveys. Both types of derived variables are supported in `cchsflow`. 
 
 - Variable mapping - mapping two or more variables into a single variable.
 - Variables that derived using math equations - BMI is an example. where BMI = weight / height*height. 
 
-`cchsflow` calculates these more complex dervived variables using functions that are referenced in `variable_details.csv` within `RecTo` section with the prefix 'Func::'. The variables used in the function are referenced in the `variableStart` section with the prefix 'DerivedVar::'. For example, BMI (`HWTGBMI_der`) includes `Func::bmi_fun` in the `RecTo` section; and `DerivedVar::[HWTGHTM, HWTGWTK]` in the `variableStart` section, which indicates the two starting variables (`HWTGHTM, HWTGWTK`).
+`cchsflow` calculates these more complex derived variables using functions that are referenced in `variable_details.csv` within `RecTo` section with the prefix 'Func::'. The variables used in the function are referenced in the `variableStart` section with the prefix 'DerivedVar::'. For example, BMI (`HWTGBMI_der`) includes `Func::bmi_fun` in the `RecTo` section; and `DerivedVar::[HWTGHTM, HWTGWTK]` in the `variableStart` section, which indicates the two starting variables (`HWTGHTM, HWTGWTK`).
 
 ## Example - Body Mass Index (BMI)
 

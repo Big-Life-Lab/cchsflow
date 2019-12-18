@@ -22,7 +22,7 @@ information on this variables}
 \item{variable_being_checked}{the name of the recoded variable}
 }
 \value{
-the data_source equivalant of variable_being_checked
+the data_source equivalent of variable_being_checked
 }
 \description{
 Retrieves the name of the column inside data_source to

@@ -23,7 +23,7 @@ ALCDTTM(ALCDTTM)
   }
 }
 \details{
-This variable was introuced in the 2007-2008 cycle of the CCHS, and
+This variable was introduced in the 2007-2008 cycle of the CCHS, and
  became the sole derived variable that categorized people into various
  drinker types from 2009 onwards. Unlike ALCDTYP, this variable does not
  distinguish between former and never drinkers.

@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The **variable_details.csv** worksheet contain details for the variables in `variables.csv`. Information from `variable_details.csv` worksheet is used by the `rec_with_table()` function to transform variables identifed in `variable_details$variableStart` to the newly transformed variable in `variable_details$variable`. 
+The **variable_details.csv** worksheet contain details for the variables in `variables.csv`. Information from `variable_details.csv` worksheet is used by the `rec_with_table()` function to transform variables identified in `variable_details$variableStart` to the newly transformed variable in `variable_details$variable`. 
 
 ```{r Read variables.csv, echo=FALSE, message=FALSE, warning=FALSE}
 library(readr)
@@ -38,7 +38,7 @@ If a categorical variable has 4 distinct categories, along with a "not applicabl
 
 + 4 for each distinct category
 
-+ 1 for the not appliacble category
++ 1 for the not applicable category
 
 + 1 for the missing categories
 

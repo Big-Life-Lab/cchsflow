@@ -37,7 +37,7 @@ will be appended to the data_source.}
 not be printed.}
 
 \item{print_note}{Logical, if \code{FALSE} (default), will not print the
-content inside the `Note`` column of the variable beinng recoded.}
+content inside the `Note`` column of the variable being recoded.}
 
 \item{variables}{character vector containing variable names to recode or
 a variables csv containing additional variable info}
@@ -70,7 +70,7 @@ The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-v
  are a string in \emph{recFrom} and value in \emph{recTo}.
  These recode pairs are the same syntax as \emph{sjmisc::rec()},
  except in \emph{sjmisc::rec()} the pairs are a string for the function
- attibute \emph{rec =}, separated by '\emph{=}'.
+ attribute \emph{rec =}, separated by '\emph{=}'.
  For example in \emph{rec_w_table}
  \emph{variable_details$recFrom = 2; variable_details$recTo = 4}
  is the same as \emph{sjmisc::rec(rec = "2=4")}.

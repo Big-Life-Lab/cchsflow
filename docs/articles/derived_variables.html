@@ -113,12 +113,12 @@
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
-<p>There are two types derived variables in the CCHS surveys. Both types of dervived variables are supported in <code>cchsflow</code>.</p>
+<p>There are two types derived variables in the CCHS surveys. Both types of derived variables are supported in <code>cchsflow</code>.</p>
 <ul>
 <li>Variable mapping - mapping two or more variables into a single variable.</li>
 <li>Variables that derived using math equations - BMI is an example. where BMI = weight / height*height.</li>
 </ul>
-<p><code>cchsflow</code> calculates these more complex dervived variables using functions that are referenced in <code>variable_details.csv</code> within <code>RecTo</code> section with the prefix ‘Func::’. The variables used in the function are referenced in the <code>variableStart</code> section with the prefix ‘DerivedVar::’. For example, BMI (<code>HWTGBMI_der</code>) includes <code>Func::bmi_fun</code> in the <code>RecTo</code> section; and <code>DerivedVar::[HWTGHTM, HWTGWTK]</code> in the <code>variableStart</code> section, which indicates the two starting variables (<code>HWTGHTM, HWTGWTK</code>).</p>
+<p><code>cchsflow</code> calculates these more complex derived variables using functions that are referenced in <code>variable_details.csv</code> within <code>RecTo</code> section with the prefix ‘Func::’. The variables used in the function are referenced in the <code>variableStart</code> section with the prefix ‘DerivedVar::’. For example, BMI (<code>HWTGBMI_der</code>) includes <code>Func::bmi_fun</code> in the <code>RecTo</code> section; and <code>DerivedVar::[HWTGHTM, HWTGWTK]</code> in the <code>variableStart</code> section, which indicates the two starting variables (<code>HWTGHTM, HWTGWTK</code>).</p>
 </div>
 <div id="example---body-mass-index-bmi" class="section level2">
 <h2 class="hasAnchor">
@@ -162,8 +162,7 @@ bmi_fun &lt;-<span class="st"> </span>
 ##     as_label</code></pre>
 <pre><code>## The following objects are masked from 'package:haven':
 ## 
-##     as_factor, read_sas, read_spss, read_stata, write_sas,
-##     zap_labels</code></pre>
+##     as_factor, read_sas, read_spss, read_stata, write_sas, zap_labels</code></pre>
 <pre><code>## Loading required package: stringr</code></pre>
 <pre><code>## Loading required package: magrittr</code></pre>
 <pre><code>## 

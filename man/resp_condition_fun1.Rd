@@ -22,7 +22,7 @@ a categorical variable (resp_condition_der) with 3 levels:
 }
 \description{
 This is one of 3 functions used to create a derived variable
- (resp_condition_der) that determines if a respondents has a respirtory
+ (resp_condition_der) that determines if a respondents has a respiratory
  condition. 3 different functions have been created to account for the fact
  that different respiratory variables are used across CCHS cycles. This
  function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as

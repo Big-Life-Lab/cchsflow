@@ -5,7 +5,7 @@
 #'  cycles, leading to measurement error when using multiple CCHS cycles. In
 #'  certain CCHS cycles (2001-2003, 2007+), there are age restrictions in which
 #'  respondents under the age of 20 and over the age of 64 were not included.
-#'  Across all CCHS cycles, female respondents who identifed as being pregnant
+#'  Across all CCHS cycles, female respondents who identified as being pregnant
 #'  were excluded; and in certain CCHS cycles (2003-2007, 2013-2014), females
 #'  who did not answer the pregnancy question were coded as NS (not stated) for
 #'  HWTGBMI. As well, in certain CCHS cycles (2001-2003, 2009-2014), respondents
