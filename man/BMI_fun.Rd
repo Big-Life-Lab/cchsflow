@@ -52,13 +52,14 @@ In earlier CCHS cycles (2001 and 2003), height was collected in inches;
  transformations were required in the harmonization process.
 }
 \examples{
-# Using bmi_fun() to create BMI values across cycles
+# Using bmi_fun() to create BMI values between cycles
 # bmi_fun() is specified in variable_details.csv along with the
 # CCHS variables and cycles included.
 
 # To transform the derived BMI variable, use rec_with_table() for each cycle
 # and specify HWTGBMI_der, along with height (HWTGHTM) and weight (HWTGWTK).
-# Then by using bind_rows(), you can combined HWTGBMI_der across cycles.
+# Then by using dplyr::bind_rows(), you can combined HWTGBMI_der across
+# cycles.
 
 library(cchsflow)
 bmi2010 <- rec_with_table(

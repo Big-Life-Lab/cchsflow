@@ -9,13 +9,16 @@ age_cat_fun(DHHGAGE_cont)
 \arguments{
 \item{DHHGAGE_cont}{continuous age variable}
 }
+\value{
+a categorical age variable (DHHGAGE_C)
+}
 \description{
-This is a derived categorical age variable that groups various
- age categories across all CCHS cycles. This is based on the continuous age
- variable (DHHGAGE_cont) that is harmonious across all CCHS cycles.
+This is a derived categorical age variable (DHHGAGE_C) that
+ groups various age categories across all CCHS cycles. This is based on the
+ continuous age variable (DHHGAGE_cont) that is harmonious across all CCHS
+ cycles.
 
- The categories of this variable are based on the age groupings seen in CCHS
- cycles from 2007 to 2014. The age breakdown is as follows:
+ The categories of this new age variable are as follows:
 
  \enumerate{
    \item 12 to 14 years
@@ -38,7 +41,8 @@ This is a derived categorical age variable that groups various
 }
 \details{
 The categories in the grouped age variable (DHHGAGE) vary between
- CCHS cycles. As such, a continous age variable (DHHGAGE_cont) was created
- that harmonized age across all CCHS cycle by taking the midpoint of each
- age category.
+ CCHS cycles. As such, a continuous age variable (DHHGAGE_cont) was created
+ that harmonized age across all CCHS cycles by taking the midpoint of each
+ age category. This new age variable (DHHGAGE_C) categorizes age based on the
+ categories used in CCHS cycles from 2007 to 2014.
 }

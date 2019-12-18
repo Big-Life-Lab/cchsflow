@@ -8,7 +8,7 @@
 \item{variable_details}{a data frame}
 }
 \description{
-This dataset provides details on how variables are specified in cchsflow.
+This dataset provides details on how variables are recoded in cchsflow.
 }
 \details{
 See the below link for more details about how the worksheet is structured

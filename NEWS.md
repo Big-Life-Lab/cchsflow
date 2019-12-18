@@ -1,4 +1,4 @@
-# cchsflow 0.3.0 (Latest build)
+# cchsflow 1.0.0 (Latest build)
 2019-12-18
 
 ## News

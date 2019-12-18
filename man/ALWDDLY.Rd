@@ -17,6 +17,6 @@ ALWDDLY(ALWDDLY)
  divides it by 7.
 }
 \details{
-This variable is used in all CCHS cycles in cchsflow and how it was
- derived remains consistent from 2001 to 2014.
+This variable is present in every CCHS cycle used in cchsflow, and
+ how it was derived remains consistent.
 }

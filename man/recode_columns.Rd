@@ -31,6 +31,6 @@ to this DB}
 Returns recoded and labeled data
 }
 \description{
-Recodes columns from passed row returns just table with those columns
+Recodes columns from passed row and returns just table with those columns
 and same rows as the data_source
 }

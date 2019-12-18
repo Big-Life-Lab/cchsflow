@@ -15,13 +15,13 @@ past week}
 
  This is a continuous variable derived by Statistics Canada that quantifies
  the amount of alcohol that is consumed in a week. This is calculated by
- adding the number of drinks consumed during each day in the past week.
+ adding the number of drinks consumed each day in the past week.
  Respondents of each CCHS cycle are asked how much alcohol they have
  consumed each day in the past week (ie. how much alcohol did you consume on
  Sunday, how much did you consume on Monday etc.). Each day is considered an
  individual variable and ALWDWKY takes the sum of all daily variables.
 }
 \details{
-This variable is used in all CCHS cycles in cchsflow and how it was
- derived remains consistent from 2001 to 2014.
+This variable is present in every CCHS cycle used in cchsflow, and
+ how it was derived remains consistent.
 }

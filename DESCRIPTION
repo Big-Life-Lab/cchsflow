@@ -1,7 +1,7 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and harmonizing CCHS variables
-Version: 0.3.0
+Version: 1.0.0
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",

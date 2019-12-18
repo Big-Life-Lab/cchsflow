@@ -12,7 +12,7 @@ pct_time_fun(DHHGAGE_cont, SDCGCBG, SDCGRES)
 \item{SDCGCBG}{whether or not someone was born in Canada (1 - born in Canada,
 2 - born outside Canada)}
 
-\item{SDCGRES}{how long someone has lived in Canada. Note in the PUMF CCHS
+\item{SDCGRES}{how long someone has lived in Canada. Note: in the PUMF CCHS
 datasets, this is a categorical variable with two categories (1 - 0-9 years;
 2 - 10+ years).}
 }
@@ -32,7 +32,7 @@ Since SDCGRES is a categorical variable measuring length of time, we've
  Canada for over 10 years is assigned a value of 15 years.
 }
 \examples{
-# Using pct_time_fun() to create percent time values across CCHS cycles
+# Using pct_time_fun() to create percent time values between CCHS cycles
 # pct_time_fun() is specified in variable_details.csv along with the CCHS
 # variables and cycles included.
 
