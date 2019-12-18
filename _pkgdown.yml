@@ -21,15 +21,15 @@ navbar:
       text: Worksheets
       menu:
       - text: Using cchsflow
-        href: articles/usingcchsflow.html
+        href: articles/using_cchsflow.html
       - text: variables.csv sheet
-        href: articles/variablesSheet.html
-      - text: variableDetails.csv sheet
-        href: articles/variableDetails.html
+        href: articles/variables_sheet.html
+      - text: variable_details.csv sheet
+        href: articles/variable_details.html
       - text: Derived variables
-        href: articles/derivedVariables.html
+        href: articles/derived_variables.html
       - text: How to add variables
-        href: articles/howtoaddvariables.html
+        href: articles/how_to_add_variables.html
     reference:
       text: Reference
       href: reference/index.html
