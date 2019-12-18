@@ -60,7 +60,7 @@ reference:
     - resp_condition_fun3
     - age_cat_fun
   - title: "Worksheets"
-    desc: Model Specification Sorksheets
+    desc: Model Specification Worksheets
     contents: 
     - variables
     - variable_details
