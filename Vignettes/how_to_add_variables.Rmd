@@ -1,0 +1,241 @@
+---
+title: "How to add variables to cchsflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3 - variable_details.csv}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction 
+
+This vignette explains how you can add variables to the _cchsflow_ package. There are two types of variables that can be added:
+
+1. Existing CCHS variables to be harmonized across cycles.
+2. Derived variables based on harmonized CCHS cycles.
+
+## How to add existing CCHS variables to cchsflow
+
+When adding variables that already exist across CCHS cycles, there are two worksheets that need to be specified:
+
+1. `variable_details.csv`: This worksheet maps variables across CCHS cycles.
+2. `variables.csv`: This worksheet lists all the variables that exist in _cchsflow_
+
+### Example of an existing CCHS variable: Body mass index (BMI)
+
+This example will show how the existing CCHS BMI variable was developed using `variable_details.csv` and `variables.csv`. **Note** this variable is different from the derived BMI variable that is also included in _cchsflow_.
+
+### Specifying the variable on `variable_details.csv`
+
+* For this variable, there are 4 rows, 1 for the continuous "category", 1 for not applicable, 1 for missing, and 1 for else. However, CCHS 2001 and 2003 code not applicable and the missing categories differently from other cycles so two extra rows will be created to account for this. In many instances there are changes in how variable categories are coded between CCHS cycles. But since the overall variable structure remains intact, extra rows can be used to help rectify this issue to make sure all values feed into the newly transformed variable.
+
+### Columns
+
+1. **variable:** the most common variable name for BMI is `HWTGBMI`. This should be written for each row.
+
+```{r, echo=FALSE, warning=FALSE}
+library(cchsflow)
+library(knitr)
+library(kableExtra)
+kable(variable_details[124:129, 1], col.names = 'variable')
+```
+
+2. **dummyVariable:** BMI is a continuous variable, so it does not have dummy variables.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:2])
+```
+
+3. **toType:** BMI was captured in the CCHS as a continuous variable. It does not make much sense to transform it into a categorical variable, so the toType should be `cont` in each row of BMI.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:3])
+```
+
+4. **databaseStart:** BMI was captured in all CCHS surveys between 2001 and 2014, so in the first row with the continuous "category" and the else row, the CCHS identifers will be listed this column:
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[c(124, 129), 1:4])
+```
+
++ For the not applicable and missing rows that pertain to the 2001 and 2003 CCHS surveys, only write the 2001 and 2003 identifiers in this column. 
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[125:126, 1:4])
+```
+
++ For the not applicable and missing rows that pertain to the 2005 CCHS survey and onwards, write the identifiers for CCHS 2005 onwards. This is because the not applicable category and the missing categories are coded differently.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[127:128, 1:4])
+```
+
+5. **variableStart:** In the 2001, 2003, and 2005 CCHS surveys the BMI variable differs from the common name, while in the CCHS surveys from 2007-2014, the BMI variable is the same as the common name. However, the values for not applicable and missing categories changes after 2003. Therefore for the first & else rows, the variableStart column will look like this:
+      
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[c(124, 129), 1:5])
+```
+      
++ For the not applicable and missing rows that pertain to the 2001 and 2003 CCHS surveys, the variable names for those two cycles will be written.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[125:126, 1:5])
+```
+
++ For the not applicable and missing rows that pertain to the 2005 CCHS surveys onwards, the column will look like this:
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[125:126, 1:5])
+```
+
+6. **fromType:** As mentioned previously, BMI was measured as a continuous variable in the CCHS, so the fromType should be `cont` in each row of BMI.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:6])
+```
+
+7. **recTo:** Since this is a continuous variable, the first row (the main "category") has `copy` written. For the not applicable rows `NA::a` is written. For the missing and else rows `NA::b` is written. The `haven` package is used for tagging NA in numeric variables.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:7])
+```
+
+8. **numValidCat:** Since this is a continuous variable, there are no actual categories; so `N/A` is written in each row.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:8])
+```
+
+9. **catLabel:** For the first row `BMI` is written. Not applicable rows `not applicable` is written. Missing rows: `missing`. Else row: `else`
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:9])
+```
+
+10. **catLabelLong:** For the first row, `body mass index` is written to give further detail on what BMI is. The other rows remain the same.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:10])
+```
+
+11. **units:** BMI is measured in kg/m^2^, so `kg/m2` is written in each row. 
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:11])
+```
+
+12. **recFrom:** Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row is written as `11.91:57.9`. In the 2001 and 2003 CCHS surveys not applicable was coded as 999.6 so the recFrom for this row would be `999.6:999.6`. Similarly, in the 2001 and 2003 CCHS surveys don't know was coded as 999.7, refusal was coded as 999.8, and not stated was coded as 999.9. Therefore the recFrom for the missing row for CCHS 2001 and 2003 would be `999.7:999.9`. In the not applicable row for the 2005 CCHS survey onwards, the recFrom is `999.96:999.96`. In the missing row for CCHS 2005 onwards, the recFrom is `999.97:999.99`. For the else row, just write `else`.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:12])
+```
+
+13. **catStartLabel:** For the first row, `BMI / self-report (D,G)` is written as it is written in CCHS documentation. The other rows  remain the same, and the values for each missing category are stated in the missing rows.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:13])
+```
+
+14. **variableStartShortLabel:** Writing `BMI` for each row is sufficient for this variable.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:14])
+```
+
+15. **variableStartLabel:** As per CCHS documentation, the label for this variable is `BMI / self-report - (D,G)`.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, 1:15])
+```
+
+16. **notes: ** As described previously, there are differences between CCHS surveys with regards to coding the not applicable and missing categories. These are documented in this section. Aside from this, there are other changes and differences that should also be documented. In the 2001 CCHS survey, this variable was restricted to participants aged 20-64. As well, don't know (999.97) and refusal (999.98) were not asked in this survey.
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[124:129, ])
+```
+
+### Specifying the variable on `variables.csv`
+
+Once mapped and specified on `variable_details.csv`, the BMI variable can now be specified on `variables.csv`
+
+```{r, echo=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+variables<- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
+kable(variables[71, ])
+```
+
+## How to create derived variables and add them to cchsflow
+
+Along with specifying the variable on `variable_details.csv` and `variables.csv`, a previous step is required in creating derived variables and that is creating a custom function that creates the derived variable from existing CCHS variables.
+
+```
+CustomFunctionName <- function(Vars from variableStart following same order){
+  outputVar <- {Code on passed vars that generates a single value output}
+  
+  return(outputVar)
+}
+```
+
+### Example of a derived variable: Smoking pack-years
+
+Pack-years is a complex derived variable often used by researchers to quantify the amount of cigarette use over a period of time. Even given its complex nature, pack-years can still be calculated. This derived variable incorporates numerous CCHS smoking variables, along with age.
+
+### Step 1. Creating a derived function
+
+With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.
+
+```{r, warning=FALSE}
+Pack_years_fun <-
+  function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
+    #Time since quit for former daily smokers
+    tsq_ds_fun <- function(SMK_09A_B, SMKG09C) {
+      SMKG09C <-
+        ifelse2(SMKG09C==1, 4,
+        ifelse2(SMKG09C==2, 8,
+        ifelse2(SMKG09C==3, 12, NA)))
+      tsq_ds <-
+        ifelse2(SMK_09A_B==1, 0.5,
+        ifelse2(SMK_09A_B==2, 1.5,
+        ifelse2(SMK_09A_B==3, 2.5,
+        ifelse2(SMK_09A_B==4, SMKG09C, NA))))
+    }
+    tsq_ds<-tsq_ds_fun(SMK_09A_B, SMKG09C)
+    # PackYears for Daily Smoker
+    ifelse2(SMKDSTY==1, pmax(((DHHGAGE_cont - SMKG203_cont)*(SMK_204/20)), 0.0137),
+    # PackYears for Occasional Smoker (former daily)     
+    ifelse2(SMKDSTY==2, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds)*(SMK_208/20)), 0.0137) + (pmax((SMK_05B*SMK_05C/30), 1)*tsq_ds),
+    # PackYears for Occasional Smoker (never daily)      
+    ifelse2(SMKDSTY==3, (pmax((SMK_05B*SMK_05C/30), 1)/20)*(DHHGAGE_cont - SMKG01C_cont),
+    # PackYears for former daily smoker (non-smoker now)      
+    ifelse2(SMKDSTY==4, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds)*(SMK_208/20)), 0.0137),
+    # PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      
+    ifelse2(SMKDSTY==5 & SMK_01A==1, 0.0137,
+    # PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      
+    ifelse2(SMKDSTY==5 & SMK_01A==2, 0.007,
+    # Non-smoker      
+    ifelse2(SMKDSTY==6, 0, NA)))))))
+  }
+```
+
+More information on what each smoking variable means can be found in the [Reference](pack_years_fun.html) section.
+
+### Steps 2 and 3. Specifying pack-years in `variable_details.csv` and `variables.csv`
+
+This is how the `variable_details.csv` sheet would look for the derived pack-years row
+```{r, echo=FALSE, warning=FALSE}
+kable(variable_details[1065,])
+```
+
+And this is how the `variables.csv` sheet would look for the derived pack-years row
+
+```{r, echo=FALSE, warning=FALSE}
+kable(variables[133,])
+```

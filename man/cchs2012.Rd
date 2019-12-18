@@ -11,16 +11,17 @@
 \item{cchs2012}{a data frame}
 }
 \description{
-This is a subset of 200 observations from the 2012 cycle of the Canadian Community Health Survey 
-(CCHS) Public Use Microdata file (PUMF) dataset. 
+This is a subset of 200 observations from the 2012 cycle of the Canadian
+Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 The CCHS survey is conducted by Statistics Canada.
 }
 \details{
-See the open license \href{https://www.statcan.gc.ca/eng/reference/licence}{here}.
+See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+license.
 
 Long name: cchs-82M0013-E-2012-Annual-component
 
-DDI: \url{https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/CCHS_DDI/cchs-82M0013-E-2012-Annual-component.xml}
+DDI: \url{https://osf.io/sbem8/}
 
 Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
 }

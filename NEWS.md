@@ -1,4 +1,29 @@
-# cchsflow 0.2.3 (Latest build) 
+# cchsflow 1.0.0 (Latest build)
+2019-12-18
+
+## News
+
+- Submitted package to CRAN
+
+## Features
+
+- Switched formatting to snake_case
+- Corrections to "using cchsflow" article
+- Removed DDI files 
+
+  
+## Dependency Changes
+
+- Dependency lowered to R 3.2
+- Dependency set for haven (>= 1.1.2)
+- Dependency set for dplyr (>= 0.8.2)
+- Dependency set for sjlabelled (>= 1.0.17)
+- Dependency set for stringr (>= 1.2.0)
+- Added [bllflow](https://bllflow.projectbiglife.ca/) functions to package to avoid dependency to 
+  package 
+
+
+# cchsflow 0.2.3
 2019-11-29
 
 ## Features

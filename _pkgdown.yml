@@ -21,15 +21,15 @@ navbar:
       text: Worksheets
       menu:
       - text: Using cchsflow
-        href: articles/usingcchsflow.html
+        href: articles/using_cchsflow.html
       - text: variables.csv sheet
-        href: articles/variablesSheet.html
-      - text: variableDetails.csv sheet
-        href: articles/variableDetails.html
+        href: articles/variables_sheet.html
+      - text: variable_details.csv sheet
+        href: articles/variable_details.html
       - text: Derived variables
-        href: articles/derivedVariables.html
+        href: articles/derived_variables.html
       - text: How to add variables
-        href: articles/howtoaddvariables.html
+        href: articles/how_to_add_variables.html
     reference:
       text: Reference
       href: reference/index.html
@@ -38,6 +38,10 @@ navbar:
       href: news/index.html
 
 reference:
+  - title: "Utility functions"
+    desc: Utility functions that are used in other cchsflow functions
+    contents:
+    - if_else2
   - title: "Alcohol CCHS variables"
     desc: Derived alcohol variables in cchsflow that users may run into issues with
     contents:
@@ -48,14 +52,13 @@ reference:
   - title: "Derived variable functions"
     desc: Functions for deriving custom CCHS variables
     contents:
-    - ifelse2
-    - BMI_fun
-    - Pack_years_fun
-    - Pct_time_fun
-    - Resp_condition_fun1
-    - Resp_condition_fun2
-    - Resp_condition_fun3
-    - DHHGAGE_cat_fun
+    - bmi_fun
+    - pack_years_fun
+    - pct_time_fun
+    - resp_condition_fun1
+    - resp_condition_fun2
+    - resp_condition_fun3
+    - age_cat_fun
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:

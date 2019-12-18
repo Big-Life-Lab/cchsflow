@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transforming and harmonizing CCHS variables • cchsflow</title>
+<title>Transforming and Harmonizing CCHS Variables • cchsflow</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -16,7 +16,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Transforming and harmonizing CCHS variables">
+<script src="pkgdown.js"></script><meta property="og:title" content="Transforming and Harmonizing CCHS Variables">
 <meta property="og:description" content="Variable transformation and harmonization for the Canadian Community Health Survey from
             2001 to 2014.">
 <meta property="og:image" content="/logo.png">
@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -59,19 +59,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/usingcchsflow.html">Using cchsflow</a>
+      <a href="articles/using_cchsflow.html">Using cchsflow</a>
     </li>
     <li>
-      <a href="articles/variablesSheet.html">variables.csv sheet</a>
+      <a href="articles/variables_sheet.html">variables.csv sheet</a>
     </li>
     <li>
-      <a href="articles/variableDetails.html">variableDetails.csv sheet</a>
+      <a href="articles/variable_details.html">variable_details.csv sheet</a>
     </li>
     <li>
-      <a href="articles/derivedVariables.html">Derived variables</a>
+      <a href="articles/derived_variables.html">Derived variables</a>
     </li>
     <li>
-      <a href="articles/howtoaddvariables.html">How to add variables</a>
+      <a href="articles/how_to_add_variables.html">How to add variables</a>
     </li>
   </ul>
 </li>
@@ -126,10 +126,10 @@
     # `variableDetails` is a database in cchsflow that contain the instructions how to transform variables.
     varDetails &lt;- variableDetails
     
-    cchs2001_BMI &lt;- RecWTable(dataSource = cchs2001test, 
-                variableDetails = varDetails, 
-                datasetName = "cchs2001", 
-                appendToData = TRUE,  
+    cchs2001_BMI &lt;- rec_with_table(data_source = cchs2001test, 
+                variable_details = varDetails, 
+                dataset_name = "cchs2001", 
+                append_to_data = TRUE,  
                 variables = "HWTGBMI")</code></pre>
 <p>Notes printed to console indicate issues that may affect BMI classification for your study.</p>
 <pre><code>[1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
@@ -160,8 +160,8 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <code>variables.csv</code> - a list of variables that can be transformed across CCHS surveys.<br>
 </li>
 <li>
-<code>variableDetails.csv</code> - information that describes how the variables are recoded.</li>
-<li>Vignettes describe how to use R to transform or generate new derived variables that are listed in <code>variables.csv</code>. Transformations are performed using <code>RecWTable()</code> from the <code>bllflow</code> R package. <code>variables.csv</code> and <code>variableDetails.csv</code> can be used with other statistics programs (see <a href="https://github.com/Big-Life-Lab/cchsflow/issues">issue</a>).</li>
+<code>variable_details.csv</code> - information that describes how the variables are recoded.</li>
+<li>Vignettes describe how to use R to transform or generate new derived variables that are listed in <code>variables.csv</code>. Transformations are performed using <code><a href="reference/rec_with_table.html">rec_with_table()</a></code>. <code>variables.csv</code> and <code>variable_details.csv</code> can be used with other statistics programs (see <a href="https://github.com/Big-Life-Lab/cchsflow/issues">issue</a>).</li>
 <li>Codebooks (metadata documents) for the original CCHS surveys (see <a href="https://github.com/Big-Life-Lab/cchsflow/tree/master/inst/extdata/CCHS_DDI">CCHS_DDI</a> folder). The PDF and DDI documents are a resource to examine how variables change across survey cycles.</li>
 </ol>
 <p>This repository does not include the CCHS data. Information on how to access the CCHS data can is <a href="https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm">here</a>. The Canadian university community can also access the CCHS through <a href="http://odesi2.scholarsportal.info/webview/">ODESI</a> (see health/Canada/Canadian Community Health Survey).</p>
@@ -171,7 +171,7 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <a href="#contributing" class="anchor"></a>Contributing</h2>
 <p>Please follow <a href="CONTRIBUTING.html">this guide</a> if you would like to contribute to the <em>cchsflow</em> package.</p>
 <p>We encourage PRs for additional variable transformations and derived variables that you believe may be helpful to the broad CCHS community.</p>
-<p>Currently, <em>cchsflow</em> supports R through the <code>RecWTable()</code> function. The CCHS community commonly uses SAS, Stata and other statistical packages. Please feel free to contribute to <code>cchsflow</code> by making a PR that creates versions of <code>RecWTable()</code> for other statistical and programming languages.</p>
+<p>Currently, <em>cchsflow</em> supports R through the <code><a href="reference/rec_with_table.html">rec_with_table()</a></code> function. The CCHS community commonly uses SAS, Stata and other statistical packages. Please feel free to contribute to <code>cchsflow</code> by making a PR that creates versions of <code><a href="reference/rec_with_table.html">rec_with_table()</a></code> for other statistical and programming languages.</p>
 </div>
 </div>
   </div>
@@ -191,7 +191,9 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://opensource.org/licenses/mit-license.php">MIT</a></li>
+<li>
+<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+</li>
 </ul>
 </div>
 <div class="community">
