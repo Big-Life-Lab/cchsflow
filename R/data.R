@@ -22,7 +22,7 @@ NULL
 #' This dataset provides details on how variables are recoded in cchsflow.
 #'
 #' See the below link for more details about how the worksheet is structured
-#' \url{https://big-life-lab.github.io/cchsflow/articles/variables_details.html}
+#' \url{https://big-life-lab.github.io/cchsflow/articles/variable_details.html}
 #'
 #' @name variable_details
 #' @aliases variable_details

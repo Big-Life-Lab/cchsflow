@@ -154,7 +154,7 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
     <div class="page-header">
     <h1>Body Mass Index (BMI) derived variable</h1>
     <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/bmi.R'><code>R/bmi.R</code></a></small>
-    <div class="hidden name"><code>bmi_fun.Rd</code></div>
+    <div class="hidden name"><code>BMI_fun.Rd</code></div>
     </div>
 
     <div class="ref-description">
@@ -173,7 +173,7 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
  all CCHS cycles. This function divides weight by the square of height.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bmi_fun</span>(<span class='no'>HWTGHTM</span>, <span class='no'>HWTGWTK</span>)</pre>
+    <pre class="usage"><span class='fu'><a href='bmi_fun.html'>bmi_fun</a></span>(<span class='no'>HWTGHTM</span>, <span class='no'>HWTGWTK</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -272,7 +272,7 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
 <span class='co'># your weight is 50kg, your BMI can be calculated as follows:</span>
 
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
-<span class='no'>BMI</span> <span class='kw'>&lt;-</span> <span class='fu'>bmi_fun</span>(<span class='kw'>HWTGHTM</span> <span class='kw'>=</span> <span class='fl'>1.7</span>, <span class='kw'>HWTGWTK</span> <span class='kw'>=</span> <span class='fl'>50</span>)
+<span class='no'>BMI</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='bmi_fun.html'>bmi_fun</a></span>(<span class='kw'>HWTGHTM</span> <span class='kw'>=</span> <span class='fl'>1.7</span>, <span class='kw'>HWTGWTK</span> <span class='kw'>=</span> <span class='fl'>50</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>BMI</span>)</div><div class='output co'>#&gt; [1] 17.30104</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
