@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>resp_condition_fun3 — resp_condition_fun3 • cchsflow</title>
+<title>resp_condition_fun2 — resp_condition_fun2 • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,12 +42,11 @@
 
 
 
-<meta property="og:title" content="resp_condition_fun3 — resp_condition_fun3" />
+<meta property="og:title" content="resp_condition_fun2 — resp_condition_fun2" />
 <meta property="og:description" content="This is one of 3 functions used to create a derived variable
  (resp_condition_der) that determines if a respondents has a respirtory
- condition. This function for CCHS cycles (2001-2003) that use COPD and
- Emphysema as a combined variable, as well as Bronchitis" />
-<meta property="og:image" content="/logo.png" />
+ condition. This function is for CCHS cycles (2005-2007) that use COPD &amp;amp;
+ Emphysema as separate variables, as well as Bronchitis." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -143,19 +142,19 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>resp_condition_fun3</h1>
+    <h1>resp_condition_fun2</h1>
     <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/respiratory-condition.R'><code>R/respiratory-condition.R</code></a></small>
-    <div class="hidden name"><code>resp_condition_fun3.Rd</code></div>
+    <div class="hidden name"><code>resp_condition_fun2.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>This is one of 3 functions used to create a derived variable
  (resp_condition_der) that determines if a respondents has a respirtory
- condition. This function for CCHS cycles (2001-2003) that use COPD and
- Emphysema as a combined variable, as well as Bronchitis</p>
+ condition. This function is for CCHS cycles (2005-2007) that use COPD &amp;
+ Emphysema as separate variables, as well as Bronchitis.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>resp_condition_fun3</span>(<span class='no'>DHHGAGE_cont</span>, <span class='no'>CCC_091</span>, <span class='no'>CCC_91A</span>)</pre>
+    <pre class="usage"><span class='fu'>resp_condition_fun2</span>(<span class='no'>DHHGAGE_cont</span>, <span class='no'>CCC_91E</span>, <span class='no'>CCC_91F</span>, <span class='no'>CCC_91A</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -165,13 +164,16 @@
       <td><p>continuous age variable.</p></td>
     </tr>
     <tr>
-      <th>CCC_091</th>
-      <td><p>variable indicating if respondent has either COPD or Emphysema</p></td>
+      <th>CCC_91E</th>
+      <td><p>variable indicating if respondent has emphysema</p></td>
+    </tr>
+    <tr>
+      <th>CCC_91F</th>
+      <td><p>variable indicating if respondent has COPD</p></td>
     </tr>
     <tr>
       <th>CCC_91A</th>
-      <td><p>variable indicating if respondent has chronic bronchitis
-cchsflow variable name: CCC_91A</p></td>
+      <td><p>variable indicating if respondent has chronic bronchitis</p></td>
     </tr>
     </table>
 
@@ -186,11 +188,12 @@ cchsflow variable name: CCC_91A</p></td>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='resp_condition_fun1.html'>resp_condition_fun1</a></code>, <code><a href='resp_condition_fun2.html'>resp_condition_fun2</a></code></p></div>
+    <div class='dont-index'><p><code><a href='resp_condition_fun1.html'>resp_condition_fun1</a></code>, <code><a href='resp_condition_fun3.html'>resp_condition_fun3</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Using resp_condition_fun3() to create pack-years values across CCHS cycles</span>
-<span class='co'># (2001-2003) resp_condition_fun3() is specified in</span>
+    <pre class="examples"><div class='input'>
+<span class='co'># Using resp_condition_fun2() to create pack-years values across CCHS cycles</span>
+<span class='co'># (2005-2007) resp_condition_fun2() is specified in</span>
 <span class='co'># variable_details.csv along with the CCHS variables and cycles included.</span>
 
 <span class='co'># To transform resp_condition_der, use rec_with_table() for each CCHS cycle</span>
@@ -200,49 +203,50 @@ cchsflow variable name: CCC_91A</p></td>
 
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
 
-<span class='no'>resp2001</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='kw'>data_source</span> <span class='kw'>=</span> <span class='no'>cchs2001</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
-  <span class='kw'>dataset_name</span> <span class='kw'>=</span> <span class='st'>"cchs2001"</span>, <span class='kw'>variables</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-    <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>, <span class='st'>"CCC_91A"</span>,
+<span class='no'>resp2005</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
+  <span class='kw'>data_source</span> <span class='kw'>=</span> <span class='no'>cchs2005</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
+  <span class='kw'>dataset_name</span> <span class='kw'>=</span> <span class='st'>"cchs2005"</span>, <span class='kw'>variables</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+    <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_91E"</span>, <span class='st'>"CCC_91F"</span>, <span class='st'>"CCC_91A"</span>,
     <span class='st'>"resp_condition_der"</span>
   )
-)</div><div class='output co'>#&gt; [1] "NOTE: 74+ inches converted to 76 inches"</div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>resp2001</span>)</div><div class='output co'>#&gt;   CCC_091 CCC_91A DHHGAGE_cont resp_condition_der
-#&gt; 1       2       2           85                  3
-#&gt; 2       2       2           85                  3
-#&gt; 3       2       2           32                  3
-#&gt; 4       2       2           77                  3
-#&gt; 5   NA(a)       2           22                 NA
-#&gt; 6       2       2           77                  3</div><div class='input'>
-<span class='no'>resp2003</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='kw'>data_source</span> <span class='kw'>=</span> <span class='no'>cchs2003</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
-  <span class='kw'>dataset_name</span> <span class='kw'>=</span> <span class='st'>"cchs2003"</span>, <span class='kw'>variables</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-    <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>, <span class='st'>"CCC_91A"</span>,
-    <span class='st'>"resp_condition_der"</span>
-  )
-)</div><div class='output co'>#&gt; [1] "NOTE: 74+ inches converted to 76 inches"</div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>resp2003</span>)</div><div class='output co'>#&gt;     CCC_091 CCC_91A DHHGAGE_cont resp_condition_der
-#&gt; 195   NA(a)       2           22                 NA
-#&gt; 196       2       1           57                  1
-#&gt; 197       2       2           42                  3
-#&gt; 198       2       2           85                  3
-#&gt; 199   NA(a)       2           17                 NA
-#&gt; 200   NA(a)       2           17                 NA</div><div class='input'>
-<span class='no'>combined_resp</span> <span class='kw'>&lt;-</span> <span class='fu'>bind_rows</span>(<span class='no'>resp2001</span>, <span class='no'>resp2003</span>)
+)
 
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_resp</span>)</div><div class='output co'>#&gt;   CCC_091 CCC_91A DHHGAGE_cont resp_condition_der
-#&gt; 1       2       2           85                  3
-#&gt; 2       2       2           85                  3
-#&gt; 3       2       2           32                  3
-#&gt; 4       2       2           77                  3
-#&gt; 5   NA(a)       2           22                 NA
-#&gt; 6       2       2           77                  3</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_resp</span>)</div><div class='output co'>#&gt;     CCC_091 CCC_91A DHHGAGE_cont resp_condition_der
-#&gt; 395   NA(a)       2           22                 NA
-#&gt; 396       2       1           57                  1
-#&gt; 397       2       2           42                  3
-#&gt; 398       2       2           85                  3
-#&gt; 399   NA(a)       2           17                 NA
-#&gt; 400   NA(a)       2           17                 NA</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>resp2005</span>)</div><div class='output co'>#&gt;   CCC_91A CCC_91E CCC_91F DHHGAGE_cont resp_condition_der
+#&gt; 1       2   NA(a)   NA(a)           27                 NA
+#&gt; 2       2       2       2           77                  3
+#&gt; 3       2       2       2           32                  3
+#&gt; 4       2       2       2           77                  3
+#&gt; 5       2       2       2           85                  3
+#&gt; 6       2   NA(a)   NA(a)           13                 NA</div><div class='input'>
+<span class='no'>resp2007_2008</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
+  <span class='kw'>data_source</span> <span class='kw'>=</span> <span class='no'>cchs2007_2008</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
+  <span class='kw'>dataset_name</span> <span class='kw'>=</span> <span class='st'>"cchs2007_2008"</span>, <span class='kw'>variables</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+    <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_91E"</span>, <span class='st'>"CCC_91F"</span>, <span class='st'>"CCC_91A"</span>,
+    <span class='st'>"resp_condition_der"</span>
+  )
+)
+
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>resp2007_2008</span>)</div><div class='output co'>#&gt;     CCC_91A CCC_91E CCC_91F DHHGAGE_cont resp_condition_der
+#&gt; 195       2       2       2           62                  3
+#&gt; 196       2       2       2           37                  3
+#&gt; 197       2       2       2           77                  3
+#&gt; 198       2       2       2           42                  3
+#&gt; 199       2       2       2           32                  3
+#&gt; 200   NA(b)       2       2           72                 NA</div><div class='input'>
+<span class='no'>combined_resp</span> <span class='kw'>&lt;-</span> <span class='fu'>bind_rows</span>(<span class='no'>resp2005</span>, <span class='no'>resp2007_2008</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Unequal factor levels: coercing to character</span></div><div class='output co'>#&gt; <span class='warning'>Warning: binding character and factor vector, coercing into character vector</span></div><div class='output co'>#&gt; <span class='warning'>Warning: binding character and factor vector, coercing into character vector</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_resp</span>)</div><div class='output co'>#&gt;   CCC_91A CCC_91E CCC_91F DHHGAGE_cont resp_condition_der
+#&gt; 1       2   NA(a)   NA(a)           27                 NA
+#&gt; 2       2       2       2           77                  3
+#&gt; 3       2       2       2           32                  3
+#&gt; 4       2       2       2           77                  3
+#&gt; 5       2       2       2           85                  3
+#&gt; 6       2   NA(a)   NA(a)           13                 NA</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_resp</span>)</div><div class='output co'>#&gt;     CCC_91A CCC_91E CCC_91F DHHGAGE_cont resp_condition_der
+#&gt; 395       2       2       2           62                  3
+#&gt; 396       2       2       2           37                  3
+#&gt; 397       2       2       2           77                  3
+#&gt; 398       2       2       2           42                  3
+#&gt; 399       2       2       2           32                  3
+#&gt; 400   NA(b)       2       2           72                 NA</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
