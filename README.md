@@ -28,10 +28,10 @@ Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 t
     # `variableDetails` is a database in cchsflow that contain the instructions how to transform variables.
     varDetails <- variableDetails
     
-    cchs2001_BMI <- RecWTable(dataSource = cchs2001test, 
-                variableDetails = varDetails, 
-                datasetName = "cchs2001", 
-                appendToData = TRUE,  
+    cchs2001_BMI <- rec_with_table(data_source = cchs2001test, 
+                variable_details = varDetails, 
+                dataset_name = "cchs2001", 
+                append_to_data = TRUE,  
                 variables = "HWTGBMI")
 ```
 
@@ -61,8 +61,8 @@ Care must be taken to understand how specific variable transformation and harmon
 *cchsflow* package includes:
 
 1. `variables.csv` - a list of variables that can be transformed across CCHS surveys.  
-2. `variableDetails.csv` - information that describes how the variables are recoded.
-3. Vignettes describe how to use R to transform or generate new derived variables that are listed in `variables.csv`. Transformations are performed using `RecWTable()` from the `bllflow` R package. `variables.csv` and `variableDetails.csv` can be used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
+2. `variable_details.csv` - information that describes how the variables are recoded.
+3. Vignettes describe how to use R to transform or generate new derived variables that are listed in `variables.csv`. Transformations are performed using `rec_with_table()`. `variables.csv` and `variable_details.csv` can be used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
 3. Codebooks (metadata documents) for the original CCHS surveys (see [CCHS_DDI](https://github.com/Big-Life-Lab/cchsflow/tree/master/inst/extdata/CCHS_DDI) folder). The PDF and DDI documents are a resource to examine how variables change across survey cycles. 
 
 This repository does not include the CCHS data. Information on how to access the CCHS data can is [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). The Canadian university community can also access the CCHS through [ODESI](http://odesi2.scholarsportal.info/webview/) (see health/Canada/Canadian Community Health Survey).
@@ -74,4 +74,4 @@ the *cchsflow* package.
 
 We encourage PRs for additional variable transformations and derived variables that you believe may be helpful to the broad CCHS community. 
 
-Currently, *cchsflow* supports R through the `RecWTable()` function. The CCHS community commonly uses SAS, Stata and other statistical packages. Please feel free to contribute to `cchsflow` by making a PR that creates versions of `RecWTable()` for other statistical and programming languages.
+Currently, *cchsflow* supports R through the `rec_with_table()` function. The CCHS community commonly uses SAS, Stata and other statistical packages. Please feel free to contribute to `cchsflow` by making a PR that creates versions of `rec_with_table()` for other statistical and programming languages.

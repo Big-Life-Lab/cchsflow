@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -59,19 +59,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/usingcchsflow.html">Using cchsflow</a>
+      <a href="articles/using_cchsflow.html">Using cchsflow</a>
     </li>
     <li>
-      <a href="articles/variablesSheet.html">variables.csv sheet</a>
+      <a href="articles/variables_sheet.html">variables.csv sheet</a>
     </li>
     <li>
-      <a href="articles/variableDetails.html">variableDetails.csv sheet</a>
+      <a href="articles/variable_details.html">variable_details.csv sheet</a>
     </li>
     <li>
-      <a href="articles/derivedVariables.html">Derived variables</a>
+      <a href="articles/derived_variables.html">Derived variables</a>
     </li>
     <li>
-      <a href="articles/howtoaddvariables.html">How to add variables</a>
+      <a href="articles/how_to_add_variables.html">How to add variables</a>
     </li>
   </ul>
 </li>
@@ -126,10 +126,10 @@
     # `variableDetails` is a database in cchsflow that contain the instructions how to transform variables.
     varDetails &lt;- variableDetails
     
-    cchs2001_BMI &lt;- RecWTable(dataSource = cchs2001test, 
-                variableDetails = varDetails, 
-                datasetName = "cchs2001", 
-                appendToData = TRUE,  
+    cchs2001_BMI &lt;- rec_with_table(data_source = cchs2001test, 
+                variable_details = varDetails, 
+                dataset_name = "cchs2001", 
+                append_to_data = TRUE,  
                 variables = "HWTGBMI")</code></pre>
 <p>Notes printed to console indicate issues that may affect BMI classification for your study.</p>
 <pre><code>[1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
@@ -160,8 +160,8 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <code>variables.csv</code> - a list of variables that can be transformed across CCHS surveys.<br>
 </li>
 <li>
-<code>variableDetails.csv</code> - information that describes how the variables are recoded.</li>
-<li>Vignettes describe how to use R to transform or generate new derived variables that are listed in <code>variables.csv</code>. Transformations are performed using <code>RecWTable()</code> from the <code>bllflow</code> R package. <code>variables.csv</code> and <code>variableDetails.csv</code> can be used with other statistics programs (see <a href="https://github.com/Big-Life-Lab/cchsflow/issues">issue</a>).</li>
+<code>variable_details.csv</code> - information that describes how the variables are recoded.</li>
+<li>Vignettes describe how to use R to transform or generate new derived variables that are listed in <code>variables.csv</code>. Transformations are performed using <code><a href="reference/rec_with_table.html">rec_with_table()</a></code>. <code>variables.csv</code> and <code>variable_details.csv</code> can be used with other statistics programs (see <a href="https://github.com/Big-Life-Lab/cchsflow/issues">issue</a>).</li>
 <li>Codebooks (metadata documents) for the original CCHS surveys (see <a href="https://github.com/Big-Life-Lab/cchsflow/tree/master/inst/extdata/CCHS_DDI">CCHS_DDI</a> folder). The PDF and DDI documents are a resource to examine how variables change across survey cycles.</li>
 </ol>
 <p>This repository does not include the CCHS data. Information on how to access the CCHS data can is <a href="https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm">here</a>. The Canadian university community can also access the CCHS through <a href="http://odesi2.scholarsportal.info/webview/">ODESI</a> (see health/Canada/Canadian Community Health Survey).</p>
@@ -171,7 +171,7 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <a href="#contributing" class="anchor"></a>Contributing</h2>
 <p>Please follow <a href="CONTRIBUTING.html">this guide</a> if you would like to contribute to the <em>cchsflow</em> package.</p>
 <p>We encourage PRs for additional variable transformations and derived variables that you believe may be helpful to the broad CCHS community.</p>
-<p>Currently, <em>cchsflow</em> supports R through the <code>RecWTable()</code> function. The CCHS community commonly uses SAS, Stata and other statistical packages. Please feel free to contribute to <code>cchsflow</code> by making a PR that creates versions of <code>RecWTable()</code> for other statistical and programming languages.</p>
+<p>Currently, <em>cchsflow</em> supports R through the <code><a href="reference/rec_with_table.html">rec_with_table()</a></code> function. The CCHS community commonly uses SAS, Stata and other statistical packages. Please feel free to contribute to <code>cchsflow</code> by making a PR that creates versions of <code><a href="reference/rec_with_table.html">rec_with_table()</a></code> for other statistical and programming languages.</p>
 </div>
 </div>
   </div>
@@ -191,7 +191,9 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://opensource.org/licenses/mit-license.php">MIT</a></li>
+<li>
+<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+</li>
 </ul>
 </div>
 <div class="community">
