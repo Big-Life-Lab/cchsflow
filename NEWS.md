@@ -8,9 +8,17 @@
 ## Features
 
 - Switched formatting to snake_case
-- Dependency lowered to R 3.2
 - Corrections to "using cchsflow" article
 - Removed DDI files 
+
+  
+## Dependency Changes
+
+- Dependency lowered to R 3.2
+- Dependency set for haven (>= 1.1.2)
+- Dependency set for dplyr (>= 0.8.2)
+- Dependency set for sjlabelled (>= 1.0.17)
+- Dependency set for stringr (>= 1.2.0)
 - Added [bllflow](https://bllflow.projectbiglife.ca/) functions to package to avoid dependency to 
   package 
 
