@@ -1,5 +1,5 @@
 # cchsflow 0.3.0 (Latest build)
-2019-12-11
+2019-12-18
 
 ## News
 
@@ -8,8 +8,8 @@
 ## Features
 
 - Switched formatting to snake_case
-- Dependency lowered to R 3.1
-- Corrections to usingcchsflow article
+- Dependency lowered to R 3.2
+- Corrections to "using cchsflow" article
 - Removed DDI files 
 - Added [bllflow](https://bllflow.projectbiglife.ca/) functions to package to avoid dependency to 
   package 
