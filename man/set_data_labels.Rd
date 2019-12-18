@@ -14,5 +14,7 @@ set_data_labels(data_to_label, variable_details, variables_sheet = NULL)
 \item{variables_sheet}{variables.csv}
 }
 \description{
-sets labels for transformed datasets
+sets labels for passed database, Uses the names of final
+variables in variable_details/variables_sheet as well as the labels contained
+in the passed dataframes
 }

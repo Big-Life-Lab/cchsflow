@@ -16,7 +16,8 @@ get_data_variable_name(
 
 \item{data}{database being checked}
 
-\item{row_being_checked}{the row from variable details that contains information on this variables}
+\item{row_being_checked}{the row from variable details that contains
+information on this variables}
 
 \item{variable_being_checked}{the name of the recoded variable}
 }
@@ -24,5 +25,6 @@ get_data_variable_name(
 the data_source equivalant of variable_being_checked
 }
 \description{
-Retrieves the name of the column inside data_source to use for calculations
+Retrieves the name of the column inside data_source to
+use for calculations
 }

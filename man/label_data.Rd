@@ -7,7 +7,8 @@
 label_data(label_list, data_to_label)
 }
 \arguments{
-\item{label_list}{the label list object that contains extracted labels from variable details}
+\item{label_list}{the label list object that contains extracted labels
+from variable details}
 
 \item{data_to_label}{The data that is to be labeled}
 }

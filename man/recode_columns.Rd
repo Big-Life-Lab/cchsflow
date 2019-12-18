@@ -16,7 +16,8 @@ recode_columns(
 \arguments{
 \item{data_source}{The source database}
 
-\item{variables_to_process}{rows from variable details that are applicable to this DB}
+\item{variables_to_process}{rows from variable details that are applicable
+to this DB}
 
 \item{data_name}{Name of the database being passed}
 
@@ -30,5 +31,6 @@ recode_columns(
 Returns recoded and labeled data
 }
 \description{
-Recodes columns from passed row returns just table with those columns and same rows as the data_source
+Recodes columns from passed row returns just table with those columns
+and same rows as the data_source
 }

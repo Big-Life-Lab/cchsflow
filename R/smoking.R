@@ -132,7 +132,7 @@ pack_years_fun <-
             # smoked at least 100 cigarettes lifetime
             if_else2(
               SMKDSTY == 5 & SMK_01A == 1, 0.0137,
-              # PackYears for former occasional smoker (non-smoker now) who have 
+              # PackYears for former occasional smoker (non-smoker now) who have
               # not smoked at least 100 cigarettes lifetime
               if_else2(
                 SMKDSTY == 5 & SMK_01A == 2, 0.007,

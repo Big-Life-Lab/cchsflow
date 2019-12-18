@@ -42,8 +42,8 @@
 #'
 #' @examples
 #' # Using bmi_fun() to create BMI values across cycles
-#' # bmi_fun() is specified in variable_details.csv along with the CCHS variables
-#' # and cycles included.
+#' # bmi_fun() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
 #'
 #' # To transform the derived BMI variable, use rec_with_table() for each cycle
 #' # and specify HWTGBMI_der, along with height (HWTGHTM) and weight (HWTGWTK).

@@ -33,8 +33,8 @@ This is one of 3 functions used to create a derived variable
 \examples{
 
 # Using resp_condition_fun2() to create pack-years values across CCHS cycles
-# (2005-2007) resp_condition_fun2() is specified in variable_details.csv along
-# with the CCHS variables and cycles included.
+# (2005-2007) resp_condition_fun2() is specified in
+# variable_details.csv along with the CCHS variables and cycles included.
 
 # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
 # and specify resp_condition_der, along with the various respiratory

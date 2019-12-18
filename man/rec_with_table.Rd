@@ -20,19 +20,27 @@ rec_with_table(
 \arguments{
 \item{data_source}{A dataframe containing the variables to be recoded.}
 
-\item{variable_details}{A dataframe containing the specifications (rules) for recoding.}
+\item{variable_details}{A dataframe containing the specifications (rules)
+for recoding.}
 
-\item{dataset_name}{String, the name of the dataset containing the variables to be recoded.}
+\item{dataset_name}{String, the name of the dataset containing the
+to be recoded.}
 
-\item{else_value}{Value (string, number, integer, logical or NA) that is used to replace any values that are outside the specified ranges (no rules for recoding).}
+\item{else_value}{Value (string, number, integer, logical or NA) that is used
+to replace any values that are outside the specified ranges
+(no rules for recoding).}
 
-\item{append_to_data}{Logical, if \code{TRUE} (default), recoded variables will be appended to the data_source.}
+\item{append_to_data}{Logical, if \code{TRUE} (default), recoded variables
+will be appended to the data_source.}
 
-\item{log}{Logical, if \code{FALSE} (default), a log of recoding will not be printed.}
+\item{log}{Logical, if \code{FALSE} (default), a log of recoding will
+not be printed.}
 
-\item{print_note}{Logical, if \code{FALSE} (default), will not print the content inside the `Note`` column of the variable beinng recoded.}
+\item{print_note}{Logical, if \code{FALSE} (default), will not print the
+content inside the `Note`` column of the variable beinng recoded.}
 
-\item{variables}{character vector containing variable names to recode or a variables csv containing additional variable info}
+\item{variables}{character vector containing variable names to recode or
+a variables csv containing additional variable info}
 
 \item{var_labels}{labels vector to attach to variables in variables}
 
@@ -46,26 +54,55 @@ The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-v
  dataframe needs the following variables to function:
  \describe{
   \item{variable}{name of new (mutated) variable that is recoded}
-  \item{toType}{type the variable is being recoded to \emph{cat = categorical, cont = continues}}
-  \item{databaseStart}{name of dataframe with original variables to be recoded}
+  \item{toType}{type the variable is being recoded to
+  \emph{cat = categorical, cont = continues}}
+  \item{databaseStart}{name of dataframe with original variables to be
+  recoded}
   \item{variableStart}{name of variable to be recoded}
-  \item{fromType}{variable type of start variable. \emph{cat = categorical or factor variable} \emph{cont = continuous variable (real number or integer)}}
+  \item{fromType}{variable type of start variable.
+  \emph{cat = categorical or factor variable}
+  \emph{cont = continuous variable (real number or integer)}}
   \item{recTo}{Value to recode to}
   \item{recFrom}{Value/range being recoded from}
  }
- Each row in \emph{variable_details} comprises one category in a newly transformed variable. The rules for each category the new variable
- are a string in \emph{recFrom} and value in \emph{recTo}. These recode pairs are the same syntax as \emph{sjmisc::rec()},
- except in \emph{sjmisc::rec()} the pairs are a string for the function attibute \emph{rec =}, separated by '\emph{=}'.
- For example in \emph{rec_w_table} \emph{variable_details$recFrom = 2; variable_details$recTo = 4} is the same as \emph{sjmisc::rec(rec = "2=4")}.
+ Each row in \emph{variable_details} comprises one category in a
+ newly transformed variable. The rules for each category the new variable
+ are a string in \emph{recFrom} and value in \emph{recTo}.
+ These recode pairs are the same syntax as \emph{sjmisc::rec()},
+ except in \emph{sjmisc::rec()} the pairs are a string for the function
+ attibute \emph{rec =}, separated by '\emph{=}'.
+ For example in \emph{rec_w_table}
+ \emph{variable_details$recFrom = 2; variable_details$recTo = 4}
+ is the same as \emph{sjmisc::rec(rec = "2=4")}.
  the pairs are obtained from the RecFrom and RecTo columns
   \describe{
-    \item{recode pairs}{each recode pair is row. see above example or \emph{PBC-variableDetails.csv}}
-    \item{multiple values}{multiple old values that should be recoded into a new single value may be separated with comma, e.g. \emph{recFrom = "1,2"; recTo = 1}}
-    \item{value range}{a value range is indicated by a colon, e.g. \emph{recFrom= "1:4"; recTo = 1} (recodes all values from 1 to 4 into 1)}
-    \item{value range for doubles}{for double vectors (with fractional part), all values within the specified range are recoded; e.g. \emph{recFrom = "1:2.5'; recTo = 1} recodes 1 to 2.5 into 1, but 2.55 would not be recoded (since it's not included in the specified range)}
-    \item{\emph{"min"} and \emph{"max"}}{minimum and maximum values are indicates by \emph{min} (or \emph{lo}) and \emph{max} (or \emph{hi}), e.g. \emph{recFrom = "min:4"; recTo = 1} (recodes all values from minimum values of \emph{x} to 4 into 1)}
-    \item{\emph{"else"}}{all other values, which have not been specified yet, are indicated by \emph{else}, e.g. \emph{recFrom = "else"; recTo = NA} (recode all other values (not specified in other rows) to "NA")}
-    \item{\emph{"copy"}}{the \emph{"else"}-token can be combined with \emph{copy}, indicating that all remaining, not yet recoded values should stay the same (are copied from the original value), e.g. \emph{recFrom = "else"; recTo = "copy"}}
-    \item{\emph{NA}'s}{\emph{NA} values are allowed both as old and new value, e.g. \emph{recFrom "NA"; recTo = 1. or "recFrom = "3:5"; recTo = "NA"} (recodes all NA into 1, and all values from 3 to 5 into NA in the new variable)}
+    \item{recode pairs}{each recode pair is row. see above example
+    or \emph{PBC-variableDetails.csv}}
+    \item{multiple values}{multiple old values that should be recoded into
+    a new single value may be separated with comma, e.g.
+    \emph{recFrom = "1,2"; recTo = 1}}
+    \item{value range}{a value range is indicated by a colon, e.g.
+    \emph{recFrom= "1:4"; recTo = 1} (recodes all values from 1 to 4 into 1)}
+    \item{value range for doubles}{for double vectors (with fractional part),
+     all values within the specified range are recoded; e.g.
+     \emph{recFrom = "1:2.5'; recTo = 1} recodes 1 to 2.5 into 1,
+     but 2.55 would not be recoded
+     (since it's not included in the specified range)}
+    \item{\emph{"min"} and \emph{"max"}}{minimum and maximum values
+    are indicates by \emph{min} (or \emph{lo}) and \emph{max} (or \emph{hi}),
+     e.g. \emph{recFrom = "min:4"; recTo = 1} (recodes all values from
+     minimum values of \emph{x} to 4 into 1)}
+    \item{\emph{"else"}}{all other values, which have not been specified yet,
+     are indicated by \emph{else}, e.g. \emph{recFrom = "else"; recTo = NA}
+     (recode all other values (not specified in other rows) to "NA")}
+    \item{\emph{"copy"}}{the \emph{"else"}-token can be combined with
+    \emph{copy}, indicating that all remaining, not yet recoded values should
+     stay the same (are copied from the original value), e.g.
+     \emph{recFrom = "else"; recTo = "copy"}}
+    \item{\emph{NA}'s}{\emph{NA} values are allowed both as old and
+    new value, e.g.
+    \emph{recFrom "NA"; recTo = 1. or "recFrom = "3:5"; recTo = "NA"}
+    (recodes all NA into 1,
+    and all values from 3 to 5 into NA in the new variable)}
 }
 }

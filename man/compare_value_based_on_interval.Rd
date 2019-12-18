@@ -24,7 +24,8 @@ compare_value_based_on_interval(
 \item{interval}{The scientific notation interval}
 }
 \value{
-a boolean vector containing true for rows where the comparison is true
+a boolean vector containing true for rows where the
+comparison is true
 }
 \description{
 Compare values on the scientific notation interval
