@@ -341,7 +341,7 @@ get_data_variable_name <-
 
 #' recode_columns
 #'
-#' Recodes columns from passed row returns just table with those columns
+#' Recodes columns from passed row and returns just table with those columns
 #' and same rows as the data_source
 #'
 #' @param data_source The source database
@@ -507,7 +507,6 @@ recode_columns <-
                 strsplit(as.character(row_being_checked[[
                   pkg.globals$argument.From]]), ":")[[1]]
             } else {
-              # TODO find a more elagant way to handle in the future
               temp_from <-
                 as.character(row_being_checked[[pkg.globals$argument.From]])
               from_values[[1]] <- temp_from
@@ -873,7 +872,6 @@ calculate_custom_function_row_value <-
            variable_names,
            custom_function_name) {
     row_values <- unname(row_values)
-    # TODO add ability to process ranges in from column
     custom_function_return_value <-
       do.call(get(custom_function_name), row_values)
 
