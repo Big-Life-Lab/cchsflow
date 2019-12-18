@@ -52,7 +52,7 @@ cchs_mock2013 <- data.frame(DHH_SEX = c(1, 2, 1), DHHGAGE = c(2, 1, 1), FVCDTOT 
 
 Did you notice that the names for the variables are slightly different in the two mock databases? That isn't a mistake: in the 2001 CCHS the variable for sex is `DHHA_SEX` and in 2013 CCHS the variable is `DHH_SEX`. 
 
-Don't worry, `cchsflow` is here to help! `variable_details.csv` contains the rules to harmonize those two variables into a common variable name. In the CCHS, the categories for `sex` are consistient: 1 = males, 2 = females. `variable_details.csv` provides instructions for how to harmonizecategory values or labels, if they change across survey cycles. Variable labes are discussed in later vignettes.
+Don't worry, `cchsflow` is here to help! `variable_details.csv` contains the rules on how to harmonize those two variables into a common variable name. In the CCHS, the categories for `sex` are consistient: 1 = males, 2 = females. `variable_details.csv` provides instructions for how to harmonize category values and labels, if they change across survey cycles. Variable labels are discussed in later vignettes.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(DT)
@@ -64,14 +64,14 @@ cat("`variables.csv` includes", length(unique(variables$variable)), "variables t
 
 To call the `rec_with_table()` function to transform the variables of a CCHS dataset:
 
-1. Create a name for your transformed dataset (e.g. cchsYear1)
+1. Create a name for your transformed dataset (e.g. cchs_transformedYear1)
 2. Indicate the database of the CCHS dataset in the `data_source` argument
-3. Indicate the name of `variable_details.csv` in the `variable_details` argument
-4. Indicate the name of the CCHS dataset (this can be found in the databaseStart section of `variable_details.csv`).
+3. Indicate the name of `variable_details` in the `variable_details` argument
+4. Indicate the name of the CCHS dataset (this can be found in the databaseStart section of `variable_details.csv` or in data.R).
 
 Your R command when calling the function should look like this:
 
-`cchsTransformedYear1 <- rec_with_table(data_source = cchsYear1, variable_details = variable_details, dataset_name = "cchsYear1")`
+`cchs_transformedYear1 <- rec_with_table(data_source = cchsYear1, variable_details = variable_details, dataset_name = "cchsYear1")`
 
 ### Default arguments
 
@@ -86,7 +86,7 @@ With `rec_with_table()` there are also default arguments that do not need to be 
 
 ### Example 1. Transform a single variable from a single database
 
-In this example, the `sex` variable in the 2001 CCHS cycle is transformed a harmonized `sex` variable for all CCHS cycles.
+In this example, the `sex` variable in the 2001 CCHS cycle is transformed into a harmonized `sex` variable for all CCHS cycles.
 
 ```{r, warning=FALSE}
 sex2001 <- rec_with_table(data_source = cchs_mock2001, variable_details = variable_details, dataset_name = "cchs2001", log = TRUE, variables = c("DHH_SEX"))
@@ -122,7 +122,7 @@ kable(combined_sex)
 
 ### Example 3. Transform a single variable from multiple databases that changes categories between cycles.
 
-There are many variables in the CCHS that changes in categories between cycles in a way that the variable cannot perserve all categories for all CCHS cycles. An example is the categorical variable for `age`. `cchsflow` offers three options to facilitate the use of these variables with inconsistent categories across cycles.
+There are many variables in the CCHS that changes in categories between cycles in a way that the variable cannot preserve all categories for all CCHS cycles. An example is the categorical variable for `age`. `cchsflow` offers three options to facilitate the use of these variables with inconsistent categories across cycles.
 
 #### Option 1: transform category `age` variable into a common variable for only cycles with the same category responses
 
@@ -164,7 +164,7 @@ kable(combined_age_cont)
 
 #### Option 3: transform the categorical `age` variable into a harmonized categorical variable
 
-`cchsflow` often includes a common harmonized categorical variable that has new, consistent variables across all cycles. These new categorical variables generally have few category levels than the original variables, reflecting the need to combine categories. Read the `Notes` variable for details.
+`cchsflow` often includes a common harmonized categorical variable that has new, consistent categories across all cycles. These new categorical variables generally have fewer category levels than the original variables, reflecting the need to combine categories. Read the `Notes` variable for details.
 
 ## Label variables and categories.
 
@@ -246,7 +246,7 @@ get_label(labelled_combined_cchs)
 
 CCHS derived variables are recoded (harmonized) using the same method as other CCHS `cchsflow` variables, with one additional considerations.
 
-Derived variables in CCHS are created from existing, original variables that are transformed into a new variable. An example is body mass index (BMI). Respondents are asked to report their height and weight. BMI is then dereived (calculated) using variables for height and weight. 
+Derived variables in CCHS are created from existing, original variables that are transformed into a new variable. An example is body mass index (BMI). Respondents are asked to report their height and weight. BMI is then derived (calculated) using recoded variables for height and weight. 
 
 Recoding `BMI` into a harmonized variable requires their underlying initial variables (height and weight). This first step of harmonizing underlying variables is completed for you, but you must have the underlying variables in your dataset. 
 

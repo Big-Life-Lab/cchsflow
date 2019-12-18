@@ -19,7 +19,7 @@ NULL
 
 #' variable_details.csv
 #'
-#' This dataset provides details on how variables are specified in cchsflow.
+#' This dataset provides details on how variables are recoded in cchsflow.
 #'
 #' See the below link for more details about how the worksheet is structured
 #' \url{https://big-life-lab.github.io/cchsflow/articles/variables_details.html}

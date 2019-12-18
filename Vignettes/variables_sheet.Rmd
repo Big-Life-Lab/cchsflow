@@ -68,6 +68,6 @@ Derived variables follow the same naming conventions as CCHS variables when bein
 
 ## Contributing or customizing `variables.csv`
 
-We recommend that you copy `variables.csv` with the variables that you use for your project. You can include only the variables that you use for your project, thereby providing a reference for your project. `variables.csv` is a CSV file to allow use `cchsflow` within a teams that do not use R or have programming experience. 
+We recommend that you copy `variables.csv` with the variables that you use for your project. You can include only the variables that you use for your project, thereby providing a reference for your project. `variables.csv` is a CSV file to allow use `cchsflow` within teams that do not use R or have programming experience. 
 
 You can create your own transformed or derived variables by using the cchsflow `variables.csv` as a template. We welcome [issues](https://github.com/Big-Life-Lab/cchsflow/issues) for comments to existing variables in `variables.csv. Also welcomed are PR for new transformations that you feel are helpful for others who use the CCHS data. See [Contributing]().

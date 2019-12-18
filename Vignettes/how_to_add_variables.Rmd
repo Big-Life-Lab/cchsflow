@@ -41,9 +41,9 @@ This example will show how the existing CCHS BMI variable was developed using `v
 1. **variable:** the most common variable name for BMI is `HWTGBMI`. This should be written for each row.
 
 ```{r, echo=FALSE, warning=FALSE}
+library(cchsflow)
 library(knitr)
 library(kableExtra)
-variable_details <- read.csv(file.path(getwd(), '../inst/extdata/variable_details.csv'))
 kable(variable_details[124:129, 1], col.names = 'variable')
 ```
 
@@ -101,7 +101,7 @@ kable(variable_details[125:126, 1:5])
 kable(variable_details[124:129, 1:6])
 ```
 
-7. **recTo:** Since this is a continuous variable, the first row (the main "category") has `copy` written. For the not applicable rows `NA::a` is written. For the missing and else rows `NA::b` is written.
+7. **recTo:** Since this is a continuous variable, the first row (the main "category") has `copy` written. For the not applicable rows `NA::a` is written. For the missing and else rows `NA::b` is written. The `haven` package is used for tagging NA in numeric variables.
 
 ```{r, echo=FALSE, warning=FALSE}
 kable(variable_details[124:129, 1:7])
