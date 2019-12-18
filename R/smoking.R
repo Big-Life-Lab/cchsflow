@@ -49,7 +49,7 @@
 #'
 #' @examples
 #' # Using pack_years_fun() to create pack-years values across CCHS cycles
-#' # pack_years_fun() is specified in variableDetails.csv along with the CCHS
+#' # pack_years_fun() is specified in variable_details.csv along with the CCHS
 #' # variables and cycles included.
 #'
 #' # To transform pack_years_der across cycles, use rec_with_table() for each
@@ -59,7 +59,7 @@
 #' library(cchsflow)
 #'
 #' pack_years2010 <- rec_with_table(
-#'   data_source = cchs2010, variable_details = variableDetails,
+#'   data_source = cchs2010, variable_details = variable_details,
 #'   dataset_name = "cchs2010", variables = c(
 #'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
@@ -70,7 +70,7 @@
 #' head(pack_years2010)
 #'
 #' pack_years2012 <- rec_with_table(
-#'   data_source = cchs2012, variable_details = variableDetails,
+#'   data_source = cchs2012, variable_details = variable_details,
 #'   dataset_name = "cchs2012", variables = c(
 #'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",

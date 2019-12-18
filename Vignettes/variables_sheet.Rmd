@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-This vignette describes how the `variables.csv` worksheet is organized and how to find variables that you can transform. See also the vignette `variableDetails.csv`. The vignette [Using cchsflow](https://big-life-lab.github.io/cchsflow/articles/usingcchsflow.html) provides examples of how to use the two worksheeets with the [`bllflow` package](http://bllflow.projectbiglife.ca). 
+This vignette describes how the `variables.csv` worksheet is organized and how to find variables that you can transform. See also the vignette `variable_details.csv`. The vignette [Using cchsflow](https://big-life-lab.github.io/cchsflow/articles/usingcchsflow.html) provides examples of how to use the two worksheeets. 
 
 Read `variables.csv`
 
@@ -68,6 +68,6 @@ Derived variables follow the same naming conventions as CCHS variables when bein
 
 ## Contributing or customizing `variables.csv`
 
-We recommend that you copy `variables.csv` with the variables that you use for your project. You can include only the variables that you use for your project, thereby providing a reference for your project. `variables.csv` is a CSV file to allow use `cchsflow` within a teams that do not use R or have programming experience. `variables.csv` can also be used with `bllflow` for further data cleaning and preprocessing.
+We recommend that you copy `variables.csv` with the variables that you use for your project. You can include only the variables that you use for your project, thereby providing a reference for your project. `variables.csv` is a CSV file to allow use `cchsflow` within a teams that do not use R or have programming experience. 
 
 You can create your own transformed or derived variables by using the cchsflow `variables.csv` as a template. We welcome [issues](https://github.com/Big-Life-Lab/cchsflow/issues) for comments to existing variables in `variables.csv. Also welcomed are PR for new transformations that you feel are helpful for others who use the CCHS data. See [Contributing]().

@@ -30,7 +30,7 @@ This is one of 3 functions used to create a derived variable
 }
 \examples{
 # Using resp_condition_fun1() to create pack-years values across CCHS cycles
-# (2009-2014) resp_condition_fun1() is specified in variableDetails.csv along
+# (2009-2014) resp_condition_fun1() is specified in variable_details.csv along
 # with the CCHS variables and cycles included.
 
 # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
@@ -41,7 +41,7 @@ This is one of 3 functions used to create a derived variable
 library(cchsflow)
 
 resp2010 <- rec_with_table(
-  data_source = cchs2010, variable_details = variableDetails,
+  data_source = cchs2010, variable_details = variable_details,
   dataset_name = "cchs2010", variables = c(
     "DHHGAGE_cont", "CCC_091",
     "resp_condition_der"
@@ -51,7 +51,7 @@ resp2010 <- rec_with_table(
 head(resp2010)
 
 resp2012 <- rec_with_table(
-  data_source = cchs2012, variable_details = variableDetails,
+  data_source = cchs2012, variable_details = variable_details,
   dataset_name = "cchs2012", variables = c(
     "DHHGAGE_cont", "CCC_091",
     "resp_condition_der"

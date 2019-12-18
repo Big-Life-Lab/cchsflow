@@ -23,7 +23,7 @@
 #'
 #' @examples
 #' # Using pct_time_fun() to create percent time values across CCHS cycles
-#' # pct_time_fun() is specified in variableDetails.csv along with the CCHS
+#' # pct_time_fun() is specified in variable_details.csv along with the CCHS
 #' # variables and cycles included.
 #'
 #' # To transform Pct_time_der across cycles, use RecWTable() for each CCHS
@@ -34,7 +34,7 @@
 #'
 #' library(cchsflow)
 #' pct_time2010 <- rec_with_table(
-#'   data_source = cchs2010, variable_details = variableDetails,
+#'   data_source = cchs2010, variable_details = variable_details,
 #'   dataset_name = "cchs2010", variables = c(
 #'     "DHHGAGE_cont", "SDCGCBG",
 #'     "SDCGRES", "Pct_time_der"
@@ -43,7 +43,7 @@
 #' head(pct_time2010)
 #'
 #' pct_time2012 <- rec_with_table(
-#'   data_source = cchs2012, variable_details = variableDetails,
+#'   data_source = cchs2012, variable_details = variable_details,
 #'   dataset_name = "cchs2012", variables = c(
 #'     "DHHGAGE_cont", "SDCGCBG",
 #'     "SDCGRES", "Pct_time_der"

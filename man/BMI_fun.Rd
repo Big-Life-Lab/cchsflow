@@ -53,7 +53,7 @@ In earlier CCHS cycles (2001 and 2003), height was collected in inches;
 }
 \examples{
 # Using bmi_fun() to create BMI values across cycles
-# bmi_fun() is specified in variableDetails.csv along with the CCHS variables
+# bmi_fun() is specified in variable_details.csv along with the CCHS variables
 # and cycles included.
 
 # To transform the derived BMI variable, use rec_with_table() for each cycle
@@ -63,7 +63,7 @@ In earlier CCHS cycles (2001 and 2003), height was collected in inches;
 library(cchsflow)
 bmi2010 <- rec_with_table(
   data_source = cchs2010, variable_details =
-    variableDetails, dataset_name = "cchs2010", variables = c(
+    variable_details, dataset_name = "cchs2010", variables = c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
@@ -73,7 +73,7 @@ head(bmi2010)
 
 bmi2012 <- rec_with_table(
   data_source = cchs2012, variable_details =
-    variableDetails, dataset_name = "cchs2012", variables = c(
+    variable_details, dataset_name = "cchs2012", variables = c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )

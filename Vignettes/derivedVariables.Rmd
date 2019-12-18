@@ -24,7 +24,7 @@ There are two types derived variables in the CCHS surveys. Both types of dervive
 
 While BMI is calculated across all CCHS cycles, the method in which it is calculated varies across CCHS cycles, leading to misclassification error that might affect your study. As such, a derived variable for BMI has been created in `cchsflow` that uses harmonized height (HWTGHTM) and weight (HWTGWTK) variables across all CCHS cycles.
 
-Using `RecWTable()` you can transform the derived BMI variable across multiple CCHS cycles and create a transformed dataset.
+Using `rec_with_table()` you can transform the derived BMI variable across multiple CCHS cycles and create a transformed dataset.
 
 ```{r, eval = FALSE}
 install.packages("devtools")
@@ -62,12 +62,12 @@ library(cchsflow)
 data(cchs2003)
 data(cchs2010)
 
-BMI2003 <- RecWTable(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+BMI2003 <- rec_with_table(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 
-BMI2010 <- RecWTable(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+BMI2010 <- rec_with_table(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 ```
 
-Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `RecWTable()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.
+Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `rec_with_table()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.
 
 Using `bind_rows()`, you can then combine your transformed datasets.
 

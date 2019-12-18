@@ -9,7 +9,7 @@ set_data_labels(data_to_label, variable_details, variables_sheet = NULL)
 \arguments{
 \item{data_to_label}{newly transformed dataset}
 
-\item{variable_details}{variableDetails.csv}
+\item{variable_details}{variable_details.csv}
 
 \item{variables_sheet}{variables.csv}
 }

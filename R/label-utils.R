@@ -2,7 +2,7 @@
 #' @description sets labels for transformed datasets
 #'
 #' @param data_to_label newly transformed dataset
-#' @param variable_details variableDetails.csv
+#' @param variable_details variable_details.csv
 #' @param variables_sheet variables.csv
 #' @export
 set_data_labels <-
