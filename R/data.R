@@ -17,22 +17,22 @@
 #' str(variables)
 NULL
 
-#' variableDetails.csv
+#' variable_details.csv
 #'
 #' This dataset provides details on how variables are specified in cchsflow.
 #'
 #' See the below link for more details about how the worksheet is structured
 #' \url{https://big-life-lab.github.io/cchsflow/articles/variablesDetails.html}
 #'
-#' @name variableDetails
-#' @aliases variableDetails
+#' @name variable_details
+#' @aliases variable_details
 #' @docType data
-#' @return \item{variableDetails}{a data frame}
+#' @return \item{variable_details}{a data frame}
 #'
 #' @keywords datasets
 #' @examples
-#' data(variableDetails)
-#' str(variableDetails)
+#' data(variable_details)
+#' str(variable_details)
 NULL
 
 #' 2001 CCHS data
