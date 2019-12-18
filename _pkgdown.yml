@@ -59,6 +59,11 @@ reference:
     - resp_condition_fun2
     - resp_condition_fun3
     - age_cat_fun
+  - title: "Worksheets"
+    desc: Model Specification Sorksheets
+    contents: 
+    - variables
+    - variable_details
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:
