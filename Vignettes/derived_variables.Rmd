@@ -18,7 +18,7 @@ There are two types derived variables in the CCHS surveys. Both types of dervive
 - Variable mapping - mapping two or more variables into a single variable.
 - Variables that derived using math equations - BMI is an example. where BMI = weight / height*height. 
 
-`cchsflow` calculates these more complex dervived variables using functions that are referenced in `variableDetails.csv` within `variableStart` with the prefix 'DerivedVar::'. For example,  For BMI (`HWTGBMI_der`) includes `DerivedVar::[HWTGHTM, HWTGWTK]`, which indicates a function with two starting variables (`HWTGHTM, HWTGWTK`).
+`cchsflow` calculates these more complex dervived variables using functions that are referenced in `variable_details.csv` within `variableStart` with the prefix 'DerivedVar::'. For example,  For BMI (`HWTGBMI_der`) includes `DerivedVar::[HWTGHTM, HWTGWTK]`, which indicates a function with two starting variables (`HWTGHTM, HWTGWTK`).
 
 ## Example - Body Mass Index (BMI)
 
@@ -62,9 +62,9 @@ library(cchsflow)
 data(cchs2003)
 data(cchs2010)
 
-BMI2003 <- rec_with_table(dataSource = cchs2003, variableDetails = variableDetails, datasetName = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+bmi2003 <- rec_with_table(data_source = cchs2003, variable_details = variable_details, dataset_name = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 
-BMI2010 <- rec_with_table(dataSource = cchs2010, variableDetails = variableDetails, datasetName = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+bmi2010 <- rec_with_table(data_source = cchs2010, variable_details = variable_details, dataset_name = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 ```
 
 Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `rec_with_table()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.
@@ -78,11 +78,11 @@ library(kableExtra)
 ```
 
 ```{r, echo=FALSE, message=FALSE}
-combinedBMI <- bind_rows(BMI2003, BMI2010)
+combined_bmi <- bind_rows(bmi2003, bmi2010)
 
-kable(combinedBMI[1:10, ])
+kable(combined_bmi[1:10, ])
 ```
 
 ## Creating a derived variable
 
-Creating a derived requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here](articles/howtoaddvariables.html)
+Creating a derived requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here](articles/how_to_add_variables.html)

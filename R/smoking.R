@@ -63,7 +63,7 @@
 #'   dataset_name = "cchs2010", variables = c(
 #'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
-#'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "Pack_years_der"
+#'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
 #'   )
 #' )
 #'
@@ -74,7 +74,7 @@
 #'   dataset_name = "cchs2012", variables = c(
 #'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
-#'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "Pack_years_der"
+#'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
 #'   )
 #' )
 #'

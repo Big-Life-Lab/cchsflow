@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-This vignette describes how the `variables.csv` worksheet is organized and how to find variables that you can transform. See also the vignette `variable_details.csv`. The vignette [Using cchsflow](https://big-life-lab.github.io/cchsflow/articles/usingcchsflow.html) provides examples of how to use the two worksheeets. 
+This vignette describes how the `variables.csv` worksheet is organized and how to find variables that you can transform. See also the vignette `variable_details.csv`. The vignette [Using cchsflow](https://big-life-lab.github.io/cchsflow/articles/using_cchsflow.html) provides examples of how to use the two worksheeets. 
 
 Read `variables.csv`
 

@@ -26,8 +26,8 @@
 #' # pct_time_fun() is specified in variable_details.csv along with the CCHS
 #' # variables and cycles included.
 #'
-#' # To transform Pct_time_der across cycles, use RecWTable() for each CCHS
-#' # cycle and specify Pct_time_der, along with age (DHHGAGE_cont), whether or
+#' # To transform pct_time_der across cycles, use rec_with_table() for each CCHS
+#' # cycle and specify pct_time_der, along with age (DHHGAGE_cont), whether or
 #' # not someone was born in Canada (SDCGCBG), how long someone has lived in
 #' # Canada (SDCGRES). Then by using bind_rows(), you can combine Pct_time_der
 #' # across cycles
@@ -37,7 +37,7 @@
 #'   data_source = cchs2010, variable_details = variable_details,
 #'   dataset_name = "cchs2010", variables = c(
 #'     "DHHGAGE_cont", "SDCGCBG",
-#'     "SDCGRES", "Pct_time_der"
+#'     "SDCGRES", "pct_time_der"
 #'   )
 #' )
 #' head(pct_time2010)
@@ -46,7 +46,7 @@
 #'   data_source = cchs2012, variable_details = variable_details,
 #'   dataset_name = "cchs2012", variables = c(
 #'     "DHHGAGE_cont", "SDCGCBG",
-#'     "SDCGRES", "Pct_time_der"
+#'     "SDCGRES", "pct_time_der"
 #'   )
 #' )
 #' tail(pct_time2012)
