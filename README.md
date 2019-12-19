@@ -63,7 +63,6 @@ Care must be taken to understand how specific variable transformation and harmon
 1. `variables.csv` - a list of variables that can be transformed across CCHS surveys.  
 2. `variable_details.csv` - information that describes how the variables are recoded.
 3. Vignettes describe how to use R to transform or generate new derived variables that are listed in `variables.csv`. Transformations are performed using `rec_with_table()`. `variables.csv` and `variable_details.csv` can be used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
-3. Codebooks (metadata documents) for the original CCHS surveys (see [CCHS_DDI](https://github.com/Big-Life-Lab/cchsflow/tree/master/inst/extdata/CCHS_DDI) folder). The PDF and DDI documents are a resource to examine how variables change across survey cycles. 
 
 This repository does not include the CCHS data. Information on how to access the CCHS data can is [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). The Canadian university community can also access the CCHS through [ODESI](http://odesi2.scholarsportal.info/webview/) (see health/Canada/Canadian Community Health Survey).
 
