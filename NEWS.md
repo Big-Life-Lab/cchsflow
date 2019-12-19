@@ -5,11 +5,13 @@
 
 - Submitted package to CRAN
 
+
 ## Features
 
 - Switched formatting to snake_case
 - Corrections to "using cchsflow" article
 - Removed DDI files 
+- Updated `LICENSE`
 
   
 ## Dependency Changes
