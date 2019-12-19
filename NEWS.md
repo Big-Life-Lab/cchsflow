@@ -1,18 +1,22 @@
-# cchsflow 1.0.0 (Latest build)
+# cchsflow 1.0.1 (Latest build)
+2019-12-19
+
+## Features
+- Updated `LICENSE`
+- Bug fixes to hyperlinks in README.md and NEWS.md
+
+# cchsflow 1.0.0
 2019-12-18
 
 ## News
 
 - Submitted package to CRAN
 
-
 ## Features
 
 - Switched formatting to snake_case
 - Corrections to "using cchsflow" article
 - Removed DDI files 
-- Updated `LICENSE`
-
   
 ## Dependency Changes
 
@@ -30,13 +34,13 @@
 
 ## Features
 
-- Updated example in the [introduction](../index.html) to reflect data that is now included in the cchsflow package.
+- Updated example in the [introduction](https://big-life-lab.github.io/cchsflow/index.html) to reflect data that is now included in the cchsflow package.
 - Updates to vignettes to reflect latest version of package
 - Updates to variables.csv & variableDetails.csv
 
 ### Variables
 
--  <font color="green">**New**</font> [DHHGAGE_C](../reference/age_cat_fun.html) - categorical age variable that groups various age categories across all CCHS cycles. Based on the continuous age variable (`DHHGAGE_cont`) that is also harmonious across all CCHS cycles.
+-  <font color="green">**New**</font> [DHHGAGE_C](https://big-life-lab.github.io/cchsflow/reference/age_cat_fun.html) - categorical age variable that groups various age categories across all CCHS cycles. Based on the continuous age variable (`DHHGAGE_cont`) that is also harmonious across all CCHS cycles.
 -  <font color = "green">**New**</font> WTS_M - sampling weight variable
 -  <font color = "green">**New**</font> DHHGHSZ - household size
 -  <font color = "green">**New**</font> INCGHH_A, INCGHH_B, INCGHH_C, INCGHH_cont - Total household income from all sources. The categories for household income vary across CCHS cycles so three categorical variables were added along with a continuous variable that harmonizes household income across all CCHS cycles by taking the midpoint of each category.
