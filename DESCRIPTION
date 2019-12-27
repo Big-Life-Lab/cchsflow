@@ -24,8 +24,6 @@ Authors@R: c(
           family = "Sequeira",
           role = c("ctb"),
           email = "ysequeira@ohri.ca"))
-    person(given = "The Ottawa Hospital",
-          role = c("cph"))
 Depends:
   R (>= 3.2),
   haven (>= 1.1.2),

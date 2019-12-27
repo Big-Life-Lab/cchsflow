@@ -15,6 +15,10 @@
 #'
 #' @param ALWDWKY cchsflow variable name for number of drinks consumed in the
 #'  past week
+#'  
+#' @examples 
+#' library(cchsflow) 
+#'  ?ALWDWKY
 #'
 #' @export
 ALWDWKY <- function(ALWDWKY) {
@@ -33,7 +37,11 @@ ALWDWKY <- function(ALWDWKY) {
 #'  how it was derived remains consistent.
 #'
 #' @param ALWDDLY cchsflow variable name for average daily alcohol consumption
-#'
+#' 
+#' @examples 
+#' library(cchsflow)
+#'  ?ALWDDLY
+#' 
 #' @export
 ALWDDLY <- function(ALWDDLY) {
   # this is for documentation purposes only
@@ -64,6 +72,10 @@ ALWDDLY <- function(ALWDDLY) {
 #'  earlier cycles of the CCHS.
 #'
 #' @param ALCDTYP cchsflow variable name for type of drinker
+#' 
+#' @examples 
+#' library(cchsflow)  
+#'  ?ALCDTYP
 #'
 #' @export
 ALCDTYP <- function(ALCDTYP) {
@@ -90,7 +102,11 @@ ALCDTYP <- function(ALCDTYP) {
 #'  distinguish between former and never drinkers.
 #'
 #' @param ALCDTTM cchsflow variable name for type of drinker (12 months)
-#'
+#' 
+#' @examples 
+#' library(cchsflow)  
+#'  ?ALCDTTM
+#' 
 #' @export
 ALCDTTM <- function(ALCDTTM) {
   # this is for documentation purposes only

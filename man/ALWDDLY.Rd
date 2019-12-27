@@ -20,3 +20,8 @@ ALWDDLY(ALWDDLY)
 This variable is present in every CCHS cycle used in cchsflow, and
  how it was derived remains consistent.
 }
+\examples{
+library(cchsflow)
+ ?ALWDDLY
+
+}
