@@ -5,7 +5,7 @@ Version: 1.0.1
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
-           role = c("aut"),
+           role = c("aut", "cph"),
            email = "dmanuel@ohri.ca",
            comment = c(ORCID = "0000-0003-0912-0845")),
     person(given = "Warsame",
@@ -24,6 +24,8 @@ Authors@R: c(
           family = "Sequeira",
           role = c("ctb"),
           email = "ysequeira@ohri.ca"))
+    person(given = "The Ottawa Hospital",
+          role = c("cph"))
 Depends:
   R (>= 3.2),
   haven (>= 1.1.2),
@@ -31,8 +33,10 @@ Depends:
   sjlabelled (>= 1.0.17),
   stringr (>= 1.2.0),
   magrittr
-Description: Variable transformation and harmonization for the Canadian Community Health Survey from
-            2001 to 2014.
+Description: Variable transformation and harmonization for the Canadian Community Health Survey (CCHS) from
+            2001 to 2014. This package transforms and harmonizes variables from each CCHS cycle into a standardized
+            set of variables. This package is useful for researchers interested in using Canadian population health data
+            across multiple years.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
