@@ -66,18 +66,12 @@
 #' @export
 pct_time_fun <-
   function(DHHGAGE_cont, SDCGCBG, SDCGRES) {
-    if_else2(
-      DHHGAGE_cont > 0, DHHGAGE_cont, NA
-    )
+    DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont, NA)
     SDCGRES_fun <- function(SDCGRES) {
-      if_else2(
-        SDCGRES == 1, 4.5,
-        if_else2(SDCGRES == 2, 15, NA)
-      )
+      if_else2(SDCGRES == 1, 4.5,
+               if_else2(SDCGRES == 2, 15, NA))
     }
     SDCGRES <- SDCGRES_fun(SDCGRES)
-    if_else2(
-      SDCGCBG == 1, 1,
-      if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont), NA)
-    )
+    if_else2(SDCGCBG == 1, 1,
+             if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont), NA))
   }
