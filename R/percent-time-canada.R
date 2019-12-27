@@ -66,6 +66,9 @@
 #' @export
 pct_time_fun <-
   function(DHHGAGE_cont, SDCGCBG, SDCGRES) {
+    if_else2(
+      DHHGAGE_cont > 0, DHHGAGE_cont, NA
+    )
     SDCGRES_fun <- function(SDCGRES) {
       if_else2(
         SDCGRES == 1, 4.5,
