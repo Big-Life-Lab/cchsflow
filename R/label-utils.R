@@ -6,6 +6,40 @@
 #' @param data_to_label newly transformed dataset
 #' @param variable_details variable_details.csv
 #' @param variables_sheet variables.csv
+#' 
+#' @return labeled data_to_label
+#' 
+#' @examples 
+#' library(cchsflow)
+#' bmi2010 <- rec_with_table(
+#'   data_source = cchs2010, variable_details =
+#'     variable_details, dataset_name = "cchs2010", variables = c(
+#'     "HWTGHTM",
+#'     "HWTGWTK", "HWTGBMI_der"
+#'   )
+#' )
+#'
+#' head(bmi2010)
+#'
+#' bmi2012 <- rec_with_table(
+#'   data_source = cchs2012, variable_details =
+#'     variable_details, dataset_name = "cchs2012", variables = c(
+#'     "HWTGHTM",
+#'     "HWTGWTK", "HWTGBMI_der"
+#'   )
+#' )
+#'
+#' tail(bmi2012)
+#'
+#' combined_bmi <- bind_rows(bmi2010, bmi2012)
+#' 
+#' library(sjlabelled)
+#' 
+#' get_label(combined_bmi)
+#' 
+#' labeled_combined_data <- set_data_labels(combined_bmi, variable_details, variables)
+#' 
+#' get_label(labeled_combined_data) 
 #' @export
 set_data_labels <-
   function(data_to_label,

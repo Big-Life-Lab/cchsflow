@@ -7,6 +7,28 @@
 #'
 #' @param v1 variable 1
 #' @param v2 variable 2
+#' 
+#' @return boolean value of if v1 and v2 are equal
+#' 
+#' @examples 
+#' library(cchsflow)
+#' is_equal(1,2)
+#' # FALSE
+#' 
+#' is_equal(1,1)
+#' # TRUE
+#' 
+#' 1==NA
+#' # NA
+#' 
+#' is_equal(1,NA)
+#' # FALSE
+#' 
+#' NA==NA
+#' # NA
+#' 
+#' is_equal(NA,NA)
+#' # TRUE
 #' @export
 is_equal <- function(v1, v2) {
   same <- (v1 == v2) | (is.na(v1) & is.na(v2))
@@ -95,6 +117,32 @@ is_equal <- function(v1, v2) {
 #' @param custom_function_path path to location of the function to load
 #'
 #' @return a dataframe that is recoded according to rules in variable_details.
+#' 
+#' @examples 
+#' library(cchsflow)
+#' bmi2010 <- rec_with_table(
+#'   data_source = cchs2010, variable_details =
+#'     variable_details, dataset_name = "cchs2010", variables = c(
+#'     "HWTGHTM",
+#'     "HWTGWTK", "HWTGBMI_der"
+#'   )
+#' )
+#'
+#' head(bmi2010)
+#'
+#' bmi2012 <- rec_with_table(
+#'   data_source = cchs2012, variable_details =
+#'     variable_details, dataset_name = "cchs2012", variables = c(
+#'     "HWTGHTM",
+#'     "HWTGWTK", "HWTGBMI_der"
+#'   )
+#' )
+#'
+#' tail(bmi2012)
+#'
+#' combined_bmi <- bind_rows(bmi2010, bmi2012)
+#' head(combined_bmi)
+#' tail(combined_bmi)
 #' @importFrom haven tagged_na
 #' @importFrom stringr str_match
 #' @importFrom dplyr rowwise select do
