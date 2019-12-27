@@ -23,10 +23,10 @@ Authors@R: c(
     person(given = "Yulric", 
           family = "Sequeira",
           role = c("ctb"),
-          email = "ysequeira@ohri.ca"))
+          email = "ysequeira@ohri.ca"),
     person(given = "The Ottawa Hospital",
           role = c("cph"),
-          email = "dmanuel@ohri.ca")
+          email = "dmanuel@ohri.ca"))
 Depends:
   R (>= 3.2),
   haven (>= 1.1.2),
