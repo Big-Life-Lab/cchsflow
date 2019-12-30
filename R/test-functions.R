@@ -70,4 +70,34 @@
 # resp_condition_fun2(40, 1, 1, 1)
 # expected output: 1
 
+# Testing resp_condition_fun3() when age is out of range
+# resp_condition_fun3(-1, 1, 1)
+# expected output: NA
 
+# Testing resp_condition_fun3() when COPD/Emphys is out of range
+# resp_condition_fun3(35, 4, 1)
+# expected output: NA
+
+# Testing resp_condition_fun3() when bronchitis is out of range
+# resp_condition_fun3(35, 1, 4)
+# expected output: NA
+
+# Testing resp_condition_fun3() when all parameters are in range
+# resp_condition_fun3(35, 1, 1)
+# expected output: 1
+
+# Testing pack_years_fun() when SMKDSTY is out of range
+# pack_years_fun(10, 40, 6, 6, 22, 96, 12, 996, 996, 96, 96, 1)
+# expected output: NA
+
+# Testing pack_years_fun() when DHHGAGE_cont is out of range
+# pack_years_fun(1, -1, 6, 6, 22, 96, 12, 996, 996, 96, 96, 1)
+# expected output: NA
+
+# Testing pack_years_fun() when SMKG203_cont is out of range
+# pack_years_fun(1, 40, 6, 6, 100, 96, 12, 996, 996, 96, 96, 1)
+# expected output: NA
+
+# Testing pack_years_fun() when all parameters in range
+# pack_years_fun(1, 40, 6, 6, 22, 96, 12, 996, 996, 96, 96, 1)
+# expected output: 10.8

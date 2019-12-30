@@ -61,7 +61,7 @@
 resp_condition_fun1 <-
   function(DHHGAGE_cont, CCC_091) {
     if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont > 35) & CCC_091 == 1), 1,
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) & CCC_091 == 1), 1,
       if_else2(
         ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) & CCC_091 == 1), 2,
         if_else2(CCC_091 == 2, 3, NA)
@@ -135,7 +135,7 @@ resp_condition_fun1 <-
 resp_condition_fun2 <-
   function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A) {
     if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont > 35) & 
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) & 
          (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 1,
       if_else2(
         ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) & 
@@ -209,7 +209,7 @@ resp_condition_fun2 <-
 resp_condition_fun3 <-
   function(DHHGAGE_cont, CCC_091, CCC_91A) {
     if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont > 35) & 
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) & 
          (CCC_091 == 1 | CCC_91A == 1)), 1,
       if_else2(
         ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) & 
