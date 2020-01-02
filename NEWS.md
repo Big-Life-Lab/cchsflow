@@ -1,3 +1,5 @@
+- Changed pct_time_fun() output for age bellow 0 to NA from NA_real_
+
 # cchsflow 1.0.1 (Latest build)
 2019-12-19
 

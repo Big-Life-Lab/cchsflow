@@ -89,6 +89,13 @@ pack_years_fun <-
   function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont,
            SMKG207_cont, SMK_204, SMK_05B,
            SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
+    # Age verification
+    if (is.na(DHHGAGE_cont)) {
+      return(NA)
+    } else if (DHHGAGE_cont < 0) {
+      return(NA)
+    }
+    
     # Time since quit for former daily smokers
     tsq_ds_fun <- function(SMK_09A_B, SMKG09C) {
       SMKG09C <-
