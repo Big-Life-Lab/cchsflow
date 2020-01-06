@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Loading the necessary packages
 
-The `rec_with_table()` and `set_data_labels()` functions are part of cchsflow. `rec_with_table()` is used to transform CCHS variables to a common name. `set_data_labels()` reapplies labels that are lost during the combination process after transforming each CCHS dataset. `variables.csv` & `variable_details.csv` are also saved in the cchsflow package as `variables` & `variable_details`. This means you will need to install & load the page onto your environment. Install & load the package onto your environment.
+The `rec_with_table()` and `set_data_labels()` functions are part of cchsflow. `rec_with_table()` is used to transform CCHS variables to a common name. `set_data_labels()` reapplies labels that are lost during the combination process after transforming each CCHS dataset. `variables.csv` & `variable_details.csv` are also saved in the cchsflow package as `variables` & `variable_details`. This means you will need to install & load the package onto your environment. Install & load the package onto your environment.
 
 ```{r eval= FALSE}
 install.packages("devtools")
