@@ -97,22 +97,22 @@ is_equal <- function(v1, v2) {
 #'     and all values from 3 to 5 into NA in the new variable)}
 #' }
 #'
-#' @param data_source A dataframe containing the variables to be recoded.
+#' @param data A dataframe containing the variables to be recoded.
 #' @param variable_details A dataframe containing the specifications (rules)
 #' for recoding.
 #' @param dataset_name String, the name of the dataset containing the
 #' to be recoded.
+#' @param variables character vector containing variable names to recode or
+#' a variables csv containing additional variable info
 #' @param else_value Value (string, number, integer, logical or NA) that is used
 #' to replace any values that are outside the specified ranges
 #' (no rules for recoding).
 #' @param append_to_data Logical, if \code{TRUE} (default), recoded variables
-#' will be appended to the data_source.
+#' will be appended to the data.
 #' @param log Logical, if \code{FALSE} (default), a log of recoding will
 #' not be printed.
 #' @param print_note Logical, if \code{FALSE} (default), will not print the
 #' content inside the `Note`` column of the variable being recoded.
-#' @param variables character vector containing variable names to recode or
-#' a variables csv containing additional variable info
 #' @param var_labels labels vector to attach to variables in variables
 #' @param custom_function_path path to location of the function to load
 #'
@@ -121,7 +121,7 @@ is_equal <- function(v1, v2) {
 #' @examples 
 #' library(cchsflow)
 #' bmi2010 <- rec_with_table(
-#'   data_source = cchs2010, variable_details =
+#'   data = cchs2010, variable_details =
 #'     variable_details, dataset_name = "cchs2010", variables = c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
@@ -131,7 +131,7 @@ is_equal <- function(v1, v2) {
 #' head(bmi2010)
 #'
 #' bmi2012 <- rec_with_table(
-#'   data_source = cchs2012, variable_details =
+#'   data = cchs2012, variable_details =
 #'     variable_details, dataset_name = "cchs2012", variables = c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
@@ -150,7 +150,7 @@ is_equal <- function(v1, v2) {
 #' @export
 
 rec_with_table <-
-  function(data_source,
+  function(data,
            variable_details,
            dataset_name,
            else_value = NA,
@@ -167,15 +167,15 @@ rec_with_table <-
 
     # ---- Step 1: Detemine if the passed data is a list or single database
     append_non_db_columns <- FALSE
-    if (class(data_source) == "list" &&
-      length(dataset_name) == length(data_source)) {
+    if (class(data) == "list" &&
+      length(dataset_name) == length(data)) {
       for (data_name in dataset_name) {
         # ---- Step 2A: Verify that the passed name exists in the passed data
 
-        if (!is.null(data_source[[data_name]])) {
-          data_source[[data_name]] <- recode_call(
+        if (!is.null(data[[data_name]])) {
+          data[[data_name]] <- recode_call(
             variables = variables,
-            data_source = data_source[[data_name]],
+            data = data[[data_name]],
             dataset_name = dataset_name,
             print_note = print_note,
             else_value = else_value,
@@ -191,16 +191,16 @@ rec_with_table <-
               "The data",
               data_name,
               "is missing from the passed list please verify the names are
-              correct in the data_source list and the dataset_name list"
+              correct in the data list and the dataset_name list"
             )
           )
         }
       }
-    } else if ("data.frame" %in% class(data_source) &&
+    } else if ("data.frame" %in% class(data) &&
       length(dataset_name) == 1) {
-      data_source <- recode_call(
+      data <- recode_call(
         variables = variables,
-        data_source = data_source,
+        data = data,
         dataset_name = dataset_name,
         print_note = print_note,
         else_value = else_value,
@@ -222,13 +222,13 @@ rec_with_table <-
         )
     }
 
-    return(data_source)
+    return(data)
   }
 
 # Creates inputs and runs recode functions
 recode_call <-
   function(variables,
-           data_source,
+           data,
            dataset_name,
            print_note,
            else_value,
@@ -301,7 +301,7 @@ recode_call <-
 
     rec_data <-
       recode_columns(
-        data_source = data_source,
+        data = data,
         variables_to_process = all_variables_detected,
         data_name = dataset_name,
         log = log,
@@ -321,19 +321,19 @@ recode_call <-
     }
 
     if (append_to_data) {
-      data_source <- cbind(data_source, rec_data)
+      data <- cbind(data, rec_data)
     } else {
-      data_source <- rec_data
+      data <- rec_data
     }
 
-    return(data_source)
+    return(data)
   }
 
 #' @title Get Data Variable Name
 #'
 #' @name get_data_variable_name
 #'
-#' @description Retrieves the name of the column inside data_source to
+#' @description Retrieves the name of the column inside data to
 #' use for calculations
 #'
 #' @param data_name name of the database being checked
@@ -342,7 +342,7 @@ recode_call <-
 #' information on this variables
 #' @param variable_being_checked the name of the recoded variable
 #'
-#' @return the data_source equivalent of variable_being_checked
+#' @return the data equivalent of variable_being_checked
 get_data_variable_name <-
   function(data_name,
            data,
@@ -390,9 +390,9 @@ get_data_variable_name <-
 #' recode_columns
 #'
 #' Recodes columns from passed row and returns just table with those columns
-#' and same rows as the data_source
+#' and same rows as the data
 #'
-#' @param data_source The source database
+#' @param data The source database
 #' @param variables_to_process rows from variable details that are applicable
 #' to this DB
 #' @param data_name Name of the database being passed
@@ -402,7 +402,7 @@ get_data_variable_name <-
 #'
 #' @return Returns recoded and labeled data
 recode_columns <-
-  function(data_source,
+  function(data,
            variables_to_process,
            data_name,
            log,
@@ -426,7 +426,7 @@ recode_columns <-
     interval_present <- TRUE
     valid_intervals <- c("[,]", "[,)", "(,]")
     interval_default <- "[,)"
-    recoded_data <- data_source[, 0]
+    recoded_data <- data[, 0]
     if (is.null(rec_variables_to_process[[pkg.globals$argument.Interval]])) {
       interval_present <- FALSE
     }
@@ -449,9 +449,9 @@ recode_columns <-
           data_name = data_name,
           row_being_checked = first_row,
           variable_being_checked = variable_being_checked,
-          data = data_source
+          data = data
         )
-      if (is.null(data_source[[data_variable_being_checked]])) {
+      if (is.null(data[[data_variable_being_checked]])) {
         warning(
           paste(
             "Data",
@@ -499,10 +499,10 @@ recode_columns <-
                 data_name = data_name,
                 row_being_checked = first_row,
                 variable_being_checked = variable_being_checked,
-                data = data_source
+                data = data
               )
             recoded_data[variable_being_checked] <-
-              data_source[data_variable_being_checked]
+              data[data_variable_being_checked]
           } else {
             recoded_data[variable_being_checked] <- else_value
           }
@@ -544,7 +544,7 @@ recode_columns <-
                 data_name = data_name,
                 row_being_checked = row_being_checked,
                 variable_being_checked = variable_being_checked,
-                data = data_source
+                data = data
               )
 
             # Recode the variable
@@ -573,7 +573,7 @@ recode_columns <-
               }
               valid_row_index <- compare_value_based_on_interval(
                 compare_columns = data_variable_being_checked,
-                data_source = data_source,
+                data = data,
                 left_boundary = from_values[[1]],
                 right_boundary = from_values[[2]],
                 interval = interval
@@ -586,7 +586,7 @@ recode_columns <-
               }
               valid_row_index <- compare_value_based_on_interval(
                 compare_columns = data_variable_being_checked,
-                data_source = data_source,
+                data = data,
                 left_boundary = from_values[[1]],
                 right_boundary = from_values[[2]],
                 interval = interval
@@ -604,7 +604,7 @@ recode_columns <-
                 variable_being_checked]]$type)
             if (is_equal(value_recorded, "copy")) {
               value_recorded <-
-                data_source[valid_row_index, data_variable_being_checked]
+                data[valid_row_index, data_variable_being_checked]
             }
             recoded_data[valid_row_index, variable_being_checked] <-
               value_recorded
@@ -672,8 +672,8 @@ recode_columns <-
 #'
 #' @param left_boundary the min value
 #' @param right_boundary the max value
-#' @param data_source the data that contains values being compared
-#' @param compare_columns The columns inside data_source being checked
+#' @param data the data that contains values being compared
+#' @param compare_columns The columns inside data being checked
 #' @param interval The scientific notation interval
 #'
 #' @return a boolean vector containing true for rows where the
@@ -681,36 +681,36 @@ recode_columns <-
 compare_value_based_on_interval <-
   function(left_boundary,
            right_boundary,
-           data_source,
+           data,
            compare_columns,
            interval) {
     return_boolean <- vector()
     if (suppressWarnings(is.na(as.numeric(left_boundary)))) {
       return_boolean <-
-        data_source[[compare_columns]] %in% data_source[[
+        data[[compare_columns]] %in% data[[
           compare_columns]][
-            which(left_boundary == data_source[[compare_columns]])]
+            which(left_boundary == data[[compare_columns]])]
     } else {
       if (interval == "[,]") {
         return_boolean <-
-          data_source[[compare_columns]] %in% data_source[[
+          data[[compare_columns]] %in% data[[
             compare_columns]][which(
-            as.numeric(left_boundary) <= data_source[[compare_columns]] &
-              data_source[[compare_columns]] <= as.numeric(right_boundary)
+            as.numeric(left_boundary) <= data[[compare_columns]] &
+              data[[compare_columns]] <= as.numeric(right_boundary)
           )]
       } else if (interval == "[,)") {
         return_boolean <-
-          data_source[[compare_columns]] %in% data_source[[
+          data[[compare_columns]] %in% data[[
             compare_columns]][which(
-            as.numeric(left_boundary) <= data_source[[compare_columns]] &
-              data_source[[compare_columns]] < as.numeric(right_boundary)
+            as.numeric(left_boundary) <= data[[compare_columns]] &
+              data[[compare_columns]] < as.numeric(right_boundary)
           )]
       } else if (interval == "(,]") {
         return_boolean <-
-          data_source[[compare_columns]] %in% data_source[[
+          data[[compare_columns]] %in% data[[
             compare_columns]][which(
-            as.numeric(left_boundary) < data_source[[compare_columns]] &
-              data_source[[compare_columns]] <= as.numeric(right_boundary)
+            as.numeric(left_boundary) < data[[compare_columns]] &
+              data[[compare_columns]] <= as.numeric(right_boundary)
           )]
       } else {
         stop("Invalid Argument was passed")
