@@ -255,9 +255,9 @@ Using the BMI example illustrated in the [derived variables](derived_variables.h
 For this example, we will use a subset of CCHS 2003 and 2010 data.
 
 ```{r, eval=FALSE}
-bmi2003 <- rec_with_table(data = cchs2003, variable_details = variable_details, dataset_name = "cchs2003", variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"), log = TRUE)
+bmi2003 <- rec_with_table(data = cchs2003, variable_details = variable_details, dataset_name = "cchs2003", variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"), log = TRUE)
 
-bmi2010 <- rec_with_table(data = cchs2010, variable_details = variable_details, dataset_name = "cchs2010", variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_derived"), log = TRUE)
+bmi2010 <- rec_with_table(data = cchs2010, variable_details = variable_details, dataset_name = "cchs2010", variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"), log = TRUE)
 
 combined_bmi <- bind_rows(bmi2003, bmi2010)
 
