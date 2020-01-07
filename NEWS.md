@@ -1,6 +1,16 @@
-- Changed pct_time_fun() output for age bellow 0 to NA from NA_real_
+# cchsflow 1.1.0 (Latest build)
+2020-01-07
 
-# cchsflow 1.0.1 (Latest build)
+## Features
+- Updated `DESCRIPTION` to expand description of package and added The Ottawa
+Hospital as author
+- Changed `data_source` parameter in rec_with_table() to `data`; and changed
+order of parameters to have `variables` after `dataset_name`
+- Included automated testing for functions
+- Refactored functions to account for age below 0 and include warning messages
+for respiratory functions
+
+# cchsflow 1.0.1 
 2019-12-19
 
 ## Features
