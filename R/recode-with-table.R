@@ -383,7 +383,7 @@ get_data_variable_name <-
         )
       )
     }
-
+    data_variable_being_checked <- trimws(data_variable_being_checked)
     return(data_variable_being_checked)
   }
 
