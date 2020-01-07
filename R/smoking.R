@@ -59,7 +59,7 @@
 #' library(cchsflow)
 #'
 #' pack_years2010 <- rec_with_table(
-#'   data_source = cchs2010, variable_details = variable_details,
+#'   data = cchs2010, variable_details = variable_details,
 #'   dataset_name = "cchs2010", variables = c(
 #'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
@@ -70,7 +70,7 @@
 #' head(pack_years2010)
 #'
 #' pack_years2012 <- rec_with_table(
-#'   data_source = cchs2012, variable_details = variable_details,
+#'   data = cchs2012, variable_details = variable_details,
 #'   dataset_name = "cchs2012", variables = c(
 #'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",

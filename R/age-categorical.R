@@ -47,7 +47,7 @@
 #' library(cchsflow) 
 #' 
 #' cat_age2010 <- rec_with_table(
-#'    data_source = cchs2010, variable_details =
+#'    data = cchs2010, variable_details =
 #'      variable_details, dataset_name = "cchs2010", variables = c(
 #'      "DHHGAGE_cont", "DHHGAGE_C"
 #'      )
