@@ -153,11 +153,11 @@ rec_with_table <-
   function(data,
            variable_details,
            dataset_name,
+           variables = NULL,
            else_value = NA,
            append_to_data = FALSE,
            log = FALSE,
            print_note = TRUE,
-           variables = NULL,
            var_labels = NULL,
            custom_function_path = NULL) {
     # If custom Functions are passed create new environment and source
