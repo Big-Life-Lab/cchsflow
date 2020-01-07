@@ -34,8 +34,8 @@ Depends:
   sjlabelled (>= 1.0.17),
   stringr (>= 1.2.0),
   magrittr
-Description: This package focuses on variable transformation and harmonization of the Canadian Community Health Survey (CCHS) from
-            2001 to 2014. Cchsflow is useful for researchers interested in using Canadian population health data
+Description: Variable transformation and harmonization of the Canadian Community Health Survey (CCHS) from
+            2001 to 2014. This is useful for researchers interested in using Canadian population health data
             across multiple years as it helps combine variables. This package relies on rec_with_table() which was based off sjmisc rec().
             Lüdecke D (2018). sjmisc: Data and Variable Transformation Functions. Journal of Open Source Software, 3(26), 754. doi: 10.21105/joss.00754.
 License: MIT + file LICENSE
