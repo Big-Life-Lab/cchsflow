@@ -51,10 +51,10 @@ The categories in the grouped age variable (DHHGAGE) vary between
 # age_cat_fun() is specified in variable_details.csv along with the CCHS
 # variables and cycles included.
 
-# To generate DHHGAGE_C in a cycle, use rec_with_table() and specify 
+# To generate DHHGAGE_C in a cycle, use rec_with_table() and specify
 # DHHGAGE_C along with DHHGAGE_cont.
 
-library(cchsflow) 
+library(cchsflow)
 
 cat_age2010 <- rec_with_table(
    data = cchs2010, variable_details =

@@ -34,39 +34,18 @@ test_that("resp_condition_fun2 has expected output when age is out of range", {
 
 test_that("resp_condition_fun2 has expected output when
           emphysema is out of range", {
-            expect_warning(out <- resp_condition_fun2(40, 3, 1, 1),
-                           regexp =
-                             "In DHHGAGE_cont:40,
-                           CCC_91E:3,
-                           CCC_91F:1,
-                           CCC_91A:1 one or more of the respiratory arguments
-                           was outside the 1:2 allowed range however
-                           the condition is still calculated")
+            expect_warning(out <- resp_condition_fun2(40, 3, 1, 1))
             expect_equal(out, 1)
           })
 
 test_that("resp_condition_fun2 has expected output when COPD is out of range", {
-            expect_warning(out <- resp_condition_fun2(40, 1, 3, 1),
-                           regexp =
-                             "In DHHGAGE_cont:40,
-                           CCC_91E:1,
-                           CCC_91F:3,
-                           CCC_91A:1 one or more of the respiratory arguments
-                           was outside the 1:2 allowed range however
-                           the condition is still calculated")
+            expect_warning(out <- resp_condition_fun2(40, 1, 3, 1))
             expect_equal(out, 1)
           })
 
 test_that("resp_condition_fun2 has expected output when
           chronic bronchitis is out of range", {
-            expect_warning(out <- resp_condition_fun2(40, 1, 1, 3),
-                           regexp =
-                             "In DHHGAGE_cont:40,
-                           CCC_91E:1,
-                           CCC_91F:1,
-                           CCC_91A:3 one or more of the respiratory arguments
-                           was outside the 1:2 allowed range however
-                           the condition is still calculated")
+            expect_warning(out <- resp_condition_fun2(40, 1, 1, 3))
             expect_equal(out, 1)
           })
 
@@ -109,25 +88,13 @@ test_that("resp_condition_fun3 has expected output when
 
 test_that("resp_condition_fun3 has expected output when
           COPD/Emphys is out of range", {
-            expect_warning(out <- resp_condition_fun3(35, 4, 1),
-                           regexp =
-                             "In DHHGAGE_cont:35,
-                           CCC_091:4,
-                           CCC_91A:1 one or more of the respiratory arguments
-                           was outside the 1:2 allowed range however
-                           the condition is still calculated")
+            expect_warning(out <- resp_condition_fun3(35, 4, 1))
             expect_equal(out, 1)
           })
 
 test_that("resp_condition_fun3 has expected output when
           bronchitis is out of range", {
-            expect_warning(out <- resp_condition_fun3(35, 1, 4),
-                           regexp =
-                             "In DHHGAGE_cont:35,
-                           CCC_091:1,
-                           CCC_91A:4 one or more of the respiratory arguments
-                           was outside the 1:2 allowed range however
-                           the condition is still calculated")
+            expect_warning(out <- resp_condition_fun3(35, 1, 4))
             expect_equal(out, 1)
           })
 

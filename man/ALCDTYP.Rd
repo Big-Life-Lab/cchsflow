@@ -34,7 +34,7 @@ This variable is used in CCHS cycles from 2001 to 2007. How it was
  earlier cycles of the CCHS.
 }
 \examples{
-library(cchsflow)  
+library(cchsflow)
  ?ALCDTYP
 
 }

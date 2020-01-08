@@ -49,7 +49,9 @@ library(sjlabelled)
 
 get_label(combined_bmi)
 
-labeled_combined_data <- set_data_labels(combined_bmi, variable_details, variables)
+labeled_combined_data <- set_data_labels(combined_bmi,
+ variable_details,
+ variables)
 
-get_label(labeled_combined_data) 
+get_label(labeled_combined_data)
 }

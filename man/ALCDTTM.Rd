@@ -29,7 +29,7 @@ This variable was introduced in the 2007-2008 cycle of the CCHS, and
  distinguish between former and never drinkers.
 }
 \examples{
-library(cchsflow)  
+library(cchsflow)
  ?ALCDTTM
 
 }
