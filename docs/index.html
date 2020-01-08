@@ -17,8 +17,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Transforming and Harmonizing CCHS Variables">
-<meta property="og:description" content="Variable transformation and harmonization for the Canadian Community Health Survey from
-            2001 to 2014.">
+<meta property="og:description" content="Variable transformation and harmonization of the Canadian Community Health Survey (CCHS) from
+            2001 to 2014. This is useful for researchers interested in using Canadian population health data
+            across multiple years as it helps combine variables. This package relies on rec_with_table() which was based off sjmisc rec().
+            Lüdecke D (2018). sjmisc: Data and Variable Transformation Functions. Journal of Open Source Software, 3(26), 754. doi: 10.21105/joss.00754.">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -39,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -123,7 +125,9 @@
 <pre><code>    # load test cchs data - included in cchsflow
     cchs2001test &lt;- cchs2001
     
-    # `variableDetails` is a database in cchsflow that contain the instructions how to transform variables.
+    # `variableDetails` is a database in cchsflow that contain the instructions 
+    how to transform variables.
+    
     varDetails &lt;- variableDetails
     
     cchs2001_BMI &lt;- rec_with_table(data_source = cchs2001test, 
@@ -133,7 +137,9 @@
                 variables = "HWTGBMI")</code></pre>
 <p>Notes printed to console indicate issues that may affect BMI classification for your study.</p>
 <pre><code>[1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
-[1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable and missing variables as 999.96 and 999.7-999.99 respectively"
+[1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 999.6
+and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable and
+missing variables as 999.96 and 999.7-999.99 respectively"
 [1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"</code></pre>
 </div>
 <div id="important-notes" class="section level2">
@@ -204,7 +210,7 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Doug Manuel <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-0912-0845" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
+<li>Doug Manuel <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0003-0912-0845" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
 <li>Warsame Yusuf <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Rostyslav Vyuha <br><small class="roles"> Author </small>  </li>
 <li>Carol Bennett <br><small class="roles"> Author </small>  </li>

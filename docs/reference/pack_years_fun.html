@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -256,18 +256,14 @@ daily smokers</p></td>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
 
 <span class='no'>pack_years2010</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='kw'>data_source</span> <span class='kw'>=</span> <span class='no'>cchs2010</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
+  <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cchs2010</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
   <span class='kw'>dataset_name</span> <span class='kw'>=</span> <span class='st'>"cchs2010"</span>, <span class='kw'>variables</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
     <span class='st'>"SMKDSTY"</span>, <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"SMK_09A_B"</span>, <span class='st'>"SMKG09C"</span>,
     <span class='st'>"SMKG203_cont"</span>, <span class='st'>"SMKG207_cont"</span>, <span class='st'>"SMK_204"</span>, <span class='st'>"SMK_05B"</span>, <span class='st'>"SMK_208"</span>,
     <span class='st'>"SMK_05C"</span>, <span class='st'>"SMK_01A"</span>, <span class='st'>"SMKG01C_cont"</span>, <span class='st'>"pack_years_der"</span>
   )
-)</div><div class='output co'>#&gt; [1] "NOTE: CCHS 2001 has different categories from other cycles"
-#&gt; [1] "NOTE: CCHS 2001 does not include don't know (7) or refusal (8)"
-#&gt; [1] "NOTE: CCHS 2001 does not include don't know (7) or refusal (8)"
-#&gt; [1] "NOTE: BMI variable derived from the harmonized height and weight variables"
-#&gt; [1] "NOTE: PackYears variable derived from various harmonized smoking variables"
-#&gt; [1] "NOTE: Percent time in Canada derived from Age, immigration status, and time in Canada variables "</div><div class='input'>
+)
+
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>pack_years2010</span>)</div><div class='output co'>#&gt;   DHHGAGE_cont SMK_01A SMK_05B SMK_05C SMK_09A_B SMK_204 SMK_208 SMKDSTY
 #&gt; 1           22       2      NA      NA     NA(a)      NA      NA       6
 #&gt; 2           42       2      NA      NA     NA(a)      NA      NA       6
@@ -283,18 +279,14 @@ daily smokers</p></td>
 #&gt; 5           NA   NA(a)           NA           NA           0.00
 #&gt; 6         16.0   NA(a)           NA           16           9.30</div><div class='input'>
 <span class='no'>pack_years2012</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='kw'>data_source</span> <span class='kw'>=</span> <span class='no'>cchs2012</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
+  <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cchs2012</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
   <span class='kw'>dataset_name</span> <span class='kw'>=</span> <span class='st'>"cchs2012"</span>, <span class='kw'>variables</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
     <span class='st'>"SMKDSTY"</span>, <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"SMK_09A_B"</span>, <span class='st'>"SMKG09C"</span>,
     <span class='st'>"SMKG203_cont"</span>, <span class='st'>"SMKG207_cont"</span>, <span class='st'>"SMK_204"</span>, <span class='st'>"SMK_05B"</span>, <span class='st'>"SMK_208"</span>,
     <span class='st'>"SMK_05C"</span>, <span class='st'>"SMK_01A"</span>, <span class='st'>"SMKG01C_cont"</span>, <span class='st'>"pack_years_der"</span>
   )
-)</div><div class='output co'>#&gt; [1] "NOTE: CCHS 2001 has different categories from other cycles"
-#&gt; [1] "NOTE: CCHS 2001 does not include don't know (7) or refusal (8)"
-#&gt; [1] "NOTE: CCHS 2001 does not include don't know (7) or refusal (8)"
-#&gt; [1] "NOTE: BMI variable derived from the harmonized height and weight variables"
-#&gt; [1] "NOTE: PackYears variable derived from various harmonized smoking variables"
-#&gt; [1] "NOTE: Percent time in Canada derived from Age, immigration status, and time in Canada variables "</div><div class='input'>
+)
+
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>pack_years2012</span>)</div><div class='output co'>#&gt;     DHHGAGE_cont SMK_01A SMK_05B SMK_05C SMK_09A_B SMK_204 SMK_208 SMKDSTY
 #&gt; 195           42       2      NA      NA     NA(a)      NA      NA       6
 #&gt; 196           57       2      NA      NA     NA(a)      NA      NA       6
