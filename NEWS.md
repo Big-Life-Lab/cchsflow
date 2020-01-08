@@ -15,7 +15,7 @@ in details but missing in variables and vice versa
 - Added trailing white space removal to startVariable during rec_with_table
 - Added missing contributing code of conduct page
 - Minor formatting changes on vignettes and `README.md` for better clarity
-- Fixed broken links in articls
+- Fixed broken links in articles
 
 # cchsflow 1.0.1 
 2019-12-19
