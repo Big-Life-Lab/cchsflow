@@ -13,6 +13,7 @@ for respiratory functions
 in details but missing in variables and vice versa
 - Added trailing white space removal to set_data_labels
 - Added trailing white space removal to startVariable during rec_with_table
+- Minor formatting changes on vignettes and `README.md` for better clarity
 
 # cchsflow 1.0.1 
 2019-12-19

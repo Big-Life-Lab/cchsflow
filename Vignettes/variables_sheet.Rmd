@@ -24,12 +24,19 @@ Read `variables.csv`
 library(readr)
 variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
 
-cat("There are", nrow(variables), "variables, grouped in", sum(!duplicated(variables$subject)), "subjects and", sum(!duplicated(variables$section)), "sections that are available for transformation in CCHS cycles from 2001 to 2014.", "\n\n")
+cat("There are", nrow(variables), "variables, grouped in", sum(!duplicated(variables$subject)),
+    "subjects and", sum(!duplicated(variables$section)), "sections that are available for
+    transformation in CCHS cycles from 2001 to 2014.", "\n\n")
 
 ```
 
 ```{r, echo=FALSE}
-cat("You can search for variables in the table below. Try searching for the", sum(variables$subject == "Age"), "age variables that are used in the Transform CCHS variables vignette. All", sum(variables$subject == "Age"), "variables are in the age subject. Try sorting the subject column by clicking the up beside the `subject` heading: the top", sum(variables$subject == "Age"), "rows of the table should show the age variables:") 
+cat("You can search for variables in the table below. Try searching for the", 
+    sum(variables$subject == "Age"), "age variables that are used in the Transform
+    CCHS variables vignette. All", sum(variables$subject == "Age"),
+    "variables are in the age subject. Try sorting the subject column by clicking
+    the up beside the `subject` heading: the top", sum(variables$subject == "Age"),
+    "rows of the table should show the age variables:") 
 
 as.character(variables[variables$subject == "Age", "variable"])
 ```
