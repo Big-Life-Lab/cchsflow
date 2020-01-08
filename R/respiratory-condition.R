@@ -143,25 +143,26 @@ resp_condition_fun2 <-
          !is_equal(CCC_91A, 2))) {
       warning(
         paste(
-          'In DHHGAGE_cont:',
+          "In DHHGAGE_cont:",
           DHHGAGE_cont,
-          ', CCC_91E:',
+          ", CCC_91E:",
           CCC_91E,
-          ', CCC_91F:',
+          ", CCC_91F:",
           CCC_91F,
-          ', CCC_91A:',
+          ", CCC_91A:",
           CCC_91A,
-          " one or more of the respiratory arguments was outside the 1:2 allowed range however the condition is still calculated",
+          "one or more of the respiratory arguments was outside the 1:2 allowed
+          range however the condition is still calculated",
           sep = ""
         ), call. = FALSE
       )
     }
-    
+
     if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) & 
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
          (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 1,
       if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) & 
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
            (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 2,
         if_else2((CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2), 3, NA)
       )
@@ -238,23 +239,24 @@ resp_condition_fun3 <-
          !is_equal(CCC_91A, 2))) {
       warning(
         paste(
-          'In DHHGAGE_cont:',
+          "In DHHGAGE_cont:",
           DHHGAGE_cont,
-          ', CCC_091:',
+          ", CCC_091:",
           CCC_091,
-          ', CCC_91A:',
+          ", CCC_91A:",
           CCC_91A,
-          " one or more of the respiratory arguments was outside the 1:2 allowed range however the condition is still calculated",
+          "one or more of the respiratory arguments was outside the 1:2 allowed
+          range however the condition is still calculated",
           sep = ""
         ), call. = FALSE
       )
     }
-    
+
     if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) & 
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
          (CCC_091 == 1 | CCC_91A == 1)), 1,
       if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) & 
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
            (CCC_091 == 1 | CCC_91A == 1)), 2,
         if_else2((CCC_091 == 2 & CCC_91A == 2), 3, NA)
       )

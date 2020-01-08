@@ -95,7 +95,7 @@ pack_years_fun <-
     } else if (DHHGAGE_cont < 0) {
       return(NA)
     }
-    
+
     # Time since quit for former daily smokers
     tsq_ds_fun <- function(SMK_09A_B, SMKG09C) {
       SMKG09C <-

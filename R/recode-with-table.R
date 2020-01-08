@@ -7,26 +7,26 @@
 #'
 #' @param v1 variable 1
 #' @param v2 variable 2
-#' 
+#'
 #' @return boolean value of if v1 and v2 are equal
-#' 
-#' @examples 
+#'
+#' @examples
 #' library(cchsflow)
 #' is_equal(1,2)
 #' # FALSE
-#' 
+#'
 #' is_equal(1,1)
 #' # TRUE
-#' 
+#'
 #' 1==NA
 #' # NA
-#' 
+#'
 #' is_equal(1,NA)
 #' # FALSE
-#' 
+#'
 #' NA==NA
 #' # NA
-#' 
+#'
 #' is_equal(NA,NA)
 #' # TRUE
 #' @export
@@ -40,10 +40,10 @@ is_equal <- function(v1, v2) {
 }
 
 #' Recode with Table
-#' 
+#'
 #' Recode with Table is responsible for recoding values of a dataset based on
 #' specifications in variable_details.
-#' 
+#'
 #' The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv}{variable_details}
 #'  dataframe needs the following variables to function:
 #'  \describe{
@@ -120,8 +120,8 @@ is_equal <- function(v1, v2) {
 #' @param custom_function_path path to location of the function to load
 #'
 #' @return a dataframe that is recoded according to rules in variable_details.
-#' 
-#' @examples 
+#'
+#' @examples
 #' library(cchsflow)
 #' bmi2010 <- rec_with_table(
 #'   data = cchs2010, variable_details =

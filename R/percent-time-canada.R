@@ -66,7 +66,7 @@
 #' @export
 pct_time_fun <-
   function(DHHGAGE_cont, SDCGCBG, SDCGRES) {
-    if (is_equal(SDCGCBG,1)) {
+    if (is_equal(SDCGCBG, 1)) {
       return(1)
     }
     DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont, return(NA))
