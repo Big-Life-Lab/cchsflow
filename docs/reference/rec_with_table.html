@@ -43,61 +43,8 @@
 
 
 <meta property="og:title" content="Recode with Table — rec_with_table" />
-<meta property="og:description" content="The variable_details
- dataframe needs the following variables to function:
-  variablename of new (mutated) variable that is recoded
-  toTypetype the variable is being recoded to
-  cat = categorical, cont = continues
-  databaseStartname of dataframe with original variables to be
-  recoded
-  variableStartname of variable to be recoded
-  fromTypevariable type of start variable.
-  cat = categorical or factor variable
-  cont = continuous variable (real number or integer)
-  recToValue to recode to
-  recFromValue/range being recoded from
- 
-Each row in variable_details comprises one category in a
- newly transformed variable. The rules for each category the new variable
- are a string in recFrom and value in recTo.
- These recode pairs are the same syntax as sjmisc::rec(),
- except in sjmisc::rec() the pairs are a string for the function
- attribute rec =, separated by '='.
- For example in rec_w_table
- variable_details$recFrom = 2; variable_details$recTo = 4
- is the same as sjmisc::rec(rec = &quot;2=4&quot;).
- the pairs are obtained from the RecFrom and RecTo columns
-    recode pairseach recode pair is row. see above example
-    or PBC-variableDetails.csv
-    multiple valuesmultiple old values that should be recoded into
-    a new single value may be separated with comma, e.g.
-    recFrom = &quot;1,2&quot;; recTo = 1
-    value rangea value range is indicated by a colon, e.g.
-    recFrom= &quot;1:4&quot;; recTo = 1 (recodes all values from 1 to 4 into 1)
-    value range for doublesfor double vectors (with fractional part),
-     all values within the specified range are recoded; e.g.
-     recFrom = &quot;1:2.5'; recTo = 1 recodes 1 to 2.5 into 1,
-     but 2.55 would not be recoded
-     (since it's not included in the specified range)
-    &quot;min&quot; and &quot;max&quot;minimum and maximum values
-    are indicates by min (or lo) and max (or hi),
-     e.g. recFrom = &quot;min:4&quot;; recTo = 1 (recodes all values from
-     minimum values of x to 4 into 1)
-    &quot;else&quot;all other values, which have not been specified yet,
-     are indicated by else, e.g. recFrom = &quot;else&quot;; recTo = NA
-     (recode all other values (not specified in other rows) to &quot;NA&quot;)
-    &quot;copy&quot;the &quot;else&quot;-token can be combined with
-    copy, indicating that all remaining, not yet recoded values should
-     stay the same (are copied from the original value), e.g.
-     recFrom = &quot;else&quot;; recTo = &quot;copy&quot;
-    NA'sNA values are allowed both as old and
-    new value, e.g.
-    recFrom &quot;NA&quot;; recTo = 1. or &quot;recFrom = &quot;3:5&quot;; recTo = &quot;NA&quot;
-    (recodes all NA into 1,
-    and all values from 3 to 5 into NA in the new variable)
-
-
-" />
+<meta property="og:description" content="Recode with Table is responsible for recoding values of a dataset based on
+specifications in variable_details." />
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -200,61 +147,8 @@ Each row in variable_details comprises one category in a
     </div>
 
     <div class="ref-description">
-    <p>The <a href='https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv'>variable_details</a>
- dataframe needs the following variables to function:</p><dl class='dl-horizontal'>
-  <dt>variable</dt><dd><p>name of new (mutated) variable that is recoded</p></dd>
-  <dt>toType</dt><dd><p>type the variable is being recoded to
-  <em>cat = categorical, cont = continues</em></p></dd>
-  <dt>databaseStart</dt><dd><p>name of dataframe with original variables to be
-  recoded</p></dd>
-  <dt>variableStart</dt><dd><p>name of variable to be recoded</p></dd>
-  <dt>fromType</dt><dd><p>variable type of start variable.
-  <em>cat = categorical or factor variable</em>
-  <em>cont = continuous variable (real number or integer)</em></p></dd>
-  <dt>recTo</dt><dd><p>Value to recode to</p></dd>
-  <dt>recFrom</dt><dd><p>Value/range being recoded from</p></dd>
- 
-</dl><p>Each row in <em>variable_details</em> comprises one category in a
- newly transformed variable. The rules for each category the new variable
- are a string in <em>recFrom</em> and value in <em>recTo</em>.
- These recode pairs are the same syntax as <em>sjmisc::rec()</em>,
- except in <em>sjmisc::rec()</em> the pairs are a string for the function
- attribute <em>rec =</em>, separated by '<em>=</em>'.
- For example in <em>rec_w_table</em>
- <em>variable_details$recFrom = 2; variable_details$recTo = 4</em>
- is the same as <em>sjmisc::rec(rec = "2=4")</em>.
- the pairs are obtained from the RecFrom and RecTo columns</p><dl class='dl-horizontal'>
-    <dt>recode pairs</dt><dd><p>each recode pair is row. see above example
-    or <em>PBC-variableDetails.csv</em></p></dd>
-    <dt>multiple values</dt><dd><p>multiple old values that should be recoded into
-    a new single value may be separated with comma, e.g.
-    <em>recFrom = "1,2"; recTo = 1</em></p></dd>
-    <dt>value range</dt><dd><p>a value range is indicated by a colon, e.g.
-    <em>recFrom= "1:4"; recTo = 1</em> (recodes all values from 1 to 4 into 1)</p></dd>
-    <dt>value range for doubles</dt><dd><p>for double vectors (with fractional part),
-     all values within the specified range are recoded; e.g.
-     <em>recFrom = "1:2.5'; recTo = 1</em> recodes 1 to 2.5 into 1,
-     but 2.55 would not be recoded
-     (since it's not included in the specified range)</p></dd>
-    <dt><em>"min"</em> and <em>"max"</em></dt><dd><p>minimum and maximum values
-    are indicates by <em>min</em> (or <em>lo</em>) and <em>max</em> (or <em>hi</em>),
-     e.g. <em>recFrom = "min:4"; recTo = 1</em> (recodes all values from
-     minimum values of <em>x</em> to 4 into 1)</p></dd>
-    <dt><em>"else"</em></dt><dd><p>all other values, which have not been specified yet,
-     are indicated by <em>else</em>, e.g. <em>recFrom = "else"; recTo = NA</em>
-     (recode all other values (not specified in other rows) to "NA")</p></dd>
-    <dt><em>"copy"</em></dt><dd><p>the <em>"else"</em>-token can be combined with
-    <em>copy</em>, indicating that all remaining, not yet recoded values should
-     stay the same (are copied from the original value), e.g.
-     <em>recFrom = "else"; recTo = "copy"</em></p></dd>
-    <dt><em>NA</em>'s</dt><dd><p><em>NA</em> values are allowed both as old and
-    new value, e.g.
-    <em>recFrom "NA"; recTo = 1. or "recFrom = "3:5"; recTo = "NA"</em>
-    (recodes all NA into 1,
-    and all values from 3 to 5 into NA in the new variable)</p></dd>
-
-</dl>
-
+    <p>Recode with Table is responsible for recoding values of a dataset based on
+specifications in variable_details.</p>
     </div>
 
     <pre class="usage"><span class='fu'>rec_with_table</span>(
@@ -326,6 +220,63 @@ content inside the `Note`` column of the variable being recoded.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>a dataframe that is recoded according to rules in variable_details.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The <a href='https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv'>variable_details</a>
+ dataframe needs the following variables to function:</p><dl class='dl-horizontal'>
+  <dt>variable</dt><dd><p>name of new (mutated) variable that is recoded</p></dd>
+  <dt>toType</dt><dd><p>type the variable is being recoded to
+  <em>cat = categorical, cont = continues</em></p></dd>
+  <dt>databaseStart</dt><dd><p>name of dataframe with original variables to be
+  recoded</p></dd>
+  <dt>variableStart</dt><dd><p>name of variable to be recoded</p></dd>
+  <dt>fromType</dt><dd><p>variable type of start variable.
+  <em>cat = categorical or factor variable</em>
+  <em>cont = continuous variable (real number or integer)</em></p></dd>
+  <dt>recTo</dt><dd><p>Value to recode to</p></dd>
+  <dt>recFrom</dt><dd><p>Value/range being recoded from</p></dd>
+ 
+</dl><p>Each row in <em>variable_details</em> comprises one category in a
+ newly transformed variable. The rules for each category the new variable
+ are a string in <em>recFrom</em> and value in <em>recTo</em>.
+ These recode pairs are the same syntax as <em>sjmisc::rec()</em>,
+ except in <em>sjmisc::rec()</em> the pairs are a string for the function
+ attribute <em>rec =</em>, separated by '<em>=</em>'.
+ For example in <em>rec_w_table</em>
+ <em>variable_details$recFrom = 2; variable_details$recTo = 4</em>
+ is the same as <em>sjmisc::rec(rec = "2=4")</em>.
+ the pairs are obtained from the RecFrom and RecTo columns</p><dl class='dl-horizontal'>
+    <dt>recode pairs</dt><dd><p>each recode pair is row. see above example
+    or <em>PBC-variableDetails.csv</em></p></dd>
+    <dt>multiple values</dt><dd><p>multiple old values that should be recoded into
+    a new single value may be separated with comma, e.g.
+    <em>recFrom = "1,2"; recTo = 1</em></p></dd>
+    <dt>value range</dt><dd><p>a value range is indicated by a colon, e.g.
+    <em>recFrom= "1:4"; recTo = 1</em> (recodes all values from 1 to 4 into 1)</p></dd>
+    <dt>value range for doubles</dt><dd><p>for double vectors (with fractional part),
+     all values within the specified range are recoded; e.g.
+     <em>recFrom = "1:2.5'; recTo = 1</em> recodes 1 to 2.5 into 1,
+     but 2.55 would not be recoded
+     (since it's not included in the specified range)</p></dd>
+    <dt><em>"min"</em> and <em>"max"</em></dt><dd><p>minimum and maximum values
+    are indicates by <em>min</em> (or <em>lo</em>) and <em>max</em> (or <em>hi</em>),
+     e.g. <em>recFrom = "min:4"; recTo = 1</em> (recodes all values from
+     minimum values of <em>x</em> to 4 into 1)</p></dd>
+    <dt><em>"else"</em></dt><dd><p>all other values, which have not been specified yet,
+     are indicated by <em>else</em>, e.g. <em>recFrom = "else"; recTo = NA</em>
+     (recode all other values (not specified in other rows) to "NA")</p></dd>
+    <dt><em>"copy"</em></dt><dd><p>the <em>"else"</em>-token can be combined with
+    <em>copy</em>, indicating that all remaining, not yet recoded values should
+     stay the same (are copied from the original value), e.g.
+     <em>recFrom = "else"; recTo = "copy"</em></p></dd>
+    <dt><em>NA</em>'s</dt><dd><p><em>NA</em> values are allowed both as old and
+    new value, e.g.
+    <em>recFrom "NA"; recTo = 1. or "recFrom = "3:5"; recTo = "NA"</em>
+    (recodes all NA into 1,
+    and all values from 3 to 5 into NA in the new variable)</p></dd>
+
+</dl>
+
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
@@ -377,6 +328,7 @@ content inside the `Note`` column of the variable being recoded.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

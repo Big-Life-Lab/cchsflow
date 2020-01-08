@@ -40,7 +40,10 @@ is_equal <- function(v1, v2) {
 }
 
 #' Recode with Table
-#'
+#' 
+#' Recode with Table is responsible for recoding values of a dataset based on
+#' specifications in variable_details.
+#' 
 #' The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv}{variable_details}
 #'  dataframe needs the following variables to function:
 #'  \describe{
