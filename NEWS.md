@@ -1,5 +1,5 @@
 # cchsflow 1.1.0 (Latest build)
-2020-01-07
+2020-01-08
 
 ## Features
 - Updated `DESCRIPTION` to expand description of package and added The Ottawa
