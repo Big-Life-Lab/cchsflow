@@ -151,12 +151,12 @@
 <div id="transforming-existing-cchs-variables" class="section level3">
 <h3 class="hasAnchor">
 <a href="#transforming-existing-cchs-variables" class="anchor"></a>Transforming existing CCHS variables</h3>
-<p>Using the naming conventions described in the <a href="https://big-life-lab.github.io/cchsflow/articles/variablesSheet.html"><code>variables.csv</code></a> and <a href="https://big-life-lab.github.io/cchsflow/articles/variableDetails.html"><code>variableDetails.csv</code></a> you can add more CCHS variables that can be transformed and harmonized across cycles.</p>
+<p>Using the naming conventions described in the <a href="https://big-life-lab.github.io/cchsflow/articles/variables_sheet.html"><code>variables.csv</code></a> and <a href="https://big-life-lab.github.io/cchsflow/articles/variable_details.html"><code>variable_details.csv</code></a> you can add more CCHS variables that can be transformed and harmonized across cycles.</p>
 </div>
 <div id="creating-a-derived-variable" class="section level3">
 <h3 class="hasAnchor">
 <a href="#creating-a-derived-variable" class="anchor"></a>Creating a derived variable</h3>
-<p>You will first need to create a custom function that will carry out the necessary transformations needed for your derived variable. You will then need to specify your derived variable on <code>variables.csv</code> and <code>variableDetails.csv</code>. For more information, <a href="'~../Vignettes/howtoaddvariables.html'">click here</a>.</p>
+<p>You will first need to create a custom function that will carry out the necessary transformations needed for your derived variable. You will then need to specify your derived variable on <code>variables.csv</code> and <code>variable_details.csv</code>. For more information, <a href="https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html">click here</a>.</p>
 </div>
 </div>
 <div id="documentation" class="section level2">
@@ -186,7 +186,7 @@
 <ul>
 <li>Please create a Git branch for each pull request (PR). <a href="https://help.github.com/en/articles/creating-a-pull-request-from-a-fork">Click here</a> for information on how to create a PR.</li>
 <li>Your contributed code should roughly follow the tidyverse <a href="http://style.tidyverse.org">style guide</a>. <em>Exceptions</em> from this guide: function names in PascalCase (e.g. NewFunction()) and variable names as camelCase (e.g newVariable &lt;- “hi”).</li>
-<li>cchsflow uses <a href="https://cran.r-project.org/package=roxygen2">roxygen2</a>, with <a href="https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html">Markdown syntax</a>, for documentation.</li>
+<li>cchsflow uses <a href="https://cran.r-project.org/package=roxygen2">roxygen2</a>, with <a href="https://bookdown.org/yihui/rmarkdown/markdown-syntax.html">Markdown syntax</a>, for documentation.</li>
 <li>cchsflow uses <a href="https://cran.r-project.org/package=testthat">testthat</a> (TBA). Adding tests to the PR makes it easier for me to merge your PR into the code base.</li>
 <li>If your PR is a user-visible change, you may add a bullet to the top of <code>NEWS.md</code> describing the changes made. You may optionally add your GitHub username, and links to relevant issue(s)/PR(s).</li>
 </ul>
