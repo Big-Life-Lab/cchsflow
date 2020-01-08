@@ -37,11 +37,11 @@ bug, you may also create an associated issue. If possible, try to illustrate you
 ## Pull request
 
 *  Please create a Git branch for each pull request (PR). [Click here](https://help.github.com/en/articles/creating-a-pull-request-from-a-fork) for information on how to create a PR.
-*  Your contributed code should roughly follow the tidyverse [style guide](http://style.tidyverse.org). _Exceptions_ from this guide: function names in PascalCase (e.g. NewFunction()) and variable names as camelCase (e.g newVariable <- "hi").
+*  Your contributed code should roughly follow the tidyverse [style guide](http://style.tidyverse.org).
 *  cchsflow uses [roxygen2](https://cran.r-project.org/package=roxygen2), with
 [Markdown syntax](https://bookdown.org/yihui/rmarkdown/markdown-syntax.html),
 for documentation.
-*  cchsflow uses [testthat](https://cran.r-project.org/package=testthat) (TBA). Adding tests to the PR makes it easier for me to merge your PR into the code base.
+*  cchsflow uses [testthat](https://cran.r-project.org/package=testthat). Adding tests to the PR makes merging the PR into the code base less prone to bugs.
 *  If your PR is a user-visible change, you may add a bullet to the top of `NEWS.md` describing the changes made. You may optionally add your GitHub username, and links to relevant issue(s)/PR(s).
 
 ## Code of Conduct
