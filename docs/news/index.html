@@ -147,21 +147,33 @@
 <h1 class="page-header">
 <a href="#cchsflow-1-1-0-latest-build" class="anchor"></a>cchsflow 1.1.0 (Latest build)</h1>
 <p>2020-01-08</p>
-<div id="features" class="section level2">
+<div id="breaking-changes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
 <ul>
-<li>Updated <code>DESCRIPTION</code> to expand description of package and added The Ottawa Hospital as author</li>
-<li>Changed <code>data_source</code> parameter in rec_with_table() to <code>data</code>; and changed order of parameters to have <code>variables</code> after <code>dataset_name</code>
-</li>
-<li>Included automated testing for functions</li>
-<li>Refactored functions to account for age below 0 and include warning messages for respiratory functions</li>
-<li>Added helpful warnings to set_data_labels() when a variable is present in details but missing in variables and vice versa</li>
-<li>Added trailing white space removal to set_data_labels</li>
-<li>Added trailing white space removal to startVariable during rec_with_table</li>
-<li>Added missing contributing code of conduct page</li>
-<li>Minor formatting changes on vignettes and <code>README.md</code> for better clarity</li>
-<li>Fixed broken links in articles</li>
+<li><p>Changed <code>data_source</code> parameter in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> to <code>data</code>.</p></li>
+<li><p>Changed order of parameters to have <code>variables</code> after <code>dataset_name</code>.</p></li>
+</ul>
+</div>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>New features</h2>
+<ul>
+<li>Added warnings to <code><a href="../reference/set_data_labels.html">set_data_labels()</a></code> when a variable is present in details but missing in variables and vice versa.</li>
+<li>Added automated testing for functions</li>
+</ul>
+</div>
+<div id="minor-improvements-and-bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-and-bug-fixes" class="anchor"></a>Minor improvements and bug fixes</h2>
+<ul>
+<li>Updated <code>DESCRIPTION</code> to expand description of package and added The Ottawa Hospital as author.</li>
+<li>Refactored <code><a href="../reference/age_cat_fun.html">age_cat_fun()</a></code> to account for age below 0 and include warning messages for respiratory functions.</li>
+<li>Added trailing white space removal to <code><a href="../reference/set_data_labels.html">set_data_labels()</a></code>.</li>
+<li>Added trailing white space removal to startVariable during <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code>.</li>
+<li>Added missing contributing code of conduct page.</li>
+<li>Minor formatting changes on vignettes and <code>README.md</code> for better clarity.</li>
+<li>Fixed broken links in articles.</li>
 </ul>
 </div>
 </div>
@@ -169,9 +181,9 @@
 <h1 class="page-header">
 <a href="#cchsflow-1-0-1" class="anchor"></a>cchsflow 1.0.1</h1>
 <p>2019-12-19</p>
-<div id="features-1" class="section level2">
+<div id="features" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-1" class="anchor"></a>Features</h2>
+<a href="#features" class="anchor"></a>Features</h2>
 <ul>
 <li>Updated <code>LICENSE</code>
 </li>
@@ -190,9 +202,9 @@
 <li>Submitted package to CRAN</li>
 </ul>
 </div>
-<div id="features-2" class="section level2">
+<div id="features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-2" class="anchor"></a>Features</h2>
+<a href="#features-1" class="anchor"></a>Features</h2>
 <ul>
 <li>Switched formatting to snake_case</li>
 <li>Corrections to “using cchsflow” article</li>
@@ -216,9 +228,9 @@
 <h1 class="page-header">
 <a href="#cchsflow-0-2-3" class="anchor"></a>cchsflow 0.2.3</h1>
 <p>2019-11-29</p>
-<div id="features-3" class="section level2">
+<div id="features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-3" class="anchor"></a>Features</h2>
+<a href="#features-2" class="anchor"></a>Features</h2>
 <ul>
 <li>Updated example in the <a href="https://big-life-lab.github.io/cchsflow/index.html">introduction</a> to reflect data that is now included in the cchsflow package.</li>
 <li>Updates to vignettes to reflect latest version of package</li>
@@ -244,9 +256,9 @@
 <h1 class="page-header">
 <a href="#cchsflow-0-2-2" class="anchor"></a>cchsflow 0.2.2</h1>
 <p>2019-11-26</p>
-<div id="features-4" class="section level2">
+<div id="features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-4" class="anchor"></a>Features</h2>
+<a href="#features-3" class="anchor"></a>Features</h2>
 <ul>
 <li>Updated ref branch of bllflow to match latest version of <code>RecWTable()</code>
 </li>
@@ -259,9 +271,9 @@
 <h1 class="page-header">
 <a href="#cchsflow-0-2-1" class="anchor"></a>cchsflow 0.2.1</h1>
 <p>2019-11-19</p>
-<div id="features-5" class="section level2">
+<div id="features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-5" class="anchor"></a>Features</h2>
+<a href="#features-4" class="anchor"></a>Features</h2>
 <ul>
 <li>Documentation for derived variable functions now available</li>
 <li>Documentation for derived alcohol variables now available</li>
@@ -271,9 +283,9 @@
     <div id="cchsflow-0-2-0" class="section level1">
 <h1 class="page-header">
 <a href="#cchsflow-0-2-0" class="anchor"></a>cchsflow 0.2.0</h1>
-<div id="features-6" class="section level2">
+<div id="features-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-6" class="anchor"></a>Features</h2>
+<a href="#features-5" class="anchor"></a>Features</h2>
 <ul>
 <li>Added Support for derived variables alongside vignettes explaining how to add new variables</li>
 <li>Added R file with custom functions for derived variables</li>
@@ -285,9 +297,9 @@
     <div id="cchsflow-0-1-0-first-version" class="section level1">
 <h1 class="page-header">
 <a href="#cchsflow-0-1-0-first-version" class="anchor"></a>cchsflow 0.1.0 (First Version)</h1>
-<div id="features-7" class="section level2">
+<div id="features-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-7" class="anchor"></a>Features</h2>
+<a href="#features-6" class="anchor"></a>Features</h2>
 <ul>
 <li>Added variables.csv that contains list of CCHS variables in cchsflow.</li>
 <li>Added variableDetails.csv that maps variables across CCHS cycles from 2001-2014</li>

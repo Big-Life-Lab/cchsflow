@@ -212,7 +212,9 @@ in the passed dataframes</p>
 
 <span class='fu'><a href='https://rdrr.io/pkg/sjlabelled/man/get_label.html'>get_label</a></span>(<span class='no'>combined_bmi</span>)</div><div class='output co'>#&gt;     HWTGHTM     HWTGWTK HWTGBMI_der 
 #&gt;          ""          ""          "" </div><div class='input'>
-<span class='no'>labeled_combined_data</span> <span class='kw'>&lt;-</span> <span class='fu'>set_data_labels</span>(<span class='no'>combined_bmi</span>, <span class='no'>variable_details</span>, <span class='no'>variables</span>)
+<span class='no'>labeled_combined_data</span> <span class='kw'>&lt;-</span> <span class='fu'>set_data_labels</span>(<span class='no'>combined_bmi</span>,
+ <span class='no'>variable_details</span>,
+ <span class='no'>variables</span>)
 
 <span class='fu'><a href='https://rdrr.io/pkg/sjlabelled/man/get_label.html'>get_label</a></span>(<span class='no'>labeled_combined_data</span>)</div><div class='output co'>#&gt;       HWTGHTM       HWTGWTK   HWTGBMI_der 
 #&gt;      "Height"      "Weight" "Derived BMI" </div></pre>
