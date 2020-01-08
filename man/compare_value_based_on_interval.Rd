@@ -7,7 +7,7 @@
 compare_value_based_on_interval(
   left_boundary,
   right_boundary,
-  data_source,
+  data,
   compare_columns,
   interval
 )
@@ -17,9 +17,9 @@ compare_value_based_on_interval(
 
 \item{right_boundary}{the max value}
 
-\item{data_source}{the data that contains values being compared}
+\item{data}{the data that contains values being compared}
 
-\item{compare_columns}{The columns inside data_source being checked}
+\item{compare_columns}{The columns inside data being checked}
 
 \item{interval}{The scientific notation interval}
 }

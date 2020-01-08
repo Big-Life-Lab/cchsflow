@@ -5,20 +5,20 @@
 \title{Recode with Table}
 \usage{
 rec_with_table(
-  data_source,
+  data,
   variable_details,
   dataset_name,
+  variables = NULL,
   else_value = NA,
   append_to_data = FALSE,
   log = FALSE,
   print_note = TRUE,
-  variables = NULL,
   var_labels = NULL,
   custom_function_path = NULL
 )
 }
 \arguments{
-\item{data_source}{A dataframe containing the variables to be recoded.}
+\item{data}{A dataframe containing the variables to be recoded.}
 
 \item{variable_details}{A dataframe containing the specifications (rules)
 for recoding.}
@@ -26,21 +26,21 @@ for recoding.}
 \item{dataset_name}{String, the name of the dataset containing the
 to be recoded.}
 
+\item{variables}{character vector containing variable names to recode or
+a variables csv containing additional variable info}
+
 \item{else_value}{Value (string, number, integer, logical or NA) that is used
 to replace any values that are outside the specified ranges
 (no rules for recoding).}
 
 \item{append_to_data}{Logical, if \code{TRUE} (default), recoded variables
-will be appended to the data_source.}
+will be appended to the data.}
 
 \item{log}{Logical, if \code{FALSE} (default), a log of recoding will
 not be printed.}
 
 \item{print_note}{Logical, if \code{FALSE} (default), will not print the
 content inside the `Note`` column of the variable being recoded.}
-
-\item{variables}{character vector containing variable names to recode or
-a variables csv containing additional variable info}
 
 \item{var_labels}{labels vector to attach to variables in variables}
 
@@ -105,4 +105,30 @@ The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-v
     (recodes all NA into 1,
     and all values from 3 to 5 into NA in the new variable)}
 }
+}
+\examples{
+library(cchsflow)
+bmi2010 <- rec_with_table(
+  data = cchs2010, variable_details =
+    variable_details, dataset_name = "cchs2010", variables = c(
+    "HWTGHTM",
+    "HWTGWTK", "HWTGBMI_der"
+  )
+)
+
+head(bmi2010)
+
+bmi2012 <- rec_with_table(
+  data = cchs2012, variable_details =
+    variable_details, dataset_name = "cchs2012", variables = c(
+    "HWTGHTM",
+    "HWTGWTK", "HWTGBMI_der"
+  )
+)
+
+tail(bmi2012)
+
+combined_bmi <- bind_rows(bmi2010, bmi2012)
+head(combined_bmi)
+tail(combined_bmi)
 }
