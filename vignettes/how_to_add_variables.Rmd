@@ -227,7 +227,7 @@ Pack_years_fun <-
   }
 ```
 
-More information on what each smoking variable means can be found in the [Reference](pack_years_fun.html) section.
+More information on what each smoking variable means can be found in the [Reference](../reference/pack_years_fun.html) section.
 
 ### Steps 2 and 3. Specifying pack-years in `variable_details.csv` and `variables.csv`
 

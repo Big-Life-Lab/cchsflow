@@ -79,4 +79,4 @@ kable(combined_bmi[1:10, ])
 
 ## Creating a derived variable
 
-Creating a derived variable requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here](articles/how_to_add_variables.html)
+Creating a derived variable requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here](how_to_add_variables.html)
