@@ -25,10 +25,10 @@ Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 t
     # load test cchs data - included in cchsflow
     cchs2001test <- cchs2001
     
-    # `variableDetails` is a database in cchsflow that contain the instructions 
+    # `variable_details` is a database in cchsflow that contain the instructions 
     how to transform variables.
     
-    varDetails <- variableDetails
+    varDetails <- variable_details
     
     cchs2001_BMI <- rec_with_table(data_source = cchs2001test, 
                 variable_details = varDetails, 

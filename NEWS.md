@@ -7,8 +7,8 @@ Hospital as author
 - Changed `data_source` parameter in rec_with_table() to `data`; and changed
 order of parameters to have `variables` after `dataset_name`
 - Included automated testing for functions
-- Refactored functions to account for age below 0 and include warning messages
-for respiratory functions
+- Refactored age_cat_fun() to account for age below 0 and include warning
+messages for respiratory functions
 - Added helpful warnings to set_data_labels() when a variable is present 
 in details but missing in variables and vice versa
 - Added trailing white space removal to set_data_labels
