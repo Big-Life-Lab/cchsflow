@@ -8,7 +8,7 @@
 #' @param v1 variable 1
 #' @param v2 variable 2
 #'
-#' @return boolean value of if v1 and v2 are equal
+#' @return boolean value of whether or not v1 and v2 are equal
 #'
 #' @examples
 #' library(cchsflow)
