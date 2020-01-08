@@ -9,8 +9,9 @@
 
 ## New features
 
-- Added  warnings to `set_data_labels()` when a variable is present in details 
+- Added warnings to `set_data_labels()` when a variable is present in details 
     but missing in variables and vice versa.
+- Added automated testing for functions
 
 ## Minor improvements and bug fixes
 
