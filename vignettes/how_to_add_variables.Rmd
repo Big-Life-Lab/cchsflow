@@ -40,7 +40,7 @@ This example will show how the existing CCHS BMI variable was developed using `v
 
 1. **variable:** the most common variable name for BMI is `HWTGBMI`. This should be written for each row.
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 library(cchsflow)
 library(knitr)
 library(kableExtra)
@@ -194,7 +194,8 @@ With complex derived variables, sometimes it is necessary to create functions wi
 
 ```{r, warning=FALSE}
 Pack_years_fun <-
-  function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
+  function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont,
+           SMK_204, SMK_05B, SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
     #Time since quit for former daily smokers
     tsq_ds_fun <- function(SMK_09A_B, SMKG09C) {
       SMKG09C <-
@@ -211,7 +212,8 @@ Pack_years_fun <-
     # PackYears for Daily Smoker
     ifelse2(SMKDSTY==1, pmax(((DHHGAGE_cont - SMKG203_cont)*(SMK_204/20)), 0.0137),
     # PackYears for Occasional Smoker (former daily)     
-    ifelse2(SMKDSTY==2, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds)*(SMK_208/20)), 0.0137) + (pmax((SMK_05B*SMK_05C/30), 1)*tsq_ds),
+    ifelse2(SMKDSTY==2, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds)*(SMK_208/20)), 0.0137) 
+            + (pmax((SMK_05B*SMK_05C/30), 1)*tsq_ds),
     # PackYears for Occasional Smoker (never daily)      
     ifelse2(SMKDSTY==3, (pmax((SMK_05B*SMK_05C/30), 1)/20)*(DHHGAGE_cont - SMKG01C_cont),
     # PackYears for former daily smoker (non-smoker now)      
@@ -225,7 +227,7 @@ Pack_years_fun <-
   }
 ```
 
-More information on what each smoking variable means can be found in the [Reference](pack_years_fun.html) section.
+More information on what each smoking variable means can be found in the [Reference](../reference/pack_years_fun.html) section.
 
 ### Steps 2 and 3. Specifying pack-years in `variable_details.csv` and `variables.csv`
 

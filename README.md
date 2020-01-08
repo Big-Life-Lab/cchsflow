@@ -25,8 +25,10 @@ Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 t
     # load test cchs data - included in cchsflow
     cchs2001test <- cchs2001
     
-    # `variableDetails` is a database in cchsflow that contain the instructions how to transform variables.
-    varDetails <- variableDetails
+    # `variable_details` is a database in cchsflow that contain the instructions 
+    how to transform variables.
+    
+    varDetails <- variable_details
     
     cchs2001_BMI <- rec_with_table(data_source = cchs2001test, 
                 variable_details = varDetails, 
@@ -38,7 +40,9 @@ Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 t
 Notes printed to console indicate issues that may affect BMI classification for your study.
 ```
 [1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
-[1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable and missing variables as 999.96 and 999.7-999.99 respectively"
+[1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 999.6
+and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable and
+missing variables as 999.96 and 999.7-999.99 respectively"
 [1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"
 ```
 

@@ -1,4 +1,31 @@
-# cchsflow 1.0.1 (Latest build)
+# cchsflow 1.1.0 (Latest build)
+2020-01-08
+
+## Breaking changes
+
+* Changed `data_source` parameter in `rec_with_table()` to `data`.
+
+* Changed order of parameters to have `variables` after `dataset_name`.
+
+## New features
+
+- Added warnings to `set_data_labels()` when a variable is present in details 
+    but missing in variables and vice versa.
+- Added automated testing for functions
+
+## Minor improvements and bug fixes
+
+- Updated `DESCRIPTION` to expand description of package and added The Ottawa
+   Hospital as author.
+- Refactored `age_cat_fun()` to account for age below 0 and include warning
+   messages for respiratory functions.
+- Added trailing white space removal to `set_data_labels()`.
+- Added trailing white space removal to startVariable during `rec_with_table()`.
+- Added missing contributing code of conduct page.
+- Minor formatting changes on vignettes and `README.md` for better clarity.
+- Fixed broken links in articles.
+
+# cchsflow 1.0.1 
 2019-12-19
 
 ## Features

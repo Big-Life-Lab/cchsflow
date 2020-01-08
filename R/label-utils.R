@@ -6,6 +6,37 @@
 #' @param data_to_label newly transformed dataset
 #' @param variable_details variable_details.csv
 #' @param variables_sheet variables.csv
+#'
+#' @return labeled data_to_label
+#'
+#' @examples
+#' library(cchsflow)
+#' library(sjlabelled)
+#' bmi2010 <- rec_with_table(
+#'   data = cchs2010, variable_details =
+#'     variable_details, dataset_name = "cchs2010", variables = c(
+#'     "HWTGHTM",
+#'     "HWTGWTK", "HWTGBMI_der"
+#'   )
+#' )
+#'
+#' bmi2012 <- rec_with_table(
+#'   data = cchs2012, variable_details =
+#'     variable_details, dataset_name = "cchs2012", variables = c(
+#'     "HWTGHTM",
+#'     "HWTGWTK", "HWTGBMI_der"
+#'   )
+#' )
+#'
+#' combined_bmi <- bind_rows(bmi2010, bmi2012)
+#'
+#' get_label(combined_bmi)
+#'
+#' labeled_combined_data <- set_data_labels(combined_bmi,
+#'  variable_details,
+#'  variables)
+#'
+#' get_label(labeled_combined_data)
 #' @export
 set_data_labels <-
   function(data_to_label,
@@ -15,6 +46,8 @@ set_data_labels <-
     variable_names <- unique(colnames(data_to_label))
     # extract only relevant variable info
     if (!is.null(variable_details)) {
+      variable_details[[pkg.globals$argument.Variables]] <- sapply(
+        variable_details[[pkg.globals$argument.Variables]], trimws)
       variable_details <-
         variable_details[variable_details[[pkg.globals$argument.Variables]]
                          %in% variable_names, ]
@@ -25,6 +58,8 @@ set_data_labels <-
       }
     }
     if (!is.null(variables_sheet)) {
+      variables_sheet[[pkg.globals$argument.Variables]] <- sapply(
+        variables_sheet[[pkg.globals$argument.Variables]], trimws)
       variables_sheet <-
         variables_sheet[variables_sheet[[pkg.globals$argument.Variables]] %in%
                           variable_names, ]
@@ -137,6 +172,12 @@ create_label_list_element <- function(variable_rows) {
 #' @return Returns labeled data
 label_data <- function(label_list, data_to_label) {
   for (variable_name in names(label_list)) {
+    if (is.na(label_list[[variable_name]]$type)) {
+      warning(paste(variable_name,
+                    "is missing from variable_details or variables
+                    (if it was also passed) please verify correct spelling"))
+      next()
+    }
     if (label_list[[variable_name]]$type == pkg.globals$argument.CatType) {
       if (class(data_to_label[[variable_name]]) != "factor") {
         data_to_label[[variable_name]] <-

@@ -11,8 +11,31 @@ is_equal(v1, v2)
 
 \item{v2}{variable 2}
 }
+\value{
+boolean value of whether or not v1 and v2 are equal
+}
 \description{
 Function to compare even with NA present
 This function returns TRUE wherever elements are the same, including NA's,
 and false everywhere else.
+}
+\examples{
+library(cchsflow)
+is_equal(1,2)
+# FALSE
+
+is_equal(1,1)
+# TRUE
+
+1==NA
+# NA
+
+is_equal(1,NA)
+# FALSE
+
+NA==NA
+# NA
+
+is_equal(NA,NA)
+# TRUE
 }

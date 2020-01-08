@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -128,7 +128,7 @@
 <p>Using <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> you can transform the derived BMI variable across multiple CCHS cycles and create a transformed dataset.</p>
 <p>In order derive variables, you must load the existing custom function associated with the derived variable</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Custom ifelse for evaluating NA</span>
-ifelse2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, a, b) {
+if_else2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, a, b) {
   falseifNA &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
     <span class="kw"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(x), <span class="ot">FALSE</span>, x)
   }
@@ -145,39 +145,11 @@ bmi_fun &lt;-<span class="st"> </span>
             (HWTGWTK<span class="op">/</span>(HWTGHTM<span class="op">*</span>HWTGHTM)), <span class="ot">NA</span>)
   }</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(cchsflow)</code></pre></div>
-<pre><code>## Loading required package: haven</code></pre>
-<pre><code>## Loading required package: dplyr</code></pre>
-<pre><code>## 
-## Attaching package: 'dplyr'</code></pre>
-<pre><code>## The following objects are masked from 'package:stats':
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre><code>## Loading required package: sjlabelled</code></pre>
-<pre><code>## 
-## Attaching package: 'sjlabelled'</code></pre>
-<pre><code>## The following object is masked from 'package:dplyr':
-## 
-##     as_label</code></pre>
-<pre><code>## The following objects are masked from 'package:haven':
-## 
-##     as_factor, read_sas, read_spss, read_stata, write_sas, zap_labels</code></pre>
-<pre><code>## Loading required package: stringr</code></pre>
-<pre><code>## Loading required package: magrittr</code></pre>
-<pre><code>## 
-## Attaching package: 'cchsflow'</code></pre>
-<pre><code>## The following object is masked _by_ '.GlobalEnv':
-## 
-##     bmi_fun</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bmi2003 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(<span class="dt">data_source =</span> cchs2003, <span class="dt">variable_details =</span> variable_details, <span class="dt">dataset_name =</span> <span class="st">"cchs2003"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_der"</span>))</code></pre></div>
-<pre><code>## [1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"
-## [1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"
-## [1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"
-## [1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"
-## [1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"
-## [1] "NOTE: Don't know (99.7) and refusal (99.8) not included in 2001 CCHS"
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bmi2003 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(<span class="dt">data =</span> cchs2003, <span class="dt">variable_details =</span> variable_details, 
+            <span class="dt">dataset_name =</span> <span class="st">"cchs2003"</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, 
+            <span class="st">"HWTGBMI_der"</span>), <span class="dt">log =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## [1] "NOTE: 2001 and 2003 CCHS use inches, values converted to meters to 3 decimal points"
+## [1] "NOTE: 74+ inches converted to 76 inches"
 ## [1] "The variable HWTCGHT was recoded into HWTGHTM for the database cchs2003 the following recodes were made:"
 ##    value_to From rows_recoded
 ## 1     1.118    1            0
@@ -218,8 +190,11 @@ bmi_fun &lt;-<span class="st"> </span>
 ## 1     copy 27.0:135.0          192
 ## 2    NA::a        996            0
 ## 3    NA::b    997:999            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bmi2010 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(<span class="dt">data_source =</span> cchs2010, <span class="dt">variable_details =</span> variable_details, <span class="dt">dataset_name =</span> <span class="st">"cchs2010"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_der"</span>))</code></pre></div>
-<pre><code>## [1] "The variable HWTGHTM was recoded into HWTGHTM for the database cchs2010 the following recodes were made:"
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bmi2010 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(<span class="dt">data =</span> cchs2010, <span class="dt">variable_details =</span> variable_details,
+            <span class="dt">dataset_name =</span> <span class="st">"cchs2010"</span>, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>,
+            <span class="st">"HWTGBMI_der"</span>), <span class="dt">log =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## [1] "NOTE: Height is a reported in meters from 2005 CCHS onwards"
+## [1] "The variable HWTGHTM was recoded into HWTGHTM for the database cchs2010 the following recodes were made:"
 ##   value_to        From rows_recoded
 ## 1     copy 0.914:2.134          190
 ## 2    NA::a       9.996            2
@@ -360,7 +335,7 @@ NA
 <div id="creating-a-derived-variable" class="section level2">
 <h2 class="hasAnchor">
 <a href="#creating-a-derived-variable" class="anchor"></a>Creating a derived variable</h2>
-<p>Creating a derived variable requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable <a href="articles/how_to_add_variables.html">see here</a></p>
+<p>Creating a derived variable requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable <a href="how_to_add_variables.html">see here</a></p>
 </div>
   </div>
 

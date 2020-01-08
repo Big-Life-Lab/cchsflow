@@ -30,11 +30,28 @@
 #'  CCHS cycles. As such, a continuous age variable (DHHGAGE_cont) was created
 #'  that harmonized age across all CCHS cycles by taking the midpoint of each
 #'  age category. This new age variable (DHHGAGE_C) categorizes age based on the
-#'  categories used in CCHS cycles from 2007 to 2014.  
+#'  categories used in CCHS cycles from 2007 to 2014.
 #'
 #' @param DHHGAGE_cont continuous age variable
-#' 
+#'
 #' @return a categorical age variable (DHHGAGE_C)
+#'
+#' @examples
+#' # Using age_cat_fun() to create categorical age values from DHHGAGE_cont
+#' # age_cat_fun() is specified in variable_details.csv along with the CCHS
+#' # variables and cycles included.
+#'
+#' # To generate DHHGAGE_C in a cycle, use rec_with_table() and specify
+#' # DHHGAGE_C along with DHHGAGE_cont.
+#'
+#' library(cchsflow)
+#'
+#' cat_age2010 <- rec_with_table(
+#'    data = cchs2010, variable_details =
+#'      variable_details, dataset_name = "cchs2010", variables = c(
+#'      "DHHGAGE_cont", "DHHGAGE_C"
+#'      )
+#'    )
 #'
 #' @export
 age_cat_fun <- function(DHHGAGE_cont) {

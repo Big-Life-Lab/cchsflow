@@ -32,7 +32,7 @@
 #' library(cchsflow)
 #'
 #' resp2010 <- rec_with_table(
-#'   data_source = cchs2010, variable_details = variable_details,
+#'   data = cchs2010, variable_details = variable_details,
 #'   dataset_name = "cchs2010", variables = c(
 #'     "DHHGAGE_cont", "CCC_091",
 #'     "resp_condition_der"
@@ -42,7 +42,7 @@
 #' head(resp2010)
 #'
 #' resp2012 <- rec_with_table(
-#'   data_source = cchs2012, variable_details = variable_details,
+#'   data = cchs2012, variable_details = variable_details,
 #'   dataset_name = "cchs2012", variables = c(
 #'     "DHHGAGE_cont", "CCC_091",
 #'     "resp_condition_der"
@@ -61,9 +61,9 @@
 resp_condition_fun1 <-
   function(DHHGAGE_cont, CCC_091) {
     if_else2(
-      (DHHGAGE_cont > 35 & CCC_091 == 1), 1,
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) & CCC_091 == 1), 1,
       if_else2(
-        (DHHGAGE_cont < 35 & CCC_091 == 1), 2,
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) & CCC_091 == 1), 2,
         if_else2(CCC_091 == 2, 3, NA)
       )
     )
@@ -106,7 +106,7 @@ resp_condition_fun1 <-
 #' library(cchsflow)
 #'
 #' resp2005 <- rec_with_table(
-#'   data_source = cchs2005, variable_details = variable_details,
+#'   data = cchs2005, variable_details = variable_details,
 #'   dataset_name = "cchs2005", variables = c(
 #'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
 #'     "resp_condition_der"
@@ -116,7 +116,7 @@ resp_condition_fun1 <-
 #' head(resp2005)
 #'
 #' resp2007_2008 <- rec_with_table(
-#'   data_source = cchs2007_2008, variable_details = variable_details,
+#'   data = cchs2007_2008, variable_details = variable_details,
 #'   dataset_name = "cchs2007_2008", variables = c(
 #'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
 #'     "resp_condition_der"
@@ -134,10 +134,36 @@ resp_condition_fun1 <-
 #' @export
 resp_condition_fun2 <-
   function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A) {
+    # Argument verification
+    if ((!is_equal(CCC_91E, 1) &
+         !is_equal(CCC_91E, 2)) |
+        (!is_equal(CCC_91F, 1) &
+         !is_equal(CCC_91F, 2)) |
+        (!is_equal(CCC_91A, 1) &
+         !is_equal(CCC_91A, 2))) {
+      warning(
+        paste(
+          "In DHHGAGE_cont:",
+          DHHGAGE_cont,
+          ", CCC_91E:",
+          CCC_91E,
+          ", CCC_91F:",
+          CCC_91F,
+          ", CCC_91A:",
+          CCC_91A,
+          "one or more of the respiratory arguments was outside the 1:2 allowed
+          range however the condition is still calculated",
+          sep = ""
+        ), call. = FALSE
+      )
+    }
+
     if_else2(
-      (DHHGAGE_cont > 35 & (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 1,
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+         (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 1,
       if_else2(
-        (DHHGAGE_cont < 35 & (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 2,
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
+           (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 2,
         if_else2((CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2), 3, NA)
       )
     )
@@ -178,7 +204,7 @@ resp_condition_fun2 <-
 #' library(cchsflow)
 #'
 #' resp2001 <- rec_with_table(
-#'   data_source = cchs2001, variable_details = variable_details,
+#'   data = cchs2001, variable_details = variable_details,
 #'   dataset_name = "cchs2001", variables = c(
 #'     "DHHGAGE_cont", "CCC_091", "CCC_91A",
 #'     "resp_condition_der"
@@ -188,7 +214,7 @@ resp_condition_fun2 <-
 #' head(resp2001)
 #'
 #' resp2003 <- rec_with_table(
-#'   data_source = cchs2003, variable_details = variable_details,
+#'   data = cchs2003, variable_details = variable_details,
 #'   dataset_name = "cchs2003", variables = c(
 #'     "DHHGAGE_cont", "CCC_091", "CCC_91A",
 #'     "resp_condition_der"
@@ -206,10 +232,32 @@ resp_condition_fun2 <-
 #' @export
 resp_condition_fun3 <-
   function(DHHGAGE_cont, CCC_091, CCC_91A) {
+    # Argument verification
+    if ((!is_equal(CCC_091, 1) &
+         !is_equal(CCC_091, 2)) |
+        (!is_equal(CCC_91A, 1) &
+         !is_equal(CCC_91A, 2))) {
+      warning(
+        paste(
+          "In DHHGAGE_cont:",
+          DHHGAGE_cont,
+          ", CCC_091:",
+          CCC_091,
+          ", CCC_91A:",
+          CCC_91A,
+          "one or more of the respiratory arguments was outside the 1:2 allowed
+          range however the condition is still calculated",
+          sep = ""
+        ), call. = FALSE
+      )
+    }
+
     if_else2(
-      (DHHGAGE_cont > 35 & (CCC_091 == 1 | CCC_91A == 1)), 1,
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+         (CCC_091 == 1 | CCC_91A == 1)), 1,
       if_else2(
-        (DHHGAGE_cont < 35 & (CCC_091 == 1 | CCC_91A == 1)), 2,
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
+           (CCC_091 == 1 | CCC_91A == 1)), 2,
         if_else2((CCC_091 == 2 & CCC_91A == 2), 3, NA)
       )
     )

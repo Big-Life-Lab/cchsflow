@@ -29,7 +29,7 @@ Using `rec_with_table()` you can transform the derived BMI variable across multi
 In order derive variables, you must load the existing custom function associated with the derived variable
 ```{r, warning=FALSE, message=FALSE}
 # Custom ifelse for evaluating NA
-ifelse2 <- function(x, a, b) {
+if_else2 <- function(x, a, b) {
   falseifNA <- function(x) {
     ifelse(is.na(x), FALSE, x)
   }
@@ -47,12 +47,18 @@ bmi_fun <-
   }
 ```
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 library(cchsflow)
+```
 
-bmi2003 <- rec_with_table(data_source = cchs2003, variable_details = variable_details, dataset_name = "cchs2003", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+```{r, warning = FALSE}
+bmi2003 <- rec_with_table(data = cchs2003, variable_details = variable_details, 
+            dataset_name = "cchs2003", variables = c("HWTGHTM", "HWTGWTK", 
+            "HWTGBMI_der"), log = TRUE)
 
-bmi2010 <- rec_with_table(data_source = cchs2010, variable_details = variable_details, dataset_name = "cchs2010", log = TRUE, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+bmi2010 <- rec_with_table(data = cchs2010, variable_details = variable_details,
+            dataset_name = "cchs2010", variables = c("HWTGHTM", "HWTGWTK",
+            "HWTGBMI_der"), log = TRUE)
 ```
 
 Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `rec_with_table()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.
@@ -73,4 +79,4 @@ kable(combined_bmi[1:10, ])
 
 ## Creating a derived variable
 
-Creating a derived variable requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here](articles/how_to_add_variables.html)
+Creating a derived variable requires the harmonization of existing CCHS variables, and a custom function that uses those harmonized variables. For more information on how to create a derived variable [see here](how_to_add_variables.html)

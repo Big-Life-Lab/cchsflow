@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -151,32 +151,6 @@
 <li>
 <strong>variable:</strong> the most common variable name for BMI is <code>HWTGBMI</code>. This should be written for each row.</li>
 </ol>
-<pre><code>#&gt; Loading required package: haven
-#&gt; Loading required package: dplyr
-#&gt; 
-#&gt; Attaching package: 'dplyr'
-#&gt; The following objects are masked from 'package:stats':
-#&gt; 
-#&gt;     filter, lag
-#&gt; The following objects are masked from 'package:base':
-#&gt; 
-#&gt;     intersect, setdiff, setequal, union
-#&gt; Loading required package: sjlabelled
-#&gt; 
-#&gt; Attaching package: 'sjlabelled'
-#&gt; The following object is masked from 'package:dplyr':
-#&gt; 
-#&gt;     as_label
-#&gt; The following objects are masked from 'package:haven':
-#&gt; 
-#&gt;     as_factor, read_sas, read_spss, read_stata, write_sas, zap_labels
-#&gt; Loading required package: stringr
-#&gt; Loading required package: magrittr
-#&gt; 
-#&gt; Attaching package: 'kableExtra'
-#&gt; The following object is masked from 'package:dplyr':
-#&gt; 
-#&gt;     group_rows</code></pre>
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
@@ -3510,7 +3484,6 @@ Epilepsy
 Do you have epilepsy?
 </td>
 <td style="text-align:left;">
-CCHS 2001 restricts BMI to ages 20-64
 </td>
 </tr>
 <tr>
@@ -3563,7 +3536,6 @@ Heart Disease
 Do you have heart disease
 </td>
 <td style="text-align:left;">
-CCHS 2001 and 2003 codes not applicable and missing variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable and missing variables as 999.96 and 999.7-999.99 respectively
 </td>
 </tr>
 <tr>
@@ -3616,7 +3588,6 @@ Heart Disease
 Do you have heart disease
 </td>
 <td style="text-align:left;">
-Don’t know (999.7) and refusal (999.8) not included in 2001 CCHS
 </td>
 </tr>
 <tr>
@@ -3820,31 +3791,31 @@ variableStart
 71
 </td>
 <td style="text-align:left;">
-HWTGBMI
+HUIGVIS
 </td>
 <td style="text-align:left;">
-BMI
+HUI Vision
 </td>
 <td style="text-align:left;">
-BMI / self-report - (D,G)
+Vision trouble - function code - (D, G)
 </td>
 <td style="text-align:left;">
-health status
+Health behaviour
 </td>
 <td style="text-align:left;">
-BMI
+Health utility index
 </td>
 <td style="text-align:left;">
-Continuous
+Categorical
 </td>
 <td style="text-align:left;">
-kg/m2
+N/A
 </td>
 <td style="text-align:left;">
-cchs2001, cchs2003, cchs2005, cchs2007_2008, cchs2009_2010, cchs2010, cchs2011_2012, cchs2012, cchs2013_2014, cchs2014
+cchs2001, cchs2003, cchs2005, cchs2007_2008, cchs2009_2010, cchs2010, cchs2012, cchs2013_2014, cchs2014
 </td>
 <td style="text-align:left;">
-cchs2001::HWTAGBMI, cchs2003::HWTCGBMI, cchs2005::HWTEGBMI, [HWTGBMI]
+cchs2001::HUIAGVIS, cchs2003::HUICGVIS, cchs2005::HUIEGVIS, [HUIGVIS]
 </td>
 </tr></tbody>
 </table>
@@ -3869,7 +3840,8 @@ cchs2001::HWTAGBMI, cchs2003::HWTCGBMI, cchs2005::HWTEGBMI, [HWTGBMI]
 <a href="#step-1--creating-a-derived-function" class="anchor"></a>Step 1. Creating a derived function</h3>
 <p>With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Pack_years_fun &lt;-
-<span class="st">  </span><span class="cf">function</span>(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont, SMK_<span class="dv">204</span>, SMK_05B, SMK_<span class="dv">208</span>, SMK_05C, SMKG01C_cont, SMK_01A) {
+<span class="st">  </span><span class="cf">function</span>(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont,
+           SMK_<span class="dv">204</span>, SMK_05B, SMK_<span class="dv">208</span>, SMK_05C, SMKG01C_cont, SMK_01A) {
     <span class="co">#Time since quit for former daily smokers</span>
     tsq_ds_fun &lt;-<span class="st"> </span><span class="cf">function</span>(SMK_09A_B, SMKG09C) {
       SMKG09C &lt;-
@@ -3886,7 +3858,8 @@ cchs2001::HWTAGBMI, cchs2003::HWTCGBMI, cchs2005::HWTEGBMI, [HWTGBMI]
     <span class="co"># PackYears for Daily Smoker</span>
     <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG203_cont)<span class="op">*</span>(SMK_<span class="dv">204</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),
     <span class="co"># PackYears for Occasional Smoker (former daily)     </span>
-    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>) <span class="op">+</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">*</span>tsq_ds),
+    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>) 
+            <span class="op">+</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">*</span>tsq_ds),
     <span class="co"># PackYears for Occasional Smoker (never daily)      </span>
     <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">3</span>, (<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">/</span><span class="dv">20</span>)<span class="op">*</span>(DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG01C_cont),
     <span class="co"># PackYears for former daily smoker (non-smoker now)      </span>
@@ -3898,7 +3871,7 @@ cchs2001::HWTAGBMI, cchs2003::HWTCGBMI, cchs2005::HWTEGBMI, [HWTGBMI]
     <span class="co"># Non-smoker      </span>
     <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">6</span>, <span class="dv">0</span>, <span class="ot">NA</span>)))))))
   }</code></pre></div>
-<p>More information on what each smoking variable means can be found in the <a href="pack_years_fun.html">Reference</a> section.</p>
+<p>More information on what each smoking variable means can be found in the <a href="../reference/pack_years_fun.html">Reference</a> section.</p>
 </div>
 <div id="steps-2-and-3--specifying-pack-years-in-variable_details-csv-and-variables-csv" class="section level3">
 <h3 class="hasAnchor">
@@ -3963,7 +3936,7 @@ notes
 1065
 </td>
 <td style="text-align:left;">
-SMKG207_cont
+SMKG203_cont
 </td>
 <td style="text-align:left;">
 N/A
@@ -3975,40 +3948,39 @@ cont
 cchs2005, cchs2007_2008, cchs2009_2010, cchs2010, cchs2011_2012, cchs2012, cchs2013_2014, cchs2014
 </td>
 <td style="text-align:left;">
-cchs2005::SMKEG207, [SMKG207]
+cchs2005::SMKEG203, [SMKG203]
 </td>
 <td style="text-align:left;">
 cat
 </td>
 <td style="text-align:left;">
-NA::a
+22
 </td>
 <td style="text-align:left;">
 N/A
 </td>
 <td style="text-align:left;">
-not applicable
+agecigd
 </td>
 <td style="text-align:left;">
-not applicable
+converted categorical age (20 to 24) started smoking daily - daily smoker
 </td>
 <td style="text-align:left;">
 years
 </td>
 <td style="text-align:left;">
-96
+5
 </td>
 <td style="text-align:left;">
-not applicable
+20 To 24 Years
 </td>
 <td style="text-align:left;">
-agecigfd
+agecigd
 </td>
 <td style="text-align:left;">
-Age started to smoke daily - former daily (G)
+Age started to smoke daily - daily smoker (G)
 </td>
 <td style="text-align:left;">
-PackYears variable derived from various harmonized smoking variables
 </td>
 </tr></tbody>
 </table>
@@ -4050,7 +4022,7 @@ variableStart
 133
 </td>
 <td style="text-align:left;">
-SMKG01C_cont
+SMKG01C_A
 </td>
 <td style="text-align:left;">
 agec1
@@ -4065,16 +4037,16 @@ health behaviour
 Smoking
 </td>
 <td style="text-align:left;">
-Continuous
+Categorical
 </td>
 <td style="text-align:left;">
 Years
 </td>
 <td style="text-align:left;">
-cchs2001, cchs2003, cchs2005, cchs2007_2008, cchs2009_2010, cchs2010, cchs2011_2012, cchs2012, cchs2013_2014, cchs2014
+cchs2001, cchs2003
 </td>
 <td style="text-align:left;">
-cchs2001::SMKAG01C, cchs2003::SMKCG01C, cchs2005::SMKEG01C, [SMKG01C]
+cchs2001::SMKAG01C, cchs2003::SMKCG01C
 </td>
 </tr></tbody>
 </table>

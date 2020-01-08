@@ -42,7 +42,7 @@ This is one of 3 functions used to create a derived variable
 library(cchsflow)
 
 resp2001 <- rec_with_table(
-  data_source = cchs2001, variable_details = variable_details,
+  data = cchs2001, variable_details = variable_details,
   dataset_name = "cchs2001", variables = c(
     "DHHGAGE_cont", "CCC_091", "CCC_91A",
     "resp_condition_der"
@@ -52,7 +52,7 @@ resp2001 <- rec_with_table(
 head(resp2001)
 
 resp2003 <- rec_with_table(
-  data_source = cchs2003, variable_details = variable_details,
+  data = cchs2003, variable_details = variable_details,
   dataset_name = "cchs2003", variables = c(
     "DHHGAGE_cont", "CCC_091", "CCC_91A",
     "resp_condition_der"

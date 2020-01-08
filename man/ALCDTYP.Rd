@@ -33,3 +33,8 @@ This variable is used in CCHS cycles from 2001 to 2007. How it was
  to differentiate between former and never drinkers, we recommend using
  earlier cycles of the CCHS.
 }
+\examples{
+library(cchsflow)
+ ?ALCDTYP
+
+}

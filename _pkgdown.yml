@@ -38,6 +38,11 @@ navbar:
       href: news/index.html
 
 reference:
+  - title: "Processing functions"
+    desc: Functions used to manipulate cchs datasets
+    contents:
+    - rec_with_table
+    - set_data_labels
   - title: "Utility functions"
     desc: Utility functions that are used in other cchsflow functions
     contents:

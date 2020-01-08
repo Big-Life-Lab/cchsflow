@@ -13,8 +13,40 @@ set_data_labels(data_to_label, variable_details, variables_sheet = NULL)
 
 \item{variables_sheet}{variables.csv}
 }
+\value{
+labeled data_to_label
+}
 \description{
 sets labels for passed database, Uses the names of final
 variables in variable_details/variables_sheet as well as the labels contained
 in the passed dataframes
+}
+\examples{
+library(cchsflow)
+library(sjlabelled)
+bmi2010 <- rec_with_table(
+  data = cchs2010, variable_details =
+    variable_details, dataset_name = "cchs2010", variables = c(
+    "HWTGHTM",
+    "HWTGWTK", "HWTGBMI_der"
+  )
+)
+
+bmi2012 <- rec_with_table(
+  data = cchs2012, variable_details =
+    variable_details, dataset_name = "cchs2012", variables = c(
+    "HWTGHTM",
+    "HWTGWTK", "HWTGBMI_der"
+  )
+)
+
+combined_bmi <- bind_rows(bmi2010, bmi2012)
+
+get_label(combined_bmi)
+
+labeled_combined_data <- set_data_labels(combined_bmi,
+ variable_details,
+ variables)
+
+get_label(labeled_combined_data)
 }

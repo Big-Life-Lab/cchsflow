@@ -34,7 +34,7 @@
 #'
 #' library(cchsflow)
 #' pct_time2010 <- rec_with_table(
-#'   data_source = cchs2010, variable_details = variable_details,
+#'   data = cchs2010, variable_details = variable_details,
 #'   dataset_name = "cchs2010", variables = c(
 #'     "DHHGAGE_cont", "SDCGCBG",
 #'     "SDCGRES", "pct_time_der"
@@ -43,7 +43,7 @@
 #' head(pct_time2010)
 #'
 #' pct_time2012 <- rec_with_table(
-#'   data_source = cchs2012, variable_details = variable_details,
+#'   data = cchs2012, variable_details = variable_details,
 #'   dataset_name = "cchs2012", variables = c(
 #'     "DHHGAGE_cont", "SDCGCBG",
 #'     "SDCGRES", "pct_time_der"
@@ -66,15 +66,11 @@
 #' @export
 pct_time_fun <-
   function(DHHGAGE_cont, SDCGCBG, SDCGRES) {
-    SDCGRES_fun <- function(SDCGRES) {
-      if_else2(
-        SDCGRES == 1, 4.5,
-        if_else2(SDCGRES == 2, 15, NA)
-      )
+    if (is_equal(SDCGCBG, 1)) {
+      return(1)
     }
-    SDCGRES <- SDCGRES_fun(SDCGRES)
-    if_else2(
-      SDCGCBG == 1, 1,
-      if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont), NA)
-    )
+    DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont, return(NA))
+    SDCGRES <- if_else2(SDCGRES == 1, 4.5,
+                        if_else2(SDCGRES == 2, 15, return(NA)))
+    if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont), NA)
   }

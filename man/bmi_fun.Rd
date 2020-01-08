@@ -63,7 +63,7 @@ In earlier CCHS cycles (2001 and 2003), height was collected in inches;
 
 library(cchsflow)
 bmi2010 <- rec_with_table(
-  data_source = cchs2010, variable_details =
+  data = cchs2010, variable_details =
     variable_details, dataset_name = "cchs2010", variables = c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
@@ -73,7 +73,7 @@ bmi2010 <- rec_with_table(
 head(bmi2010)
 
 bmi2012 <- rec_with_table(
-  data_source = cchs2012, variable_details =
+  data = cchs2012, variable_details =
     variable_details, dataset_name = "cchs2012", variables = c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
