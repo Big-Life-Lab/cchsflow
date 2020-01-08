@@ -9,7 +9,7 @@ order of parameters to have `variables` after `dataset_name`
 - Included automated testing for functions
 - Refactored functions to account for age below 0 and include warning messages
 for respiratory functions
-- Added helpful warnings to set_data_labels when a variable is present 
+- Added helpful warnings to set_data_labels() when a variable is present 
 in details but missing in variables and vice versa
 - Added trailing white space removal to set_data_labels
 - Added trailing white space removal to startVariable during rec_with_table
