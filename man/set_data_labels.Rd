@@ -23,6 +23,7 @@ in the passed dataframes
 }
 \examples{
 library(cchsflow)
+library(sjlabelled)
 bmi2010 <- rec_with_table(
   data = cchs2010, variable_details =
     variable_details, dataset_name = "cchs2010", variables = c(
@@ -30,8 +31,6 @@ bmi2010 <- rec_with_table(
     "HWTGWTK", "HWTGBMI_der"
   )
 )
-
-head(bmi2010)
 
 bmi2012 <- rec_with_table(
   data = cchs2012, variable_details =
@@ -41,11 +40,7 @@ bmi2012 <- rec_with_table(
   )
 )
 
-tail(bmi2012)
-
 combined_bmi <- bind_rows(bmi2010, bmi2012)
-
-library(sjlabelled)
 
 get_label(combined_bmi)
 

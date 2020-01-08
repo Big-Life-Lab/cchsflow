@@ -51,7 +51,7 @@ a dataframe that is recoded according to rules in variable_details.
 }
 \description{
 Recode with Table is responsible for recoding values of a dataset based on
-specifications in variable_details.
+the specifications in variable_details.
 }
 \details{
 The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv}{variable_details}

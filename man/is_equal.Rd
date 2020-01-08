@@ -12,7 +12,7 @@ is_equal(v1, v2)
 \item{v2}{variable 2}
 }
 \value{
-boolean value of if v1 and v2 are equal
+boolean value of whether or not v1 and v2 are equal
 }
 \description{
 Function to compare even with NA present
