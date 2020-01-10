@@ -171,6 +171,10 @@ rec_with_table <-
       warning('Loading cchsflow variable_details',call. = FALSE)
       data(variable_details, package = 'cchsflow', envir = environment())  
     }
+    if (is.null(variables)){
+      warning('Loading cchsflow variables',call. = FALSE)
+      data(variables, package = 'cchsflow', envir = environment())  
+    }
     # ---- Step 1: Detemine if the passed data is a list or single database
     append_non_db_columns <- FALSE
     if (class(data) == "list" &&
