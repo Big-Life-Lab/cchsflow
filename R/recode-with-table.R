@@ -101,12 +101,12 @@ is_equal <- function(v1, v2) {
 #' }
 #'
 #' @param data A dataframe containing the variables to be recoded.
-#' @param variable_details A dataframe containing the specifications (rules)
-#' for recoding.
-#' @param database_name String, the name of the dataset containing the
-#' to be recoded.
 #' @param variables character vector containing variable names to recode or
 #' a variables csv containing additional variable info
+#' @param database_name String, the name of the dataset containing the
+#' to be recoded.
+#' @param variable_details A dataframe containing the specifications (rules)
+#' for recoding.
 #' @param else_value Value (string, number, integer, logical or NA) that is used
 #' to replace any values that are outside the specified ranges
 #' (no rules for recoding).
@@ -124,8 +124,7 @@ is_equal <- function(v1, v2) {
 #' @examples
 #' library(cchsflow)
 #' bmi2010 <- rec_with_table(
-#'   data = cchs2010, variable_details =
-#'     variable_details, database_name = "cchs2010", variables = c(
+#'   data = cchs2010, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -134,8 +133,7 @@ is_equal <- function(v1, v2) {
 #' head(bmi2010)
 #'
 #' bmi2012 <- rec_with_table(
-#'   data = cchs2012, variable_details =
-#'     variable_details, database_name = "cchs2012", variables = c(
+#'   data = cchs2012,  c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -254,6 +252,8 @@ recode_call <-
     variable_details[[pkg.globals$argument.Variables]] <-
       trimws(variable_details[[pkg.globals$argument.Variables]])
     if (!is.null(variables) && "data.frame" %in% class(variables)) {
+      variables[[pkg.globals$argument.Variables]] <-
+        trimws(variables[[pkg.globals$argument.Variables]])
       variable_details <-
         update_variable_details_based_on_variable_sheet(
           variable_sheet = variables,

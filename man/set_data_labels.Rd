@@ -25,16 +25,14 @@ in the passed dataframes
 library(cchsflow)
 library(sjlabelled)
 bmi2010 <- rec_with_table(
-  data = cchs2010, variable_details =
-    variable_details, dataset_name = "cchs2010", variables = c(
+ cchs2010, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
 )
 
 bmi2012 <- rec_with_table(
-  data = cchs2012, variable_details =
-    variable_details, dataset_name = "cchs2012", variables = c(
+  cchs2012, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
