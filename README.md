@@ -43,7 +43,7 @@ BMI. `cchsflow` harmonizes the BMI variable across different cycles.
 ```
     # load test cchs data - included in cchsflow
     
-    # `variableDetails` is a database in cchsflow that contain the instructions 
+    # `variable_details` is a database in cchsflow that contain the instructions 
     how to transform variables.
     
     cchs2001_BMI <- rec_with_table(
