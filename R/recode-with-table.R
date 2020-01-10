@@ -174,7 +174,8 @@ rec_with_table <-
     if (is.null(variables)){
       warning('Loading cchsflow variables',call. = FALSE)
       data(variables, package = 'cchsflow', envir = environment())  
-    }if (is.null(database_name)){
+    }
+    if (is.null(database_name)){
       warning('Using the passed data variable name as database_name',call. = FALSE)
       database_name <- deparse(substitute(data))  
     }
