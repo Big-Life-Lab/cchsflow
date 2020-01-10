@@ -156,7 +156,7 @@ rec_with_table <-
   function(data,
            variables = NULL,
            dataset_name,
-           variable_details,
+           variable_details = NULL,
            else_value = NA,
            append_to_data = FALSE,
            log = FALSE,
@@ -167,7 +167,10 @@ rec_with_table <-
     if (!is.null(custom_function_path)) {
       source(custom_function_path)
     }
-
+    if (is.null(variable_details)){
+      warning('Loading cchsflow variable_details',call. = FALSE)
+      data(variable_details, package = 'cchsflow', envir = environment())  
+    }
     # ---- Step 1: Detemine if the passed data is a list or single database
     append_non_db_columns <- FALSE
     if (class(data) == "list" &&
