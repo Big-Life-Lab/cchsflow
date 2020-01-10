@@ -1,4 +1,11 @@
-# cchsflow 1.1.0 (Latest build)
+# cchsflow 1.2.0 (Latest build)
+2020-01-10
+
+## Minor improvements and bug fixes
+- Autolinked DOI in `DESCRIPTION`
+- Fixes to R chunk in `README.md` 
+
+# cchsflow 1.1.0
 2020-01-08
 
 ## Breaking changes
