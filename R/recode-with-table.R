@@ -154,9 +154,9 @@ is_equal <- function(v1, v2) {
 
 rec_with_table <-
   function(data,
-           variable_details,
-           dataset_name,
            variables = NULL,
+           dataset_name,
+           variable_details,
            else_value = NA,
            append_to_data = FALSE,
            log = FALSE,
