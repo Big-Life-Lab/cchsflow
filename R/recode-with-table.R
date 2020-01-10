@@ -168,15 +168,15 @@ rec_with_table <-
       source(custom_function_path)
     }
     if (is.null(variable_details)){
-      warning('Loading cchsflow variable_details',call. = FALSE)
+      print('Loading cchsflow variable_details')
       data(variable_details, package = 'cchsflow', envir = environment())  
     }
     if (is.null(variables)){
-      warning('Loading cchsflow variables',call. = FALSE)
+      print('Loading cchsflow variables')
       data(variables, package = 'cchsflow', envir = environment())  
     }
     if (is.null(database_name)){
-      warning('Using the passed data variable name as database_name',call. = FALSE)
+      print('Using the passed data variable name as database_name')
       database_name <- deparse(substitute(data))  
     }
     # ---- Step 1: Detemine if the passed data is a list or single database
@@ -626,7 +626,7 @@ recode_columns <-
               !is.null(row_being_checked[[pkg.globals$argument.Notes]]) &&
               !is_equal(row_being_checked[[pkg.globals$argument.Notes]], "") &&
               !is.na(row_being_checked[[pkg.globals$argument.Notes]])) {
-              print(paste("NOTE:", as.character(row_being_checked[[
+              print(paste("NOTE for",variable_being_checked,":", as.character(row_being_checked[[
                 pkg.globals$argument.Notes]])))
             }
           }

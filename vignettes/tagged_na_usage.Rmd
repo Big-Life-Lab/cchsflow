@@ -1,0 +1,24 @@
+---
+title: "tagged_na_usage"
+author: "Rostyslav Vyuha"
+date: "January 10, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reason for tagged na usage
+
+It is often usefull to store different types of NA to represent wide varriety of missing values.
+Base R unfortunattelly does not support more then one type of NA. Different people have decided to handle this in their own manner
+We however decided to go with the haven package, haven has an introduction of tagged na. This is only applied to numeric values as character base values can use any string to represent. Haven allows u to attach an additional byte to the numeric na that through the usage of haven can be distinguished. This also alowes normal NA treatment as well as special distinction.
+
+```{r cars}
+library(haven)
+x <- c(1:5, tagged_na("a"), tagged_na("z"), NA)
+na_tag(x) # is used to read the tagged NA in most other functions they are still viewed as NA
+print_tagged_na(x) # Is used to print the na as well as their tag
+```
+
