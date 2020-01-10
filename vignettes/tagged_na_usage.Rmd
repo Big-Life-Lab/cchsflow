@@ -1,20 +1,24 @@
 ---
 title: "tagged_na_usage"
-author: "Rostyslav Vyuha"
-date: "January 10, 2020"
 output: html_document
+vignette: >
+  %\VignetteIndexEntry{3 - variable_details.csv}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Reason for tagged na usage
+## Reasons for tagged_na usage
 
-It is often usefull to store different types of NA to represent wide varriety of missing values.
-Base R unfortunattelly does not support more then one type of NA. Different people have decided to handle this in their own manner
-We however decided to go with the haven package, haven has an introduction of tagged na. This is only applied to numeric values as character base values can use any string to represent. Haven allows u to attach an additional byte to the numeric na that through the usage of haven can be distinguished. This also alowes normal NA treatment as well as special distinction.
+It is often useful to store different types of NA to represent wide variety of missing values.
+Base R unfortunately does not support more then one type of NA. Different people have decided to handle this in their own manner.
 
+For `cchsflow`, we have decided to go with the `haven` package for handling of missing. The haven package has an [introduction](https://haven.tidyverse.org/reference/tagged_na.html) of tagged_na. This is only applied to numeric values as character base values can use any string to represent NA. Haven allows you to attach an additional byte to the numeric NA value that can be distinguished. This also allows normal treatment of NA, as well as special distinction for missing values.
+
+## Example
 ```{r cars}
 library(haven)
 x <- c(1:5, tagged_na("a"), tagged_na("z"), NA)
