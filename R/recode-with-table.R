@@ -103,7 +103,7 @@ is_equal <- function(v1, v2) {
 #' @param data A dataframe containing the variables to be recoded.
 #' @param variable_details A dataframe containing the specifications (rules)
 #' for recoding.
-#' @param dataset_name String, the name of the dataset containing the
+#' @param database_name String, the name of the dataset containing the
 #' to be recoded.
 #' @param variables character vector containing variable names to recode or
 #' a variables csv containing additional variable info
@@ -125,7 +125,7 @@ is_equal <- function(v1, v2) {
 #' library(cchsflow)
 #' bmi2010 <- rec_with_table(
 #'   data = cchs2010, variable_details =
-#'     variable_details, dataset_name = "cchs2010", variables = c(
+#'     variable_details, database_name = "cchs2010", variables = c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -135,7 +135,7 @@ is_equal <- function(v1, v2) {
 #'
 #' bmi2012 <- rec_with_table(
 #'   data = cchs2012, variable_details =
-#'     variable_details, dataset_name = "cchs2012", variables = c(
+#'     variable_details, database_name = "cchs2012", variables = c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -155,7 +155,7 @@ is_equal <- function(v1, v2) {
 rec_with_table <-
   function(data,
            variables = NULL,
-           dataset_name,
+           database_name = NULL,
            variable_details = NULL,
            else_value = NA,
            append_to_data = FALSE,
@@ -174,19 +174,22 @@ rec_with_table <-
     if (is.null(variables)){
       warning('Loading cchsflow variables',call. = FALSE)
       data(variables, package = 'cchsflow', envir = environment())  
+    }if (is.null(database_name)){
+      warning('Using the passed data variable name as database_name',call. = FALSE)
+      database_name <- deparse(substitute(data))  
     }
     # ---- Step 1: Detemine if the passed data is a list or single database
     append_non_db_columns <- FALSE
     if (class(data) == "list" &&
-      length(dataset_name) == length(data)) {
-      for (data_name in dataset_name) {
+      length(database_name) == length(data)) {
+      for (data_name in database_name) {
         # ---- Step 2A: Verify that the passed name exists in the passed data
 
         if (!is.null(data[[data_name]])) {
           data[[data_name]] <- recode_call(
             variables = variables,
             data = data[[data_name]],
-            dataset_name = dataset_name,
+            database_name = database_name,
             print_note = print_note,
             else_value = else_value,
             variable_details = variable_details,
@@ -201,17 +204,17 @@ rec_with_table <-
               "The data",
               data_name,
               "is missing from the passed list please verify the names are
-              correct in the data list and the dataset_name list"
+              correct in the data list and the database_name list"
             )
           )
         }
       }
     } else if ("data.frame" %in% class(data) &&
-      length(dataset_name) == 1) {
+      length(database_name) == 1) {
       data <- recode_call(
         variables = variables,
         data = data,
-        dataset_name = dataset_name,
+        database_name = database_name,
         print_note = print_note,
         else_value = else_value,
         variable_details = variable_details,
@@ -239,7 +242,7 @@ rec_with_table <-
 recode_call <-
   function(variables,
            data,
-           dataset_name,
+           database_name,
            print_note,
            else_value,
            variable_details,
@@ -306,14 +309,14 @@ recode_call <-
     all_possible_var_names <-
       unique(as.character(variable_details[[pkg.globals$argument.Variables]]))
     all_variables_detected <-
-      variable_details[grepl(dataset_name, variable_details[[
+      variable_details[grepl(database_name, variable_details[[
         pkg.globals$argument.DatabaseStart]]), ]
 
     rec_data <-
       recode_columns(
         data = data,
         variables_to_process = all_variables_detected,
-        data_name = dataset_name,
+        data_name = database_name,
         log = log,
         print_note = print_note,
         else_default = else_value
