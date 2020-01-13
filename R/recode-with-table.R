@@ -626,7 +626,7 @@ recode_columns <-
               !is.null(row_being_checked[[pkg.globals$argument.Notes]]) &&
               !is_equal(row_being_checked[[pkg.globals$argument.Notes]], "") &&
               !is.na(row_being_checked[[pkg.globals$argument.Notes]])) {
-              print(paste("NOTE for",variable_being_checked,
+              print(paste("NOTE for", variable_being_checked,
                           ":",
                           as.character(row_being_checked[[
                 pkg.globals$argument.Notes]])))
