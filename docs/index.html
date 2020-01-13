@@ -112,7 +112,7 @@
 </h1></div>
 
 <p><em>cchsflow</em> supports the use of the Canadian Community Health Survey (CCHS) by transforming variables from each cycle into harmonized, consistent versions that span survey cycles (currently, 2001 to 2014).</p>
-<p>The CCHS is a population-based cross-sectional survey of Canadians that is administered every two years since 2001. There are approximately 130,000 respondents per cycle. Studies use multiple CCHS cycles to examine trends over time and increase sample to examine sub-groups that are too small to examine in a single cycle.</p>
+<p>The CCHS is a population-based cross-sectional survey of Canadians that has been administered every two years since 2001. There are approximately 130,000 respondents per cycle. Studies use multiple CCHS cycles to examine trends over time and increase sample size to examine sub-groups that are too small to examine in a single cycle.</p>
 <p>The CCHS is one of the largest and most robust ongoing population health surveys worldwide. The CCHS, administered by Statistics Canada, is Canada’s main general population health survey. Information about the survey is found <a href="http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&amp;SDDS=3226">here</a>. The CCHS has a <a href="https://www.statcan.gc.ca/eng/reference/licence">Statistic Canada Open Licence</a>.</p>
 <div id="concept" class="section level2">
 <h2 class="hasAnchor">
@@ -130,11 +130,14 @@
     cchs2001_BMI &lt;- rec_with_table(cchs2001, "HWTGBMI")
     </code></pre>
 <p>Notes printed to console indicate issues that may affect BMI classification for your study.</p>
-<pre><code>[1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
-[1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 
-999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable 
-and missing variables as 999.96 and 999.7-999.99 respectively"
-[1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"</code></pre>
+<pre><code>[1] "Loading cchsflow variable_details"
+[1] "Using the passed data variable name as database_name"
+[1] "NOTE for HWTGBMI : CCHS 2001 restricts BMI to ages 20-64"
+[1] "NOTE for HWTGBMI : CCHS 2001 and 2003 codes not applicable and missing 
+variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes 
+not applicable and missing variables as 999.96 and 999.7-999.99 respectively"
+[1] "NOTE for HWTGBMI : Don't know (999.7) and refusal (999.8) not included
+in 2001 CCHS"</code></pre>
 </div>
 <div id="important-notes" class="section level2">
 <h2 class="hasAnchor">
@@ -163,7 +166,7 @@ and missing variables as 999.96 and 999.7-999.99 respectively"
 <code>variable_details.csv</code> - information that describes how the variables are recoded.</li>
 <li>Vignettes describe how to use R to transform or generate new derived variables that are listed in <code>variables.csv</code>. Transformations are performed using <code><a href="reference/rec_with_table.html">rec_with_table()</a></code>. <code>variables.csv</code> and <code>variable_details.csv</code> can be used with other statistics programs (see <a href="https://github.com/Big-Life-Lab/cchsflow/issues">issue</a>).</li>
 </ol>
-<p>This repository does not include the CCHS data. Information on how to access the CCHS data can is <a href="https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm">here</a>. The Canadian university community can also access the CCHS through <a href="http://odesi2.scholarsportal.info/webview/">ODESI</a> (see health/Canada/Canadian Community Health Survey).</p>
+<p>This repository does not include the CCHS data. Instead, it contains subsets of 200 observations in each CCHS cycle. Information on how to access the CCHS data can is <a href="https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm">here</a>. The Canadian university community can also access the CCHS through <a href="http://odesi2.scholarsportal.info/webview/">ODESI</a> (see health/Canada/Canadian Community Health Survey).</p>
 </div>
 <div id="contributing" class="section level2">
 <h2 class="hasAnchor">
