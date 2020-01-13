@@ -9,7 +9,7 @@ come  with the package.
 
 ## Minor improvements and bug fixes
 - Autolinked DOI in `DESCRIPTION`
-- Fixes to R chunk in `README.md`
+- Fixes to R chunks and minor edits in `README.md` 
 - Modified tests and examples to use the new simplified `rec_with_table()` call
 - Modified vignettes to reflect use of new `rec_with_table()` call
 

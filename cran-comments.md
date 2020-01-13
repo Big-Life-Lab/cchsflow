@@ -2,7 +2,7 @@
 
 This is a resubmission. In this version I have:
 * Autolinked DOI in `DESCRIPTION`
-* Made fixes to R chunk in `README.md` 
+* Made fixes to R chunks and minor edits in `README.md` 
 * Changed dataset_name to database_name
 * Added a simple `rec_with_table()` function call that uses `data` variable name 
 as `database_name` as well as default `variables` and `variable_details` that

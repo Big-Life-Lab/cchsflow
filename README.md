@@ -6,9 +6,9 @@ development](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](ht
 *cchsflow* supports the use of the Canadian Community Health Survey (CCHS) by transforming variables from each cycle into harmonized, consistent versions that 
 span survey cycles (currently, 2001 to 2014). 
 
-The CCHS is a population-based cross-sectional survey of Canadians that is administered every two years since 2001. There are approximately 130,000 
+The CCHS is a population-based cross-sectional survey of Canadians that has been administered every two years since 2001. There are approximately 130,000 
 respondents per cycle. Studies use multiple CCHS cycles to examine trends over 
-time and increase sample to examine sub-groups that are too small to examine in 
+time and increase sample size to examine sub-groups that are too small to examine in 
 a single cycle. 
 
 The CCHS is one of the largest and most robust ongoing population health surveys worldwide. The CCHS, administered by Statistics Canada, is Canada's main general population health survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
@@ -50,11 +50,14 @@ BMI. `cchsflow` harmonizes the BMI variable across different cycles.
 Notes printed to console indicate issues that may affect BMI classification for 
 your study.
 ```
-[1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
-[1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 
-999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable 
-and missing variables as 999.96 and 999.7-999.99 respectively"
-[1] "NOTE: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS"
+[1] "Loading cchsflow variable_details"
+[1] "Using the passed data variable name as database_name"
+[1] "NOTE for HWTGBMI : CCHS 2001 restricts BMI to ages 20-64"
+[1] "NOTE for HWTGBMI : CCHS 2001 and 2003 codes not applicable and missing 
+variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes 
+not applicable and missing variables as 999.96 and 999.7-999.99 respectively"
+[1] "NOTE for HWTGBMI : Don't know (999.7) and refusal (999.8) not included
+in 2001 CCHS"
 ```
 
 ## Important notes
@@ -90,7 +93,8 @@ variables that are listed in `variables.csv`. Transformations are performed
 using `rec_with_table()`. `variables.csv` and `variable_details.csv` can be 
 used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
 
-This repository does not include the CCHS data. Information on how to access 
+This repository does not include the CCHS data. Instead, it contains subsets of
+200 observations in each CCHS cycle. Information on how to access 
 the CCHS data can is 
 [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). 
 The Canadian university community can also access the CCHS through [ODESI](http://odesi2.scholarsportal.info/webview/) (see health/Canada/Canadian Community Health Survey).
