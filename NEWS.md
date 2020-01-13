@@ -1,9 +1,16 @@
 # cchsflow 1.2.0 (Latest build)
 2020-01-10
 
+## Breaking changes
+- Changed dataset_name to database_name
+- Added a simple rec_with_table function call that uses data variable name 
+as database_name as well as default variables and variable_details that come 
+with the package.
+
 ## Minor improvements and bug fixes
 - Autolinked DOI in `DESCRIPTION`
-- Fixes to R chunk in `README.md` 
+- Fixes to R chunk in `README.md`
+- Modified tests and examples to use the new simplified rec_with_table call
 
 # cchsflow 1.1.0
 2020-01-08
