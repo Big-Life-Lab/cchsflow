@@ -3,9 +3,9 @@
 
 ## Breaking changes
 - Changed dataset_name to database_name
-- Added a simple rec_with_table function call that uses data variable name 
-as database_name as well as default variables and variable_details that come 
-with the package.
+- Added a simple `rec_with_table()` function call that uses `data` variable name 
+as `database_name` as well as default `variables` and `variable_details` that
+come  with the package.
 
 ## Minor improvements and bug fixes
 - Autolinked DOI in `DESCRIPTION`
