@@ -1,5 +1,5 @@
 # cchsflow 1.2.0 (Latest build)
-2020-01-10
+2020-01-13
 
 ## Breaking changes
 - Changed dataset_name to database_name
