@@ -8,6 +8,7 @@ This is a resubmission. In this version I have:
 as `database_name` as well as default `variables` and `variable_details` that
 come  with the package.
 * Modified tests and examples to use the new simplified rec_with_table call
+* Modified vignettes to reflect use of new `rec_with_table()` call
 
 ## Test environments
 * local OS X install, R 4.0.0
