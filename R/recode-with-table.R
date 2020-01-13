@@ -165,17 +165,17 @@ rec_with_table <-
     if (!is.null(custom_function_path)) {
       source(custom_function_path)
     }
-    if (is.null(variable_details)){
-      print('Loading cchsflow variable_details')
-      data(variable_details, package = 'cchsflow', envir = environment())  
+    if (is.null(variable_details)) {
+      print("Loading cchsflow variable_details")
+      data(variable_details, package = "cchsflow", envir = environment())
     }
-    if (is.null(variables)){
-      print('Loading cchsflow variables')
-      data(variables, package = 'cchsflow', envir = environment())  
+    if (is.null(variables)) {
+      print("Loading cchsflow variables")
+      data(variables, package = "cchsflow", envir = environment())
     }
-    if (is.null(database_name)){
-      print('Using the passed data variable name as database_name')
-      database_name <- deparse(substitute(data))  
+    if (is.null(database_name)) {
+      print("Using the passed data variable name as database_name")
+      database_name <- deparse(substitute(data))
     }
     # ---- Step 1: Detemine if the passed data is a list or single database
     append_non_db_columns <- FALSE
@@ -626,7 +626,9 @@ recode_columns <-
               !is.null(row_being_checked[[pkg.globals$argument.Notes]]) &&
               !is_equal(row_being_checked[[pkg.globals$argument.Notes]], "") &&
               !is.na(row_being_checked[[pkg.globals$argument.Notes]])) {
-              print(paste("NOTE for",variable_being_checked,":", as.character(row_being_checked[[
+              print(paste("NOTE for",variable_being_checked,
+                          ":",
+                          as.character(row_being_checked[[
                 pkg.globals$argument.Notes]])))
             }
           }
