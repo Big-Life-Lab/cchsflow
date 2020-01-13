@@ -126,12 +126,9 @@
 <p><code>cchsflow</code> creates harmonized variables (where possible) between CCHS cycles. Searching BMI in <code>variables</code> (described in the Introduction section of variableDetails.csv <a href="https://big-life-lab.github.io/cchsflow/articles/variable_details.html">vignette</a>) shows <code>HWTGBMI</code> calculates BMI with two decimal places for all cycles for all respondents using the respondents’ untruncated height and weight.</p>
 <p><em>Calculate a harmonized BMI variable for CCHS 2001 cycle</em></p>
 <pre><code>    # load test cchs data - included in cchsflow
-    
-    
-    cchs2001_BMI &lt;- rec_with_table(
-            cchs2001, 
-            "HWTGBMI"
-            )</code></pre>
+
+    cchs2001_BMI &lt;- rec_with_table(cchs2001, "HWTGBMI")
+    </code></pre>
 <p>Notes printed to console indicate issues that may affect BMI classification for your study.</p>
 <pre><code>[1] "NOTE: CCHS 2001 restricts BMI to ages 20-64"
 [1] "NOTE: CCHS 2001 and 2003 codes not applicable and missing variables as 

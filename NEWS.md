@@ -10,7 +10,8 @@ come  with the package.
 ## Minor improvements and bug fixes
 - Autolinked DOI in `DESCRIPTION`
 - Fixes to R chunk in `README.md`
-- Modified tests and examples to use the new simplified rec_with_table call
+- Modified tests and examples to use the new simplified `rec_with_table()` call
+- Modified vignettes to reflect use of new `rec_with_table()` call
 
 # cchsflow 1.1.0
 2020-01-08
