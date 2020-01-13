@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -113,6 +113,9 @@
     </li>
     <li>
       <a href="../articles/how_to_add_variables.html">How to add variables</a>
+    </li>
+    <li>
+      <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
     </li>
   </ul>
 </li>
@@ -201,12 +204,13 @@ cchsflow variable name: CCC_91A</p></td>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
 
 <span class='no'>resp2001</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cchs2001</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
-  <span class='kw'>dataset_name</span> <span class='kw'>=</span> <span class='st'>"cchs2001"</span>, <span class='kw'>variables</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+  <span class='no'>cchs2001</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
     <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>, <span class='st'>"CCC_91A"</span>,
     <span class='st'>"resp_condition_der"</span>
   )
-)</div><div class='output co'>#&gt; [1] "NOTE: Not applicable, don't know, refusal, not stated (96-99) were options in CCHS 2003, but had zero responses"</div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
+)</div><div class='output co'>#&gt; [1] "Loading cchsflow variable_details"
+#&gt; [1] "Using the passed data variable name as database_name"
+#&gt; [1] "NOTE for DHHGAGE_cont : Not applicable, don't know, refusal, not stated (96-99) were options in CCHS 2003, but had zero responses"</div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
@@ -281,12 +285,13 @@ cchsflow variable name: CCC_91A</p></td>
 #&gt; 5   NA(a)       2           22                 NA
 #&gt; 6       2       2           77                  3</div><div class='input'>
 <span class='no'>resp2003</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cchs2003</span>, <span class='kw'>variable_details</span> <span class='kw'>=</span> <span class='no'>variable_details</span>,
-  <span class='kw'>dataset_name</span> <span class='kw'>=</span> <span class='st'>"cchs2003"</span>, <span class='kw'>variables</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+  <span class='no'>cchs2003</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
     <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>, <span class='st'>"CCC_91A"</span>,
     <span class='st'>"resp_condition_der"</span>
   )
-)</div><div class='output co'>#&gt; [1] "NOTE: Not applicable, don't know, refusal, not stated (96-99) were options in CCHS 2003, but had zero responses"</div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
+)</div><div class='output co'>#&gt; [1] "Loading cchsflow variable_details"
+#&gt; [1] "Using the passed data variable name as database_name"
+#&gt; [1] "NOTE for DHHGAGE_cont : Not applicable, don't know, refusal, not stated (96-99) were options in CCHS 2003, but had zero responses"</div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2one or more of the respiratory arguments was outside the 1:2 allowed</span>

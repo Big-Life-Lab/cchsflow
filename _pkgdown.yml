@@ -30,6 +30,8 @@ navbar:
         href: articles/derived_variables.html
       - text: How to add variables
         href: articles/how_to_add_variables.html
+      - text: How to use tagged_na
+        href: articles/tagged_na_usage.html
     reference:
       text: Reference
       href: reference/index.html

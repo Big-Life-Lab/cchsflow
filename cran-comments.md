@@ -1,15 +1,14 @@
 ## Resubmission
 
 This is a resubmission. In this version I have:
-* Expanded Descrption section of `DESCRIPTION` to further describe package and
-cite authors of previous packages.
-* Added The Ottawa Hospital as author.
-* Added executable examples to exported functions.
-* Enabled automated testing of functions through the use of testthat.
-* Additional features were also added. Their details are located in the
-changelog.
-* Fixed broken links in articles, and reformatted R chunks in vignettes for
-better clarity.
+* Autolinked DOI in `DESCRIPTION`
+* Made fixes to R chunks and minor edits in `README.md` 
+* Changed dataset_name to database_name
+* Added a simple `rec_with_table()` function call that uses `data` variable name 
+as `database_name` as well as default `variables` and `variable_details` that
+come  with the package.
+* Modified tests and examples to use the new simplified rec_with_table call
+* Modified vignettes to reflect use of new `rec_with_table()` call
 
 ## Test environments
 * local OS X install, R 4.0.0

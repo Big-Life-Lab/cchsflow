@@ -76,7 +76,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -109,6 +109,9 @@
     </li>
     <li>
       <a href="../articles/how_to_add_variables.html">How to add variables</a>
+    </li>
+    <li>
+      <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
     </li>
   </ul>
 </li>
@@ -143,13 +146,38 @@
       <small>Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="cchsflow-1-1-0-latest-build" class="section level1">
+    <div id="cchsflow-120-latest-build" class="section level1">
 <h1 class="page-header">
-<a href="#cchsflow-1-1-0-latest-build" class="anchor"></a>cchsflow 1.1.0 (Latest build)</h1>
-<p>2020-01-08</p>
+<a href="#cchsflow-120-latest-build" class="anchor"></a>cchsflow 1.2.0 (Latest build)</h1>
+<p>2020-01-13</p>
 <div id="breaking-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
+<ul>
+<li>Changed dataset_name to database_name</li>
+<li>Added a simple <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> function call that uses <code>data</code> variable name as <code>database_name</code> as well as default <code>variables</code> and <code>variable_details</code> that come with the package.</li>
+</ul>
+</div>
+<div id="minor-improvements-and-bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-and-bug-fixes" class="anchor"></a>Minor improvements and bug fixes</h2>
+<ul>
+<li>Autolinked DOI in <code>DESCRIPTION</code>
+</li>
+<li>Fixes to R chunks and minor edits in <code>README.md</code>
+</li>
+<li>Modified tests and examples to use the new simplified <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> call</li>
+<li>Modified vignettes to reflect use of new <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> call</li>
+</ul>
+</div>
+</div>
+    <div id="cchsflow-110" class="section level1">
+<h1 class="page-header">
+<a href="#cchsflow-110" class="anchor"></a>cchsflow 1.1.0</h1>
+<p>2020-01-08</p>
+<div id="breaking-changes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#breaking-changes-1" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li><p>Changed <code>data_source</code> parameter in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> to <code>data</code>.</p></li>
 <li><p>Changed order of parameters to have <code>variables</code> after <code>dataset_name</code>.</p></li>
@@ -163,9 +191,9 @@
 <li>Added automated testing for functions</li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes" class="section level2">
+<div id="minor-improvements-and-bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-1" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li>Updated <code>DESCRIPTION</code> to expand description of package and added The Ottawa Hospital as author.</li>
 <li>Refactored <code><a href="../reference/age_cat_fun.html">age_cat_fun()</a></code> to account for age below 0 and include warning messages for respiratory functions.</li>
@@ -177,9 +205,9 @@
 </ul>
 </div>
 </div>
-    <div id="cchsflow-1-0-1" class="section level1">
+    <div id="cchsflow-101" class="section level1">
 <h1 class="page-header">
-<a href="#cchsflow-1-0-1" class="anchor"></a>cchsflow 1.0.1</h1>
+<a href="#cchsflow-101" class="anchor"></a>cchsflow 1.0.1</h1>
 <p>2019-12-19</p>
 <div id="features" class="section level2">
 <h2 class="hasAnchor">
@@ -191,9 +219,9 @@
 </ul>
 </div>
 </div>
-    <div id="cchsflow-1-0-0" class="section level1">
+    <div id="cchsflow-100" class="section level1">
 <h1 class="page-header">
-<a href="#cchsflow-1-0-0" class="anchor"></a>cchsflow 1.0.0</h1>
+<a href="#cchsflow-100" class="anchor"></a>cchsflow 1.0.0</h1>
 <p>2019-12-18</p>
 <div id="news" class="section level2">
 <h2 class="hasAnchor">
@@ -224,9 +252,9 @@
 </ul>
 </div>
 </div>
-    <div id="cchsflow-0-2-3" class="section level1">
+    <div id="cchsflow-023" class="section level1">
 <h1 class="page-header">
-<a href="#cchsflow-0-2-3" class="anchor"></a>cchsflow 0.2.3</h1>
+<a href="#cchsflow-023" class="anchor"></a>cchsflow 0.2.3</h1>
 <p>2019-11-29</p>
 <div id="features-2" class="section level2">
 <h2 class="hasAnchor">
@@ -252,9 +280,9 @@
 </div>
 </div>
 </div>
-    <div id="cchsflow-0-2-2" class="section level1">
+    <div id="cchsflow-022" class="section level1">
 <h1 class="page-header">
-<a href="#cchsflow-0-2-2" class="anchor"></a>cchsflow 0.2.2</h1>
+<a href="#cchsflow-022" class="anchor"></a>cchsflow 0.2.2</h1>
 <p>2019-11-26</p>
 <div id="features-3" class="section level2">
 <h2 class="hasAnchor">
@@ -267,9 +295,9 @@
 </ul>
 </div>
 </div>
-    <div id="cchsflow-0-2-1" class="section level1">
+    <div id="cchsflow-021" class="section level1">
 <h1 class="page-header">
-<a href="#cchsflow-0-2-1" class="anchor"></a>cchsflow 0.2.1</h1>
+<a href="#cchsflow-021" class="anchor"></a>cchsflow 0.2.1</h1>
 <p>2019-11-19</p>
 <div id="features-4" class="section level2">
 <h2 class="hasAnchor">
@@ -280,9 +308,9 @@
 </ul>
 </div>
 </div>
-    <div id="cchsflow-0-2-0" class="section level1">
+    <div id="cchsflow-020" class="section level1">
 <h1 class="page-header">
-<a href="#cchsflow-0-2-0" class="anchor"></a>cchsflow 0.2.0</h1>
+<a href="#cchsflow-020" class="anchor"></a>cchsflow 0.2.0</h1>
 <div id="features-5" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features-5" class="anchor"></a>Features</h2>
@@ -294,9 +322,9 @@
 </ul>
 </div>
 </div>
-    <div id="cchsflow-0-1-0-first-version" class="section level1">
+    <div id="cchsflow-010-first-version" class="section level1">
 <h1 class="page-header">
-<a href="#cchsflow-0-1-0-first-version" class="anchor"></a>cchsflow 0.1.0 (First Version)</h1>
+<a href="#cchsflow-010-first-version" class="anchor"></a>cchsflow 0.1.0 (First Version)</h1>
 <div id="features-6" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features-6" class="anchor"></a>Features</h2>
@@ -313,14 +341,15 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-        <li><a href="#cchsflow-1-1-0-latest-build">1.1.0</a></li>
-        <li><a href="#cchsflow-1-0-1">1.0.1</a></li>
-        <li><a href="#cchsflow-1-0-0">1.0.0</a></li>
-        <li><a href="#cchsflow-0-2-3">0.2.3</a></li>
-        <li><a href="#cchsflow-0-2-2">0.2.2</a></li>
-        <li><a href="#cchsflow-0-2-1">0.2.1</a></li>
-        <li><a href="#cchsflow-0-2-0">0.2.0</a></li>
-        <li><a href="#cchsflow-0-1-0-first-version">0.1.0</a></li>
+        <li><a href="#cchsflow-120-latest-build">1.2.0</a></li>
+        <li><a href="#cchsflow-110">1.1.0</a></li>
+        <li><a href="#cchsflow-101">1.0.1</a></li>
+        <li><a href="#cchsflow-100">1.0.0</a></li>
+        <li><a href="#cchsflow-023">0.2.3</a></li>
+        <li><a href="#cchsflow-022">0.2.2</a></li>
+        <li><a href="#cchsflow-021">0.2.1</a></li>
+        <li><a href="#cchsflow-020">0.2.0</a></li>
+        <li><a href="#cchsflow-010-first-version">0.1.0</a></li>
       </ul>
     </div>
   </div>

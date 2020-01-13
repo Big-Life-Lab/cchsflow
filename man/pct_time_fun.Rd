@@ -44,8 +44,7 @@ Since SDCGRES is a categorical variable measuring length of time, we've
 
 library(cchsflow)
 pct_time2010 <- rec_with_table(
-  data = cchs2010, variable_details = variable_details,
-  dataset_name = "cchs2010", variables = c(
+  cchs2010, c(
     "DHHGAGE_cont", "SDCGCBG",
     "SDCGRES", "pct_time_der"
   )
@@ -53,8 +52,7 @@ pct_time2010 <- rec_with_table(
 head(pct_time2010)
 
 pct_time2012 <- rec_with_table(
-  data = cchs2012, variable_details = variable_details,
-  dataset_name = "cchs2012", variables = c(
+  cchs2012,  c(
     "DHHGAGE_cont", "SDCGCBG",
     "SDCGRES", "pct_time_der"
   )

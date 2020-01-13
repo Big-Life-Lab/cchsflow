@@ -101,12 +101,12 @@ is_equal <- function(v1, v2) {
 #' }
 #'
 #' @param data A dataframe containing the variables to be recoded.
-#' @param variable_details A dataframe containing the specifications (rules)
-#' for recoding.
-#' @param dataset_name String, the name of the dataset containing the
-#' to be recoded.
 #' @param variables character vector containing variable names to recode or
 #' a variables csv containing additional variable info
+#' @param database_name String, the name of the dataset containing the
+#' to be recoded.
+#' @param variable_details A dataframe containing the specifications (rules)
+#' for recoding.
 #' @param else_value Value (string, number, integer, logical or NA) that is used
 #' to replace any values that are outside the specified ranges
 #' (no rules for recoding).
@@ -124,8 +124,7 @@ is_equal <- function(v1, v2) {
 #' @examples
 #' library(cchsflow)
 #' bmi2010 <- rec_with_table(
-#'   data = cchs2010, variable_details =
-#'     variable_details, dataset_name = "cchs2010", variables = c(
+#'   data = cchs2010, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -134,8 +133,7 @@ is_equal <- function(v1, v2) {
 #' head(bmi2010)
 #'
 #' bmi2012 <- rec_with_table(
-#'   data = cchs2012, variable_details =
-#'     variable_details, dataset_name = "cchs2012", variables = c(
+#'   data = cchs2012,  c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -154,9 +152,9 @@ is_equal <- function(v1, v2) {
 
 rec_with_table <-
   function(data,
-           variable_details,
-           dataset_name,
            variables = NULL,
+           database_name = NULL,
+           variable_details = NULL,
            else_value = NA,
            append_to_data = FALSE,
            log = FALSE,
@@ -167,19 +165,30 @@ rec_with_table <-
     if (!is.null(custom_function_path)) {
       source(custom_function_path)
     }
-
+    if (is.null(variable_details)) {
+      print("Loading cchsflow variable_details")
+      data(variable_details, package = "cchsflow", envir = environment())
+    }
+    if (is.null(variables)) {
+      print("Loading cchsflow variables")
+      data(variables, package = "cchsflow", envir = environment())
+    }
+    if (is.null(database_name)) {
+      print("Using the passed data variable name as database_name")
+      database_name <- deparse(substitute(data))
+    }
     # ---- Step 1: Detemine if the passed data is a list or single database
     append_non_db_columns <- FALSE
     if (class(data) == "list" &&
-      length(dataset_name) == length(data)) {
-      for (data_name in dataset_name) {
+      length(database_name) == length(data)) {
+      for (data_name in database_name) {
         # ---- Step 2A: Verify that the passed name exists in the passed data
 
         if (!is.null(data[[data_name]])) {
           data[[data_name]] <- recode_call(
             variables = variables,
             data = data[[data_name]],
-            dataset_name = dataset_name,
+            database_name = database_name,
             print_note = print_note,
             else_value = else_value,
             variable_details = variable_details,
@@ -194,17 +203,17 @@ rec_with_table <-
               "The data",
               data_name,
               "is missing from the passed list please verify the names are
-              correct in the data list and the dataset_name list"
+              correct in the data list and the database_name list"
             )
           )
         }
       }
     } else if ("data.frame" %in% class(data) &&
-      length(dataset_name) == 1) {
+      length(database_name) == 1) {
       data <- recode_call(
         variables = variables,
         data = data,
-        dataset_name = dataset_name,
+        database_name = database_name,
         print_note = print_note,
         else_value = else_value,
         variable_details = variable_details,
@@ -232,7 +241,7 @@ rec_with_table <-
 recode_call <-
   function(variables,
            data,
-           dataset_name,
+           database_name,
            print_note,
            else_value,
            variable_details,
@@ -243,6 +252,8 @@ recode_call <-
     variable_details[[pkg.globals$argument.Variables]] <-
       trimws(variable_details[[pkg.globals$argument.Variables]])
     if (!is.null(variables) && "data.frame" %in% class(variables)) {
+      variables[[pkg.globals$argument.Variables]] <-
+        trimws(variables[[pkg.globals$argument.Variables]])
       variable_details <-
         update_variable_details_based_on_variable_sheet(
           variable_sheet = variables,
@@ -299,14 +310,14 @@ recode_call <-
     all_possible_var_names <-
       unique(as.character(variable_details[[pkg.globals$argument.Variables]]))
     all_variables_detected <-
-      variable_details[grepl(dataset_name, variable_details[[
+      variable_details[grepl(database_name, variable_details[[
         pkg.globals$argument.DatabaseStart]]), ]
 
     rec_data <-
       recode_columns(
         data = data,
         variables_to_process = all_variables_detected,
-        data_name = dataset_name,
+        data_name = database_name,
         log = log,
         print_note = print_note,
         else_default = else_value
@@ -615,7 +626,9 @@ recode_columns <-
               !is.null(row_being_checked[[pkg.globals$argument.Notes]]) &&
               !is_equal(row_being_checked[[pkg.globals$argument.Notes]], "") &&
               !is.na(row_being_checked[[pkg.globals$argument.Notes]])) {
-              print(paste("NOTE:", as.character(row_being_checked[[
+              print(paste("NOTE for", variable_being_checked,
+                          ":",
+                          as.character(row_being_checked[[
                 pkg.globals$argument.Notes]])))
             }
           }
