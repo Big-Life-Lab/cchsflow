@@ -64,5 +64,6 @@ tail(comb_food_insecurity)
 
 }
 \seealso{
-
+\code{\link{food_insecurity_fun1}},
+\code{\link{food_insecurity_fun3}}
 }
