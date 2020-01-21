@@ -52,7 +52,9 @@
 #' head(comb_food_insecurity)
 #' tail(comb_food_insecurity)
 #' 
-#' @seealso \code{\link{food_insecurity_fun2}},\code{\link{food_insecurity_fun3}
+#' @seealso \code{\link{food_insecurity_fun2}},
+#' \code{\link{food_insecurity_fun3}}
+#' 
 #' @export
 food_insecurity_fun1 <- 
   function(FINF1) {
@@ -114,7 +116,8 @@ food_insecurity_fun1 <-
 #' head(comb_food_insecurity)
 #' tail(comb_food_insecurity)
 #' 
-#' @seealso \code{\link{food_insecurity_fun1}},\code{\link{food_insecurity_fun3}
+#' @seealso \code{\link{food_insecurity_fun1}},
+#' \code{\link{food_insecurity_fun3}}
 #' @export
 food_insecurity_fun2 <-
   function(FSCDHFS) {
@@ -178,7 +181,8 @@ food_insecurity_fun2 <-
 #' tail(comb_food_insecurity)
 #' 
 #' 
-#' @seealso \code{\link{food_insecurity_fun1}},\code{\link{food_insecurity_fun2}
+#' @seealso \code{\link{food_insecurity_fun1}},
+#' \code{\link{food_insecurity_fun2}}
 #' @export
 food_insecurity_fun3 <-
   function(FSCDHFS2) {
