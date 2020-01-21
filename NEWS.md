@@ -1,4 +1,14 @@
-# cchsflow 1.2.0 (Latest build)
+# cchsflow 1.3.0 (Latest build)
+2020-01-21
+
+## Variables
+- <font color = "green">**New**</font> food_insecurity_der. Derived food
+insecurity variable.
+
+## Minor improvements and bug fixes
+- Minor edits to `DESCRIPTION`
+
+# cchsflow 1.2.0 
 2020-01-13
 
 ## Breaking changes
