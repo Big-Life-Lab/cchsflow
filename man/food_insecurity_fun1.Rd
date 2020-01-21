@@ -6,6 +6,9 @@
 \usage{
 food_insecurity_fun1(FINF1)
 }
+\arguments{
+\item{FINF1}{CCHS variable indicating food insecurity in the past 12 months}
+}
 \value{
 a categorical variable (food_insecurity_der) with 2 levels:
 

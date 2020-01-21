@@ -6,13 +6,17 @@
 \usage{
 food_insecurity_fun3(FSCDHFS2)
 }
-\value{
-a categorical variable (food_insecurity_der) with 2 levels:
+\arguments{
+\item{FSCDHFS2}{CCHS variable measuring household food insecurity in the last
+ 12 months
 
  \enumerate{
   \item 1 - no food insecurity in the last 12 months 
   \item 2 - food insecurity in the last 12 months
- }
+ }}
+}
+\value{
+a categorical variable (food_insecurity_der) with 2 levels:
 }
 \description{
 This function uses the food insecurity variable from the 2007

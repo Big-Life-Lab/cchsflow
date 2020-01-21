@@ -14,6 +14,8 @@
 #'  insecurity variables, it is appropriate to use FINF1, FSCDHFS, or FSCDHFS2
 #'  that are available on cchsflow. For multiple CCHS survey years that do not
 #'  use the same food insecurity variables, food_insecurity_der is recommended.
+#' 
+#' @param FINF1 CCHS variable indicating food insecurity in the past 12 months
 #'   
 #' @return a categorical variable (food_insecurity_der) with 2 levels:
 #' 
@@ -75,6 +77,8 @@ food_insecurity_fun1 <-
 #'  that are available on cchsflow. For multiple CCHS survey years that do not
 #'  use the same food insecurity variables, food_insecurity_der is recommended.
 #'   
+#' @param FSCDHFS CCHS variable measuring hunger in the last 12 months
+#' 
 #' @return a categorical variable (food_insecurity_der) with 2 levels:
 #' 
 #'  \enumerate{
@@ -103,7 +107,7 @@ food_insecurity_fun1 <-
 #' head(food_insecurity2005)
 #' 
 #' food_insecurity2007 <- rec_with_table(cchs2007_2008, 
-#'    ("FSCDHFS2", "food_insecurity_der"))
+#'    c("FSCDHFS2", "food_insecurity_der"))
 #' tail(food_insecurity2007)
 #' 
 #' comb_food_insecurity <- bind_rows(food_insecurity2005, food_insecurity2007)
@@ -136,6 +140,9 @@ food_insecurity_fun2 <-
 #'  use the same food insecurity variables, food_insecurity_der is recommended.
 #'   
 #' @return a categorical variable (food_insecurity_der) with 2 levels:
+#' 
+#' @param FSCDHFS2 CCHS variable measuring household food insecurity in the last
+#'  12 months
 #' 
 #'  \enumerate{
 #'   \item 1 - no food insecurity in the last 12 months 

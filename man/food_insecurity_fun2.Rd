@@ -6,6 +6,9 @@
 \usage{
 food_insecurity_fun2(FSCDHFS)
 }
+\arguments{
+\item{FSCDHFS}{CCHS variable measuring hunger in the last 12 months}
+}
 \value{
 a categorical variable (food_insecurity_der) with 2 levels:
 
@@ -52,7 +55,7 @@ food_insecurity2005 <- rec_with_table(cchs2005,
 head(food_insecurity2005)
 
 food_insecurity2007 <- rec_with_table(cchs2007_2008, 
-   ("FSCDHFS2", "food_insecurity_der"))
+   c("FSCDHFS2", "food_insecurity_der"))
 tail(food_insecurity2007)
 
 comb_food_insecurity <- bind_rows(food_insecurity2005, food_insecurity2007)
