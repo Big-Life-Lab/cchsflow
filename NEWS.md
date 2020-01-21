@@ -6,7 +6,7 @@
 insecurity variable.
 
 ## Major improvements
-- Messages are no longer printed to console message() is used instead this
+- Messages are no longer printed to console, and message() is used instead. This
 enables the ability to easily suppress console output for testing purposes.
 
 ## Minor improvements and bug fixes
