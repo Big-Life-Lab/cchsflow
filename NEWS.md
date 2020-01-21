@@ -5,6 +5,10 @@
 - <font color = "green">**New**</font> food_insecurity_der. Derived food
 insecurity variable.
 
+## Major improvements
+- Messages are no longer printed to console message() is used instead this
+enables the ability to easily suppress console output for testing purposes.
+
 ## Minor improvements and bug fixes
 - Minor edits to `DESCRIPTION`
 

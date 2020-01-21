@@ -166,15 +166,15 @@ rec_with_table <-
       source(custom_function_path)
     }
     if (is.null(variable_details)) {
-      print("Loading cchsflow variable_details")
+      message("Loading cchsflow variable_details")
       data(variable_details, package = "cchsflow", envir = environment())
     }
     if (is.null(variables)) {
-      print("Loading cchsflow variables")
+      message("Loading cchsflow variables")
       data(variables, package = "cchsflow", envir = environment())
     }
     if (is.null(database_name)) {
-      print("Using the passed data variable name as database_name")
+      message("Using the passed data variable name as database_name")
       database_name <- deparse(substitute(data))
     }
     # ---- Step 1: Detemine if the passed data is a list or single database
@@ -626,24 +626,22 @@ recode_columns <-
               !is.null(row_being_checked[[pkg.globals$argument.Notes]]) &&
               !is_equal(row_being_checked[[pkg.globals$argument.Notes]], "") &&
               !is.na(row_being_checked[[pkg.globals$argument.Notes]])) {
-              print(paste("NOTE for", variable_being_checked,
-                          ":",
+              message("NOTE for ", variable_being_checked,
+                          ": ",
                           as.character(row_being_checked[[
-                pkg.globals$argument.Notes]])))
+                pkg.globals$argument.Notes]]))
             }
           }
           # if log was requested print it
           if (log) {
-            print(
-              paste(
-                "The variable",
+            message(
+                "The variable ",
                 data_variable_being_checked,
-                "was recoded into",
+                " was recoded into ",
                 variable_being_checked,
-                "for the database",
+                " for the database ",
                 data_name,
-                "the following recodes were made:"
-              )
+                " the following recodes were made: "
             )
             # Reset rowCount to avoid confusion
             rownames(log_table) <- NULL
