@@ -114,7 +114,7 @@ is_equal <- function(v1, v2) {
 #' will be appended to the data.
 #' @param log Logical, if \code{FALSE} (default), a log of recoding will
 #' not be printed.
-#' @param print_note Logical, if \code{FALSE} (default), will not print the
+#' @param notes Logical, if \code{FALSE} (default), will not print the
 #' content inside the `Note`` column of the variable being recoded.
 #' @param var_labels labels vector to attach to variables in variables
 #' @param custom_function_path path to location of the function to load
@@ -158,7 +158,7 @@ rec_with_table <-
            else_value = NA,
            append_to_data = FALSE,
            log = FALSE,
-           print_note = TRUE,
+           notes = TRUE,
            var_labels = NULL,
            custom_function_path = NULL) {
     # If custom Functions are passed create new environment and source
@@ -189,7 +189,7 @@ rec_with_table <-
             variables = variables,
             data = data[[data_name]],
             database_name = database_name,
-            print_note = print_note,
+            print_note = notes,
             else_value = else_value,
             variable_details = variable_details,
             append_to_data = append_to_data,
@@ -214,7 +214,7 @@ rec_with_table <-
         variables = variables,
         data = data,
         database_name = database_name,
-        print_note = print_note,
+        print_note = notes,
         else_value = else_value,
         variable_details = variable_details,
         append_to_data = append_to_data,
