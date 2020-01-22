@@ -12,9 +12,9 @@ approapriate use of the CCHS survey data. Defaulting the message() to console is
 analagous to messages for other common R functions and packages. e.g. 
 install.package() notes or devtools check notes. 
 
-`cchsflow` is intended to be used byresearchers examining data from the Canadian 
-Community Health Survey (CCHS)between 2001 and 2014. During this time period, 
-there have been major and minormodification to variables between survey cycles. 
+`cchsflow` is intended to be used by researchers examining data from the Canadian 
+Community Health Survey (CCHS) between 2001 and 2014. During this time period, 
+there have been major and minor modification to variables between survey cycles. 
 The purpose of the `print_note`parameter is to inform users of any potential 
 changes in variables that have been transformed and harmonized between survey 
 cycles. Given that these changes may impact their research, we believe it is 
