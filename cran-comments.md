@@ -3,8 +3,7 @@
 This is a resubmission. In this version I have:
 * Enabled the use of message() to suppress messages on console
 * Added quotation marks to 'sjmisc' in `DESCRIPTION`
-* Added food_insecurity_der as a new derived variable using
-`food_insecurity_fun1()`, `food_insecurity_fun2()`, and `food_insecurity_fun3()`
+* Added food_insecurity_der as a new derived variable
 
 Note:
 * In `rec_with_table()`, we have decided to set the `print_note` parameter to be
