@@ -1,6 +1,7 @@
 ## Resubmission
 
-This is a resubmission. In this version I have:
+This is a resubmission. In this version we have:
+* Changed `print_note()` parameter in `rec_with_table()` to `notes`.
 * Enabled the use of message() to suppress messages on console
 * Added quotation marks to 'sjmisc' in `DESCRIPTION`
 * Added food_insecurity_der as a new derived variable

@@ -1,5 +1,8 @@
-# cchsflow 1.2.1 (Latest build)
-2020-01-22
+# cchsflow 1.3.0 (Latest build)
+2020-01-23
+
+## Breaking changes
+- Changed `print_note()` parameter in `rec_with_table()` to `notes`.
 
 ## Variables
 - <font color = "green">**New**</font> food_insecurity_der. Derived food

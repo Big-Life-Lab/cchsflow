@@ -50,13 +50,13 @@ BMI. `cchsflow` harmonizes the BMI variable across different cycles.
 Notes printed to console indicate issues that may affect BMI classification for 
 your study.
 ```
-[1] "Loading cchsflow variable_details"
-[1] "Using the passed data variable name as database_name"
-[1] "NOTE for HWTGBMI : CCHS 2001 restricts BMI to ages 20-64"
-[1] "NOTE for HWTGBMI : CCHS 2001 and 2003 codes not applicable and missing 
+Loading cchsflow variable_details
+Using the passed data variable name as database_name
+NOTE for HWTGBMI : CCHS 2001 restricts BMI to ages 20-64
+NOTE for HWTGBMI : CCHS 2001 and 2003 codes not applicable and missing 
 variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes 
-not applicable and missing variables as 999.96 and 999.7-999.99 respectively"
-[1] "NOTE for HWTGBMI : Don't know (999.7) and refusal (999.8) not included
+not applicable and missing variables as 999.96 and 999.7-999.99 respectively
+NOTE for HWTGBMI : Don't know (999.7) and refusal (999.8) not included
 in 2001 CCHS"
 ```
 
