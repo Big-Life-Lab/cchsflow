@@ -20,17 +20,21 @@
 #'  
 #'  If you are using cchsflow for CCHS survey years that use consistent food
 #'  insecurity variables, it is appropriate to use FINF1, FSCDHFS, or FSCDHFS2
-#'  that are available on cchsflow. For multiple CCHS survey years that do not
-#'  use the same food insecurity variables, food_insecurity_der is recommended.
+#'  that are available on cchsflow. If you are using cchsflow for only the 2001
+#'  and 2003 cycles, it is appropriate to use FINF1. If you are using cchsflow
+#'  for only the 2005 cycle, FSCDHFS is appropriate. If you are using cchsflow
+#'  for cycles between 2007 and 2014, FSCDHFS2 is appropriate. For multiple CCHS
+#'  survey years that do not use the same food insecurity variables (i.e. using
+#'  cchsflow for years 2001 to 2007), food_insecurity_der is recommended.
 #' 
-#' @param FINF1 CCHS variable used in 2001 and 2003 indicating food insecurity
-#'  in the past 12 months
+#' @param FINF1 variable used in 2001 and 2003 survey cycles indicating food
+#'  insecurity in the past 12 months
 #' 
-#' @param FSCDHFS CCHS variable used in 2005 measuring food insecurity & hunger
-#'  in the last 12 months
+#' @param FSCDHFS variable used in the 2005 survey cycle measuring food
+#'  insecurity & hunger in the last 12 months
 #' 
-#' @param FSCDHFS2 CCHS variable used in 2007-2014 measuring household food
-#'  insecurity in the last 12 months
+#' @param FSCDHFS2 variable used in 2007-2014 survey cycles measuring household
+#'  food insecurity in the last 12 months
 #' 
 #'
 #' @examples 

@@ -21,7 +21,7 @@ cycles. Given that these changes may impact their research, we believe it is
 imperative to default `print_note` to `TRUE` so they do not miss these notes.
 
 The previous CRAN reviewer suggested creating an object for the notes. We have 
-considered this approach but our users have indicated that this obejct would be 
+considered this approach but our users have indicated that this object would be 
 infrequently used. Therefore, we have not created an object at this time.
 
 ## Test environments
