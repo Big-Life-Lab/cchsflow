@@ -49,7 +49,7 @@ reference:
     desc: Utility functions that are used in other cchsflow functions
     contents:
     - if_else2
-  - title: "Potentially problematic CCHS variables"
+  - title: "Potentially problematic variables"
     desc: Derived variables in cchsflow that users may run into issues with
     contents:
     - ALWDWKY
