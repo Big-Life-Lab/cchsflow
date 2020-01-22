@@ -70,7 +70,7 @@ With `rec_with_table()` there are also default arguments that do not need to be 
   + `else_value` defaults to NA. Values out of range set to NA.
   + `append_to_data` defaults to FALSE. Transformed variables will not be appended to the original CCHS dataset.
   + `log` defaults to FALSE. Logs of the variable transformations will not be displayed. 
-  + `print_note` defaults to TRUE. Information in the `Notes` column from `variable_details.csv` will be displayed
+  + `notes` defaults to TRUE. Information in the `Notes` column from `variable_details.csv` will be displayed
   + `var_labels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`. The format to add labels to a subset of variables is `c(variable = "Label")`.
 
 ### Example 1. Transform a single variable from a single database
@@ -211,9 +211,9 @@ options(htmlwidgets.TOJSON_ARGS = list(na = 'string'))
 ```
 
 ```{r, warning=FALSE}
-transformed2001 <- rec_with_table(data = cchs2001, print_note = FALSE)
+transformed2001 <- rec_with_table(data = cchs2001, notes = FALSE)
 
-transformed2012 <- rec_with_table(data = cchs2012, print_note = FALSE)
+transformed2012 <- rec_with_table(data = cchs2012, notes = FALSE)
 
 combined_cchs <- bind_rows(transformed2001, transformed2012)
 labeled_combined_cchs <- set_data_labels(data_to_label = combined_cchs,
