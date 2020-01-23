@@ -49,13 +49,14 @@ reference:
     desc: Utility functions that are used in other cchsflow functions
     contents:
     - if_else2
-  - title: "Alcohol CCHS variables"
-    desc: Derived alcohol variables in cchsflow that users may run into issues with
+  - title: "Potentially problematic variables"
+    desc: Derived variables in cchsflow that users may run into issues with
     contents:
     - ALWDWKY
     - ALWDDLY
     - ALCDTYP
     - ALCDTTM
+    - food_insecurity_der
   - title: "Derived variable functions"
     desc: Functions for deriving custom CCHS variables
     contents:

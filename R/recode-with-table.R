@@ -114,7 +114,7 @@ is_equal <- function(v1, v2) {
 #' will be appended to the data.
 #' @param log Logical, if \code{FALSE} (default), a log of recoding will
 #' not be printed.
-#' @param print_note Logical, if \code{FALSE} (default), will not print the
+#' @param notes Logical, if \code{FALSE} (default), will not print the
 #' content inside the `Note`` column of the variable being recoded.
 #' @param var_labels labels vector to attach to variables in variables
 #' @param custom_function_path path to location of the function to load
@@ -158,7 +158,7 @@ rec_with_table <-
            else_value = NA,
            append_to_data = FALSE,
            log = FALSE,
-           print_note = TRUE,
+           notes = TRUE,
            var_labels = NULL,
            custom_function_path = NULL) {
     # If custom Functions are passed create new environment and source
@@ -166,15 +166,15 @@ rec_with_table <-
       source(custom_function_path)
     }
     if (is.null(variable_details)) {
-      print("Loading cchsflow variable_details")
+      message("Loading cchsflow variable_details")
       data(variable_details, package = "cchsflow", envir = environment())
     }
     if (is.null(variables)) {
-      print("Loading cchsflow variables")
+      message("Loading cchsflow variables")
       data(variables, package = "cchsflow", envir = environment())
     }
     if (is.null(database_name)) {
-      print("Using the passed data variable name as database_name")
+      message("Using the passed data variable name as database_name")
       database_name <- deparse(substitute(data))
     }
     # ---- Step 1: Detemine if the passed data is a list or single database
@@ -189,7 +189,7 @@ rec_with_table <-
             variables = variables,
             data = data[[data_name]],
             database_name = database_name,
-            print_note = print_note,
+            print_note = notes,
             else_value = else_value,
             variable_details = variable_details,
             append_to_data = append_to_data,
@@ -214,7 +214,7 @@ rec_with_table <-
         variables = variables,
         data = data,
         database_name = database_name,
-        print_note = print_note,
+        print_note = notes,
         else_value = else_value,
         variable_details = variable_details,
         append_to_data = append_to_data,
@@ -626,24 +626,22 @@ recode_columns <-
               !is.null(row_being_checked[[pkg.globals$argument.Notes]]) &&
               !is_equal(row_being_checked[[pkg.globals$argument.Notes]], "") &&
               !is.na(row_being_checked[[pkg.globals$argument.Notes]])) {
-              print(paste("NOTE for", variable_being_checked,
-                          ":",
+              message("NOTE for ", variable_being_checked,
+                          ": ",
                           as.character(row_being_checked[[
-                pkg.globals$argument.Notes]])))
+                pkg.globals$argument.Notes]]))
             }
           }
           # if log was requested print it
           if (log) {
-            print(
-              paste(
-                "The variable",
+            message(
+                "The variable ",
                 data_variable_being_checked,
-                "was recoded into",
+                " was recoded into ",
                 variable_being_checked,
-                "for the database",
+                " for the database ",
                 data_name,
-                "the following recodes were made:"
-              )
+                " the following recodes were made: "
             )
             # Reset rowCount to avoid confusion
             rownames(log_table) <- NULL

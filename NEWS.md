@@ -1,4 +1,21 @@
-# cchsflow 1.2.0 (Latest build)
+# cchsflow 1.3.0 (Latest build)
+2020-01-23
+
+## Breaking changes
+- Changed `print_note()` parameter in `rec_with_table()` to `notes`.
+
+## Variables
+- <font color = "green">**New**</font> food_insecurity_der. Derived food
+insecurity variable.
+
+## Major improvements
+- `message()` is now used to print messages onto console. This enables the
+ability to easily suppress console output for testing purposes.
+
+## Minor improvements and bug fixes
+- Minor edits to `DESCRIPTION`
+
+# cchsflow 1.2.0 
 2020-01-13
 
 ## Breaking changes

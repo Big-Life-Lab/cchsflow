@@ -1,14 +1,29 @@
 ## Resubmission
 
-This is a resubmission. In this version I have:
-* Autolinked DOI in `DESCRIPTION`
-* Made fixes to R chunks and minor edits in `README.md` 
-* Changed dataset_name to database_name
-* Added a simple `rec_with_table()` function call that uses `data` variable name 
-as `database_name` as well as default `variables` and `variable_details` that
-come  with the package.
-* Modified tests and examples to use the new simplified rec_with_table call
-* Modified vignettes to reflect use of new `rec_with_table()` call
+This is a resubmission. In this version we have:
+* Changed `print_note()` parameter in `rec_with_table()` to `notes`.
+* Enabled the use of message() to suppress messages on console
+* Added quotation marks to 'sjmisc' in `DESCRIPTION`
+* Added food_insecurity_der as a new derived variable
+
+Note:
+* In `rec_with_table()`, we prefer to set the `print_note` parameter to be
+set to `TRUE` as a default. We believe the note is important information for the 
+approapriate use of the CCHS survey data. Defaulting the message() to console is 
+analagous to messages for other common R functions and packages. e.g. 
+install.package() notes or devtools check notes. 
+
+`cchsflow` is intended to be used by researchers examining data from the Canadian 
+Community Health Survey (CCHS) between 2001 and 2014. During this time period, 
+there have been major and minor modification to variables between survey cycles. 
+The purpose of the `print_note`parameter is to inform users of any potential 
+changes in variables that have been transformed and harmonized between survey 
+cycles. Given that these changes may impact their research, we believe it is 
+imperative to default `print_note` to `TRUE` so they do not miss these notes.
+
+The previous CRAN reviewer suggested creating an object for the notes. We have 
+considered this approach but our users have indicated that this object would be 
+infrequently used. Therefore, we have not created an object at this time.
 
 ## Test environments
 * local OS X install, R 4.0.0

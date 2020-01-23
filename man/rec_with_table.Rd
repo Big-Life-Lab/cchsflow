@@ -12,7 +12,7 @@ rec_with_table(
   else_value = NA,
   append_to_data = FALSE,
   log = FALSE,
-  print_note = TRUE,
+  notes = TRUE,
   var_labels = NULL,
   custom_function_path = NULL
 )
@@ -39,7 +39,7 @@ will be appended to the data.}
 \item{log}{Logical, if \code{FALSE} (default), a log of recoding will
 not be printed.}
 
-\item{print_note}{Logical, if \code{FALSE} (default), will not print the
+\item{notes}{Logical, if \code{FALSE} (default), will not print the
 content inside the `Note`` column of the variable being recoded.}
 
 \item{var_labels}{labels vector to attach to variables in variables}
