@@ -1,4 +1,4 @@
-#' @title food_insecurity_der
+#' @title Food insecurity
 #' 
 #' @description \strong{NOTE:} this is not a function.
 #'  
@@ -8,8 +8,8 @@
 #'  with two categories:
 #'  
 #'  \enumerate{
-#'   \item 1 - no food insecurity in the last 12 months 
-#'   \item 2 - food insecurity in the last 12 months
+#'   \item no food insecurity in the last 12 months 
+#'   \item food insecurity in the last 12 months
 #'  }
 #'  
 #' @details Food insecurity is measured differently across CCHS cycles. In 2001
