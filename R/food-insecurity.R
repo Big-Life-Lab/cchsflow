@@ -2,7 +2,7 @@
 #' 
 #' @description \strong{NOTE:} this is not a function.
 #'  
-#'  This is a derivied variable that uses the different food insecurity
+#'  This is a derived variable that uses the different food insecurity
 #'  variables from all CCHS cycles to generate food_insecurity_der that is
 #'  harmonized across all cycles. food_insecurity_der is a categorical variable
 #'  with two categories:
