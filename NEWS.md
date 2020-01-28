@@ -1,4 +1,14 @@
-# cchsflow 1.3.0 (Latest build)
+# cchsflow 1.3.1 (Latest build)
+2020-01-28
+
+## Variables
+- <font color = "green">**New**</font> CCC_31A. Ever diagnosed with cancer
+- <font color = "green">**New**</font> CCC_072. Ever diagnosed with hypertension
+- <font color = "green">**New**</font> CCC_073. Taken blood pressure medication
+in the last month
+- <font color = "green">**New**</font> HCU_1AA. Has regular medical doctor
+
+# cchsflow 1.3.0 
 2020-01-23
 
 ## Breaking changes
