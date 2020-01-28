@@ -6,13 +6,13 @@
 \usage{
 rec_with_table(
   data,
-  variable_details,
-  dataset_name,
   variables = NULL,
+  database_name = NULL,
+  variable_details = NULL,
   else_value = NA,
   append_to_data = FALSE,
   log = FALSE,
-  print_note = TRUE,
+  notes = TRUE,
   var_labels = NULL,
   custom_function_path = NULL
 )
@@ -20,14 +20,14 @@ rec_with_table(
 \arguments{
 \item{data}{A dataframe containing the variables to be recoded.}
 
-\item{variable_details}{A dataframe containing the specifications (rules)
-for recoding.}
-
-\item{dataset_name}{String, the name of the dataset containing the
-to be recoded.}
-
 \item{variables}{character vector containing variable names to recode or
 a variables csv containing additional variable info}
+
+\item{database_name}{String, the name of the dataset containing the
+to be recoded.}
+
+\item{variable_details}{A dataframe containing the specifications (rules)
+for recoding.}
 
 \item{else_value}{Value (string, number, integer, logical or NA) that is used
 to replace any values that are outside the specified ranges
@@ -39,7 +39,7 @@ will be appended to the data.}
 \item{log}{Logical, if \code{FALSE} (default), a log of recoding will
 not be printed.}
 
-\item{print_note}{Logical, if \code{FALSE} (default), will not print the
+\item{notes}{Logical, if \code{FALSE} (default), will not print the
 content inside the `Note`` column of the variable being recoded.}
 
 \item{var_labels}{labels vector to attach to variables in variables}
@@ -113,8 +113,7 @@ The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-v
 \examples{
 library(cchsflow)
 bmi2010 <- rec_with_table(
-  data = cchs2010, variable_details =
-    variable_details, dataset_name = "cchs2010", variables = c(
+  data = cchs2010, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
@@ -123,8 +122,7 @@ bmi2010 <- rec_with_table(
 head(bmi2010)
 
 bmi2012 <- rec_with_table(
-  data = cchs2012, variable_details =
-    variable_details, dataset_name = "cchs2012", variables = c(
+  data = cchs2012,  c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )

@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -72,6 +72,9 @@
     <li>
       <a href="../articles/how_to_add_variables.html">How to add variables</a>
     </li>
+    <li>
+      <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -98,7 +101,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="how_to_add_variables_files/jquery-1.11.3/jquery.min.js"></script><script src="how_to_add_variables_files/elevate-section-attrs-2.0/elevate-section-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>How to add variables to cchsflow</h1>
@@ -3839,38 +3842,38 @@ cchs2001::HUIAGVIS, cchs2003::HUICGVIS, cchs2005::HUIEGVIS, [HUIGVIS]
 <h3 class="hasAnchor">
 <a href="#step-1--creating-a-derived-function" class="anchor"></a>Step 1. Creating a derived function</h3>
 <p>With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Pack_years_fun &lt;-
-<span class="st">  </span><span class="cf">function</span>(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont,
-           SMK_<span class="dv">204</span>, SMK_05B, SMK_<span class="dv">208</span>, SMK_05C, SMKG01C_cont, SMK_01A) {
-    <span class="co">#Time since quit for former daily smokers</span>
-    tsq_ds_fun &lt;-<span class="st"> </span><span class="cf">function</span>(SMK_09A_B, SMKG09C) {
-      SMKG09C &lt;-
-<span class="st">        </span><span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">1</span>, <span class="dv">4</span>,
-        <span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">2</span>, <span class="dv">8</span>,
-        <span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">3</span>, <span class="dv">12</span>, <span class="ot">NA</span>)))
-      tsq_ds &lt;-
-<span class="st">        </span><span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.5</span>,
-        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">2</span>, <span class="fl">1.5</span>,
-        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">3</span>, <span class="fl">2.5</span>,
-        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">4</span>, SMKG09C, <span class="ot">NA</span>))))
-    }
-    tsq_ds&lt;-<span class="kw">tsq_ds_fun</span>(SMK_09A_B, SMKG09C)
-    <span class="co"># PackYears for Daily Smoker</span>
-    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG203_cont)<span class="op">*</span>(SMK_<span class="dv">204</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),
-    <span class="co"># PackYears for Occasional Smoker (former daily)     </span>
-    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>) 
-            <span class="op">+</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">*</span>tsq_ds),
-    <span class="co"># PackYears for Occasional Smoker (never daily)      </span>
-    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">3</span>, (<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">/</span><span class="dv">20</span>)<span class="op">*</span>(DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG01C_cont),
-    <span class="co"># PackYears for former daily smoker (non-smoker now)      </span>
-    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">4</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),
-    <span class="co"># PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      </span>
-    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.0137</span>,
-    <span class="co"># PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      </span>
-    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">2</span>, <span class="fl">0.007</span>,
-    <span class="co"># Non-smoker      </span>
-    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">6</span>, <span class="dv">0</span>, <span class="ot">NA</span>)))))))
-  }</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>Pack_years_fun &lt;-</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="st">  </span><span class="cf">function</span>(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>           SMK_<span class="dv">204</span>, SMK_05B, SMK_<span class="dv">208</span>, SMK_05C, SMKG01C_cont, SMK_01A) {</span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="co">#Time since quit for former daily smokers</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>    tsq_ds_fun &lt;-<span class="st"> </span><span class="cf">function</span>(SMK_09A_B, SMKG09C) {</span>
+<span id="cb2-6"><a href="#cb2-6"></a>      SMKG09C &lt;-</span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="st">        </span><span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">1</span>, <span class="dv">4</span>,</span>
+<span id="cb2-8"><a href="#cb2-8"></a>        <span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">2</span>, <span class="dv">8</span>,</span>
+<span id="cb2-9"><a href="#cb2-9"></a>        <span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">3</span>, <span class="dv">12</span>, <span class="ot">NA</span>)))</span>
+<span id="cb2-10"><a href="#cb2-10"></a>      tsq_ds &lt;-</span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="st">        </span><span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.5</span>,</span>
+<span id="cb2-12"><a href="#cb2-12"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">2</span>, <span class="fl">1.5</span>,</span>
+<span id="cb2-13"><a href="#cb2-13"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">3</span>, <span class="fl">2.5</span>,</span>
+<span id="cb2-14"><a href="#cb2-14"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">4</span>, SMKG09C, <span class="ot">NA</span>))))</span>
+<span id="cb2-15"><a href="#cb2-15"></a>    }</span>
+<span id="cb2-16"><a href="#cb2-16"></a>    tsq_ds&lt;-<span class="kw">tsq_ds_fun</span>(SMK_09A_B, SMKG09C)</span>
+<span id="cb2-17"><a href="#cb2-17"></a>    <span class="co"># PackYears for Daily Smoker</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG203_cont)<span class="op">*</span>(SMK_<span class="dv">204</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),</span>
+<span id="cb2-19"><a href="#cb2-19"></a>    <span class="co"># PackYears for Occasional Smoker (former daily)     </span></span>
+<span id="cb2-20"><a href="#cb2-20"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>) </span>
+<span id="cb2-21"><a href="#cb2-21"></a>            <span class="op">+</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">*</span>tsq_ds),</span>
+<span id="cb2-22"><a href="#cb2-22"></a>    <span class="co"># PackYears for Occasional Smoker (never daily)      </span></span>
+<span id="cb2-23"><a href="#cb2-23"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">3</span>, (<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">/</span><span class="dv">20</span>)<span class="op">*</span>(DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG01C_cont),</span>
+<span id="cb2-24"><a href="#cb2-24"></a>    <span class="co"># PackYears for former daily smoker (non-smoker now)      </span></span>
+<span id="cb2-25"><a href="#cb2-25"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">4</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),</span>
+<span id="cb2-26"><a href="#cb2-26"></a>    <span class="co"># PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      </span></span>
+<span id="cb2-27"><a href="#cb2-27"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.0137</span>,</span>
+<span id="cb2-28"><a href="#cb2-28"></a>    <span class="co"># PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      </span></span>
+<span id="cb2-29"><a href="#cb2-29"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">2</span>, <span class="fl">0.007</span>,</span>
+<span id="cb2-30"><a href="#cb2-30"></a>    <span class="co"># Non-smoker      </span></span>
+<span id="cb2-31"><a href="#cb2-31"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">6</span>, <span class="dv">0</span>, <span class="ot">NA</span>)))))))</span>
+<span id="cb2-32"><a href="#cb2-32"></a>  }</span></code></pre></div>
 <p>More information on what each smoking variable means can be found in the <a href="../reference/pack_years_fun.html">Reference</a> section.</p>
 </div>
 <div id="steps-2-and-3--specifying-pack-years-in-variable_details-csv-and-variables-csv" class="section level3">
@@ -3936,13 +3939,13 @@ notes
 1065
 </td>
 <td style="text-align:left;">
-SMKG203_cont
+SMKG203_B
 </td>
 <td style="text-align:left;">
-N/A
+SMKG203_B_cat11_NA::b
 </td>
 <td style="text-align:left;">
-cont
+cat
 </td>
 <td style="text-align:left;">
 cchs2005, cchs2007_2008, cchs2009_2010, cchs2010, cchs2011_2012, cchs2012, cchs2013_2014, cchs2014
@@ -3954,25 +3957,25 @@ cchs2005::SMKEG203, [SMKG203]
 cat
 </td>
 <td style="text-align:left;">
-22
+NA::b
 </td>
 <td style="text-align:left;">
-N/A
+11
 </td>
 <td style="text-align:left;">
-agecigd
+else
 </td>
 <td style="text-align:left;">
-converted categorical age (20 to 24) started smoking daily - daily smoker
+else
 </td>
 <td style="text-align:left;">
 years
 </td>
 <td style="text-align:left;">
-5
+else
 </td>
 <td style="text-align:left;">
-20 To 24 Years
+else
 </td>
 <td style="text-align:left;">
 agecigd

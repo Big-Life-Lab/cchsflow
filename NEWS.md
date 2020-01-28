@@ -1,4 +1,36 @@
-# cchsflow 1.1.0 (Latest build)
+# cchsflow 1.3.0 (Latest build)
+2020-01-23
+
+## Breaking changes
+- Changed `print_note()` parameter in `rec_with_table()` to `notes`.
+
+## Variables
+- <font color = "green">**New**</font> food_insecurity_der. Derived food
+insecurity variable.
+
+## Major improvements
+- `message()` is now used to print messages onto console. This enables the
+ability to easily suppress console output for testing purposes.
+
+## Minor improvements and bug fixes
+- Minor edits to `DESCRIPTION`
+
+# cchsflow 1.2.0 
+2020-01-13
+
+## Breaking changes
+- Changed dataset_name to database_name
+- Added a simple `rec_with_table()` function call that uses `data` variable name 
+as `database_name` as well as default `variables` and `variable_details` that
+come  with the package.
+
+## Minor improvements and bug fixes
+- Autolinked DOI in `DESCRIPTION`
+- Fixes to R chunks and minor edits in `README.md` 
+- Modified tests and examples to use the new simplified `rec_with_table()` call
+- Modified vignettes to reflect use of new `rec_with_table()` call
+
+# cchsflow 1.1.0
 2020-01-08
 
 ## Breaking changes

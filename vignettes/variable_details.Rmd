@@ -46,7 +46,7 @@ If a categorical variable has 4 distinct categories, along with a "not applicabl
 
 ### Naming convention for not applicable and missing values
 
-`rec_with_table()` uses the `tagged_na()` function from the [haven](https://www.rdocumentation.org/packages/haven/versions/2.1.1) package to tag not applicable responses as `NA(a)`, and missing values (don't know, refusal, not stated) as `NA(b)`. As you will see later, not applicable values are transformed to `NA::a`, and missing values are transformed to `NA::b`.
+`rec_with_table()` uses the `tagged_na()` function from the [haven](https://www.rdocumentation.org/packages/haven/versions/2.1.1) package to tag not applicable responses as `NA(a)`, and missing values (don't know, refusal, not stated) as `NA(b)`. As you will see later, not applicable values are transformed to `NA::a`, and missing values are transformed to `NA::b`. See [here](tagged_na_usage.html) for more information about `tagged_na()`.
 
 ### Columns
 The following are the columns that are listed in `variable_details.csv`. Many of these columns need to be specified in order for `rec_with_table()` to be functional. We will use the `sex` variable to illustrate how each column is specified:
