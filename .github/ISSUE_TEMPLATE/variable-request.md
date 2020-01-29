@@ -27,3 +27,6 @@ List the variables in cchsflow used to create this variable
 
 **Additional context**
 Add any other context or screenshots about the feature request here.
+
+**Additional instructions for derived variables**
+Please attach an .R file that includes documentation of the derived variable as per roxygen2 standards, along with the code to derive the variable
