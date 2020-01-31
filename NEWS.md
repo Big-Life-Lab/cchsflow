@@ -1,4 +1,14 @@
-# cchsflow 1.3.1 (Latest build)
+# cchsflow 1.3.2 (Latest build)
+2020-02-03
+
+## Variables
+- <font color = "green">**New**</font> [binge_drinker](https://big-life-lab.github.io/cchsflow/reference/binge_drinker_fun.html) -
+derived binge drinking variable
+
+## Minor improvements
+- Minor edits to labels and sections in `variables.csv`
+
+# cchsflow 1.3.1
 2020-01-28
 
 ## Variables
