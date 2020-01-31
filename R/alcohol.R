@@ -201,20 +201,20 @@ binge_drinker_fun <-
   function(DHH_SEX, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6,
            ALW_2A7) {
     # Males with at least one day with 5 or more drinks
-    if_else2((DHH_SEX = 1 & (ALW_2A1 >= 5 | ALW_2A2 >= 5 | ALW_2A3 >=5 |
+    if_else2((DHH_SEX == 1 & (ALW_2A1 >= 5 | ALW_2A2 >= 5 | ALW_2A3 >=5 |
                               ALW_2A4 >= 5 | ALW_2A5 >= 5 | ALW_2A6 >= 5 |
                               ALW_2A7 >= 5)), 1,
     # Males with no days with 5 or more drinks
-    if_else2((DHH_SEX = 1 & (ALW_2A1 < 5 & ALW_2A2 < 5 &
+    if_else2((DHH_SEX == 1 & (ALW_2A1 < 5 & ALW_2A2 < 5 &
                               ALW_2A3 < 5 & ALW_2A4 < 5 &
                               ALW_2A5 < 5 & ALW_2A6 < 5 &
                               ALW_2A7 < 5)), 2,
     # Females with at least one day with 4 or more drinks
-    if_else2((DHH_SEX = 2 & (ALW_2A1 >= 4 | ALW_2A2 >= 4 | ALW_2A3 >= 4 |
+    if_else2((DHH_SEX == 2 & (ALW_2A1 >= 4 | ALW_2A2 >= 4 | ALW_2A3 >= 4 |
                                ALW_2A4 >= 4 | ALW_2A5 >= 4 | ALW_2A6 >= 4 |
                                ALW_2A7 >= 4)), 1,
     # Females with no days with 4 or more drinks
-    if_else2((DHH_SEX = 2 & (ALW_2A1 < 4 & ALW_2A2 < 4 &
+    if_else2((DHH_SEX == 2 & (ALW_2A1 < 4 & ALW_2A2 < 4 &
                                ALW_2A3 < 4 & ALW_2A4 < 4 &
                                ALW_2A5 < 4 & ALW_2A6 < 4 &
                                ALW_2A7 < 4)), 2, NA))))
