@@ -205,17 +205,17 @@ binge_drinker_fun <-
                               ALW_2A4 >= 5 | ALW_2A5 >= 5 | ALW_2A6 >= 5 |
                               ALW_2A7 >= 5)), 1,
     # Males with no days with 5 or more drinks
-    if_else2((DHH_SEX == 1 & (ALW_2A1 < 5 & ALW_2A2 < 5 &
-                              ALW_2A3 < 5 & ALW_2A4 < 5 &
-                              ALW_2A5 < 5 & ALW_2A6 < 5 &
-                              ALW_2A7 < 5)), 2,
+    if_else2((DHH_SEX == 1 & (ALW_2A1 %in% (0:4) & ALW_2A2 %in% (0:4) &
+                              ALW_2A3 %in% (0:4) & ALW_2A4 %in% (0:4) &
+                              ALW_2A5 %in% (0:4) & ALW_2A6 %in% (0:4) &
+                              ALW_2A7 %in% (0:4))), 2,
     # Females with at least one day with 4 or more drinks
     if_else2((DHH_SEX == 2 & (ALW_2A1 >= 4 | ALW_2A2 >= 4 | ALW_2A3 >= 4 |
                                ALW_2A4 >= 4 | ALW_2A5 >= 4 | ALW_2A6 >= 4 |
                                ALW_2A7 >= 4)), 1,
     # Females with no days with 4 or more drinks
-    if_else2((DHH_SEX == 2 & (ALW_2A1 < 4 & ALW_2A2 < 4 &
-                               ALW_2A3 < 4 & ALW_2A4 < 4 &
-                               ALW_2A5 < 4 & ALW_2A6 < 4 &
-                               ALW_2A7 < 4)), 2, NA))))
+    if_else2((DHH_SEX == 2 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
+                               ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
+                               ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
+                               ALW_2A7 %in% (0:3))), 2, NA))))
   }
