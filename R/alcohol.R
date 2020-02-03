@@ -147,7 +147,7 @@ ALCDTTM <- function(ALCDTTM) {
 #'   \item 2 - non-binge drinker
 #'  }
 #' 
-#' @example 
+#' @examples 
 #' # Using binge_drinker_fun() to create binge_drinker values across CCHS cycles
 #' # binge_drinker_fun() is specified in variable_details.csv along with the
 #' # CCHS variables and cycles included.
