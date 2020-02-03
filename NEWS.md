@@ -6,7 +6,12 @@
 derived binge drinking variable
 
 ## Minor improvements
-- Minor edits to labels and sections in `variables.csv`
+- Issue and variable request templates added on Github
+- Minor edits to the labels and sections in `variables.csv`
+- Minor correction to `DESCRIPTION`
+- Minor corrections to the documentation of [`resp_condition_fun1()`](https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun1.html),
+[`resp_condition_fun2()`](https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun2.html),
+[`resp_condition_fun3()`](https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun3.html),
 
 # cchsflow 1.3.1
 2020-01-28
