@@ -12,6 +12,10 @@ Using the naming conventions described in the [`variables.csv`](https://big-life
 
 You will first need to create a custom function that will carry out the necessary transformations needed for your derived variable. You will then need to specify your derived variable on `variables.csv` and `variable_details.csv`. For more information, [click here](https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html).
 
+### Requesting a variable
+
+To request a variable to be added to cchsflow, please use the variable request template available on the GitHub [repository](https://github.com/Big-Life-Lab/cchsflow/issues).
+
 ## Documentation
 
 
@@ -32,7 +36,7 @@ When linking to other .Rmd files make sure their extension is changed to .html. 
 ## Filing an issue
 
 The easiest way to propose a change or new feature is to file an issue. If you've found a
-bug, you may also create an associated issue. If possible, try to illustrate your proposal or the bug with a minimal [reproducible example](https://www.tidyverse.org/help/#reprex).
+bug, you may also create an associated issue. If possible, try to illustrate your proposal or the bug with a minimal [reproducible example](https://www.tidyverse.org/help/#reprex). When filing an issue, please use the issues template available on the GitHub [repository](https://github.com/Big-Life-Lab/cchsflow/issues).
 
 ## Pull request
 
