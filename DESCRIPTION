@@ -1,7 +1,7 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and Harmonizing CCHS Variables
-Version: 1.3.1
+Version: 1.3.2
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -37,7 +37,7 @@ Depends:
 Description: Variable transformation and harmonization of the Canadian Community Health Survey (CCHS) from
             2001 to 2014. This is useful for researchers interested in using Canadian population health data
             across multiple years as it helps combine variables. This package relies on rec_with_table() which was based off 'sjmisc' rec().
-            Lüdecke D (2018). "sjmisc: Data and Variable Transformation Functions". Journal of Open Source Software, 3(26), 754. <doi: 10.21105/joss.00754>.
+            Lüdecke D (2018). "sjmisc: Data and Variable Transformation Functions". Journal of Open Source Software, 3(26), 754. <doi:10.21105/joss.00754>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
