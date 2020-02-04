@@ -1,10 +1,10 @@
 ## Resubmission
 
 This is a resubmission. In this version we have:
-* Added removed space in doi specifications in `DESCRIPTION`
+* Removed space in doi specifications in `DESCRIPTION`
 * Added binge_drinker as a new derived variable
-* Done minor edits to the labels and sections in `variables.csv`
-* Done minor edits to the documentation of `resp_condition_fun1()`,
+* Made minor edits to the labels and sections in `variables.csv`
+* Made minor edits to the documentation of `resp_condition_fun1()`,
 `resp_condition_fun2()`, `resp_condition_fun3()`
 
 
