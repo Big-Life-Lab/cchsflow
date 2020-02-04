@@ -30,7 +30,7 @@ This is one of 3 functions used to create a derived variable
  Emphysema as a combined variable, as well as Bronchitis
 }
 \examples{
-# Using resp_condition_fun3() to create pack-years values across CCHS cycles
+# Using resp_condition_fun3() to create values across CCHS cycles
 # (2001-2003) resp_condition_fun3() is specified in
 # variable_details.csv along with the CCHS variables and cycles included.
 

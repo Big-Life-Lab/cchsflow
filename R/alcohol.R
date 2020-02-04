@@ -111,3 +111,111 @@ ALCDTYP <- function(ALCDTYP) {
 ALCDTTM <- function(ALCDTTM) {
   # this is for documentation purposes only
 }
+
+#' @title Binge drinking
+#' 
+#' @description This function creates a derived categorical variable that
+#'  flags for binge drinking based on the number drinks consumed on a single
+#'  day.
+#'
+#' @details In health research, binge drinking is defined as having an excess
+#'  amount of alcohol in a single day. For males, this is defined as having five
+#'  or more drinks; and for females it is four or more drinks. In the CCHS,
+#'  respondents are asked to count the number of drinks they had during each
+#'  day of the last week.
+#' 
+#' @param DHH_SEX sex of respondent (1 - male, 2 - female)
+#' 
+#' @param ALW_2A1 Number of drinks on Sunday
+#' 
+#' @param ALW_2A2 Number of drinks on Monday
+#' 
+#' @param ALW_2A3 Number of drinks on Tuesday
+#' 
+#' @param ALW_2A4 Number of drinks on Wednesday
+#' 
+#' @param ALW_2A5 Number of drinks on Thursday
+#' 
+#' @param ALW_2A6 Number of drinks on Friday
+#' 
+#' @param ALW_2A7 Number of drinks on Saturday
+#' 
+#' @return Categorical variable (binge_drinker) with two categories:
+#' 
+#'  \enumerate{
+#'   \item 1 - binge drinker
+#'   \item 2 - non-binge drinker
+#'  }
+#' 
+#' @examples 
+#' # Using binge_drinker_fun() to create binge_drinker values across CCHS cycles
+#' # binge_drinker_fun() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
+#' 
+#' # To transform binge_drinker, use rec_with_table() for each CCHS cycle
+#' # and specify binge_drinker, along with the various alcohol and sex
+#' # variables. Then by using bind_rows() you can combine binge_drinker
+#' # across cycles.
+#' 
+#' library(cchsflow)
+#' binge2001 <- rec_with_table(
+#'   cchs2001, c(
+#'     "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4", "ALW_2A5",
+#'     "ALW_2A6", "ALW_2A7", "binge_drinker"
+#'   )
+#' )
+#' 
+#' head(binge2001)
+#' 
+#' binge2010 <- rec_with_table(
+#'   cchs2010, c(
+#'     "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4", "ALW_2A5",
+#'     "ALW_2A6", "ALW_2A7", "binge_drinker"
+#'   )
+#' )
+#' 
+#' tail(binge2010)
+#' 
+#' combined_binge <- bind_rows(binge2001, binge2010)
+#' 
+#' head(combined_binge)
+#' 
+#' tail(combined_binge)
+#' 
+#' # Using binge_drinker_fun() to generate binge_drinker with user-inputted
+#' # values.
+#' #
+#' # Let's say you are a male, and you had 3 drinks on Sunday, 1 drink on
+#' # Monday, 6 drinks on Tuesday, 0 drinks on Wednesday, 3 drinks on Thurday,
+#' # 8 drinks on Friday, and 2 drinks on Saturday. Using binge_drinker_fun(),
+#' # we can check if you would be classified as a drinker.
+#' 
+#' binge <- binge_drinker_fun(DHH_SEX = 1, ALW_2A1 = 3, ALW_2A2 = 1,
+#'                           ALW_2A3 = 6, ALW_2A4 = 0, ALW_2A5 = 3,
+#'                           ALW_2A6 = 8, ALW_2A7 = 2)
+#' 
+#' print(binge)
+#' @export
+
+binge_drinker_fun <-
+  function(DHH_SEX, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6,
+           ALW_2A7) {
+    # Males with at least one day with 5 or more drinks
+    if_else2((DHH_SEX == 1 & (ALW_2A1 >= 5 | ALW_2A2 >= 5 | ALW_2A3 >=5 |
+                              ALW_2A4 >= 5 | ALW_2A5 >= 5 | ALW_2A6 >= 5 |
+                              ALW_2A7 >= 5)), 1,
+    # Males with no days with 5 or more drinks
+    if_else2((DHH_SEX == 1 & (ALW_2A1 %in% (0:4) & ALW_2A2 %in% (0:4) &
+                              ALW_2A3 %in% (0:4) & ALW_2A4 %in% (0:4) &
+                              ALW_2A5 %in% (0:4) & ALW_2A6 %in% (0:4) &
+                              ALW_2A7 %in% (0:4))), 2,
+    # Females with at least one day with 4 or more drinks
+    if_else2((DHH_SEX == 2 & (ALW_2A1 >= 4 | ALW_2A2 >= 4 | ALW_2A3 >= 4 |
+                               ALW_2A4 >= 4 | ALW_2A5 >= 4 | ALW_2A6 >= 4 |
+                               ALW_2A7 >= 4)), 1,
+    # Females with no days with 4 or more drinks
+    if_else2((DHH_SEX == 2 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
+                               ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
+                               ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
+                               ALW_2A7 %in% (0:3))), 2, NA))))
+  }

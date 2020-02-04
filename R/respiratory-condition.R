@@ -20,7 +20,7 @@
 #'  }
 #'
 #' @examples
-#' # Using resp_condition_fun1() to create pack-years values across CCHS cycles
+#' # Using resp_condition_fun1() to create values across CCHS cycles
 #' # (2009-2014) resp_condition_fun1() is specified in
 #' # variable_details.csv along with the CCHS variables and cycles included.
 #'
@@ -92,7 +92,7 @@ resp_condition_fun1 <-
 #'
 #' @examples
 #'
-#' # Using resp_condition_fun2() to create pack-years values across CCHS cycles
+#' # Using resp_condition_fun2() to create values across CCHS cycles
 #' # (2005-2007) resp_condition_fun2() is specified in
 #' # variable_details.csv along with the CCHS variables and cycles included.
 #'
@@ -188,7 +188,7 @@ resp_condition_fun2 <-
 #'  }
 #'
 #' @examples
-#' # Using resp_condition_fun3() to create pack-years values across CCHS cycles
+#' # Using resp_condition_fun3() to create values across CCHS cycles
 #' # (2001-2003) resp_condition_fun3() is specified in
 #' # variable_details.csv along with the CCHS variables and cycles included.
 #'
