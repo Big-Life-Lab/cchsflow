@@ -1,4 +1,13 @@
-# cchsflow 1.3.2 (Latest build)
+# cchsflow 1.3.3 (Latest build)
+2020-02-06
+
+## Variables
+- <font color = "green">**New**</font> [multiple conditions](https://big-life-lab.github.io/cchsflow/reference/multiple_conditions_fun.html) -
+derived multiple chronic conditions variable
+- Modifications to derived respiratory condition variable to include respondents
+with asthma.
+
+# cchsflow 1.3.2
 2020-02-04
 
 ## Variables
