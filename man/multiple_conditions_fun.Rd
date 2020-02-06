@@ -10,7 +10,7 @@ multiple_conditions_fun(
   CCC_151,
   CCC_171,
   CCC_280,
-  resp_condition,
+  resp_condition_der,
   CCC_051
 )
 }
@@ -27,7 +27,7 @@ of a stroke}
 \item{CCC_280}{variable indicating if respondent has a mood disorder. Note,
 variable was not asked to respondents in the 2001 CCHS survey cycle}
 
-\item{resp_condition}{derived variable indicating if respondent has a
+\item{resp_condition_der}{derived variable indicating if respondent has a
 respiratory condition. See \code{\link{resp_condition_fun1}} for
 documentation on how variable was derived}
 
@@ -61,7 +61,7 @@ mood disorder (CCC_280) was not asked to respondents in the 2001 CCHS
  
  library(cchsflow)
  conditions_2010 <- rec_with_table(cchs2010, c("CCC_121","CCC_131","CCC_151",
- "CCC_171","CCC_280","resp_condition","CCC_051"))
+ "CCC_171","CCC_280","resp_condition_der","CCC_051", "multiple_conditions"))
  
  head(conditions_2010)
  
