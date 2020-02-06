@@ -76,8 +76,12 @@ multiple_conditions_fun <-
                                if_else2(resp_condition_der == 3, 2, 0))
     
     # Calculate number of conditions based on yes
-    conditions <- (CCC_121%%2) + (CCC_131%%2) + (CCC_151%%2) +(CCC_171%%2) +
-      (CCC_280%%2) + (resp_condition_der%%2) + (CCC_051%%2)
+    conditions <- 
+      if_else2((CCC_121 %in% 1:2 | CCC_131 %in% 1:2 | CCC_151 %in% 1:2 |
+                 CCC_171 %in% 1:2 | CCC_280 %in% 1:2 |
+                 resp_condition_der %in% 1:2 | CCC_051 %in% 1:2), 
+               ((CCC_121%%2) + (CCC_131%%2) + (CCC_151%%2) +(CCC_171%%2) +
+                  (CCC_280%%2) + (resp_condition_der%%2) + (CCC_051%%2)), NA)
     
     if_else2(conditions>= 5, "5+", conditions)
   }
