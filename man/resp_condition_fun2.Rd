@@ -4,7 +4,7 @@
 \alias{resp_condition_fun2}
 \title{resp_condition_fun2}
 \usage{
-resp_condition_fun2(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A)
+resp_condition_fun2(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A, CCC_031)
 }
 \arguments{
 \item{DHHGAGE_cont}{continuous age variable.}
@@ -14,6 +14,8 @@ resp_condition_fun2(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A)
 \item{CCC_91F}{variable indicating if respondent has COPD}
 
 \item{CCC_91A}{variable indicating if respondent has chronic bronchitis}
+
+\item{CCC_031}{variable indicating if respondent has asthma}
 }
 \value{
 a categorical variable (resp_condition_der) with 3 levels:
@@ -28,7 +30,8 @@ a categorical variable (resp_condition_der) with 3 levels:
 This is one of 3 functions used to create a derived variable
  (resp_condition_der) that determines if a respondents has a respiratory
  condition. This function is for CCHS cycles (2005-2007) that use COPD &
- Emphysema as separate variables, as well as Bronchitis.
+ Emphysema as separate variables, as well as Bronchitis. Asthma is used
+ across CCHS cycles as a separate variable.
 }
 \examples{
 
@@ -45,7 +48,7 @@ library(cchsflow)
 
 resp2005 <- rec_with_table(
   cchs2005, c(
-    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
+    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031"
     "resp_condition_der"
   )
 )
@@ -54,7 +57,7 @@ head(resp2005)
 
 resp2007_2008 <- rec_with_table(
   cchs2007_2008,  c(
-    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
+    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031"
     "resp_condition_der"
   )
 )
