@@ -1,5 +1,5 @@
 ---
-title: "tagged_na_usage"
+title: "missing data (tagged_na)"
 output: html_document
 vignette: >
   %\VignetteIndexEntry{3 - variable_details.csv}     
@@ -11,12 +11,29 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Reasons for tagged_na usage
+## Missing data (tagged_na)
 
-It is often useful to store different types of NA to represent wide variety of missing values.
-Base R unfortunately does not support more then one type of NA. Different people have decided to handle this in their own manner.
+Base R supports only one type of NA ('not available') to represent missing 
+values. However, the CCHS has serval types of missing data or incomplete 
+category responses. The category values can change across variables and survey 
+cycles, but the most common values are:
 
-For `cchsflow`, we have decided to go with the `haven` package for handling of missing. The haven package has an [introduction](https://haven.tidyverse.org/reference/tagged_na.html) of tagged_na. This is only applied to numeric values as character base values can use any string to represent NA. Haven allows you to attach an additional byte to the numeric NA value that can be distinguished. This also allows normal treatment of NA, as well as special distinction for missing values.
+| Category value | Label |
+|----------------|--------------|
+| 6                  | not applicatable |
+| 7                  | don't knonw      |
+| 8                  | refusal          |
+| 9                  | not stated       |
+
+Furthermore, variables may be entirely missing from a specific cycle, which 
+results in 'not asked' missing data that is not included or coded in CCHS 
+surveys.
+
+`cchsflow` uses the `haven` package [`tagged_na`](https://haven.tidyverse.org/reference/tagged_na.html) 
+to allow multiple missing data categories. `tagged_na` adds an addition 
+character to the NA value, thereby allowing users to define additional missing 
+data types. `tagged_na` applies only for numeric values, as character base 
+values can use any string to represent NA or missing data. 
 
 ## Example
 ```{r cars}
@@ -26,3 +43,13 @@ na_tag(x) # is used to read the tagged NA in most other functions they are still
 print_tagged_na(x) # Is used to print the na as well as their tag
 ```
 
+## CCHS approach to coding missing data
+`cchsflow` recodes category values as:
+
+| `tagged_na` | Category value | Label |
+|----------------|--------------|
+| NA(a) | 6                  | not applicatable |
+| NA(b) | 7                  | don't knonw      |
+| NA(b) | 8                  | refusal          |
+| NA(b) | 9                  | not stated       |
+| NA(b) | question not asked in the survey cycle |
