@@ -54,7 +54,7 @@ head(resp2001)
 
 resp2003 <- rec_with_table(
   cchs2003,c(
-    "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031"
+    "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )
 )

@@ -48,7 +48,7 @@ library(cchsflow)
 
 resp2005 <- rec_with_table(
   cchs2005, c(
-    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031"
+    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )
 )
@@ -57,7 +57,7 @@ head(resp2005)
 
 resp2007_2008 <- rec_with_table(
   cchs2007_2008,  c(
-    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031"
+    "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )
 )

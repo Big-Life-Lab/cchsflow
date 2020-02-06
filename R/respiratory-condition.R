@@ -61,6 +61,25 @@
 #' @export
 resp_condition_fun1 <-
   function(DHHGAGE_cont, CCC_091, CCC_031) {
+    # Argument verification
+    if ((!is_equal(CCC_091, 1) &
+         !is_equal(CCC_091, 2)) |
+        (!is_equal(CCC_031, 1) &
+         !is_equal(CCC_031, 2))) {
+      warning(
+        paste(
+          "In DHHGAGE_cont:",
+          DHHGAGE_cont,
+          ", CCC_091:",
+          CCC_091,
+          ", CCC_031:",
+          CCC_031,
+          "one or more of the respiratory arguments was outside the 1:2 allowed
+          range however the condition is still calculated",
+          sep = ""
+        ), call. = FALSE
+      )
+    }
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
          (CCC_091 == 1 | CCC_031 == 1)), 1,
@@ -113,7 +132,7 @@ resp_condition_fun1 <-
 #'
 #' resp2005 <- rec_with_table(
 #'   cchs2005, c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031"
+#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
@@ -122,7 +141,7 @@ resp_condition_fun1 <-
 #'
 #' resp2007_2008 <- rec_with_table(
 #'   cchs2007_2008,  c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031"
+#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
@@ -225,7 +244,7 @@ resp_condition_fun2 <-
 #'
 #' resp2003 <- rec_with_table(
 #'   cchs2003,c(
-#'     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031"
+#'     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
