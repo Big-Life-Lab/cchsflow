@@ -35,15 +35,23 @@
 #'  "5+" category. 
 #' 
 #' @examples 
-#'  # Using multiple_conditions_fun() to generate multiple_conditions in a CCHS
+#'  # Using rec_with_table() to generate multiple_conditions in a CCHS
 #'  # cycle.
 #'  
 #'  # multiple_conditions_fun() is specified in variable_details.csv along with
 #'  # the CCHS variables and cycles included.
 #'  
-#'  library(cchsflow)
-#'  conditions_2010 <- rec_with_table(cchs2010, c("CCC_121","CCC_131","CCC_151",
-#'  "CCC_171","CCC_280","resp_condition_der","CCC_051", "multiple_conditions"))
+#'  # To generate multiple_conditions, use rec_with_table() and specify the
+#'  # multiple_conditions, along with the variables that are derived from it.
+#'  # Since resp_condition_der is also a derived variable, you will have to
+#'  # specify the variables that are derived from it. In this example, data
+#'  # from the 2010 CCHS will be used, so DHHGAGE_cont, CCC_091, and CCC_031
+#'  # will be specified along with resp_condition_der.
+#'  
+#' library(cchsflow)
+#'  conditions_2010 <- rec_with_table(cchs2010, c("DHHGAGE_cont", "CCC_091",
+#'  "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
+#'  "resp_condition_der","CCC_051", "multiple_conditions"))
 #'  
 #'  head(conditions_2010)
 #'  
