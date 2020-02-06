@@ -61,27 +61,23 @@ multiple_conditions_fun <-
     resp_condition_der <- as.numeric(resp_condition_der)
     CCC_051 <- as.numeric(CCC_051)
     
-    # verify for NA
-    CCC_121 <- if_else2(is.na(CCC_121), 0, CCC_121)
-    CCC_131 <- if_else2(is.na(CCC_131), 0, CCC_131)
-    CCC_151 <- if_else2(is.na(CCC_151), 0, CCC_151)
-    CCC_171 <- if_else2(is.na(CCC_171), 0, CCC_171)
-    CCC_280 <- if_else2(is.na(CCC_280), 0, CCC_280)
-    resp_condition_der <- if_else2(is.na(resp_condition_der), 0,
-                                   resp_condition_der)
-    CCC_051 <- if_else2(is.na(CCC_051), 0, CCC_051)
+    # set invalid/NA values to 0
+    CCC_121 <- if_else2(CCC_121 %in% (1:2), CCC_121, 0)
+    CCC_131 <- if_else2(CCC_131 %in% (1:2), CCC_131, 0)
+    CCC_151 <- if_else2(CCC_151 %in% (1:2), CCC_151, 0)
+    CCC_171 <- if_else2(CCC_171 %in% (1:2), CCC_171, 0)
+    CCC_280 <- if_else2(CCC_280 %in% (1:2), CCC_280, 0)
+    resp_condition_der <- if_else2(resp_condition_der %in% (1:3),
+                                   resp_condition_der, 0)
+    CCC_051 <- if_else2(CCC_051 %in% (1:2), CCC_051, 0)
     
     # adjust resp_condition to yes = 1, no = 2
-    resp_condition_der <- if_else2(resp_condition_der %in% c(1:2), 1,
-                               if_else2(resp_condition_der == 3, 2, 0))
+    resp_condition_der <- if_else2(resp_condition_der %in% c(1:2), 1, 2)
     
     # Calculate number of conditions based on yes
     conditions <- 
-      if_else2((CCC_121 %in% 1:2 | CCC_131 %in% 1:2 | CCC_151 %in% 1:2 |
-                 CCC_171 %in% 1:2 | CCC_280 %in% 1:2 |
-                 resp_condition_der %in% 1:2 | CCC_051 %in% 1:2), 
-               ((CCC_121%%2) + (CCC_131%%2) + (CCC_151%%2) +(CCC_171%%2) +
-                  (CCC_280%%2) + (resp_condition_der%%2) + (CCC_051%%2)), NA)
+      (CCC_121%%2) + (CCC_131%%2) + (CCC_151%%2) +(CCC_171%%2) +
+                  (CCC_280%%2) + (resp_condition_der%%2) + (CCC_051%%2)
     
     if_else2(conditions>= 5, "5+", conditions)
   }
