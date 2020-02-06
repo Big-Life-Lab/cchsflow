@@ -1,5 +1,9 @@
-# cchsflow 1.3.3 (Latest build)
-2020-02-06
+# cchsflow 1.4.0 (Latest build)
+2020-02-07
+
+## Breaking changes
+- Added to _p suffix to the names of datasets & databaseStarts to denote CCHS
+PUMF data
 
 ## Variables
 - <font color = "green">**New**</font> [multiple conditions](https://big-life-lab.github.io/cchsflow/reference/multiple_conditions_fun.html) -
