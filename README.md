@@ -46,7 +46,7 @@ BMI. `cchsflow` harmonizes the BMI variable across different cycles.
 ```
     # load test cchs data - included in cchsflow
 
-    cchs2001_BMI <- rec_with_table(cchs2001, "HWTGBMI")
+    cchs2001_BMI <- rec_with_table(cchs2001_p, "HWTGBMI")
     
 ```
 

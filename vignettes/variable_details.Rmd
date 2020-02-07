@@ -69,7 +69,7 @@ kable(variable_details[c(180:184), c(1:2)])
 kable(variable_details[c(180:184), c(1:3)])
 ```
 
-4. **databaseStart:** the CCHS surveys that contain the variable of interest, separated by commas. 
+4. **databaseStart:** the CCHS surveys that contain the variable of interest, separated by commas. If the PUMF dataset from the CCHS is used, the survey names will have a _p suffix. If the Shared dataset from the CCHS is used, the survey names will have a _s suffix.
 
 ```{r, echo=FALSE, warning=FALSE}
 kable(variable_details[c(180:184), c(1:4)])
