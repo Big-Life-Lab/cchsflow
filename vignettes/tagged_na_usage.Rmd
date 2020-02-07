@@ -14,14 +14,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Missing data (tagged_na)
 
 Base R supports only one type of NA ('not available') to represent missing 
-values. However, the CCHS has serval types of missing data or incomplete 
+values. However, the CCHS has several types of missing data or incomplete 
 category responses. The category values can change across variables and survey 
 cycles, but the most common values are:
 
 | Category value | Label |
 |----------------|--------------|
-| 6                  | not applicatable |
-| 7                  | don't knonw      |
+| 6                  | not applicable   |
+| 7                  | don't know       |
 | 8                  | refusal          |
 | 9                  | not stated       |
 
@@ -48,8 +48,8 @@ print_tagged_na(x) # Is used to print the na as well as their tag
 
 | `tagged_na` | Category value | Label |
 |----------------|--------------|
-| NA(a) | 6                  | not applicatable |
-| NA(b) | 7                  | don't knonw      |
-| NA(b) | 8                  | refusal          |
-| NA(b) | 9                  | not stated       |
-| NA(b) | question not asked in the survey cycle |
+| NA(a) | 6                  | not applicable     |
+| NA(b) | 7                  | don't know         |
+| NA(b) | 8                  | refusal            |
+| NA(b) | 9                  | not stated         |
+| NA(b) | question not asked in the survey cycle  |
