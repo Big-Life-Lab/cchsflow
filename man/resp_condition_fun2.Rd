@@ -47,7 +47,7 @@ This is one of 3 functions used to create a derived variable
 library(cchsflow)
 
 resp2005 <- rec_with_table(
-  cchs2005, c(
+  cchs2005_p, c(
     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )
@@ -56,7 +56,7 @@ resp2005 <- rec_with_table(
 head(resp2005)
 
 resp2007_2008 <- rec_with_table(
-  cchs2007_2008,  c(
+  cchs2007_2008_p,  c(
     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )
