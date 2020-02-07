@@ -52,4 +52,4 @@ print_tagged_na(x) # Is used to print the na as well as their tag
 | NA(b) | 7                  | don't know         |
 | NA(b) | 8                  | refusal            |
 | NA(b) | 9                  | not stated         |
-| NA(b) | question not asked in the survey cycle  |
+| NA(a) | question not asked in the survey cycle  |
