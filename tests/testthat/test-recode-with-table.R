@@ -1,7 +1,7 @@
 load(file.path("..", "testdata", "rec_with_table_test_data.RData"))
 test_that("rec_with_table matches the standard 2001 recode", {
   out <- suppressWarnings(
-    cchsflow::rec_with_table(cchs2001,
+    cchsflow::rec_with_table(cchs2001_p,
                              note = FALSE))
   expect_mapequal(out,
     cchs2001Standard)
@@ -9,7 +9,7 @@ test_that("rec_with_table matches the standard 2001 recode", {
 
 test_that("rec_with_table matches the standard 2003 recode", {
   out <- suppressWarnings(
-    cchsflow::rec_with_table(cchs2003,
+    cchsflow::rec_with_table(cchs2003_p,
                              note = FALSE))
   expect_mapequal(out,
                     cchs2003Standard)
@@ -17,7 +17,7 @@ test_that("rec_with_table matches the standard 2003 recode", {
 
 test_that("rec_with_table matches the standard 2005 recode", {
   out <- suppressWarnings(
-    cchsflow::rec_with_table(cchs2005,
+    cchsflow::rec_with_table(cchs2005_p,
                              note = FALSE))
   expect_mapequal(out,
                     cchs2005Standard)
@@ -25,7 +25,7 @@ test_that("rec_with_table matches the standard 2005 recode", {
 
 test_that("rec_with_table matches the standard 2014 recode", {
   out <- suppressWarnings(
-    cchsflow::rec_with_table(cchs2014,
+    cchsflow::rec_with_table(cchs2014_p,
                              note = FALSE))
   expect_mapequal(out,
                     cchs2014Standard)

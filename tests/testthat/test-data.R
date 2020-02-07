@@ -43,101 +43,101 @@ test_that("variable_details included with cchsflow is not empty", {
 })
 
 # Testing cchs2001
-test_that("cchs2001 dataset included with cchsflow
+test_that("cchs2001_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2001, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2001_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2001 dataset included with cchsflow contains
+test_that("cchs2001_p dataset included with cchsflow contains
           only the 200 sample rows", {
-            expect_true(nrow(cchs2001) == 200)
+            expect_true(nrow(cchs2001_p) == 200)
           })
 
 # Testing cchs2003
-test_that("cchs2003 dataset included with cchsflow
+test_that("cchs2003_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2003, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2003_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2003 dataset included with cchsflow contains
+test_that("cchs2003_p dataset included with cchsflow contains
           only the 200 sample rows", {
-            expect_true(nrow(cchs2003) == 200)
+            expect_true(nrow(cchs2003_p) == 200)
           })
 
 # Testing cchs2005
-test_that("cchs2005 dataset included with cchsflow
+test_that("cchs2005_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2005, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2005_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2005 dataset included with cchsflow contains
+test_that("cchs2005_p dataset included with cchsflow contains
           only the 200 sample rows", {
-            expect_true(nrow(cchs2005) == 200)
+            expect_true(nrow(cchs2005_p) == 200)
           })
 
 # Testing cchs2007_2008
-test_that("cchs2007_2008 dataset included with cchsflow
+test_that("cchs2007_2008_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2007_2008, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2007_2008_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2007_2008 dataset included with cchsflow
+test_that("cchs2007_2008_p dataset included with cchsflow
           contains only the 200 sample rows", {
-            expect_true(nrow(cchs2007_2008) == 200)
+            expect_true(nrow(cchs2007_2008_p) == 200)
           })
 
 # Testing cchs2009_2010
-test_that("cchs2009_2010 dataset included with cchsflow
+test_that("cchs2009_2010_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2009_2010, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2009_2010_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2009_2010 dataset included with cchsflow
+test_that("cchs2009_2010_p dataset included with cchsflow
           contains only the 200 sample rows", {
-            expect_true(nrow(cchs2009_2010) == 200)
+            expect_true(nrow(cchs2009_2010_p) == 200)
           })
 
 # Testing cchs2010
-test_that("cchs2010 dataset included with cchsflow
+test_that("cchs2010_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2010, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2010_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2010 dataset included with cchsflow
-          ontains only the 200 sample rows", {
-            expect_true(nrow(cchs2010) == 200)
+test_that("cchs2010_p dataset included with cchsflow
+          contains only the 200 sample rows", {
+            expect_true(nrow(cchs2010_p) == 200)
           })
 
 # Testing cchs2011_2012
-test_that("cchs2011_2012 dataset included with cchsflow
+test_that("cchs2011_2012_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2011_2012, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2011_2012_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2011_2012 dataset included with cchsflow
+test_that("cchs2011_2012_p dataset included with cchsflow
           contains only the 200 sample rows", {
-            expect_true(nrow(cchs2011_2012) == 200)
+            expect_true(nrow(cchs2011_2012_p) == 200)
           })
 
 # Testing cchs2012
-test_that("cchs2012 dataset included with cchsflow
+test_that("cchs2012_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2012, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2012_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2012 dataset included with cchsflow
+test_that("cchs2012_p dataset included with cchsflow
           contains only the 200 sample rows", {
-            expect_true(nrow(cchs2012) == 200)
+            expect_true(nrow(cchs2012_p) == 200)
           })
 
 # Testing cchs2013_2014
-test_that("cchs2013_2014 dataset included with cchsflow
+test_that("cchs2013_2014_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2013_2014, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2013_2014_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2013_2014 dataset included with cchsflow
+test_that("cchs2013_2014_p dataset included with cchsflow
           contains only the 200 sample rows", {
-            expect_true(nrow(cchs2013_2014) == 200)
+            expect_true(nrow(cchs2013_2014_p) == 200)
           })
 
 # Testing cchs2014
-test_that("cchs2014 dataset included with cchsflow
+test_that("cchs2014_p dataset included with cchsflow
           is saved in correct format", {
-            expect_s3_class(cchs2014, "data.frame", exact = TRUE)
+            expect_s3_class(cchs2014_p, "data.frame", exact = TRUE)
           })
-test_that("cchs2014 dataset included with cchsflow
+test_that("cchs2014_p dataset included with cchsflow
           contains only the 200 sample rows", {
-            expect_true(nrow(cchs2014) == 200)
+            expect_true(nrow(cchs2014_p) == 200)
           })
