@@ -47,7 +47,7 @@
 #'  # and CCC_031 will be specified along with resp_condition_der.
 #'  
 #' library(cchsflow)
-#'  conditions_2001 <- rec_with_table(cchs2001, c("DHHGAGE_cont", "CCC_091",
+#'  conditions_2001 <- rec_with_table(cchs2001_p, c("DHHGAGE_cont", "CCC_091",
 #'  "CCC_91A", "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
 #'  "resp_condition_der","CCC_051", "multiple_conditions"))
 #'  
@@ -139,7 +139,7 @@ multiple_conditions_fun1 <-
 #'  # will be specified along with resp_condition_der.
 #'  
 #' library(cchsflow)
-#'  conditions_2010 <- rec_with_table(cchs2010, c("DHHGAGE_cont", "CCC_091",
+#'  conditions_2010 <- rec_with_table(cchs2010_p, c("DHHGAGE_cont", "CCC_091",
 #'  "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
 #'  "resp_condition_der","CCC_051", "multiple_conditions"))
 #'  

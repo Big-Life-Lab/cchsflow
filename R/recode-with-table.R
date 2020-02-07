@@ -124,7 +124,7 @@ is_equal <- function(v1, v2) {
 #' @examples
 #' library(cchsflow)
 #' bmi2010 <- rec_with_table(
-#'   data = cchs2010, c(
+#'   data = cchs2010_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -133,7 +133,7 @@ is_equal <- function(v1, v2) {
 #' head(bmi2010)
 #'
 #' bmi2012 <- rec_with_table(
-#'   data = cchs2012,  c(
+#'   data = cchs2012_p,  c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )

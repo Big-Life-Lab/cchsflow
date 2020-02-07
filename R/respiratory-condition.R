@@ -35,7 +35,7 @@
 #' library(cchsflow)
 #'
 #' resp2010 <- rec_with_table(
-#'   cchs2010,  c(
+#'   cchs2010_p,  c(
 #'     "DHHGAGE_cont", "CCC_091", "CCC_031",
 #'     "resp_condition_der"
 #'   )
@@ -44,7 +44,7 @@
 #' head(resp2010)
 #'
 #' resp2012 <- rec_with_table(
-#'   cchs2012, c(
+#'   cchs2012_p, c(
 #'     "DHHGAGE_cont", "CCC_091", "CCC_031",
 #'     "resp_condition_der"
 #'   )
@@ -131,7 +131,7 @@ resp_condition_fun1 <-
 #' library(cchsflow)
 #'
 #' resp2005 <- rec_with_table(
-#'   cchs2005, c(
+#'   cchs2005_p, c(
 #'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
@@ -140,7 +140,7 @@ resp_condition_fun1 <-
 #' head(resp2005)
 #'
 #' resp2007_2008 <- rec_with_table(
-#'   cchs2007_2008,  c(
+#'   cchs2007_2008_p,  c(
 #'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
@@ -234,7 +234,7 @@ resp_condition_fun2 <-
 #' library(cchsflow)
 #'
 #' resp2001 <- rec_with_table(
-#'   cchs2001, c(
+#'   cchs2001_p, c(
 #'     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
@@ -243,7 +243,7 @@ resp_condition_fun2 <-
 #' head(resp2001)
 #'
 #' resp2003 <- rec_with_table(
-#'   cchs2003,c(
+#'   cchs2003_p,c(
 #'     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
