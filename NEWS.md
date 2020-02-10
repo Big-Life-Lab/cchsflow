@@ -1,4 +1,24 @@
-# cchsflow 1.3.2 (Latest build)
+# cchsflow 1.4.0 (Latest build)
+2020-02-10
+
+## Breaking changes
+- Added to _p suffix to the names of datasets & databaseStarts to denote CCHS
+PUMF data
+
+## Features
+- Badges added to `README.md` with `usethis`.
+
+## Variables
+- <font color = "green">**New**</font> [multiple conditions](https://big-life-lab.github.io/cchsflow/reference/multiple_conditions_fun.html) -
+derived multiple chronic conditions variable
+- Modifications to derived respiratory condition variable to include respondents
+with asthma.
+
+## Minor improvements
+- Expansion to [tagged_na](https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html)
+article
+
+# cchsflow 1.3.2
 2020-02-04
 
 ## Variables

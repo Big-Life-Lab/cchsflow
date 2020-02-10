@@ -52,10 +52,10 @@ library(cchsflow)
 ```
 
 ```{r, warning = FALSE}
-bmi2003 <- rec_with_table(cchs2003, variables = c("HWTGHTM", "HWTGWTK", 
+bmi2003 <- rec_with_table(cchs2003_p, variables = c("HWTGHTM", "HWTGWTK", 
             "HWTGBMI_der"), log = TRUE)
 
-bmi2010 <- rec_with_table(cchs2010, variables = c("HWTGHTM", "HWTGWTK",
+bmi2010 <- rec_with_table(cchs2010_p, variables = c("HWTGHTM", "HWTGWTK",
             "HWTGBMI_der"), log = TRUE)
 ```
 

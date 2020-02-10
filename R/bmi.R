@@ -52,7 +52,7 @@
 #'
 #' library(cchsflow)
 #' bmi2010 <- rec_with_table(
-#'   cchs2010, c(
+#'   cchs2010_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -61,7 +61,7 @@
 #' head(bmi2010)
 #'
 #' bmi2012 <- rec_with_table(
-#'   cchs2012, c(
+#'   cchs2012_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )

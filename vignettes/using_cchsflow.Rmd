@@ -78,7 +78,7 @@ With `rec_with_table()` there are also default arguments that do not need to be 
 In this example, the `sex` variable in the 2001 CCHS cycle is transformed into a harmonized `sex` variable for all CCHS cycles.
 
 ```{r, warning=FALSE}
-sex2001 <- rec_with_table(cchs2001, "DHH_SEX", log = TRUE)
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE)
 ```
 
 ```{r, echo=FALSE}
@@ -96,10 +96,10 @@ Use the `bind_rows` function to combine datasets and create a new dataset name. 
 This example shows how you can transform and combine a variable across multiple CCHS cycles. The sex variable in CCHS 2001 (`DHHA_SEX`) and CCHS 2012 (`DHH_SEX`) is transformed a common variable (`DHH_SEX`) and combined into a single dataset. In `cchsflow` the CCHS 2007 variable name is used as the common variable name. See the [variable_details vignette](variable_details.html) for more information.
 
 ```{r, warning = FALSE}
-sex2001 <- rec_with_table(cchs2001, "DHH_SEX", log = TRUE)
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE)
 head(sex2001)
 
-sex2012 <- rec_with_table(cchs2012, "DHH_SEX", log = TRUE)
+sex2012 <- rec_with_table(cchs2012_p, "DHH_SEX", log = TRUE)
 tail(sex2012)
 ```
 
@@ -123,10 +123,10 @@ Transform the `age` variable into variables that cannot be combined across cycle
 `DHHGAGE_A` is the age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is the age variable for CCHS cycles 2005-2014. 
 
 ```{r, warning=FALSE}
-age2001 <- rec_with_table(cchs2001, "DHHGAGE_A")
+age2001 <- rec_with_table(cchs2001_p, "DHHGAGE_A")
 head(age2001)
 
-age2012 <- rec_with_table(cchs2012, "DHHGAGE_B")
+age2012 <- rec_with_table(cchs2012_p, "DHHGAGE_B")
 tail(age2012)
 ```
 
@@ -144,10 +144,10 @@ tail(combined_age_cat)
 Transform categorical variables such as `age` into a single harmonized `age_cont` variable. This variable takes the midpoint age of each category for all CCHS cycles. With this option, the age category variable from all CCHS cycles can be combined into a single dataset.
 
 ```{r, warning=FALSE}
-age2001_cont <- rec_with_table(cchs2001, "DHHGAGE_cont")
+age2001_cont <- rec_with_table(cchs2001_p, "DHHGAGE_cont")
 head(age2001_cont)
 
-age2012_cont <- rec_with_table(cchs2012, "DHHGAGE_cont")
+age2012_cont <- rec_with_table(cchs2012_p, "DHHGAGE_cont")
 tail(age2012_cont)
 ```
 
@@ -175,12 +175,12 @@ Use the `set_data_labels()` function to label the variables in your final datase
 The variables argument in `rec_with_table()` allows multiple variables to be transformed from a CCHS dataset. In this example, the age and sex variables from the 2001 and 2012 CCHS datasets will be transformed and labeled using `rec_with_table()`. They will then be combined into a single dataset and labeled using `set_data_labels()`.
 
 ```{r, warning=FALSE}
-age_sex_2001 <- rec_with_table(cchs2001, c("DHHGAGE_cont", "DHH_SEX"),
+age_sex_2001 <- rec_with_table(cchs2001_p, c("DHHGAGE_cont", "DHH_SEX"),
                 var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
 
 get_label(age_sex_2001)
 
-age_sex_2012 <- rec_with_table(cchs2012, c("DHHGAGE_cont", "DHH_SEX"),
+age_sex_2012 <- rec_with_table(cchs2012_p, c("DHHGAGE_cont", "DHH_SEX"),
                 var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
 
 get_label(age_sex_2012)
@@ -211,9 +211,9 @@ options(htmlwidgets.TOJSON_ARGS = list(na = 'string'))
 ```
 
 ```{r, warning=FALSE}
-transformed2001 <- rec_with_table(data = cchs2001, notes = FALSE)
+transformed2001 <- rec_with_table(data = cchs2001_p, notes = FALSE)
 
-transformed2012 <- rec_with_table(data = cchs2012, notes = FALSE)
+transformed2012 <- rec_with_table(data = cchs2012_p, notes = FALSE)
 
 combined_cchs <- bind_rows(transformed2001, transformed2012)
 labeled_combined_cchs <- set_data_labels(data_to_label = combined_cchs,
@@ -231,12 +231,12 @@ Recoding `BMI` into a harmonized variable requires their underlying initial vari
 Using the BMI example illustrated in the [derived variables](derived_variables.html) article, `rec_with_table()` is able to transform BMI across multiple cycles provided that height (`HWTGHTM`) and weight (`HWTGWTK`) are specified.
 
 ```{r, warning=FALSE}
-bmi2001 <- rec_with_table(cchs2001, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
+bmi2001 <- rec_with_table(cchs2001_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
                           log = TRUE)
 
 head(bmi2001)
 
-bmi2012 <- rec_with_table(cchs2012, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
+bmi2012 <- rec_with_table(cchs2012_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
                           log = TRUE)
 tail(bmi2012)
 

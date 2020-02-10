@@ -5,11 +5,14 @@
 #'  condition. 3 different functions have been created to account for the fact
 #'  that different respiratory variables are used across CCHS cycles. This
 #'  function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as
-#'  a combined variable.
+#'  a combined variable. Asthma is used across CCHS cycles as a separate
+#'  variable.
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
 #' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
+#' 
+#' @param CCC_031 variable indicating if respondent has asthma
 #'
 #' @return a categorical variable (resp_condition_der) with 3 levels:
 #'
@@ -32,8 +35,8 @@
 #' library(cchsflow)
 #'
 #' resp2010 <- rec_with_table(
-#'   cchs2010,  c(
-#'     "DHHGAGE_cont", "CCC_091",
+#'   cchs2010_p,  c(
+#'     "DHHGAGE_cont", "CCC_091", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
@@ -41,8 +44,8 @@
 #' head(resp2010)
 #'
 #' resp2012 <- rec_with_table(
-#'   cchs2012, c(
-#'     "DHHGAGE_cont", "CCC_091",
+#'   cchs2012_p, c(
+#'     "DHHGAGE_cont", "CCC_091", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
@@ -57,12 +60,33 @@
 #'
 #' @export
 resp_condition_fun1 <-
-  function(DHHGAGE_cont, CCC_091) {
+  function(DHHGAGE_cont, CCC_091, CCC_031) {
+    # Argument verification
+    if ((!is_equal(CCC_091, 1) &
+         !is_equal(CCC_091, 2)) |
+        (!is_equal(CCC_031, 1) &
+         !is_equal(CCC_031, 2))) {
+      warning(
+        paste(
+          "In DHHGAGE_cont:",
+          DHHGAGE_cont,
+          ", CCC_091:",
+          CCC_091,
+          ", CCC_031:",
+          CCC_031,
+          "one or more of the respiratory arguments was outside the 1:2 allowed
+          range however the condition is still calculated",
+          sep = ""
+        ), call. = FALSE
+      )
+    }
     if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) & CCC_091 == 1), 1,
+      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+         (CCC_091 == 1 | CCC_031 == 1)), 1,
       if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) & CCC_091 == 1), 2,
-        if_else2(CCC_091 == 2, 3, NA)
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
+           (CCC_091 == 1 | CCC_031 == 1)), 2,
+        if_else2((CCC_091 == 2 & CCC_031 == 2), 3, NA)
       )
     )
   }
@@ -72,7 +96,8 @@ resp_condition_fun1 <-
 #' @description This is one of 3 functions used to create a derived variable
 #'  (resp_condition_der) that determines if a respondents has a respiratory
 #'  condition. This function is for CCHS cycles (2005-2007) that use COPD &
-#'  Emphysema as separate variables, as well as Bronchitis.
+#'  Emphysema as separate variables, as well as Bronchitis. Asthma is used
+#'  across CCHS cycles as a separate variable.
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
@@ -81,6 +106,8 @@ resp_condition_fun1 <-
 #' @param CCC_91F variable indicating if respondent has COPD
 #'
 #' @param CCC_91A variable indicating if respondent has chronic bronchitis
+#' 
+#' @param CCC_031 variable indicating if respondent has asthma
 #'
 #' @return a categorical variable (resp_condition_der) with 3 levels:
 #'
@@ -104,8 +131,8 @@ resp_condition_fun1 <-
 #' library(cchsflow)
 #'
 #' resp2005 <- rec_with_table(
-#'   cchs2005, c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
+#'   cchs2005_p, c(
+#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
@@ -113,8 +140,8 @@ resp_condition_fun1 <-
 #' head(resp2005)
 #'
 #' resp2007_2008 <- rec_with_table(
-#'   cchs2007_2008,  c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A",
+#'   cchs2007_2008_p,  c(
+#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
@@ -129,14 +156,16 @@ resp_condition_fun1 <-
 #'
 #' @export
 resp_condition_fun2 <-
-  function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A) {
+  function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A, CCC_031) {
     # Argument verification
     if ((!is_equal(CCC_91E, 1) &
          !is_equal(CCC_91E, 2)) |
         (!is_equal(CCC_91F, 1) &
          !is_equal(CCC_91F, 2)) |
         (!is_equal(CCC_91A, 1) &
-         !is_equal(CCC_91A, 2))) {
+         !is_equal(CCC_91A, 2)) |
+        (!is_equal(CCC_031, 1) &
+         !is_equal(CCC_031, 2))) {
       warning(
         paste(
           "In DHHGAGE_cont:",
@@ -147,6 +176,8 @@ resp_condition_fun2 <-
           CCC_91F,
           ", CCC_91A:",
           CCC_91A,
+          ", CCC_031:",
+          CCC_031,
           "one or more of the respiratory arguments was outside the 1:2 allowed
           range however the condition is still calculated",
           sep = ""
@@ -156,11 +187,12 @@ resp_condition_fun2 <-
 
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-         (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 1,
+         (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
       if_else2(
         ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-           (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1)), 2,
-        if_else2((CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2), 3, NA)
+           (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
+        if_else2((CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2 &
+                    CCC_031 == 2), 3, NA)
       )
     )
   }
@@ -170,14 +202,16 @@ resp_condition_fun2 <-
 #' @description This is one of 3 functions used to create a derived variable
 #'  (resp_condition_der) that determines if a respondents has a respiratory
 #'  condition. This function for CCHS cycles (2001-2003) that use COPD and
-#'  Emphysema as a combined variable, as well as Bronchitis
+#'  Emphysema as a combined variable, as well as Bronchitis. Asthma is used
+#'  across CCHS cycles as a separate variable.
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
 #' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
 #'
 #' @param CCC_91A variable indicating if respondent has chronic bronchitis
-#'  cchsflow variable name: CCC_91A
+#'  
+#' @param CCC_031 variable indicating if respondent has asthma
 #'
 #' @return a categorical variable (resp_condition_der) with 3 levels:
 #'
@@ -200,8 +234,8 @@ resp_condition_fun2 <-
 #' library(cchsflow)
 #'
 #' resp2001 <- rec_with_table(
-#'   cchs2001, c(
-#'     "DHHGAGE_cont", "CCC_091", "CCC_91A",
+#'   cchs2001_p, c(
+#'     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
@@ -209,8 +243,8 @@ resp_condition_fun2 <-
 #' head(resp2001)
 #'
 #' resp2003 <- rec_with_table(
-#'   cchs2003,c(
-#'     "DHHGAGE_cont", "CCC_091", "CCC_91A",
+#'   cchs2003_p,c(
+#'     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
 #'     "resp_condition_der"
 #'   )
 #' )
@@ -225,12 +259,14 @@ resp_condition_fun2 <-
 #'
 #' @export
 resp_condition_fun3 <-
-  function(DHHGAGE_cont, CCC_091, CCC_91A) {
+  function(DHHGAGE_cont, CCC_091, CCC_91A, CCC_031) {
     # Argument verification
     if ((!is_equal(CCC_091, 1) &
          !is_equal(CCC_091, 2)) |
         (!is_equal(CCC_91A, 1) &
-         !is_equal(CCC_91A, 2))) {
+         !is_equal(CCC_91A, 2)) |
+        (!is_equal(CCC_031, 1) &
+         !is_equal(CCC_031, 2))) {
       warning(
         paste(
           "In DHHGAGE_cont:",
@@ -239,6 +275,8 @@ resp_condition_fun3 <-
           CCC_091,
           ", CCC_91A:",
           CCC_91A,
+          ", CCC_031:",
+          CCC_031,
           "one or more of the respiratory arguments was outside the 1:2 allowed
           range however the condition is still calculated",
           sep = ""
@@ -248,11 +286,11 @@ resp_condition_fun3 <-
 
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-         (CCC_091 == 1 | CCC_91A == 1)), 1,
+         (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
       if_else2(
         ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-           (CCC_091 == 1 | CCC_91A == 1)), 2,
-        if_else2((CCC_091 == 2 & CCC_91A == 2), 3, NA)
+           (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
+        if_else2((CCC_091 == 2 & CCC_91A == 2 & CCC_031 == 2), 3, NA)
       )
     )
   }

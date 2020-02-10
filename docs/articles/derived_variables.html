@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.0</span>
       </span>
     </div>
 
@@ -148,13 +148,13 @@
 <span id="cb1-16"><a href="#cb1-16"></a>            (HWTGWTK<span class="op">/</span>(HWTGHTM<span class="op">*</span>HWTGHTM)), <span class="ot">NA</span>)</span>
 <span id="cb1-17"><a href="#cb1-17"></a>  }</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(cchsflow)</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>bmi2003 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(cchs2003, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, </span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>bmi2003 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(cchs2003_p, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, </span>
 <span id="cb3-2"><a href="#cb3-2"></a>            <span class="st">"HWTGBMI_der"</span>), <span class="dt">log =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## Loading cchsflow variable_details</code></pre>
 <pre><code>## Using the passed data variable name as database_name</code></pre>
 <pre><code>## NOTE for HWTGHTM: 2001 and 2003 CCHS use inches, values converted to meters to 3 decimal points</code></pre>
 <pre><code>## NOTE for HWTGHTM: 74+ inches converted to 76 inches</code></pre>
-<pre><code>## The variable HWTCGHT was recoded into HWTGHTM for the database cchs2003 the following recodes were made:</code></pre>
+<pre><code>## The variable HWTCGHT was recoded into HWTGHTM for the database cchs2003_p the following recodes were made:</code></pre>
 <pre><code>##    value_to From rows_recoded
 ## 1     1.118    1            0
 ## 2     1.143    2            0
@@ -189,22 +189,22 @@
 ## 31    1.930   31            6
 ## 32    NA::a   96            0
 ## 33    NA::b   99            1</code></pre>
-<pre><code>## The variable HWTCGWTK was recoded into HWTGWTK for the database cchs2003 the following recodes were made:</code></pre>
+<pre><code>## The variable HWTCGWTK was recoded into HWTGWTK for the database cchs2003_p the following recodes were made:</code></pre>
 <pre><code>##   value_to       From rows_recoded
 ## 1     copy 27.0:135.0          192
 ## 2    NA::a        996            0
 ## 3    NA::b    997:999            0</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>bmi2010 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(cchs2010, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>,</span>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>bmi2010 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(cchs2010_p, <span class="dt">variables =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>,</span>
 <span id="cb12-2"><a href="#cb12-2"></a>            <span class="st">"HWTGBMI_der"</span>), <span class="dt">log =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## Loading cchsflow variable_details</code></pre>
 <pre><code>## Using the passed data variable name as database_name</code></pre>
 <pre><code>## NOTE for HWTGHTM: Height is a reported in meters from 2005 CCHS onwards</code></pre>
-<pre><code>## The variable HWTGHTM was recoded into HWTGHTM for the database cchs2010 the following recodes were made:</code></pre>
+<pre><code>## The variable HWTGHTM was recoded into HWTGHTM for the database cchs2010_p the following recodes were made:</code></pre>
 <pre><code>##   value_to        From rows_recoded
 ## 1     copy 0.914:2.134          190
 ## 2    NA::a       9.996            2
 ## 3    NA::b 9.997:9.999            0</code></pre>
-<pre><code>## The variable HWTGWTK was recoded into HWTGWTK for the database cchs2010 the following recodes were made:</code></pre>
+<pre><code>## The variable HWTGWTK was recoded into HWTGWTK for the database cchs2010_p the following recodes were made:</code></pre>
 <pre><code>##   value_to          From rows_recoded
 ## 1     copy    27.0:135.0          185
 ## 2    NA::a        999.96            0
