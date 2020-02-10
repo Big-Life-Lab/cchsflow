@@ -9,7 +9,7 @@ PUMF data
 - Badges added to `README.md` with `usethis`.
 
 ## Variables
-- <font color = "green">**New**</font> [multiple conditions](https://big-life-lab.github.io/cchsflow/reference/multiple_conditions_fun.html) -
+- <font color = "green">**New**</font> [multiple conditions](https://big-life-lab.github.io/cchsflow/reference/multiple_conditions_fun1.html) -
 derived multiple chronic conditions variable
 - Modifications to derived respiratory condition variable to include respondents
 with asthma.

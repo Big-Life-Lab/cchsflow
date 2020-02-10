@@ -68,6 +68,8 @@ reference:
     - resp_condition_fun3
     - age_cat_fun
     - binge_drinker_fun
+    - multiple_conditions_fun1
+    - multiple_conditions_fun2
   - title: "Worksheets"
     desc: Model Specification Worksheets
     contents: 
