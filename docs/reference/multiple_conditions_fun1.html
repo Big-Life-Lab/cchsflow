@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>resp_condition_fun3 — resp_condition_fun3 • cchsflow</title>
+<title>Multiple chronic conditions (5 chronic conditions) — multiple_conditions_fun1 • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,12 +42,12 @@
 
 
 
-<meta property="og:title" content="resp_condition_fun3 — resp_condition_fun3" />
-<meta property="og:description" content="This is one of 3 functions used to create a derived variable
- (resp_condition_der) that determines if a respondents has a respiratory
- condition. This function for CCHS cycles (2001-2003) that use COPD and
- Emphysema as a combined variable, as well as Bronchitis. Asthma is used
- across CCHS cycles as a separate variable." />
+<meta property="og:title" content="Multiple chronic conditions (5 chronic conditions) — multiple_conditions_fun1" />
+<meta property="og:description" content="This function generates a derived variable (multiple_conditions)
+ that counts the number of chronic conditions a respondent has. This function
+ takes 5 CCHS-defined conditions (heart disease, cancer, stroke, bowel
+ disorder, and arthritis), and well one derived variable (respiratory
+ condition) to count the number of conditions a respondent has." />
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -147,73 +147,104 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>resp_condition_fun3</h1>
-    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/respiratory-condition.R'><code>R/respiratory-condition.R</code></a></small>
-    <div class="hidden name"><code>resp_condition_fun3.Rd</code></div>
+    <h1>Multiple chronic conditions (5 chronic conditions)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/multiple-conditions.R'><code>R/multiple-conditions.R</code></a></small>
+    <div class="hidden name"><code>multiple_conditions_fun1.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This is one of 3 functions used to create a derived variable
- (resp_condition_der) that determines if a respondents has a respiratory
- condition. This function for CCHS cycles (2001-2003) that use COPD and
- Emphysema as a combined variable, as well as Bronchitis. Asthma is used
- across CCHS cycles as a separate variable.</p>
+    <p>This function generates a derived variable (multiple_conditions)
+ that counts the number of chronic conditions a respondent has. This function
+ takes 5 CCHS-defined conditions (heart disease, cancer, stroke, bowel
+ disorder, and arthritis), and well one derived variable (respiratory
+ condition) to count the number of conditions a respondent has.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>resp_condition_fun3</span>(<span class='no'>DHHGAGE_cont</span>, <span class='no'>CCC_091</span>, <span class='no'>CCC_91A</span>, <span class='no'>CCC_031</span>)</pre>
+    <pre class="usage"><span class='fu'>multiple_conditions_fun1</span>(
+  <span class='no'>CCC_121</span>,
+  <span class='no'>CCC_131</span>,
+  <span class='no'>CCC_151</span>,
+  <span class='no'>CCC_171</span>,
+  <span class='no'>resp_condition_der</span>,
+  <span class='no'>CCC_051</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>DHHGAGE_cont</th>
-      <td><p>continuous age variable.</p></td>
+      <th>CCC_121</th>
+      <td><p>variable indicating if respondent has heart disease (1 = 
+respondent has heart disease, 2 = respondent does not have heart disease)</p></td>
     </tr>
     <tr>
-      <th>CCC_091</th>
-      <td><p>variable indicating if respondent has either COPD or Emphysema</p></td>
+      <th>CCC_131</th>
+      <td><p>variable indicating if respondent has active cancer (1 =
+respondent has active cancer, 2 =  respondent does not have active cancer)</p></td>
     </tr>
     <tr>
-      <th>CCC_91A</th>
-      <td><p>variable indicating if respondent has chronic bronchitis</p></td>
+      <th>CCC_151</th>
+      <td><p>variable indicating if respondent suffers from the effects
+of a stroke (1 = respondent suffers from stroke effects, 2 = respondent
+does not suffer from stroke effects)</p></td>
     </tr>
     <tr>
-      <th>CCC_031</th>
-      <td><p>variable indicating if respondent has asthma</p></td>
+      <th>CCC_171</th>
+      <td><p>variable indicating if respondent has a bowel disorder (1 =
+respondent has bowel disorder, 2 = respondent does not have a bowel
+disorder)</p></td>
+    </tr>
+    <tr>
+      <th>resp_condition_der</th>
+      <td><p>derived variable indicating if respondent has a
+respiratory condition (1 = respondent is over the age of 35 and has
+a respiratory condition, 2 = respondent is under the age of 35 and has a
+respiratory conditions, 3 = respondent does not have a respiratory
+condition). See <code><a href='resp_condition_fun1.html'>resp_condition_fun1</a></code> for
+documentation on how variable was derived.</p></td>
+    </tr>
+    <tr>
+      <th>CCC_051</th>
+      <td><p>variable indicating if respondent has arthritis or
+rheumatism (1 = respondent has arthritis or rheumatism, 2 = respondent does
+not have arthritis or rheumatism)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a categorical variable (resp_condition_der) with 3 levels:</p>
-<p></p><ol>
-<li><p>respondent is over the age of 35 and has a respiratory condition</p></li>
-<li><p>respondent is under the age of 35 and has a respiratory condition</p></li>
-<li><p>respondent does not have a respiratory condition</p></li>
-</ol>
+    <p>A categorical variable indicating the number of chronic conditions
+ a respondent has. Respondents with 5 or more conditions are grouped in the
+ "5+" category.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
+    <p>mood disorder (CCC_280) was not asked to respondents in the 2001
+ CCHS survey cycle. This mean respondents in this cycle will only be able to
+ have a maximum of 6 chronic conditions as opposed to 7 for respondents in
+ other cycles. <code><a href='multiple_conditions_fun2.html'>multiple_conditions_fun2</a></code> is used for CCHS cycles
+ from 2003 to 2014.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='resp_condition_fun1.html'>resp_condition_fun1</a></code>, <code><a href='resp_condition_fun2.html'>resp_condition_fun2</a></code></p></div>
+    <div class='dont-index'><p><code><a href='multiple_conditions_fun2.html'>multiple_conditions_fun2</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Using resp_condition_fun3() to create values across CCHS cycles</span>
-<span class='co'># (2001-2003) resp_condition_fun3() is specified in</span>
-<span class='co'># variable_details.csv along with the CCHS variables and cycles included.</span>
+    <pre class="examples"><div class='input'> <span class='co'># Using rec_with_table() to generate multiple_conditions in a CCHS</span>
+ <span class='co'># cycle.</span>
 
-<span class='co'># To transform resp_condition_der, use rec_with_table() for each CCHS cycle</span>
-<span class='co'># and specify resp_condition_der, along with the various respiratory</span>
-<span class='co'># variables. Then by using bind_rows() you can combine resp_condition_der</span>
-<span class='co'># across cycles.</span>
+ <span class='co'># multiple_conditions_fun1() is specified in variable_details.csv along with</span>
+ <span class='co'># the CCHS variables and cycles included.</span>
+
+ <span class='co'># To generate multiple_conditions, use rec_with_table() and specify the</span>
+ <span class='co'># multiple_conditions, along with the variables that are derived from it.</span>
+ <span class='co'># Since resp_condition_der is also a derived variable, you will have to</span>
+ <span class='co'># specify the variables that are derived from it. In this example, data</span>
+ <span class='co'># from the 2001 CCHS will be used, so DHHGAGE_cont, CCC_091, and CCC_91A,</span>
+ <span class='co'># and CCC_031 will be specified along with resp_condition_der.</span>
 
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
-
-<span class='no'>resp2001</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='no'>cchs2001_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-    <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>, <span class='st'>"CCC_91A"</span>, <span class='st'>"CCC_031"</span>,
-    <span class='st'>"resp_condition_der"</span>
-  )
-)</div><div class='output co'>#&gt; <span class='message'>Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for DHHGAGE_cont: Not applicable, don't know, refusal, not stated (96-99) were options in CCHS 2003, but had zero responses</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
+ <span class='no'>conditions_2001</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(<span class='no'>cchs2001_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>,
+ <span class='st'>"CCC_91A"</span>, <span class='st'>"CCC_031"</span>, <span class='st'>"CCC_121"</span>,<span class='st'>"CCC_131"</span>,<span class='st'>"CCC_151"</span>, <span class='st'>"CCC_171"</span>,<span class='st'>"CCC_280"</span>,
+ <span class='st'>"resp_condition_der"</span>,<span class='st'>"CCC_051"</span>, <span class='st'>"multiple_conditions"</span>))</div><div class='output co'>#&gt; <span class='message'>Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for DHHGAGE_cont: Not applicable, don't know, refusal, not stated (96-99) were options in CCHS 2003, but had zero responses</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
@@ -280,105 +311,38 @@
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
 #&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>resp2001</span>)</div><div class='output co'>#&gt;   CCC_031 CCC_091 CCC_91A DHHGAGE_cont resp_condition_der
-#&gt; 1       2       2       2           85                  3
-#&gt; 2       2       2       2           85                  3
-#&gt; 3       2       2       2           32                  3
-#&gt; 4       2       2       2           77                  3
-#&gt; 5       2   NA(a)       2           22                 NA
-#&gt; 6       2       2       2           77                  3</div><div class='input'>
-<span class='no'>resp2003</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='no'>cchs2003_p</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-    <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>, <span class='st'>"CCC_91A"</span>, <span class='st'>"CCC_031"</span>,
-    <span class='st'>"resp_condition_der"</span>
-  )
-)</div><div class='output co'>#&gt; <span class='message'>Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for DHHGAGE_cont: Not applicable, don't know, refusal, not stated (96-99) were options in CCHS 2003, but had zero responses</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:1, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:1, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:13, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:27, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:22, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:1one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='output co'>#&gt; <span class='warning'>Warning: In DHHGAGE_cont:17, CCC_091:NA(a), CCC_91A:2, CCC_031:2one or more of the respiratory arguments was outside the 1:2 allowed</span>
-#&gt; <span class='warning'>          range however the condition is still calculated</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>resp2003</span>)</div><div class='output co'>#&gt;     CCC_031 CCC_091 CCC_91A DHHGAGE_cont resp_condition_der
-#&gt; 195       2   NA(a)       2           22                 NA
-#&gt; 196       1       2       1           57                  1
-#&gt; 197       2       2       2           42                  3
-#&gt; 198       2       2       2           85                  3
-#&gt; 199       1   NA(a)       2           17                  2
-#&gt; 200       2   NA(a)       2           17                 NA</div><div class='input'>
-<span class='no'>combined_resp</span> <span class='kw'>&lt;-</span> <span class='fu'>bind_rows</span>(<span class='no'>resp2001</span>, <span class='no'>resp2003</span>)
+ <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>conditions_2001</span>)</div><div class='output co'>#&gt;   CCC_031 CCC_051 CCC_091 CCC_121 CCC_131 CCC_151 CCC_171 CCC_91A DHHGAGE_cont
+#&gt; 1       2       2       2       1       2       2       2       2           85
+#&gt; 2       2       2       2       2       2       2       2       2           85
+#&gt; 3       2       2       2       2       2       2       2       2           32
+#&gt; 4       2       2       2       2       2       2       2       2           77
+#&gt; 5       2       2   NA(a)       2       2       2       2       2           22
+#&gt; 6       2       2       2       2       2       2       2       2           77
+#&gt;   resp_condition_der multiple_conditions
+#&gt; 1                  3                   1
+#&gt; 2                  3                   0
+#&gt; 3                  3                   0
+#&gt; 4                  3                   0
+#&gt; 5                 NA                   0
+#&gt; 6                  3                   0</div><div class='input'>
+ <span class='co'># Generating multiple_conditions with user inputted values</span>
+ <span class='co'># Let's say you are an individual that has heart disease, bowel disorder,</span>
+ <span class='co'># and arthritis. multiple_conditions_fun2() can be used to count the number</span>
+ <span class='co'># of chronic conditions you have</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_resp</span>)</div><div class='output co'>#&gt;   CCC_031 CCC_091 CCC_91A DHHGAGE_cont resp_condition_der
-#&gt; 1       2       2       2           85                  3
-#&gt; 2       2       2       2           85                  3
-#&gt; 3       2       2       2           32                  3
-#&gt; 4       2       2       2           77                  3
-#&gt; 5       2   NA(a)       2           22                 NA
-#&gt; 6       2       2       2           77                  3</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_resp</span>)</div><div class='output co'>#&gt;     CCC_031 CCC_091 CCC_91A DHHGAGE_cont resp_condition_der
-#&gt; 395       2   NA(a)       2           22                 NA
-#&gt; 396       1       2       1           57                  1
-#&gt; 397       2       2       2           42                  3
-#&gt; 398       2       2       2           85                  3
-#&gt; 399       1   NA(a)       2           17                  2
-#&gt; 400       2   NA(a)       2           17                 NA</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
+ <span class='no'>num_conditions</span> <span class='kw'>&lt;-</span> <span class='fu'>multiple_conditions_fun1</span>(<span class='kw'>CCC_121</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>CCC_131</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+ <span class='kw'>CCC_151</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>CCC_171</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>resp_condition_der</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>CCC_051</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>num_conditions</span>)</div><div class='output co'>#&gt; [1] 3</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
       <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
