@@ -11,31 +11,46 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Missing data (tagged_na)
+## Missing data (`NA` --> `tagged_na`)
 
 Base R supports only one type of NA ('not available') to represent missing 
-values. However, the CCHS has several types of missing data or incomplete 
-category responses. The category values can change across variables and survey 
+values. The CCHS, however, has several types of missing data or incomplete 
+category responses. `cchsflow` uses the `haven` package [`tagged_na()`](https://haven.tidyverse.org/reference/tagged_na.html) 
+to allow multiple missing data categories. `tagged_na()` adds an addition 
+character to the NA value, thereby allowing users to define additional missing 
+data types. `tagged_na()` applies only for numeric values, as character base 
+values can use any string to represent NA or missing data. 
+
+## CCHS approach to coding missing data
+
+CCHS category values can change across variables and survey 
 cycles, but the most common values are:
 
-| Category value | Label |
+| CCHS category value | Label |
 |----------------|--------------|
 | 6                  | not applicable   |
 | 7                  | don't know       |
 | 8                  | refusal          |
 | 9                  | not stated       |
 
-Furthermore, variables may be entirely missing from a specific cycle, which 
-results in 'not asked' missing data that is not included or coded in CCHS 
-surveys.
 
-`cchsflow` uses the `haven` package [`tagged_na`](https://haven.tidyverse.org/reference/tagged_na.html) 
-to allow multiple missing data categories. `tagged_na` adds an addition 
-character to the NA value, thereby allowing users to define additional missing 
-data types. `tagged_na` applies only for numeric values, as character base 
-values can use any string to represent NA or missing data. 
+`cchsflow` recodes the four CCHS category missing data categories values into 
+two NA values that are commonly used for most studies. NA(a) = 'not applicable' 
+and NA(b) = 'missing'. Furthermore, variables may be entirely missing from a 
+specific cycle, which results in 'not asked' missing data that is not included 
+or coded in CCHS surveys, recoded to NA(a)
 
-## Example
+**Summary of `tagged_na` values and their corresponding CCHS category values.**
+
+| cchsflow `tagged_na` | CCHS category value | Label |
+|----------------|--------------|
+| NA(a) | 6                  | not applicable     |
+| NA(b) | 7                  | don't know         |
+| NA(b) | 8                  | refusal            |
+| NA(b) | 9                  | not stated         |
+| NA(a) | question not asked in the survey cycle  |
+
+## Example `haven::tagged_na()`
 ```{r cars}
 library(haven)
 x <- c(1:5, tagged_na("a"), tagged_na("z"), NA)
@@ -43,13 +58,3 @@ na_tag(x) # is used to read the tagged NA in most other functions they are still
 print_tagged_na(x) # Is used to print the na as well as their tag
 ```
 
-## CCHS approach to coding missing data
-`cchsflow` recodes category values as:
-
-| `tagged_na` | Category value | Label |
-|----------------|--------------|
-| NA(a) | 6                  | not applicable     |
-| NA(b) | 7                  | don't know         |
-| NA(b) | 8                  | refusal            |
-| NA(b) | 9                  | not stated         |
-| NA(a) | question not asked in the survey cycle  |
