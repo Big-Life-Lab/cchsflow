@@ -915,12 +915,12 @@ recode_derived_variables <-
         )
       # Set type of var
       if(as.character(row_being_checked[[pkg.globals$argument.ToType]]) != pkg.globals$argument.CatType) {
-        column_value <- as.numeric(column_value)
+        column_value <- as.numeric(column_value[["column_being_added"]])
       }else{
-        column_value <- as.factor(column_value)
+        column_value <- as.factor(column_value[["column_being_added"]])
       }
       recoded_data[[variable_being_processed]] <-
-        unlist(column_value[["column_being_added"]])
+        unlist(column_value)
 
       var_stack <-
         var_stack[!(var_stack == variable_being_processed)]
