@@ -40,23 +40,11 @@ navbar:
       href: news/index.html
 
 reference:
-  - title: "Processing functions"
-    desc: Functions used to manipulate cchs datasets
-    contents:
-    - rec_with_table
-    - set_data_labels
-  - title: "Utility functions"
-    desc: Utility functions that are used in other cchsflow functions
-    contents:
-    - if_else2
-  - title: "Potentially problematic variables"
-    desc: Derived variables in cchsflow that users may run into issues with
-    contents:
-    - ALWDWKY
-    - ALWDDLY
-    - ALCDTYP
-    - ALCDTTM
-    - food_insecurity_der
+   - title: "Worksheets"
+    desc: Model Specification Worksheets
+    contents: 
+    - variables
+    - variable_details
   - title: "Derived variable functions"
     desc: Functions for deriving custom CCHS variables
     contents:
@@ -70,11 +58,14 @@ reference:
     - binge_drinker_fun
     - multiple_conditions_fun1
     - multiple_conditions_fun2
-  - title: "Worksheets"
-    desc: Model Specification Worksheets
-    contents: 
-    - variables
-    - variable_details
+  - title: "Potentially problematic variables"
+    desc: Derived variables in cchsflow that users may run into issues with
+    contents:
+    - ALWDWKY
+    - ALWDDLY
+    - ALCDTYP
+    - ALCDTTM
+    - food_insecurity_der
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:
@@ -88,3 +79,12 @@ reference:
     - cchs2012_p
     - cchs2013_2014_p
     - cchs2014_p
+  - title: "Processing functions"
+    desc: Functions used to manipulate cchs datasets
+    contents:
+    - rec_with_table
+    - set_data_labels
+  - title: "Utility functions"
+    desc: Utility functions that are used in other cchsflow functions
+    contents:
+    - if_else2

@@ -35,7 +35,7 @@ NULL
 #' str(variable_details)
 NULL
 
-#' 2001 CCHS data
+#' 2001 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2001 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -64,7 +64,7 @@ NULL
 #' str(cchs2001_p)
 NULL
 
-#' 2003 CCHS data
+#' 2003 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2003 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -94,7 +94,7 @@ NULL
 #' str(cchs2003_p)
 NULL
 
-#' 2005 CCHS data
+#' 2005 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2005 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -124,7 +124,7 @@ NULL
 #' str(cchs2005_p)
 NULL
 
-#' 2007-2008 CCHS data
+#' 2007-2008 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2007-2008 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -153,7 +153,7 @@ NULL
 #' str(cchs2007_2008_p)
 NULL
 
-#' 2009-2010 CCHS data
+#' 2009-2010 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2009-2010 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -182,7 +182,7 @@ NULL
 #' str(cchs2009_2010_p)
 NULL
 
-#' 2010 CCHS data
+#' 2010 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2010 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -211,7 +211,7 @@ NULL
 #' str(cchs2010_p)
 NULL
 
-#' 2011-2012 CCHS data
+#' 2011-2012 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2011-2012 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -241,7 +241,7 @@ NULL
 #' str(cchs2011_2012_p)
 NULL
 
-#' 2012 CCHS data
+#' 2012 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2012 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -270,7 +270,7 @@ NULL
 #' str(cchs2012_p)
 NULL
 
-#' 2013-2014 CCHS data
+#' 2013-2014 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2013-2014 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
@@ -299,7 +299,7 @@ NULL
 #' str(cchs2013_2014_p)
 NULL
 
-#' 2014 CCHS data
+#' 2014 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2014 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.

@@ -5,6 +5,8 @@
 - Suppressed warning messages in function examples
 - Minor edits & corrections to [tagged_na](https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html), [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html), and
 [how to add variables](https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html) articles.
+- Minor changes to titles of sample datasets
+- Bug fixes to Reference page
 
 # cchsflow 1.4.0 
 2020-02-10

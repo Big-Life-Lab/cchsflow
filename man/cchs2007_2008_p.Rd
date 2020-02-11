@@ -3,7 +3,7 @@
 \docType{data}
 \name{cchs2007_2008_p}
 \alias{cchs2007_2008_p}
-\title{2007-2008 CCHS data}
+\title{2007-2008 CCHS PUMF subset data (200 respondents)}
 \source{
 \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
 }
