@@ -40,7 +40,7 @@ navbar:
       href: news/index.html
 
 reference:
-   - title: "Worksheets"
+  - title: "Worksheets"
     desc: Model Specification Worksheets
     contents: 
     - variables
