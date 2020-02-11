@@ -18,7 +18,7 @@ navbar:
     right: github
   components:
     articles:
-      text: Worksheets
+      text: Articles
       menu:
       - text: Using cchsflow
         href: articles/using_cchsflow.html
