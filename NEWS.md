@@ -1,4 +1,15 @@
-# cchsflow 1.4.0 (Latest build)
+# cchsflow 1.4.1 (Latest build)
+2020-02-11
+
+## Minor improvements
+- Suppressed warning messages in function examples
+- Minor edits & corrections to [tagged_na](https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html), [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html), and
+[how to add variables](https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html) articles.
+- Minor changes to titles of sample datasets
+- Minor refactor in `rec_with_table()` to match output type with specified toType for derived variables
+- Bug fixes to Reference page
+
+# cchsflow 1.4.0 
 2020-02-10
 
 ## Breaking changes

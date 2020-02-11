@@ -101,7 +101,8 @@ pack_years2012 <- rec_with_table(
 
 tail(pack_years2012)
 
-combined_pack_years <- bind_rows(pack_years2010, pack_years2012)
+combined_pack_years <- suppressWarnings(bind_rows(pack_years2010,
+ pack_years2012))
 
 head(combined_pack_years)
 tail(combined_pack_years)
