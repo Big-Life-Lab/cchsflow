@@ -73,7 +73,7 @@ mood disorder (CCC_280) was not asked to respondents in the 2001
  # and CCC_031 will be specified along with resp_condition_der.
  
 library(cchsflow)
- conditions_2001 <- suppressMessages(rec_with_table(cchs2001_p,
+ conditions_2001 <- suppressWarnings(rec_with_table(cchs2001_p,
  c("DHHGAGE_cont", "CCC_091",
  "CCC_91A", "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
  "resp_condition_der","CCC_051", "multiple_conditions")))
