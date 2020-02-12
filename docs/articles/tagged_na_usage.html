@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.1</span>
       </span>
     </div>
 
@@ -52,7 +52,7 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Worksheets
+    Articles
      
     <span class="caret"></span>
   </a>
@@ -114,13 +114,18 @@
 
     
     
-<div id="missing-data-tagged_na" class="section level2">
+<div id="missing-data-na-tagged_na" class="section level2">
 <h2 class="hasAnchor">
-<a href="#missing-data-tagged_na" class="anchor"></a>Missing data (tagged_na)</h2>
-<p>Base R supports only one type of NA (‘not available’) to represent missing values. However, the CCHS has several types of missing data or incomplete category responses. The category values can change across variables and survey cycles, but the most common values are:</p>
+<a href="#missing-data-na-tagged_na" class="anchor"></a>Missing data (<code>NA</code> –&gt; <code>tagged_na</code>)</h2>
+<p>Base R supports only one type of NA (‘not available’) to represent missing values. The CCHS, however, has several types of missing data or incomplete category responses. <code>cchsflow</code> uses the <code>haven</code> package <a href="https://haven.tidyverse.org/reference/tagged_na.html"><code><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na()</a></code></a> to allow multiple missing data categories. <code><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na()</a></code> adds an addition character to the NA value, thereby allowing users to define additional missing data types. <code><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na()</a></code> applies only for numeric values, as character base values can use any string to represent NA or missing data.</p>
+</div>
+<div id="cchs-approach-to-coding-missing-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#cchs-approach-to-coding-missing-data" class="anchor"></a>CCHS approach to coding missing data</h2>
+<p>CCHS category values can change across variables and survey cycles, but the most common values are:</p>
 <table class="table">
 <thead><tr class="header">
-<th>Category value</th>
+<th>CCHS category value</th>
 <th>Label</th>
 </tr></thead>
 <tbody>
@@ -142,27 +147,13 @@
 </tr>
 </tbody>
 </table>
-<p>Furthermore, variables may be entirely missing from a specific cycle, which results in ‘not asked’ missing data that is not included or coded in CCHS surveys.</p>
-<p><code>cchsflow</code> uses the <code>haven</code> package <a href="https://haven.tidyverse.org/reference/tagged_na.html"><code>tagged_na</code></a> to allow multiple missing data categories. <code>tagged_na</code> adds an addition character to the NA value, thereby allowing users to define additional missing data types. <code>tagged_na</code> applies only for numeric values, as character base values can use any string to represent NA or missing data.</p>
-</div>
-<div id="example" class="section level2">
-<h2 class="hasAnchor">
-<a href="#example" class="anchor"></a>Example</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(haven)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"a"</span>), <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"z"</span>), <span class="ot">NA</span>)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">na_tag</a></span>(x) <span class="co"># is used to read the tagged NA in most other functions they are still viewed as NA</span></span></code></pre></div>
-<pre><code>## [1] NA  NA  NA  NA  NA  "a" "z" NA</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">print_tagged_na</a></span>(x) <span class="co"># Is used to print the na as well as their tag</span></span></code></pre></div>
-<pre><code>## [1]     1     2     3     4     5 NA(a) NA(z)    NA</code></pre>
-</div>
-<div id="cchs-approach-to-coding-missing-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#cchs-approach-to-coding-missing-data" class="anchor"></a>CCHS approach to coding missing data</h2>
-<p><code>cchsflow</code> recodes category values as:</p>
+<p><code>cchsflow</code> recodes the four CCHS category missing data categories values into two NA values that are commonly used for most studies. NA(a) = ‘not applicable’ and NA(b) = ‘missing’. Furthermore, variables may be entirely missing from a specific cycle, which results in ‘not asked’ missing data that is not included or coded in CCHS surveys, recoded to NA(a)</p>
+<p><strong>Summary of <code>tagged_na</code> values and their corresponding CCHS category values.</strong></p>
 <table class="table">
 <thead><tr class="header">
-<th><code>tagged_na</code></th>
-<th>Category value</th>
+<th>cchsflow <code>tagged_na</code>
+</th>
+<th>CCHS category value</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -188,6 +179,17 @@
 </tbody>
 </table>
 </div>
+<div id="example-haventagged_na" class="section level2">
+<h2 class="hasAnchor">
+<a href="#example-haventagged_na" class="anchor"></a>Example <code>haven::tagged_na()</code>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(haven)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"a"</span>), <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"z"</span>), <span class="ot">NA</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">na_tag</a></span>(x) <span class="co"># is used to read the tagged NA in most other functions they are still viewed as NA</span></span></code></pre></div>
+<pre><code>## [1] NA  NA  NA  NA  NA  "a" "z" NA</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">print_tagged_na</a></span>(x) <span class="co"># Is used to print the na as well as their tag</span></span></code></pre></div>
+<pre><code>## [1]     1     2     3     4     5 NA(a) NA(z)    NA</code></pre>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -196,9 +198,9 @@
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#missing-data-tagged_na">Missing data (tagged_na)</a></li>
-      <li><a href="#example">Example</a></li>
+<li><a href="#missing-data-na-tagged_na">Missing data (<code>NA</code> –&gt; <code>tagged_na</code>)</a></li>
       <li><a href="#cchs-approach-to-coding-missing-data">CCHS approach to coding missing data</a></li>
+      <li><a href="#example-haventagged_na">Example <code>haven::tagged_na()</code></a></li>
       </ul>
 </div>
       </div>
