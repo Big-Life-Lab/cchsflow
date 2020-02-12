@@ -439,7 +439,7 @@ recode_columns <-
     # Set interval if none is present
     interval_present <- TRUE
     valid_intervals <- c("[,]", "[,)", "(,]")
-    interval_default <- "[,)"
+    interval_default <- "[,]"
     recoded_data <- data[, 0]
     if (is.null(rec_variables_to_process[[pkg.globals$argument.Interval]])) {
       interval_present <- FALSE
