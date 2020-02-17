@@ -80,11 +80,20 @@ wording and category responses. Furthermore, there have been changes in survey s
 
 ## Installation
 
-    # If not installed, install the devtools
-    install.packages("devtools")
-    
-    # then, install the package
+```
+    # Install release version from CRAN
+    install.packages("cchsflow")
+
+    # Install the most recent version from GitHub
     devtools::install_github("Big-Life-Lab/cchsflow")
+```
+
+Do you just want new variables not yet added to the CRAN version?
+
+You can download and use the latest version of 
+[`variables.csv`](https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variables.csv)
+and [`variable_details.csv`](https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variable_details.csv) 
+from GitHub.
     
 ## What is in the `cchsflow` package?
 
@@ -98,9 +107,18 @@ recoded.
 variables that are listed in `variables.csv`. Transformations are performed 
 using `rec_with_table()`. `variables.csv` and `variable_details.csv` can be 
 used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
+4. Demonstration CCHS data. `cchsflow` includes a random sample of 200 respondents from 
+each CCHS PUMF file from 2001 to 2013. These data are used for the vignettes. 
+The CCHS test data is stored in /data as .RData files. They can be read as a 
+package database.
 
-This repository does not include the CCHS data. Instead, it contains subsets of
-200 observations in each CCHS cycle. Information on how to access 
+```
+# read the CCHS 2014 PUMF test data
+
+test_data <- cchs2014_p
+```
+
+This repository does not include the full CCHS data. Information on how to access 
 the CCHS data can is 
 [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). 
 The Canadian university community can also access the CCHS through [ODESI](http://odesi2.scholarsportal.info/webview/) (see health/Canada/Canadian Community Health Survey).
