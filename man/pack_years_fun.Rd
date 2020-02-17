@@ -82,7 +82,7 @@ pack-years is calculated by multiplying the number of cigarette
 library(cchsflow)
 
 pack_years2010 <- rec_with_table(
-  cchs2010, c(
+  cchs2010_p, c(
     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
@@ -92,7 +92,7 @@ pack_years2010 <- rec_with_table(
 head(pack_years2010)
 
 pack_years2012 <- rec_with_table(
-  cchs2012,c(
+  cchs2012_p,c(
     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
@@ -101,7 +101,8 @@ pack_years2012 <- rec_with_table(
 
 tail(pack_years2012)
 
-combined_pack_years <- bind_rows(pack_years2010, pack_years2012)
+combined_pack_years <- suppressWarnings(bind_rows(pack_years2010,
+ pack_years2012))
 
 head(combined_pack_years)
 tail(combined_pack_years)

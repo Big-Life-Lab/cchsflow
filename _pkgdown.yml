@@ -18,7 +18,7 @@ navbar:
     right: github
   components:
     articles:
-      text: Worksheets
+      text: Articles
       menu:
       - text: Using cchsflow
         href: articles/using_cchsflow.html
@@ -40,23 +40,11 @@ navbar:
       href: news/index.html
 
 reference:
-  - title: "Processing functions"
-    desc: Functions used to manipulate cchs datasets
-    contents:
-    - rec_with_table
-    - set_data_labels
-  - title: "Utility functions"
-    desc: Utility functions that are used in other cchsflow functions
-    contents:
-    - if_else2
-  - title: "Potentially problematic variables"
-    desc: Derived variables in cchsflow that users may run into issues with
-    contents:
-    - ALWDWKY
-    - ALWDDLY
-    - ALCDTYP
-    - ALCDTTM
-    - food_insecurity_der
+  - title: "Worksheets"
+    desc: Model Specification Worksheets
+    contents: 
+    - variables
+    - variable_details
   - title: "Derived variable functions"
     desc: Functions for deriving custom CCHS variables
     contents:
@@ -68,21 +56,35 @@ reference:
     - resp_condition_fun3
     - age_cat_fun
     - binge_drinker_fun
-  - title: "Worksheets"
-    desc: Model Specification Worksheets
-    contents: 
-    - variables
-    - variable_details
+    - multiple_conditions_fun1
+    - multiple_conditions_fun2
+  - title: "Potentially problematic variables"
+    desc: Derived variables in cchsflow that users may run into issues with
+    contents:
+    - ALWDWKY
+    - ALWDDLY
+    - ALCDTYP
+    - ALCDTTM
+    - food_insecurity_der
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:
-    - cchs2001
-    - cchs2003
-    - cchs2005
-    - cchs2007_2008
-    - cchs2009_2010
-    - cchs2010
-    - cchs2011_2012
-    - cchs2012
-    - cchs2013_2014
-    - cchs2014 
+    - cchs2001_p
+    - cchs2003_p
+    - cchs2005_p
+    - cchs2007_2008_p
+    - cchs2009_2010_p
+    - cchs2010_p
+    - cchs2011_2012_p
+    - cchs2012_p
+    - cchs2013_2014_p
+    - cchs2014_p
+  - title: "Processing functions"
+    desc: Functions used to manipulate cchs datasets
+    contents:
+    - rec_with_table
+    - set_data_labels
+  - title: "Utility functions"
+    desc: Utility functions that are used in other cchsflow functions
+    contents:
+    - if_else2

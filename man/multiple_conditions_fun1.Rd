@@ -2,7 +2,7 @@
 % Please edit documentation in R/multiple-conditions.R
 \name{multiple_conditions_fun1}
 \alias{multiple_conditions_fun1}
-\title{Multiple chronic conditions}
+\title{Multiple chronic conditions (5 chronic conditions)}
 \usage{
 multiple_conditions_fun1(
   CCC_121,
@@ -14,21 +14,30 @@ multiple_conditions_fun1(
 )
 }
 \arguments{
-\item{CCC_121}{variable indicating if respondent has heart disease}
+\item{CCC_121}{variable indicating if respondent has heart disease (1 = 
+respondent has heart disease, 2 = respondent does not have heart disease)}
 
-\item{CCC_131}{variable indicating if respondent has active cancer}
+\item{CCC_131}{variable indicating if respondent has active cancer (1 =
+respondent has active cancer, 2 =  respondent does not have active cancer)}
 
 \item{CCC_151}{variable indicating if respondent suffers from the effects
-of a stroke}
+of a stroke (1 = respondent suffers from stroke effects, 2 = respondent
+does not suffer from stroke effects)}
 
-\item{CCC_171}{variable indicating if respondent has a bowel disorder}
+\item{CCC_171}{variable indicating if respondent has a bowel disorder (1 =
+respondent has bowel disorder, 2 = respondent does not have a bowel
+disorder)}
 
 \item{resp_condition_der}{derived variable indicating if respondent has a
-respiratory condition. See \code{\link{resp_condition_fun1}} for
-documentation on how variable was derived}
+respiratory condition (1 = respondent is over the age of 35 and has
+a respiratory condition, 2 = respondent is under the age of 35 and has a
+respiratory conditions, 3 = respondent does not have a respiratory
+condition). See \code{\link{resp_condition_fun1}} for
+documentation on how variable was derived.}
 
 \item{CCC_051}{variable indicating if respondent has arthritis or
-rheumatism}
+rheumatism (1 = respondent has arthritis or rheumatism, 2 = respondent does
+not have arthritis or rheumatism)}
 }
 \value{
 A categorical variable indicating the number of chronic conditions
@@ -38,9 +47,9 @@ A categorical variable indicating the number of chronic conditions
 \description{
 This function generates a derived variable (multiple_conditions)
  that counts the number of chronic conditions a respondent has. This function
- takes 5 CCHS variables (heart disease, cancer, stroke, bowel disorder, and
- arthritis), and well one derived variable (respiratory condition) to count
- the number of conditions a respondent has.
+ takes 5 CCHS-defined conditions (heart disease, cancer, stroke, bowel
+ disorder, and arthritis), and well one derived variable (respiratory
+ condition) to count the number of conditions a respondent has.
 }
 \details{
 mood disorder (CCC_280) was not asked to respondents in the 2001
@@ -64,11 +73,23 @@ mood disorder (CCC_280) was not asked to respondents in the 2001
  # and CCC_031 will be specified along with resp_condition_der.
  
 library(cchsflow)
- conditions_2001 <- rec_with_table(cchs2001, c("DHHGAGE_cont", "CCC_091",
+ conditions_2001 <- suppressWarnings(rec_with_table(cchs2001_p,
+ c("DHHGAGE_cont", "CCC_091",
  "CCC_91A", "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
- "resp_condition_der","CCC_051", "multiple_conditions"))
+ "resp_condition_der","CCC_051", "multiple_conditions")))
  
  head(conditions_2001)
+ 
+ # Generating multiple_conditions with user inputted values
+ # Let's say you are an individual that has heart disease, bowel disorder,
+ # and arthritis. multiple_conditions_fun1() can be used to count the number
+ # of chronic conditions you have
+ 
+library(cchsflow)
+ num_conditions <- multiple_conditions_fun1(CCC_121 = 1, CCC_131 = 2, 
+ CCC_151 = 2, CCC_171 = 1, resp_condition_der = 3, CCC_051 = 1) 
+ 
+print(num_conditions)
 
 }
 \seealso{

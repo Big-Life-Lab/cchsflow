@@ -113,7 +113,7 @@ The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-v
 \examples{
 library(cchsflow)
 bmi2010 <- rec_with_table(
-  data = cchs2010, c(
+  data = cchs2010_p, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
@@ -122,7 +122,7 @@ bmi2010 <- rec_with_table(
 head(bmi2010)
 
 bmi2012 <- rec_with_table(
-  data = cchs2012,  c(
+  data = cchs2012_p,  c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )

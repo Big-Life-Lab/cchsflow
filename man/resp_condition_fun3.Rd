@@ -43,25 +43,25 @@ This is one of 3 functions used to create a derived variable
 
 library(cchsflow)
 
-resp2001 <- rec_with_table(
-  cchs2001, c(
+resp2001 <- suppressWarnings(rec_with_table(
+  cchs2001_p, c(
     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )
-)
+))
 
 head(resp2001)
 
-resp2003 <- rec_with_table(
-  cchs2003,c(
+resp2003 <- suppressWarnings(rec_with_table(
+  cchs2003_p,c(
     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )
-)
+))
 
 tail(resp2003)
 
-combined_resp <- bind_rows(resp2001, resp2003)
+combined_resp <- suppressWarnings(bind_rows(resp2001, resp2003))
 
 head(combined_resp)
 tail(combined_resp)

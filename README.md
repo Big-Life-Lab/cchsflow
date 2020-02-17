@@ -1,7 +1,10 @@
 # cchsflow <img src="man/figures/logo.svg" align="right" alt="" width="180"/>
 
-[![Lifecycle:
-development](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+<!-- badges: start -->
+[![Lifecycle:development](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CRAN status](https://www.r-pkg.org/badges/version/cchsflow)](https://CRAN.R-project.org/package=cchsflow)
+<!-- badges: end -->
 
 *cchsflow* supports the use of the Canadian Community Health Survey (CCHS) by transforming variables from each cycle into harmonized, consistent versions that 
 span survey cycles (currently, 2001 to 2014). 
@@ -43,7 +46,7 @@ BMI. `cchsflow` harmonizes the BMI variable across different cycles.
 ```
     # load test cchs data - included in cchsflow
 
-    cchs2001_BMI <- rec_with_table(cchs2001, "HWTGBMI")
+    cchs2001_BMI <- rec_with_table(cchs2001_p, "HWTGBMI")
     
 ```
 

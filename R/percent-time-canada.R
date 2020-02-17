@@ -34,7 +34,7 @@
 #'
 #' library(cchsflow)
 #' pct_time2010 <- rec_with_table(
-#'   cchs2010, c(
+#'   cchs2010_p, c(
 #'     "DHHGAGE_cont", "SDCGCBG",
 #'     "SDCGRES", "pct_time_der"
 #'   )
@@ -42,7 +42,7 @@
 #' head(pct_time2010)
 #'
 #' pct_time2012 <- rec_with_table(
-#'   cchs2012,  c(
+#'   cchs2012_p,  c(
 #'     "DHHGAGE_cont", "SDCGCBG",
 #'     "SDCGRES", "pct_time_der"
 #'   )
