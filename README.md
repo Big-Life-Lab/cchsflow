@@ -3,9 +3,9 @@
 <!-- badges: start -->
 [![Lifecycle:
 development](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CRAN status](https://www.r-pkg.org/badges/version/cchsflow)](https://CRAN.R-project.org/package=cchsflow)
 ![](https://img.shields.io/github/v/release/big-life-lab/cchsflow?color=green&label=GitHub)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![](https://img.shields.io/badge/doi-10.17605/OSF.IO/HKUY3-yellowgreen.svg)](https://OSF.IO/HKUY3)
 <!-- badges: end -->
 
