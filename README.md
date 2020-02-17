@@ -1,9 +1,12 @@
 # cchsflow <img src="man/figures/logo.svg" align="right" alt="" width="180"/>
 
 <!-- badges: start -->
-[![Lifecycle:development](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Lifecycle:
+development](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CRAN status](https://www.r-pkg.org/badges/version/cchsflow)](https://CRAN.R-project.org/package=cchsflow)
+![](https://img.shields.io/github/v/release/big-life-lab/cchsflow?color=green&label=GitHub)
+[![](https://img.shields.io/badge/doi-10.17605/OSF.IO/HKUY3-yellowgreen.svg)](https://OSF.IO/HKUY3)
 <!-- badges: end -->
 
 *cchsflow* supports the use of the Canadian Community Health Survey (CCHS) by transforming variables from each cycle into harmonized, consistent versions that 
