@@ -77,7 +77,11 @@ wording and category responses. Furthermore, there have been changes in survey s
 
 ## Installation
 
-    # If not installed, install the devtools
+    # To install the version of cchsflow on CRAN
+    install.packages("cchsflow")
+    
+    # To install the most up to date version of cchsflow,
+    # install the devtools
     install.packages("devtools")
     
     # then, install the package
