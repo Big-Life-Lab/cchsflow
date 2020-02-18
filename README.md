@@ -1,30 +1,40 @@
 # cchsflow <img src="man/figures/logo.svg" align="right" alt="" width="180"/>
 
 <!-- badges: start -->
-[![Lifecycle:development](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Lifecycle:
+development](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN status](https://www.r-pkg.org/badges/version/cchsflow)](https://CRAN.R-project.org/package=cchsflow)
+![](https://img.shields.io/github/v/release/big-life-lab/cchsflow?color=green&label=GitHub)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![](https://img.shields.io/badge/doi-10.17605/OSF.IO/HKUY3-yellowgreen.svg)](https://OSF.IO/HKUY3)
 <!-- badges: end -->
 
-*cchsflow* supports the use of the Canadian Community Health Survey (CCHS) by transforming variables from each cycle into harmonized, consistent versions that 
+*cchsflow* supports the use of the Canadian Community Health Survey (CCHS) by 
+transforming variables from each cycle into harmonized, consistent versions that 
 span survey cycles (currently, 2001 to 2014). 
 
-The CCHS is a population-based cross-sectional survey of Canadians that has been administered every two years since 2001. There are approximately 130,000 
+The CCHS is a population-based cross-sectional survey of Canadians that has been 
+administered every two years since 2001. There are approximately 130,000 
 respondents per cycle. Studies use multiple CCHS cycles to examine trends over 
-time and increase sample size to examine sub-groups that are too small to examine in 
-a single cycle. 
+time and increase sample size to examine sub-groups that are too small to examine 
+in a single cycle. 
 
-The CCHS is one of the largest and most robust ongoing population health surveys worldwide. The CCHS, administered by Statistics Canada, is Canada's main general population health survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
+The CCHS is one of the largest and most robust ongoing population health surveys 
+worldwide. The CCHS, administered by Statistics Canada, is Canada's main general 
+population health survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
 The CCHS has a [Statistic Canada Open Licence](https://www.statcan.gc.ca/eng/reference/licence).
 
 ## Concept
 
-Each cycle of the CCHS contains over 1000 variables that cover the same topics, including sociodemographic measures, health behaviours, health status and health 
-care use. The _seemingly_ consistent questions in the CCHS entice you; however, 
-you quickly realize a challenge... 
+Each cycle of the CCHS contains over 1000 variables that cover the four main 
+topics: sociodemographic measures, health behaviours, health status and health 
+care use. The _seemingly_ consistent questions across CCHS cycles entice you to 
+combine them together to increase sample size; however, you soon realize a 
+challenge... 
 
 Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 
-to 2014. BMI _seems_ like a straightforward measure that is routinely-collected worldwide. Indeed, BMI is included in all CCHS cycles. You examine the 
+to 2014. BMI _seems_ like a straightforward measure that is routinely-collected 
+worldwide. Indeed, BMI is included in all CCHS cycles. You examine the 
 documentation and find the variable `HWTAGBMI` in the CCHS 2001 corresponds to 
 body mass index, but that in other cycles, the variable name changes to 
 `HWTCGBMI`, `HWTDGBMI`, `HWTEGBMI`, etc. On reading the documentation, you 
@@ -38,8 +48,12 @@ BMI. `cchsflow` harmonizes the BMI variable across different cycles.
 
 ## Usage
 
-`cchsflow` creates harmonized variables (where possible) between CCHS cycles. Searching BMI in `variables` (described in the Introduction section of variableDetails.csv 
-[vignette](https://big-life-lab.github.io/cchsflow/articles/variable_details.html)) shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all respondents using the respondents' untruncated height and weight. 
+`cchsflow` creates harmonized variables (where possible) between CCHS cycles. 
+Searching BMI in `variables` (described in the Introduction section of 
+variableDetails.csv 
+[vignette](https://big-life-lab.github.io/cchsflow/articles/variable_details.html)) 
+shows `HWTGBMI` calculates BMI with two decimal places for all cycles for all 
+respondents using the respondents' untruncated height and weight. 
 
 *Calculate a harmonized BMI variable for CCHS 2001 cycle*
 
@@ -71,21 +85,29 @@ that are described in this repository have been used in several research
 projects, but there are no guarantees regarding the accuracy or appropriate 
 uses.
 
-Care must be taken to understand how specific variable transformation and harmonization with `cchsflow` affect your study or use of CCHS data. Across 
+Care must be taken to understand how specific variable transformation and 
+harmonization with `cchsflow` affect your study or use of CCHS data. Across 
 survey cycles, almost all CCHS variables have had at least some change in 
-wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses. 
+wording and category responses. Furthermore, there have been changes in survey 
+sampling, response rates, weighting methods and other survey design changes that 
+affect responses. 
 
 ## Installation
 
-    # To install the version of cchsflow on CRAN
+```
+    # Install release version from CRAN
     install.packages("cchsflow")
-    
-    # To install the most up to date version of cchsflow,
-    # install the devtools
-    install.packages("devtools")
-    
-    # then, install the package
+
+    # Install the most recent version from GitHub
     devtools::install_github("Big-Life-Lab/cchsflow")
+```
+
+Do you just want new variables not yet added to the CRAN version?
+
+You can download and use the latest version of 
+[`variables.csv`](https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variables.csv)
+and [`variable_details.csv`](https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variable_details.csv) 
+from GitHub.
     
 ## What is in the `cchsflow` package?
 
@@ -95,24 +117,42 @@ wording and category responses. Furthermore, there have been changes in survey s
 surveys.  
 2. `variable_details.csv` - information that describes how the variables are 
 recoded.
-3. Vignettes describe how to use R to transform or generate new derived 
+3. Vignettes - that describe how to use R to transform or generate new derived 
 variables that are listed in `variables.csv`. Transformations are performed 
 using `rec_with_table()`. `variables.csv` and `variable_details.csv` can be 
 used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
+4. Demonstration CCHS data -  `cchsflow` includes a random sample of 200 
+respondents from each CCHS PUMF file from 2001 to 2014. These data are used for 
+the vignettes. 
+The CCHS test data is stored in /data as .RData files. They can be read as a 
+package database.
 
-This repository does not include the CCHS data. Instead, it contains subsets of
-200 observations in each CCHS cycle. Information on how to access 
-the CCHS data can is 
+```
+# read the CCHS 2014 PUMF test data
+
+test_data <- cchs2014_p
+```
+
+This repository does not include the full CCHS data. Information on how to 
+access the CCHS data can is 
 [here](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/4144189-eng.htm). 
-The Canadian university community can also access the CCHS through [ODESI](http://odesi2.scholarsportal.info/webview/) (see health/Canada/Canadian Community Health Survey).
+The Canadian university community can also access the CCHS through 
+[ODESI](http://odesi2.scholarsportal.info/webview/)
+(see health/Canada/Canadian Community Health Survey).
+
+### Roadmap
+
+Project on the roadmap can be found on [here](https://github.com/Big-Life-Lab/cchsflow/projects).
 
 ## Contributing
 
-Please follow [this guide](https://big-life-lab.github.io/cchsflow/CONTRIBUTING.html) if you would like to contribute to
-the *cchsflow* package.
+Please follow [this guide](https://big-life-lab.github.io/cchsflow/CONTRIBUTING.html) 
+if you would like to contribute to the *cchsflow* package.
 
-We encourage PRs for additional variable transformations and derived variables that you believe may be helpful to the broad CCHS community. 
+We encourage PRs for additional variable transformations and derived variables 
+that you believe may be helpful to the broad CCHS community. 
 
 Currently, *cchsflow* supports R through the `rec_with_table()` function. The 
 CCHS community commonly uses SAS, Stata and other statistical packages. Please 
-feel free to contribute to `cchsflow` by making a PR that creates versions of `rec_with_table()` for other statistical and programming languages.
+feel free to contribute to `cchsflow` by making a PR that creates versions of 
+`rec_with_table()` for other statistical and programming languages.
