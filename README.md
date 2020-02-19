@@ -169,5 +169,3 @@ permission of Statistics Canada.
 Adapted from Statistics Canada, Canadian Community Health Surveys 2013 to 2013 
 PUMF, accessed Jan 2020. This does not constitute an endorsement by Statistics 
 Canada of this product.
-
-```
