@@ -433,7 +433,7 @@ recode_columns <-
 
     rec_variables_to_process <-
       variables_to_process[(!grepl("Func::|map::", variables_to_process[[
-        pkg.globals$argument.CatValue]])) && (!grepl("DerivedVar::", variables_to_process[[
+        pkg.globals$argument.CatValue]])) & (!grepl("DerivedVar::", variables_to_process[[
           pkg.globals$argument.VariableStart]])), ]
 
     label_list <- list()
