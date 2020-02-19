@@ -80,7 +80,7 @@ reference:
     - cchs2013_2014_p
     - cchs2014_p
   - title: "Processing functions"
-    desc: Functions used to manipulate cchs datasets
+    desc: Functions used to manipulate CCHS datasets
     contents:
     - rec_with_table
     - set_data_labels

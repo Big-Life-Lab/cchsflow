@@ -1,3 +1,12 @@
+# cchsflow 1.4.2 (Latest build)
+2020-02-19
+
+## Bug fixes and minor improvements
+- New badges and documentation updates to reflect package being added to CRAN
+- Fixed bug in `rec_with_table()` to include all values in recFrom column
+- Improvements in labelling of variables in `variables.csv` &
+`variable_details.csv`, as well as labelling of derived categorical variables
+
 # cchsflow 1.4.1 (Latest build)
 2020-02-11
 

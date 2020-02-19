@@ -432,14 +432,15 @@ recode_columns <-
         pkg.globals$argument.CatValue]]), ]
 
     rec_variables_to_process <-
-      variables_to_process[!grepl("Func::|map::", variables_to_process[[
-        pkg.globals$argument.CatValue]]), ]
+      variables_to_process[(!grepl("Func::|map::", variables_to_process[[
+        pkg.globals$argument.CatValue]])) & (!grepl("DerivedVar::", variables_to_process[[
+          pkg.globals$argument.VariableStart]])), ]
 
     label_list <- list()
     # Set interval if none is present
     interval_present <- TRUE
     valid_intervals <- c("[,]", "[,)", "(,]")
-    interval_default <- "[,)"
+    interval_default <- "[,]"
     recoded_data <- data[, 0]
     if (is.null(rec_variables_to_process[[pkg.globals$argument.Interval]])) {
       interval_present <- FALSE
