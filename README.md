@@ -159,16 +159,15 @@ feel free to contribute to `cchsflow` by making a PR that creates versions of
 
 ## Statistics Canada Attribution
 
-Subject to the Statistics Canada Open Licence Agreement, licensed products using Statistics Canada data should employ the following acknowledgement of source:
+CCHS data used in this library is accessed and adapted in accordance to the  
+Statistics Canada Open Licence Agreement.
 
-```
-Acknowledgment of Source
+Source from Statistics Canada, Canadian Community Health Survey 2001 to 2013 
+PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with the 
+permission of Statistics Canada.
 
-(a) You shall include and maintain the following notice on all licensed rights of the Information:
+Adapted from Statistics Canada, Canadian Community Health Surveys 2013 to 2013 
+PUMF, accessed Jan 2020. This does not constitute an endorsement by Statistics 
+Canada of this product.
 
-  - Source: Statistics Canada, name of product, reference date. Reproduced and distributed on an "as is" basis with the permission of Statistics Canada.
- 
-(b) Where any Information is contained within a Value-added Product, you shall include on such Value-added Product the following notice:
-
-  - Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
 ```
