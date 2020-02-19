@@ -42,7 +42,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2001-c1-1-general-file
 #'
@@ -71,8 +73,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
-#'
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2003-c2-1-General File
 #'
@@ -101,8 +104,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
-#'
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2005-c3-1-main-file
 #'
@@ -131,7 +135,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-E-2007-2008-AnnualComponent
 #'
@@ -160,7 +166,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: CCHS-82M0013-E-2009-2010-Annualcomponent
 #'
@@ -189,7 +197,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: CCHS-82M0013-E-2010-AnnualComponent
 #'
@@ -218,8 +228,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
-#'
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2011-2012-Annual-component
 #'
@@ -248,7 +259,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2012-Annual-component
 #'
@@ -277,7 +290,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2013-2014-Annual-component
 #'
@@ -306,7 +321,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2014-Annual-component
 #'
