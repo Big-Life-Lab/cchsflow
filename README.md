@@ -156,3 +156,19 @@ Currently, *cchsflow* supports R through the `rec_with_table()` function. The
 CCHS community commonly uses SAS, Stata and other statistical packages. Please 
 feel free to contribute to `cchsflow` by making a PR that creates versions of 
 `rec_with_table()` for other statistical and programming languages.
+
+## Statistics Canada Attribution
+
+Subject to the Statistics Canada Open Licence Agreement, licensed products using Statistics Canada data should employ the following acknowledgement of source:
+
+```
+Acknowledgment of Source
+
+(a) You shall include and maintain the following notice on all licensed rights of the Information:
+
+  - Source: Statistics Canada, name of product, reference date. Reproduced and distributed on an "as is" basis with the permission of Statistics Canada.
+ 
+(b) Where any Information is contained within a Value-added Product, you shall include on such Value-added Product the following notice:
+
+  - Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
+```
