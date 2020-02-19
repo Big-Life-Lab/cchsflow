@@ -17,7 +17,9 @@ The CCHS survey is conducted by Statistics Canada.
 }
 \details{
 See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-license.
+license. Source from Statistics Canada, Canadian Community Health Survey 
+PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+the permission of Statistics Canada.
 
 Long name: cchs-E-2007-2008-AnnualComponent
 
