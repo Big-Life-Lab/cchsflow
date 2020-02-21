@@ -3,7 +3,7 @@
 <!-- badges: start -->
 [![Lifecycle:
 development](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-[![CRAN status](https://www.r-pkg.org/badges/version/cchsflow)](https://CRAN.R-project.org/package=cchsflow)
+[![](https://img.shields.io/cran/v/cchsflow?color=green)](https://CRAN.R-project.org/package=cchsflow)
 ![](https://img.shields.io/github/v/release/big-life-lab/cchsflow?color=green&label=GitHub)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![](https://img.shields.io/badge/doi-10.17605/OSF.IO/HKUY3-yellowgreen.svg)](https://OSF.IO/HKUY3)
@@ -159,7 +159,7 @@ feel free to contribute to `cchsflow` by making a PR that creates versions of
 
 ## Statistics Canada Attribution
 
-CCHS data used in this library is accessed and adapted in accordance to the  
+CCHS data used in this library is accessed and adapted in accordance to the 
 Statistics Canada Open Licence Agreement.
 
 Source from Statistics Canada, Canadian Community Health Survey 2001 to 2013 

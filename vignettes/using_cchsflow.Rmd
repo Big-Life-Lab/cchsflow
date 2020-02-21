@@ -15,19 +15,20 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Loading the necessary packages
 
-The `rec_with_table()` and `set_data_labels()` functions are part of cchsflow. `rec_with_table()` is used to transform CCHS variables to a common name. `set_data_labels()` reapplies labels that are lost during the combination process after transforming each CCHS dataset. `variables.csv` & `variable_details.csv` are also saved in the cchsflow package as `variables` & `variable_details`. This means you will need to install & load the package onto your environment. Install & load the package onto your environment.
 
 ```{r eval= FALSE}
-install.packages("devtools")
-library(devtools)
-install_github("Big-Life-Lab/cchsflow")
+# Install release version from CRAN
+    install.packages("cchsflow")
+
+# Install the most recent version from GitHub
+    devtools::install_github("Big-Life-Lab/cchsflow")
 ```
 
 ```{r results= 'hide', message = FALSE, warning=FALSE}
 library(cchsflow)
 ```
 
-We use the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package to combine datasets.
+The vignettes use the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package to combine datasets.
 
 ```{r results = 'hide', message = FALSE, warning =FALSE}
 library(dplyr)

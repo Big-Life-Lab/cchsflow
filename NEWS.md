@@ -1,4 +1,10 @@
-# cchsflow 1.4.2 (Latest build)
+# cchsflow 1.4.3 (Latest build)
+2020-02-21
+
+## Minor improvements
+- Minor documentation improvements in vignettes and home page
+
+# cchsflow 1.4.2 
 2020-02-19
 
 ## Bug fixes and minor improvements
@@ -7,7 +13,7 @@
 - Improvements in labelling of variables in `variables.csv` &
 `variable_details.csv`, as well as labelling of derived categorical variables
 
-# cchsflow 1.4.1 (Latest build)
+# cchsflow 1.4.1
 2020-02-11
 
 ## Minor improvements
