@@ -1,6 +1,7 @@
 ---
 title: "Get started"
 output: rmarkdown::html_vignette
+date: "`r Sys.Date()`"
 vignette: >
   %\VignetteIndexEntry{1 - using cchsflow}     
   %\VignetteEngine{knitr::rmarkdown} 
@@ -8,7 +9,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
 ```
 
 ## Load packages
@@ -42,6 +43,9 @@ harmonized `sex` variable that is consistent all CCHS cycles.
 
 ```{r, warning=FALSE}
 sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE)
+
+get_label(sex2001)
+get_labels(sex2001)
 ```
 
 ```{r, echo=FALSE}
@@ -66,11 +70,66 @@ rec_with_table().
 The rules for the transformation in two dataframes that are included in `cchsflow`:
  `variables` and `variable_details`. We will discuss later how to find the names of the common transformed variables. There are also vignettes that further describe `variables` and `variable_details`, including how to add or customize transformed variables.
  
+ ### Which variables are transformed? How "good" is the transformation?
+ 
+`cchsflow` includes commonly used sociodemogrphaphic, health behaviour and health status variables.
+
+There are four different types of variables that can be transformed, including variables that are:
+
+1) Consistent and unchanged across all cycles. These variables have no changes to the wording of the question that was asked, the response values and who was asked the question (same inclusion criteria and skip pattern). These variables have no additional notes.
+
+2) Mostly consistent across cycles. These variables may have a small change in wording or response category. Notes for these variables are printed to the console and form a `notes` variable in `variable_details`. Caution is required when using these variables. The notes should be reviewed to assess whether these variables can be used in your study.
+
+3) Either not collected in all cycles or have major changes between cycles. These variable may be included in `cchsflow` with a note that says which cycles include the variable and can be transformed to a common variable.
+
+4) Mostly consistent but with complex changes or transformation rules. These "Potentially problematic variables" are discussed in th reference guide (see ....).
+
+5) Not consistent between cycles. Variable that are inconsistent or not asked in most cycles are not included in `cchsflow`. In the future, we hope to include these variables with an marker that they've been reviewed but rejected from inclusion in `cchsflow`. 
+
+### Example 2. Variable transfomation with a note
+
+```{r}
+BMI2001 <- rec_with_table(cchs2001_p, "HWTGBMI", log = TRUE)
+
+```
+BMI has several notes reflecting a number of changes that occurred over the CCHS. Notice that the note included advice to use `HWTGBMI_der`. Despite the large number of notes, BMI can be used for most studies because the common transformed variable `HWTGBMI_der` was derived from height and weight variables that are included and largely unchanged across CCHS cycles. However, to use `HWTGBMI_der` you'll also need to include the transformed measures for height (`HWTGHTM`) and weight (`HWTGWTK`).
+
+More information about `HWTGBMI_der` can be found in the documentation reference for 'derived variable functions' or by typing `?BMI_fun` in the R console.
+
+```{r}
+BMI2001C <- rec_with_table(cchs2001_p,  
+                           c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"), 
+                           log = TRUE)
+?bmi_fun
+```
+ 
  ### Variable names and labels included
  
- .....
+By default, `rec_w_table` can include variable and value labels for the harmonized variables. 
  
- ### Default arguments
+hmm, not sure what is going on here....
+```{r, warning=FALSE}
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE, var_labels = c(var_name = "DHH_SEX"))
+
+get_label(sex2001)
+attr(sex2001$DHH_SEX, 'label') <- "Sex"
+get_label(sex2001)
+```
+
+Labels can then be used in plots and tables.
+```{r fig1, fig.height = 5, fig.width = 7, warning=FALSE}
+
+barplot(
+  table(as_label(sex2001$DHH_SEX)),
+  col = cm.colors(5),
+  ylim = c(0, 140),
+  legend = TRUE,
+  main = attr(sex2001$DHH_SEX, 'label'),
+  ylab = 'Frequency (n)'
+  )
+```
+ 
+### Default arguments
 
 With `rec_with_table()` there are also default arguments that do not need to be called unless you would like to modify them.
 
@@ -83,7 +142,7 @@ With `rec_with_table()` there are also default arguments that do not need to be 
   + `notes` defaults to TRUE. Information in the `Notes` column from `variable_details.csv` will be displayed
   + `var_labels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`. The format to add labels to a subset of variables is `c(variable = "Label")`.
   
-------
+------ end here -------
 
 ## Steps
 
