@@ -838,9 +838,9 @@ recode_derived_variables <-
         warning(
           paste(
             variable_being_processed,
-            "could not be calculated because",
+            "could not be derived because",
             feeder_vars,
-            "was never recoded and is not a function variable"
+            "was never specified nor is it a function variable, therefore it was not recoded \n"
           )
         )
         var_stack <-
