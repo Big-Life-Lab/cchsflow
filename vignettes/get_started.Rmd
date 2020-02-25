@@ -1,5 +1,5 @@
 ---
-title: "Using cchsflow"
+title: "Get started"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{1 - using cchsflow}     
@@ -11,10 +11,7 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Getting Started
-
-### Loading the necessary packages
-
+## Load packages
 
 ```{r eval= FALSE}
 # Install release version from CRAN
@@ -28,17 +25,71 @@ knitr::opts_chunk$set(echo = TRUE)
 library(cchsflow)
 ```
 
-The vignettes use the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package to combine datasets.
+The vignettes use the `bind_rows` function in the [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package to 
+combine datasets.
 
 ```{r results = 'hide', message = FALSE, warning =FALSE}
 library(dplyr)
 ```
+## Step 1. Transform variables into haromonized versions
+
+Use`rec_with_table()` to transform the variables of a CCHS dataset.
+
+### Example 1. Transform a single variable from a single database
+
+In this example, the `sex` variable in the 2001 CCHS cycle is transformed into a 
+harmonized `sex` variable that is consistent all CCHS cycles.
+
+```{r, warning=FALSE}
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE)
+```
+
+```{r, echo=FALSE}
+head(sex2001)
+```
+
+`cchs2001_p` is the name of test CCHS data that is included in the `cchsflow`
+library. `cchsflow` includes test CCHS data for the public use microdata file 
+(PUMF) for all general household survey (.1 versions) between 2001 and 2013. 
+Each suvey cycle has a sample of 200 respondents. `cchs2000_p` indicates this is 
+the CCHS 2001 PUMF file. See [Reference](../reference/index.html) for more 
+information of each CCHS cycle.
+
+`DHH_SEX` is the name of the harmonized variable for sex. Up to 2007, the 
+variable names in CCHS changed every cycle. Since 2007, there has _generally_ 
+been a consistent name. `cchsflow` uses the variable name from the 2007 cycle whenever 
+possible. For example, in the CCHS 2001, the variable for sex is `DHHA_SEX` and
+in CCHS 2007 the same variable is `DHH_SEX`. This name, `DHH_SEX` is the 
+harmonized name for sex, meaning `DHHA_SEX` is transformed to `DHH_SEX` using 
+rec_with_table(). 
+
+The rules for the transformation in two dataframes that are included in `cchsflow`:
+ `variables` and `variable_details`. We will discuss later how to find the names of the common transformed variables. There are also vignettes that further describe `variables` and `variable_details`, including how to add or customize transformed variables.
+ 
+ ### Variable names and labels included
+ 
+ .....
+ 
+ ### Default arguments
+
+With `rec_with_table()` there are also default arguments that do not need to be called unless you would like to modify them.
+
+  + `variables` defaults to NULL. This results in the `variables.csv` sheet in the cchsflow package being used to specify which variables to transform. This argument can be modified if you want use your own `variables.csv` sheet or by specifying particular variables to transform.
+  + `database_name` defaults to NULL. This results in `rec_with_table()` using the database indicated in the `data` argument.
+  + `variable_details` defaults to NULL. This results in the `variable_details.csv` sheet in the cchsflow being used. This argument can be modified if want use your own `variable_details.csv` sheet.
+  + `else_value` defaults to NA. Values out of range set to NA.
+  + `append_to_data` defaults to FALSE. Transformed variables will not be appended to the original CCHS dataset.
+  + `log` defaults to FALSE. Logs of the variable transformations will not be displayed. 
+  + `notes` defaults to TRUE. Information in the `Notes` column from `variable_details.csv` will be displayed
+  + `var_labels` is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from `variables.csv`. The format to add labels to a subset of variables is `c(variable = "Label")`.
+  
+------
 
 ## Steps
 
-### Step 1. Load the CCHS datasets
+### Step 1. Transform variables into haromonized versions
 
-Load the CCHS datasets as well as the two variable worksheets. There are sample datasets for each CCHS cycle saved in `cchsflow`. For this vignette we will use sample data from the 2001 and 2012 CCHS cycles. See [Reference](../reference/index.html) for more information of each CCHS cycle.
+Load the CCHS datasets as well as the two variable worksheets. There are sample datasets for each CCHS cycle saved in `cchsflow`. For this vignette we will use sample data from the 2001 and 2012 CCHS cycles. 
 
 Did you notice that the names for the variables are slightly different in the two mock databases? That isn't a mistake: in the 2001 CCHS the variable for sex is `DHHA_SEX` and in 2012 CCHS the variable is `DHH_SEX`. 
 
