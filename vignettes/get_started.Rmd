@@ -41,11 +41,61 @@ Use`rec_with_table()` to transform the variables of a CCHS dataset.
 In this example, the `sex` variable in the 2001 CCHS cycle is transformed into a 
 harmonized `sex` variable that is consistent all CCHS cycles.
 
-```{r, warning=FALSE}
+
+## for Rusty: find <s>Waldo</s> labels!
+```{r}
 sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE)
 
 get_label(sex2001)
-get_labels(sex2001)
+
+# where is my label???
+```
+
+OK. I guess that I'll need to attach them. A bit of a pain if you ask me.
+
+```{r}
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE, var_labels = c(var_name = "DHH_SEX"))
+```
+
+There, that should do it! But wait, there still missing or I can't find them...
+```{r}
+get_label(sex2001)
+```
+
+Hmm, let me try to set it myself.
+```{r}
+set_label(sex2001$DHH_SEX, label = "Sex")
+```
+Looks good in the console message:
+```
+attr(,"label")
+[1] Sex
+```
+
+Double check. What?!
+```{r} 
+get_label(sex2001$DHH_SEX)
+```
+
+Not sure what I am missing... Looks fine to me. https://strengejacke.github.io/sjlabelled/reference/set_label.html
+
+I'll try a different way.
+```{r} 
+set_label(sex2001$DHH_SEX) <- "Sex"
+get_label(sex2001$DHH_SEX)
+```
+OK. That works.
+
+So does....
+```{r}
+attr(sex2001$DHH_SEX, 'label') <- "Sex"
+get_label(sex2001$DHH_SEX)
+```
+
+---- end message to Rusty.
+
+```{r, warning=FALSE}
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE)
 ```
 
 ```{r, echo=FALSE}
