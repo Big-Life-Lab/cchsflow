@@ -247,10 +247,10 @@ _cchsflow_ often includes a common harmonized categorical variable that has new,
 
 ## Label variables and categories.
 
-Use the `set_data_labels()` function to label the variables in your final dataset. `rec_with_table()` labels individual datasets. `set_data_labels()` labels combined dataset that lose labels when datasets are combined. 
+Use the `set_data_labels()` to label the variables in your final dataset. Labels are lost during the database merging. `set_data_labels` set labels with the orginal information in `variables` and `variable_details`.
 
 ```{r}
-`labeled_combined_cchs <- set_data_labels(data_to_label = combined_cchs, variable_details = variable_details, variables_sheet = variables)`
+labeled_combined_cchs <- set_data_labels(data_to_label = combined_age_cont, variable_details = variable_details, variables_sheet = variables)
 ```
 
 ### Example 4. Transform multiple variables from multiple datasets
