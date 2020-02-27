@@ -32,7 +32,7 @@ combine datasets.
 ```{r results = 'hide', message = FALSE, warning =FALSE}
 library(dplyr)
 ```
-## Step 1. Transform variables into haromonized versions
+## Step 1. Transform variables into harmonized versions
 
 Use `rec_with_table()` to transform the variables of a CCHS dataset.
 
@@ -64,12 +64,12 @@ in CCHS 2007 the same variable is `DHH_SEX`. This name, `DHH_SEX` is the
 harmonized name for sex, meaning `DHHA_SEX` is transformed to `DHH_SEX` using 
 `rec_with_table()`. 
 
-The rules for the transformation and harmonization are in in two dataframes that are included in 
+The rules for the transformation and harmonization are in two dataframes that are included in 
  `variables` and `variable_details`, both included in _cchsflow_. There are vignettes that further describe `variables` and `variable_details`, including how to add or customize transformed variables.
  
 ### Which variables are transformed? How "good" is the transformation?
  
-_cchsflow_ includes commonly used sociodemogrphaphic, health behaviour and health status variables. In general, variables across CCHS cycles can be grouped into five categories:
+_cchsflow_ includes commonly used sociodemographic, health behaviour and health status variables. In general, variables across CCHS cycles can be grouped into five categories:
 
 1) Consistent and unchanged across all cycles. These variables have no changes to the wording of the question that was asked, the response values and who was asked the question (same inclusion criteria and skip pattern).
 
@@ -86,7 +86,7 @@ _cchsflow_ includes commonly used sociodemogrphaphic, health behaviour and healt
 `notes` provide context for the decisions that informed harmonization that may affect your decision to use a harmonized variable. 
 
 ```{r}
-warning("_cchsflow_ includes ", length(unique(variable_details$notes)), " variables with notes.")
+warning("cchsflow includes ", length(unique(variable_details$notes)), " variables with notes.")
 
 ```
 
@@ -97,8 +97,6 @@ For example, for `DHHGAGE_A` the category `NA::b` has the following `note`:
 This note informs the decision to combine values 96 to 99 in `DHHGAGE_A` for CCHS2003 into one common missing value `NA::b`. The label for the `NA::b` category is, "`don't know (97); refusal (98); not stated (99)`".
 
 By default, `rec_with_table()` prints notes to the console.
-
-
 
 ```{r}
 BMI2001 <- rec_with_table(cchs2001_p, "HWTGBMI", log = TRUE)
