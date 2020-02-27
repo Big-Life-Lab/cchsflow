@@ -16,10 +16,10 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
 
 ```{r eval= FALSE}
 # Install release version from CRAN
-    install.packages("cchsflow")
+install.packages("cchsflow")
 
 # Install the most recent version from GitHub
-    devtools::install_github("Big-Life-Lab/cchsflow")
+devtools::install_github("Big-Life-Lab/cchsflow")
 ```
 
 ```{r results= 'hide', message = FALSE, warning=FALSE}
@@ -87,7 +87,6 @@ _cchsflow_ includes commonly used sociodemogrphaphic, health behaviour and healt
 
 ```{r}
 warning("_cchsflow_ includes ", length(unique(variable_details$notes)), " variables with notes.")
-
 ```
 
 For example, for `DHHGAGE_A` the category `NA::b` has the following `note`:
@@ -102,7 +101,6 @@ By default, `rec_with_table()` prints notes to the console.
 
 ```{r}
 BMI2001 <- rec_with_table(cchs2001_p, "HWTGBMI", log = TRUE)
-
 ```
 
 #### Notes with guidance or additional infomation
@@ -111,9 +109,10 @@ BMI has several notes reflecting a number of changes that occurred over the CCHS
 More information about `HWTGBMI_der` can be found in the documentation reference for 'derived variable functions' or by typing `?BMI_fun` in the R console.
 
 ```{r}
-BMI2001C <- rec_with_table(cchs2001_p,  
-                           c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"), 
-                           log = TRUE)
+BMI2001C <- rec_with_table(cchs2001_p,
+  c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
+  log = TRUE
+)
 ```
 ### Warning messages
 
@@ -136,8 +135,8 @@ barplot(
   ylim = c(0, 140),
   legend = TRUE,
   main = get_label(sex2001$DHH_SEX),
-  ylab = 'Frequency (n)'
-  )
+  ylab = "Frequency (n)"
+)
 ```
  
 ### Missing data
@@ -258,12 +257,14 @@ The variables argument in `rec_with_table()` allows multiple variables to be tra
 
 ```{r, warning=FALSE}
 age_sex_2001 <- rec_with_table(cchs2001_p, c("DHHGAGE_cont", "DHH_SEX"),
-                var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
+  var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex")
+)
 
 get_label(age_sex_2001)
 
 age_sex_2012 <- rec_with_table(cchs2012_p, c("DHHGAGE_cont", "DHH_SEX"),
-                var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex"))
+  var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex")
+)
 
 get_label(age_sex_2012)
 ```
@@ -272,8 +273,10 @@ In the above example, `var_labels` is called in `rec_with_table()` to label the 
 
 ```{r, warning=FALSE}
 combined_age_sex <- bind_rows(age_sex_2001, age_sex_2012)
-labeled_combined_age_sex <- set_data_labels(data_to_label = combined_age_sex,
-            variable_details = variable_details, variables_sheet = variables)
+labeled_combined_age_sex <- set_data_labels(
+  data_to_label = combined_age_sex,
+  variable_details = variable_details, variables_sheet = variables
+)
 ```
 
 In the above code, `set_data_labels()` is used to label the combined age and sex dataset. Similar to before, you can check if labels have been added using `get_label()`.
@@ -289,7 +292,7 @@ For more information on `get_label()` and other label helper functions, please r
 All the variables listed in `variables.csv` & `variable_details.csv` will be transformed if the variables argument in `rec_with_table()` is not specified. In this example, all variables specified in the two worksheets will be transformed, combined, and labeled for the 2001 and 2012 CCHS cycles.
 
 ```{r, echo=FALSE}
-options(htmlwidgets.TOJSON_ARGS = list(na = 'string'))
+options(htmlwidgets.TOJSON_ARGS = list(na = "string"))
 ```
 
 ```{r, warning=FALSE}
@@ -298,8 +301,10 @@ transformed2001 <- rec_with_table(data = cchs2001_p, notes = FALSE)
 transformed2012 <- rec_with_table(data = cchs2012_p, notes = FALSE)
 
 combined_cchs <- bind_rows(transformed2001, transformed2012)
-labeled_combined_cchs <- set_data_labels(data_to_label = combined_cchs,
-              variable_details = variable_details, variables_sheet = variables)
+labeled_combined_cchs <- set_data_labels(
+  data_to_label = combined_cchs,
+  variable_details = variable_details, variables_sheet = variables
+)
 ```
 
 ### Example 7. Transform CCHS derived variables such as Body Mass Index (BMI) {#example7}
@@ -314,12 +319,14 @@ Using the BMI example illustrated in the [derived variables](derived_variables.h
 
 ```{r, warning=FALSE}
 bmi2001 <- rec_with_table(cchs2001_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
-                          log = TRUE)
+  log = TRUE
+)
 
 head(bmi2001)
 
 bmi2012 <- rec_with_table(cchs2012_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
-                          log = TRUE)
+  log = TRUE
+)
 tail(bmi2012)
 
 combined_bmi <- bind_rows(bmi2001, bmi2012)
@@ -327,4 +334,3 @@ combined_bmi <- bind_rows(bmi2001, bmi2012)
 head(combined_bmi)
 tail(combined_bmi)
 ```
-
