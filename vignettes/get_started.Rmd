@@ -135,16 +135,17 @@ BMI2001 <- rec_with_table(cchs2001_p, "HWTGBMI", log = TRUE)
 
 ### Notes with guidance or additional infomation
 
-BMI has several notes reflecting a number of changes that occurred over the
-CCHS. Notice that the note included advice to use `HWTGBMI_der`. Despite the
-large number of notes, BMI can be used for most studies because the common
-transformed variable `HWTGBMI_der` was derived from height and weight variables
-that are included and largely unchanged across CCHS cycles. However, to use
-`HWTGBMI_der` you'll also need to include the transformed measures for height
-(`HWTGHTM`) and weight (`HWTGWTK`).
-
-More information about `HWTGBMI_der` can be found in the documentation reference
-for 'derived variable functions' or by typing `?BMI_fun` in the R console.
+Several variables such as BMI have a quite a few notes reflecting a range of
+changes that occurred over CCHS cycles. Variables with notes can usually be used
+after reviewing and considering whether or how the variable changes affect your
+use. There can also be further guidance in notes. For example, BMI notes include
+advice to use `HWTGBMI_der`. Despite the large number of changes, BMI can be
+used for most studies because the common transformed variable `HWTGBMI_der` was
+derived from height and weight variables that are included and largely unchanged
+across CCHS cycles. However, to use `HWTGBMI_der` you'll also need to include
+the transformed measures for height (`HWTGHTM`) and weight (`HWTGWTK`). More
+information about `HWTGBMI_der` can be found in the documentation reference for
+'derived variable functions' or by typing `?BMI_fun` in the R console.
 
 ```{r}
 BMI2001C <- rec_with_table(cchs2001_p,
@@ -188,7 +189,7 @@ barplot(
 
 ### Missing data
 
-If you've been wathcing, my may have noticed that _cchsflow_ recodes the values
+If you've been watching, you may have noticed that _cchsflow_ recodes the values
 in factor or categorical variables for 6 ("not applicable"), 7 ("don’t know"),
 and 8 ("refusal"), 9 ("not stated") into `tagged_NA` values NA(a) ("not
 applicable") and NA (b) ("missing"). There are two reasons. First, the typical
