@@ -1,7 +1,6 @@
 ---
 title: "Get started"
 output: rmarkdown::html_vignette
-date: "`r Sys.Date()`"
 vignette: >
   %\VignetteIndexEntry{1 - using cchsflow}     
   %\VignetteEngine{knitr::rmarkdown}  %\VignetteEncoding{UTF-8}
@@ -56,9 +55,13 @@ head(sex2001)
 `cchs2001_p` is the name of test CCHS data that is included in the _cchsflow_
 library. _cchsflow_ includes test CCHS data for the public use microdata file
 (PUMF) for all general household survey (.1 versions) between 2001 and 2013.
-Each suvey cycle has a sample of 200 respondents. `cchs2000_p` indicates this is
-the CCHS 2001 PUMF file. See [Reference](../reference/index.html) for more
+Each survey cycle has a sample of 200 respondents. `cchs2000_p` indicates this 
+isthe CCHS 2001 PUMF file. See [Reference](../reference/index.html) for more
 information of each CCHS cycle.
+
+You'll want to use _cchsflow_ on your own CCHS data that you'll need to first
+load: something like `cchs2001 <- read.csv("~/data/cchs2001.csv")`. CCHS PUMF 
+data can be obtained from Statistics Canada. 
 
 `DHH_SEX` is the name of the harmonized variable for sex. Up to 2007, the
 variable names in CCHS changed every cycle. Since 2007, there has _generally_
