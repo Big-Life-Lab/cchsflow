@@ -85,8 +85,14 @@ resp_condition_fun1 <-
          (CCC_091 == 1 | CCC_031 == 1)), 1,
       if_else2(
         ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-           (CCC_091 == 1 | CCC_031 == 1)), 2,
-        if_else2((CCC_091 == 2 & CCC_031 == 2), 3, NA)
+           (CCC_091 == 1)), 2,
+        if_else2(
+          ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
+             (CCC_091 == 2)), 3,
+          if_else2(
+            ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+              (CCC_091 == 2 & CCC_031 == 2)), 3, NA)
+          )
       )
     )
   }
@@ -189,10 +195,20 @@ resp_condition_fun2 <-
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
          (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
       if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
+        ((DHHGAGE_cont >= 30 & DHHGAGE_cont < 35) &
            (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
-        if_else2((CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2 &
-                    CCC_031 == 2), 3, NA)
+        if_else2(
+          ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
+             (CCC_91A == 1 | CCC_031 == 1)), 2,
+          if_else2(
+            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
+               (CCC_91A == 2 & CCC_031 == 2)), 3,
+            if_else2(
+              ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) &
+                 (CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2 &
+                        CCC_031 == 2)), 3, NA)
+          )
+        )
       )
     )
   }
@@ -288,9 +304,19 @@ resp_condition_fun3 <-
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
          (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
       if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
+        ((DHHGAGE_cont >= 30 & DHHGAGE_cont < 35) &
            (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
-        if_else2((CCC_091 == 2 & CCC_91A == 2 & CCC_031 == 2), 3, NA)
+        if_else2(
+          ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
+             (CCC_91A == 1 | CCC_031 == 1)), 2,
+          if_else2(
+            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
+               (CCC_91A == 2 & CCC_031 == 2)), 3,
+            if_else2(
+              ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) & 
+                       (CCC_091 == 2 & CCC_91A == 2 & CCC_031 == 2)), 3, NA)
+          )
+        )
       )
     )
   }
