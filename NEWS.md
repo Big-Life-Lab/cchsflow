@@ -5,9 +5,14 @@
 - Docsearch added to website
 - New article on getting started with _cchsflow_
 
+## Bug fixes
+- Refactor to `pct_time_fun` function to output value from 0-100% as opposed
+to 0-1
+- Refactor to respiratory functions to better capture respondents under 35
+with respiratory conditions
+
 ## Minor improvements
-- Improvements to `rec_with_table()`, `pct_time_fun()`, and respiratory
-functions
+- Improvements to warning outputs in `rec_with_table()`
 - Improvements to labels in `variables.csv` & `variable_details.csv`
 
 # cchsflow 1.4.3 
