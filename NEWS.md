@@ -1,4 +1,21 @@
-# cchsflow 1.4.3 (Latest build)
+# cchsflow 1.4.4 (Latest build)
+2020-03-03
+
+## Features
+- Docsearch added to website
+- New article on getting started with _cchsflow_
+
+## Bug fixes
+- Refactor to `pct_time_fun` function to output value from 0-100% as opposed
+to 0-1
+- Refactor to respiratory functions to better capture respondents under 35
+with respiratory conditions
+
+## Minor improvements
+- Improvements to warning outputs in `rec_with_table()`
+- Improvements to labels in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.4.3 
 2020-02-21
 
 ## Minor improvements

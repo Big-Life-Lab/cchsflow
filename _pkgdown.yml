@@ -3,6 +3,9 @@ destination: docs
 template:
   params:
     bootswatch: cosmo
+    docsearch:
+      api_key: a674c1edc7b44c4ee995ef4227708c57
+      index_name: cchsflow
 
 development:
   mode: auto
@@ -14,14 +17,15 @@ home:
       
 navbar:
   structure:
-    left: [home, articles, reference, news]
+    left: [home, get_started, articles, reference, news]
     right: github
   components:
+    get_started:
+      text: Get started
+      href: articles/get_started.html
     articles:
       text: Articles
       menu:
-      - text: Using cchsflow
-        href: articles/using_cchsflow.html
       - text: variables.csv sheet
         href: articles/variables_sheet.html
       - text: variable_details.csv sheet

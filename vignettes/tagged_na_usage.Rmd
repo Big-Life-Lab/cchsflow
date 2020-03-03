@@ -51,10 +51,21 @@ or coded in CCHS surveys, recoded to NA(a)
 | NA(a) | question not asked in the survey cycle  |
 
 ## Example `haven::tagged_na()`
-```{r cars}
+```{r}
 library(haven)
-x <- c(1:5, tagged_na("a"), tagged_na("z"), NA)
-na_tag(x) # is used to read the tagged NA in most other functions they are still viewed as NA
-print_tagged_na(x) # Is used to print the na as well as their tag
-```
+x <- c(1:5, tagged_na("a"), tagged_na("b"))
 
+# Is used to read the tagged NA in most other functions they are still viewed as NA
+na_tag(x)
+```
+```{r}
+# Is used to print the na as well as their tag
+print_tagged_na(x)
+```
+```{r}
+# Tagged NA's work identically to regular NAs
+x
+```
+```{r}
+is.na(x)
+```
