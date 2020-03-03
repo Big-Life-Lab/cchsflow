@@ -1,4 +1,16 @@
-# cchsflow 1.4.3 (Latest build)
+# cchsflow 1.4.4 (Latest build)
+2020-03-03
+
+## Features
+- Docsearch added to website
+- New article on getting started with _cchsflow_
+
+## Minor improvements
+- Improvements to `rec_with_table()`, `pct_time_fun()`, and respiratory
+functions
+- Improvements to labels in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.4.3 
 2020-02-21
 
 ## Minor improvements
