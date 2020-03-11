@@ -160,7 +160,8 @@ rec_with_table <-
            log = FALSE,
            notes = TRUE,
            var_labels = NULL,
-           custom_function_path = NULL) {
+           custom_function_path = NULL,
+           attach_data_name = FALSE) {
     # If custom Functions are passed create new environment and source
     if (!is.null(custom_function_path)) {
       source(custom_function_path)
@@ -222,6 +223,9 @@ rec_with_table <-
         log = log,
         var_labels = var_labels
       )
+      if (attach_data_name) {
+        data[["data_name"]] <- database_name
+      }
     } else {
       stop(
         paste(
