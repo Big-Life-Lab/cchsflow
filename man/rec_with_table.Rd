@@ -14,7 +14,8 @@ rec_with_table(
   log = FALSE,
   notes = TRUE,
   var_labels = NULL,
-  custom_function_path = NULL
+  custom_function_path = NULL,
+  attach_data_name = FALSE
 )
 }
 \arguments{
