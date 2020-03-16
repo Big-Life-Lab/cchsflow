@@ -57,7 +57,7 @@ The categories in the grouped age variable (DHHGAGE) vary between
 library(cchsflow)
 
 cat_age2009_2010 <- rec_with_table(
-   cchs2009_2010p,  c(
+   cchs2009_2010_p,  c(
      "DHHGAGE_cont", "DHHGAGE_C"
      )
    )
