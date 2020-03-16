@@ -19,7 +19,7 @@ adl_fun(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
 }
 \value{
 A derived variable (ADL_der) with 2 categories:
- \enumerate {
+ \enumerate{
   \item - Needs help with tasks
   \item - Does not need help with tasks
  }
