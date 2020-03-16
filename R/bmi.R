@@ -51,25 +51,25 @@
 #' # cycles.
 #'
 #' library(cchsflow)
-#' bmi2010 <- rec_with_table(
-#'   cchs2010_p, c(
+#' bmi2001 <- rec_with_table(
+#'   cchs2001_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
 #' )
 #'
-#' head(bmi2010)
+#' head(bmi2001)
 #'
-#' bmi2012 <- rec_with_table(
-#'   cchs2012_p, c(
+#' bmi2011_2012 <- rec_with_table(
+#'   cchs2011_2012_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
 #' )
 #'
-#' tail(bmi2012)
+#' tail(bmi2011_2012)
 #'
-#' combined_bmi <- bind_rows(bmi2010, bmi2012)
+#' combined_bmi <- bind_rows(bmi2010, bmi2011_2012)
 #' head(combined_bmi)
 #' tail(combined_bmi)
 #'
