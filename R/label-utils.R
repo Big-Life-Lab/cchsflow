@@ -183,7 +183,7 @@ label_data <- function(label_list, data_to_label) {
       }
       # List fix
       label_list[[variable_name]]$values <- unlist(label_list[[variable_name]]$values)
-      label_list[[variable_name]]$label_long <- unlist(label_list[[variable_name]]$label_long)
+      label_list[[variable_name]]$values_long <- unlist(label_list[[variable_name]]$values_long)
       
       data_to_label[, variable_name] <-
         set_labels(data_to_label[, variable_name],
