@@ -177,30 +177,34 @@ label_data <- function(label_list, data_to_label) {
       next()
     }
     if (label_list[[variable_name]]$type == pkg.globals$argument.CatType) {
-      if (class(data_to_label[[variable_name]]) != "factor") {
-        data_to_label[[variable_name]] <-
-          factor(data_to_label[[variable_name]])
+      if (class(data_to_label[, variable_name]) != "factor") {
+        data_to_label[, variable_name] <-
+          factor(data_to_label[, variable_name])
       }
-      data_to_label[[variable_name]] <-
-        set_labels(data_to_label[[variable_name]],
+      # List fix
+      label_list[[variable_name]]$values <- unlist(label_list[[variable_name]]$values)
+      label_list[[variable_name]]$label_long <- unlist(label_list[[variable_name]]$label_long)
+      
+      data_to_label[, variable_name] <-
+        set_labels(data_to_label[, variable_name],
                    labels = label_list[[variable_name]]$values)
-      attr(data_to_label[[variable_name]], "labels_long") <-
+      attr(data_to_label[, variable_name], "labels_long") <-
         label_list[[variable_name]]$values_long
     } else {
-      if (class(data_to_label[[variable_name]]) == "factor") {
-        data_to_label[[variable_name]] <-
-          as.numeric(levels(data_to_label[[variable_name]])
-                     [data_to_label[[variable_name]]])
+      if (class(data_to_label[, variable_name]) == "factor") {
+        data_to_label[, variable_name] <-
+          as.numeric(levels(data_to_label[, variable_name])
+                     [data_to_label[, variable_name]])
       } else {
-        data_to_label[[variable_name]] <-
-          as.numeric(data_to_label[[variable_name]])
+        data_to_label[, variable_name] <-
+          as.numeric(data_to_label[, variable_name])
       }
     }
-    set_label(data_to_label[[variable_name]]) <-
+    set_label(data_to_label[, variable_name]) <-
       label_list[[variable_name]]$label
-    attr(data_to_label[[variable_name]], "unit") <-
+    attr(data_to_label[, variable_name], "unit") <-
       label_list[[variable_name]]$unit
-    attr(data_to_label[[variable_name]], "label_long") <-
+    attr(data_to_label[, variable_name], "label_long") <-
       label_list[[variable_name]]$label_long
   }
 
