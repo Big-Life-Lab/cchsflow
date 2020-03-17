@@ -109,11 +109,17 @@
 #' @export
 
 adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-  if_else2(ADL_01 == 1 | ADL_02 == 1 | ADL_03 == 1 | ADL_04 == 1 |
-             ADL_05 == 1, 1,
-           if_else2(ADL_01 == 2 & ADL_02 == 2 & ADL_03 == 2 & ADL_04 == 2 &
-                      ADL_05 == 2, 2,
-                    if_else2(is.na(ADL_01)| is.na(ADL_02)| is.na(ADL_03)|
-                               is.na(ADL_04)| is.na(ADL_05), return(NA),
-                             return(NA))))
+  # Check to see if all values are in range
+  if_else2((ADL_01 %in% 1:2) & (ADL_02 %in% 1:2) & (ADL_03 %in% 1:2) &
+             (ADL_04 %in% 1:2) & (ADL_05 %in% 1:2),
+           # Examining if respondents needed help with any task
+           if_else2(ADL_01 == 1 | ADL_02 == 1 | ADL_03 == 1 | ADL_04 == 1 |
+                      ADL_05 == 1, 1,
+                    # Examining if respondents do not need help with any task
+                    if_else2(ADL_01 == 2 & ADL_02 == 2 & ADL_03 == 2 &
+                               ADL_04 == 2 & ADL_05 == 2, 2, return(NA))),
+           # Return NA if any ADL variable is out of range
+           return(NA)
+           )
+
 }
