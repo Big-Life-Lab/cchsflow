@@ -19,12 +19,13 @@
 #' @param RAC_2C Reduction in other activities
 #' 
 #' @return the CCHS derived variable RACDPAL with 3 categories:
-#'  \enumerate
+#'  \enumerate{
 #'   \item Sometimes
 #'   \item Often
 #'   \item Never
+#'   }
 #' 
-#' @example 
+#' @examples 
 #' # Using RACDPAL_fun() to transform RACDPAL in 2001. 
 #' # RACDPAL_fun() is specified in variable_details.csv along with the
 #' # CCHS variables and cycles included.
@@ -40,7 +41,7 @@
 #'   )
 #' )
 #' 
-#' head(adl2001)
+#' head(RACDPAL_2001)
 #' 
 #' # Note: In other CCHS cycles you only need to specify RACDPAL as the variable
 #' # was included in those survey cycles.
