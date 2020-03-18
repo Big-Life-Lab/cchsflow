@@ -80,8 +80,11 @@ reference:
     - cchs2005_p
     - cchs2007_2008_p
     - cchs2009_2010_p
+    - cchs2010_p
     - cchs2011_2012_p
+    - cchs2012_p 
     - cchs2013_2014_p
+    - cchs2014_p 
   - title: "Processing functions"
     desc: Functions used to manipulate CCHS datasets
     contents:

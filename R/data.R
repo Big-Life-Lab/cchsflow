@@ -190,6 +190,37 @@ NULL
 #' str(cchs2009_2010_p)
 NULL
 
+#' 2010 CCHS PUMF subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2010 cycle of the Canadian
+#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#'
+#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: CCHS-82M0013-E-2010-AnnualComponent
+#'
+#' DDI: \url{https://osf.io/7stpz/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2010_p
+#' @aliases cchs2010_p
+#' @docType data
+#' @return \item{cchs2010_p}{a data frame}
+#'
+#' @source
+#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=81424}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2010_p)
+#' str(cchs2010_p)
+NULL
+
 #' 2011-2012 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2011-2012 cycle of the Canadian
@@ -221,6 +252,37 @@ NULL
 #' str(cchs2011_2012_p)
 NULL
 
+#' 2012 CCHS PUMF subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2012 cycle of the Canadian
+#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#'
+#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: cchs-82M0013-E-2012-Annual-component
+#'
+#' DDI: \url{https://osf.io/sbem8/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2012_p
+#' @aliases cchs2012_p
+#' @docType data
+#' @return \item{cchs2012_p}{a data frame}
+#'
+#' @source
+#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=135927}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2012_p)
+#' str(cchs2012_p)
+NULL
+
 #' 2013-2014 CCHS PUMF subset data (200 respondents)
 #'
 #' This is a subset of 200 observations from the 2013-2014 cycle of the Canadian
@@ -250,4 +312,35 @@ NULL
 #' @examples
 #' data(cchs2013_2014_p)
 #' str(cchs2013_2014_p)
+NULL
+
+#' 2014 CCHS PUMF subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2014 cycle of the Canadian
+#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#'
+#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: cchs-82M0013-E-2014-Annual-component
+#'
+#' DDI: \url{https://osf.io/tbmdn/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2014_p
+#' @aliases cchs2014_p
+#' @docType data
+#' @return \item{cchs2014_p}{a data frame}
+#'
+#' @source
+#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=164081}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2014_p)
+#' str(cchs2014_p)
 NULL
