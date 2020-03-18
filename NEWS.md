@@ -8,9 +8,13 @@
 ## Variables
 - <font color = "green">**New**</font> [ADL_der](https://big-life-lab.github.io/cchsflow/reference/adl_fun.html) -
 derived needs help with task variable
+- <font color = "green">**New**</font> [RACDPAL_fun](https://big-life-lab.github.io/cchsflow/reference/RACDPAL_fun.html) - custom function to derive RACDPAL for the 2001 CCHS survey cycle
 - <font color = "green">**New**</font> ADL_07 - Needs help with heavy household
 chores
 - <font color = "green">**New**</font> ADM_RNO - Sequential record number
+- <font color = "green">**New**</font> RAC_2B - Reduction in activities at
+school or work due to disability variable used only in the 2001 CCHS survey
+cycle
 
 # cchsflow 1.4.4 (Latest build)
 2020-03-03
