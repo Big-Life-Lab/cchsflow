@@ -69,7 +69,7 @@
 #' # CCHS variables and cycles included.
 #' 
 #' # To transform ADL_der, use rec_with_table() for each CCHS cycle
-#' # and specify ADL_dr, along with the various ADL variables.
+#' # and specify ADL_der, along with the various ADL variables.
 #' # Then by using bind_rows() you can combine ADL_der across cycles.
 #' 
 #' library(cchsflow)
