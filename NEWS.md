@@ -1,3 +1,17 @@
+# cchsflow 1.5.0 (Latest build)
+2020-03-20
+
+## Breaking changes
+
+## Features
+
+## Variables
+- <font color = "green">**New**</font> [ADL_der](https://big-life-lab.github.io/cchsflow/reference/adl_fun.html) -
+derived needs help with task variable
+- <font color = "green">**New**</font> ADL_07 - Needs help with heavy household
+chores
+- <font color = "green">**New**</font> ADM_RNO - Sequential record number
+
 # cchsflow 1.4.4 (Latest build)
 2020-03-03
 
