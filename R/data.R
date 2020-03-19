@@ -195,6 +195,10 @@ NULL
 #' This is a subset of 200 observations from the 2010 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2009-2010 PUMF
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
@@ -257,6 +261,10 @@ NULL
 #' This is a subset of 200 observations from the 2012 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2011-2012 PUMF
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
@@ -319,6 +327,10 @@ NULL
 #' This is a subset of 200 observations from the 2014 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2013-2014 PUMF
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
