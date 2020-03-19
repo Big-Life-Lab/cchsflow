@@ -46,6 +46,18 @@
 #' # Note: In other CCHS cycles you only need to specify RACDPAL as the variable
 #' # was included in those survey cycles.
 #' 
+#' # Using RACDPAL_fun() with user inputted data.
+#' 
+#' # Let's say you're an individual that sometimes has difficulties with
+#' # activities due to disability, sometimes has a reduction in activities at
+#' # home, often has a reduction at school or work, and never has a reduction
+#' # in other activities. Your participation and activity limitation can be
+#' # determined as follows:
+#' 
+#' library(cchsflow)
+#' RACDPAL <- RACDPAL_fun(1, 1, 2, 3)
+#' print(RACDPAL)
+#' 
 #' @export
 
 RACDPAL_fun <- function(RAC_1, RAC_2A, RAC_2B, RAC_2C){
