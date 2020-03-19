@@ -36,6 +36,8 @@ navbar:
         href: articles/how_to_add_variables.html
       - text: How to use tagged_na
         href: articles/tagged_na_usage.html
+      - text: CCHS datasets that overlap each other
+        href: articles/duplicate_datasets.html
     reference:
       text: Reference
       href: reference/index.html
