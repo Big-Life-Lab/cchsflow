@@ -1,11 +1,10 @@
 ## Resubmission
 
 This is a resubmission. In this version we have:
-* Removed space in doi specifications in `DESCRIPTION`
-* Added binge_drinker as a new derived variable
-* Made minor edits to the labels and sections in `variables.csv`
-* Made minor edits to the documentation of `resp_condition_fun1()`,
-`resp_condition_fun2()`, `resp_condition_fun3()`
+* Fixed errors caused by R 4.0 devel 
+* Fixed our tests
+* Added new argument for rec_with_table
+
 
 
 ## Test environments
