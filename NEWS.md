@@ -2,7 +2,8 @@
 2020-03-20
 
 ## Breaking changes
-
+- Modified internal list index access to be complient with R 4.0.(Only those not using our label related functions should worry.) 
+- Added new argument for adding data_name to rec_with_table return
 ## Features
 
 ## Variables
