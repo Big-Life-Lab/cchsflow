@@ -236,6 +236,9 @@ called unless you would like to modify them.
   transformed dataset that only contains a subset of variables from
   `variables.csv`. The format to add labels to a subset of variables is
   `c(variable = "Label")`.
+- `attach_data_name` is set to FALSE. This argument can be used to append a
+  column that denotes the name of the dataset each transformed row came from.
+  See [Example 8](#example8).
 
 ## Example 3. Transform a single variable from multiple CCHS datasets
 
@@ -452,13 +455,13 @@ head(combined_bmi)
 tail(combined_bmi)
 ```
 
-### Example 8: Distinguishing which cycle data is from in combined datasets
+## Example 8: Distinguishing which cycle data is from in combined datasets
 
 It can be important to know from which cycle data comes from after combining all
 the cycles. `rec_with_table()` provides the option of appending a column that
 indicates from which dataset respondents come from by setting the parameter
-`attach_data_name` to be TRUE. Using the BMI example above, `rec_with_table()`
-can specify which dataset each respondent came from.
+`attach_data_name` to be TRUE. Using the BMI example in [Example 7](#example7),
+`rec_with_table()` can specify which dataset each respondent came from.
 
 ```{r, warning=FALSE}
 bmi2001 <- rec_with_table(cchs2001_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
