@@ -2,9 +2,8 @@
 2020-03-20
 
 ## Breaking changes
-- Modified internal list index access to be complient with R 4.0.(Only those not using our label related functions should worry.) 
-- Added new argument for adding data_name to rec_with_table return
-## Features
+- Modified internal list index access to be compliant with R 4.0.
+- Added new argument for adding data_name to `rec_with_table()` return
 
 ## Variables
 - <font color = "green">**New**</font> [ADL_der](https://big-life-lab.github.io/cchsflow/reference/adl_fun.html) -
@@ -16,6 +15,12 @@ chores
 - <font color = "green">**New**</font> RAC_2B - Reduction in activities at
 school or work due to disability variable used only in the 2001 CCHS survey
 cycle
+- <font color = "green">**New**</font> INCGPER_cont - continuous personal income variable
+
+## Minor improvements
+- New [article](https://big-life-lab.github.io/cchsflow/articles/duplicate_datasets.html)
+that describes overlaps in certain CCHS datasets
+- Expanded derived variables section in [How to add variables](https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html) article
 
 # cchsflow 1.4.4 (Latest build)
 2020-03-03
