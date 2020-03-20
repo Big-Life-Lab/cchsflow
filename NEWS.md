@@ -1,4 +1,10 @@
-# cchsflow 1.5.0 (Latest build)
+# cchsflow 1.5.1 (Latest build)
+2020-03-20
+
+## Minor improvements
+- Minor hotfix in description of package
+
+# cchsflow 1.5.0 
 2020-03-20
 
 ## Breaking changes
