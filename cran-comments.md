@@ -17,6 +17,7 @@ to 0-1
 * Refactored respiratory functions to better capture respondents under 35
 with respiratory conditions
 * Added support for more CCHS variables
+* Added documentation to the vignettes
 
 ## Test environments
 * local OS X install, R 4.0.0

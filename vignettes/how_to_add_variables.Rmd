@@ -247,7 +247,7 @@ kable(variables[3,])
 
 ### Adding labels to a derived variable
 
-For a continuous derived variable like pack-years, the labels specified in `variables.csv` are sufficient for the variable to be properly labelled. For categorical derived variables, extra rows will need to be added on `variable_details.csv` so that labels are generated for each category. The example below shows how binge_drinker, a derived categorial variable flagging respondents who binge drink, is specified in `variable_details.csv`.
+For a continuous derived variable like pack-years, the labels specified in `variables.csv` are sufficient for the variable to be properly labelled. For categorical derived variables, extra rows will need to be added on `variable_details.csv` so that labels are generated for each category. The example below shows how binge_drinker, a derived categorical variable flagging respondents who binge drink, is specified in `variable_details.csv`.
 
 ```{r, echo=FALSE, warning=FALSE}
 kable(variable_details[10:12,])
