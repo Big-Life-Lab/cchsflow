@@ -87,7 +87,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.0</span>
       </span>
     </div>
 
@@ -123,6 +123,9 @@
     </li>
     <li>
       <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
+    </li>
+    <li>
+      <a href="../articles/duplicate_datasets.html">CCHS datasets that overlap each other</a>
     </li>
   </ul>
 </li>
@@ -262,24 +265,24 @@ not have arthritis or rheumatism)</p></td>
  <span class='co'># will be specified along with resp_condition_der.</span>
 
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
- <span class='no'>conditions_2010</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span>(<span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(<span class='no'>cchs2010_p</span>,
+ <span class='no'>conditions_2009_2010</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span>(<span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(<span class='no'>cchs2009_2010_p</span>,
  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>,
  <span class='st'>"CCC_031"</span>, <span class='st'>"CCC_121"</span>,<span class='st'>"CCC_131"</span>,<span class='st'>"CCC_151"</span>, <span class='st'>"CCC_171"</span>,<span class='st'>"CCC_280"</span>,
  <span class='st'>"resp_condition_der"</span>,<span class='st'>"CCC_051"</span>, <span class='st'>"multiple_conditions"</span>)))</div><div class='output co'>#&gt; <span class='message'>Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='input'>
- <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>conditions_2010</span>)</div><div class='output co'>#&gt;   CCC_031 CCC_051 CCC_091 CCC_121 CCC_131 CCC_151 CCC_171 CCC_280 DHHGAGE_cont
-#&gt; 1       2       2   NA(a)       2       2       2       2       2           22
-#&gt; 2       2       2       2       2       2       2       2       2           42
-#&gt; 3       2       2       2       2       2       2       2       2           37
-#&gt; 4       2       1       1       2       2       2       2       2           37
-#&gt; 5       2       2       2       2       2       2       2       2           37
-#&gt; 6       2       1   NA(a)       2       2       2       2       2           32
-#&gt;   resp_condition_der multiple_conditions
-#&gt; 1               &lt;NA&gt;                   0
-#&gt; 2                  3                   1
-#&gt; 3                  3                   1
-#&gt; 4                  1                   2
-#&gt; 5                  3                   1
-#&gt; 6               &lt;NA&gt;                   1</div><div class='input'>
+ <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>conditions_2009_2010</span>)</div><div class='output co'>#&gt;   CCC_031 CCC_051 CCC_091 CCC_121 CCC_131 CCC_151 CCC_171 CCC_280 DHHGAGE_cont
+#&gt; 1       2   NA(a)   NA(a)       2       2       2       2       2           13
+#&gt; 2       2       2   NA(a)       2       2       2       2       2           27
+#&gt; 3       2       1       2       2       2       2       2       1           62
+#&gt; 4       2       2       2       2       2       2       2       2           52
+#&gt; 5       2       2       2       2       2       2       2       2           67
+#&gt; 6       2       1       2       2       2       2       2       2           62
+#&gt;   resp_condition_der
+#&gt; 1               &lt;NA&gt;
+#&gt; 2               &lt;NA&gt;
+#&gt; 3                  3
+#&gt; 4                  3
+#&gt; 5                  3
+#&gt; 6                  3</div><div class='input'>
  <span class='co'># Generating multiple_conditions with user inputted values</span>
  <span class='co'># Let's say you are an individual that has heart disease, bowel disorder,</span>
  <span class='co'># and arthritis. multiple_conditions_fun2() can be used to count the number</span>

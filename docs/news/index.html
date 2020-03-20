@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.0</span>
       </span>
     </div>
 
@@ -118,6 +118,9 @@
     </li>
     <li>
       <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
+    </li>
+    <li>
+      <a href="../articles/duplicate_datasets.html">CCHS datasets that overlap each other</a>
     </li>
   </ul>
 </li>
@@ -158,6 +161,49 @@
       <small>Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="cchsflow-150-latest-build" class="section level1">
+<h1 class="page-header">
+<a href="#cchsflow-150-latest-build" class="anchor"></a>cchsflow 1.5.0 (Latest build)<small> Unreleased </small>
+</h1>
+<p>2020-03-20</p>
+<div id="breaking-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
+<ul>
+<li>Modified internal list index access to be compliant with R 4.0.</li>
+<li>Added <code>attach_data_name</code>: new argument for adding data_name to <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> return</li>
+</ul>
+</div>
+<div id="variables" class="section level2">
+<h2 class="hasAnchor">
+<a href="#variables" class="anchor"></a>Variables</h2>
+<ul>
+<li>
+<font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/adl_fun.html">ADL_der</a> - derived “needs help with task” variable.</li>
+<li>
+<font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/RACDPAL_fun.html">RACDPAL_fun</a> - custom function to derive RACDPAL for the 2001 CCHS survey cycle.</li>
+<li>
+<font color="green"><strong>New</strong></font> ADL_07 - Needs help with heavy household chores. Recoded variable used in CCHS cycles 2001-2005.</li>
+<li>
+<font color="green"><strong>New</strong></font> ADM_RNO - Sequential record number used in all CCHS cycles.</li>
+<li>
+<font color="green"><strong>New</strong></font> RAC_2B - Reduction in activities at school or work due to disability variable used only in the 2001 CCHS survey cycle</li>
+<li>
+<font color="green"><strong>New</strong></font> INCGPER_cont - continuous personal income variable harmonized across all CCHS cycles</li>
+</ul>
+</div>
+<div id="minor-improvements" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements" class="anchor"></a>Minor improvements</h2>
+<ul>
+<li>New <a href="https://big-life-lab.github.io/cchsflow/articles/duplicate_datasets.html">article</a> that describes overlaps in certain CCHS datasets</li>
+<li>Documentation on <a href="https://big-life-lab.github.io/cchsflow/reference/GEN_02A2.html">GEN_02A2</a> variable</li>
+<li>Expanded derived variables section in <a href="https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html">How to add variables</a> article</li>
+<li>Added example in <a href="https://big-life-lab.github.io/cchsflow/articles/get_started.html">get started</a> that uses new attach_data_name argument in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code>
+</li>
+</ul>
+</div>
+</div>
     <div id="cchsflow-144-latest-build" class="section level1">
 <h1 class="page-header">
 <a href="#cchsflow-144-latest-build" class="anchor"></a>cchsflow 1.4.4 (Latest build)<small> Unreleased </small>
@@ -180,9 +226,9 @@
 <li>Refactor to respiratory functions to better capture respondents under 35 with respiratory conditions</li>
 </ul>
 </div>
-<div id="minor-improvements" class="section level2">
+<div id="minor-improvements-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-1" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Improvements to warning outputs in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code>
 </li>
@@ -196,9 +242,9 @@
 <a href="#cchsflow-143" class="anchor"></a>cchsflow 1.4.3<small> Unreleased </small>
 </h1>
 <p>2020-02-21</p>
-<div id="minor-improvements-1" class="section level2">
+<div id="minor-improvements-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-1" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-2" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Minor documentation improvements in vignettes and home page</li>
 </ul>
@@ -224,9 +270,9 @@
 <a href="#cchsflow-141" class="anchor"></a>cchsflow 1.4.1<small> Unreleased </small>
 </h1>
 <p>2020-02-11</p>
-<div id="minor-improvements-2" class="section level2">
+<div id="minor-improvements-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-2" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-3" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Suppressed warning messages in function examples</li>
 <li>Minor edits &amp; corrections to <a href="https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html">tagged_na</a>, <a href="https://big-life-lab.github.io/cchsflow/articles/variable_details.html">variable_details</a>, and <a href="https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html">how to add variables</a> articles.</li>
@@ -241,9 +287,9 @@
 <a href="#cchsflow-140" class="anchor"></a>cchsflow 1.4.0<small> Unreleased </small>
 </h1>
 <p>2020-02-10</p>
-<div id="breaking-changes" class="section level2">
+<div id="breaking-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-1" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li>Added to _p suffix to the names of datasets &amp; databaseStarts to denote CCHS PUMF data</li>
 </ul>
@@ -255,18 +301,18 @@
 <li>Badges added to <code>README.md</code> with <code>usethis</code>.</li>
 </ul>
 </div>
-<div id="variables" class="section level2">
+<div id="variables-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables" class="anchor"></a>Variables</h2>
+<a href="#variables-1" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/multiple_conditions_fun1.html">multiple conditions</a> - derived multiple chronic conditions variable</li>
 <li>Modifications to derived respiratory condition variable to include respondents with asthma.</li>
 </ul>
 </div>
-<div id="minor-improvements-3" class="section level2">
+<div id="minor-improvements-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-3" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-4" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Expansion to <a href="https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html">tagged_na</a> article</li>
 </ul>
@@ -277,17 +323,17 @@
 <a href="#cchsflow-132" class="anchor"></a>cchsflow 1.3.2<small> 2020-02-16 </small>
 </h1>
 <p>2020-02-04</p>
-<div id="variables-1" class="section level2">
+<div id="variables-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables-1" class="anchor"></a>Variables</h2>
+<a href="#variables-2" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/binge_drinker_fun.html">binge_drinker</a> - derived binge drinking variable</li>
 </ul>
 </div>
-<div id="minor-improvements-4" class="section level2">
+<div id="minor-improvements-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-4" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-5" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Issue and variable request templates added on Github</li>
 <li>Minor edits to the labels and sections in <code>variables.csv</code>
@@ -303,9 +349,9 @@
 <a href="#cchsflow-131" class="anchor"></a>cchsflow 1.3.1<small> Unreleased </small>
 </h1>
 <p>2020-01-28</p>
-<div id="variables-2" class="section level2">
+<div id="variables-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables-2" class="anchor"></a>Variables</h2>
+<a href="#variables-3" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> CCC_31A. Ever diagnosed with cancer</li>
@@ -323,16 +369,16 @@
 <a href="#cchsflow-130" class="anchor"></a>cchsflow 1.3.0<small> Unreleased </small>
 </h1>
 <p>2020-01-23</p>
-<div id="breaking-changes-1" class="section level2">
+<div id="breaking-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes-1" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-2" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li>Changed <code>print_note()</code> parameter in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> to <code>notes</code>.</li>
 </ul>
 </div>
-<div id="variables-3" class="section level2">
+<div id="variables-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables-3" class="anchor"></a>Variables</h2>
+<a href="#variables-4" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> food_insecurity_der. Derived food insecurity variable.</li>
@@ -360,9 +406,9 @@
 <a href="#cchsflow-120" class="anchor"></a>cchsflow 1.2.0<small> Unreleased </small>
 </h1>
 <p>2020-01-13</p>
-<div id="breaking-changes-2" class="section level2">
+<div id="breaking-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes-2" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-3" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li>Changed dataset_name to database_name</li>
 <li>Added a simple <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> function call that uses <code>data</code> variable name as <code>database_name</code> as well as default <code>variables</code> and <code>variable_details</code> that come with the package.</li>
@@ -386,9 +432,9 @@
 <a href="#cchsflow-110" class="anchor"></a>cchsflow 1.1.0<small> Unreleased </small>
 </h1>
 <p>2020-01-08</p>
-<div id="breaking-changes-3" class="section level2">
+<div id="breaking-changes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes-3" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-4" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li><p>Changed <code>data_source</code> parameter in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> to <code>data</code>.</p></li>
 <li><p>Changed order of parameters to have <code>variables</code> after <code>dataset_name</code>.</p></li>
@@ -478,9 +524,9 @@
 <li>Updates to vignettes to reflect latest version of package</li>
 <li>Updates to variables.csv &amp; variableDetails.csv</li>
 </ul>
-<div id="variables-4" class="section level3">
+<div id="variables-5" class="section level3">
 <h3 class="hasAnchor">
-<a href="#variables-4" class="anchor"></a>Variables</h3>
+<a href="#variables-5" class="anchor"></a>Variables</h3>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/age_cat_fun.html">DHHGAGE_C</a> - categorical age variable that groups various age categories across all CCHS cycles. Based on the continuous age variable (<code>DHHGAGE_cont</code>) that is also harmonious across all CCHS cycles.</li>
@@ -559,6 +605,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#cchsflow-150-latest-build">1.5.0</a></li>
         <li><a href="#cchsflow-144-latest-build">1.4.4</a></li>
         <li><a href="#cchsflow-143">1.4.3</a></li>
         <li><a href="#cchsflow-142">1.4.2</a></li>

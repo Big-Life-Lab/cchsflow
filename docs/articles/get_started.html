@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.0</span>
       </span>
     </div>
 
@@ -77,6 +77,9 @@
     <li>
       <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
     </li>
+    <li>
+      <a href="../articles/duplicate_datasets.html">CCHS datasets that overlap each other</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -109,7 +112,7 @@
 
       
 
-      </header><script src="get_started_files/jquery-1.11.3/jquery.min.js"></script><script src="get_started_files/elevate-section-attrs-2.0/elevate-section-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Get started</h1>
@@ -180,13 +183,13 @@
 </div>
 <div id="example2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#example2" class="anchor"></a>Example 2. Variable transfomation with a note</h2>
+<a href="#example2" class="anchor"></a>Example 2. Variable transformation with a note</h2>
 <p><code>notes</code> provide context for the decisions that informed harmonization that may affect your decision to use a harmonized variable.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw"><a href="https://rdrr.io/r/base/warning.html">warning</a></span>(</span>
 <span id="cb6-2"><a href="#cb6-2"></a>  <span class="st">"cchsflow includes "</span>, <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(variable_details<span class="op">$</span>notes)),</span>
 <span id="cb6-3"><a href="#cb6-3"></a>  <span class="st">" variables with notes."</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a>)</span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; Warning: cchsflow includes 40 variables with notes.</span></span></code></pre></div>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; Warning: cchsflow includes 44 variables with notes.</span></span></code></pre></div>
 <p>For example, for <code>DHHGAGE_A</code> the category <code>NA::b</code> has the following <code>note</code>:</p>
 <p><code>Not applicable, don't know, refusal, not stated (96-99) were options only in CCHS 2003, but had zero responses</code>.</p>
 <p>This note informs the decision to combine values 96 to 99 in <code>DHHGAGE_A</code> for CCHS2003 into one common missing value <code>NA::b</code>. The label for the <code>NA::b</code> category is, “<code>don't know (97); refusal (98); not stated (99)</code>”.</p>
@@ -194,7 +197,7 @@
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>BMI2001 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(cchs2001_p, <span class="st">"HWTGBMI"</span>, <span class="dt">log =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt; Loading cchsflow variable_details</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; Using the passed data variable name as database_name</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; </span><span class="al">NOTE</span><span class="co"> for HWTGBMI: CCHS 2001 restricts BMI to ages 20-64. Consider using using HWTGBMI_der for the most concistent BMI variable across all CCHS cycles. See documentation for  BMI_fun() in derived variables for more details, or type ?BMI_fun in the console.</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; </span><span class="al">NOTE</span><span class="co"> for HWTGBMI: CCHS 2001 restricts BMI to ages 20-64. Consider using using HWTGBMI_der for the most concistent BMI variable across all CCHS cycles. See documentation for BMI_fun() in derived variables for more details, or type ?BMI_fun in the console.</span></span>
 <span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; </span><span class="al">NOTE</span><span class="co"> for HWTGBMI: CCHS 2001 and 2003 codes not applicable and missing variables as 999.6 and 999.7-999.9 respectively, while CCHS 2005 onwards codes not applicable and missing variables as 999.96 and 999.7-999.99 respectively</span></span>
 <span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt; </span><span class="al">NOTE</span><span class="co"> for HWTGBMI: Don't know (999.7) and refusal (999.8) not included in 2001 CCHS</span></span>
 <span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; The variable HWTAGBMI was recoded into HWTGBMI for the database cchs2001_p the following recodes were made:</span></span>
@@ -202,9 +205,9 @@
 <span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; 1     copy  11.91:57.9          142</span></span>
 <span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt; 2    NA::a       999.6           58</span></span>
 <span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt; 3    NA::b 999.7:999.9            0</span></span></code></pre></div>
-<div id="notes-with-guidance-or-additional-infomation" class="section level3">
+<div id="notes-with-guidance-or-additional-information" class="section level3">
 <h3 class="hasAnchor">
-<a href="#notes-with-guidance-or-additional-infomation" class="anchor"></a>Notes with guidance or additional infomation</h3>
+<a href="#notes-with-guidance-or-additional-information" class="anchor"></a>Notes with guidance or additional information</h3>
 <p>Several variables such as BMI have a quite a few notes reflecting a range of changes that occurred over CCHS cycles. Variables with notes can usually be used after reviewing and considering whether or how the variable changes affect your use. There can also be further guidance in notes. For example, BMI notes include advice to use <code>HWTGBMI_der</code>. Despite the large number of changes, BMI can be used for most studies because the common transformed variable <code>HWTGBMI_der</code> was derived from height and weight variables that are included and largely unchanged across CCHS cycles. However, to use <code>HWTGBMI_der</code> you’ll also need to include the transformed measures for height (<code>HWTGHTM</code>) and weight (<code>HWTGWTK</code>). More information about <code>HWTGBMI_der</code> can be found in the documentation reference for ‘derived variable functions’ or by typing <code>?BMI_fun</code> in the R console.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>BMI2001C &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(cchs2001_p,</span>
 <span id="cb8-2"><a href="#cb8-2"></a>  <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_der"</span>),</span>
@@ -222,7 +225,7 @@
 <span id="cb8-14"><a href="#cb8-14"></a><span class="co">#&gt; 4     1.194    4            0</span></span>
 <span id="cb8-15"><a href="#cb8-15"></a><span class="co">#&gt; 5     1.219    5            0</span></span>
 <span id="cb8-16"><a href="#cb8-16"></a><span class="co">#&gt; 6     1.245    6            0</span></span>
-<span id="cb8-17"><a href="#cb8-17"></a><span class="co">#&gt; 7      1.27    7            0</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="co">#&gt; 7     1.270    7            0</span></span>
 <span id="cb8-18"><a href="#cb8-18"></a><span class="co">#&gt; 8     1.295    8            0</span></span>
 <span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; 9     1.321    9            0</span></span>
 <span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt; 10    1.346   10            0</span></span>
@@ -235,7 +238,7 @@
 <span id="cb8-27"><a href="#cb8-27"></a><span class="co">#&gt; 17    1.524   17            8</span></span>
 <span id="cb8-28"><a href="#cb8-28"></a><span class="co">#&gt; 18    1.549   18            7</span></span>
 <span id="cb8-29"><a href="#cb8-29"></a><span class="co">#&gt; 19    1.575   19           21</span></span>
-<span id="cb8-30"><a href="#cb8-30"></a><span class="co">#&gt; 20      1.6   20           12</span></span>
+<span id="cb8-30"><a href="#cb8-30"></a><span class="co">#&gt; 20    1.600   20           12</span></span>
 <span id="cb8-31"><a href="#cb8-31"></a><span class="co">#&gt; 21    1.626   21           13</span></span>
 <span id="cb8-32"><a href="#cb8-32"></a><span class="co">#&gt; 22    1.651   22           19</span></span>
 <span id="cb8-33"><a href="#cb8-33"></a><span class="co">#&gt; 23    1.676   23           16</span></span>
@@ -292,7 +295,7 @@
 <h3 class="hasAnchor">
 <a href="#missing-data" class="anchor"></a>Missing data</h3>
 <p>If you’ve been watching, you may have noticed that <em>cchsflow</em> recodes the values in factor or categorical variables for 6 (“not applicable”), 7 (“don’t know”), and 8 (“refusal”), 9 (“not stated”) into <code>tagged_NA</code> values NA(a) (“not applicable”) and NA (b) (“missing”). There are two reasons. First, the typical uses of CCHS consider the two values “not applicable” and “missing” for most situations. Second, R and other open languages typically support only one NA.</p>
-<p>Be carefull when use use <code>NA</code> in your study. See <a href="../articles/tagged_na_usage.html"><code>missing data (tagged_na)</code></a>for more information.</p>
+<p>Be careful when use use <code>NA</code> in your study. See <a href="../articles/tagged_na_usage.html"><code>missing data (tagged_na)</code></a>for more information.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(haven)</span>
 <span id="cb11-2"><a href="#cb11-2"></a>x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"a"</span>), <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"b"</span>), <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"b"</span>), <span class="ot">NA</span>)</span>
 <span id="cb11-3"><a href="#cb11-3"></a>x</span>
@@ -329,6 +332,8 @@
 <code>notes</code> defaults to TRUE. Information in the <code>Notes</code> column from <code>variable_details.csv</code> will be displayed</li>
 <li>
 <code>var_labels</code> is set to NULL. This argument can be used to add labels to a transformed dataset that only contains a subset of variables from <code>variables.csv</code>. The format to add labels to a subset of variables is <code><a href="https://rdrr.io/r/base/c.html">c(variable = "Label")</a></code>.</li>
+<li>
+<code>attach_data_name</code> is set to FALSE. This argument can be used to append a column that denotes the name of the dataset each transformed row came from. See <a href="#example8">Example 8</a>.</li>
 </ul>
 </div>
 </div>
@@ -488,7 +493,7 @@
 <div id="label-variables-and-categories" class="section level3">
 <h3 class="hasAnchor">
 <a href="#label-variables-and-categories" class="anchor"></a>Label variables and categories</h3>
-<p>Use <code><a href="../reference/set_data_labels.html">set_data_labels()</a></code> to label the variables in your final dataset. Labels are lost during the database merging. <code><a href="../reference/set_data_labels.html">set_data_labels()</a></code> set labels with the orginal information in <code>variables</code> and <code>variable_details</code>.</p>
+<p>Use <code><a href="../reference/set_data_labels.html">set_data_labels()</a></code> to label the variables in your final dataset. Labels are lost during the database merging. <code><a href="../reference/set_data_labels.html">set_data_labels()</a></code> set labels with the original information in <code>variables</code> and <code>variable_details</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>labeled_combined_cchs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/set_data_labels.html">set_data_labels</a></span>(</span>
 <span id="cb21-2"><a href="#cb21-2"></a>  <span class="dt">data_to_label =</span> combined_age_cont,</span>
 <span id="cb21-3"><a href="#cb21-3"></a>  <span class="dt">variable_details =</span> variable_details,</span>
@@ -574,7 +579,7 @@
 <span id="cb26-13"><a href="#cb26-13"></a><span class="co">#&gt; 4     1.194    4            0</span></span>
 <span id="cb26-14"><a href="#cb26-14"></a><span class="co">#&gt; 5     1.219    5            0</span></span>
 <span id="cb26-15"><a href="#cb26-15"></a><span class="co">#&gt; 6     1.245    6            0</span></span>
-<span id="cb26-16"><a href="#cb26-16"></a><span class="co">#&gt; 7      1.27    7            0</span></span>
+<span id="cb26-16"><a href="#cb26-16"></a><span class="co">#&gt; 7     1.270    7            0</span></span>
 <span id="cb26-17"><a href="#cb26-17"></a><span class="co">#&gt; 8     1.295    8            0</span></span>
 <span id="cb26-18"><a href="#cb26-18"></a><span class="co">#&gt; 9     1.321    9            0</span></span>
 <span id="cb26-19"><a href="#cb26-19"></a><span class="co">#&gt; 10    1.346   10            0</span></span>
@@ -587,7 +592,7 @@
 <span id="cb26-26"><a href="#cb26-26"></a><span class="co">#&gt; 17    1.524   17            8</span></span>
 <span id="cb26-27"><a href="#cb26-27"></a><span class="co">#&gt; 18    1.549   18            7</span></span>
 <span id="cb26-28"><a href="#cb26-28"></a><span class="co">#&gt; 19    1.575   19           21</span></span>
-<span id="cb26-29"><a href="#cb26-29"></a><span class="co">#&gt; 20      1.6   20           12</span></span>
+<span id="cb26-29"><a href="#cb26-29"></a><span class="co">#&gt; 20    1.600   20           12</span></span>
 <span id="cb26-30"><a href="#cb26-30"></a><span class="co">#&gt; 21    1.626   21           13</span></span>
 <span id="cb26-31"><a href="#cb26-31"></a><span class="co">#&gt; 22    1.651   22           19</span></span>
 <span id="cb26-32"><a href="#cb26-32"></a><span class="co">#&gt; 23    1.676   23           16</span></span>
@@ -660,6 +665,111 @@
 <span id="cb26-99"><a href="#cb26-99"></a><span class="co">#&gt; 399   1.829   85.50    25.55870</span></span>
 <span id="cb26-100"><a href="#cb26-100"></a><span class="co">#&gt; 400   1.702   74.25    25.63170</span></span></code></pre></div>
 </div>
+<div id="example-8-distinguishing-which-cycle-data-is-from-in-combined-datasets" class="section level2">
+<h2 class="hasAnchor">
+<a href="#example-8-distinguishing-which-cycle-data-is-from-in-combined-datasets" class="anchor"></a>Example 8: Distinguishing which cycle data is from in combined datasets</h2>
+<p>It can be important to know from which cycle data comes from after combining all the cycles. <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> provides the option of appending a column that indicates from which dataset respondents come from by setting the parameter <code>attach_data_name</code> to be TRUE. Using the BMI example in <a href="#example7">Example 7</a>, <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> can specify which dataset each respondent came from.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>bmi2001 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(cchs2001_p, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_der"</span>),</span>
+<span id="cb27-2"><a href="#cb27-2"></a>  <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">attach_data_name =</span> <span class="ot">TRUE</span></span>
+<span id="cb27-3"><a href="#cb27-3"></a>)</span>
+<span id="cb27-4"><a href="#cb27-4"></a><span class="co">#&gt; Loading cchsflow variable_details</span></span>
+<span id="cb27-5"><a href="#cb27-5"></a><span class="co">#&gt; Using the passed data variable name as database_name</span></span>
+<span id="cb27-6"><a href="#cb27-6"></a><span class="co">#&gt; </span><span class="al">NOTE</span><span class="co"> for HWTGHTM: 2001 and 2003 CCHS use inches, values converted to meters to 3 decimal points</span></span>
+<span id="cb27-7"><a href="#cb27-7"></a><span class="co">#&gt; </span><span class="al">NOTE</span><span class="co"> for HWTGHTM: 74+ inches converted to 76 inches</span></span>
+<span id="cb27-8"><a href="#cb27-8"></a><span class="co">#&gt; The variable HWTAGHT was recoded into HWTGHTM for the database cchs2001_p the following recodes were made:</span></span>
+<span id="cb27-9"><a href="#cb27-9"></a><span class="co">#&gt;    value_to From rows_recoded</span></span>
+<span id="cb27-10"><a href="#cb27-10"></a><span class="co">#&gt; 1     1.118    1            0</span></span>
+<span id="cb27-11"><a href="#cb27-11"></a><span class="co">#&gt; 2     1.143    2            0</span></span>
+<span id="cb27-12"><a href="#cb27-12"></a><span class="co">#&gt; 3     1.168    3            0</span></span>
+<span id="cb27-13"><a href="#cb27-13"></a><span class="co">#&gt; 4     1.194    4            0</span></span>
+<span id="cb27-14"><a href="#cb27-14"></a><span class="co">#&gt; 5     1.219    5            0</span></span>
+<span id="cb27-15"><a href="#cb27-15"></a><span class="co">#&gt; 6     1.245    6            0</span></span>
+<span id="cb27-16"><a href="#cb27-16"></a><span class="co">#&gt; 7     1.270    7            0</span></span>
+<span id="cb27-17"><a href="#cb27-17"></a><span class="co">#&gt; 8     1.295    8            0</span></span>
+<span id="cb27-18"><a href="#cb27-18"></a><span class="co">#&gt; 9     1.321    9            0</span></span>
+<span id="cb27-19"><a href="#cb27-19"></a><span class="co">#&gt; 10    1.346   10            0</span></span>
+<span id="cb27-20"><a href="#cb27-20"></a><span class="co">#&gt; 11    1.372   11            0</span></span>
+<span id="cb27-21"><a href="#cb27-21"></a><span class="co">#&gt; 12    1.397   12            0</span></span>
+<span id="cb27-22"><a href="#cb27-22"></a><span class="co">#&gt; 13    1.422   13            1</span></span>
+<span id="cb27-23"><a href="#cb27-23"></a><span class="co">#&gt; 14    1.448   14            0</span></span>
+<span id="cb27-24"><a href="#cb27-24"></a><span class="co">#&gt; 15    1.473   15            1</span></span>
+<span id="cb27-25"><a href="#cb27-25"></a><span class="co">#&gt; 16    1.499   16            2</span></span>
+<span id="cb27-26"><a href="#cb27-26"></a><span class="co">#&gt; 17    1.524   17            8</span></span>
+<span id="cb27-27"><a href="#cb27-27"></a><span class="co">#&gt; 18    1.549   18            7</span></span>
+<span id="cb27-28"><a href="#cb27-28"></a><span class="co">#&gt; 19    1.575   19           21</span></span>
+<span id="cb27-29"><a href="#cb27-29"></a><span class="co">#&gt; 20    1.600   20           12</span></span>
+<span id="cb27-30"><a href="#cb27-30"></a><span class="co">#&gt; 21    1.626   21           13</span></span>
+<span id="cb27-31"><a href="#cb27-31"></a><span class="co">#&gt; 22    1.651   22           19</span></span>
+<span id="cb27-32"><a href="#cb27-32"></a><span class="co">#&gt; 23    1.676   23           16</span></span>
+<span id="cb27-33"><a href="#cb27-33"></a><span class="co">#&gt; 24    1.702   24           21</span></span>
+<span id="cb27-34"><a href="#cb27-34"></a><span class="co">#&gt; 25    1.727   25           16</span></span>
+<span id="cb27-35"><a href="#cb27-35"></a><span class="co">#&gt; 26    1.753   26           11</span></span>
+<span id="cb27-36"><a href="#cb27-36"></a><span class="co">#&gt; 27    1.778   27           13</span></span>
+<span id="cb27-37"><a href="#cb27-37"></a><span class="co">#&gt; 28    1.803   28           14</span></span>
+<span id="cb27-38"><a href="#cb27-38"></a><span class="co">#&gt; 29    1.829   29           10</span></span>
+<span id="cb27-39"><a href="#cb27-39"></a><span class="co">#&gt; 30    1.854   30            8</span></span>
+<span id="cb27-40"><a href="#cb27-40"></a><span class="co">#&gt; 31     1.93   31            6</span></span>
+<span id="cb27-41"><a href="#cb27-41"></a><span class="co">#&gt; 32    NA::a   96            0</span></span>
+<span id="cb27-42"><a href="#cb27-42"></a><span class="co">#&gt; 33    NA::b   99            1</span></span>
+<span id="cb27-43"><a href="#cb27-43"></a><span class="co">#&gt; The variable HWTAGWTK was recoded into HWTGWTK for the database cchs2001_p the following recodes were made:</span></span>
+<span id="cb27-44"><a href="#cb27-44"></a><span class="co">#&gt;   value_to          From rows_recoded</span></span>
+<span id="cb27-45"><a href="#cb27-45"></a><span class="co">#&gt; 1     copy    27.0:135.0          199</span></span>
+<span id="cb27-46"><a href="#cb27-46"></a><span class="co">#&gt; 2    NA::a        999.96            0</span></span>
+<span id="cb27-47"><a href="#cb27-47"></a><span class="co">#&gt; 3    NA::b 999.97:999.99            1</span></span>
+<span id="cb27-48"><a href="#cb27-48"></a></span>
+<span id="cb27-49"><a href="#cb27-49"></a><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(bmi2001)</span>
+<span id="cb27-50"><a href="#cb27-50"></a><span class="co">#&gt;   HWTGHTM HWTGWTK HWTGBMI_der  data_name</span></span>
+<span id="cb27-51"><a href="#cb27-51"></a><span class="co">#&gt; 1   1.422   56.25    27.81784 cchs2001_p</span></span>
+<span id="cb27-52"><a href="#cb27-52"></a><span class="co">#&gt; 2   1.549   51.75    21.56788 cchs2001_p</span></span>
+<span id="cb27-53"><a href="#cb27-53"></a><span class="co">#&gt; 3   1.803   78.75    24.22474 cchs2001_p</span></span>
+<span id="cb27-54"><a href="#cb27-54"></a><span class="co">#&gt; 4   1.575   60.75    24.48980 cchs2001_p</span></span>
+<span id="cb27-55"><a href="#cb27-55"></a><span class="co">#&gt; 5   1.727   63.00    21.12301 cchs2001_p</span></span>
+<span id="cb27-56"><a href="#cb27-56"></a><span class="co">#&gt; 6   1.829   91.80    27.44197 cchs2001_p</span></span>
+<span id="cb27-57"><a href="#cb27-57"></a></span>
+<span id="cb27-58"><a href="#cb27-58"></a>bmi2012 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rec_with_table.html">rec_with_table</a></span>(cchs2012_p, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"HWTGHTM"</span>, <span class="st">"HWTGWTK"</span>, <span class="st">"HWTGBMI_der"</span>),</span>
+<span id="cb27-59"><a href="#cb27-59"></a>  <span class="dt">log =</span> <span class="ot">TRUE</span>, <span class="dt">attach_data_name =</span> <span class="ot">TRUE</span></span>
+<span id="cb27-60"><a href="#cb27-60"></a>)</span>
+<span id="cb27-61"><a href="#cb27-61"></a><span class="co">#&gt; Loading cchsflow variable_details</span></span>
+<span id="cb27-62"><a href="#cb27-62"></a><span class="co">#&gt; Using the passed data variable name as database_name</span></span>
+<span id="cb27-63"><a href="#cb27-63"></a><span class="co">#&gt; </span><span class="al">NOTE</span><span class="co"> for HWTGHTM: Height is a reported in meters from 2005 CCHS onwards</span></span>
+<span id="cb27-64"><a href="#cb27-64"></a><span class="co">#&gt; The variable HWTGHTM was recoded into HWTGHTM for the database cchs2012_p the following recodes were made:</span></span>
+<span id="cb27-65"><a href="#cb27-65"></a><span class="co">#&gt;   value_to        From rows_recoded</span></span>
+<span id="cb27-66"><a href="#cb27-66"></a><span class="co">#&gt; 1     copy 0.914:2.134          191</span></span>
+<span id="cb27-67"><a href="#cb27-67"></a><span class="co">#&gt; 2    NA::a       9.996            2</span></span>
+<span id="cb27-68"><a href="#cb27-68"></a><span class="co">#&gt; 3    NA::b 9.997:9.999            7</span></span>
+<span id="cb27-69"><a href="#cb27-69"></a><span class="co">#&gt; The variable HWTGWTK was recoded into HWTGWTK for the database cchs2012_p the following recodes were made:</span></span>
+<span id="cb27-70"><a href="#cb27-70"></a><span class="co">#&gt;   value_to          From rows_recoded</span></span>
+<span id="cb27-71"><a href="#cb27-71"></a><span class="co">#&gt; 1     copy    27.0:135.0          189</span></span>
+<span id="cb27-72"><a href="#cb27-72"></a><span class="co">#&gt; 2    NA::a        999.96            0</span></span>
+<span id="cb27-73"><a href="#cb27-73"></a><span class="co">#&gt; 3    NA::b 999.97:999.99           11</span></span>
+<span id="cb27-74"><a href="#cb27-74"></a><span class="kw"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(bmi2012)</span>
+<span id="cb27-75"><a href="#cb27-75"></a><span class="co">#&gt;     HWTGHTM HWTGWTK HWTGBMI_der  data_name</span></span>
+<span id="cb27-76"><a href="#cb27-76"></a><span class="co">#&gt; 195   1.829  108.00    32.28467 cchs2012_p</span></span>
+<span id="cb27-77"><a href="#cb27-77"></a><span class="co">#&gt; 196   1.524   70.20    30.22506 cchs2012_p</span></span>
+<span id="cb27-78"><a href="#cb27-78"></a><span class="co">#&gt; 197   1.803   84.00    25.83972 cchs2012_p</span></span>
+<span id="cb27-79"><a href="#cb27-79"></a><span class="co">#&gt; 198   1.575   63.00    25.39683 cchs2012_p</span></span>
+<span id="cb27-80"><a href="#cb27-80"></a><span class="co">#&gt; 199   1.829   85.50    25.55870 cchs2012_p</span></span>
+<span id="cb27-81"><a href="#cb27-81"></a><span class="co">#&gt; 200   1.702   74.25    25.63170 cchs2012_p</span></span>
+<span id="cb27-82"><a href="#cb27-82"></a></span>
+<span id="cb27-83"><a href="#cb27-83"></a>combined_bmi &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>(bmi2001, bmi2012)</span>
+<span id="cb27-84"><a href="#cb27-84"></a></span>
+<span id="cb27-85"><a href="#cb27-85"></a><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(combined_bmi)</span>
+<span id="cb27-86"><a href="#cb27-86"></a><span class="co">#&gt;   HWTGHTM HWTGWTK HWTGBMI_der  data_name</span></span>
+<span id="cb27-87"><a href="#cb27-87"></a><span class="co">#&gt; 1   1.422   56.25    27.81784 cchs2001_p</span></span>
+<span id="cb27-88"><a href="#cb27-88"></a><span class="co">#&gt; 2   1.549   51.75    21.56788 cchs2001_p</span></span>
+<span id="cb27-89"><a href="#cb27-89"></a><span class="co">#&gt; 3   1.803   78.75    24.22474 cchs2001_p</span></span>
+<span id="cb27-90"><a href="#cb27-90"></a><span class="co">#&gt; 4   1.575   60.75    24.48980 cchs2001_p</span></span>
+<span id="cb27-91"><a href="#cb27-91"></a><span class="co">#&gt; 5   1.727   63.00    21.12301 cchs2001_p</span></span>
+<span id="cb27-92"><a href="#cb27-92"></a><span class="co">#&gt; 6   1.829   91.80    27.44197 cchs2001_p</span></span>
+<span id="cb27-93"><a href="#cb27-93"></a><span class="kw"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(combined_bmi)</span>
+<span id="cb27-94"><a href="#cb27-94"></a><span class="co">#&gt;     HWTGHTM HWTGWTK HWTGBMI_der  data_name</span></span>
+<span id="cb27-95"><a href="#cb27-95"></a><span class="co">#&gt; 395   1.829  108.00    32.28467 cchs2012_p</span></span>
+<span id="cb27-96"><a href="#cb27-96"></a><span class="co">#&gt; 396   1.524   70.20    30.22506 cchs2012_p</span></span>
+<span id="cb27-97"><a href="#cb27-97"></a><span class="co">#&gt; 397   1.803   84.00    25.83972 cchs2012_p</span></span>
+<span id="cb27-98"><a href="#cb27-98"></a><span class="co">#&gt; 398   1.575   63.00    25.39683 cchs2012_p</span></span>
+<span id="cb27-99"><a href="#cb27-99"></a><span class="co">#&gt; 399   1.829   85.50    25.55870 cchs2012_p</span></span>
+<span id="cb27-100"><a href="#cb27-100"></a><span class="co">#&gt; 400   1.702   74.25    25.63170 cchs2012_p</span></span></code></pre></div>
+</div>
 </div>
   </div>
 
@@ -674,12 +784,13 @@
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#example-1--transform-a-single-variable-from-a-single-database">Example 1. Transform a single variable from a single database</a></li>
       <li><a href="#which-variables-are-transformed-how-good-is-the-transformation">Which variables are transformed? How “good” is the transformation?</a></li>
-      <li><a href="#example2">Example 2. Variable transfomation with a note</a></li>
+      <li><a href="#example2">Example 2. Variable transformation with a note</a></li>
       <li><a href="#example-3--transform-a-single-variable-from-multiple-cchs-datasets">Example 3. Transform a single variable from multiple CCHS datasets</a></li>
       <li><a href="#example4">Example 4. Transform a single variable from multiple databases that changes categories between cycles.</a></li>
       <li><a href="#example-5--transform-multiple-variables-from-multiple-datasets">Example 5. Transform multiple variables from multiple datasets</a></li>
       <li><a href="#example6">Example 6. Transform all variables in the variable_details sheet</a></li>
       <li><a href="#example7">Example 7. Transform CCHS derived variables such as Body Mass Index (BMI)</a></li>
+      <li><a href="#example-8-distinguishing-which-cycle-data-is-from-in-combined-datasets">Example 8: Distinguishing which cycle data is from in combined datasets</a></li>
       </ul>
 </li>
       </ul>
