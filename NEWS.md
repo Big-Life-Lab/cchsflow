@@ -1,4 +1,67 @@
-# cchsflow 1.4.1 (Latest build)
+# cchsflow 1.5.0 (Latest build)
+2020-03-20
+
+## Breaking changes
+- Modified internal list index access to be compliant with R 4.0.
+- Added `attach_data_name`: new argument for adding data_name to
+`rec_with_table()` return
+
+## Variables
+- <font color = "green">**New**</font> [ADL_der](https://big-life-lab.github.io/cchsflow/reference/adl_fun.html) -
+derived "needs help with task" variable.
+- <font color = "green">**New**</font> [RACDPAL_fun](https://big-life-lab.github.io/cchsflow/reference/RACDPAL_fun.html) - custom function to derive RACDPAL for the 2001 CCHS survey cycle.
+- <font color = "green">**New**</font> ADL_07 - Needs help with heavy household
+chores. Recoded variable used in CCHS cycles 2001-2005. 
+- <font color = "green">**New**</font> ADM_RNO - Sequential record number used
+in all CCHS cycles.
+- <font color = "green">**New**</font> RAC_2B - Reduction in activities at
+school or work due to disability variable used only in the 2001 CCHS survey
+cycle
+- <font color = "green">**New**</font> INCGPER_cont - continuous personal income
+variable harmonized across all CCHS cycles
+
+## Minor improvements
+- New [article](https://big-life-lab.github.io/cchsflow/articles/duplicate_datasets.html)
+that describes overlaps in certain CCHS datasets
+- Documentation on [GEN_02A2](https://big-life-lab.github.io/cchsflow/reference/GEN_02A2.html)
+variable
+- Expanded derived variables section in [How to add variables](https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html) article
+- Added example in [get started](https://big-life-lab.github.io/cchsflow/articles/get_started.html)
+that uses new attach_data_name argument in `rec_with_table()`
+
+# cchsflow 1.4.4 (Latest build)
+2020-03-03
+
+## Features
+- Docsearch added to website
+- New article on getting started with _cchsflow_
+
+## Bug fixes
+- Refactor to `pct_time_fun` function to output value from 0-100% as opposed
+to 0-1
+- Refactor to respiratory functions to better capture respondents under 35
+with respiratory conditions
+
+## Minor improvements
+- Improvements to warning outputs in `rec_with_table()`
+- Improvements to labels in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.4.3 
+2020-02-21
+
+## Minor improvements
+- Minor documentation improvements in vignettes and home page
+
+# cchsflow 1.4.2 
+2020-02-19
+
+## Bug fixes and minor improvements
+- New badges and documentation updates to reflect package being added to CRAN
+- Fixed bug in `rec_with_table()` to include all values in recFrom column
+- Improvements in labelling of variables in `variables.csv` &
+`variable_details.csv`, as well as labelling of derived categorical variables
+
+# cchsflow 1.4.1
 2020-02-11
 
 ## Minor improvements

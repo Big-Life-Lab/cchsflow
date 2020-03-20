@@ -16,8 +16,14 @@ Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 The CCHS survey is conducted by Statistics Canada.
 }
 \details{
+\strong{NOTE:} this subset of respondents may also be in the 2009-2010 PUMF
+subset. Please see the "CCHS datasets that overlap each other" article to see
+how the two datasets contain overlap.
+
 See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-license.
+license. Source from Statistics Canada, Canadian Community Health Survey 
+PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+the permission of Statistics Canada.
 
 Long name: CCHS-82M0013-E-2010-AnnualComponent
 
