@@ -36,6 +36,8 @@ navbar:
         href: articles/how_to_add_variables.html
       - text: How to use tagged_na
         href: articles/tagged_na_usage.html
+      - text: CCHS datasets that overlap each other
+        href: articles/duplicate_datasets.html
     reference:
       text: Reference
       href: reference/index.html
@@ -62,6 +64,7 @@ reference:
     - binge_drinker_fun
     - multiple_conditions_fun1
     - multiple_conditions_fun2
+    - adl_fun
   - title: "Potentially problematic variables"
     desc: Derived variables in cchsflow that users may run into issues with
     contents:
@@ -70,6 +73,7 @@ reference:
     - ALCDTYP
     - ALCDTTM
     - food_insecurity_der
+    - GEN_02A2
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:
@@ -80,9 +84,9 @@ reference:
     - cchs2009_2010_p
     - cchs2010_p
     - cchs2011_2012_p
-    - cchs2012_p
+    - cchs2012_p 
     - cchs2013_2014_p
-    - cchs2014_p
+    - cchs2014_p 
   - title: "Processing functions"
     desc: Functions used to manipulate CCHS datasets
     contents:

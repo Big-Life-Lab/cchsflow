@@ -58,28 +58,28 @@
 #'
 #' library(cchsflow)
 #'
-#' pack_years2010 <- rec_with_table(
-#'   cchs2010_p, c(
+#' pack_years2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
 #'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
 #'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
 #'   )
 #' )
 #'
-#' head(pack_years2010)
+#' head(pack_years2009_2010)
 #'
-#' pack_years2012 <- rec_with_table(
-#'   cchs2012_p,c(
+#' pack_years2011_2012 <- rec_with_table(
+#'   cchs2011_2012_p,c(
 #'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
 #'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
 #'   )
 #' )
 #'
-#' tail(pack_years2012)
+#' tail(pack_years2011_2012)
 #'
-#' combined_pack_years <- suppressWarnings(bind_rows(pack_years2010,
-#'  pack_years2012))
+#' combined_pack_years <- suppressWarnings(bind_rows(pack_years2009_2010,
+#'  pack_years2011_2012))
 #'
 #' head(combined_pack_years)
 #' tail(combined_pack_years)

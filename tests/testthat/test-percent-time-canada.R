@@ -13,7 +13,7 @@ test_that("pct_time_fun has expected output when
 })
 
 test_that("pct_time_fun has expected output when all arguments are in range", {
-  expect_equal(pct_time_fun(20, 2, 1), 0.225)
+  expect_equal(pct_time_fun(20, 2, 1), 22.5)
 })
 
 test_that("pct_time_fun has expected output when age is NA", {

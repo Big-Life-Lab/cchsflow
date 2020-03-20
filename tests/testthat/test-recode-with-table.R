@@ -23,10 +23,3 @@ test_that("rec_with_table matches the standard 2005 recode", {
                     cchs2005Standard)
 })
 
-test_that("rec_with_table matches the standard 2014 recode", {
-  out <- suppressWarnings(
-    cchsflow::rec_with_table(cchs2014_p,
-                             note = FALSE))
-  expect_mapequal(out,
-                    cchs2014Standard)
-})
