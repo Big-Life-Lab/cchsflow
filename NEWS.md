@@ -1,4 +1,10 @@
-# cchsflow 1.5.1 (Latest build)
+# cchsflow 1.5.2 (Latest build)
+2020-03-24
+
+## Bug Fixes
+- Fixes to typos in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.5.1
 2020-03-20
 
 ## Minor improvements
