@@ -143,7 +143,7 @@ pack_years_fun <-
               if_else2(
                 SMKDSTY == 5 & SMK_01A == 2, 0.007,
                 # Non-smoker
-                if_else2(SMKDSTY == 6, 0, NA)
+                if_else2(SMKDSTY == 6, 0, "NA(b)")
               )
             )
           )

@@ -74,6 +74,6 @@ RACDPAL_fun <- function(RAC_1, RAC_2A, RAC_2B, RAC_2C){
                              # impacted them
                              if_else2(RAC_1 == 3 & RAC_2A == 3 &
                                         (RAC_2B %in% 3:4) &
-                                        RAC_2C == 3, 3, NA))), NA
+                                        RAC_2C == 3, 3, "NA(b)"))), "NA(b)"
   )
 }

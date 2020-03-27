@@ -70,5 +70,5 @@ pct_time_fun <-
     DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont, return(NA))
     SDCGRES <- if_else2(SDCGRES == 1, 4.5,
                         if_else2(SDCGRES == 2, 15, return(NA)))
-    if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont * 100), NA)
+    if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont * 100), "NA(b)")
   }
