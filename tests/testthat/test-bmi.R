@@ -1,7 +1,7 @@
 test_that("bmi_fun() handles one or more NA arguments properly", {
-  expect_equal(bmi_fun(NA, 50), NA)
-  expect_equal(bmi_fun(1.7, NA), NA)
-  expect_equal(bmi_fun(NA, NA), NA)
+  expect_equal(bmi_fun(NA, 50), "NA(b)")
+  expect_equal(bmi_fun(1.7, NA), "NA(b)")
+  expect_equal(bmi_fun(NA, NA), "NA(b)")
 })
 
 test_that("bmi_fun() generates a bmi when appropriate parameters are passed", {

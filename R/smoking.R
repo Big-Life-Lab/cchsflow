@@ -90,9 +90,9 @@ pack_years_fun <-
            SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
     # Age verification
     if (is.na(DHHGAGE_cont)) {
-      return(NA)
+      return("NA(b)")
     } else if (DHHGAGE_cont < 0) {
-      return(NA)
+      return("NA(b)")
     }
 
     # Time since quit for former daily smokers
