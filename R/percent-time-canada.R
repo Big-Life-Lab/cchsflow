@@ -67,8 +67,10 @@ pct_time_fun <-
     if (is_equal(SDCGCBG, 1)) {
       return(100)
     }
-    DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont, return("NA(b)"))
+    DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont,
+                             return(tagged_na("b")))
     SDCGRES <- if_else2(SDCGRES == 1, 4.5,
-                        if_else2(SDCGRES == 2, 15, return("NA(b)")))
-    if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont * 100), "NA(b)")
+                        if_else2(SDCGRES == 2, 15, return(tagged_na("b"))))
+    
+    if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont * 100), tagged_na("b"))
   }

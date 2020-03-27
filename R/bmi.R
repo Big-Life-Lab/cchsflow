@@ -86,6 +86,6 @@ bmi_fun <-
   function(HWTGHTM, HWTGWTK) {
     if_else2(
       (!is.na(HWTGHTM)) & (!is.na(HWTGWTK)), (HWTGWTK / (HWTGHTM * HWTGHTM)),
-      "NA(b)"
+      tagged_na("b")
     )
   }
