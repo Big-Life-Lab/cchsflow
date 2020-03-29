@@ -1,8 +1,8 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and Harmonizing CCHS Variables
-Version: 1.5.2
-Date: 2020-03-24
+Version: 1.6.0
+Date: 2020-03-30
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -49,6 +49,6 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: 
     testthat (>= 2.1.0)
