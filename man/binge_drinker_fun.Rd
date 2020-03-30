@@ -6,6 +6,7 @@
 \usage{
 binge_drinker_fun(
   DHH_SEX,
+  ALW_1,
   ALW_2A1,
   ALW_2A2,
   ALW_2A3,
@@ -17,6 +18,8 @@ binge_drinker_fun(
 }
 \arguments{
 \item{DHH_SEX}{sex of respondent (1 - male, 2 - female)}
+
+\item{ALW_1}{Drinks in the last week (1 - yes, 2 - no)}
 
 \item{ALW_2A1}{Number of drinks on Sunday}
 
@@ -53,6 +56,7 @@ In health research, binge drinking is defined as having an excess
  day of the last week.
 }
 \examples{
+ 
 # Using binge_drinker_fun() to create binge_drinker values across CCHS cycles
 # binge_drinker_fun() is specified in variable_details.csv along with the
 # CCHS variables and cycles included.
@@ -65,8 +69,8 @@ In health research, binge drinking is defined as having an excess
 library(cchsflow)
 binge2001 <- rec_with_table(
   cchs2001_p, c(
-    "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4", "ALW_2A5",
-    "ALW_2A6", "ALW_2A7", "binge_drinker"
+    "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+    "ALW_2A5", "ALW_2A6", "ALW_2A7", "binge_drinker"
   )
 )
 
@@ -74,8 +78,8 @@ head(binge2001)
 
 binge2009_2010 <- rec_with_table(
   cchs2009_2010_p, c(
-    "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4", "ALW_2A5",
-    "ALW_2A6", "ALW_2A7", "binge_drinker"
+    "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+    "ALW_2A5", "ALW_2A6", "ALW_2A7", "binge_drinker"
   )
 )
 
@@ -90,12 +94,13 @@ tail(combined_binge)
 # Using binge_drinker_fun() to generate binge_drinker with user-inputted
 # values.
 #
-# Let's say you are a male, and you had 3 drinks on Sunday, 1 drink on
+# Let's say you are a male, and you had drinks in the last week. Let's say
+# you had 3 drinks on Sunday, 1 drink on
 # Monday, 6 drinks on Tuesday, 0 drinks on Wednesday, 3 drinks on Thurday,
 # 8 drinks on Friday, and 2 drinks on Saturday. Using binge_drinker_fun(),
 # we can check if you would be classified as a drinker.
 
-binge <- binge_drinker_fun(DHH_SEX = 1, ALW_2A1 = 3, ALW_2A2 = 1,
+binge <- binge_drinker_fun(DHH_SEX = 1, ALW_1 = 1, ALW_2A1 = 3, ALW_2A2 = 1,
                           ALW_2A3 = 6, ALW_2A4 = 0, ALW_2A5 = 3,
                           ALW_2A6 = 8, ALW_2A7 = 2)
 
