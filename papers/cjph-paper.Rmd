@@ -2,8 +2,10 @@
 title: "Problem description"
 author: "Warsame Yusuf"
 date: '2020-03-10'
+output:
+  html_document:
+    df_print: paged
 csl: elsevier-vancouver.csl
-output: word_document
 bibliography: bibliography.bib
 ---
 
@@ -14,11 +16,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-The approach for transforming and cleaning variables in population health surveys and other data systems is still largely a manual "hard code" approach. Several approaches have developed over the past 20 years. Examples include collaborative efforts to published standards such as [Ontario's Provincial Health Indicators Work Group](https://www.apheo.ca/core-indicators-work-group).[@AssociationofPublicHealthEpidemiologistsinOntario2018] There are an increasing number of data repository such as Maelstrom that hold metadata for surveys and other data sources. Metadata is often included using standards such as the Data Documentation initiative that has been used in over 10 000 studies.[@Bergeron2018; @Platt2020; @Manuel2019] The CCHS metadata in DDI format is available at ODESI, but there are few tools that are available to use this metadata and the CCHS documents use an older version of DDI that lacks the ability to follow the provenance of variables across cycles.[@ODESI2020]
+The common data science maxim is that 80 to 90 percent of an analyst's time is devoted to data cleaning and variable transformation.  Public health epidemiologists and researchers face this challenge when using health surveys and other routinely-collected data that changes over time and across jurisdictions. 
 
-We present an open science approach to transforming and harmonizing the CCHS surveys. The approach is an R language package _cchsflow_ with references files that could be used in other programming languages. _cchsflow_ harmonizes over 140 variables for CCHS PUMF from 2001 to 2014. Current work is underway to add CCHS share files and additional variables. _cchsflow_ use of open science approach means that users can use and contribute to the package, including making suggestions and requests, identify errors. People can even "fork" the package -- meaning the can use the _cchsflow_ for other purposes such as harmonizing other databases. 
+Over the past 20 years, several approaches have developed to reduce the amount of manually cleaning and transforming public health data into a consistent format. Examples include collaborative efforts to published standards such as [Ontario's Provincial Health Indicators Work Group](https://www.apheo.ca/core-indicators-work-group). [@AssociationofPublicHealthEpidemiologistsinOntario2018] There is also an increasing number of data repositories such as Maelstrom with metadata for surveys and other data sources. Metadata is often included using standards such as the Data Documentation initiative that has been used in over 10 000 studies.[@Bergeron2018; @Platt2020; @Manuel2019] The Canadian Community Health Survey (CCHS) is an example of a well-documented database with metadata in DDI format is available at ODESI. However, there are few tools that are available to use this metadata by analysts. and the CCHS metadata lacks the ability to follow the provenance of variables across cycles.[@ODESI2020]
 
-Even this paper was created using open science principles. We wrote the paper using R markdown - a notebook that allow R code to be executed within the document. The notebook is available on [GitHub](https://github.com/Big-Life-Lab/cchsflow/blob/paper-writeups/papers/cjph-paper.Rmd) which allows readers to make commnents, suggestion or note errors. Reader can execute or modify the examples in this paper.
+We present an open science approach to transforming and harmonizing the CCHS surveys called _cchsflow_. _cchsflow_ currently harmonizes over 140 variables for CCHS Public Use Microfile from 2001 to 2014. Current work is underway to add CCHS share files and additional variables. _cchsflow_ use of open science approach means that users can use and contribute to the package, including making suggestions and requests, identify errors. People can even "fork" the package -- meaning the can use the _cchsflow_ for other purposes such as harmonizing other databases. _cchsflow_ uses R language package since R is the most commonly used open statistical programming language. However, the core of _cchsflow_ are references files that could be used in other programming languages.
+
+Even this paper was created using the open science principles that were used for _cchsflow_. We wrote the paper using R markdown - a notebook that allow R code to be executed within the document. The notebook is available on [GitHub](https://github.com/Big-Life-Lab/cchsflow/blob/paper-writeups/papers/cjph-paper.Rmd) which allows readers to make commnents, suggestions or note errors. Reader can execute or modify all examples in this paper in R.
 
 \pagebreak
 ## Background
