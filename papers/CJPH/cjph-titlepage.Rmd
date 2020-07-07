@@ -1,0 +1,24 @@
+---
+title: 'cchsflow: An open science approach to transform & combine population health
+  surveys into one dataset'
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Authors:** 
+Warsame Yusuf, Methodologist, Ottawa Hospital Research Institute. 1053 Carling Avenue, Ottawa, Ontario, K1Y 4E9. Email: waryusuf@ohri.ca. Phone: 613-798-5555 ext 19108. ORCID: 0000-0001-5571-8122
+
+Douglas G. Manuel, Senior Scientist & Physician, Ottawa Hospital Research Institute. 1053 Carling Avenue, Ottawa, Ontario, K1Y 4E9. ORCID: 0000-0003-0912-0845
+
+Rostyslav Vyuha, Research Assistant, Ottawa Hospital Research Institute. 1053 Carling Avenue, Ottawa, Ontario, K1Y 4E9. ORCID: 0000-0002-6700-0991
+
+Carol Bennett, Epidemiologist, Ottawa Hospital Research Insitute. 1053 Carling Avenue, Ottawa, Ontario, K1Y 4E9. ORCID: 0000-0002-3033-9860
+
+**Conflict of Interest:** The authors declare that they have no conflict of interest.
+
+**Word count:** Abstract: 225; Text body: 3000.

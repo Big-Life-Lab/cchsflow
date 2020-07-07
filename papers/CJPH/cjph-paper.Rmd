@@ -3,6 +3,7 @@ title: "Problem description"
 author: "Warsame Yusuf"
 date: '2020-03-10'
 output:
+  word_document: default
   html_document:
     df_print: paged
 csl: elsevier-vancouver.csl
