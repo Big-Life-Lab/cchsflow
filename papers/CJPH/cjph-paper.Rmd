@@ -1,13 +1,12 @@
 ---
-title: "Problem description"
-author: "Warsame Yusuf"
-date: '2020-03-10'
+title: 'cchsflow: An open science approach to transform & combine population health
+  surveys into one dataset'
 output:
   word_document: default
   html_document:
     df_print: paged
-csl: elsevier-vancouver.csl
-bibliography: bibliography.bib
+csl: ../elsevier-vancouver.csl
+bibliography: ../bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -17,9 +16,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-You are a public health epidemiologist who wants to examine the change in Body Mass Index (BMI) in your health unit over the past 15 years. You review the codebook for the Canadian Community Health Survey (CCHS) and note that BMI is collected. BMI _seems_ like a straightforward measure that is routinely-collected worldwide. Indeed, BMI is included in all CCHS cycles. You examine the documentation and find the variable HWTAGBMI in the CCHS 2001 corresponds to body mass index, but that in other cycles, the variable name changes to HWTCGBMI, HWTDGBMI, HWTEGBMI, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don’t calculate BMI for respondents under the age of 20 or over the age of 64 years. Also, some cycles calculate BMI only if height and weight are within specific ranges. After spending hours on the task, you talk with a collegue in a neighbouring health unit. They also did the same task a few years ago. You share your Stata code by email and compare notes, only to realize that there you both have different approaches, each with errors. 
+You are a public health epidemiologist who wants to examine the change in Body Mass Index (BMI) in your health unit over the past 15 years. You review the codebook for the Canadian Community Health Survey (CCHS) and note that BMI is collected. BMI _seems_ like a straightforward measure that is routinely collected worldwide. Indeed, BMI is included in all CCHS cycles. You examine the documentation and find the variable HWTAGBMI in the CCHS 2001 corresponds to body mass index, but that in other cycles, the variable name changes to HWTCGBMI, HWTDGBMI, HWTEGBMI, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don’t calculate BMI for respondents under the age of 20 or over the age of 64 years. Also, some cycles calculate BMI only if height and weight are within specific ranges. After spending hours on the task, you talk with a collegue in a neighbouring health unit. They also did the same task a few years ago. You share your Stata code by email and compare notes, only to realize that there you both have different approaches, each with errors. 
 
-We present an open science approach to transforming and harmonizing the CCHS surveys called _cchsflow_. _cchsflow_ currently harmonizes 160 variables for CCHS Public Use Microdata File (PUMF) from 2001 to 2014. _cchsflow_ use of open science approach means that users can use and contribute to the package, including making suggestions and requests, identify errors. People can even "fork" the package meaning they can use the _cchsflow_ infrastructure for other purposes such as harmonizing other databases. _cchsflow_ uses R language package since R is the most commonly used open statistical programming language. The core of _cchsflow_, however, are references files that could be used in other programming languages.
+We present an open science approach to transforming and harmonizing the CCHS surveys called _cchsflow_. _cchsflow_ currently harmonizes 160 variables for CCHS Public Use Microdata File (PUMF) from 2001 to 2014. _cchsflow_ use of open science approach means that users can use and contribute to the package, including making suggestions and requests, and identify errors. People can even "fork" the package meaning they can use the _cchsflow_ infrastructure for other purposes such as harmonizing other databases. _cchsflow_ uses R language package since R is the most commonly used open statistical programming language. The core of _cchsflow_, however, are references files that could be used in other programming languages.
 
 Even this paper was created using the open science principles that were used for _cchsflow_. We wrote the paper using R markdown - a notebook that allow R code to be executed within the document. The notebook is available on [GitHub](https://github.com/Big-Life-Lab/cchsflow/blob/paper-writeups/papers/CJPH/cjph-paper.Rmd) which allows readers to make commnents, suggestions or note errors. Readers can execute or modify all examples in this paper in R.
 
