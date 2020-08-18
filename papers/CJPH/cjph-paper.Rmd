@@ -35,64 +35,49 @@ Data cleaning, including transforming variables into harmonized or common variab
 
 Open science is defined as "transparent and accessible knowledge that is shared and developed through collaborative networks".[@Vicente-Saez2018] Included in open science is: open data, data that is publicly accessible such as the CCHS with Statistics Canada's new Open License[ref]; open source, the use of open access programs such as data science languages including R, Python and Julia, and; open methodology, program code that is publicly accessible and shared.[@McKiernan2016; @Stodden2013] In public health, there has also been a marked trend toward open data and sharing code - notably during the covid-19 pandemic.[@moorthy2020data]
 
-Adopting open science practices comes with benefits. McKiernan et al. found that open science is associated with increased research exposure in both media and in citations; and an increase in collaboration, funding, job opportunities.[@McKiernan2016] For public health professionals, an open science approach and toolkit facilitates collaboration as it allows for data & coding methods to be shared between different health units. Additional benefits include improved transparency, accessibility, efficiency, reduced coding errors and faster analyses. The objective for public health practioners is to improve and compress many time consuming, repetitive, inconsistent analyses tasks.
+Adopting open science practices comes with benefits. McKiernan et al. found that open science is associated with increased research exposure in both media and in citations; and an increase in collaboration, funding, job opportunities.[@McKiernan2016] For public health professionals, an open science approach and toolkit facilitates collaboration as it allows for data & coding methods to be shared between different health units. Additional benefits include improved transparency, accessibility, efficiency, reduced coding errors and faster analyses. The objective for public health practitioners is to improve and compress many time consuming, repetitive, inconsistent analyses tasks.
 
 \pagebreak
 
 ## Objectives
 
-The objectives of _cchsflow_ was to minimize the amount of time spent cleaning and transforming CCHS variables across multiple survey cycles. Open science practices used in _cchsflow_ included data and code that is freely and widely accessible to support collaboration with public health professionals that use CCHS data. 
+The objective of _cchsflow_ was to develop an open R package to minimize the amount of time spent cleaning and transforming CCHS variables across multiple survey cycles. 
 
 ## Methods
 
-To be able to transform & harmonize variables and data across numerous CCHS cycles, the _cchsflow_ R package was created.[@cchsflow] This package currently uses datasets from CCHS PUMF surveys, in which the variables of each were harmonized and transformed to use the same set of variables. In _cchsflow_, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014 as they have shown to be most consistent. To develop the package, variables were first mapped across the 10 cycles.
-
-### Mapping of variables
-
-To transform and standardize variables into a common set of variables, CCHS variables were mapped across the 10 survey cycles in which all the names of a particular variable, their variable type (categorical or continuous), and their category structure (for categorical variables) were identified. For most variables, the only difference between cycles were their variable name; as such, only a name change was required to standardize a variable across the 10 cycles. For variables where their category structures varied between cycles, there were two options. The first option was to create a derived variable that could be used for all survey cycles. An example of this was age. In the PUMF CCHS datasets, age is a categorical variable broken into several age groups. In the 2001 and 2003 CCHS survey cycles, there were 15 age categories; while in CCHS survey cycles from 2005 to 2014, there were 16 age categories. To rectify this difference, a continuous age variable was derived that takes the midpoint of each age category for all cycles. The two grouped age variables were still specified and transformed for users interested in particular cycles of CCHS. The second option for variables with different category structures is to keep them as separate variables. In this scenario, there was no viable solution in harmonizing the variable across cycles. 
-
-### Transformation of variables through specification worksheets
-
-Two CSV worksheets are included in the _cchsflow_ packages: one that specifies all the variables in the package called *variables.csv*, and one that provides details on those variables called *variable_details.csv*; which specify which CCHS datasets these variables come from; their starting and final variable type; and their category structure. The "rec_with_table" function uses the information specified in the two worksheets to create a transformed dataset from a CCHS cycle. Once all CCHS survey cycles have been transformed, they can combined using the "bind_rows" function from the _dplyr_ package [@dplyr] to create one large transformed dataset that spans across the 10 CCHS survey cycles. The two CSV worksheets also provide labels for the variables and their categories. The "rec_with_table" function uses the labels provided in the worksheets to label individual transformed cycles; while the "set_data_labels" function in _cchsflow_ labels the combined dataset. 
+_cchsflow_ followed the approach of the Open Source Initiate and open software for research.[@OSI][@JOSS] _cchflow_ was created in R with provisions to support other program languages such as Stat or SAS.[@cchsflow] The package currently supports the first 10 cycles of the CCHS PUMF surveys from 2001 to 2013, in which the variables of each were harmonized and transformed to use the same set of variables. In _cchsflow_, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014 as they have shown to be most consistent. 
 
 ### Selection of variables
 
-Variables from the CCHS that have been selected to be included and transformed across survey cycles fall under three categories: health behaviours, sociodemographic information, and health status. In Gochman's handbook on health behaviour research, he defines health behaviours as "overt behavioral patterns, actions and habits that relate to health, to health restoration and to health improvement".[@Gochman1997] This definition encompasses a wide variety of behaviours such as, smoking, alcohol, diet, and physical activity.[@Conner2017] For this project, the aforementioned behaviours were examined using existing CCHS variables, as well as derived variables. With respect to sociodemographic information, variables such as age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status were collected and added to the _cchsflow_ library. According to Chandrakant Shah, health status can be defined as "[t]he degree to which a person is able to function physically, emotionally, socially, with or without aid from the healthcare system.".[@Shah2003] Within this definition of health status lies health conditions, human function, well-being, and deaths. Within this project, variables relating to health conditions, human function, and well-being were collected. Deaths were not collected as CCHS data included only living respondents.    
+Variables included in _cchsflow_ include three categories: health behaviours, sociodemographic information, and health status. There are provisions and instructions how users can contribute or request the addition of new variables. 
+
+In Gochman's handbook on health behaviour research, he defines health behaviours as "overt behavioral patterns, actions and habits that relate to health, to health restoration and to health improvement".[@Gochman1997] This definition encompasses a wide variety of behaviours such as, smoking, alcohol, diet, and physical activity.[@Conner2017] For this project, the aforementioned behaviours were examined using existing CCHS variables, as well as derived variables. With respect to sociodemographic information, variables such as age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status were collected and added to the _cchsflow_ library. According to Shah, health status can be defined as "[t]he degree to which a person is able to function physically, emotionally, socially, with or without aid from the healthcare system.".[@Shah2003] Within this definition of health status lies health conditions, human function, well-being, and deaths. Within this project, variables relating to health conditions, human function, and well-being were collected. Deaths were not collected as CCHS data included only living respondents.   
+
+### Variable mapping
+
+CCHS variables were transformed and into a common from across the 10 survey cycles. For many variables, the only difference between cycles were their variable name; as such, only a name change was required to standardize a variable across the 10 cycles. 
+
+Changes in the number and type of categories was also common. For example, in the 2001 and 2003 CCHS survey cycles, there were 15 age categories; while in CCHS survey cycles from 2005 to 2014, there were 16 age categories. There were two options for such variable category changes. The first option was to create a harmonized variable by collapsing categories into common forms. The second option maintained separate variables. For age we also included a third option to maximize age information by deriving a new continuous age variable was derived that takes the midpoint of each age category for all cycles.
+
+There were also changes to question wording, missing categories, inclusion and exclusion criteria. Variables where not included in all cycles or all health regions.  We included harmonized variables when there was a consensus amongst developers that the differences across cycles where small. _notes_ are included when any difference was identified, with a default to print all notes during transformations.
+
+### Transformation of variables through specification worksheets
+
+Two worksheets are included in the _cchsflow_ packages that contain variable information and metadata:  *variables.csv* specifies all the variables in the package. *variable_details.csv*; specifies which CCHS datasets the variables come from; their starting and final variable type; and their category structure. 
+
+The "rec_with_table" function uses the information specified in the two worksheets to create a transformed dataset from a CCHS cycle. Once all CCHS survey cycles have been transformed, they can combined to create one large transformed dataset that spans across the 10 CCHS survey cycles. The two CSV worksheets also provide labels for the variables and their categories. The "rec_with_table" function uses the labels provided in the worksheets to label individual transformed cycles; while the "set_data_labels" function in _cchsflow_ labels the combined dataset. 
 
 ### Derived variables
 
-Derived variables were also generated in the _cchsflow_ package. These variables were based on derived variables used in previous studies [@Manuel2016], and used transformed variables within the _cchsflow_ package. If a derived variable is based on one CCHS variable, it is derived using the "rec_with_table" function; while derived variables using multiple CCHS variables required custom functions to be created. Similar to CCHS variables, derived variables are specified in the two worksheets, and are transformed & labelled in the same manner using "rec_with_table" & "set_data_labels".
-
-```{r, eval=FALSE}
-binge_drinker_fun <-
-  function(DHH_SEX, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6,
-           ALW_2A7) {
-    # Males with at least one day with 5 or more drinks
-    if_else2((DHH_SEX == 1 & (ALW_2A1 >= 5 | ALW_2A2 >= 5 | ALW_2A3 >=5 |
-                              ALW_2A4 >= 5 | ALW_2A5 >= 5 | ALW_2A6 >= 5 |
-                              ALW_2A7 >= 5)), 1,
-    # Males with no days with 5 or more drinks
-    if_else2((DHH_SEX == 1 & (ALW_2A1 %in% (0:4) & ALW_2A2 %in% (0:4) &
-                              ALW_2A3 %in% (0:4) & ALW_2A4 %in% (0:4) &
-                              ALW_2A5 %in% (0:4) & ALW_2A6 %in% (0:4) &
-                              ALW_2A7 %in% (0:4))), 2,
-    # Females with at least one day with 4 or more drinks
-    if_else2((DHH_SEX == 2 & (ALW_2A1 >= 4 | ALW_2A2 >= 4 | ALW_2A3 >= 4 |
-                               ALW_2A4 >= 4 | ALW_2A5 >= 4 | ALW_2A6 >= 4 |
-                               ALW_2A7 >= 4)), 1,
-    # Females with no days with 4 or more drinks
-    if_else2((DHH_SEX == 2 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
-                               ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
-                               ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
-                               ALW_2A7 %in% (0:3))), 2, NA))))
-  }
-```
-
-**Figure 1:** The custom function used to generate the binge drinker derived variable. This derived variable takes into account the sex of respondents, and the number of drinks they have reported to have consumed in the last 7 days to flag if a respondent is a binge drinker.
+CCHS includes derived variables that were created using multiple responses and variables. BMI is an example of an orinigal CCHS derived variable that was calculated using self-reported height and weight. Several new derived variables were included including were also generated in the _cchsflow_ package and there are provisions and instructions for adding additional variables.   These variables were based on derived variables used in previous studies and include smoking pack-years, binge drinking and diet pattern.[@Manuel2016] 
  
 ### Collaboration with other users
 
-To promote collaboration in line with open science practices, a GitHub page has been created where users can request new variables to be transformed and added to the package. GitHub is a website where users can share their code and data repository, and is based on the Git version-control system.[@Dabbish2012] Here, users can contribute to the _cchsflow_ by adding variables directly using the specification worksheets, and create code for custom functions if they are creating derived variables. Users can also request variables to be added using the issues tab on the GitHub page. 
+To promote collaboration in line with open science practices, a GitHub page has been created where users can request new variables to be transformed and added to the package. GitHub is most popular code repository with over 45 million users. Github based on the Git version-control system.[@Dabbish2012] Users can contribute to the _cchsflow_ by adding variables directly using the specification worksheets, and create code for custom functions if they are creating derived variables. Users can also request variables to be added using the issues tab on the GitHub page. 
+### Documentation
+
+Open source, web-based documentation is available at [https://big-life-lab.github.io/cchsflow/]{https://big-life-lab.github.io/cchsflow/}
+and includes a searchable reference of all transformation, vignettes of examples of how to perform transformations, collaboration principles, a development roadmap
 
 \pagebreak
 
