@@ -1,0 +1,93 @@
+﻿"Because of any condition or health problem, do you need the help of another person in preparing meals?"
+Needs help with at least one task - (F)
+Derived needs help with tasks
+Sequential record number
+"Past year, have you drank alcohol"
+Type of drinker (last 12 months)
+Type of drinker - (D)
+"Past week, had any alcohol"
+Number of drinks on Sunday
+Average daily alcohol consumption
+Weekly consumption of alcohol
+Binge Drinker
+Have you ever been diagnosed with high blood pressure?
+In the past month have you taken any medicine for high blood pressure?
+"Do you have COPD(eg bronchitis,emphysema)"
+Is this dwelling owned by a member of this household?
+Sex
+Age - (G)
+Categorical age
+Household size - (G)
+Marital status - (G)
+Highest level/education - respondent 4 levels - (D)
+Some food insecurity in past 12 months
+Derived food insecurity in the last 12 months
+Household food security status - (D)
+Household Food Security Status (HC)
+Daily consumption - carrots - (D)
+"In general, would you say your health is (excellent, very good, good, fair or poor)?"
+How satisfied are you with your life in general
+"Using a scale of 0 to 10, where 0 means ""very dissatisfied"" and 10 means ""Very satisfied"", how do you feel about life as a whole right now?"
+"In general, would you say your mental health is (excellent, very good, good, fair, poor)?"
+"Thinking about the amount of stress in your life, would you say that most days are (not at all stressful, not very stressful, a bit stressful, quite a bit stressful, extremely stressful)?"
+"Would you say that most days were (not at all stressful, not very stressful, a bit stressful, quite a bit stressful, extremely stressful)?"
+How would you describe your sense of belonging to your local community?
+Province of residence of respondent - (G)
+Do you have a regular medical doctor?
+Cognition prob. - function code - (D)
+Emotional problems - function code - (D)
+Health Utility Index (HUI3) - (D)
+"Dexterity trouble - function code (D, G)"
+Act. prevent/pain - function code - (D)
+"BMI / self-report - (D,G)"
+Derived Body Mass Index
+Height
+"Height (metres)/self-reported - (D,G)"
+"Weight - kilograms (D, G)"
+Household income distribution - (D)
+household inc. distribution-prov. level - (D)
+household inc. distribution- hr level - (D)
+"Total household income from all sources (D, G)"
+Total household income from all sources - continuous
+"Total pers. inc. from all sources (D, G)"
+"Total pers. inc. from all sources (D, G) - continuous"
+"In the past month, did you take sleeping pills such as Imovane, Nytol or Starnoc?"
+Number of chronic conditions
+"In a typical week in the past 3 months, how many hours did you usually spend walking to work or to school or while doing errands?"
+"In a typical week, how much time did you usually spend bicycling to work or to school or while doing errands?"
+[Other than the ( X ) times you already reported walking for exercise was there any other time / Was there any time] in the past 3 months when you walked to and from work or school?
+No. of times/3 mo./walking work/school
+About how much time did you spend on each occasion?
+[Other than the ( X ) times you already reported bicycling was there any other time / Was there any other time] in the past 3 months when you bicycled to and from work or school?
+No. of times/3 mo./bicycl. work/school
+Daily energy expenditure - (D)
+Smoking pack-years
+Percentage of time in Canada
+"Do you have any difficulty hearing, seeing, communicating, walking, climbing stairs, bending, learning or doing any similar activities?"
+Cause of health problem - (G)
+Impact of health problems
+Participation and activity limitation
+Cause of health problem
+Respiratory Condition
+Are you an immigrant?
+Country of birth - (G)
+"Cultural or racial origin - (D, G)"
+"Length/time in Canada since imm. (D, G)"
+How often do you have trouble going to sleep or staying asleep?
+How often do you find your sleep refreshing?
+How often do you find it difficult to stay awake when you want to?
+How long do you usually spend sleeping each night?
+"In lifetime, smoked 100 or more cigarettes"
+# of cigarettes smoked daily - occasional smoker
+Number of days smoked at least one cigarette - occasional smoker
+Ever smoked cigarettes daily - occasional smoker
+When did you stop smoking - never daily
+When did you stop smoking daily - occasional smoker - (G)
+# of cigarettes smoked daily - daily smoker
+# of cigarettes smoke each day - former daily
+Type of smoker - (D)
+Age smoked first whole cigarette - (G)
+Weights - Master
+Does a long-term physical condition or mental condition or health problem reduce the amount or the kind of activity you can do at work or at school?
+Age started to smoke daily - daily smoker (G)
+Years since stopped smoking daily - never daily
