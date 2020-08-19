@@ -2,9 +2,9 @@
 title: 'cchsflow: An open science approach to transform & combine population health
   surveys into one dataset'
 output:
-  word_document: default
   html_document:
     df_print: paged
+  word_document: default
 csl: ../elsevier-vancouver.csl
 bibliography: ../bibliography.bib
 ---
@@ -63,27 +63,32 @@ There were also changes to question wording, missing categories, inclusion and e
 
 ### Transformation of variables through specification worksheets
 
-Two worksheets are included in the _cchsflow_ packages that contain variable information and metadata:  *variables.csv* specifies all the variables in the package. *variable_details.csv*; specifies which CCHS datasets the variables come from; their starting and final variable type; and their category structure. 
+Two worksheets are included in the _cchsflow_ packages that contain variable information and metadata:  *variables.csv* specifies all the variables in the package. *variable_details.csv* specifies CCHS data that contain the variables, the variable type, and the category structure. 
 
-The "rec_with_table" function uses the information specified in the two worksheets to create a transformed dataset from a CCHS cycle. Once all CCHS survey cycles have been transformed, they can combined to create one large transformed dataset that spans across the 10 CCHS survey cycles. The two CSV worksheets also provide labels for the variables and their categories. The "rec_with_table" function uses the labels provided in the worksheets to label individual transformed cycles; while the "set_data_labels" function in _cchsflow_ labels the combined dataset. 
+_rec_with_table()_, short for 'recode with table' is the key function to transform variables. _rec_with_table()_ uses the two worksheets to create a transformed data from a CCHS cycle. Once all CCHS survey cycles have been transformed, they can combined to create one large transformed data set that spans across the 10 CCHS survey cycles. The two CSV worksheets also has variable labels and other metadata that can be added to the data using the _rec_with_table()_ function. 
 
 ### Derived variables
 
-CCHS includes derived variables that were created using multiple responses and variables. BMI is an example of an orinigal CCHS derived variable that was calculated using self-reported height and weight. Several new derived variables were included including were also generated in the _cchsflow_ package and there are provisions and instructions for adding additional variables.   These variables were based on derived variables used in previous studies and include smoking pack-years, binge drinking and diet pattern.[@Manuel2016] 
+CCHS includes derived variables that were created using multiple responses and variables. BMI is an example of an original CCHS derived variable that was calculated using self-reported height and weight. Several new derived variables were included including were also generated in the _cchsflow_ package and there are provisions and instructions for adding additional variables. These variables were based on derived variables used in previous studies and include smoking pack-years, binge drinking and diet pattern.[@Manuel2016] 
  
 ### Collaboration with other users
 
-To promote collaboration in line with open science practices, a GitHub page has been created where users can request new variables to be transformed and added to the package. GitHub is most popular code repository with over 45 million users. Github based on the Git version-control system.[@Dabbish2012] Users can contribute to the _cchsflow_ by adding variables directly using the specification worksheets, and create code for custom functions if they are creating derived variables. Users can also request variables to be added using the issues tab on the GitHub page. 
+Collaboration is facilitated using GitHub, the most popular on-line code repository with over 45 million users. Github is based on the Git version-control system which, in turn, is a cornerstone of open software development.[@Dabbish2012] Users add new variable transformations using the worksheets and then create a 'pull request' or PR to add the transformation to the main _cchsflow_ package.  Users can also request variables to be added or identify issues using the 'issues' feature.
+
 ### Documentation
 
-Open source, web-based documentation is available at [https://big-life-lab.github.io/cchsflow/]{https://big-life-lab.github.io/cchsflow/}
-and includes a searchable reference of all transformation, vignettes of examples of how to perform transformations, collaboration principles, a development roadmap
+Open source, web-based documentation is available at [https://big-life-lab.github.io/cchsflow/](https://big-life-lab.github.io/cchsflow/)
+and includes a searchable reference of all transformation, vignettes of examples of how to perform transformations, collaboration principles, a development roadmap.
+
+.... insert image of the gitpage ....
 
 \pagebreak
 
 ## Results
 
-The _cchsflow_ has been developed as an R package that has been added to the Comprehensive R Archive Network (CRAN), a network of servers that contain documentation for R packages [@CRAN2020], and can be readily installed using the "install.packages" function in R. **Figure 3a** illustrates the command line to install the CRAN version of _cchsflow_, while **Figure 3b** illustrates the command to install the development version of _cchsflow_, which is a more up to date version of the package. As of version 1.6.0, _cchsflow_ includes support for CCHS PUMF datasets from 2001 to 2014, and contains 160 variables.[@cchsflow] Once combined, users have access to 1,092,951 survey respondents over a 13 year time period. The _cchsflow_ package contains the following items: the *variables.csv* worksheet, the *variable_details.csv* worksheet, the various functions, and subsets of 200 respondents for each CCHS cycle.
+The _cchsflow_ is available on Comprehensive R Archive Network (CRAN), a network of servers that contain documentation for R packages [@CRAN2020]. As of version 1.6.0, _cchsflow_ includes support for CCHS PUMF datasets from 2001 to 2014, and contains 160 variables.[@cchsflow] Once combined, users have access to 1,092,951 survey respondents over a 13 year time period. The _cchsflow_ package contains the following items: the *variables.csv* worksheet, the *variable_details.csv* worksheet, the various functions, and subsets of 200 respondents for each CCHS cycle.
+
+**Figure 3a** illustrates the command line to install the CRAN version of _cchsflow_, while **Figure 3b** illustrates the command to install the development version of _cchsflow_, which is a more up to date version of the package.
 
 ```{r, eval=FALSE}
 install.packages("cchsflow")
@@ -97,58 +102,38 @@ devtools::install_github("Big-Life-Lab/cchsflow")
 
 ### Recode with table
 
-The "rec_with_table" function is the primary function used to recode variables based on the information from the two specification worksheets. The function has the ability to transform an entire dataset, or a subset of variables. To use the "rec_with_table" function, the _cchsflow_ package must be loaded in the R environment. Similarly, the CCHS datasets that are to be transformed must also be loaded in the R environment. **Figure 4a** illustrates how to load the _cchsflow_ package & 2001 CCHS dataset into the R environment, and how to use "rec_with_table" to transform the 2001 survey cycle. **Figure 4b** illustrates how to transform a subset of variables from the 2001 survey cycle.    
+The _rec_with_table()_ function is used to recode or transform variables based on the information from the two specification worksheets. The function has the ability to transform an entire data set, or a subset of variables. **Figure 4a** illustrates how to load the _cchsflow_ package, the 2001 CCHS data and then transform all variables in _cchsflow_ to their harmonized version.  The _cchsflow_ package comes with a subsample of CCHS data for 2001 to 2013 versions, made possible with Statistics Canada new Open Lincence.[ref open licence]. **Figure 4b** illustrates how to transform a subset of variables from the 2001 survey cycle.    
 
 ```{r, eval=FALSE}
 library(cchsflow)
 cchs2001 <- read.csv("~/data/cchs2001.csv")
 transformed_cchs <- rec_with_table(cchs2001)
 ```
-**Figure 4a:** The command lines to load the _cchsflow_ package, load the 2001 CCHS PUMF dataset and then transform the dataset using the rec_with_table function. 
+**Figure 4a:** The command lines to load the _cchsflow_ package, load the 2001 CCHS PUMF data and then transform the all variables in the worksheets using the _rec_with_table()_ function. 
 
 ```{r, eval=FALSE}
 library(cchsflow)
 cchs2001 <- read.csv("~/data/cchs2001.csv")
 transformed_cchs2001 <- rec_with_table(cchs2001, c("DHH_SEX", "DHHGAGE_cont"))
 ```
-**Figure 4b:** The command lines to load the _cchsflow_ package, load the 2001 CCHS PUMF dataset and then transform the sex & age variables from the dataset using the rec_with_table function.
+**Figure 4b:** The command lines to transform the sex & age variables using the _rec_with_table()_ function.
 
-### Combining transformed datasets
-
-Once all the desired CCHS datasets have been transformed, the datasets can now be combined to generate one dataset that consists of multiple CCHS survey cycles. Using the "bind_rows" function from the _dplyr_ package [@dplyr], multiple transformed CCHS datasets can be combined without issues. **Figure 5** illustrates how to combine multiple transformed datasets into one.
-
-```{r, eval=FALSE}
-library(dplyr)
-transformed_cycles <- bind_rows(transformed_cchs2001, transformed_cchs2003)
-```
-**Figure 5:** The command lines to load the _dplyr_ package, and combine transformed CCHS cycles.
-
-### Labelling transformed datasets
-
-The "rec_with_table" function adds labels to variables and their categories that specified in the specification worksheets. These labels, however, are lost when datasets are combined. The "set_data_labels" function is used to reattach labels that were lost during the combination process. **Figures 6a and 6b** demonstrate how to utilize the "set_data_labels" function. When installing the _cchsflow_ package, the _sjlabelled_ package is also installed.[@sjlabelled] This package comes with functions that are used to observe which labels are present in a transformed dataset. **Figure 6b** demonstrates how the "get_label" function displays the labels that were added to the combined dataset.
-
-```{r, eval=FALSE}
-labelled_transformed_cycles <- set_data_labels(transformed_cycles, variable_details, variables)
-```
-**Figure 6a:** The command line to add data labels to a newly combined dataset.
-
-```{r, eval=FALSE, warning=FALSE, message=FALSE}
-library(cchsflow)
-bmi2001 <- rec_with_table(cchs2001, c("HWTGHTM","HWTGWTK", "HWTGBMI_der"))
-bmi2003 <- rec_with_table(cchs2003, c("HWTGHTM","HWTGWTK", "HWTGBMI_der"))
-
-combined_bmi <- bind_rows(bmi2001, bmi2003)
-labelled_combined_bmi <- set_data_labels(combined_bmi, variable_details, variables)
-
-get_label(labelled_combined_bmi)
-```
-**Figure 6b:** Using set_data_labels to add labels to a combined dataset. The get_label function illustrates the labels that are in the combined dataset.
 
 \pagebreak
 
 ## Discussion
 
-In this project, an R package called _cchsflow_ was created that harmonizes and transforms data from 2001 to 2014 [@cchsflow]. With this package, users of the CCHS now have a repository of over 1 million respondents across a 13 year period. This open science practice improves the efficiency of health data analysis as less time will be spent collecting, transforming, and recombining variables. By introducing a tool that prepares CCHS datasets for analysis, public health professionals that use CCHS data are able to spend less time on data cleaning, and spend more time on analysis such as surveillance and health status reporting. With the use of specification worksheets, users can use _cchsflow_ to generate labelled CCHS datasets consisting of multiple survey cycles.
+In this project, an R package called _cchsflow_ was created that harmonizes and transforms data from 2001 to 2014.[@cchsflow] __cchsflow_ provided public health epidemiologists and others the ability to more robustly analyze over 1 million respondents across a 13 year period to examine trends in health indicators. An open science approach improves collaboration, transparency and efficiency when transforming variables. The package allows public health professionals that use CCHS  to spend less time on data cleaning, and spend more time on analysis such as surveillance and health status reporting. 
+
+_cchsflow_ extends the current approach of 
+
+- https://www.apheo.ca/core-indicators-work-group
+- DDI
+- Maelstrom
+- OHDP
+- https://indicatorlibrary.cihi.ca/display/HSPIL/Indicator+Library?desktop=true&_ga=2.214437141.328439497.1597831848-1908179218.1597831848
+- https://www.canada.ca/content/dam/phac-aspc/documents/services/publications/science-research/key-health-inequalities-canada-national-portrait-executive-summary/key_health_inequalities_full_report-eng.pdf
+
 
 While the CCHS aims to be consistent across survey cycles, there can be differences between cycles that can sometimes be irreconcilable with a simple variable name change. Within the CCHS, there are variables that are measured differently or categorized differently. Within _cchsflow_, variables with irreconcilable differences were either transformed into a new derived variable, or kept as separate variables that can be only be used in select cycles. Along with variables with irreconciliable differences, there are variables in _cchsflow_ that were not asked in all CCHS cycles. This means for some variables, data does not span across the length of the CCHS cycles available in _cchsflow_. For users looking to examine specific CCHS cycles this does not pose as an issue. For those looking to use all available cycles in _cchsflow_, further data manipulation will need to be done. A possible solution is to implement imputation, where missing data is replaced with values on based on other respondents and responses to other variables. 
 
