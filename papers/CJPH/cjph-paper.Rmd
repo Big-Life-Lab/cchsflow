@@ -1,10 +1,9 @@
 ---
 title: 'cchsflow: An open science approach to transform & combine population health
   surveys into one dataset'
-csl: ../elsevier-vancouver.csl
+  
 output:
   word_document: default
-  pdf_document: default
   html_document:
     df_print: paged
 csl: ../elsevier-vancouver.csl
