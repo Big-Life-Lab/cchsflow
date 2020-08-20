@@ -1,28 +1,27 @@
 ---
 title: 'cchsflow: An open science approach to transform & combine population health
   surveys into one dataset'
+csl: ../elsevier-vancouver.csl
 output:
+  word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
-  word_document: default
-csl: ../elsevier-vancouver.csl
 bibliography: ../bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-
 ## Introduction
 
-You are a public health epidemiologist who wants to examine the change in Body Mass Index (BMI) in your health unit over the past 15 years. You review the codebook for the Canadian Community Health Survey (CCHS) and note that BMI is collected. BMI _seems_ like a straightforward measure that is routinely collected worldwide.[ref for CCHS] Indeed, BMI is included in all CCHS cycles. You examine the documentation and find the variable HWTAGBMI in the CCHS 2001 corresponds to body mass index, but that in other cycles, the variable name changes to HWTCGBMI, HWTDGBMI, HWTEGBMI, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don’t calculate BMI for respondents under the age of 20 or over the age of 64 years. Also, some cycles calculate BMI only if height and weight are within specific ranges. After spending hours on the task, you talk with a collegue in a neighbouring health unit. They did the same task a few years ago. You share your Stata code by email and compare notes, only to realize that you both had different approaches, each with errors. 
+You are a public health epidemiologist who wants to examine the change in Body Mass Index (BMI) in your health unit over the past 15 years. You review the codebook for the Canadian Community Health Survey (CCHS) and note that BMI is collected. BMI _seems_ like a straightforward measure that is routinely collected worldwide.[@StatisticsCanada2001] Indeed, BMI is included in all CCHS cycles. You examine the documentation and find the variable HWTAGBMI in the CCHS 2001 corresponds to body mass index, but that in other cycles, the variable name changes to HWTCGBMI, HWTDGBMI, HWTEGBMI, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don’t calculate BMI for respondents under the age of 20 or over the age of 64 years. Also, some cycles calculate BMI only if height and weight are within specific ranges. After spending hours on the task, you talk with a collegue in a neighbouring health unit. They did the same task a few years ago. You share your Stata code by email and compare notes, only to realize that you both had different approaches, each with errors. 
 
-We present an open science approach to transforming and harmonizing the CCHS surveys.[ref for Open Science] Open science is the movement to improve research reproducibility, accessibility, and collaboration. Public health practice strives for these qualities and can potentially benefit from the same tools used to support open science. 
+We present an open science approach to transforming and harmonizing the CCHS surveys. Open science is the movement to improve research reproducibility, accessibility, and collaboration.[@Ross2013] Public health practice strives for these qualities and can potentially benefit from the same tools used to support open science. 
 
 We created a process called _cchsflow_ that currently harmonizes 160 variables for CCHS Public Use Microdata File (PUMF) from 2001 to 2014. Users of _cchsflow_ contribute to the package, including making suggestions and requests, and identify errors. People can also "fork" the package meaning they can use the _cchsflow_ approach to harmonize other databases. _cchsflow_ uses R language package since R is the most commonly used open statistical programming language. The core of _cchsflow_, however, are references files that could be used in other programming languages.
 
-Even this paper was created using the open science principles that were used for _cchsflow_. We wrote the paper using R markdown - a notebook that allow R code to be executed within the document. The notebook is available on [GitHub](https://github.com/Big-Life-Lab/cchsflow/blob/paper-writeups/papers/CJPH/cjph-paper.Rmd) which allows readers to make comments, suggestions or note errors. Readers can execute or modify all examples in this paper in R.
+Even this paper was created using the open science principles that were used for _cchsflow_. This paper was written using R markdown - a notebook that allows R code to be executed within the document. The notebook is available on [GitHub](https://github.com/Big-Life-Lab/cchsflow/blob/paper-writeups/papers/CJPH/cjph-paper.Rmd) which allows readers to make comments, suggestions or note errors. Readers can execute or modify all examples in this paper in R.
 
 \pagebreak
 ## Background
@@ -35,17 +34,17 @@ Data cleaning, including transforming variables into harmonized or common variab
 
 Open science is defined as "transparent and accessible knowledge that is shared and developed through collaborative networks".[@Vicente-Saez2018] Included in open science is: open data, data that is publicly accessible such as the CCHS with Statistics Canada's new Open License[ref]; open source, the use of open access programs such as data science languages including R, Python and Julia, and; open methodology, program code that is publicly accessible and shared.[@McKiernan2016; @Stodden2013] In public health, there has also been a marked trend toward open data and sharing code - notably during the covid-19 pandemic.[@moorthy2020data]
 
-Adopting open science practices comes with benefits. McKiernan et al. found that open science is associated with increased research exposure in both media and in citations; and an increase in collaboration, funding, job opportunities.[@McKiernan2016] For public health professionals, an open science approach and toolkit facilitates collaboration as it allows for data & coding methods to be shared between different health units. Additional benefits include improved transparency, accessibility, efficiency, reduced coding errors and faster analyses. The objective for public health practitioners is to improve and compress many time consuming, repetitive, inconsistent analyses tasks.
+Adopting open science practices comes with benefits. McKiernan et al. found that open science is associated with increased research exposure in both media and in citations; and an increase in collaboration, funding, and job opportunities.[@McKiernan2016] For public health professionals, an open science approach and toolkit facilitates collaboration as it allows for data & coding methods to be shared between different health units. Additional benefits include improved transparency, accessibility, efficiency, reduced coding errors and faster analyses. The objective for public health practitioners is to improve and compress many time consuming, repetitive, inconsistent analyses tasks.
 
 \pagebreak
 
 ## Objectives
 
-The objective of _cchsflow_ was to develop an open R package to minimize the amount of time spent cleaning and transforming CCHS variables across multiple survey cycles. 
+The objective of _cchsflow_ was to develop an open R package to minimize the amount of time spent cleaning and transforming CCHS variables across multiple survey cycles. This package would be in constant development, and open to contributions & feedback from public health users. 
 
 ## Methods
 
-_cchsflow_ followed the approach of the Open Source Initiate and open software for research.[@OSI][@JOSS] _cchflow_ was created in R with provisions to support other program languages such as Stat or SAS.[@cchsflow] The package currently supports the first 10 cycles of the CCHS PUMF surveys from 2001 to 2013, in which the variables of each were harmonized and transformed to use the same set of variables. In _cchsflow_, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014 as they have shown to be most consistent. 
+_cchsflow_ followed the approach of the Open Source Initiate and open software for research.[@OSI][@JOSS] _cchflow_ was created in R with provisions to support other program languages such as Stat or SAS.[@cchsflow] The package currently supports the first 10 cycles of the CCHS Public Use Microdata File (PUMF) surveys from 2001 to 2013, in which the variables of each were harmonized and transformed to use the same set of variables. Variable harmonization & transformation refers to the standardization of variables so that variables have the same name & category stucture across multiple survey cycles. In _cchsflow_, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014 as they have shown to be most consistent. 
 
 ### Selection of variables
 
@@ -71,6 +70,49 @@ _rec_with_table()_, short for 'recode with table' is the key function to transfo
 
 CCHS includes derived variables that were created using multiple responses and variables. BMI is an example of an original CCHS derived variable that was calculated using self-reported height and weight. Several new derived variables were included including were also generated in the _cchsflow_ package and there are provisions and instructions for adding additional variables. These variables were based on derived variables used in previous studies and include smoking pack-years, binge drinking and diet pattern.[@Manuel2016] 
  
+```{r, echo=FALSE}
+library(DiagrammeR)
+flowchart <- grViz("digraph flowchart {
+              graph [layout = dot, overlap = true, ranksep = 1, nodesep = 1]
+              # node definitions with subtituted label text
+              node [shape = rectangle, fontsize = 20]
+              tab1 [label = '@@1']
+              tab2 [label = '@@2']
+              tab3 [label = '@@3']
+              tab4 [label = '@@4']
+              tab5 [label = '@@5']
+              tab6 [label = '@@6']
+              tab7 [label = '@@7']
+              tab8 [label = '@@8']
+              tab9 [label = '@@9']
+              
+      
+              # edge definitions with the node IDs
+              tab1 -> tab2 -> tab3 
+              tab3 -> tab5 [label = ' Yes', fontsize = 20]
+              tab3 -> tab4 [label = ' No', fontsize = 20]
+              tab4 -> tab6 [label = ' Yes', fontsize = 20]
+              tab4 -> tab8 [label = ' No', fontsize = 20]
+              tab5 -> tab9 [label = ' Yes', fontsize = 20]
+              tab5 -> tab7 [label = ' No', fontsize = 20]
+              }
+      
+              [1]: 'Identify a variable to be\\nadded to cchsflow.'
+              [2]: 'Identify which CCHS survey\\ncycles this variable is in.'
+              [3]: 'Are the categories consistent\\nacross cycles?'
+              [4]: 'Can categories be collapsed to\\nbecome consistent? Or can it be converted into\\na categorical variable?'
+              [5]: 'Are the variable names\\nconsistent across cycles?'
+              [6]: 'Create a derived categorical variable\\nwith collapsed categories for all cycles;\\nor create a derived continuous variable using\\nmidpoints of each category.'
+              [7]: 'Rename variable to common name\\nused from 2007-2014.'
+              [8]: 'Cannot harmonize into one final variable.\\nCombine variables that are consistent.'
+              [9]: 'No transformations needed, specify\\nwhich survey cycles variable is in.'
+              ")
+
+flowchart
+```
+
+**Figure 1**: Flowchart of how to add a CCHS variable to cchsflow. 
+ 
 ### Collaboration with other users
 
 Collaboration is facilitated using GitHub, the most popular on-line code repository with over 45 million users. Github is based on the Git version-control system which, in turn, is a cornerstone of open software development.[@Dabbish2012] Users add new variable transformations using the worksheets and then create a 'pull request' or PR to add the transformation to the main _cchsflow_ package.  Users can also request variables to be added or identify issues using the 'issues' feature.
@@ -80,7 +122,9 @@ Collaboration is facilitated using GitHub, the most popular on-line code reposit
 Open source, web-based documentation is available at [https://big-life-lab.github.io/cchsflow/](https://big-life-lab.github.io/cchsflow/)
 and includes a searchable reference of all transformation, vignettes of examples of how to perform transformations, collaboration principles, a development roadmap.
 
-.... insert image of the gitpage ....
+![](images/Figure1.png)
+
+**Figure 2:** The homepage for the cchsflow GitHub repository.
 
 \pagebreak
 
@@ -102,7 +146,7 @@ devtools::install_github("Big-Life-Lab/cchsflow")
 
 ### Recode with table
 
-The _rec_with_table()_ function is used to recode or transform variables based on the information from the two specification worksheets. The function has the ability to transform an entire data set, or a subset of variables. **Figure 4a** illustrates how to load the _cchsflow_ package, the 2001 CCHS data and then transform all variables in _cchsflow_ to their harmonized version.  The _cchsflow_ package comes with a subsample of CCHS data for 2001 to 2013 versions, made possible with Statistics Canada new Open Lincence.[ref open licence]. **Figure 4b** illustrates how to transform a subset of variables from the 2001 survey cycle.    
+The _rec_with_table()_ function is used to recode or transform variables based on the information from the two specification worksheets. The function has the ability to transform an entire data set, or a subset of variables. **Figure 4a** illustrates how to load the _cchsflow_ package, the 2001 CCHS data and then transform all variables in _cchsflow_ to their harmonized version.  The _cchsflow_ package comes with a subsample of CCHS data for 2001 to 2013 versions, made possible with Statistics Canada new Open Lincence.[@StatisticsCanada2019]. **Figure 4b** illustrates how to transform a subset of variables from the 2001 survey cycle.    
 
 ```{r, eval=FALSE}
 library(cchsflow)
@@ -123,7 +167,7 @@ transformed_cchs2001 <- rec_with_table(cchs2001, c("DHH_SEX", "DHHGAGE_cont"))
 
 ## Discussion
 
-In this project, an R package called _cchsflow_ was created that harmonizes and transforms data from 2001 to 2014.[@cchsflow] __cchsflow_ provided public health epidemiologists and others the ability to more robustly analyze over 1 million respondents across a 13 year period to examine trends in health indicators. An open science approach improves collaboration, transparency and efficiency when transforming variables. The package allows public health professionals that use CCHS  to spend less time on data cleaning, and spend more time on analysis such as surveillance and health status reporting. 
+In this project, an R package called _cchsflow_ was created that harmonizes and transforms data from 2001 to 2014.[@cchsflow] _cchsflow_ provided public health epidemiologists and others the ability to more robustly analyze over 1 million respondents across a 13 year period to examine trends in health indicators. An open science approach improves collaboration, transparency and efficiency when transforming variables. The package allows public health professionals that use CCHS  to spend less time on data cleaning, and spend more time on analysis such as surveillance and health status reporting. 
 
 _cchsflow_ extends the current approach of 
 
@@ -145,7 +189,7 @@ While there are many strengths to this project, there are also several limitatio
 
 ## Conclusion
 
-In this project, an R package called _cchsflow_ was created that transforms and harmonizes variables from the Canadian Community Health Survey from 2001 to 2014, generating a dataset of over 1 million respondents. The _cchsflow_ package is an open source package, and encourages the contribution & collaboration of public health professionals that use CCHS data. While there are limitations in what data can be shared due to confidentiality, open science is a vital tool in public health as it is transparent and improves the collection and preparation of data for users of health data for surveillance and health status reporting. Open science also allows public health professionals to collaborate and share their work with other colleagues, saving time recoding and cleaning health datasets. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean and prepare CCHS data for the many CCHS users in health units across Canada.
+In this project, an R package called _cchsflow_ was created that transforms and harmonizes variables from the Canadian Community Health Survey from 2001 to 2014, generating a dataset of over 1 million respondents. The _cchsflow_ package is an open source package, and encourages the contribution & collaboration of public health professionals that use CCHS data. While there are limitations in what data can be shared due to confidentiality, open science is a vital tool in public health as it is transparent and improves the collection and preparation of data for users of health data. This allows for enhanced surveillance and health status reporting. Open science also allows public health professionals to collaborate and share their work with other colleagues, saving time recoding and cleaning health datasets. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean and prepare CCHS data for the many CCHS users in health units across Canada.
 
 \pagebreak
 
