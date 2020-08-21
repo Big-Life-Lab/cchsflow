@@ -2,8 +2,8 @@
 title: 'cchsflow: An open science approach to transform & combine population health
   surveys into one dataset'
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Abstract
 
-**Authors:** Warsame Yusuf, Methodologist, Ottawa Hospital Research Institute. Douglas G. Manuel, Senior Scientist & Physician, Ottawa Hospital Research Institute. Rostyslav Vyuha, Research Assistant, Ottawa Hospital Research Institute. Carol Bennett, Epidemiologist, Ottawa Hospital Research Institute.
+**Authors:** Warsame Yusuf, Methodologist, Ottawa Hospital Research Institute. Rostyslav Vyuha, Research Assistant, Ottawa Hospital Research Institute. Carol Bennett, Epidemiologist, Ottawa Hospital Research Institute. Douglas G. Manuel, Senior Scientist & Physician, Ottawa Hospital Research Institute.
 
 **Setting:**  The Canadian Community Health Survey (CCHS) is one of the world's largest cross-sectional population health surveys with over 130 000 respondents every two years or over 1.1 million respondents since its inception in 2001. While the survey remains relatively consistent over the years, there are differences between cycles that pose a major challenge to analyse the survey over time. 
 
