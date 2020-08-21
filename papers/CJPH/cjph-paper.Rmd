@@ -1,12 +1,12 @@
 ---
 title: 'cchsflow: An open science approach to transform & combine population health
   surveys into one dataset'
-  
+csl: ../apa-6th-edition.csl
 output:
-  word_document: default
   html_document:
     df_print: paged
-csl: ../apa-6th-edition.csl
+  pdf_document: default
+  word_document: default
 bibliography: ../bibliography.bib
 ---
 
@@ -67,10 +67,10 @@ _rec_with_table()_, short for 'recode with table' is the key function to transfo
 
 CCHS includes derived variables that were created using multiple responses and variables. BMI is an example of an original CCHS derived variable that was calculated using self-reported height and weight. Several new derived variables were included including were also generated in the _cchsflow_ package and there are provisions and instructions for adding additional variables. These variables were based on derived variables used in previous studies and include smoking pack-years, binge drinking and diet pattern.[@Manuel2016] 
  
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.align='center'}
 library(DiagrammeR)
-flowchart <- grViz("digraph flowchart {
-              graph [layout = dot, overlap = true, ranksep = 1, nodesep = 1]
+grViz("digraph flowchart {
+              graph [overlap = false, ranksep = 1, nodesep = 0.5]
               # node definitions with subtituted label text
               node [shape = rectangle, fontsize = 50]
               tab1 [label = '@@1']
@@ -85,6 +85,7 @@ flowchart <- grViz("digraph flowchart {
               
       
               # edge definitions with the node IDs
+              
               tab1 -> tab2 -> tab3 
               tab3 -> tab5 [label = ' Yes', fontsize = 50]
               tab3 -> tab4 [label = ' No', fontsize = 50]
@@ -104,10 +105,9 @@ flowchart <- grViz("digraph flowchart {
               [8]: 'Cannot harmonize into one final variable.\\nCombine variables that are consistent.'
               [9]: 'No transformations needed, specify\\nwhich survey cycles variable is in.'
               ",
-              height = 750
+              height = 300,
+      width = 900
               )
-
-flowchart
 ```
 
 **Figure 1**: Flowchart of how CCHS variables to where added to cchsflow. Users can add variables using the same approach.
