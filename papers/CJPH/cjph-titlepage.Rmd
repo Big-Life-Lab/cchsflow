@@ -11,16 +11,51 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 **Authors:** 
-Warsame Yusuf, Methodologist, Ottawa Hospital Research Institute. 1053 Carling Avenue, Ottawa, Ontario, K1Y 4E9. Email: waryusuf@ohri.ca. Phone: 613-798-5555 ext 19108. ORCID: 0000-0001-5571-8122
 
-Douglas G. Manuel, Senior Scientist & Physician, Ottawa Hospital Research Institute. 1053 Carling Avenue, Ottawa, Ontario, K1Y 4E9. ORCID: 0000-0003-0912-0845
+Warsame Yusuf^1^, ORCID: 0000-0001-5571-8122
 
-Rostyslav Vyuha, Research Assistant, Ottawa Hospital Research Institute. 1053 Carling Avenue, Ottawa, Ontario, K1Y 4E9. ORCID: 0000-0002-6700-0991
+Rostyslav Vyuha^1^, ORCID: 0000-0002-6700-0991
 
-Carol Bennett, Epidemiologist, Ottawa Hospital Research Institute. 1053 Carling Avenue, Ottawa, Ontario, K1Y 4E9. ORCID: 0000-0002-3033-9860
+Carol Bennett^1^, ORCID: 0000-0002-3033-9860
+
+Douglas G. Manuel^1,2,3,4,5^, ORCID: 0000-0003-0912-0845
+
+^1^ Ottawa Hospital Research Institute, Ottawa, Ontario, Canada
+
+^2^ ICES, Ottawa and Toronto, Ontario, Canada
+
+^3^ Statistics Canada, Ottawa, Ontario, Canada
+
+^4^ Department of Family Medicine, University of Ottawa, Ottawa, Ontario, Canada
+
+^5^ School of Epidemiology, Public Health and Preventative Medicine, University of Ottawa, Ottawa, Ontario, Canada
+
+**Corresponding author information**
+
+Warsame Yusuf
+
+Ottawa Hospital Research Institute
+
+Civic Campus, ASB 2-012
+
+1053 Carling Avenue, Ottawa, ON K1Y 4E9
+
+Tel: 613-798-5555 ext. 19108
+
+Fax: 613-761-5492
+
+waryusuf@ohri.ca
 
 **Funding:** This study was funded by CIHR (FRN 162222). 
 
 **Conflict of Interest:** The authors declare that they have no conflict of interest.
 
-**Word count:** Abstract: 225; Text body: 3000.
+**Word count:** Abstract: 228; Text body: 2860
+
+**Pages:** 
+
+**Figures:** 6
+
+**References:** 27
+
+**Keywords:** Health Surveys, Data Analysis, Data Science, Population Health

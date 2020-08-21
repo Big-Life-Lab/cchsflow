@@ -55,7 +55,7 @@ CCHS variables were transformed and into a common from across the 10 survey cycl
 
 Changes in the number and type of categories was also common. For example, in the 2001 and 2003 CCHS survey cycles, there were 15 age categories; while in CCHS survey cycles from 2005 to 2014, there were 16 age categories. There were two options for such variable category changes. The first option was to create a harmonized variable by collapsing categories into common forms. The second option maintained separate variables. For age we also included a third option to maximize age information by deriving a new continuous age variable was derived that takes the midpoint of each age category for all cycles.
 
-There were also changes to question wording, missing categories, inclusion and exclusion criteria. Variables where not included in all cycles or all health regions.  We included harmonized variables when there was a consensus amongst developers that the differences across cycles where small. _notes_ are included when any difference was identified, with a default to print all notes during transformations.
+There were also changes to question wording, missing categories, inclusion and exclusion criteria. Variables where not included in all cycles or all health regions.  We included harmonized variables when there was a consensus amongst developers that the differences across cycles where small _notes_ are included when any difference was identified, with a default to print all notes during transformations.
 
 ### Transformation of variables through specification worksheets
 
@@ -72,7 +72,7 @@ library(DiagrammeR)
 grViz("digraph flowchart {
               graph [overlap = false, ranksep = 1, nodesep = 0.5]
               # node definitions with subtituted label text
-              node [shape = rectangle, fontsize = 50]
+              node [shape = rectangle, fontsize = 100]
               tab1 [label = '@@1'];
               tab2 [label = '@@2'];
               tab3 [label = '@@3'];
@@ -90,12 +90,12 @@ grViz("digraph flowchart {
               # edge definitions with the node IDs
               
               tab1 -> tab2 -> tab3 ;
-              tab3 -> tab5 [label = ' Yes', fontsize = 50];
-              tab3 -> tab4 [label = ' No', fontsize = 50];
-              tab4 -> tab6 [label = ' Yes', fontsize = 50];
-              tab4 -> tab8 [label = ' No', fontsize = 50];
-              tab5 -> tab9 [label = ' Yes', fontsize = 50];
-              tab5 -> tab7 [label = ' No', fontsize = 50];
+              tab3 -> tab5 [label = ' Yes', fontsize = 100];
+              tab3 -> tab4 [label = ' No', fontsize = 100];
+              tab4 -> tab6 [label = ' Yes', fontsize = 100];
+              tab4 -> tab8 [label = ' No', fontsize = 100];
+              tab5 -> tab9 [label = ' Yes', fontsize = 100];
+              tab5 -> tab7 [label = ' No', fontsize = 100];
               tab6 -> tab10;
               tab7 -> tab11;
               tab9 -> tab12
@@ -114,15 +114,12 @@ grViz("digraph flowchart {
               [11]: 'Document any slight differences\\nbetween survey cycles\\nin variable_details.csv.'
               [12]: 'Document any slight differences\\nbetween survey cycles\\nin variable_details.csv.'
               ",
-              height = 300,
-      width = 900
+              height = 1000,
+      width = 2000
               )
 ```
 
-**Figure 1**: Flowchart of how CCHS variables to where added to cchsflow. Users can add variables using the same approach.
- 
-### Collaboration with other users
-
+**Figure 1**: Flowchart of how CCHS variables were added to cchsflow. Users can add variables using the same approach.
 
 ### Documentation
 
@@ -131,11 +128,11 @@ and includes a searchable reference of all transformation, vignettes of examples
 
 ![](images/Figure1.png)
 
-**Figure 2:** The homepage for the cchsflow GitHub repository.
+**Figure 2:** The homepage for the cchsflow website.
 
 ## Results
 
-The _cchsflow_ is available on Comprehensive R Archive Network (CRAN), a network of servers that contain documentation for R packages.[@CRAN2020] As of version 1.6.0, _cchsflow_ includes support for CCHS PUMF datasets from 2001 to 2014, and contains 160 variables.[@cchsflow] Once combined, users have access to 1,092,951 survey respondents over a 13 year time period. The _cchsflow_ package contains the following items: the *variables.csv* worksheet, the *variable_details.csv* worksheet, the various functions, and subsets of 200 respondents for each CCHS cycle.
+The _cchsflow_ is available on the Comprehensive R Archive Network (CRAN), a network of servers that contain documentation for R packages.[@CRAN2020] As of version 1.6.0, _cchsflow_ includes support for CCHS PUMF datasets from 2001 to 2014, and contains 160 variables.[@cchsflow] Once combined, users have access to 1,092,951 survey respondents over a 13 year time period. The _cchsflow_ package contains the following items: the *variables.csv* worksheet, the *variable_details.csv* worksheet, the various functions, and subsets of 200 respondents for each CCHS cycle.
 
 **Figure 3a** illustrates the command line to install the CRAN version of _cchsflow_, while **Figure 3b** illustrates the command to install the development version of _cchsflow_, which is a more up to date version of the package.
 
@@ -172,11 +169,12 @@ transformed_cchs2001 <- rec_with_table(cchs2001, c("DHH_SEX", "DHHGAGE_cont"))
 _cchsflow_ R package harmonizes and transforms CCHS data from 2001 to 2014.[@cchsflow] _cchsflow_ provides public health epidemiologists and others the ability to more robustly analyze over 1 million respondents across a 13 year period to examine trends in health indicators. The use of an open science approach improves collaboration, transparency and efficiency when transforming variables. The package allows public health professionals that use CCHS to spend less time on data cleaning, and spend more time on analysis such as surveillance and health status reporting. 
 
 ### Comparison to other projects
-A consistent approach to calculate health indicators is a long-standing public health goal. _cchsflow_ uses an open science approach to build from and support several related health indicator and harmonization projects that use CCHS data including the Canadian Institute for Health Information indicator library, the Public Health Agency of Canada health inequality reports, Ontario's Public Health Indicator Working Group, and Manitoba Centre for Health Policy Concept Dictionary and recent algorithm harmonization initiative from the new SPOR Canadian Data Platform.[@CIHI_HI; @AssociationofPublicHealthEpidemiologistsinOntario2018; @Pan-CanadianPublicHealthNetwork2018; @MCHP_concept; @HealthDataResearchNetworkCanada2020] These initiatives typical include the definition of indicators but it is uncommon to publish how to calculate indicators using CCHS data, especially across CCHS cycles. _cchsflow_ an provides open, reusable, accessible, collaborative approach to calculate indicators using the CCHS. 
 
-_cchsflow_ facilitates the use CCHS metadata for public health. Metadata is increasingly recognized as helpful data infrastructure to support open science and data harmonization. Metadata is "data about data" and includes information about variable and category labels, types, and provenance (how the data was collected and transformed).[add ref] The CCHS comes with Data Documentation Initiative (DDI) metadata. DDI metadata is available for over 10 thousand different surveys and research projects worldwide.[add ddi reference] There is also initiatives such as Maelstrom that is used by other Canadian health surveys to improve the use of metadata.[add Maelstrom reference] 
+A consistent approach to calculate health indicators is a long-standing public health goal. _cchsflow_ uses an open science approach to build from and support several related health indicator & harmonization projects that use CCHS data including the Canadian Institute for Health Information indicator library, the Public Health Agency of Canada health inequality reports, Ontario's Public Health Indicator Working Group, and Manitoba Centre for Health Policy Concept Dictionary and recent algorithm harmonization initiative from the new SPOR Canadian Data Platform.[@CIHI_HI; @AssociationofPublicHealthEpidemiologistsinOntario2018; @Pan-CanadianPublicHealthNetwork2018; @MCHP_concept; @HealthDataResearchNetworkCanada2020] These initiatives typical include the definition of indicators but it is uncommon to publish how to calculate indicators using CCHS data, especially across CCHS cycles. _cchsflow_ an provides open, reusable, accessible, collaborative approach to calculate indicators using the CCHS. 
 
-To our knowledge public health practitioners seldom use metadata beyond variable labels in their analyses work flow. Barriers to use metadata in public health include the lack of well-organized metadata in public health data and a lack of metadata analysis tools such as _cchsflow_. It is commendable that DDI documents are included with CCHS, but the not all metadata is included or consistent. Support for variable transformation is robustly supported in newer versions of DDI that are not yet available for the CCHS. _cchsflow_ uses DDI documents to create the worksheets with the added benefit of harmonizing and transforming metadata across CCHS cycles. _cchsflow_ transformations also support the use of Predictive Modeling Markup Language (PMML).[PMML reference] Our team uses _cchsflow_'s PMML metadata in public health planning tools that calculate life expectancy and chronic disease risk for public health regions.[BLL planning tool reference]
+_cchsflow_ facilitates the use CCHS metadata for public health. Metadata is increasingly recognized as helpful data infrastructure to support open science and data harmonization. Metadata is "data about data" and includes information about variable and category labels, types, and provenance (how the data was collected and transformed).[@Duval2002] The CCHS comes with Data Documentation Initiative (DDI) metadata. DDI metadata is available for over 10 thousand different surveys and research projects worldwide.[@DDIAlliance2020] There is also initiatives such as Maelstrom that is used by other Canadian health surveys to improve the use of metadata.[@Bergeron2018] 
+
+To our knowledge public health practitioners seldom use metadata beyond variable labels in their analyses work flow. Barriers to use metadata in public health include the lack of well-organized metadata in public health data and a lack of metadata analysis tools such as _cchsflow_. It is commendable that DDI documents are included with CCHS, but the not all metadata is included or consistent. Support for variable transformation is robustly supported in newer versions of DDI that are not yet available for the CCHS. _cchsflow_ uses DDI documents to create the worksheets with the added benefit of harmonizing and transforming metadata across CCHS cycles. _cchsflow_ transformations also support the use of Predictive Modeling Markup Language (PMML).[@Grossman1999] Our team uses _cchsflow_'s PMML metadata in public health planning tools that calculate life expectancy and chronic disease risk for public health regions.[@ProjectBigLife2020]
 
 ### Limitations and challenges
 
@@ -198,7 +196,7 @@ A roadmap, also known as milestones, next steps or future plans, are recommended
 
 ### Conclusion
 
-Open science and the open science toolkit is transforming science and has been invaluable in public health emergencies such as covid-19. _cchsflow_'s open science also allows public health professionals to collaborate and share their work with other colleagues, saving time recoding and cleaning health datasets. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean and prepare CCHS data for the many CCHS users in health units across Canada.
+Open science and the open science toolkit is transforming science and has been invaluable in public health emergencies such as COVID-19. _cchsflow_'s open science also allows public health professionals to collaborate and share their work with other colleagues, saving time recoding and cleaning health datasets. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean and prepare CCHS data for the many CCHS users in health units across Canada.
 
 \pagebreak
 
