@@ -108,7 +108,7 @@ flowchart <- grViz("digraph flowchart {
 flowchart
 ```
 
-**Figure 1**: Flowchart of how to add a CCHS variable to cchsflow. 
+**Figure 1**: Flowchart of how CCHS variables to where added to cchsflow. Users can add variables using the same approach.
  
 ### Collaboration with other users
 
@@ -173,8 +173,6 @@ While the CCHS has many consistent variables across survey cycles, there are dif
 
 _cchsflow_ has been used in a range of projects but care must be taken to understand how specific variable transformation and harmonization with _cchsflow_ affects each use of CCHS data. Across survey cycles, almost all CCHS variables have had at least some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses. Combining CCHS across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.
 
-### Open science approach
-
 ### Collaboration with other users
 
 Collaboration is facilitated using GitHub, the most popular on-line code repository with over 45 million users. Github is based on the Git version-control system which, in turn, is a cornerstone of open software development.[@Dabbish2012]
@@ -182,6 +180,10 @@ Collaboration is facilitated using GitHub, the most popular on-line code reposit
 The open-access nature of the _cchsflow_ package also allows users to add other CCHS variables that might benefit others. There is complete transparency on how the package was developed as the entire source code for the package is publicly accessible on the repository. Along with being transparent, putting the _cchsflow_ package on GitHub offers users of the package the opportunity to provide feedback on how to further improve the package. In the issues section of the GitHub repository, users can submit bug reports where they can identify issues they are encountering while using the package. Users add new variable transformations using the worksheets and then create a 'pull request' or PR to add the transformation to the main _cchsflow_ package. Users can also request variables to be added or identify issues using the 'issues' feature. All _cchsflow_ documentation (and this paper write up) are also open-access and available on the GitHub repository. Users can make comments, identify errors, add vignettes and examples.
 
 GitHub provides benefit to users in that it provides them an opportunity to implement better practices in their own code [@Dabbish2012]. The implementation of GitHub in the development of _cchsflow_ allows public health professionals across Canada to collaborate and share potential variables that can be useful for health surveillance and health status reporting. 
+
+### Roadmap
+
+A roadmap, also known as milestones, next steps or future plans, are recommended for open software projects. _cchflow_ includes a roadmap and milestones on the [project website](https://github.com/Big-Life-Lab/cchsflow/projects). At time of writing, the roadmap includes the adding the 'share' version of CCHS that is used in Statistics Canada Regional Data Centres and other settings, ability compare variable frequency across survey cycles and improved metadata support. _cchsflow_ has been forked by related projects to support other data sets. The expanded use of _cchsflow_ for related projects is a halmark of open science and demonstration of how an open science leads to expanded science and public health resources. 
 
 ### Conclusion
 
