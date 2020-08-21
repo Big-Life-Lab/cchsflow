@@ -73,31 +73,31 @@ grViz("digraph flowchart {
               graph [overlap = false, ranksep = 1, nodesep = 0.5]
               # node definitions with subtituted label text
               node [shape = rectangle, fontsize = 50]
-              tab1 [label = '@@1']
-              tab2 [label = '@@2']
-              tab3 [label = '@@3']
-              tab4 [label = '@@4']
-              tab5 [label = '@@5']
-              tab6 [label = '@@6']
-              tab7 [label = '@@7']
-              tab8 [label = '@@8']
-              tab9 [label = '@@9']
-              tab10 [label = '@@10']
-              tab11 [label = '@@11']
+              tab1 [label = '@@1'];
+              tab2 [label = '@@2'];
+              tab3 [label = '@@3'];
+              tab4 [label = '@@4'];
+              tab5 [label = '@@5'];
+              tab6 [label = '@@6'];
+              tab7 [label = '@@7'];
+              tab8 [label = '@@8'];
+              tab9 [label = '@@9'];
+              tab10 [label = '@@10'];
+              tab11 [label = '@@11'];
               tab12 [label = '@@12']
               
       
               # edge definitions with the node IDs
               
-              tab1 -> tab2 -> tab3 
-              tab3 -> tab5 [label = ' Yes', fontsize = 50]
-              tab3 -> tab4 [label = ' No', fontsize = 50]
-              tab4 -> tab6 [label = ' Yes', fontsize = 50]
-              tab4 -> tab8 [label = ' No', fontsize = 50]
-              tab5 -> tab9 [label = ' Yes', fontsize = 50]
-              tab5 -> tab7 [label = ' No', fontsize = 50]
-              tab6 -> tab10
-              tab7 -> tab11
+              tab1 -> tab2 -> tab3 ;
+              tab3 -> tab5 [label = ' Yes', fontsize = 50];
+              tab3 -> tab4 [label = ' No', fontsize = 50];
+              tab4 -> tab6 [label = ' Yes', fontsize = 50];
+              tab4 -> tab8 [label = ' No', fontsize = 50];
+              tab5 -> tab9 [label = ' Yes', fontsize = 50];
+              tab5 -> tab7 [label = ' No', fontsize = 50];
+              tab6 -> tab10;
+              tab7 -> tab11;
               tab9 -> tab12
               }
       
