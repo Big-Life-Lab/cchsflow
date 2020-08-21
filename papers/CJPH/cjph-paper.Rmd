@@ -3,10 +3,10 @@ title: 'cchsflow: An open science approach to transform & combine population hea
   surveys into one dataset'
 csl: ../apa-6th-edition.csl
 output:
+  word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
-  word_document: default
 bibliography: ../bibliography.bib
 ---
 
@@ -82,6 +82,9 @@ grViz("digraph flowchart {
               tab7 [label = '@@7']
               tab8 [label = '@@8']
               tab9 [label = '@@9']
+              tab10 [label = '@@10']
+              tab11 [label = '@@11']
+              tab12 [label = '@@12']
               
       
               # edge definitions with the node IDs
@@ -93,6 +96,9 @@ grViz("digraph flowchart {
               tab4 -> tab8 [label = ' No', fontsize = 50]
               tab5 -> tab9 [label = ' Yes', fontsize = 50]
               tab5 -> tab7 [label = ' No', fontsize = 50]
+              tab6 -> tab10
+              tab7 -> tab11
+              tab9 -> tab12
               }
       
               [1]: 'Identify a variable to be\\nadded to cchsflow.'
@@ -104,6 +110,9 @@ grViz("digraph flowchart {
               [7]: 'Rename variable to common name\\nused from 2007-2014.'
               [8]: 'Cannot harmonize into one final variable.\\nCombine variables that are consistent.'
               [9]: 'No transformations needed, specify\\nwhich survey cycles variable is in.'
+              [10]: 'Document what variables were\\nused to create derived variable\\nin variable_details.csv.'
+              [11]: 'Document any slight differences\\nbetween survey cycles\\nin variable_details.csv.'
+              [12]: 'Document any slight differences\\nbetween survey cycles\\nin variable_details.csv.'
               ",
               height = 300,
       width = 900
