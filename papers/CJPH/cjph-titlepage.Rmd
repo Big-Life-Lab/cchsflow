@@ -1,6 +1,5 @@
 ---
-title: 'cchsflow: An open science approach to transform & combine population health
-  surveys into one dataset'
+title: 'cchsflow: An open science approach to transform & combine population health surveys'
 output:
   word_document: default
   pdf_document: default
@@ -17,6 +16,10 @@ Warsame Yusuf^1^, ORCID: 0000-0001-5571-8122
 Rostyslav Vyuha^1^, ORCID: 0000-0002-6700-0991
 
 Carol Bennett^1^, ORCID: 0000-0002-3033-9860
+
+Yulric Sequeria^1^, ORCID: 0000-0001-7456-6427
+
+Courtney Maskerine^1,4^
 
 Douglas G. Manuel^1,2,3,4,5^, ORCID: 0000-0003-0912-0845
 
