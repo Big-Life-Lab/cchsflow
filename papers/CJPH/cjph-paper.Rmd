@@ -27,7 +27,7 @@ Even this paper was created using the open science principles. This paper was wr
 
 ### Cleaning and transforming CCHS datasets
 
-Data cleaning, including transforming variables into harmonized or common variables, is typically the most time consuming part of data analyses. According to Dasu & Johnson, 80% of data analysis is spent on data cleaning.[@Dasu2003] With the CCHS, data cleaning and harmonization issues arise when combining CCHS surveys for longitudinal analysis. Currently, there is no standardized method or tool used to combine CCHS survey cycles. Health units across Canada that use the CCHS do their own data cleaning and preparation, taking time away from other data analysis.   
+Data cleaning, including transforming variables into harmonized or common variables, is typically the most time-consuming part of data analyses. According to Dasu & Johnson, 80% of data analysis is spent on data cleaning.[@Dasu2003] With the CCHS, data cleaning and harmonization issues arise when combining CCHS surveys for longitudinal analysis. Currently, there is no standardized method or tool used to combine CCHS survey cycles. Health units across Canada that use the CCHS do their own data cleaning and preparation, taking time away from other data analysis.   
 
 ### Open science and its benefits to public health practice
 
@@ -115,7 +115,7 @@ grViz("digraph flowchart {
               )
 ```
 
-**Figure 1**: Flowchart of how CCHS variables were added to cchsflow. Users can add variables using the same approach.
+**Figure 1**: Flowchart of how CCHS variables were added to _cchsflow_. Users can add variables using the same approach.
 
 ### Documentation
 
@@ -123,7 +123,7 @@ Open source, web-based documentation is available at [https://big-life-lab.githu
 
 ![](images/Figure1.png)
 
-**Figure 2:** The homepage for the cchsflow website.
+**Figure 2:** The homepage for the _cchsflow_ website.
 
 ## Results
 
@@ -161,19 +161,19 @@ transformed_cchs2001 <- rec_with_table(cchs2001, c("DHH_SEX", "DHHGAGE_cont"))
 
 ## Discussion
 
-_cchsflow_ R package harmonizes and transforms CCHS data from 2001 to 2014.[@cchsflow] _cchsflow_ provides public health epidemiologists and others the ability to more robustly analyze over 1 million respondents across a 13 year period to examine trends in health indicators. The use of an open science approach improves collaboration, transparency, and efficiency when transforming variables. The package allows public health professionals that use CCHS to spend less time on data cleaning, and spend more time on analysis such as surveillance and health status reporting. 
+_cchsflow_ R package harmonizes and transforms CCHS data from 2001 to 2014.[@cchsflow] _cchsflow_ provides public health epidemiologists and others the ability to more robustly analyze over 1 million respondents across a 13-year period to examine trends in health indicators. The use of an open science approach improves collaboration, transparency, and efficiency when transforming variables. The package allows public health professionals that use CCHS to spend less time on data cleaning and spend more time on analysis such as surveillance and health status reporting. 
 
 ### Comparison to other projects
 
 _cchsflow_ facilitates the use of CCHS metadata for public health. Metadata is increasingly recognized as helpful data infrastructure to support open science and data harmonization. Metadata is "data about data" and includes information about variable and category labels, variable types, and provenance (how the data was collected and transformed).[@mcgilvray2008executing; @duval2002metadata] The CCHS comes with Data Documentation Initiative (DDI) metadata.[@vardigan2008data] DDI metadata is used worldwide for over 10 thousand different surveys and research projects.[@DDI] There are also initiatives such as Maelstrom that is used by other Canadian health surveys to improve the use of metadata.[@bergeron2018fostering] 
 
-A consistent approach to calculate health indicators is a long-standing public health goal. _cchsflow_ uses an open science approach to build from and support several health-related indicator and harmonization projects that use CCHS data including the Canadian Institute for Health Information indicator library, the Public Health Agency of Canada health inequality reports, Ontario's Public Health Indicator Working Group, the Manitoba Centre for Health Policy Concept Dictionary, and a recent algorithm harmonization initiative from the new SPOR Canadian Data Platform.[@CIHI_HI; @AssociationofPublicHealthEpidemiologistsinOntario2018; @Pan-CanadianPublicHealthNetwork2018; @MCHP_concept; @HealthDataResearchNetworkCanada2020] These initiatives typically include the definition of indicators, but it is uncommon to publish how to calculate indicators using CCHS data, especially across CCHS cycles. _cchsflow_ an provides open, reusable, accessible, and collaborative approach to calculate indicators using the CCHS. 
+A consistent approach to calculate health indicators is a long-standing public health goal. _cchsflow_ uses an open science approach to build from and support several health-related indicator and harmonization projects that use CCHS data including the Canadian Institute for Health Information indicator library, the Public Health Agency of Canada health inequality reports, and Ontario's Public Health Indicator Working Group. [@CIHI_HI; @AssociationofPublicHealthEpidemiologistsinOntario2018; @Pan-CanadianPublicHealthNetwork2018] These initiatives typically include the definition of indicators, but it is uncommon to publish how to calculate indicators using CCHS data, especially across CCHS cycles. _cchsflow_ an provides open, reusable, accessible, and collaborative approach to calculate indicators using the CCHS. 
 
 To our knowledge it is uncommon for public health practitioners to use metadata beyond variable labels in their analyses workflow.[@manuelCESB2019] Barriers to using metadata in public health include the lack of well-organized metadata in public health data and the lack of metadata analysis tools such as _cchsflow_. It is commendable that DDI documents are included with CCHS, but not all metadata is included or consistent. Support for variable transformation is robustly supported in newer versions of DDI that are not yet available for the CCHS. _cchsflow_ uses DDI documents to create the worksheets with the added benefit of harmonizing and transforming metadata across CCHS cycles. _cchsflow_ also supports the use of Predictive Modeling Markup Language (PMML).[@Grossman1999] Our team uses _cchsflow_'s PMML metadata in public health planning tools that calculate life expectancy and chronic disease risk for public health regions.[@ProjectBigLife2020]
 
 ### Limitations and challenges
 
-While the CCHS has many consistent variables across survey cycles, there are differences between cycles that can sometimes be irreconcilable or difficult to harmonize. Within _cchsflow_, variables with irreconcilable differences were either transformed into a new derived variable, or kept as separate variables that can be only be used in select cycles. Along with variables with irreconcilable differences, there are variables in _cchsflow_ that were not asked in all CCHS cycles. This means for some variables, data does not span across the length of the CCHS cycles available in _cchsflow_. A possible solution is to impute missing variables, where missing data is replaced with values on based on other respondents and responses to other variables.
+While the CCHS has many consistent variables across survey cycles, there are differences between cycles that can sometimes be irreconcilable or difficult to harmonize. Within _cchsflow_, variables with irreconcilable differences were either transformed into a new derived variable or kept as separate variables that can be only be used in select cycles. Along with variables with irreconcilable differences, there are variables in _cchsflow_ that were not asked in all CCHS cycles. This means for some variables, data does not span across the length of the CCHS cycles available in _cchsflow_. A possible solution is to impute missing variables, where missing data is replaced with values on based on other respondents and responses to other variables.
 
 _cchsflow_ has been used in a range of projects, but care must be taken to understand how specific variable transformation and harmonization with _cchsflow_ affects each use of CCHS data. Across survey cycles, almost all CCHS variables have had at least some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses. Combining CCHS datasets across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.
 
@@ -191,7 +191,7 @@ A roadmap, also known as next steps or future plans, are recommended for open so
 
 ### Conclusion
 
-Open science and the open science toolkit is transforming science and has been invaluable in public health emergencies such as COVID-19. _cchsflow_'s open science also allows public health professionals to collaborate and share their work with other colleagues, saving time recoding and cleaning health datasets. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean and prepare CCHS data for the many CCHS users in health units across Canada.
+Open science and the open science toolkit are transforming science and have been invaluable in public health emergencies such as COVID-19. _cchsflow_'s open science also allows public health professionals to collaborate and share their work with other colleagues, saving time recoding and cleaning health datasets. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean and prepare CCHS data for the many CCHS users in health units across Canada.
 
 \pagebreak
 

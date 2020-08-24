@@ -50,12 +50,12 @@ waryusuf@ohri.ca
 
 **Conflict of Interest:** The authors declare that they have no conflict of interest.
 
-**Word count:** Abstract: 228; Text body: 2860
+**Word count:** Abstract: 228; Text body: 2835
 
-**Pages:** 
+**Pages:** 6
 
 **Figures:** 6
 
-**References:** 27
+**References:** 30
 
 **Keywords:** Health Surveys, Data Analysis, Data Science, Population Health
