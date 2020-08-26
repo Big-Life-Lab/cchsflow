@@ -17,7 +17,7 @@ Rostyslav Vyuha^1^, ORCID: 0000-0002-6700-0991
 
 Carol Bennett^1^, ORCID: 0000-0002-3033-9860
 
-Yulric Sequeria^1^, ORCID: 0000-0001-7456-6427
+Yulric Sequeira^1^, ORCID: 0000-0001-7456-6427
 
 Courtney Maskerine^1,4^
 
@@ -53,9 +53,9 @@ waryusuf@ohri.ca
 
 **Conflict of Interest:** The authors declare that they have no conflict of interest.
 
-**Word count:** Abstract: 228; Text body: 2835
+**Word count:** Abstract: 228; Text body: 2801
 
-**Pages:** 6
+**Pages:** 8
 
 **Figures:** 6
 
