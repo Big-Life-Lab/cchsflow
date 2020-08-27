@@ -1,3 +1,13 @@
+# cchsflow 1.4.4 (Latest build)
+2020-08-27
+
+## Features
+- `description` added to variables.csv to allow a description of variables.
+
+## Variables
+- <font color = "green">**New**</font> DHHGAGE_5. Age (20-year age groups). 
+Available for all survey cycles.
+
 # cchsflow 1.4.3 (Latest build)
 2020-02-21
 
