@@ -1,3 +1,0 @@
-variable,label,labelLong,section,subject,variableType,units
-HWTGBMI_derived,Derived BMI,Derived Body Mass Index,health behaviour,BMI,Continuous,kg/m2
-PackYears_derived,PackYears,Smoking pack-years,health behaviour,Smoking,Continuous,Years

@@ -1,4 +1,4 @@
-# cchsflow 1.4.4 (Latest build)
+# cchsflow 1.6.1 (Latest build)
 2020-08-27
 
 ## Features
@@ -8,7 +8,88 @@
 - <font color = "green">**New**</font> DHHGAGE_5. Age (20-year age groups). 
 Available for all survey cycles.
 
-# cchsflow 1.4.3 (Latest build)
+# cchsflow 1.6.0 
+2020-03-30
+
+## Breaking changes
+- Refactored derived variable functions to handle tagged_na
+- Added new parameter ALW_1 to `binge_drinker_fun()`
+
+## Bug Fixes
+- Bug fix to `resp_condition_fun1()` that was not correctly handling respondents
+under 35 with respiratory conditions
+
+## Variables
+- <font color = "green">**New**</font> SDC_5A_1 - Knowledge of official
+languages. Used in CCHS cycles 2011-2014
+- <font color = "green">**New**</font> SDCDFOLS - First official language
+spoken. Used in CCHS cycles 2011-2014
+- <font color = "green">**New**</font> SDCGLHM - Languages spoken at home. Used
+in CCHS cycles 2007-2014
+- <font color = "green">**New**</font> SDCGLNG - Languages - can converse in.
+Used in CCHS cycles 2001-2010
+
+# cchsflow 1.5.2
+2020-03-24
+
+## Bug Fixes
+- Fixes to typos in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.5.1
+2020-03-20
+
+## Minor improvements
+- Minor hotfix in description of package
+
+# cchsflow 1.5.0 
+2020-03-20
+
+## Breaking changes
+- Modified internal list index access to be compliant with R 4.0.
+- Added `attach_data_name`: new argument for adding data_name to
+`rec_with_table()` return
+
+## Variables
+- <font color = "green">**New**</font> [ADL_der](https://big-life-lab.github.io/cchsflow/reference/adl_fun.html) -
+derived "needs help with task" variable.
+- <font color = "green">**New**</font> [RACDPAL_fun](https://big-life-lab.github.io/cchsflow/reference/RACDPAL_fun.html) - custom function to derive RACDPAL for the 2001 CCHS survey cycle.
+- <font color = "green">**New**</font> ADL_07 - Needs help with heavy household
+chores. Recoded variable used in CCHS cycles 2001-2005. 
+- <font color = "green">**New**</font> ADM_RNO - Sequential record number used
+in all CCHS cycles.
+- <font color = "green">**New**</font> RAC_2B - Reduction in activities at
+school or work due to disability variable used only in the 2001 CCHS survey
+cycle
+- <font color = "green">**New**</font> INCGPER_cont - continuous personal income
+variable harmonized across all CCHS cycles
+
+## Minor improvements
+- New [article](https://big-life-lab.github.io/cchsflow/articles/duplicate_datasets.html)
+that describes overlaps in certain CCHS datasets
+- Documentation on [GEN_02A2](https://big-life-lab.github.io/cchsflow/reference/GEN_02A2.html)
+variable
+- Expanded derived variables section in [How to add variables](https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html) article
+- Added example in [get started](https://big-life-lab.github.io/cchsflow/articles/get_started.html)
+that uses new attach_data_name argument in `rec_with_table()`
+
+# cchsflow 1.4.4 (Latest build)
+2020-03-03
+
+## Features
+- Docsearch added to website
+- New article on getting started with _cchsflow_
+
+## Bug fixes
+- Refactor to `pct_time_fun` function to output value from 0-100% as opposed
+to 0-1
+- Refactor to respiratory functions to better capture respondents under 35
+with respiratory conditions
+
+## Minor improvements
+- Improvements to warning outputs in `rec_with_table()`
+- Improvements to labels in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.4.3 
 2020-02-21
 
 ## Minor improvements

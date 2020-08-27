@@ -118,30 +118,31 @@ is_equal <- function(v1, v2) {
 #' content inside the `Note`` column of the variable being recoded.
 #' @param var_labels labels vector to attach to variables in variables
 #' @param custom_function_path path to location of the function to load
+#' @param attach_data_name to attach name of database to end table
 #'
 #' @return a dataframe that is recoded according to rules in variable_details.
 #'
 #' @examples
 #' library(cchsflow)
-#' bmi2010 <- rec_with_table(
-#'   data = cchs2010_p, c(
+#' bmi2001 <- rec_with_table(
+#'   data = cchs2001_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
 #' )
 #'
-#' head(bmi2010)
+#' head(bmi2001)
 #'
-#' bmi2012 <- rec_with_table(
-#'   data = cchs2012_p,  c(
+#' bmi2011_2012 <- rec_with_table(
+#'   data = cchs2011_2012_p,  c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
 #' )
 #'
-#' tail(bmi2012)
+#' tail(bmi2011_2012)
 #'
-#' combined_bmi <- bind_rows(bmi2010, bmi2012)
+#' combined_bmi <- bind_rows(bmi2001, bmi2011_2012)
 #' head(combined_bmi)
 #' tail(combined_bmi)
 #' @importFrom haven tagged_na
@@ -160,7 +161,8 @@ rec_with_table <-
            log = FALSE,
            notes = TRUE,
            var_labels = NULL,
-           custom_function_path = NULL) {
+           custom_function_path = NULL,
+           attach_data_name = FALSE) {
     # If custom Functions are passed create new environment and source
     if (!is.null(custom_function_path)) {
       source(custom_function_path)
@@ -222,6 +224,9 @@ rec_with_table <-
         log = log,
         var_labels = var_labels
       )
+      if (attach_data_name) {
+        data[["data_name"]] <- database_name
+      }
     } else {
       stop(
         paste(
@@ -838,9 +843,9 @@ recode_derived_variables <-
         warning(
           paste(
             variable_being_processed,
-            "could not be calculated because",
+            "could not be derived because",
             feeder_vars,
-            "was never recoded and is not a function variable"
+            "was never specified nor is it a function variable, therefore it was not recoded \n"
           )
         )
         var_stack <-

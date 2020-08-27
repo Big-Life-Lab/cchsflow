@@ -1,7 +1,7 @@
 # resp_condition_fun1-------------------------------
 
 test_that("resp_condition_fun1 has expected output when age is out of range", {
-            expect_equal(resp_condition_fun1(-1, 1, 1), NA)
+            expect_equal(resp_condition_fun1(-1, 1, 1), "NA(b)")
           })
 
 test_that("resp_condition_fun1 has expected output when
@@ -15,7 +15,7 @@ test_that("resp_condition_fun1 has expected output when
           })
 
 test_that("resp_condition_fun1 has expected output when age is NA", {
-  expect_equal(resp_condition_fun1(NA, 1, 1), NA)
+  expect_equal(resp_condition_fun1(NA, 1, 1), "NA(b)")
 })
 
 test_that("resp_condition_fun1 has expected output when COPD/Emphs is NA", {
@@ -27,7 +27,7 @@ test_that("resp_condition_fun1 has expected output when Asthma is NA", {
 })
 
 test_that("resp_condition_fun1 has expected output when all arguments are NA", {
-            expect_equal(resp_condition_fun1(NA, NA, NA), NA)
+            expect_equal(resp_condition_fun1(NA, NA, NA), "NA(b)")
           })
 
 test_that("resp_condition_fun1 has expected output when
@@ -38,7 +38,7 @@ test_that("resp_condition_fun1 has expected output when
 # resp_condition_fun2-----------------------
 
 test_that("resp_condition_fun2 has expected output when age is out of range", {
-            expect_equal(resp_condition_fun2(-1, 1, 1, 1, 1), NA)
+            expect_equal(resp_condition_fun2(-1, 1, 1, 1, 1), "NA(b)")
           })
 
 test_that("resp_condition_fun2 has expected output when
@@ -106,7 +106,7 @@ test_that("resp_condition_fun2 has expected output when
 
 test_that("resp_condition_fun3 has expected output when
           age is out of range", {
-            expect_equal(resp_condition_fun3(-1, 1, 1, 1), NA)
+            expect_equal(resp_condition_fun3(-1, 1, 1, 1), "NA(b)")
           })
 
 test_that("resp_condition_fun3 has expected output when

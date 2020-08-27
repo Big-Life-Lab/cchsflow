@@ -40,6 +40,12 @@
 <script src="../pkgdown.js"></script>
 
 
+<!-- docsearch -->
+<script src="../docsearch.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link href="../docsearch.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+
 
 
 <meta property="og:title" content="variables.csv — variables" />
@@ -77,7 +83,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.0</span>
       </span>
     </div>
 
@@ -89,6 +95,9 @@
      
   </a>
 </li>
+<li>
+  <a href="../articles/get_started.html">Get started</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Articles
@@ -96,9 +105,6 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/using_cchsflow.html">Using cchsflow</a>
-    </li>
     <li>
       <a href="../articles/variables_sheet.html">variables.csv sheet</a>
     </li>
@@ -113,6 +119,9 @@
     </li>
     <li>
       <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
+    </li>
+    <li>
+      <a href="../articles/duplicate_datasets.html">CCHS datasets that overlap each other</a>
     </li>
   </ul>
 </li>
@@ -131,6 +140,12 @@
   </a>
 </li>
       </ul>
+      
+      <form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
+        <div class="form-group">
+          <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
+        </div>
+      </form>
       
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -167,16 +182,16 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>variables</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>variables</span>)</div><div class='output co'>#&gt; 'data.frame':	150 obs. of  9 variables:
-#&gt;  $ variable     : Factor w/ 150 levels "ADL_01","ADL_02",..: 1 2 3 4 5 6 7 8 9 10 ...
-#&gt;  $ label        : Factor w/ 128 levels "# of drinks - Friday",..: 59 54 55 57 56 58 60 15 41 40 ...
-#&gt;  $ labelLong    : Factor w/ 130 levels "# days smoked at least 1 cigarette",..: 81 77 76 80 79 78 82 96 119 118 ...
-#&gt;  $ section      : Factor w/ 6 levels "Demographics",..: 4 4 4 4 4 4 4 2 2 2 ...
-#&gt;  $ subject      : Factor w/ 29 levels "ADL","Age","Alcohol",..: 1 1 1 1 1 1 1 3 3 3 ...
-#&gt;  $ variableType : Factor w/ 2 levels "Categorical",..: 1 1 1 1 1 1 1 1 1 1 ...
+<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>variables</span>)</div><div class='output co'>#&gt; 'data.frame':	160 obs. of  9 variables:
+#&gt;  $ variable     : Factor w/ 160 levels "ADL_01","ADL_02",..: 1 2 3 4 5 6 7 9 8 10 ...
+#&gt;  $ label        : Factor w/ 134 levels "# of drinks - Friday",..: 60 54 56 58 57 59 55 61 35 116 ...
+#&gt;  $ labelLong    : Factor w/ 138 levels "# days smoked at least 1 cigarette",..: 88 83 82 87 86 85 84 89 30 117 ...
+#&gt;  $ section      : Factor w/ 6 levels "Demographics",..: 4 4 4 4 4 4 4 4 4 5 ...
+#&gt;  $ subject      : Factor w/ 30 levels "ADL","Age","Alcohol",..: 1 1 1 1 1 1 1 1 1 23 ...
+#&gt;  $ variableType : Factor w/ 2 levels "Categorical",..: 1 1 1 1 1 1 1 1 1 2 ...
 #&gt;  $ units        : Factor w/ 16 levels "%","$/year","cigarettes",..: 14 14 14 14 14 14 14 14 14 14 ...
-#&gt;  $ databaseStart: Factor w/ 23 levels "cchs2001_p","cchs2001_p, cchs2003_p",..: 5 16 5 5 5 16 5 5 5 4 ...
-#&gt;  $ variableStart: Factor w/ 150 levels "[FSCDHFS2]","[FSCEDHFS]",..: 87 124 88 89 90 125 92 18 28 29 ...</div></pre>
+#&gt;  $ databaseStart: Factor w/ 22 levels "cchs2001_p","cchs2001_p, cchs2003_p",..: 6 6 6 6 6 16 3 6 6 6 ...
+#&gt;  $ variableStart: Factor w/ 160 levels "[FSCDHFS2]","[FSCEDHFS]",..: 94 95 96 98 99 135 97 101 153 22 ...</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -203,6 +218,23 @@
    </div>
 
   
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script>
+<script>
+  docsearch({
+    
+    
+    apiKey: 'a674c1edc7b44c4ee995ef4227708c57',
+    indexName: 'cchsflow',
+    inputSelector: 'input#search-input.form-control',
+    transformData: function(hits) {
+      return hits.map(function (hit) {
+        hit.url = updateHitURL(hit);
+        return hit;
+      });
+    }
+  });
+</script>
+
 
 
   </body>

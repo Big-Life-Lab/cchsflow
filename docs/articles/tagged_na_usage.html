@@ -16,7 +16,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="missing data (tagged_na)">
+<script src="../pkgdown.js"></script><!-- docsearch --><script src="../docsearch.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous">
+<link href="../docsearch.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script><meta property="og:title" content="missing data (tagged_na)">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.0</span>
       </span>
     </div>
 
@@ -50,6 +52,9 @@
      
   </a>
 </li>
+<li>
+  <a href="../articles/get_started.html">Get started</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Articles
@@ -58,9 +63,6 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/using_cchsflow.html">Using cchsflow</a>
-    </li>
-    <li>
       <a href="../articles/variables_sheet.html">variables.csv sheet</a>
     </li>
     <li>
@@ -74,6 +76,9 @@
     </li>
     <li>
       <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
+    </li>
+    <li>
+      <a href="../articles/duplicate_datasets.html">CCHS datasets that overlap each other</a>
     </li>
   </ul>
 </li>
@@ -92,7 +97,13 @@
   </a>
 </li>
       </ul>
+<form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
+        <div class="form-group">
+          <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
 </div>
+      </form>
+      
+    </div>
 <!--/.nav-collapse -->
   </div>
 <!--/.container -->
@@ -101,7 +112,7 @@
 
       
 
-      </header><script src="tagged_na_usage_files/jquery-1.11.3/jquery.min.js"></script><script src="tagged_na_usage_files/elevate-section-attrs-2.0/elevate-section-attrs.js"></script><div class="row">
+      </header><script src="tagged_na_usage_files/header-attrs-2.1/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>missing data (tagged_na)</h1>
@@ -184,11 +195,19 @@
 <a href="#example-haventagged_na" class="anchor"></a>Example <code>haven::tagged_na()</code>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(haven)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"a"</span>), <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"z"</span>), <span class="ot">NA</span>)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">na_tag</a></span>(x) <span class="co"># is used to read the tagged NA in most other functions they are still viewed as NA</span></span></code></pre></div>
-<pre><code>## [1] NA  NA  NA  NA  NA  "a" "z" NA</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">print_tagged_na</a></span>(x) <span class="co"># Is used to print the na as well as their tag</span></span></code></pre></div>
-<pre><code>## [1]     1     2     3     4     5 NA(a) NA(z)    NA</code></pre>
+<span id="cb1-2"><a href="#cb1-2"></a>x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"a"</span>), <span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">tagged_na</a></span>(<span class="st">"b"</span>))</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># Is used to read the tagged NA in most other functions they are still viewed as NA</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">na_tag</a></span>(x)</span></code></pre></div>
+<pre><code>## [1] NA  NA  NA  NA  NA  "a" "b"</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Is used to print the na as well as their tag</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw"><a href="https://haven.tidyverse.org/reference/tagged_na.html">print_tagged_na</a></span>(x)</span></code></pre></div>
+<pre><code>## [1]     1     2     3     4     5 NA(a) NA(b)</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Tagged NA's work identically to regular NAs</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>x</span></code></pre></div>
+<pre><code>## [1]  1  2  3  4  5 NA NA</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(x)</span></code></pre></div>
+<pre><code>## [1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE</code></pre>
 </div>
   </div>
 
@@ -221,7 +240,20 @@
 </div>
 
   
-
-
-  </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script><script>
+  docsearch({
+    
+    
+    apiKey: 'a674c1edc7b44c4ee995ef4227708c57',
+    indexName: 'cchsflow',
+    inputSelector: 'input#search-input.form-control',
+    transformData: function(hits) {
+      return hits.map(function (hit) {
+        hit.url = updateHitURL(hit);
+        return hit;
+      });
+    }
+  });
+</script>
+</body>
 </html>
