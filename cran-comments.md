@@ -1,23 +1,12 @@
 ## Resubmission
 
 This is a resubmission. In this version we have:
-* Fixed errors caused by R 4.0 devel 
-* Fixed our tests
-* Added new argument for rec_with_table()
-* Added badges to `README.md`
-* Added to _p suffix to the names of datasets & databaseStarts to denote CCHS
-PUMF data
-* Suppressed warning messages in function examples
-* Refactored `rec_with_table()` to match output type with specified toType for
-derived variables
-* Fixed bug in `rec_with_table()` to include all values in recFrom column
-* Improved warning outputs in `rec_with_table()`
-* Refactored `pct_time_fun()` to output value from 0-100% as opposed
-to 0-1
-* Refactored respiratory functions to better capture respondents under 35
-with respiratory conditions
-* Added support for more CCHS variables
-* Added documentation to the vignettes
+* Fixed a breaking bug in `variable_details()` that halted variable
+transformation with the 2007-2008 CCHS cycle
+* Fixed bug in `resp_condition_fun1()`
+* Refactored derived variable functions to handle tagged_na
+* Added new parameter ALW_1 to `binge_drinker_fun()`
+* Added language variables to library
 
 ## Test environments
 * local OS X install, R 4.0.0
@@ -26,7 +15,5 @@ with respiratory conditions
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-* This is a new release.
+0 errors | 0 warnings | 0 notes
 

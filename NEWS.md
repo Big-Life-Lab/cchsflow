@@ -1,4 +1,47 @@
-# cchsflow 1.5.0 (Latest build)
+# cchsflow 1.6.1 (Latest build)
+2020-08-27
+
+## Features
+- `description` added to variables.csv to allow a description of variables.
+
+## Variables
+- <font color = "green">**New**</font> DHHGAGE_5. Age (20-year age groups). 
+Available for all survey cycles.
+
+# cchsflow 1.6.0 
+2020-03-30
+
+## Breaking changes
+- Refactored derived variable functions to handle tagged_na
+- Added new parameter ALW_1 to `binge_drinker_fun()`
+
+## Bug Fixes
+- Bug fix to `resp_condition_fun1()` that was not correctly handling respondents
+under 35 with respiratory conditions
+
+## Variables
+- <font color = "green">**New**</font> SDC_5A_1 - Knowledge of official
+languages. Used in CCHS cycles 2011-2014
+- <font color = "green">**New**</font> SDCDFOLS - First official language
+spoken. Used in CCHS cycles 2011-2014
+- <font color = "green">**New**</font> SDCGLHM - Languages spoken at home. Used
+in CCHS cycles 2007-2014
+- <font color = "green">**New**</font> SDCGLNG - Languages - can converse in.
+Used in CCHS cycles 2001-2010
+
+# cchsflow 1.5.2
+2020-03-24
+
+## Bug Fixes
+- Fixes to typos in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.5.1
+2020-03-20
+
+## Minor improvements
+- Minor hotfix in description of package
+
+# cchsflow 1.5.0 
 2020-03-20
 
 ## Breaking changes

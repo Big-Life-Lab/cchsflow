@@ -1,8 +1,8 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and Harmonizing CCHS Variables
-Version: 1.5.0
-Date: 2020-03-20
+Version: 1.6.0
+Date: 2020-03-30
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -35,7 +35,7 @@ Depends:
   sjlabelled (>= 1.0.17),
   stringr (>= 1.2.0),
   magrittr
-Description: cchsflow supports the use of the Canadian Community Health Survey 
+Description: Supporting the use of the Canadian Community Health Survey 
              (CCHS) by transforming variables from each cycle into harmonized, 
              consistent versions that span survey cycles (currently, 2001 to 
              2014). CCHS data used in this library is accessed and adapted in 
@@ -49,6 +49,6 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: 
     testthat (>= 2.1.0)

@@ -117,9 +117,9 @@ adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
                       ADL_05 == 1, 1,
                     # Examining if respondents do not need help with any task
                     if_else2(ADL_01 == 2 & ADL_02 == 2 & ADL_03 == 2 &
-                               ADL_04 == 2 & ADL_05 == 2, 2, return(NA))),
+                               ADL_04 == 2 & ADL_05 == 2, 2, "NA(b)")),
            # Return NA if any ADL variable is out of range
-           return(NA)
+           "NA(b)"
            )
 
 }
