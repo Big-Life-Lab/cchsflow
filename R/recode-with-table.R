@@ -448,14 +448,9 @@ recode_columns <-
     
     label_list <- list()
     # Set interval if none is present
-    interval_present <- TRUE
     valid_intervals <- c("[,]", "[,)", "(,]")
     interval_default <- "[,]"
     recoded_data <- data[, 0]
-    if (is.null(rec_variables_to_process[[pkg.globals$argument.Interval]])) {
-      interval_present <- FALSE
-    }
-    
     # Loop through the rows of recode vars
     while (nrow(rec_variables_to_process) > 0) {
       variable_being_checked <-
@@ -568,11 +563,18 @@ recode_columns <-
             
             # Recode the variable
             from_values <- list()
-            if (grepl(":", as.character(row_being_checked[[
+            interval <- ""
+            if (grepl("\\[*\\]", as.character(row_being_checked[[
               pkg.globals$argument.From]]))) {
               from_values <-
                 strsplit(as.character(row_being_checked[[
-                  pkg.globals$argument.From]]), ":")[[1]]
+                  pkg.globals$argument.From]]), ",")[[1]]
+              from_values[[1]] <- trimws(from_values[[1]])
+              from_values[[2]] <- trimws(from_values[[2]])
+              interval_left <- substr(from_values[[1]], 1, 1)
+              interval_right <- substr(from_values[[2]], nchar(from_values[[2]]), nchar(from_values[[2]]))
+              interval <- paste0(interval_left,",",interval_right)
+              
             } else {
               temp_from <-
                 as.character(row_being_checked[[pkg.globals$argument.From]])
@@ -581,36 +583,20 @@ recode_columns <-
             }
             value_recorded <-
               as.character(row_being_checked[[pkg.globals$argument.CatValue]])
-            if (interval_present) {
-              interval <- as.character(row_being_checked[[
-                pkg.globals$argument.Interval]])
-              if (!interval %in% valid_intervals) {
-                interval <- interval_default
-              }
-              if (from_values[[1]] == from_values[[2]]) {
-                interval <- "[,]"
-              }
-              valid_row_index <- compare_value_based_on_interval(
-                compare_columns = data_variable_being_checked,
-                data = data,
-                left_boundary = from_values[[1]],
-                right_boundary = from_values[[2]],
-                interval = interval
-              )
-            } else {
-              if (from_values[[1]] == from_values[[2]]) {
-                interval <- "[,]"
-              } else {
-                interval <- interval_default
-              }
-              valid_row_index <- compare_value_based_on_interval(
-                compare_columns = data_variable_being_checked,
-                data = data,
-                left_boundary = from_values[[1]],
-                right_boundary = from_values[[2]],
-                interval = interval
-              )
+            if (from_values[[1]] == from_values[[2]]) {
+              interval <- "[,]"
+            }else if (!interval %in% valid_intervals) {
+              message(paste("For variable", variable_being_checked, "invalid interval was passed.\nDefault interval will be used:", interval_default))
+              interval <- interval_default
             }
+            valid_row_index <- compare_value_based_on_interval(
+              compare_columns = data_variable_being_checked,
+              data = data,
+              left_boundary = from_values[[1]],
+              right_boundary = from_values[[2]],
+              interval = interval
+            )
+            
             # Start construction of dataframe for log
             log_table[row, "value_to"] <- value_recorded
             log_table[row, "From"] <-
