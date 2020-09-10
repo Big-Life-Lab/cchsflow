@@ -125,10 +125,9 @@ kable(variable_details[c(198:202), c(1:11)])
 
 12. **recFrom:** the range of values for a particular category in a variable as indicated in the CCHS. See CCHS data documentation for each survey cycle and use the smallest and large values as your range to capture all values between the survey years. 
 
-The rules for each category of a new variable are a string in `recFrom` and value in `recTo`. These recode pairs are the same syntax as `{sjmisc::rec()`. Recode pairs are obtained from the RecFrom and RecTo columns
-  *value range* is indicated by a colon, e.g. `recFrom= "1:4"; recTo = 1` (recodes all values from 1 to 4 into 1}
-  *value range* for double vectors (with fractional part), all values within the specified range are recoded; e.g. `recFrom = "1:2.5"; recTo = 1` recodes 1 to 2.5 into 1, but 2.55 would not be recoded (since it's not included in the specified range)
-  *minimum and maximum values* are indicates by `min` (or `lo`) and `max` (or `hi`), e.g. `recFrom = "min:4"; recTo = 1` (recodes all values from minimum values to 4 into 1)
+The rules for each category of a new variable are a string in `recFrom` and value in `recTo`. These recode pairs are the same syntax as interval notation in which a closed range of values are specified using square brackets. See [here](https://en.wikipedia.org/wiki/Interval_(mathematics)#Notations_for_intervals) for more information on interval notation. Recode pairs are obtained from the RecFrom and RecTo columns
+  *value range* is indicated by a comma, e.g. `recFrom= [1,4]; recTo = 1` (recodes all values from 1 to 4 into 1}
+  *value range* for double vectors (with fractional part), all values within the specified range are recoded; e.g. `recFrom = [1,2.5]; recTo = 1` recodes 1 to 2.5 into 1, but 2.55 would not be recoded (since it's not included in the specified range).
   *NA* is used for missing values (don't know, refusal, not stated)
   *else* is used all other values, which have not been specified yet, are indicated by `else`, e.g. `recFrom = "else"; recTo = NA` (recode all other values (not specified in other rows) to "NA")}
   *copy* the `else` token can be combined with `copy`, indicating that all remaining, not yet recoded values should stay the same (are copied from the original value), e.g. `recFrom = "else"; recTo = "copy"`
