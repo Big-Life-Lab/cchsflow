@@ -574,7 +574,8 @@ recode_columns <-
               interval_left <- substr(from_values[[1]], 1, 1)
               interval_right <- substr(from_values[[2]], nchar(from_values[[2]]), nchar(from_values[[2]]))
               interval <- paste0(interval_left,",",interval_right)
-              
+              from_values[[1]] <- gsub("\\[|\\]", "", from_values[[1]])
+              from_values[[2]] <- gsub("\\[|\\]", "", from_values[[2]])
             } else {
               temp_from <-
                 as.character(row_being_checked[[pkg.globals$argument.From]])
