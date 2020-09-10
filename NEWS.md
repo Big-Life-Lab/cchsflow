@@ -1,12 +1,62 @@
-# cchsflow 1.6.1 (Latest build)
-2020-08-27
+# cchsflow 1.7.0 (Latest build)
+2020-09-10
+
+## Breaking changes
+- Notation in **recFrom** column of `variable_details.csv` is now changed to
+interval notation (e.g. 7:9 is now denoted as [7,9]).
 
 ## Features
-- `description` added to variables.csv to allow a description of variables.
+- New `description` column added to `variables.csv` to allow a description of
+variables.
+- New `role` column added to `variables.csv` to allow users to set roles for
+variable manipulation.
 
-## Variables
-- <font color = "green">**New**</font> DHHGAGE_5. Age (20-year age groups). 
-Available for all survey cycles.
+## New variables
+Age:
+1. DHHGAGE_5: age variable categorized into 5 20-year age groups. Used in all
+CCHS cycles.
+2. DHHGAGE_D: age variable categorized into 8 10-year age groups. Used in all
+CCHS cycles.
+
+Depression:
+1. DPSDPP: Depression Scale - Predicted Probability. Used in all CCHS cycles.
+2. DPSDSF: Depression Scale - Short Form Score. Used in all CCHS cycles
+3. DIS_10G: Frequency - distress: felt sad / depressed - past month. Used in
+CCHS cycles 2005-2014.
+4. DIS_10H: Frequency - distress: depressed/nothing cheers - past month. Used in
+CCHS cycles 2005-2014.
+5. DPSDMT: Specific month when felt depressed. Used in all CCHS cycles.
+6. DPSDWK: Number of weeks felt depressed - (D). Used in all CCHS cycles.
+7. DPS_02: Felt sad/blue/depressed - 2 weeks or more - 12 mo. Used in CCHS
+cycles 2007-2012.
+8. DPS_03: Sad/depressed - length feelings lasted - 2 wk. Used in CCHS cycles
+2007-2012.
+9. DPS_04: Sad/depressed - frequency - 2 wk. Used in CCHS cycles 2007-2012.
+10. DPS_05: Sad/depressed - lose interest in things - 2 wk. Used in CCHS cycles
+2007-2012.
+11. DPS_06: Sad/depressed - felt tired out / low on energy - 2 wk. Used in CCHS
+cycles 2007-2012.
+12. DPS_07: Sad/depressed - weight change - 2 wk. Used in CCHS cycles 2007-2012.
+13. DPS_08A: Sad/depressed - weight change (amount) - 2 wk. Used in CCHS cycles
+2007-2012.
+14. DPS_08B: Sad/depressed - weight change (lb/kg) - 2 wk. Used in CCHS cycles
+2007-2012.
+15. DPS_09: Sad/depressed - trouble falling asleep - 2 wk. Used in CCHS cycles
+2007-2012.
+16. DPS_10: Sad/depressed trouble falling asleep - frequency - 2 wk. Used in
+CCHS cycles 2007-2012.
+17. DPS_11: Sad/depressed - trouble concentrating - 2 wk. Used in CCHS cycles
+2007-2012.
+18. DPS_12: Sad/depressed - felt down on self - 2 wk. Used in CCHS cycles
+2007-2012.
+19. DPS_13: Sad/depressed - thought a lot about death - 2 wk. Used in CCHS
+cycles 2007-2012.
+20. DPS_14: Sad/depressed - number of weeks - 12 mo. Used in CCHS cycles
+2007-2012.
+
+Influenza:
+1. FLU_160: Ever had a flu shot. Used in all CCHS cycles.
+2. FLU_162: Last time had flu shot. Used in all CCHS cycles.
 
 # cchsflow 1.6.0 
 2020-03-30
