@@ -122,7 +122,7 @@ variable
 - Added example in [get started](https://big-life-lab.github.io/cchsflow/articles/get_started.html)
 that uses new attach_data_name argument in `rec_with_table()`
 
-# cchsflow 1.4.4 (Latest build)
+# cchsflow 1.4.4
 2020-03-03
 
 ## Features
