@@ -57,7 +57,7 @@ Recode with Table is responsible for recoding values of a dataset based on
 the specifications in variable_details.
 }
 \details{
-The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv}{variable_details}
+The \href{https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variable_details.csv}{variable_details}
  dataframe needs the following variables to function:
  \describe{
   \item{variable}{name of new (mutated) variable that is recoded}
