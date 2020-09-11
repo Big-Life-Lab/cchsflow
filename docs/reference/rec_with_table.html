@@ -84,7 +84,7 @@ the specifications in variable_details." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -188,7 +188,7 @@ the specifications in variable_details.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A dataframe containing the variables to be recoded.</p></td>
+      <td><p>A dataframe containing the variables to be recoded. Can also be a list of dataframes</p></td>
     </tr>
     <tr>
       <th>variables</th>
@@ -197,8 +197,8 @@ a variables csv containing additional variable info</p></td>
     </tr>
     <tr>
       <th>database_name</th>
-      <td><p>String, the name of the dataset containing the
-to be recoded.</p></td>
+      <td><p>String, the name of the dataset containing the variables
+to be recoded. Can also be a vector of strings if data is a list</p></td>
     </tr>
     <tr>
       <th>variable_details</th>
@@ -249,7 +249,7 @@ content inside the `Note`` column of the variable being recoded.</p></td>
  dataframe needs the following variables to function:</p><dl class='dl-horizontal'>
   <dt>variable</dt><dd><p>name of new (mutated) variable that is recoded</p></dd>
   <dt>toType</dt><dd><p>type the variable is being recoded to
-  <em>cat = categorical, cont = continues</em></p></dd>
+  <em>cat = categorical, cont = continuous</em></p></dd>
   <dt>databaseStart</dt><dd><p>name of dataframe with original variables to be
   recoded</p></dd>
   <dt>variableStart</dt><dd><p>name of variable to be recoded</p></dd>
@@ -308,7 +308,8 @@ content inside the `Note`` column of the variable being recoded.</p></td>
     <span class='st'>"HWTGHTM"</span>,
     <span class='st'>"HWTGWTK"</span>, <span class='st'>"HWTGBMI_der"</span>
   )
-)</div><div class='output co'>#&gt; <span class='message'>Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: 2001 and 2003 CCHS use inches, values converted to meters to 3 decimal points</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: 74+ inches converted to 76 inches</span></div><div class='input'>
+)</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: 2001 and 2003 CCHS use inches, values converted to meters to 3 decimal points</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: 74+ inches converted to 76 inches</span></div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>bmi2001</span>)</div><div class='output co'>#&gt;   HWTGHTM HWTGWTK HWTGBMI_der
 #&gt; 1   1.422   56.25    27.81784
 #&gt; 2   1.549   51.75    21.56788
@@ -321,7 +322,8 @@ content inside the `Note`` column of the variable being recoded.</p></td>
     <span class='st'>"HWTGHTM"</span>,
     <span class='st'>"HWTGWTK"</span>, <span class='st'>"HWTGBMI_der"</span>
   )
-)</div><div class='output co'>#&gt; <span class='message'>Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: Height is a reported in meters from 2005 CCHS onwards</span></div><div class='input'>
+)</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: Height is a reported in meters from 2005 CCHS onwards</span></div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>bmi2011_2012</span>)</div><div class='output co'>#&gt;     HWTGHTM HWTGWTK HWTGBMI_der
 #&gt; 195   1.600   64.35    25.13672
 #&gt; 196   1.880   80.10    22.66297

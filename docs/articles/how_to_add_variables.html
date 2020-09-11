@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -112,7 +112,7 @@
 
       
 
-      </header><script src="how_to_add_variables_files/header-attrs-2.1/header-attrs.js"></script><div class="row">
+      </header><script src="how_to_add_variables_files/header-attrs-2.3/header-attrs.js"></script><script src="how_to_add_variables_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>How to add variables to cchsflow</h1>
@@ -1932,7 +1932,7 @@ kg/m2
 </table>
 <ol start="12" style="list-style-type: decimal">
 <li>
-<strong>recFrom:</strong> Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row is written as <code>11.91:57.9</code>. In the 2001 and 2003 CCHS surveys not applicable was coded as 999.6 so the recFrom for this row would be <code>999.6:999.6</code>. Similarly, in the 2001 and 2003 CCHS surveys don’t know was coded as 999.7, refusal was coded as 999.8, and not stated was coded as 999.9. Therefore the recFrom for the missing row for CCHS 2001 and 2003 would be <code>999.7:999.9</code>. In the not applicable row for the 2005 CCHS survey onwards, the recFrom is <code>999.96:999.96</code>. In the missing row for CCHS 2005 onwards, the recFrom is <code>999.97:999.99</code>. For the else row, just write <code>else</code>.</li>
+<strong>recFrom:</strong> Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row is written as <code>[11.91,57.9]</code>. In the 2001 and 2003 CCHS surveys not applicable was coded as 999.6 so the recFrom for this row would be <code>[999.6,999.6]</code>. Similarly, in the 2001 and 2003 CCHS surveys don’t know was coded as 999.7, refusal was coded as 999.8, and not stated was coded as 999.9. Therefore the recFrom for the missing row for CCHS 2001 and 2003 would be <code>[999.7,999.9]</code>. In the not applicable row for the 2005 CCHS survey onwards, the recFrom is <code>[999.96,999.96]</code>. In the missing row for CCHS 2005 onwards, the recFrom is <code>[999.97,999.99]</code>. For the else row, just write <code>else</code>.</li>
 </ol>
 <table class="table">
 <thead><tr>
@@ -2009,7 +2009,7 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 </tr>
 <tr>
@@ -2085,7 +2085,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 </tr>
 <tr>
@@ -2161,7 +2161,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 </tr>
 <tr>
@@ -2286,7 +2286,7 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 <td style="text-align:left;">
 BMI / self-report - (D,G)
@@ -2368,7 +2368,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 <td style="text-align:left;">
 don’t know (999.7); refusal (999.8); not stated (999.9)
@@ -2450,7 +2450,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 <td style="text-align:left;">
 don’t know (999.97); refusal (999.98); not stated (999.99)
@@ -2584,7 +2584,7 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 <td style="text-align:left;">
 BMI / self-report - (D,G)
@@ -2672,7 +2672,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 <td style="text-align:left;">
 don’t know (999.7); refusal (999.8); not stated (999.9)
@@ -2760,7 +2760,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 <td style="text-align:left;">
 don’t know (999.97); refusal (999.98); not stated (999.99)
@@ -2903,7 +2903,7 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 <td style="text-align:left;">
 BMI / self-report - (D,G)
@@ -2997,7 +2997,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 <td style="text-align:left;">
 don’t know (999.7); refusal (999.8); not stated (999.9)
@@ -3091,7 +3091,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 <td style="text-align:left;">
 don’t know (999.97); refusal (999.98); not stated (999.99)
@@ -3243,7 +3243,7 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 <td style="text-align:left;">
 BMI / self-report - (D,G)
@@ -3343,7 +3343,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 <td style="text-align:left;">
 don’t know (999.7); refusal (999.8); not stated (999.9)
@@ -3442,7 +3442,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 <td style="text-align:left;">
 don’t know (999.97); refusal (999.98); not stated (999.99)
@@ -5095,7 +5095,7 @@ missing
 N/A
 </td>
 <td style="text-align:left;">
-7:9
+[7,9]
 </td>
 <td style="text-align:left;">
 don’t know (7); refusal (8); not stated (9)

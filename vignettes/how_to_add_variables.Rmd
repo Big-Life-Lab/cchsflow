@@ -2,7 +2,7 @@
 title: "How to add variables to cchsflow"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3 - variable_details.csv}     
+  %\VignetteIndexEntry{How to add variables to cchsflow}     
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---

@@ -2,7 +2,7 @@
 title: "missing data (tagged_na)"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{3 - variable_details.csv}     
+  %\VignetteIndexEntry{How to use tagged_na}     
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---
