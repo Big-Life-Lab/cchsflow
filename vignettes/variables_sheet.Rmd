@@ -2,7 +2,7 @@
 title: "variables.csv"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2 - variables.csv}     
+  %\VignetteIndexEntry{variables.csv}     
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---
