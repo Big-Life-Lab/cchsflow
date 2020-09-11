@@ -1,5 +1,5 @@
 # cchsflow 1.7.0 (Latest build)
-2020-09-10
+2020-09-11
 
 ## Breaking changes
 - Notation in **recFrom** column of `variable_details.csv` is now changed to
