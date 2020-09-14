@@ -72,6 +72,8 @@ reference:
     - ALWDDLY
     - ALCDTYP
     - ALCDTTM
+    - DPSDSF
+    - DPSDPP
     - food_insecurity_der
     - GEN_02A2
   - title: "CCHS datasets"

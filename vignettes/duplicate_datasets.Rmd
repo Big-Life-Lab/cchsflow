@@ -2,7 +2,7 @@
 title: "CCHS datasets that overlap each other"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{6 - Duplicate datasets}     
+  %\VignetteIndexEntry{CCHS datasets that overlap each other}     
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---

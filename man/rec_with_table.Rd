@@ -19,13 +19,13 @@ rec_with_table(
 )
 }
 \arguments{
-\item{data}{A dataframe containing the variables to be recoded.}
+\item{data}{A dataframe containing the variables to be recoded. Can also be a list of dataframes}
 
 \item{variables}{character vector containing variable names to recode or
 a variables csv containing additional variable info}
 
-\item{database_name}{String, the name of the dataset containing the
-to be recoded.}
+\item{database_name}{String, the name of the dataset containing the variables
+to be recoded. Can also be a vector of strings if data is a list}
 
 \item{variable_details}{A dataframe containing the specifications (rules)
 for recoding.}
@@ -57,12 +57,12 @@ Recode with Table is responsible for recoding values of a dataset based on
 the specifications in variable_details.
 }
 \details{
-The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv}{variable_details}
+The \href{https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variable_details.csv}{variable_details}
  dataframe needs the following variables to function:
  \describe{
   \item{variable}{name of new (mutated) variable that is recoded}
   \item{toType}{type the variable is being recoded to
-  \emph{cat = categorical, cont = continues}}
+  \emph{cat = categorical, cont = continuous}}
   \item{databaseStart}{name of dataframe with original variables to be
   recoded}
   \item{variableStart}{name of variable to be recoded}

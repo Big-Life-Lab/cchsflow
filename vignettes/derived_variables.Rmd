@@ -2,7 +2,7 @@
 title: "Derived variables"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{1 - using cchsflow}     
+  %\VignetteIndexEntry{Derived variables}     
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---
