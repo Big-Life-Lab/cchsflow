@@ -43,12 +43,12 @@ or coded in CCHS surveys, recoded to NA(a)
 **Summary of `tagged_na` values and their corresponding CCHS category values.**
 
 | cchsflow `tagged_na` | CCHS category value | Label |
-|----------------|--------------|
+|----------------|--------------|-----------------|
 | NA(a) | 6                  | not applicable     |
 | NA(b) | 7                  | don't know         |
 | NA(b) | 8                  | refusal            |
 | NA(b) | 9                  | not stated         |
-| NA(a) | question not asked in the survey cycle  |
+| NA(c) | | question not asked in the survey cycle  |
 
 ## Example `haven::tagged_na()`
 ```{r}
