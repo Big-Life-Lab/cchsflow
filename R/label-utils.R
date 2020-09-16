@@ -179,7 +179,7 @@ label_data <- function(label_list, data_to_label) {
     if (label_list[[variable_name]]$type == pkg.globals$argument.CatType) {
       if (class(data_to_label[, variable_name]) != "factor") {
         data_to_label[, variable_name] <-
-          factor(data_to_label[, variable_name])
+          factor(data_to_label[[variable_name]])
       }
       # List fix
       label_list[[variable_name]]$values <- unlist(label_list[[variable_name]]$values)
