@@ -8,6 +8,8 @@ article.
 
 ## New variables
 - GEODPMF: Health region. Specified for the 2013-14 & 2014 CCHS cycles.
+- id_year: ID variable that appends data_name to ADM_RNO, creating a unique
+identifier for all respondents.
 
 # cchsflow 1.7.0 
 2020-09-11
