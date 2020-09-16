@@ -1,4 +1,15 @@
-# cchsflow 1.7.0 (Latest build)
+# cchsflow 1.7.1 (Latest build)
+2020-09-16
+
+## Minor improvements
+- Corrections to typos in [tagged_na](https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html)
+article.
+- Refactor `recTo` values for GEOGPRV to values specified in CCHS.
+
+## New variables
+- GEODPMF: Health region. Specified for the 2013-14 & 2014 CCHS cycles.
+
+# cchsflow 1.7.0 
 2020-09-11
 
 ## Breaking changes
