@@ -9,7 +9,7 @@ merge_data <- function(...) {
     true_NA_index <- !(NA_index == tagged_NA_index)
     if (is.numeric(new_data[[i]])) {
       new_data[true_NA_index, i] <-
-        "NA(c)"
+        haven::tagged_na("c")
     } else {
       if (!"NA(c)" %in% levels(new_data[[i]])) {
         levels(new_data[[i]]) <-
