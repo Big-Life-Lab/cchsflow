@@ -12,9 +12,7 @@
 #'  Click \href{https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html}(here)
 #'  for more details on how NA's are treated in cchsflow.
 #' 
-#' @param data starting data frame.
-#' 
-#' @param ... additional data frames to be merged.
+#' @param ... recoded data frames to be merged.
 #' 
 #' @return a merged data frame consisting of multiple recoded CCHS cycles with
 #'  labels for variable names and tags for variables not included in particular
@@ -37,9 +35,9 @@
 #' tail(income_merged)
 #' 
 #' @export
-merge_rec_data <- function(data, ...) {
+merge_rec_data <- function(...) {
   # Step 1: bind datasets
-  new_data <- bind_rows(data,...)
+  new_data <- bind_rows(...)
   
   # Step 2: apply NA(c) to untagged NA's
   for (i in names(new_data)) {
