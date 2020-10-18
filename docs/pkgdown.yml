@@ -3,9 +3,10 @@ pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
   derived_variables: derived_variables.html
+  duplicate_datasets: duplicate_datasets.html
+  get_started: get_started.html
   how_to_add_variables: how_to_add_variables.html
   tagged_na_usage: tagged_na_usage.html
-  using_cchsflow: using_cchsflow.html
   variable_details: variable_details.html
   variables_sheet: variables_sheet.html
 

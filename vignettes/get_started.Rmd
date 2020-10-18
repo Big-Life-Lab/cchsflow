@@ -1,0 +1,482 @@
+---
+title: "Get started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started}     
+  %\VignetteEngine{knitr::rmarkdown}  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
+```
+
+### Load packages
+
+```{r eval= FALSE}
+# Install release version from CRAN
+install.packages("cchsflow")
+
+# Install the most recent version from GitHub
+devtools::install_github("Big-Life-Lab/cchsflow")
+```
+
+```{r results= 'hide', message = FALSE, warning=FALSE}
+library(cchsflow)
+```
+
+The vignettes use the `bind_rows` function in the
+[dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8) package to
+combine datasets.
+
+```{r results = 'hide', message = FALSE, warning =FALSE}
+library(dplyr)
+```
+
+# Transform variables into harmonized versions
+
+Use `rec_with_table()` to transform the variables of a CCHS dataset.
+
+## Example 1. Transform a single variable from a single database
+
+In this example, the `sex` variable in the 2001 CCHS cycle is transformed into a
+harmonized `sex` variable that is consistent all CCHS cycles.
+
+```{r}
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX",
+  log = TRUE,
+  var_labels = c(DHH_SEX = "SEX")
+)
+```
+
+```{r, echo=FALSE}
+head(sex2001)
+```
+
+`cchs2001_p` is the name of test CCHS data that is included in the _cchsflow_
+library. _cchsflow_ includes test CCHS data for the public use microdata file
+(PUMF) for all general household survey (.1 versions) between 2001 and 2013.
+Each survey cycle has a sample of 200 respondents. `cchs2000_p` indicates this 
+isthe CCHS 2001 PUMF file. See [Reference](../reference/index.html) for more
+information of each CCHS cycle.
+
+You'll want to use _cchsflow_ on your own CCHS data that you'll need to first
+load: something like `cchs2001 <- read.csv("~/data/cchs2001.csv")`. CCHS PUMF 
+data can be obtained from Statistics Canada. 
+
+`DHH_SEX` is the name of the harmonized variable for sex. Up to 2007, the
+variable names in CCHS changed every cycle. Since 2007, there has _generally_
+been a consistent name. _cchsflow_ uses the variable name from the 2007 cycle
+whenever possible. For example, in the CCHS 2001, the variable for sex is
+`DHHA_SEX` and in CCHS 2007 the same variable is `DHH_SEX`. This name, `DHH_SEX`
+is the harmonized name for sex, meaning `DHHA_SEX` is transformed to `DHH_SEX`
+using `rec_with_table()`.
+
+The rules for the transformation and harmonization are in two dataframes that
+are included in `variables` and `variable_details`, both included in _cchsflow_.
+There are vignettes that further describe `variables` and `variable_details`,
+including how to add or customize transformed variables.
+
+## Which variables are transformed? How "good" is the transformation?
+
+_cchsflow_ includes commonly used sociodemographic, health behaviour and health
+status variables. In general, variables across CCHS cycles can be grouped into
+five categories:
+
+1. Consistent and unchanged across all cycles. These variables have no changes
+   to the wording of the question that was asked, the response values and who
+   was asked the question (same inclusion criteria and skip pattern).
+
+2. Mostly consistent across cycles. These variables may have a small change in
+   wording or response category. Notes for these variables are printed to the
+   console when they are recoded with `rec_with_table()`. The notes are
+   contained in `variable_details$notes`. Caution is required when using these
+   variables. The notes should be reviewed to assess whether these variables can
+   be used in your study. See [Example 2](#example2).
+
+3. Either not collected in all cycles or have major changes between cycles.
+   These variable may be included in _cchsflow_ with a note that says which
+   cycles include the variable and can be transformed to a common variable. See
+   [Example 4](#example4).
+
+4. Mostly consistent but with complex changes or transformation rules. See the
+   [Reference](../reference/index.html) for these derived and "Potentially
+   problematic variables". See [Example 7](#example7).
+
+5. Not consistent between cycles. Variable that are inconsistent or not asked in
+   most cycles are not included in _cchsflow_. In the future, we hope to include
+   these variables with an marker that they've been reviewed but rejected from
+   inclusion in _cchsflow_.
+
+## Example 2. Variable transformation with a note {#example2}
+
+`notes` provide context for the decisions that informed harmonization that may
+affect your decision to use a harmonized variable.
+
+```{r}
+warning(
+  "cchsflow includes ", length(unique(variable_details$notes)),
+  " variables with notes."
+)
+```
+
+For example, for `DHHGAGE_A` the category `NA::b` has the following `note`:
+
+`Not applicable, don't know, refusal, not stated (96-99) were options only in CCHS 2003, but had zero responses`.
+
+This note informs the decision to combine values 96 to 99 in `DHHGAGE_A` for
+CCHS2003 into one common missing value `NA::b`. The label for the `NA::b`
+category is, "`don't know (97); refusal (98); not stated (99)`".
+
+By default, `rec_with_table()` prints notes to the console.
+
+```{r}
+BMI2001 <- rec_with_table(cchs2001_p, "HWTGBMI", log = TRUE)
+```
+
+### Notes with guidance or additional information
+
+Several variables such as BMI have a quite a few notes reflecting a range of
+changes that occurred over CCHS cycles. Variables with notes can usually be used
+after reviewing and considering whether or how the variable changes affect your
+use. There can also be further guidance in notes. For example, BMI notes include
+advice to use `HWTGBMI_der`. Despite the large number of changes, BMI can be
+used for most studies because the common transformed variable `HWTGBMI_der` was
+derived from height and weight variables that are included and largely unchanged
+across CCHS cycles. However, to use `HWTGBMI_der` you'll also need to include
+the transformed measures for height (`HWTGHTM`) and weight (`HWTGWTK`). More
+information about `HWTGBMI_der` can be found in the documentation reference for
+'derived variable functions' or by typing `?BMI_fun` in the R console.
+
+```{r}
+BMI2001C <- rec_with_table(cchs2001_p,
+  c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
+  log = TRUE
+)
+```
+
+### Warning messages
+
+Warning messages will appear when your dataset is missing variables in your
+`variables` worksheet or `rec_with_table()` call.
+
+### Variable names and labels included
+
+`rec_with_table()` can include variable and value labels for the harmonized
+variables using the `var_labels` attribute. By default, `rec_with_table()` will
+include all labels if then all variables in `variables` are recoded. See
+[Example 6](#example6).
+
+```{r, warning=FALSE}
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX",
+  log = TRUE,
+  var_labels = c("DHH_SEX" = "Sex")
+)
+```
+
+Labels can then be used in plots and tables.
+
+```{r fig1, fig.height = 5, fig.width = 7, warning=FALSE}
+
+barplot(
+  table(as_label(sex2001$DHH_SEX)),
+  col = cm.colors(5),
+  ylim = c(0, 140),
+  legend = TRUE,
+  main = get_label(sex2001$DHH_SEX),
+  ylab = "Frequency (n)"
+)
+```
+
+### Missing data
+
+If you've been watching, you may have noticed that _cchsflow_ recodes the values
+in factor or categorical variables for 6 ("not applicable"), 7 ("don’t know"),
+and 8 ("refusal"), 9 ("not stated") into `tagged_NA` values NA(a) ("not
+applicable") and NA (b) ("missing"). There are two reasons. First, the typical
+uses of CCHS consider the two values "not applicable" and "missing" for most
+situations. Second, R and other open languages typically support only one NA.
+
+Be careful when use use `NA` in your study. See
+[`missing data (tagged_na)`](../articles/tagged_na_usage.html)for more
+information.
+
+```{r}
+library(haven)
+x <- c(1:5, tagged_na("a"), tagged_na("b"), tagged_na("b"), NA)
+x
+# Do you want to calculate mean by excluding 'missing', 'not applicable', or both?
+sum(!is_tagged_na(x, "a"))
+sum(!is_tagged_na(x, "b"))
+sum(!is.na(x))
+sum(!is_tagged_na(x))
+```
+
+### Default arguments for `rec_with_table()`
+
+With `rec_with_table()` there are also default arguments that do not need to be
+called unless you would like to modify them.
+
+- `variables` defaults to NULL. This results in the `variables.csv` sheet in the
+  cchsflow package being used to specify which variables to transform. This
+  argument can be modified if you want use your own `variables.csv` sheet or by
+  specifying particular variables to transform.
+- `database_name` defaults to NULL. This results in `rec_with_table()` using the
+  database indicated in the `data` argument.
+- `variable_details` defaults to NULL. This results in the
+  `variable_details.csv` sheet in the cchsflow being used. This argument can be
+  modified if want use your own `variable_details.csv` sheet.
+- `else_value` defaults to NA. Values out of range set to NA.
+- `append_to_data` defaults to FALSE. Transformed variables will not be appended
+  to the original CCHS dataset.
+- `log` defaults to FALSE. Logs of the variable transformations will not be
+  displayed.
+- `notes` defaults to TRUE. Information in the `Notes` column from
+  `variable_details.csv` will be displayed
+- `var_labels` is set to NULL. This argument can be used to add labels to a
+  transformed dataset that only contains a subset of variables from
+  `variables.csv`. The format to add labels to a subset of variables is
+  `c(variable = "Label")`.
+- `attach_data_name` is set to FALSE. This argument can be used to append a
+  column that denotes the name of the dataset each transformed row came from.
+  See [Example 8](#example8).
+
+## Example 3. Transform a single variable from multiple CCHS datasets
+
+This example shows how you can transform and combine a variable across multiple
+CCHS cycles. The sex variable in CCHS 2001 (`DHHA_SEX`) and CCHS 2012
+(`DHH_SEX`) is transformed a common variable (`DHH_SEX`) and combined into a
+single dataset. In _cchsflow_ the CCHS 2007 variable name is used as the common
+variable name. See the [variable_details vignette](variable_details.html) for
+more information.
+
+```{r, warning = FALSE}
+sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX", log = TRUE)
+head(sex2001)
+
+sex2012 <- rec_with_table(cchs2012_p, "DHH_SEX", log = TRUE)
+tail(sex2012)
+```
+
+```{r, warning=FALSE}
+combined_sex <- bind_rows(sex2001, sex2012)
+```
+
+```{r, echo=FALSE}
+head(combined_sex)
+tail(combined_sex)
+```
+
+## Example 4. Transform a single variable from multiple databases that changes categories between cycles. {#example4}
+
+There are many variables in the CCHS that changes in categories between cycles
+in a way that the variable cannot preserve all categories for all CCHS cycles.
+An example is the categorical variable for `age`. _cchsflow_ offers three
+options to facilitate the use of these variables with inconsistent categories
+across cycles.
+
+### Option 1: transform category `age` variable into a common variable for only cycles with the same category responses
+
+Transform the `age` variable into variables that cannot be combined across
+cycles. The categories in `age` variable in the CCHS changed in 2005 and
+therefore it is not possible to have the same `age` categories across all CCHS
+cycles.
+
+`DHHGAGE_A` is the age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is
+the age variable for CCHS cycles 2005-2014.
+
+```{r, warning=FALSE}
+age2001 <- rec_with_table(cchs2001_p, "DHHGAGE_A")
+head(age2001)
+
+age2012 <- rec_with_table(cchs2012_p, "DHHGAGE_B")
+tail(age2012)
+```
+
+```{r, warning=FALSE}
+combined_age_cat <- bind_rows(age2001, age2012)
+```
+
+```{r, echo=FALSE}
+head(combined_age_cat)
+tail(combined_age_cat)
+```
+
+### Option 2: transform the categorical `age` variable into a continuous `age_cont` variable
+
+Transform categorical variables such as `age` into a single harmonized
+`age_cont` variable. This variable takes the midpoint age of each category for
+all CCHS cycles. With this option, the age category variable from all CCHS
+cycles can be combined into a single dataset.
+
+```{r, warning=FALSE}
+age2001_cont <- rec_with_table(cchs2001_p, "DHHGAGE_cont")
+head(age2001_cont)
+
+age2012_cont <- rec_with_table(cchs2012_p, "DHHGAGE_cont")
+tail(age2012_cont)
+```
+
+```{r, warning= FALSE}
+combined_age_cont <- bind_rows(age2001_cont, age2012_cont)
+```
+
+```{r, echo=FALSE}
+head(combined_age_cont)
+tail(combined_age_cont)
+```
+
+### Option 3: transform the categorical `age` variable into a harmonized categorical variable
+
+_cchsflow_ often includes a common harmonized categorical variable that has new,
+consistent categories across all cycles. These new categorical variables
+generally have fewer category levels than the original variables, reflecting the
+need to combine categories. Read the `Notes` variable for details.
+
+### Label variables and categories
+
+Use `set_data_labels()` to label the variables in your final dataset. Labels are
+lost during the database merging. `set_data_labels()` set labels with the
+original information in `variables` and `variable_details`.
+
+```{r}
+labeled_combined_cchs <- set_data_labels(
+  data_to_label = combined_age_cont,
+  variable_details = variable_details,
+  variables_sheet = variables
+)
+```
+
+## Example 5. Transform multiple variables from multiple datasets
+
+The variables argument in `rec_with_table()` allows multiple variables to be
+transformed from a CCHS dataset. In this example, the age and sex variables from
+the 2001 and 2012 CCHS datasets will be transformed and labeled using
+`rec_with_table()`. They will then be combined into a single dataset and labeled
+using `set_data_labels()`.
+
+```{r, warning=FALSE}
+age_sex_2001 <- rec_with_table(cchs2001_p, c("DHHGAGE_cont", "DHH_SEX"),
+  var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex")
+)
+
+get_label(age_sex_2001)
+
+age_sex_2012 <- rec_with_table(cchs2012_p, c("DHHGAGE_cont", "DHH_SEX"),
+  var_labels = c(DHHGAGE_cont = "Age", DHH_SEX = "Sex")
+)
+
+get_label(age_sex_2012)
+```
+
+In the above example, `var_labels` is called in `rec_with_table()` to label the
+age and sex variables in the 2001 and 2012 datasets. Use `get_label()` to view
+the variable labels in your transformed dataset. As mentioned previously,
+`var_labels` can be used all the variables in `variables.csv` or a subset of
+variables.
+
+```{r, warning=FALSE}
+combined_age_sex <- bind_rows(age_sex_2001, age_sex_2012)
+labeled_combined_age_sex <- set_data_labels(
+  data_to_label = combined_age_sex,
+  variable_details = variable_details, variables_sheet = variables
+)
+```
+
+In the above code, `set_data_labels()` is used to label the combined age and sex
+dataset. Similar to before, you can check if labels have been added using
+`get_label()`.
+
+```{r, warning=FALSE}
+get_label(labeled_combined_age_sex)
+```
+
+For more information on `get_label()` and other label helper functions, please
+refer to the [sjlabelled](https://strengejacke.github.io/sjlabelled/reference/)
+package.
+
+## Example 6. Transform all variables in the variable_details sheet {#example6}
+
+All the variables listed in `variables.csv` & `variable_details.csv` will be
+transformed if the variables argument in `rec_with_table()` is not specified. In
+this example, all variables specified in the two worksheets will be transformed,
+combined, and labeled for the 2001 and 2012 CCHS cycles.
+
+```{r, echo=FALSE}
+options(htmlwidgets.TOJSON_ARGS = list(na = "string"))
+```
+
+```{r, warning=FALSE}
+transformed2001 <- rec_with_table(data = cchs2001_p, notes = FALSE)
+
+transformed2012 <- rec_with_table(data = cchs2012_p, notes = FALSE)
+
+combined_cchs <- bind_rows(transformed2001, transformed2012)
+labeled_combined_cchs <- set_data_labels(
+  data_to_label = combined_cchs,
+  variable_details = variable_details, variables_sheet = variables
+)
+```
+
+## Example 7. Transform CCHS derived variables such as Body Mass Index (BMI) {#example7}
+
+CCHS derived variables are recoded (harmonized) using the same method as other
+CCHS _cchsflow_ variables, with one additional considerations.
+
+Derived variables in CCHS are created from existing, original variables that are
+transformed into a new variable. An example is body mass index (BMI).
+Respondents are asked to report their height and weight. BMI is then derived
+(calculated) using recoded variables for height and weight.
+
+Recoding `BMI` into a harmonized variable requires their underlying initial
+variables (height and weight). This first step of harmonizing underlying
+variables is completed for you, but you must have the underlying variables in
+your dataset.
+
+Using the BMI example illustrated in the
+[derived variables](derived_variables.html) article, `rec_with_table()` is able
+to transform BMI across multiple cycles provided that height (`HWTGHTM`) and
+weight (`HWTGWTK`) are specified.
+
+```{r, warning=FALSE}
+bmi2001 <- rec_with_table(cchs2001_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
+  log = TRUE
+)
+
+head(bmi2001)
+
+bmi2012 <- rec_with_table(cchs2012_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
+  log = TRUE
+)
+tail(bmi2012)
+
+combined_bmi <- bind_rows(bmi2001, bmi2012)
+
+head(combined_bmi)
+tail(combined_bmi)
+```
+
+## Example 8: Distinguishing which cycle data is from in combined datasets
+
+It can be important to know from which cycle data comes from after combining all
+the cycles. `rec_with_table()` provides the option of appending a column that
+indicates from which dataset respondents come from by setting the parameter
+`attach_data_name` to be TRUE. Using the BMI example in [Example 7](#example7),
+`rec_with_table()` can specify which dataset each respondent came from.
+
+```{r, warning=FALSE}
+bmi2001 <- rec_with_table(cchs2001_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
+  log = TRUE, attach_data_name = TRUE
+)
+
+head(bmi2001)
+
+bmi2012 <- rec_with_table(cchs2012_p, c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"),
+  log = TRUE, attach_data_name = TRUE
+)
+tail(bmi2012)
+
+combined_bmi <- bind_rows(bmi2001, bmi2012)
+
+head(combined_bmi)
+tail(combined_bmi)
+```

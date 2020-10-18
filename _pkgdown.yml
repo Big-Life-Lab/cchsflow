@@ -3,6 +3,9 @@ destination: docs
 template:
   params:
     bootswatch: cosmo
+    docsearch:
+      api_key: a674c1edc7b44c4ee995ef4227708c57
+      index_name: cchsflow
 
 development:
   mode: auto
@@ -14,14 +17,15 @@ home:
       
 navbar:
   structure:
-    left: [home, articles, reference, news]
+    left: [home, get_started, articles, reference, news]
     right: github
   components:
+    get_started:
+      text: Get started
+      href: articles/get_started.html
     articles:
       text: Articles
       menu:
-      - text: Using cchsflow
-        href: articles/using_cchsflow.html
       - text: variables.csv sheet
         href: articles/variables_sheet.html
       - text: variable_details.csv sheet
@@ -32,6 +36,8 @@ navbar:
         href: articles/how_to_add_variables.html
       - text: How to use tagged_na
         href: articles/tagged_na_usage.html
+      - text: CCHS datasets that overlap each other
+        href: articles/duplicate_datasets.html
     reference:
       text: Reference
       href: reference/index.html
@@ -58,6 +64,7 @@ reference:
     - binge_drinker_fun
     - multiple_conditions_fun1
     - multiple_conditions_fun2
+    - adl_fun
   - title: "Potentially problematic variables"
     desc: Derived variables in cchsflow that users may run into issues with
     contents:
@@ -65,7 +72,10 @@ reference:
     - ALWDDLY
     - ALCDTYP
     - ALCDTTM
+    - DPSDSF
+    - DPSDPP
     - food_insecurity_der
+    - GEN_02A2
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:
@@ -76,11 +86,11 @@ reference:
     - cchs2009_2010_p
     - cchs2010_p
     - cchs2011_2012_p
-    - cchs2012_p
+    - cchs2012_p 
     - cchs2013_2014_p
-    - cchs2014_p
+    - cchs2014_p 
   - title: "Processing functions"
-    desc: Functions used to manipulate cchs datasets
+    desc: Functions used to manipulate CCHS datasets
     contents:
     - rec_with_table
     - set_data_labels

@@ -16,7 +16,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="How to add variables to cchsflow">
+<script src="../pkgdown.js"></script><!-- docsearch --><script src="../docsearch.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous">
+<link href="../docsearch.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script><meta property="og:title" content="How to add variables to cchsflow">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -50,6 +52,9 @@
      
   </a>
 </li>
+<li>
+  <a href="../articles/get_started.html">Get started</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Articles
@@ -58,9 +63,6 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/using_cchsflow.html">Using cchsflow</a>
-    </li>
-    <li>
       <a href="../articles/variables_sheet.html">variables.csv sheet</a>
     </li>
     <li>
@@ -74,6 +76,9 @@
     </li>
     <li>
       <a href="../articles/tagged_na_usage.html">How to use tagged_na</a>
+    </li>
+    <li>
+      <a href="../articles/duplicate_datasets.html">CCHS datasets that overlap each other</a>
     </li>
   </ul>
 </li>
@@ -92,7 +97,13 @@
   </a>
 </li>
       </ul>
+<form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
+        <div class="form-group">
+          <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
 </div>
+      </form>
+      
+    </div>
 <!--/.nav-collapse -->
   </div>
 <!--/.container -->
@@ -101,7 +112,7 @@
 
       
 
-      </header><script src="how_to_add_variables_files/jquery-1.11.3/jquery.min.js"></script><script src="how_to_add_variables_files/elevate-section-attrs-2.0/elevate-section-attrs.js"></script><div class="row">
+      </header><script src="how_to_add_variables_files/header-attrs-2.3/header-attrs.js"></script><script src="how_to_add_variables_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>How to add variables to cchsflow</h1>
@@ -137,7 +148,9 @@
 <div id="example-of-an-existing-cchs-variable-body-mass-index-bmi" class="section level3">
 <h3 class="hasAnchor">
 <a href="#example-of-an-existing-cchs-variable-body-mass-index-bmi" class="anchor"></a>Example of an existing CCHS variable: Body mass index (BMI)</h3>
-<p>This example will show how the existing CCHS BMI variable was developed using <code>variable_details.csv</code> and <code>variables.csv</code>. <strong>Note</strong> this variable is different from the derived BMI variable that is also included in <em>cchsflow</em>.</p>
+<p>This example will show how the existing CCHS BMI variable was developed using <code>variable_details.csv</code> and <code>variables.csv</code>. <strong>Note</strong> this variable is different from the derived BMI variable that is also included in <em>cchsflow</em>. For this article, a sample <code>variable_details.csv</code> &amp; <code>variables.csv</code> will be loaded to demonstrate how to add variables.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>variables &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span>(), <span class="st">'../inst/extdata/sample_variables.csv'</span>))</span>
+<span id="cb1-2"><a href="#cb1-2"></a>variable_details &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span>(),<span class="st">'../inst/extdata/sample_variable_details.csv'</span>))</span></code></pre></div>
 </div>
 <div id="specifying-the-variable-on-variable_details-csv" class="section level3">
 <h3 class="hasAnchor">
@@ -200,8 +213,6 @@ HWTGBMI
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
-</th>
-<th style="text-align:left;">
 variable
 </th>
 <th style="text-align:left;">
@@ -211,8 +222,13 @@ dummyVariable
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
+HWTGBMI
 </td>
+<td style="text-align:left;">
+N/A
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -222,8 +238,13 @@ N/A
 </tr>
 <tr>
 <td style="text-align:left;">
-505
+HWTGBMI
 </td>
+<td style="text-align:left;">
+N/A
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -233,9 +254,6 @@ N/A
 </tr>
 <tr>
 <td style="text-align:left;">
-506
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -243,31 +261,6 @@ N/A
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-507
-</td>
-<td style="text-align:left;">
-HWTGBMI
-</td>
-<td style="text-align:left;">
-N/A
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
-HWTGBMI
-</td>
-<td style="text-align:left;">
-N/A
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -284,8 +277,6 @@ N/A
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
-</th>
-<th style="text-align:left;">
 variable
 </th>
 <th style="text-align:left;">
@@ -298,8 +289,16 @@ toType
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
+HWTGBMI
 </td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cont
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -312,8 +311,16 @@ cont
 </tr>
 <tr>
 <td style="text-align:left;">
-505
+HWTGBMI
 </td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cont
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -326,9 +333,6 @@ cont
 </tr>
 <tr>
 <td style="text-align:left;">
-506
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -339,37 +343,6 @@ cont
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-507
-</td>
-<td style="text-align:left;">
-HWTGBMI
-</td>
-<td style="text-align:left;">
-N/A
-</td>
-<td style="text-align:left;">
-cont
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
-HWTGBMI
-</td>
-<td style="text-align:left;">
-N/A
-</td>
-<td style="text-align:left;">
-cont
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -406,7 +379,7 @@ databaseStart
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
+1
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -423,7 +396,7 @@ cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p
 </tr>
 <tr>
 <td style="text-align:left;">
-509
+6
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -463,7 +436,7 @@ databaseStart
 <tbody>
 <tr>
 <td style="text-align:left;">
-505
+2
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -480,7 +453,7 @@ cchs2001_p, cchs2003_p
 </tr>
 <tr>
 <td style="text-align:left;">
-506
+3
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -520,7 +493,7 @@ databaseStart
 <tbody>
 <tr>
 <td style="text-align:left;">
-507
+4
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -537,7 +510,7 @@ cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2
 </tr>
 <tr>
 <td style="text-align:left;">
-508
+5
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -581,7 +554,7 @@ variableStart
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
+1
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -601,7 +574,7 @@ cchs2001_p::HWTAGBMI, cchs2003_p::HWTCGBMI, cchs2005_p::HWTEGBMI, [HWTGBMI]
 </tr>
 <tr>
 <td style="text-align:left;">
-509
+6
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -647,7 +620,7 @@ variableStart
 <tbody>
 <tr>
 <td style="text-align:left;">
-505
+2
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -667,7 +640,7 @@ cchs2001_p::HWTAGBMI, cchs2003_p::HWTCGBMI
 </tr>
 <tr>
 <td style="text-align:left;">
-506
+3
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -713,7 +686,7 @@ variableStart
 <tbody>
 <tr>
 <td style="text-align:left;">
-505
+4
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -725,15 +698,15 @@ N/A
 cont
 </td>
 <td style="text-align:left;">
-cchs2001_p, cchs2003_p
+cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
 </td>
 <td style="text-align:left;">
-cchs2001_p::HWTAGBMI, cchs2003_p::HWTCGBMI
+cchs2005_p::HWTEGBMI, [HWTGBMI]
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-506
+5
 </td>
 <td style="text-align:left;">
 HWTGBMI
@@ -745,10 +718,10 @@ N/A
 cont
 </td>
 <td style="text-align:left;">
-cchs2001_p, cchs2003_p
+cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
 </td>
 <td style="text-align:left;">
-cchs2001_p::HWTAGBMI, cchs2003_p::HWTCGBMI
+cchs2005_p::HWTEGBMI, [HWTGBMI]
 </td>
 </tr>
 </tbody>
@@ -759,8 +732,6 @@ cchs2001_p::HWTAGBMI, cchs2003_p::HWTCGBMI
 </ol>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
-</th>
 <th style="text-align:left;">
 variable
 </th>
@@ -783,9 +754,6 @@ fromType
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -806,8 +774,25 @@ cont
 </tr>
 <tr>
 <td style="text-align:left;">
-505
+HWTGBMI
 </td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cont
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p
+</td>
+<td style="text-align:left;">
+cchs2001_p::HWTAGBMI, cchs2003_p::HWTCGBMI
+</td>
+<td style="text-align:left;">
+cont
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -829,32 +814,6 @@ cont
 </tr>
 <tr>
 <td style="text-align:left;">
-506
-</td>
-<td style="text-align:left;">
-HWTGBMI
-</td>
-<td style="text-align:left;">
-N/A
-</td>
-<td style="text-align:left;">
-cont
-</td>
-<td style="text-align:left;">
-cchs2001_p, cchs2003_p
-</td>
-<td style="text-align:left;">
-cchs2001_p::HWTAGBMI, cchs2003_p::HWTCGBMI
-</td>
-<td style="text-align:left;">
-cont
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-507
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -875,9 +834,6 @@ cont
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -897,9 +853,6 @@ cont
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -928,8 +881,6 @@ cont
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
-</th>
-<th style="text-align:left;">
 variable
 </th>
 <th style="text-align:left;">
@@ -954,9 +905,6 @@ recTo
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -980,9 +928,6 @@ copy
 </tr>
 <tr>
 <td style="text-align:left;">
-505
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1005,9 +950,6 @@ NA::a
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-506
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1032,9 +974,6 @@ NA::b
 </tr>
 <tr>
 <td style="text-align:left;">
-507
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1058,9 +997,6 @@ NA::a
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1083,9 +1019,6 @@ NA::b
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1117,8 +1050,6 @@ NA::b
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
-</th>
-<th style="text-align:left;">
 variable
 </th>
 <th style="text-align:left;">
@@ -1146,9 +1077,6 @@ numValidCat
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1175,9 +1103,6 @@ N/A
 </tr>
 <tr>
 <td style="text-align:left;">
-505
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1203,9 +1128,6 @@ N/A
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-506
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1233,9 +1155,6 @@ N/A
 </tr>
 <tr>
 <td style="text-align:left;">
-507
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1262,9 +1181,6 @@ N/A
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1290,9 +1206,6 @@ N/A
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1328,8 +1241,6 @@ N/A
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
-</th>
-<th style="text-align:left;">
 variable
 </th>
 <th style="text-align:left;">
@@ -1360,9 +1271,6 @@ catLabel
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1392,9 +1300,6 @@ BMI
 </tr>
 <tr>
 <td style="text-align:left;">
-505
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1423,9 +1328,6 @@ not applicable
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-506
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1456,9 +1358,6 @@ missing
 </tr>
 <tr>
 <td style="text-align:left;">
-507
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1488,9 +1387,6 @@ not applicable
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1519,9 +1415,6 @@ missing
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1547,7 +1440,7 @@ NA::b
 N/A
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 </tr>
 </tbody>
@@ -1558,8 +1451,6 @@ else
 </ol>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
-</th>
 <th style="text-align:left;">
 variable
 </th>
@@ -1594,9 +1485,6 @@ catLabelLong
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1629,9 +1517,6 @@ Body Mass Index
 </tr>
 <tr>
 <td style="text-align:left;">
-505
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1663,9 +1548,6 @@ not applicable
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-506
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1699,9 +1581,6 @@ missing
 </tr>
 <tr>
 <td style="text-align:left;">
-507
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1734,9 +1613,6 @@ not applicable
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1768,9 +1644,6 @@ missing
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1796,10 +1669,10 @@ NA::b
 N/A
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 </tr>
 </tbody>
@@ -1810,8 +1683,6 @@ else
 </ol>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
-</th>
 <th style="text-align:left;">
 variable
 </th>
@@ -1849,9 +1720,6 @@ units
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1887,9 +1755,6 @@ kg/m2
 </tr>
 <tr>
 <td style="text-align:left;">
-505
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -1924,9 +1789,6 @@ kg/m2
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-506
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -1963,9 +1825,6 @@ kg/m2
 </tr>
 <tr>
 <td style="text-align:left;">
-507
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2001,9 +1860,6 @@ kg/m2
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2038,9 +1894,6 @@ kg/m2
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2066,10 +1919,10 @@ NA::b
 N/A
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
 kg/m2
@@ -2079,12 +1932,10 @@ kg/m2
 </table>
 <ol start="12" style="list-style-type: decimal">
 <li>
-<strong>recFrom:</strong> Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row is written as <code>11.91:57.9</code>. In the 2001 and 2003 CCHS surveys not applicable was coded as 999.6 so the recFrom for this row would be <code>999.6:999.6</code>. Similarly, in the 2001 and 2003 CCHS surveys don’t know was coded as 999.7, refusal was coded as 999.8, and not stated was coded as 999.9. Therefore the recFrom for the missing row for CCHS 2001 and 2003 would be <code>999.7:999.9</code>. In the not applicable row for the 2005 CCHS survey onwards, the recFrom is <code>999.96:999.96</code>. In the missing row for CCHS 2005 onwards, the recFrom is <code>999.97:999.99</code>. For the else row, just write <code>else</code>.</li>
+<strong>recFrom:</strong> Going through the CCHS data documentation from 2001 to 2014, it was found that the lowest BMI value was 11.91 and the highest BMI value was 57.9. Therefore the recFrom for the first row is written as <code>[11.91,57.9]</code>. In the 2001 and 2003 CCHS surveys not applicable was coded as 999.6 so the recFrom for this row would be <code>[999.6,999.6]</code>. Similarly, in the 2001 and 2003 CCHS surveys don’t know was coded as 999.7, refusal was coded as 999.8, and not stated was coded as 999.9. Therefore the recFrom for the missing row for CCHS 2001 and 2003 would be <code>[999.7,999.9]</code>. In the not applicable row for the 2005 CCHS survey onwards, the recFrom is <code>[999.96,999.96]</code>. In the missing row for CCHS 2005 onwards, the recFrom is <code>[999.97,999.99]</code>. For the else row, just write <code>else</code>.</li>
 </ol>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
-</th>
 <th style="text-align:left;">
 variable
 </th>
@@ -2125,9 +1976,6 @@ recFrom
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2161,13 +2009,10 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-505
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2207,9 +2052,6 @@ kg/m2
 </tr>
 <tr>
 <td style="text-align:left;">
-506
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2243,13 +2085,10 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-507
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2289,9 +2128,6 @@ kg/m2
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2325,13 +2161,10 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2357,10 +2190,10 @@ NA::b
 N/A
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
 kg/m2
@@ -2377,8 +2210,6 @@ else
 </ol>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
-</th>
 <th style="text-align:left;">
 variable
 </th>
@@ -2422,9 +2253,6 @@ catStartLabel
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2458,16 +2286,13 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 <td style="text-align:left;">
 BMI / self-report - (D,G)
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-505
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2510,9 +2335,6 @@ Not applicable
 </tr>
 <tr>
 <td style="text-align:left;">
-506
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2546,16 +2368,13 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 <td style="text-align:left;">
 don’t know (999.7); refusal (999.8); not stated (999.9)
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-507
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2598,9 +2417,6 @@ Not applicable
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2634,16 +2450,13 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 <td style="text-align:left;">
 don’t know (999.97); refusal (999.98); not stated (999.99)
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2669,10 +2482,10 @@ NA::b
 N/A
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
 kg/m2
@@ -2692,8 +2505,6 @@ else
 </ol>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
-</th>
 <th style="text-align:left;">
 variable
 </th>
@@ -2740,9 +2551,6 @@ variableStartShortLabel
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2776,7 +2584,7 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 <td style="text-align:left;">
 BMI / self-report - (D,G)
@@ -2786,9 +2594,6 @@ BMI
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-505
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2834,9 +2639,6 @@ BMI
 </tr>
 <tr>
 <td style="text-align:left;">
-506
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2870,7 +2672,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 <td style="text-align:left;">
 don’t know (999.7); refusal (999.8); not stated (999.9)
@@ -2880,9 +2682,6 @@ BMI
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-507
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -2928,9 +2727,6 @@ BMI
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -2964,7 +2760,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 <td style="text-align:left;">
 don’t know (999.97); refusal (999.98); not stated (999.99)
@@ -2974,9 +2770,6 @@ BMI
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -3002,10 +2795,10 @@ NA::b
 N/A
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
 kg/m2
@@ -3028,8 +2821,6 @@ BMI
 </ol>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
-</th>
 <th style="text-align:left;">
 variable
 </th>
@@ -3079,9 +2870,6 @@ variableStartLabel
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -3115,7 +2903,7 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 <td style="text-align:left;">
 BMI / self-report - (D,G)
@@ -3128,9 +2916,6 @@ BMI / self-report - (D,G)
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-505
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -3179,9 +2964,6 @@ BMI / self-report - (D,G)
 </tr>
 <tr>
 <td style="text-align:left;">
-506
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -3215,7 +2997,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 <td style="text-align:left;">
 don’t know (999.7); refusal (999.8); not stated (999.9)
@@ -3228,9 +3010,6 @@ BMI / self-report - (D,G)
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-507
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -3279,9 +3058,6 @@ BMI / self-report - (D,G)
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -3315,7 +3091,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 <td style="text-align:left;">
 don’t know (999.97); refusal (999.98); not stated (999.99)
@@ -3328,9 +3104,6 @@ BMI / self-report - (D,G)
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -3356,10 +3129,10 @@ NA::b
 N/A
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
 kg/m2
@@ -3385,8 +3158,6 @@ BMI / self-report - (D,G)
 </ol>
 <table class="table">
 <thead><tr>
-<th style="text-align:left;">
-</th>
 <th style="text-align:left;">
 variable
 </th>
@@ -3439,9 +3210,6 @@ notes
 <tbody>
 <tr>
 <td style="text-align:left;">
-504
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -3475,7 +3243,7 @@ Body Mass Index
 kg/m2
 </td>
 <td style="text-align:left;">
-11.91:57.9
+[11.91,57.9]
 </td>
 <td style="text-align:left;">
 BMI / self-report - (D,G)
@@ -3487,13 +3255,10 @@ BMI
 BMI / self-report - (D,G)
 </td>
 <td style="text-align:left;">
-CCHS 2001 restricts BMI to ages 20-64
+CCHS 2001 restricts BMI to ages 20-64. Consider using using HWTGBMI_der for the most concistent BMI variable across all CCHS cycles. See documentation for BMI_fun() in derived variables for more details, or type ?BMI_fun in the console.
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-505
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -3545,9 +3310,6 @@ CCHS 2001 and 2003 codes not applicable and missing variables as 999.6 and 999.7
 </tr>
 <tr>
 <td style="text-align:left;">
-506
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -3581,7 +3343,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.7:999.9
+[999.7,999.9]
 </td>
 <td style="text-align:left;">
 don’t know (999.7); refusal (999.8); not stated (999.9)
@@ -3597,9 +3359,6 @@ Don’t know (999.7) and refusal (999.8) not included in 2001 CCHS
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-507
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -3650,9 +3409,6 @@ BMI / self-report - (D,G)
 </tr>
 <tr>
 <td style="text-align:left;">
-508
-</td>
-<td style="text-align:left;">
 HWTGBMI
 </td>
 <td style="text-align:left;">
@@ -3686,7 +3442,7 @@ missing
 kg/m2
 </td>
 <td style="text-align:left;">
-999.97:999.99
+[999.97,999.99]
 </td>
 <td style="text-align:left;">
 don’t know (999.97); refusal (999.98); not stated (999.99)
@@ -3701,9 +3457,6 @@ BMI / self-report - (D,G)
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-509
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -3729,10 +3482,10 @@ NA::b
 N/A
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
-else
+missing
 </td>
 <td style="text-align:left;">
 kg/m2
@@ -3763,8 +3516,6 @@ BMI / self-report - (D,G)
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
-</th>
-<th style="text-align:left;">
 variable
 </th>
 <th style="text-align:left;">
@@ -3793,9 +3544,6 @@ variableStart
 </th>
 </tr></thead>
 <tbody><tr>
-<td style="text-align:left;">
-78
-</td>
 <td style="text-align:left;">
 HWTGBMI
 </td>
@@ -3845,38 +3593,38 @@ cchs2001_p::HWTAGBMI, cchs2003_p::HWTCGBMI, cchs2005_p::HWTEGBMI, [HWTGBMI]
 <h3 class="hasAnchor">
 <a href="#step-1--creating-a-derived-function" class="anchor"></a>Step 1. Creating a derived function</h3>
 <p>With complex derived variables, sometimes it is necessary to create functions within the custom function. For pack-years, a nested function was used to create an intermediate smoking variable that was used in the main function.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>Pack_years_fun &lt;-</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="st">  </span><span class="cf">function</span>(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont,</span>
-<span id="cb2-3"><a href="#cb2-3"></a>           SMK_<span class="dv">204</span>, SMK_05B, SMK_<span class="dv">208</span>, SMK_05C, SMKG01C_cont, SMK_01A) {</span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="co">#Time since quit for former daily smokers</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>    tsq_ds_fun &lt;-<span class="st"> </span><span class="cf">function</span>(SMK_09A_B, SMKG09C) {</span>
-<span id="cb2-6"><a href="#cb2-6"></a>      SMKG09C &lt;-</span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="st">        </span><span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">1</span>, <span class="dv">4</span>,</span>
-<span id="cb2-8"><a href="#cb2-8"></a>        <span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">2</span>, <span class="dv">8</span>,</span>
-<span id="cb2-9"><a href="#cb2-9"></a>        <span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">3</span>, <span class="dv">12</span>, <span class="ot">NA</span>)))</span>
-<span id="cb2-10"><a href="#cb2-10"></a>      tsq_ds &lt;-</span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="st">        </span><span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.5</span>,</span>
-<span id="cb2-12"><a href="#cb2-12"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">2</span>, <span class="fl">1.5</span>,</span>
-<span id="cb2-13"><a href="#cb2-13"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">3</span>, <span class="fl">2.5</span>,</span>
-<span id="cb2-14"><a href="#cb2-14"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">4</span>, SMKG09C, <span class="ot">NA</span>))))</span>
-<span id="cb2-15"><a href="#cb2-15"></a>    }</span>
-<span id="cb2-16"><a href="#cb2-16"></a>    tsq_ds&lt;-<span class="kw">tsq_ds_fun</span>(SMK_09A_B, SMKG09C)</span>
-<span id="cb2-17"><a href="#cb2-17"></a>    <span class="co"># PackYears for Daily Smoker</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG203_cont)<span class="op">*</span>(SMK_<span class="dv">204</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),</span>
-<span id="cb2-19"><a href="#cb2-19"></a>    <span class="co"># PackYears for Occasional Smoker (former daily)     </span></span>
-<span id="cb2-20"><a href="#cb2-20"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>) </span>
-<span id="cb2-21"><a href="#cb2-21"></a>            <span class="op">+</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">*</span>tsq_ds),</span>
-<span id="cb2-22"><a href="#cb2-22"></a>    <span class="co"># PackYears for Occasional Smoker (never daily)      </span></span>
-<span id="cb2-23"><a href="#cb2-23"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">3</span>, (<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">/</span><span class="dv">20</span>)<span class="op">*</span>(DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG01C_cont),</span>
-<span id="cb2-24"><a href="#cb2-24"></a>    <span class="co"># PackYears for former daily smoker (non-smoker now)      </span></span>
-<span id="cb2-25"><a href="#cb2-25"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">4</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),</span>
-<span id="cb2-26"><a href="#cb2-26"></a>    <span class="co"># PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      </span></span>
-<span id="cb2-27"><a href="#cb2-27"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.0137</span>,</span>
-<span id="cb2-28"><a href="#cb2-28"></a>    <span class="co"># PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      </span></span>
-<span id="cb2-29"><a href="#cb2-29"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">2</span>, <span class="fl">0.007</span>,</span>
-<span id="cb2-30"><a href="#cb2-30"></a>    <span class="co"># Non-smoker      </span></span>
-<span id="cb2-31"><a href="#cb2-31"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">6</span>, <span class="dv">0</span>, <span class="ot">NA</span>)))))))</span>
-<span id="cb2-32"><a href="#cb2-32"></a>  }</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>Pack_years_fun &lt;-</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="st">  </span><span class="cf">function</span>(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont,</span>
+<span id="cb3-3"><a href="#cb3-3"></a>           SMK_<span class="dv">204</span>, SMK_05B, SMK_<span class="dv">208</span>, SMK_05C, SMKG01C_cont, SMK_01A) {</span>
+<span id="cb3-4"><a href="#cb3-4"></a>    <span class="co">#Time since quit for former daily smokers</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>    tsq_ds_fun &lt;-<span class="st"> </span><span class="cf">function</span>(SMK_09A_B, SMKG09C) {</span>
+<span id="cb3-6"><a href="#cb3-6"></a>      SMKG09C &lt;-</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="st">        </span><span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">1</span>, <span class="dv">4</span>,</span>
+<span id="cb3-8"><a href="#cb3-8"></a>        <span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">2</span>, <span class="dv">8</span>,</span>
+<span id="cb3-9"><a href="#cb3-9"></a>        <span class="kw">ifelse2</span>(SMKG09C<span class="op">==</span><span class="dv">3</span>, <span class="dv">12</span>, <span class="ot">NA</span>)))</span>
+<span id="cb3-10"><a href="#cb3-10"></a>      tsq_ds &lt;-</span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="st">        </span><span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.5</span>,</span>
+<span id="cb3-12"><a href="#cb3-12"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">2</span>, <span class="fl">1.5</span>,</span>
+<span id="cb3-13"><a href="#cb3-13"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">3</span>, <span class="fl">2.5</span>,</span>
+<span id="cb3-14"><a href="#cb3-14"></a>        <span class="kw">ifelse2</span>(SMK_09A_B<span class="op">==</span><span class="dv">4</span>, SMKG09C, <span class="ot">NA</span>))))</span>
+<span id="cb3-15"><a href="#cb3-15"></a>    }</span>
+<span id="cb3-16"><a href="#cb3-16"></a>    tsq_ds&lt;-<span class="kw">tsq_ds_fun</span>(SMK_09A_B, SMKG09C)</span>
+<span id="cb3-17"><a href="#cb3-17"></a>    <span class="co"># PackYears for Daily Smoker</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG203_cont)<span class="op">*</span>(SMK_<span class="dv">204</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),</span>
+<span id="cb3-19"><a href="#cb3-19"></a>    <span class="co"># PackYears for Occasional Smoker (former daily)     </span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>) </span>
+<span id="cb3-21"><a href="#cb3-21"></a>            <span class="op">+</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">*</span>tsq_ds),</span>
+<span id="cb3-22"><a href="#cb3-22"></a>    <span class="co"># PackYears for Occasional Smoker (never daily)      </span></span>
+<span id="cb3-23"><a href="#cb3-23"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">3</span>, (<span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>((SMK_05B<span class="op">*</span>SMK_05C<span class="op">/</span><span class="dv">30</span>), <span class="dv">1</span>)<span class="op">/</span><span class="dv">20</span>)<span class="op">*</span>(DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG01C_cont),</span>
+<span id="cb3-24"><a href="#cb3-24"></a>    <span class="co"># PackYears for former daily smoker (non-smoker now)      </span></span>
+<span id="cb3-25"><a href="#cb3-25"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">4</span>, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(((DHHGAGE_cont <span class="op">-</span><span class="st"> </span>SMKG207_cont <span class="op">-</span><span class="st"> </span>tsq_ds)<span class="op">*</span>(SMK_<span class="dv">208</span><span class="op">/</span><span class="dv">20</span>)), <span class="fl">0.0137</span>),</span>
+<span id="cb3-26"><a href="#cb3-26"></a>    <span class="co"># PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      </span></span>
+<span id="cb3-27"><a href="#cb3-27"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">1</span>, <span class="fl">0.0137</span>,</span>
+<span id="cb3-28"><a href="#cb3-28"></a>    <span class="co"># PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      </span></span>
+<span id="cb3-29"><a href="#cb3-29"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SMK_01A<span class="op">==</span><span class="dv">2</span>, <span class="fl">0.007</span>,</span>
+<span id="cb3-30"><a href="#cb3-30"></a>    <span class="co"># Non-smoker      </span></span>
+<span id="cb3-31"><a href="#cb3-31"></a>    <span class="kw">ifelse2</span>(SMKDSTY<span class="op">==</span><span class="dv">6</span>, <span class="dv">0</span>, <span class="ot">NA</span>)))))))</span>
+<span id="cb3-32"><a href="#cb3-32"></a>  }</span></code></pre></div>
 <p>More information on what each smoking variable means can be found in the <a href="../reference/pack_years_fun.html">Reference</a> section.</p>
 </div>
 <div id="steps-2-and-3--specifying-pack-years-in-variable_details-csv-and-variables-csv" class="section level3">
@@ -3939,7 +3687,7 @@ notes
 </tr></thead>
 <tbody><tr>
 <td style="text-align:left;">
-716
+9
 </td>
 <td style="text-align:left;">
 pack_years_der
@@ -3981,7 +3729,7 @@ N/A
 N/A
 </td>
 <td style="text-align:left;">
-PackYears
+Smoking pack-years
 </td>
 <td style="text-align:left;">
 Smoking pack-years
@@ -4026,7 +3774,7 @@ variableStart
 </tr></thead>
 <tbody><tr>
 <td style="text-align:left;">
-101
+3
 </td>
 <td style="text-align:left;">
 pack_years_der
@@ -4056,6 +3804,1364 @@ cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2
 DerivedVar::[SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C, SMKG01C_cont, SMK_01A]
 </td>
 </tr></tbody>
+</table>
+</div>
+<div id="adding-labels-to-a-derived-variable" class="section level3">
+<h3 class="hasAnchor">
+<a href="#adding-labels-to-a-derived-variable" class="anchor"></a>Adding labels to a derived variable</h3>
+<p>For a continuous derived variable like pack-years, the labels specified in <code>variables.csv</code> are sufficient for the variable to be properly labelled. For categorical derived variables, extra rows will need to be added on <code>variable_details.csv</code> so that labels are generated for each category. The example below shows how binge_drinker, a derived categorical variable flagging respondents who binge drink, is specified in <code>variable_details.csv</code>.</p>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+variable
+</th>
+<th style="text-align:left;">
+dummyVariable
+</th>
+<th style="text-align:left;">
+toType
+</th>
+<th style="text-align:left;">
+databaseStart
+</th>
+<th style="text-align:left;">
+variableStart
+</th>
+<th style="text-align:left;">
+fromType
+</th>
+<th style="text-align:left;">
+recTo
+</th>
+<th style="text-align:left;">
+numValidCat
+</th>
+<th style="text-align:left;">
+catLabel
+</th>
+<th style="text-align:left;">
+catLabelLong
+</th>
+<th style="text-align:left;">
+units
+</th>
+<th style="text-align:left;">
+recFrom
+</th>
+<th style="text-align:left;">
+catStartLabel
+</th>
+<th style="text-align:left;">
+variableStartShortLabel
+</th>
+<th style="text-align:left;">
+variableStartLabel
+</th>
+<th style="text-align:left;">
+notes
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+binge_drinker
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[DHH_SEX, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Func::binge_drinker_fun
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Binge Drinker
+</td>
+<td style="text-align:left;">
+Binge Drinker
+</td>
+<td style="text-align:left;">
+Derived from DHH_SEX, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+11
+</td>
+<td style="text-align:left;">
+binge_drinker
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[DHH_SEX, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+Binge drinker
+</td>
+<td style="text-align:left;">
+Binge drinker
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Binge drinker
+</td>
+<td style="text-align:left;">
+Binge Drinker
+</td>
+<td style="text-align:left;">
+Binge Drinker
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+12
+</td>
+<td style="text-align:left;">
+binge_drinker
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[DHH_SEX, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+Regular drinker
+</td>
+<td style="text-align:left;">
+Regular drinker
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Regular drinker
+</td>
+<td style="text-align:left;">
+Binge Drinker
+</td>
+<td style="text-align:left;">
+Binge Drinker
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+<p>As you can see, the first row for binge_drinker specifies the function for the derived variable and the base variables included. The second and third rows specify the categories of the variables, which are then labelled.</p>
+</div>
+<div id="creating-a-derived-variable-using-derived-variables" class="section level3">
+<h3 class="hasAnchor">
+<a href="#creating-a-derived-variable-using-derived-variables" class="anchor"></a>Creating a derived variable using derived variables</h3>
+<p>It is possible to create a derived variable that involves derived variables. When creating the custom function for it, use the derived variable name inside the function. Similarly, when specifying the variable in <code>variable_details.csv</code> and <code>variables.csv</code>, use the derived variable in the <strong>variableStart</strong> column. The example below shows how number_conditions, a derived categorical variable that counts the number of chronic conditions that uses the derived respiratory condition variable, is specified in <code>variable_details.csv</code> and <code>variables.csv</code>.</p>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+variable
+</th>
+<th style="text-align:left;">
+dummyVariable
+</th>
+<th style="text-align:left;">
+toType
+</th>
+<th style="text-align:left;">
+databaseStart
+</th>
+<th style="text-align:left;">
+variableStart
+</th>
+<th style="text-align:left;">
+fromType
+</th>
+<th style="text-align:left;">
+recTo
+</th>
+<th style="text-align:left;">
+numValidCat
+</th>
+<th style="text-align:left;">
+catLabel
+</th>
+<th style="text-align:left;">
+catLabelLong
+</th>
+<th style="text-align:left;">
+units
+</th>
+<th style="text-align:left;">
+recFrom
+</th>
+<th style="text-align:left;">
+catStartLabel
+</th>
+<th style="text-align:left;">
+variableStartShortLabel
+</th>
+<th style="text-align:left;">
+variableStartLabel
+</th>
+<th style="text-align:left;">
+notes
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+13
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+number_conditions_catN/A_Func::multiple_conditions_fun1
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, resp_condition_der, CCC_051]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Func::multiple_conditions_fun1
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+This variable is derived from CCC_121, CCC_131, CCC_151, CCC_171, resp_condition, CCC_050
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+14
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+number_conditions_catN/A_Func::multiple_conditions_fun2
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition_der, CCC_051]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Func::multiple_conditions_fun2
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+This variable is derived from CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition, CCC_051
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+15
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+number_conditions_cat6_0
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2011_2012_p, cchs2013_2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition_der, CCC_051]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+number_conditions_cat6_1
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition_der, CCC_051]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+number_conditions_cat6_2
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition_der, CCC_051]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+18
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+number_conditions_cat6_3
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition_der, CCC_051]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+19
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+number_conditions_cat6_4
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition_der, CCC_051]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+20
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+number_conditions_cat6_5+
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition_der, CCC_051]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+5+
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+5+
+</td>
+<td style="text-align:left;">
+5+
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+5+
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+variable
+</th>
+<th style="text-align:left;">
+label
+</th>
+<th style="text-align:left;">
+labelLong
+</th>
+<th style="text-align:left;">
+section
+</th>
+<th style="text-align:left;">
+subject
+</th>
+<th style="text-align:left;">
+variableType
+</th>
+<th style="text-align:left;">
+units
+</th>
+<th style="text-align:left;">
+databaseStart
+</th>
+<th style="text-align:left;">
+variableStart
+</th>
+</tr></thead>
+<tbody><tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+number_conditions
+</td>
+<td style="text-align:left;">
+Number of conditions
+</td>
+<td style="text-align:left;">
+Number of chronic conditions
+</td>
+<td style="text-align:left;">
+Health status
+</td>
+<td style="text-align:left;">
+Chronic conditions
+</td>
+<td style="text-align:left;">
+Categorical
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, resp_condition_der, CCC_051], DerivedVar::[CCC_121, CCC_131, CCC_151, CCC_171, CCC_280, resp_condition_der, CCC_051]
+</td>
+</tr></tbody>
+</table>
+</div>
+<div id="creating-a-derived-variable-that-exists-in-other-cchs-cycles" class="section level3">
+<h3 class="hasAnchor">
+<a href="#creating-a-derived-variable-that-exists-in-other-cchs-cycles" class="anchor"></a>Creating a derived variable that exists in other CCHS cycles</h3>
+<p>In order to harmonize a variable across all cycles, you may need to create a derived variable for the years in which the variable is not present. An example of this is RACDPAL, a variable that was derived from 2003 to 2014. To create and specify RACDPAL for 2001, the same derived variable conventions apply with a few slight differences. In <code>variables.csv</code>, the DerivedVar is enclosed with the database in which it is derived.</p>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+variableStart
+</th>
+</tr></thead>
+<tbody><tr>
+<td style="text-align:left;">
+cchs2001_p::[DerivedVar::[RAC_1, RAC_2A, RAC_2B, RAC_2C]], cchs2003_p::RACCDPAL, cchs2005_p::RACEDPAL, [RACDPAL]
+</td>
+</tr></tbody>
+</table>
+<p>This is to specify that for the 2001 CCHS cycle, it is derived from those base variables; while in later cycles it is simply recoded from the database.</p>
+<p>In <code>variable_details.csv</code>, additional rows are created for the 2001 cycle so that <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> understands that in 2001 it will be derived from base variables, while in later cycles it is a simple recode.</p>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+variable
+</th>
+<th style="text-align:left;">
+dummyVariable
+</th>
+<th style="text-align:left;">
+toType
+</th>
+<th style="text-align:left;">
+databaseStart
+</th>
+<th style="text-align:left;">
+variableStart
+</th>
+<th style="text-align:left;">
+fromType
+</th>
+<th style="text-align:left;">
+recTo
+</th>
+<th style="text-align:left;">
+numValidCat
+</th>
+<th style="text-align:left;">
+catLabel
+</th>
+<th style="text-align:left;">
+catLabelLong
+</th>
+<th style="text-align:left;">
+units
+</th>
+<th style="text-align:left;">
+recFrom
+</th>
+<th style="text-align:left;">
+catStartLabel
+</th>
+<th style="text-align:left;">
+variableStartShortLabel
+</th>
+<th style="text-align:left;">
+variableStartLabel
+</th>
+<th style="text-align:left;">
+notes
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+21
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[RAC_1, RAC_2A, RAC_2B, RAC_2C]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Func::RACDPAL_fun
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+22
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[RAC_1, RAC_2A, RAC_2B, RAC_2C]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Sometimes
+</td>
+<td style="text-align:left;">
+Sometimes
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Sometimes
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+23
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[RAC_1, RAC_2A, RAC_2B, RAC_2C]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Often
+</td>
+<td style="text-align:left;">
+Often
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Often
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+24
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2001_p
+</td>
+<td style="text-align:left;">
+DerivedVar::[RAC_1, RAC_2A, RAC_2B, RAC_2C]
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Never
+</td>
+<td style="text-align:left;">
+Never
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+Never
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+RACDPAL_cat3_1
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+cchs2003_p::RACCDPAL, cchs2005_p::RACEDPAL, [RACDPAL]
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Sometimes
+</td>
+<td style="text-align:left;">
+Sometimes
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+Sometimes
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+26
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+RACDPAL_cat3_2
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+cchs2003_p::RACCDPAL, cchs2005_p::RACEDPAL, [RACDPAL]
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Often
+</td>
+<td style="text-align:left;">
+Often
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+Often
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+27
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+RACDPAL_cat3_3
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+cchs2003_p::RACCDPAL, cchs2005_p::RACEDPAL, [RACDPAL]
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Never
+</td>
+<td style="text-align:left;">
+Never
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Never
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+28
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+RACDPAL_cat3_NA::a
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+cchs2003_p::RACCDPAL, cchs2005_p::RACEDPAL, [RACDPAL]
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+NA::a
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+not applicable
+</td>
+<td style="text-align:left;">
+not applicable
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+not applicable
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+29
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+RACDPAL_cat3_NA::b
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+cchs2003_p::RACCDPAL, cchs2005_p::RACEDPAL, [RACDPAL]
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+NA::b
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+missing
+</td>
+<td style="text-align:left;">
+missing
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+[7,9]
+</td>
+<td style="text-align:left;">
+don’t know (7); refusal (8); not stated (9)
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+30
+</td>
+<td style="text-align:left;">
+RACDPAL
+</td>
+<td style="text-align:left;">
+RACDPAL_cat3_NA::b
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p
+</td>
+<td style="text-align:left;">
+cchs2003_p::RACCDPAL, cchs2005_p::RACEDPAL, [RACDPAL]
+</td>
+<td style="text-align:left;">
+cat
+</td>
+<td style="text-align:left;">
+NA::b
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+missing
+</td>
+<td style="text-align:left;">
+missing
+</td>
+<td style="text-align:left;">
+N/A
+</td>
+<td style="text-align:left;">
+else
+</td>
+<td style="text-align:left;">
+else
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+Participation and activity limitation
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -4090,7 +5196,20 @@ DerivedVar::[SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_co
 </div>
 
   
-
-
-  </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script><script>
+  docsearch({
+    
+    
+    apiKey: 'a674c1edc7b44c4ee995ef4227708c57',
+    indexName: 'cchsflow',
+    inputSelector: 'input#search-input.form-control',
+    transformData: function(hits) {
+      return hits.map(function (hit) {
+        hit.url = updateHitURL(hit);
+        return hit;
+      });
+    }
+  });
+</script>
+</body>
 </html>
