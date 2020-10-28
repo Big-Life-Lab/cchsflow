@@ -3,7 +3,7 @@
 #' @description A 6 category variables representing the number of tasks
 #' an individual needs help with. It also has two categories to represent
 #' "missing" and "not applicable". It uses the following five ADL variables
-#' which are common accros CCHS cycles from 2201 to 2014:
+#' which are common accros CCHS cycles from 2001 to 2014:
 #' \enumerate{
 #'   \item ADL_01 - Needs help preparing meals
 #'   \item ADL_02 - Needs help getting to appointments/errands
