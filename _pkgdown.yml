@@ -95,6 +95,7 @@ reference:
     contents:
     - rec_with_table
     - set_data_labels
+    - merge_rec_data
   - title: "Utility functions"
     desc: Utility functions that are used in other cchsflow functions
     contents:
