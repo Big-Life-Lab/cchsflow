@@ -81,7 +81,7 @@ adl_score_5_fun <-
     # values in each row
     count_missing_adl <- rep(0, length(ADL_01))
     # For each row of each of the above ADL variables, if they have a value of 
-    # "not applicable" then increment the count for that row in the above
+    # "missing" then increment the count for that row in the above
     # vector by one
     count_missing_adl <-
       ifelse(ADL_01 == "NA::b", count_missing_adl + 1, count_missing_adl)
@@ -98,7 +98,7 @@ adl_score_5_fun <-
     # values in each row
     count_not_applicable_adl <- rep(0, length(ADL_01))
     # For each row of each of the above ADL variables, if they have a value of 
-    # "missing" then increment the count for that row in the above
+    # "not applicable" then increment the count for that row in the above
     # vector by one
     count_not_applicable_adl <-
       ifelse(ADL_01 == "NA::a",
