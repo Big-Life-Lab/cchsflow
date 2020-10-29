@@ -27,8 +27,9 @@
 #'   \item 4 - Needs help with at least 4 tasks
 #'   \item 5 - Needs help with at least 5 tasks
 #' }
-#' A value of NA::a means that all the input variables had NA::a
-#' A value of NA::b means that all the input variables were missing
+#' A value of NA::b means at least one of the component variables had missing data
+#' A value of NA::a means that none of the component variables had missing data
+#' but at least one of them had a value of "not applicable"
 #'
 #' @export
 #'
@@ -130,19 +131,19 @@ adl_score_5_fun <-
     count_adl <- ifelse(ADL_04 == "2", count_adl + 1, count_adl)
     count_adl <- ifelse(ADL_05 == "2", count_adl + 1, count_adl)
     
-    # If the individual had missing data for all the variables then set
+    # If the individual had missing data for any of the variables then set
     # the score to missing
-    # If the inividual has "not applicable" data for all the variables, then
+    # If the inividual has "not applicable" for any of the variables, then
     # set the score to "not applicable"
-    # Otherwise set the score for each individual to count of the number
+    # Otherwise set the score for each individual to the count of the number
     # of tasks they needed help with
     total_num_adls <- 5
     ADL_score_5 <-
       ifelse(
-        count_missing_adl == total_num_adls,
+        count_missing_adl >= 1,
         "NA::b",
         ifelse(
-          count_not_applicable_adl == total_num_adls,
+          count_not_applicable_adl >= 1,
           "NA::a",
           count_adl
         )
