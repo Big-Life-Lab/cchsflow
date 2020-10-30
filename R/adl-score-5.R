@@ -26,10 +26,9 @@
 #'   \item 3 - Needs help with at least 3 tasks
 #'   \item 4 - Needs help with at least 4 tasks
 #'   \item 5 - Needs help with at least 5 tasks
+#'   \item NA::a - Not applicable. At least one of the component variables had a value of not applicable
+#'   \item NA::b - Missing. At least one of the component variables had a value of misssing, but none of had a **not applicable** value
 #' }
-#' A value of NA::b means at least one of the component variables had missing data
-#' A value of NA::a means that none of the component variables had missing data
-#' but at least one of them had a value of "not applicable"
 #'
 #' @export
 #'
@@ -140,11 +139,11 @@ adl_score_5_fun <-
     total_num_adls <- 5
     ADL_score_5 <-
       ifelse(
-        count_missing_adl >= 1,
-        "NA::b",
+        count_not_applicable_adl >= 1,
+        "NA::a",
         ifelse(
-          count_not_applicable_adl >= 1,
-          "NA::a",
+          count_missing_adl >= 1,
+          "NA::b",
           count_adl
         )
       )
