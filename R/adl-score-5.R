@@ -1,9 +1,6 @@
-#' @title Derived variable. Number of tasks the individual needs help with
+#' @title The number of activities of daily living tasks that require help. A  derived variable.
 #'
-#' @description A 6 category variables representing the number of tasks
-#' an individual needs help with. It also has two categories to represent
-#' "missing" and "not applicable". It uses the following five ADL variables
-#' which are common accros CCHS cycles from 2001 to 2014:
+#' @description A 6 category variable (ADL_score_5) representing the number of activities of daily living tasks that require help. The following five ADL variables are used. All variables are common across CCHS cycles from 2001 to 2014:
 #' \enumerate{
 #'   \item ADL_01 - Needs help preparing meals
 #'   \item ADL_02 - Needs help getting to appointments/errands
@@ -11,6 +8,7 @@
 #'   \item ADL_04 - Needs help doing personal care
 #'   \item ADL_05 - Needs help moving inside house
 #' }
+#' There are two categories to represent "missing" and "not applicable". 
 #'
 #' @param ADL_01 Needs help preparing meals
 #' @param ADL_02 Needs help getting to appointments/errands
@@ -33,9 +31,9 @@
 #' @export
 #'
 #' @examples
-#' # Using adl_score_5_fun() to create ADL_score_5 values across CCHS cycles
-#' # adl_score_5_fun() is specified in variable_details.csv along with the
-#' # CCHS variables and cycles included.
+#' # Use adl_score_5_fun() to create the variable ADL_score_5 across CCHS 
+#' # cycles adl_score_5_fun() is specified in variable_details.csv along with 
+#' # the CCHS variables and cycles included.
 #'
 #' # To transform ADL_score_5, use rec_with_table() for each CCHS cycle
 #' # and specify ADL_score_5, along with the various ADL variables.
@@ -132,7 +130,7 @@ adl_score_5_fun <-
     
     # If the individual had missing data for any of the variables then set
     # the score to missing
-    # If the inividual has "not applicable" for any of the variables, then
+    # If the individual has "not applicable" for any of the variables, then
     # set the score to "not applicable"
     # Otherwise set the score for each individual to the count of the number
     # of tasks they needed help with
@@ -150,3 +148,4 @@ adl_score_5_fun <-
     
     return(ADL_score_5)
   }
+
