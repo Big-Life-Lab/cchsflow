@@ -78,7 +78,7 @@
 #'
 adl_score_5_fun <-
   function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-    # For each row in the ADL variables, count the total number of "not applicable"
+    # For each row in the ADL variables, count the total number of "missing"
     # values in each row
     count_missing_adl <- rep(0, length(ADL_01))
     # For each row of each of the above ADL variables, if they have a value of 
@@ -95,7 +95,7 @@ adl_score_5_fun <-
     count_missing_adl <-
       ifelse(ADL_05 == "NA::b", count_missing_adl + 1, count_missing_adl)
     
-    # For each row in the ADL variables, count the total number of missing
+    # For each row in the ADL variables, count the total number of "not applicable"
     # values in each row
     count_not_applicable_adl <- rep(0, length(ADL_01))
     # For each row of each of the above ADL variables, if they have a value of 
