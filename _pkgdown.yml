@@ -65,6 +65,7 @@ reference:
     - multiple_conditions_fun1
     - multiple_conditions_fun2
     - adl_fun
+    - adl_score_5_fun
   - title: "Potentially problematic variables"
     desc: Derived variables in cchsflow that users may run into issues with
     contents:
