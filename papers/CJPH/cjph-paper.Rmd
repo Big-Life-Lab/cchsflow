@@ -2,8 +2,8 @@
 title: 'cchsflow: An open science approach to transform & combine population health surveys'
 csl: ../apa-6th-edition.csl
 output:
-  word_document: default
   pdf_document: default
+  word_document: default
   html_document:
     df_print: paged
 bibliography: ../bibliography.bib
