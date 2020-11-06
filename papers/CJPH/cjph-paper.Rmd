@@ -81,7 +81,7 @@ Variables included in _cchsflow_ fall into three categories: health behaviours, 
 
 ```{r Read variables.csv, message=FALSE, warning=FALSE}
 library(readr)
-variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
+variables <- read.csv(file.path(getwd(), '../../inst/extdata/variables.csv'))
 
 cat("At time of writing, cchsflow contains: \n",
   nrow(variables), "variables \n",
