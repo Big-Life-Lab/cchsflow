@@ -2,15 +2,21 @@
 title: 'cchsflow: An open science approach to transform & combine population health surveys'
 csl: ../apa-6th-edition.csl
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
 bibliography: ../bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
+
+
+library(readr)
+library(knitr)
+library(kableExtra)
+library(cchsflow)
 ```
 
 ## Abstract
@@ -73,7 +79,29 @@ _cchsflow_ follows the approach of the Open Source Initiative and open software 
 
 Variables included in _cchsflow_ fall into three categories: health behaviours, sociodemographic information, and health status. There are provisions and instructions on how users can contribute or request the addition of new variables. 
 
-In Gochman's handbook on health behaviour research, he defines health behaviours as "overt behavioral patterns, actions and habits that relate to health, to health restoration and to health improvement".[@Gochman1997] This definition encompasses a wide variety of behaviours such as, smoking, alcohol, diet, and physical activity.[@Conner2017] For the development of _cchsflow_, the aforementioned behaviours were examined using existing CCHS variables, as well as derived variables. With respect to sociodemographic information, variables such as age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status were collected and added to the _cchsflow_ library. According to Shah, health status can be defined as "[t]he degree to which a person is able to function physically, emotionally, socially, with or without aid from the healthcare system.".[@Shah2003] Within this definition of health status lies health conditions, human function, wellbeing, and deaths. Variables relating to health conditions, human function, and wellbeing were collected. Deaths were not collected as CCHS data included only living respondents.   
+```{r Read variables.csv, message=FALSE, warning=FALSE}
+library(readr)
+variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
+
+cat("At time of writing, cchsflow contains: \n",
+  nrow(variables), "variables \n",
+  sum(!duplicated(variables$subject)), "subjects \n", sum(!duplicated(variables$section)), "sections \n \n")
+
+# Calculate the number of variables by section or subject
+
+cat("The sections include: \n",
+  sum(variables$section == "Health behaviour"), "health behaviour variables \n",
+  sum(variables$section == "Sociodemographics"), "sociodemographic variables \n",
+  sum(variables$section == "Health status"), "health stauts variables \n"
+)
+    
+```
+
+Health behaviours include variables smoking, alcohol, diet, and physical activity.[@Conner2017] There are derived variables such as smoking pack-years (`pack_years_der`) that are not available in the original CCHS data files. 
+
+Sociodemographic variables include age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status. A harmonized occupation variables were created  (`LBFA_31A`, `LBFA_31A_a` and `LBFA_31A_b`) by reviewing studies that used the CCHS to study occupation. References to these papers are included in the `notes` section of the variable transformation. 
+
+Health status variables including chronic disease, the Health Utility Index According, need for help for activities of daily living, mental health, and other measures. The addition of mental health variables included a discussion with mental health researchers who regularly use the CCHS. Their feedback during the harmonization of these variables is open and available, where others can make further comments [https://github.com/Big-Life-Lab/cchsflow/pull/64)(https://github.com/Big-Life-Lab/cchsflow/pull/64). There is a new derived variables for the number of ADLs requiring assistance (`ADL_score_5`) that is not available in the original CCHS data. 
 
 ### Variable mapping
 
