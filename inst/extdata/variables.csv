@@ -70,6 +70,36 @@ FINF1,Food insecurity 12M,Some food insecurity in past 12 months,Sociodemographi
 food_insecurity_der,Food insecurity 12M,Derived food insecurity,Sociodemographics,Food security,Categorical,N/A,"cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p","cchs2001_p::FINAF1, cchs2003_p::FINCF1, [FSCEDHFS], [FSCDHFS2]"
 FSCDHFS,Food security,Household food security status - (D),Sociodemographics,Food security,Categorical,N/A,cchs2005_p,[FSCEDHFS]
 FSCDHFS2,HC food security,Household food security status - (HC),Sociodemographics,Food security,Categorical,N/A,"cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p",[FSCDHFS2]
+FVC_1A,Drinks fruit juice unit,Drinks fruit juices - reporting unit ,Health behaviour,Fruits/vegetables,Categorical,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_1A]
+FVC_1B,Drinks fruit juices daily,Drinks fruit juices - no. of times/day ,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_1B]
+FVC_1C,Drinks fruit juices weekly,Drinks fruit juices - no. of times/week,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_1C]
+FVC_1D,Drinks fruit juices monthly,Drinks fruit juices - no. of times/month,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_1D]
+FVC_1E,Drinks fruit juices yearly,Drinks fruit juices - no. of times/year,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_1E]
+FVC_2A,Eats fruit unit,Eats fruit - reporting unit ,Health behaviour,Fruits/vegetables,Categorical,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_2A]
+FVC_2B,Eats fruit daily,Eats fruit - no. of times/day ,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_2B]
+FVC_2C,Eats fruit weekly,Eats fruit - no. of times/week,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_2C]
+FVC_2D,Eats fruit monthly,Eats fruit - no. of times/month,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_2D]
+FVC_2E,Eats fruit yearly,Eats fruit - no. of times/year,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_2E]
+FVC_3A,Eats green salad unit,Eats green salad - reporting unit ,Health behaviour,Fruits/vegetables,Categorical,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_3A]
+FVC_3B,Eats green salad daily,Eats green salad - no. of times/day ,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_3B]
+FVC_3C,Eats green salad weekly,Eats green salad - no. of times/week,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_3C]
+FVC_3D,Eats green salad monthly,Eats green salad - no. of times/month,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_3D]
+FVC_3E,Eats green salad yearly,Eats green salad - no. of times/year,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_3E]
+FVC_4A,Eats potatoes unit,Eats potatoes - reporting unit ,Health behaviour,Fruits/vegetables,Categorical,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_4A]
+FVC_4B,Eats potatoes daily,Eats potatoes - no. of times/day ,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_4B]
+FVC_4C,Eats potatoes weekly,Eats potatoes - no. of times/week,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_4C]
+FVC_4D,Eats potatoes monthly,Eats potatoes - no. of times/month,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_4D]
+FVC_4E,Eats potatoes  yearly,Eats potatoes - no. of times/year,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_4E]
+FVC_5A,Eats carrots unit,Eats carrots - reporting unit ,Health behaviour,Fruits/vegetables,Categorical,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_5A]
+FVC_5B,Eats carrots daily,Eats carrots - no. of times/day ,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_5B]
+FVC_5C,Eats carrots weekly,Eats carrots - no. of times/week ,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_5C]
+FVC_5D,Eats carrots monthly,Eats carrots - no. of times/month,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_5D]
+FVC_5E,Eats carrots  yearly,Eats carrots - no. of times/year,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_5E]
+FVC_6A,Eats other vegetables unit,Eats other vegetables - reporting unit ,Health behaviour,Fruits/vegetables,Categorical,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_6A]
+FVC_6B,Eats other vegetables daily,Eats other vegetables - servings/day ,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_6B]
+FVC_6C,Eats other vegetables weekly,Eats other vegetables - servings/week,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_6C]
+FVC_6D,Eats other vegetables monthly,Eats other vegetables - servings/month,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_6D]
+FVC_6E,Eats other vegetables yearly,Eats other vegetables - servings/year,Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVC_6E]
 FVCDCAR,Carrot consumption,Daily consumption - carrots (D),Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p","cchs2001_p::FVCADCAR, cchs2003_p::FVCCDCAR, cchs2005_p::FVCEDCAR, [FVCDCAR]"
 FVCDFRU,Fruit consumption,Daily consumption - fruit - (D),Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p","cchs2001_p::FVCADFRU, cchs2003_p::FVCCDFRU, cchs2005_p::FVCEDFRU, [FVCDFRU]"
 FVCDJUI,Juice consumption,Daily consumption - fruit juice (D),Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p","cchs2001_p::FVCADJUI, cchs2003_p::FVCCDJUI, cchs2005_p::FVCEDJUI, [FVCDJUI]"
@@ -77,6 +107,7 @@ FVCDPOT,Potato consumption,Daily consumption - potatoes (D),Health behaviour,Fru
 FVCDSAL,Salad consumption,Daily consumption - green salad - (D),Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p","cchs2001_p::FVCADSAL, cchs2003_p::FVCCDSAL, cchs2005_p::FVCEDSAL, [FVCDSAL]"
 FVCDTOT,Total fruit/veg consumption,Daily consumptoin - total fruits and veg. - (D),Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p","cchs2001_p::FVCADTOT, cchs2003_p::FVCCDTOT, cchs2005_p::FVCEDTOT, [FVCDTOT]"
 FVCDVEG,Other veg consumption,Daily consumption other vegetables - (D),Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p","cchs2001_p::FVCADVEG, cchs2003_p::FVCCDVEG, cchs2005_p::FVCEDVEG, [FVCDVEG]"
+FVCGTOT,Daily total fruits and vegetables,"Daily cons. - Total fruits/veg. - (D,G) ",Health behaviour,Fruits/vegetables,Continuous,N/A,"cchs2009_s, cchs2010_s, cchs2012_s",[FVCGTOT]
 GEN_01,Self perceived health,Self perceived health,Health behaviour,Self-perceived health,Categorical,N/A,"cchs2001_p, cchs2003_p, cchs2005_p, cchs2007_2008_p, cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p","cchs2001_p::GENA_01, cchs2003_p::GENC_01, cchs2005_p::GENE_01, [GEN_01]"
 GEN_02A,Life satisfaction_cat,Satisfaction with life,Health behaviour,Satisfaction with life,Categorical,N/A,"cchs2003_p, cchs2005_p, cchs2007_2008_p","cchs2003_p::GENC_02A, cchs2005_p::GENE_02A, [GEN_02A]"
 GEN_02A2,Life satisfaction_cont,Satisfaction with life in general,Health behaviour,Satisfaction with life,Continuous,N/A,"cchs2009_2010_p, cchs2010_p, cchs2011_2012_p, cchs2012_p, cchs2013_2014_p, cchs2014_p",[GEN_02A2]
