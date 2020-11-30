@@ -1,0 +1,45 @@
+---
+title: "CCHS datasets that overlap each other"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CCHS datasets that overlap each other}     
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## CCHS datasets currently supported by cchsflow
+
+The following datasets are currently supported by cchsflow:
+
+* CCHS PUMF 2001
+* CCHS PUMF 2003
+* CCHS PUMF 2005
+* CCHS PUMF 2007-2008
+* CCHS PUMF 2009-2010
+* CCHS PUMF 2010
+* CCHS PUMF 2011-2012
+* CCHS PUMF 2012
+* CCHS PUMF 2013-2014
+* CCHS PUMF 2014
+
+## Datasets in cchsflow with overlap
+
+Starting with the 2009-2010 CCHS survey cycle, Statistics Canada released different data files containing different CCHS information. The two types of data files that are included in cchsflow are **Two year data files** & **One year data files**. The two year data files are combined data file which contain respondents from two years along with common variables that are asked across both years. The one year data file contains respondents from one year along with common variables and variables that were optional in that year. The two year data files do not contain optional variables that were asked in one year.
+
+This means that the respondents from the CCHS PUMF 2010 dataset are also included in the CCHS PUMF 2009-2010 dataset. There are optional variables, however, that are not included in the CCHS PUMF 2009-2010 dataset. The same goes for the CCHS PUMF 2011-2012 & CCHS PUMF 2012 datasets and CCHS PUMF 2013-2014 & CCHS PUMF 2014 datasets. As cchsflow continues to grow in the number of variables that are supported, the two types of data files are supported so that optional variables can be captured and harmonized across as many cycles as possible.
+
+## Which datasets to use for my research?
+
+Care must be taken in ensuring that your research does not include repeats of the same respondent. If your research primarily focuses on common variables, we recommend using the two year data files (i.e. CCHS 2009-2010, 2011-2012, 2013-2014). If your research requires the use of optional variables that are not included in the two year data files, we recommend using the one year data files (i.e. CCHS 2010, CCHS 2012, CCHS 2014).
+
+## More information
+
+For more information on the difference between the two year data files & one year data files and which variables fall under common and optional, please read the User Guides of the following datasets:
+
+* [User Guide for CCHS 2009-2010 & 2010](https://osf.io/tdvqm/)
+* [User Guide for CCHS 2011-2012 & 2012](https://osf.io/6ps5k/)
+* [User Guide for CCHS 2013-2014 & 2014](https://osf.io/w6p2f/)

@@ -1,4 +1,160 @@
-# cchsflow 1.4.1 (Latest build)
+# cchsflow 1.7.0 (Latest build)
+2020-09-11
+
+## Breaking changes
+- Notation in **recFrom** column of `variable_details.csv` is now changed to
+interval notation (e.g. 7:9 is now denoted as [7,9]).
+
+## Features
+- New `description` column added to `variables.csv` to allow a description of
+variables.
+- New `role` column added to `variables.csv` to allow users to set roles for
+variable manipulation.
+
+## New variables
+Age:
+1. DHHGAGE_5: age variable categorized into 5 20-year age groups. Used in all
+CCHS cycles.
+2. DHHGAGE_D: age variable categorized into 8 10-year age groups. Used in all
+CCHS cycles.
+
+Depression:
+1. DPSDPP: Depression Scale - Predicted Probability. Used in all CCHS cycles.
+2. DPSDSF: Depression Scale - Short Form Score. Used in all CCHS cycles
+3. DIS_10G: Frequency - distress: felt sad / depressed - past month. Used in
+CCHS cycles 2005-2014.
+4. DIS_10H: Frequency - distress: depressed/nothing cheers - past month. Used in
+CCHS cycles 2005-2014.
+5. DPSDMT: Specific month when felt depressed. Used in all CCHS cycles.
+6. DPSDWK: Number of weeks felt depressed - (D). Used in all CCHS cycles.
+7. DPS_02: Felt sad/blue/depressed - 2 weeks or more - 12 mo. Used in CCHS
+cycles 2007-2012.
+8. DPS_03: Sad/depressed - length feelings lasted - 2 wk. Used in CCHS cycles
+2007-2012.
+9. DPS_04: Sad/depressed - frequency - 2 wk. Used in CCHS cycles 2007-2012.
+10. DPS_05: Sad/depressed - lose interest in things - 2 wk. Used in CCHS cycles
+2007-2012.
+11. DPS_06: Sad/depressed - felt tired out / low on energy - 2 wk. Used in CCHS
+cycles 2007-2012.
+12. DPS_07: Sad/depressed - weight change - 2 wk. Used in CCHS cycles 2007-2012.
+13. DPS_08A: Sad/depressed - weight change (amount) - 2 wk. Used in CCHS cycles
+2007-2012.
+14. DPS_08B: Sad/depressed - weight change (lb/kg) - 2 wk. Used in CCHS cycles
+2007-2012.
+15. DPS_09: Sad/depressed - trouble falling asleep - 2 wk. Used in CCHS cycles
+2007-2012.
+16. DPS_10: Sad/depressed trouble falling asleep - frequency - 2 wk. Used in
+CCHS cycles 2007-2012.
+17. DPS_11: Sad/depressed - trouble concentrating - 2 wk. Used in CCHS cycles
+2007-2012.
+18. DPS_12: Sad/depressed - felt down on self - 2 wk. Used in CCHS cycles
+2007-2012.
+19. DPS_13: Sad/depressed - thought a lot about death - 2 wk. Used in CCHS
+cycles 2007-2012.
+20. DPS_14: Sad/depressed - number of weeks - 12 mo. Used in CCHS cycles
+2007-2012.
+
+Influenza:
+1. FLU_160: Ever had a flu shot. Used in all CCHS cycles.
+2. FLU_162: Last time had flu shot. Used in all CCHS cycles.
+
+# cchsflow 1.6.0 
+2020-03-30
+
+## Breaking changes
+- Refactored derived variable functions to handle tagged_na
+- Added new parameter ALW_1 to `binge_drinker_fun()`
+
+## Bug Fixes
+- Bug fix to `resp_condition_fun1()` that was not correctly handling respondents
+under 35 with respiratory conditions
+
+## Variables
+- <font color = "green">**New**</font> SDC_5A_1 - Knowledge of official
+languages. Used in CCHS cycles 2011-2014
+- <font color = "green">**New**</font> SDCDFOLS - First official language
+spoken. Used in CCHS cycles 2011-2014
+- <font color = "green">**New**</font> SDCGLHM - Languages spoken at home. Used
+in CCHS cycles 2007-2014
+- <font color = "green">**New**</font> SDCGLNG - Languages - can converse in.
+Used in CCHS cycles 2001-2010
+
+# cchsflow 1.5.2
+2020-03-24
+
+## Bug Fixes
+- Fixes to typos in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.5.1
+2020-03-20
+
+## Minor improvements
+- Minor hotfix in description of package
+
+# cchsflow 1.5.0 
+2020-03-20
+
+## Breaking changes
+- Modified internal list index access to be compliant with R 4.0.
+- Added `attach_data_name`: new argument for adding data_name to
+`rec_with_table()` return
+
+## Variables
+- <font color = "green">**New**</font> [ADL_der](https://big-life-lab.github.io/cchsflow/reference/adl_fun.html) -
+derived "needs help with task" variable.
+- <font color = "green">**New**</font> [RACDPAL_fun](https://big-life-lab.github.io/cchsflow/reference/RACDPAL_fun.html) - custom function to derive RACDPAL for the 2001 CCHS survey cycle.
+- <font color = "green">**New**</font> ADL_07 - Needs help with heavy household
+chores. Recoded variable used in CCHS cycles 2001-2005. 
+- <font color = "green">**New**</font> ADM_RNO - Sequential record number used
+in all CCHS cycles.
+- <font color = "green">**New**</font> RAC_2B - Reduction in activities at
+school or work due to disability variable used only in the 2001 CCHS survey
+cycle
+- <font color = "green">**New**</font> INCGPER_cont - continuous personal income
+variable harmonized across all CCHS cycles
+
+## Minor improvements
+- New [article](https://big-life-lab.github.io/cchsflow/articles/duplicate_datasets.html)
+that describes overlaps in certain CCHS datasets
+- Documentation on [GEN_02A2](https://big-life-lab.github.io/cchsflow/reference/GEN_02A2.html)
+variable
+- Expanded derived variables section in [How to add variables](https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html) article
+- Added example in [get started](https://big-life-lab.github.io/cchsflow/articles/get_started.html)
+that uses new attach_data_name argument in `rec_with_table()`
+
+# cchsflow 1.4.4
+2020-03-03
+
+## Features
+- Docsearch added to website
+- New article on getting started with _cchsflow_
+
+## Bug fixes
+- Refactor to `pct_time_fun` function to output value from 0-100% as opposed
+to 0-1
+- Refactor to respiratory functions to better capture respondents under 35
+with respiratory conditions
+
+## Minor improvements
+- Improvements to warning outputs in `rec_with_table()`
+- Improvements to labels in `variables.csv` & `variable_details.csv`
+
+# cchsflow 1.4.3 
+2020-02-21
+
+## Minor improvements
+- Minor documentation improvements in vignettes and home page
+
+# cchsflow 1.4.2 
+2020-02-19
+
+## Bug fixes and minor improvements
+- New badges and documentation updates to reflect package being added to CRAN
+- Fixed bug in `rec_with_table()` to include all values in recFrom column
+- Improvements in labelling of variables in `variables.csv` &
+`variable_details.csv`, as well as labelling of derived categorical variables
+
+# cchsflow 1.4.1
 2020-02-11
 
 ## Minor improvements

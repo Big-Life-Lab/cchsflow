@@ -42,7 +42,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2001-c1-1-general-file
 #'
@@ -71,8 +73,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
-#'
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2003-c2-1-General File
 #'
@@ -101,8 +104,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
-#'
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2005-c3-1-main-file
 #'
@@ -131,7 +135,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-E-2007-2008-AnnualComponent
 #'
@@ -160,7 +166,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: CCHS-82M0013-E-2009-2010-Annualcomponent
 #'
@@ -187,9 +195,15 @@ NULL
 #' This is a subset of 200 observations from the 2010 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2009-2010 PUMF
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: CCHS-82M0013-E-2010-AnnualComponent
 #'
@@ -218,8 +232,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
-#'
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2011-2012-Annual-component
 #'
@@ -246,9 +261,15 @@ NULL
 #' This is a subset of 200 observations from the 2012 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2011-2012 PUMF
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2012-Annual-component
 #'
@@ -277,7 +298,9 @@ NULL
 #' The CCHS survey is conducted by Statistics Canada.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2013-2014-Annual-component
 #'
@@ -304,9 +327,15 @@ NULL
 #' This is a subset of 200 observations from the 2014 cycle of the Canadian
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2013-2014 PUMF
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
 #'
 #' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
-#' license.
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
 #'
 #' Long name: cchs-82M0013-E-2014-Annual-component
 #'

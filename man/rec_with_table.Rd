@@ -14,17 +14,18 @@ rec_with_table(
   log = FALSE,
   notes = TRUE,
   var_labels = NULL,
-  custom_function_path = NULL
+  custom_function_path = NULL,
+  attach_data_name = FALSE
 )
 }
 \arguments{
-\item{data}{A dataframe containing the variables to be recoded.}
+\item{data}{A dataframe containing the variables to be recoded. Can also be a list of dataframes}
 
 \item{variables}{character vector containing variable names to recode or
 a variables csv containing additional variable info}
 
-\item{database_name}{String, the name of the dataset containing the
-to be recoded.}
+\item{database_name}{String, the name of the dataset containing the variables
+to be recoded. Can also be a vector of strings if data is a list}
 
 \item{variable_details}{A dataframe containing the specifications (rules)
 for recoding.}
@@ -45,6 +46,8 @@ content inside the `Note`` column of the variable being recoded.}
 \item{var_labels}{labels vector to attach to variables in variables}
 
 \item{custom_function_path}{path to location of the function to load}
+
+\item{attach_data_name}{to attach name of database to end table}
 }
 \value{
 a dataframe that is recoded according to rules in variable_details.
@@ -54,12 +57,12 @@ Recode with Table is responsible for recoding values of a dataset based on
 the specifications in variable_details.
 }
 \details{
-The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv}{variable_details}
+The \href{https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variable_details.csv}{variable_details}
  dataframe needs the following variables to function:
  \describe{
   \item{variable}{name of new (mutated) variable that is recoded}
   \item{toType}{type the variable is being recoded to
-  \emph{cat = categorical, cont = continues}}
+  \emph{cat = categorical, cont = continuous}}
   \item{databaseStart}{name of dataframe with original variables to be
   recoded}
   \item{variableStart}{name of variable to be recoded}
@@ -112,25 +115,25 @@ The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-v
 }
 \examples{
 library(cchsflow)
-bmi2010 <- rec_with_table(
-  data = cchs2010_p, c(
+bmi2001 <- rec_with_table(
+  data = cchs2001_p, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
 )
 
-head(bmi2010)
+head(bmi2001)
 
-bmi2012 <- rec_with_table(
-  data = cchs2012_p,  c(
+bmi2011_2012 <- rec_with_table(
+  data = cchs2011_2012_p,  c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
 )
 
-tail(bmi2012)
+tail(bmi2011_2012)
 
-combined_bmi <- bind_rows(bmi2010, bmi2012)
+combined_bmi <- bind_rows(bmi2001, bmi2011_2012)
 head(combined_bmi)
 tail(combined_bmi)
 }

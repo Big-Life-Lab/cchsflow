@@ -43,23 +43,23 @@ Since SDCGRES is a categorical variable measuring length of time, we've
 # across cycles
 
 library(cchsflow)
-pct_time2010 <- rec_with_table(
-  cchs2010_p, c(
+pct_time2009_2010 <- rec_with_table(
+  cchs2009_2010_p, c(
     "DHHGAGE_cont", "SDCGCBG",
     "SDCGRES", "pct_time_der"
   )
 )
-head(pct_time2010)
+head(pct_time2009_2010)
 
-pct_time2012 <- rec_with_table(
-  cchs2012_p,  c(
+pct_time2011_2012 <- rec_with_table(
+  cchs2011_2012_p,  c(
     "DHHGAGE_cont", "SDCGCBG",
     "SDCGRES", "pct_time_der"
   )
 )
-tail(pct_time2012)
+tail(pct_time2011_2012)
 
-combined_pct_time <- bind_rows(pct_time2010, pct_time2012)
+combined_pct_time <- bind_rows(pct_time2009_2010, pct_time2011_2012)
 head(combined_pct_time)
 tail(combined_pct_time)
 

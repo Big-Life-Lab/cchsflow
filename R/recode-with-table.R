@@ -44,12 +44,12 @@ is_equal <- function(v1, v2) {
 #' Recode with Table is responsible for recoding values of a dataset based on
 #' the specifications in variable_details.
 #'
-#' The \href{https://github.com/Big-Life-Lab/bllflow/blob/master/inst/extdata/PBC-variableDetails.csv}{variable_details}
+#' The \href{https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variable_details.csv}{variable_details}
 #'  dataframe needs the following variables to function:
 #'  \describe{
 #'   \item{variable}{name of new (mutated) variable that is recoded}
 #'   \item{toType}{type the variable is being recoded to
-#'   \emph{cat = categorical, cont = continues}}
+#'   \emph{cat = categorical, cont = continuous}}
 #'   \item{databaseStart}{name of dataframe with original variables to be
 #'   recoded}
 #'   \item{variableStart}{name of variable to be recoded}
@@ -100,11 +100,11 @@ is_equal <- function(v1, v2) {
 #'     and all values from 3 to 5 into NA in the new variable)}
 #' }
 #'
-#' @param data A dataframe containing the variables to be recoded.
+#' @param data A dataframe containing the variables to be recoded. Can also be a list of dataframes
 #' @param variables character vector containing variable names to recode or
 #' a variables csv containing additional variable info
-#' @param database_name String, the name of the dataset containing the
-#' to be recoded.
+#' @param database_name String, the name of the dataset containing the variables
+#' to be recoded. Can also be a vector of strings if data is a list
 #' @param variable_details A dataframe containing the specifications (rules)
 #' for recoding.
 #' @param else_value Value (string, number, integer, logical or NA) that is used
@@ -118,30 +118,31 @@ is_equal <- function(v1, v2) {
 #' content inside the `Note`` column of the variable being recoded.
 #' @param var_labels labels vector to attach to variables in variables
 #' @param custom_function_path path to location of the function to load
+#' @param attach_data_name to attach name of database to end table
 #'
 #' @return a dataframe that is recoded according to rules in variable_details.
 #'
 #' @examples
 #' library(cchsflow)
-#' bmi2010 <- rec_with_table(
-#'   data = cchs2010_p, c(
+#' bmi2001 <- rec_with_table(
+#'   data = cchs2001_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
 #' )
 #'
-#' head(bmi2010)
+#' head(bmi2001)
 #'
-#' bmi2012 <- rec_with_table(
-#'   data = cchs2012_p,  c(
+#' bmi2011_2012 <- rec_with_table(
+#'   data = cchs2011_2012_p,  c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
 #' )
 #'
-#' tail(bmi2012)
+#' tail(bmi2011_2012)
 #'
-#' combined_bmi <- bind_rows(bmi2010, bmi2012)
+#' combined_bmi <- bind_rows(bmi2001, bmi2011_2012)
 #' head(combined_bmi)
 #' tail(combined_bmi)
 #' @importFrom haven tagged_na
@@ -160,17 +161,20 @@ rec_with_table <-
            log = FALSE,
            notes = TRUE,
            var_labels = NULL,
-           custom_function_path = NULL) {
+           custom_function_path = NULL,
+           attach_data_name = FALSE) {
     # If custom Functions are passed create new environment and source
     if (!is.null(custom_function_path)) {
       source(custom_function_path)
     }
     if (is.null(variable_details)) {
-      message("Loading cchsflow variable_details")
+      message("No variable_details detected.
+              Loading cchsflow variable_details")
       data(variable_details, package = "cchsflow", envir = environment())
     }
     if (is.null(variables)) {
-      message("Loading cchsflow variables")
+      message("No variables detected.
+              Loading cchsflow variables")
       data(variables, package = "cchsflow", envir = environment())
     }
     if (is.null(database_name)) {
@@ -180,10 +184,10 @@ rec_with_table <-
     # ---- Step 1: Detemine if the passed data is a list or single database
     append_non_db_columns <- FALSE
     if (class(data) == "list" &&
-      length(database_name) == length(data)) {
+        length(database_name) == length(data)) {
       for (data_name in database_name) {
         # ---- Step 2A: Verify that the passed name exists in the passed data
-
+        
         if (!is.null(data[[data_name]])) {
           data[[data_name]] <- recode_call(
             variables = variables,
@@ -209,7 +213,7 @@ rec_with_table <-
         }
       }
     } else if ("data.frame" %in% class(data) &&
-      length(database_name) == 1) {
+               length(database_name) == 1) {
       data <- recode_call(
         variables = variables,
         data = data,
@@ -222,18 +226,21 @@ rec_with_table <-
         log = log,
         var_labels = var_labels
       )
+      if (attach_data_name) {
+        data[["data_name"]] <- database_name
+      }
     } else {
       stop(
         paste(
           "The passed number of data does not match the passed number of
-          dataNames please verify that the number of databases matches number
+          data_names. Please verify that the number of databases matches the number
           of passed names.
           Aborting operation!"
         ),
         call. = FALSE
-        )
+      )
     }
-
+    
     return(data)
   }
 
@@ -258,7 +265,7 @@ recode_call <-
         update_variable_details_based_on_variable_sheet(
           variable_sheet = variables,
           variable_details = variable_details
-          )
+        )
     } else {
       if (!is.null(variables)) {
         variable_details <-
@@ -306,13 +313,13 @@ recode_call <-
         }
       }
     }
-
+    
     all_possible_var_names <-
       unique(as.character(variable_details[[pkg.globals$argument.Variables]]))
     all_variables_detected <-
       variable_details[grepl(database_name, variable_details[[
         pkg.globals$argument.DatabaseStart]]), ]
-
+    
     rec_data <-
       recode_columns(
         data = data,
@@ -333,13 +340,13 @@ recode_call <-
         rec_data[[missed_variable_name]] <- NA
       }
     }
-
+    
     if (append_to_data) {
       data <- cbind(data, rec_data)
     } else {
       data <- rec_data
     }
-
+    
     return(data)
   }
 
@@ -353,7 +360,7 @@ recode_call <-
 #' @param data_name name of the database being checked
 #' @param data database being checked
 #' @param row_being_checked the row from variable details that contains
-#' information on this variables
+#' information on this variable
 #' @param variable_being_checked the name of the recoded variable
 #'
 #' @return the data equivalent of variable_being_checked
@@ -365,7 +372,7 @@ get_data_variable_name <-
     data_variable_being_checked <- character()
     var_start_names <-
       as.character(row_being_checked[[pkg.globals$argument.VariableStart]])
-
+    
     if (grepl(data_name, var_start_names)) {
       var_start_names_list <- as.list(strsplit(var_start_names, ",")[[1]])
       # Find exact var Name
@@ -376,7 +383,9 @@ get_data_variable_name <-
             as.list(strsplit(var_name, "::")[[1]])[[2]]
         }
       }
+      # Check for default variable name
     } else if (grepl("\\[", var_start_names)) {
+      # Strip default var name tags: []
       data_variable_being_checked <-
         str_match(var_start_names, "\\[(.*?)\\]")[, 2]
     } else {
@@ -426,25 +435,22 @@ recode_columns <-
     map_variables_to_process <-
       variables_to_process[grepl("map::", variables_to_process[[
         pkg.globals$argument.CatValue]]), ]
-
+    
     func_variables_to_process <-
       variables_to_process[grepl("Func::", variables_to_process[[
         pkg.globals$argument.CatValue]]), ]
-
+    
     rec_variables_to_process <-
-      variables_to_process[!grepl("Func::|map::", variables_to_process[[
-        pkg.globals$argument.CatValue]]), ]
-
+      variables_to_process[(!grepl("Func::|map::", variables_to_process[[
+        pkg.globals$argument.CatValue]])) & (!grepl("DerivedVar::",
+                                                    variables_to_process[[
+                                                      pkg.globals$argument.VariableStart]])), ]
+    
     label_list <- list()
     # Set interval if none is present
-    interval_present <- TRUE
     valid_intervals <- c("[,]", "[,)", "(,]")
-    interval_default <- "[,)"
+    interval_default <- "[,]"
     recoded_data <- data[, 0]
-    if (is.null(rec_variables_to_process[[pkg.globals$argument.Interval]])) {
-      interval_present <- FALSE
-    }
-
     # Loop through the rows of recode vars
     while (nrow(rec_variables_to_process) > 0) {
       variable_being_checked <-
@@ -482,6 +488,7 @@ recode_columns <-
           all_from_values_for_variable)) != length(
             all_from_values_for_variable)) {
           for (single_from in all_from_values_for_variable) {
+            # Check if value is repeated more then once
             if (sum(all_from_values_for_variable == single_from) > 1) {
               stop(
                 paste(
@@ -494,7 +501,7 @@ recode_columns <-
             }
           }
         }
-
+        
         # Set factor for all recode values
         label_list[[variable_being_checked]] <-
           create_label_list_element(rows_being_checked)
@@ -503,18 +510,11 @@ recode_columns <-
             pkg.globals$argument.From]] == "else",
             pkg.globals$argument.CatValue])
         if (length(else_value) == 1 &&
-          !is_equal(else_value, "character(0)")) {
+            !is_equal(else_value, "character(0)")) {
           else_value <-
             recode_variable_NA_formating(else_value, label_list[[
               variable_being_checked]]$type)
           if (is_equal(else_value, "copy")) {
-            data_variable_being_checked <-
-              get_data_variable_name(
-                data_name = data_name,
-                row_being_checked = first_row,
-                variable_being_checked = variable_being_checked,
-                data = data
-              )
             recoded_data[variable_being_checked] <-
               data[data_variable_being_checked]
           } else {
@@ -545,13 +545,13 @@ recode_columns <-
           levels(recoded_data[[variable_being_checked]]) <-
             c(levels(recoded_data[[variable_being_checked]]),
               levels(rows_being_checked[[pkg.globals$argument.CatValue]]))
-
+          
           for (row in seq_len(nrow(rows_being_checked))) {
             row_being_checked <- rows_being_checked[row, ]
             # If cat go check for label and obtain it
-
+            
             # regardless obtain unit and attach
-
+            
             # find var name for this database
             data_variable_being_checked <-
               get_data_variable_name(
@@ -560,14 +560,22 @@ recode_columns <-
                 variable_being_checked = variable_being_checked,
                 data = data
               )
-
+            
             # Recode the variable
             from_values <- list()
-            if (grepl(":", as.character(row_being_checked[[
+            interval <- ""
+            if (grepl("\\[*\\]", as.character(row_being_checked[[
               pkg.globals$argument.From]]))) {
               from_values <-
                 strsplit(as.character(row_being_checked[[
-                  pkg.globals$argument.From]]), ":")[[1]]
+                  pkg.globals$argument.From]]), ",")[[1]]
+              from_values[[1]] <- trimws(from_values[[1]])
+              from_values[[2]] <- trimws(from_values[[2]])
+              interval_left <- substr(from_values[[1]], 1, 1)
+              interval_right <- substr(from_values[[2]], nchar(from_values[[2]]), nchar(from_values[[2]]))
+              interval <- paste0(interval_left,",",interval_right)
+              from_values[[1]] <- gsub("\\[|\\]", "", from_values[[1]])
+              from_values[[2]] <- gsub("\\[|\\]", "", from_values[[2]])
             } else {
               temp_from <-
                 as.character(row_being_checked[[pkg.globals$argument.From]])
@@ -576,43 +584,27 @@ recode_columns <-
             }
             value_recorded <-
               as.character(row_being_checked[[pkg.globals$argument.CatValue]])
-            if (interval_present) {
-              interval <- as.character(row_being_checked[[
-                pkg.globals$argument.Interval]])
-              if (!interval %in% valid_intervals) {
-                interval <- interval_default
-              }
-              if (from_values[[1]] == from_values[[2]]) {
-                interval <- "[,]"
-              }
-              valid_row_index <- compare_value_based_on_interval(
-                compare_columns = data_variable_being_checked,
-                data = data,
-                left_boundary = from_values[[1]],
-                right_boundary = from_values[[2]],
-                interval = interval
-              )
-            } else {
-              if (from_values[[1]] == from_values[[2]]) {
-                interval <- "[,]"
-              } else {
-                interval <- interval_default
-              }
-              valid_row_index <- compare_value_based_on_interval(
-                compare_columns = data_variable_being_checked,
-                data = data,
-                left_boundary = from_values[[1]],
-                right_boundary = from_values[[2]],
-                interval = interval
-              )
+            if (from_values[[1]] == from_values[[2]]) {
+              interval <- "[,]"
+            }else if (!interval %in% valid_intervals) {
+              message(paste("For variable", variable_being_checked, "invalid interval was passed.\nDefault interval will be used:", interval_default))
+              interval <- interval_default
             }
+            valid_row_index <- compare_value_based_on_interval(
+              compare_columns = data_variable_being_checked,
+              data = data,
+              left_boundary = from_values[[1]],
+              right_boundary = from_values[[2]],
+              interval = interval
+            )
+            
             # Start construction of dataframe for log
             log_table[row, "value_to"] <- value_recorded
             log_table[row, "From"] <-
               as.character(row_being_checked[[pkg.globals$argument.From]])
             log_table[row, "rows_recoded"] <-
               sum(valid_row_index, na.rm = TRUE)
-
+            
             value_recorded <-
               recode_variable_NA_formating(value_recorded, label_list[[
                 variable_being_checked]]$type)
@@ -623,25 +615,26 @@ recode_columns <-
             recoded_data[valid_row_index, variable_being_checked] <-
               value_recorded
             if (print_note &&
-              !is.null(row_being_checked[[pkg.globals$argument.Notes]]) &&
-              !is_equal(row_being_checked[[pkg.globals$argument.Notes]], "") &&
-              !is.na(row_being_checked[[pkg.globals$argument.Notes]])) {
+                !is.null(row_being_checked[[pkg.globals$argument.Notes]]) &&
+                !is_equal(row_being_checked[[pkg.globals$argument.Notes]],
+                          "") &&
+                !is.na(row_being_checked[[pkg.globals$argument.Notes]])) {
               message("NOTE for ", variable_being_checked,
-                          ": ",
-                          as.character(row_being_checked[[
-                pkg.globals$argument.Notes]]))
+                      ": ",
+                      as.character(row_being_checked[[
+                        pkg.globals$argument.Notes]]))
             }
           }
           # if log was requested print it
           if (log) {
             message(
-                "The variable ",
-                data_variable_being_checked,
-                " was recoded into ",
-                variable_being_checked,
-                " for the database ",
-                data_name,
-                " the following recodes were made: "
+              "The variable ",
+              data_variable_being_checked,
+              " was recoded into ",
+              variable_being_checked,
+              " for the database ",
+              data_name,
+              " the following recodes were made: "
             )
             # Reset rowCount to avoid confusion
             rownames(log_table) <- NULL
@@ -650,7 +643,7 @@ recode_columns <-
         }
       }
     }
-
+    
     # Process funcVars
     while (nrow(func_variables_to_process) > 0) {
       first_row <- func_variables_to_process[1, ]
@@ -676,7 +669,7 @@ recode_columns <-
     # Populate data Labels
     recoded_data <-
       label_data(label_list = label_list, data_to_label = recoded_data)
-
+    
     return(recoded_data)
   }
 
@@ -709,28 +702,28 @@ compare_value_based_on_interval <-
         return_boolean <-
           data[[compare_columns]] %in% data[[
             compare_columns]][which(
-            as.numeric(left_boundary) <= data[[compare_columns]] &
-              data[[compare_columns]] <= as.numeric(right_boundary)
-          )]
+              as.numeric(left_boundary) <= data[[compare_columns]] &
+                data[[compare_columns]] <= as.numeric(right_boundary)
+            )]
       } else if (interval == "[,)") {
         return_boolean <-
           data[[compare_columns]] %in% data[[
             compare_columns]][which(
-            as.numeric(left_boundary) <= data[[compare_columns]] &
-              data[[compare_columns]] < as.numeric(right_boundary)
-          )]
+              as.numeric(left_boundary) <= data[[compare_columns]] &
+                data[[compare_columns]] < as.numeric(right_boundary)
+            )]
       } else if (interval == "(,]") {
         return_boolean <-
           data[[compare_columns]] %in% data[[
             compare_columns]][which(
-            as.numeric(left_boundary) < data[[compare_columns]] &
-              data[[compare_columns]] <= as.numeric(right_boundary)
-          )]
+              as.numeric(left_boundary) < data[[compare_columns]] &
+                data[[compare_columns]] <= as.numeric(right_boundary)
+            )]
       } else {
         stop("Invalid Argument was passed")
       }
     }
-
+    
     return(return_boolean)
   }
 
@@ -770,10 +763,18 @@ update_variable_details_based_on_variable_sheet <-
       variable_details[variable_details[[pkg.globals$argument.Variables]] %in%
                          variable_sheet[[
                            pkg.globals$MSW.Variables.Columns.Variable]], ]
-
+    
     return(variable_details)
   }
 
+#' Recode NA formatting
+#' 
+#' Recodes the NA depending on the var type
+#' 
+#' @param cell_value The value inside the recTo column
+#' @param var_type the toType of a variable
+#' 
+#' @return an appropriately coded tagged NA
 recode_variable_NA_formating <- function(cell_value, var_type) {
   recode_value <- NULL
   if (grepl("NA", cell_value)) {
@@ -785,12 +786,12 @@ recode_variable_NA_formating <- function(cell_value, var_type) {
     }
   } else {
     if (!is_equal(var_type, pkg.globals$argument.CatType) &&
-      !is_equal(cell_value, "copy")) {
+        !is_equal(cell_value, "copy")) {
       cell_value <- as.numeric(cell_value)
     }
     recode_value <- cell_value
   }
-
+  
   return(recode_value)
 }
 
@@ -828,7 +829,7 @@ recode_derived_variables <-
       feeder_vars <- sapply(feeder_vars, trimws)
       used_feeder_vars <- feeder_vars
       feeder_vars <- setdiff(feeder_vars, names(recoded_data))
-
+      
       # Check if the variable has a function to recode
       non_func_missing_variables <-
         setdiff(feeder_vars, unique(as.character(variables_to_process[[
@@ -837,14 +838,15 @@ recode_derived_variables <-
         warning(
           paste(
             variable_being_processed,
-            "could not be calculated because",
+            "could not be derived because",
             feeder_vars,
-            "was never recoded and is not a function variable"
+            "was never specified nor is it a function variable,
+            therefore it was not recoded \n"
           )
         )
         var_stack <-
           var_stack[!(var_stack == variable_being_processed)]
-
+        
         return(
           list(
             var_stack = var_stack,
@@ -869,7 +871,7 @@ recode_derived_variables <-
           )
         )
       }
-
+      
       # Update var_stack and recurse to get the feeder vars
       for (one_feeder in feeder_vars) {
         # Need to check recoded data again in case a recursion added it
@@ -892,16 +894,16 @@ recode_derived_variables <-
             derived_return$variables_to_process
         }
       }
-
+      
       # Obtain the function for each row
       append(label_list, create_label_list_element(variable_rows))
-
+      
       row_being_checked <- variable_rows[row_num, ]
       func_cell <-
         as.character(row_being_checked[[pkg.globals$argument.CatValue]])
       function_being_used <-
         as.list(strsplit(func_cell, "::"))[[1]][[2]]
-
+      
       column_value <-
         recoded_data %>%
         rowwise() %>%
@@ -914,18 +916,19 @@ recode_derived_variables <-
           )
         )
       # Set type of var
-      if(as.character(row_being_checked[[pkg.globals$argument.ToType]]) != pkg.globals$argument.CatType) {
+      if (as.character(row_being_checked[[pkg.globals$argument.ToType]]) !=
+          pkg.globals$argument.CatType) {
         column_value <- as.numeric(unlist(column_value[["column_being_added"]]))
       }else{
         column_value <- as.factor(unlist(column_value[["column_being_added"]]))
       }
       recoded_data[[variable_being_processed]] <-
         column_value
-
+      
       var_stack <-
         var_stack[!(var_stack == variable_being_processed)]
     }
-
+    
     return(
       list(
         var_stack = var_stack,
@@ -942,6 +945,6 @@ calculate_custom_function_row_value <-
     row_values <- unname(row_values)
     custom_function_return_value <-
       do.call(get(custom_function_name), row_values)
-
+    
     return(custom_function_return_value)
   }

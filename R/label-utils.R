@@ -12,21 +12,21 @@
 #' @examples
 #' library(cchsflow)
 #' library(sjlabelled)
-#' bmi2010 <- rec_with_table(
-#'  cchs2010_p, c(
+#' bmi2001 <- rec_with_table(
+#'  cchs2001_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
 #' )
 #'
-#' bmi2012 <- rec_with_table(
-#'   cchs2012_p, c(
+#' bmi2003 <- rec_with_table(
+#'   cchs2003_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
 #' )
 #'
-#' combined_bmi <- bind_rows(bmi2010, bmi2012)
+#' combined_bmi <- bind_rows(bmi2001, bmi2003)
 #'
 #' get_label(combined_bmi)
 #'
@@ -177,30 +177,34 @@ label_data <- function(label_list, data_to_label) {
       next()
     }
     if (label_list[[variable_name]]$type == pkg.globals$argument.CatType) {
-      if (class(data_to_label[[variable_name]]) != "factor") {
-        data_to_label[[variable_name]] <-
-          factor(data_to_label[[variable_name]])
+      if (class(data_to_label[, variable_name]) != "factor") {
+        data_to_label[, variable_name] <-
+          factor(data_to_label[, variable_name])
       }
-      data_to_label[[variable_name]] <-
-        set_labels(data_to_label[[variable_name]],
+      # List fix
+      label_list[[variable_name]]$values <- unlist(label_list[[variable_name]]$values)
+      label_list[[variable_name]]$values_long <- unlist(label_list[[variable_name]]$values_long)
+      
+      data_to_label[, variable_name] <-
+        set_labels(data_to_label[, variable_name],
                    labels = label_list[[variable_name]]$values)
-      attr(data_to_label[[variable_name]], "labels_long") <-
+      attr(data_to_label[, variable_name], "labels_long") <-
         label_list[[variable_name]]$values_long
     } else {
-      if (class(data_to_label[[variable_name]]) == "factor") {
-        data_to_label[[variable_name]] <-
-          as.numeric(levels(data_to_label[[variable_name]])
-                     [data_to_label[[variable_name]]])
+      if (class(data_to_label[, variable_name]) == "factor") {
+        data_to_label[, variable_name] <-
+          as.numeric(levels(data_to_label[, variable_name])
+                     [data_to_label[, variable_name]])
       } else {
-        data_to_label[[variable_name]] <-
-          as.numeric(data_to_label[[variable_name]])
+        data_to_label[, variable_name] <-
+          as.numeric(data_to_label[, variable_name])
       }
     }
-    set_label(data_to_label[[variable_name]]) <-
+    set_label(data_to_label[, variable_name]) <-
       label_list[[variable_name]]$label
-    attr(data_to_label[[variable_name]], "unit") <-
+    attr(data_to_label[, variable_name], "unit") <-
       label_list[[variable_name]]$unit
-    attr(data_to_label[[variable_name]], "label_long") <-
+    attr(data_to_label[, variable_name], "label_long") <-
       label_list[[variable_name]]$label_long
   }
 

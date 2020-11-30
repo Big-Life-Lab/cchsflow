@@ -24,21 +24,21 @@ in the passed dataframes
 \examples{
 library(cchsflow)
 library(sjlabelled)
-bmi2010 <- rec_with_table(
- cchs2010_p, c(
+bmi2001 <- rec_with_table(
+ cchs2001_p, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
 )
 
-bmi2012 <- rec_with_table(
-  cchs2012_p, c(
+bmi2003 <- rec_with_table(
+  cchs2003_p, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
 )
 
-combined_bmi <- bind_rows(bmi2010, bmi2012)
+combined_bmi <- bind_rows(bmi2001, bmi2003)
 
 get_label(combined_bmi)
 

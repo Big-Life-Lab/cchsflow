@@ -33,23 +33,23 @@
 #' # across cycles
 #'
 #' library(cchsflow)
-#' pct_time2010 <- rec_with_table(
-#'   cchs2010_p, c(
+#' pct_time2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
 #'     "DHHGAGE_cont", "SDCGCBG",
 #'     "SDCGRES", "pct_time_der"
 #'   )
 #' )
-#' head(pct_time2010)
+#' head(pct_time2009_2010)
 #'
-#' pct_time2012 <- rec_with_table(
-#'   cchs2012_p,  c(
+#' pct_time2011_2012 <- rec_with_table(
+#'   cchs2011_2012_p,  c(
 #'     "DHHGAGE_cont", "SDCGCBG",
 #'     "SDCGRES", "pct_time_der"
 #'   )
 #' )
-#' tail(pct_time2012)
+#' tail(pct_time2011_2012)
 #'
-#' combined_pct_time <- bind_rows(pct_time2010, pct_time2012)
+#' combined_pct_time <- bind_rows(pct_time2009_2010, pct_time2011_2012)
 #' head(combined_pct_time)
 #' tail(combined_pct_time)
 #'
@@ -65,10 +65,12 @@
 pct_time_fun <-
   function(DHHGAGE_cont, SDCGCBG, SDCGRES) {
     if (is_equal(SDCGCBG, 1)) {
-      return(1)
+      return(100)
     }
-    DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont, return(NA))
+    DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont,
+                             return(tagged_na("b")))
     SDCGRES <- if_else2(SDCGRES == 1, 4.5,
-                        if_else2(SDCGRES == 2, 15, return(NA)))
-    if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont), NA)
+                        if_else2(SDCGRES == 2, 15, return(tagged_na("b"))))
+    
+    if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont * 100), tagged_na("b"))
   }
