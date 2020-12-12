@@ -121,7 +121,7 @@ Which displays:
 
 At the time of writing, there are `r variables_total` variables, `r subjects_total` subjects and `r sections_total` sections.
 
-See code [here](_).
+See code [https://github.com/Big-Life-Lab/cchsflow/blob/516276bcf2d7ff53b2cb8e8e0c7c168ccd70e4f5/papers/CJPH/cjph-paper.Rmd#L122](https://github.com/Big-Life-Lab/cchsflow/blob/516276bcf2d7ff53b2cb8e8e0c7c168ccd70e4f5/papers/CJPH/cjph-paper.Rmd#L122).
 
 Health behaviours include variables smoking, alcohol, diet, and physical activity.[@Conner2017] There are derived variables such as smoking pack-years (`pack_years_der`) that are not available in the original CCHS data files.
 
