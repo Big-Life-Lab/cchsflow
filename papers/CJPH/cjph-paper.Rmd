@@ -2,10 +2,10 @@
 title: 'cchsflow: An open science approach to transform & combine population health surveys'
 csl: ../apa-6th-edition.csl
 output:
-  word_document: default
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
+  word_document: default
 bibliography: ../bibliography.bib
 ---
 
@@ -21,13 +21,13 @@ library(cchsflow)
 
 ## Abstract
 
-**Setting:**  The Canadian Community Health Survey (CCHS) is one of the world's largest onging cross-sectional population health surveys with over 130 000 respondents every two years or over 1.1 million respondents since its inception in 2001. While the survey remains relatively consistent over the years, there are differences between cycles that pose a challenge to analyse the survey over time. 
+**Setting:** The Canadian Community Health Survey (CCHS) is one of the world's largest onging cross-sectional population health surveys with over 130 000 respondents every two years or over 1.1 million respondents since its inception in 2001. While the survey remains relatively consistent over the years, there are differences between cycles that pose a challenge to analyse the survey over time.
 
-**Intervention:** A program package _cchsflow_ was developed to transform & harmonize CCHS variables to consistent formats across multiple survey cycles. An open science approach was used to maintain transparency, reproducibility and collaboration. 
+**Intervention:** A program package *cchsflow* was developed to transform & harmonize CCHS variables to consistent formats across multiple survey cycles. An open science approach was used to maintain transparency, reproducibility and collaboration.
 
-**Outcomes:** The _cchsflow_ R package uses CCHS survey data between 2001 and 2014. Worksheets were created that identify variables, their names in previous cycles, their category structure, and their final variable names. These worksheets were then used to recode variables in each CCHS cycle into consistently named and labelled variables.  Following, survey cycles can be combined. The package was then added as a GitHub repository to encourage collaboration with other researchers.
+**Outcomes:** The *cchsflow* R package uses CCHS survey data between 2001 and 2014. Worksheets were created that identify variables, their names in previous cycles, their category structure, and their final variable names. These worksheets were then used to recode variables in each CCHS cycle into consistently named and labelled variables. Following, survey cycles can be combined. The package was then added as a GitHub repository to encourage collaboration with other researchers.
 
-**Implication:** The _cchsflow_ package has been added to the Comprehensive R Network (CRAN); and contains support for over 160 CCHS variables, generating a combined data set of over 1 million respondents. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean & prepare data for the many CCHS users across Canada.
+**Implication:** The *cchsflow* package has been added to the Comprehensive R Network (CRAN); and contains support for over 160 CCHS variables, generating a combined data set of over 1 million respondents. By implementing open science practices, *cchsflow* aims to minimize the amount of time needed to clean & prepare data for the many CCHS users across Canada.
 
 **Keywords:** Health Surveys, Data Analysis, Data Science, Population Health
 
@@ -35,13 +35,13 @@ library(cchsflow)
 
 ## Résumé
 
-**État Actuel:** L’Enquête sur la santé dans les collectivités canadiennes (ESCC) est l’une des plus grandes enquêtes transversales sur la santé de la population avec plus de 130 000 sondés tous les deux ans et plus de 1.1 million de sondés depuis son début en 2001. Tant que l’enquête reste relativement cohérent, il y a des différences entre des cycles qui pose une challenge majeure pour analyser l’enquête au fil du temps.
+**État Actuel:** L'Enquête sur la santé dans les collectivités canadiennes (ESCC) est l'une des plus grandes enquêtes transversales sur la santé de la population avec plus de 130 000 sondés tous les deux ans et plus de 1.1 million de sondés depuis son début en 2001. Tant que l'enquête reste relativement cohérent, il y a des différences entre des cycles qui pose une challenge majeure pour analyser l'enquête au fil du temps.
 
-**Intervention:** Nous avons développé un processus du nom de cchsflow pour transformer et harmoniser les variables de l’ESCC dans des formats cohérents aux travers plusieurs cycles d’enquêtes.
+**Intervention:** Nous avons développé un processus du nom de cchsflow pour transformer et harmoniser les variables de l'ESCC dans des formats cohérents aux travers plusieurs cycles d'enquêtes.
 
-**Résultats:** Le paquet cchsflow R développé utilisait les données d’enquête de l’ESCC entre 2001 et 2014. Les feuilles de travail étaient crées pour identifier des variables, leurs noms dans des cycles précédents, leurs structures de catégories et leurs noms des variables finales. Ces feuilles de travail ont ensuite été utilisées pour ré-coder les variables dans chaque cycle de l'ESCC pour générer les ensembles de données harmonisés qui peuvent être combiner dans un ensemble de données constamment étiqueté pour analyser. Le paquet a ensuite été ajouté comme un entrepôt de GitHub pour encourager la collaboration entre les autres chercheurs. 
+**Résultats:** Le paquet cchsflow R développé utilisait les données d'enquête de l'ESCC entre 2001 et 2014. Les feuilles de travail étaient crées pour identifier des variables, leurs noms dans des cycles précédents, leurs structures de catégories et leurs noms des variables finales. Ces feuilles de travail ont ensuite été utilisées pour ré-coder les variables dans chaque cycle de l'ESCC pour générer les ensembles de données harmonisés qui peuvent être combiner dans un ensemble de données constamment étiqueté pour analyser. Le paquet a ensuite été ajouté comme un entrepôt de GitHub pour encourager la collaboration entre les autres chercheurs.
 
-**Implication:** Le paquet cchsflow a été ajoute au Comprehensive R Archive Network (CRAN) et contient appui pour plus de 160 variables de l’ESCC, générer un ensemble de données de plus d’un million de sondés. En exécutant les pratiques de sciences ouvertes, cchsflow vise de minimiser le montant de temps nécessaires pour nettoyer et préparer les données pour les plusieurs CCHS participants à travers le Canada. 
+**Implication:** Le paquet cchsflow a été ajoute au Comprehensive R Archive Network (CRAN) et contient appui pour plus de 160 variables de l'ESCC, générer un ensemble de données de plus d'un million de sondés. En exécutant les pratiques de sciences ouvertes, cchsflow vise de minimiser le montant de temps nécessaires pour nettoyer et préparer les données pour les plusieurs CCHS participants à travers le Canada.
 
 **Mots clés:** Enquêtes de santé, Analyse des données, Science des données, Santé de la population
 
@@ -49,21 +49,21 @@ library(cchsflow)
 
 ## Introduction
 
-> You are a public health epidemiologist who would like to report the change in body mass index (BMI) in your health unit over the past 15 years. You review the codebook for the Canadian Community Health Survey (CCHS) and note that BMI is collected. BMI _seems_ like a straightforward measure that is routinely collected worldwide.[@StatisticsCanada2001] Indeed, BMI is included in all CCHS cycles. You examine the documentation and find the variable HWTAGBMI in the CCHS 2001 corresponds to body mass index, but that in other cycles, the variable name changes to HWTCGBMI, HWTDGBMI, HWTEGBMI, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don’t calculate BMI for respondents under the age of 20 or over the age of 64 years. Also, some cycles calculate BMI only if height and weight are within specific ranges. 
+> You are a public health epidemiologist who would like to report the change in body mass index (BMI) in your health unit over the past 15 years. You review the codebook for the Canadian Community Health Survey (CCHS) and note that BMI is collected. BMI *seems* like a straightforward measure that is routinely collected worldwide.[@StatisticsCanada2001] Indeed, BMI is included in all CCHS cycles. You examine the documentation and find the variable HWTAGBMI in the CCHS 2001 corresponds to body mass index, but that in other cycles, the variable name changes to HWTCGBMI, HWTDGBMI, HWTEGBMI, etc. On reading the documentation, you notice that some cycles round the value to one decimal, whereas other cycles round to two digits. Furthermore, some cycles don't calculate BMI for respondents under the age of 20 or over the age of 64 years. Also, some cycles calculate BMI only if height and weight are within specific ranges.
 
-> After spending hours on the task, you talk with a colleague in a neighbouring health unit. They did the same task a few years ago. You share your Stata code by email and compare notes, only to realize that you both had different approaches, each with errors. 
+> After spending hours on the task, you talk with a colleague in a neighbouring health unit. They did the same task a few years ago. You share your Stata code by email and compare notes, only to realize that you both had different approaches, each with errors.
 
-A process called _cchsflow_ was created to minimize the amount of time public health epidemiologists and others spend cleaning and transforming CCHS variables across multiple survey cycles. An open science approach was sought for the development of _cchsflow_. Open science is the movement to improve research reproducibility, accessibility, and collaboration.[@Ross2013] Public health practice strives for these qualities and, therefore, the field can potentially benefit from the same tools that are used to support open science. An example of the open science toolkit is versioning software and cloud-based repositories such as GitHub and GitLab that allow people to collaborate and share programming code. 
+A process called *cchsflow* was created to minimize the amount of time public health epidemiologists and others spend cleaning and transforming CCHS variables across multiple survey cycles. An open science approach was sought for the development of *cchsflow*. Open science is the movement to improve research reproducibility, accessibility, and collaboration.[@Ross2013] Public health practice strives for these qualities and, therefore, the field can potentially benefit from the same tools that are used to support open science. An example of the open science toolkit is versioning software and cloud-based repositories such as GitHub and GitLab that allow people to collaborate and share programming code.
 
-Currently, _cchsflow_ harmonizes 160 variables for 1,092,951 survey respondents of the CCHS Public Use Microdata File (PUMF) from 2001 to 2014. _cchsflow_ uses open science tools to allow users the ability to contribute to the package, including making suggestions and requests, and identify errors. People can also "fork" the package, meaning they can use the _cchsflow_ approach to harmonize other databases. _cchsflow_ uses R language package since R is the most commonly used open statistical programming language. The core of _cchsflow_, however, are reference files that could be used in other programming languages.
+Currently, *cchsflow* harmonizes 160 variables for 1,092,951 survey respondents of the CCHS Public Use Microdata File (PUMF) from 2001 to 2014. *cchsflow* uses open science tools to allow users the ability to contribute to the package, including making suggestions and requests, and identify errors. People can also "fork" the package, meaning they can use the *cchsflow* approach to harmonize other databases. *cchsflow* uses R language package since R is the most commonly used open statistical programming language. The core of *cchsflow*, however, are reference files that could be used in other programming languages.
 
-Even this paper was created using the open science principles. This paper was written using R Markdown - a notebook that allows R code to be executed within a document. Both the _cchsflow_ R package and this paper's notebook are available on [GitHub](https://github.com/Big-Life-Lab/cchsflow/blob/paper-writeups/papers/CJPH/cjph-paper.Rmd) which allows readers to make comments, suggestions or note errors. Readers can execute or modify all examples in this paper in R.
+Even this paper was created using the open science principles. This paper was written using R Markdown - a notebook that allows R code to be executed within a document. Both the *cchsflow* R package and this paper's notebook are available on [GitHub](https://github.com/Big-Life-Lab/cchsflow/blob/paper-writeups/papers/CJPH/cjph-paper.Rmd) which allows readers to make comments, suggestions or note errors. Readers can execute or modify all examples in this paper in R.
 
 ## Background
 
 ### Cleaning and transforming CCHS data
 
-Data cleaning, including transforming variables into harmonized or common variables, is typically the most time-consuming part of data analyses. According to Dasu & Johnson, 80% of data analysis is spent on data cleaning.[@Dasu2003] With the CCHS, data cleaning and harmonization issues arise when combining CCHS surveys for longitudinal analysis. Currently, there is no standardized method or tool used to combine CCHS survey cycles. Health units across Canada that use the CCHS do their own data cleaning and preparation, taking time away from other data analysis.   
+Data cleaning, including transforming variables into harmonized or common variables, is typically the most time-consuming part of data analyses. According to Dasu & Johnson, 80% of data analysis is spent on data cleaning.[@Dasu2003] With the CCHS, data cleaning and harmonization issues arise when combining CCHS surveys. Currently, there is no standardized method or tool used to combine CCHS survey cycles. Health units across Canada that use the CCHS do their own data cleaning and preparation, taking time away from other data analysis.
 
 ### Open science and its benefits to public health practice
 
@@ -73,53 +73,79 @@ Adopting open science practices comes with well-described benefits.[@hicks2018gu
 
 ## Methods
 
-_cchsflow_ follows the approach of the Open Source Initiative and open software for research.[@OpenSourceInitiative2020; @JournalofOpenSourceSoftware2018] _cchsflow_ was created in R with provisions to support other program languages such as Stata or SAS.[@cchsflow] The package currently supports the first 10 cycles of the CCHS PUMF surveys from 2001 to 2014, in which the variables of each were harmonized and transformed to use the same set of variables. In _cchsflow_, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014 as they have shown to be the most consistent. The developers of _cchsflow_ are CCHS superusers in that they are heavy users of CCHS data for their research; and the development of the package involved the consultation of members at Statistics Canada. These members were involved in the validation of variable harmonization and provided guidance on variables that may have been difficult to harmonize.
+*cchsflow* follows the approach of the Open Source Initiative and open software for research.[@OpenSourceInitiative2020; @JournalofOpenSourceSoftware2018] *cchsflow* was created in R with provisions to support other program languages such as Stata or SAS.[@cchsflow] The package currently supports the first 10 cycles of the CCHS PUMF surveys from 2001 to 2014, in which the variables of each were harmonized and transformed to use the same set of variables. In *cchsflow*, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014 as they have shown to be the most consistent.
+
+The developers of *cchsflow* are public health researchers who collaborate with federal, provincial and local public health units. *cchsflow* began following publication of several peer-reviewed reports created with Public Health Ontario, ICES and the Ontario Public Health Association.[@ ] We faced several challenges. First, local Public Health Units requested additional analyses and updates which were difficult to support. Second, we used the same variable transformations in additional peer-review studies and reports. As projects evolved and team members changed, we found ourselves having difficulties keeping our variable code organized, consistent and visioned. Third, we translated our reports into on-line calculators at Project Big Life (https://projectbiglife.ca)[<https://projectbiglife.ca>] which required rewriting transformations in other web-enabled languages (JavaScript), survey tools (Lime Survey) and algorithm scoring engines (Predictive Modeling Mark-up Language).[@limesurvey2016][@Grossman1999] [@ProjectBigLife2020]
+
+The variables in *cchsflow* are used peer-reviewed studies of our development team and other researchers.[@Manuel2012][\@Manuel2016][\@Manuel2018][\@Manuel2020] Occupation variables are an example that were incorporated from peer-reviewed occupation studies.[@nowrouzi2019] Depression variables are an example of variables where there were not consistent use in peer-review literature, but were added in consultation with mental health researchers. Open discusion with the mental health researchers is included in the package development. <https://github.com/Big-Life-Lab/cchsflow/pull/64> Anyone can participate in the discussions when new variables are added. One of us (DGM) is a part-time employee at Statistics Canada. The *cchsflow* package is not a Statistics Canada product, nor is the package endorsed by Statistics Canada. However, analysts at Statistics Canada use *cchslow* and have contributed to variable transformations.
 
 ### Selection of variables
 
-Variables included in _cchsflow_ fall into three categories: health behaviours, sociodemographic information, and health status. There are provisions and instructions on how users can contribute or request the addition of new variables. 
+Variables included in *cchsflow* fall into three categories: health behaviours, sociodemographic information, and health status. There are provisions and instructions on how users can contribute or request the addition of new variables.
 
 ```{r Read variables.csv, message=FALSE, warning=FALSE}
+# load the cchsflow `variables` worksheet that contains a list of all variables, along with other metadata such as subject and section.
+
 library(readr)
 variables <- read.csv(file.path(getwd(), '../../inst/extdata/variables.csv'))
 
+# calculate summary totals.
+variables_total = nrow(variables)
+subjects_total = sum(!duplicated(variables$subject))
+sections_total = sum(!duplicated(variables$section))
+health_behaviours_total = sum(variables$section == "Health behaviour")
+SEP_total = sum(variables$section == "Sociodemographics")
+health_status_total = sum(variables$section == "Health status")
+
 cat("At time of writing, cchsflow contains: \n",
-  nrow(variables), "variables \n",
-  sum(!duplicated(variables$subject)), "subjects \n", sum(!duplicated(variables$section)), "sections \n \n")
+  variables_total, "variables \n",
+  subjects_total, "subjects \n", 
+  sections_total, "sections \n \n")
 
 # Calculate the number of variables by section or subject
 
 cat("The sections include: \n",
-  sum(variables$section == "Health behaviour"), "health behaviour variables \n",
-  sum(variables$section == "Sociodemographics"), "sociodemographic variables \n",
-  sum(variables$section == "Health status"), "health stauts variables \n"
+  health_behaviours_total, "health behaviour variables \n",
+  SEP_total, "sociodemographic variables \n",
+  health_behaviours_total, "health stauts variables \n"
 )
-    
 ```
 
-Health behaviours include variables smoking, alcohol, diet, and physical activity.[@Conner2017] There are derived variables such as smoking pack-years (`pack_years_der`) that are not available in the original CCHS data files. 
+As an open science addendum, you can use Rmarkdown to add the variables into the text to create dynamic reports that can be regularly and automatically updated. For example, we could have set the above code chunk to `echo = FALSE, results = hide` which hides the above code and then written the text as:
 
-Sociodemographic variables include age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status. A harmonized occupation variables were created  (`LBFA_31A`, `LBFA_31A_a` and `LBFA_31A_b`) by reviewing studies that used the CCHS to study occupation. References to these papers are included in the `notes` section of the variable transformation. 
+```{markdown eval=FALSE}
+At the time of writing, there are `r variables_total` variables, `r subjects_total` subjects and `r sections_total` sections.
+```
 
-Health status variables including chronic disease, the Health Utility Index According, need for help for activities of daily living, mental health, and other measures. The addition of mental health variables included a discussion with mental health researchers who regularly use the CCHS. Their feedback during the harmonization of these variables is open and available, where others can make further comments [https://github.com/Big-Life-Lab/cchsflow/pull/64)(https://github.com/Big-Life-Lab/cchsflow/pull/64). There is a new derived variables for the number of ADLs requiring assistance (`ADL_score_5`) that is not available in the original CCHS data. 
+Which displays:
+
+At the time of writing, there are `r variables_total` variables, `r subjects_total` subjects and `r sections_total` sections.
+
+See code [here](_).
+
+Health behaviours include variables smoking, alcohol, diet, and physical activity.[@Conner2017] There are derived variables such as smoking pack-years (`pack_years_der`) that are not available in the original CCHS data files.
+
+Sociodemographic variables include age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status. A harmonized occupation variables were created (`LBFA_31A`, `LBFA_31A_a` and `LBFA_31A_b`) by reviewing studies that used the CCHS to study occupation.[@nowrouzi2019] References to these papers are included in the `notes` section of the variable transformation.
+
+Health status variables including chronic disease, the Health Utility Index, need for help for activities of daily living, mental health, and other measures. There is a new derived variables for the number of ADLs requiring assistance (`ADL_score_5`) that is not available in the original CCHS data.
 
 ### Variable mapping
 
-CCHS variables were transformed across 10 survey cycles. For many variables, the only difference between cycles were their variable name. As such, only a name change was required to standardize a variable across the 10 cycles. 
+CCHS variables were transformed across 10 survey cycles. For many variables, the only difference between cycles were their variable name. As such, only a name change was required to standardize a variable across the 10 cycles.
 
 Changes in the number and type of categories was also common. For example, in the 2001 and 2003 CCHS survey cycles, there were 15 age categories; while in CCHS survey cycles from 2005 to 2014, there were 16 age categories. There were two options for such variable category changes. The first option was to create a harmonized variable by collapsing categories into common forms. The second option was to maintain separate variables. For age a third option was also added to maximize age information by deriving a new continuous age variable, one that takes the midpoint of each age category for all cycles.
 
-There were also changes to question wording, missing categories, and inclusion and exclusion criteria. Variables were not included in all cycles or all health regions. Harmonized variables were included when there was a consensus amongst developers that the differences across cycles where small. _Notes_ were included when any difference was identified, with a default to print all notes during transformations.
+There were also changes to question wording, missing categories, and inclusion and exclusion criteria. Variables were not included in all cycles or all health regions. Harmonized variables were included when there was a consensus amongst developers that the differences across cycles where small. *Notes* were included when any difference was identified, with a default to print all notes during transformations.
 
 ### Transformation of variables through specification worksheets
 
-Two worksheets are included in the _cchsflow_ packages that contain variable information and metadata: *variables.csv* specifies all the variables in the package and *variable_details.csv* specifies CCHS data that contain the variables, the variable type, and the category structure. 
+Two worksheets are included in the *cchsflow* packages that contain variable information and metadata: *variables.csv* specifies all the variables in the package and *variable\_details.csv* specifies CCHS data that contain the variables, the variable type, and the category structure.
 
-*rec_with_table()* — short for "recode with table" — is the key function to transform variables. *rec_with_table()* uses the two worksheets to create a transformed data from a CCHS cycle. Once all CCHS survey cycles have been transformed, they can be combined to create one large transformed data set that spans across the 10 CCHS survey cycles. The two CSV worksheets also have variable labels and other metadata that can be added to the data using the *rec_with_table()* function. 
+*rec\_with\_table()* --- short for "recode with table" --- is the key function to transform variables. *rec\_with\_table()* uses the two worksheets to create a transformed data from a CCHS cycle. Once all CCHS survey cycles have been transformed, they can be combined to create one large transformed data set that spans across the 10 CCHS survey cycles. The two CSV worksheets also have variable labels and other metadata that can be added to the data using the *rec\_with\_table()* function.
 
 ### Derived variables
 
-CCHS includes derived variables that were created using multiple responses and variables. BMI is an example of an original CCHS derived variable that was calculated using self-reported height and weight. Several new derived variables were included, and there are provisions and instructions for adding additional variables. These variables were based on derived variables used in previous studies and include smoking pack-years, binge drinking, and diet pattern.[@Manuel2016] 
+CCHS includes derived variables that were created using multiple responses and variables. BMI is an example of an original CCHS derived variable that was calculated using self-reported height and weight. Several new derived variables were included, and there are provisions and instructions for adding additional variables. These variables were based on derived variables used in previous studies and include smoking pack-years, binge drinking, and diet pattern.[@Manuel2016]
 
 > After examining BMI, you wish to look at trends at disability in your health unit over the past 15 years. You decide to use activities of daily living (ADL) as an indicator of disability. In the CCHS, ADL is a derived variable which takes into accounts various tasks that a respondent may require help with. You notice in the documentation that this derived variable is available across all CCHS cycles, but that different task variables are used between the different cycles.
 
@@ -127,51 +153,53 @@ CCHS includes derived variables that were created using multiple responses and v
 
 ### Documentation
 
-Open source, web-based documentation is available at [https://big-life-lab.github.io/cchsflow/](https://big-life-lab.github.io/cchsflow/), and includes a searchable reference of all transformations, vignettes with examples of how to perform transformations, collaboration principles, and a development roadmap.
+Open source, web-based documentation is available at <https://big-life-lab.github.io/cchsflow/>, and includes a searchable reference of all transformations, vignettes with examples of how to perform transformations, collaboration principles, and a development roadmap.
 
 ## Results
 
-The _cchsflow_ package is available on the Comprehensive R Archive Network (CRAN), a network of servers that contain documentation for R packages.[@CRAN2020; @cchsflow] The package contains the following items: the *variables.csv* worksheet, the *variable_details.csv* worksheet, the various functions, and subsets of 200 respondents for each CCHS cycle.
+The *cchsflow* package is available on the Comprehensive R Archive Network (CRAN), a network of servers that contain documentation for R packages.[@CRAN2020; @cchsflow] The package contains the following items: the *variables.csv* worksheet, the *variable\_details.csv* worksheet, the various functions, and subsets of 200 respondents for each CCHS cycle.
 
-**Figure 3a** illustrates the command line to install the CRAN version of _cchsflow_, while **Figure 3b** illustrates the command to install the development version of _cchsflow_, which is a more up to date version of the package.
+**Figure 3a** illustrates the command line to install the CRAN version of *cchsflow*, while **Figure 3b** illustrates the command to install the development version of *cchsflow*, which is a more up to date version of the package.
 
 ### Recode with table
 
-The *rec_with_table()* function is used to recode or transform variables based on the information from the two specification worksheets. The function has the ability to transform an entire data set, or a subset of variables. **Figure 4a** illustrates how to load the _cchsflow_ package, the 2001 CCHS data, and then transform all variables in _cchsflow_ to their harmonized version.  The _cchsflow_ package comes with a subsample of CCHS data for 2001 to 2013 versions, made possible with Statistics Canada new Open License [@stc_open]. **Figure 4b** illustrates how to transform a subset of variables from the 2001 survey cycle.    
+The *rec\_with\_table()* function is used to recode or transform variables based on the information from the two specification worksheets. The function has the ability to transform an entire data set, or a subset of variables. **Figure 4a** illustrates how to load the *cchsflow* package, the 2001 CCHS data, and then transform all variables in *cchsflow* to their harmonized version. The *cchsflow* package comes with a subsample of CCHS data for 2001 to 2013 versions, made possible with Statistics Canada new Open License [@stc_open]. **Figure 4b** illustrates how to transform a subset of variables from the 2001 survey cycle.
 
 ## Discussion
 
-_cchsflow_ R package harmonizes and transforms CCHS data from 2001 to 2014.[@cchsflow] _cchsflow_ provides public health epidemiologists and others the ability to more robustly analyze over 1 million respondents across a 13-year period to examine trends in health indicators. The use of an open science approach improves collaboration, transparency, and efficiency when transforming variables. The package allows public health professionals that use CCHS to spend less time on data cleaning and spend more time on analysis such as surveillance and health status reporting. 
+*cchsflow* R package harmonizes and transforms CCHS data from 2001 to 2014.[@cchsflow] *cchsflow* provides public health epidemiologists and others the ability to more robustly analyze over 1 million respondents across a 13-year period to examine trends in health indicators. The use of an open science approach improves collaboration, transparency, and efficiency when transforming variables. The package allows public health professionals that use CCHS to spend less time on data cleaning and spend more time on analysis such as surveillance and health status reporting.
 
 ### Comparison to other projects
 
-_cchsflow_ facilitates the use of CCHS metadata for public health. Metadata is increasingly recognized as helpful data infrastructure to support open science and data harmonization. Metadata is "data about data" and includes information about variable and category labels, variable types, and provenance (how the data was collected and transformed).[@mcgilvray2008executing; @duval2002metadata] The CCHS comes with Data Documentation Initiative (DDI) metadata.[@vardigan2008data] DDI metadata is used worldwide for over 10 thousand different surveys and research projects.[@DDI] There are also initiatives such as Maelstrom that are used by other Canadian health surveys to improve the use of metadata.[@bergeron2018fostering] 
+A consistent approach to calculate health indicators is a long-standing public health goal. *cchsflow* uses an open science approach to build from and support several health-related indicator and harmonization projects that use CCHS data including the Canadian Institute for Health Information indicator library, the Public Health Agency of Canada health inequality reports, and Ontario's Public Health Indicator Working Group.[@CIHI_HI; @AssociationofPublicHealthEpidemiologistsinOntario2018; @Pan-CanadianPublicHealthNetwork2018] These initiatives typically include the definition of indicators, but it is uncommon to publish how to calculate indicators using CCHS data, especially across CCHS cycles.
 
-A consistent approach to calculate health indicators is a long-standing public health goal. _cchsflow_ uses an open science approach to build from and support several health-related indicator and harmonization projects that use CCHS data including the Canadian Institute for Health Information indicator library, the Public Health Agency of Canada health inequality reports, and Ontario's Public Health Indicator Working Group.[@CIHI_HI; @AssociationofPublicHealthEpidemiologistsinOntario2018; @Pan-CanadianPublicHealthNetwork2018] These initiatives typically include the definition of indicators, but it is uncommon to publish how to calculate indicators using CCHS data, especially across CCHS cycles. _cchsflow_ provides an open, reusable, accessible, and collaborative approach to calculate indicators using the CCHS. 
+Observational Health Data Sciences and Informatics (OHDSI) is an open science network that creases a common dictionary and software tools to support studies across different information systems.[@ODESI2020] The focus of OHDSI is hospital data. Investigators in different hospitals generate their own code to harmonize their hospital data into common, standard definitions.
 
-It is uncommon for public health practitioners to use metadata beyond variable labels in their analyses workflow.[@manuelCESB2019] Barriers to using metadata in public health include the lack of well-organized metadata in public health data and the lack of metadata analysis tools such as _cchsflow_. It is commendable that DDI documents are included with CCHS, but not all metadata is included or consistent. Variable transformation is robustly supported in newer versions of DDI that are not yet available for the CCHS. _cchsflow_ uses DDI documents to create the worksheets with the added benefit of harmonizing and transforming metadata across CCHS cycles. _cchsflow_ also supports the use of Predictive Modeling Markup Language (PMML).[@Grossman1999] The Project Big Life team uses _cchsflow_'s PMML metadata in public health planning tools.[@ProjectBigLife2020]
+*cchsflow* facilitates the use of CCHS metadata that comes with the survey but is uncommonly used by public health practitioners.[@manuelCESB2019] The CCHS comes with Data Documentation Initiative (DDI) metadata.[@vardigan2008data] DDI metadata is used worldwide for over ten thousand different surveys and research projects.[@DDI] There are also initiatives such as Maelstrom that are used by other Canadian health surveys to improve the use of metadata.[@bergeron2018fostering] Metadata is increasingly recognized as helpful data infrastructure to support open science and data harmonization. Metadata is "data about data" and includes information about variable and category labels, variable types, and provenance (how the data was collected and transformed).[@mcgilvray2008executing; @duval2002metadata]
+
+Barriers to using metadata in public health include the lack of well-organized metadata in public health data and the lack of metadata analysis tools such as *cchsflow*. It is commendable that DDI documents are included with CCHS, but not all metadata is included or consistent. Variable transformation is robustly supported in newer versions of DDI that are not yet available for the CCHS. *cchsflow* uses DDI documents to create the worksheets with the added benefit of harmonizing and transforming metadata across CCHS cycles. *cchsflow* also supports the use of Predictive Modeling Markup Language (PMML).[@Grossman1999] The Project Big Life team uses *cchsflow*'s PMML metadata in public health planning tools.[@ProjectBigLife2020]
 
 ### Limitations and challenges
 
-While the CCHS has many consistent variables across survey cycles, there are differences between cycles that can be irreconcilable or difficult to harmonize. Within _cchsflow_, variables with irreconcilable differences were either transformed into a new derived variable or kept as separate variables that can be only be used in select cycles. Along with variables with differences, there are variables in _cchsflow_ that were not asked in all CCHS cycles. This means for some variables, data does not span across the length of the CCHS cycles available in _cchsflow_. A possible solution is to impute missing variables, where missing data is replaced with values based on other respondents and responses to other variables.
+While the CCHS has many consistent variables across survey cycles, there are differences between cycles that can be irreconcilable or difficult to harmonize. Within *cchsflow*, variables with irreconcilable differences were either transformed into a new derived variable or kept as separate variables that can be only be used in select cycles. Along with variables with differences, there are variables in *cchsflow* that were not asked in all CCHS cycles. This means for some variables, data does not span across the length of the CCHS cycles available in *cchsflow*. A possible solution is to impute missing variables, where missing data is replaced with values based on other respondents and responses to other variables.
 
-_cchsflow_ has been used in a range of projects such as the Project Big Life Planning Tool [@ProjectBigLife2020] where harmonized variables across surveys were used to create predictive algorithms that calculate life expectancy and chronic disease risk for local public health regions. Care must be taken to understand how specific variable transformation and harmonization with _cchsflow_ affects each use of CCHS data. Across survey cycles, almost all CCHS variables have had at least some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses. Combining CCHS data across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.
+Care must be taken to understand how specific variable transformation and harmonization with *cchsflow* affects each use of CCHS data. Across survey cycles, almost all CCHS variables have had at least some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses. Combining CCHS data across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.
 
 ### Collaboration with other users
 
 Collaboration is facilitated using GitHub, the most popular online code repository with over 45 million users. Github is based on the Git version-control system which, in turn, is a cornerstone of open software development.[@Dabbish2012]
 
-The open-access approach _cchsflow_ allows users to add other CCHS variables that might benefit others. There is complete transparency on how the package was developed with the entire source code for the package publicly accessible. Along with being transparent, sourcing the _cchsflow_ package on GitHub offers users of the package the opportunity to provide feedback on how to further improve the package. In the [issues section](https://github.com/Big-Life-Lab/cchsflow/issues) of the GitHub repository, users can submit bug reports where they can identify issues they are encountering while using the package. Users can also request variables to be added or add new variable transformations themselves. New variables are added using a "pull request" that is then reviewed by the package maintainers before merging with the main _cchsflow_ package. All _cchsflow_ documentation (including this paper write up) are also open access and available on the GitHub repository.
+The open-access approach *cchsflow* allows users to add other CCHS variables that might benefit others. There is full transparency on how the package was developed with the entire source code for the package publicly accessible. Along with being transparent, sourcing the *cchsflow* package on GitHub offers users of the package the opportunity to provide feedback on how to further improve the package. In the [issues section](https://github.com/Big-Life-Lab/cchsflow/issues) of the GitHub repository, users can submit bug reports where they can identify issues they are encountering while using the package. Users can also request variables to be added or add new variable transformations themselves. New variables are added using a "pull request" that is then reviewed by the package maintainers before merging with the main *cchsflow* package. All *cchsflow* documentation (including this paper write up) are also open access and available on the GitHub repository.
 
-GitHub provides benefit to users in that it allows them an opportunity to implement better practices in their own code [@Dabbish2012]. The implementation of GitHub in the development of _cchsflow_ allows public health professionals across Canada to collaborate and share potential variables that can be useful for health surveillance and health status reporting. Projects that examine health surveillance and health status reporting such as the Public Health Agency of Canada health inequality reports [@Pan-CanadianPublicHealthNetwork2018] can greatly benefit from _cchsflow_'s repository of harmonized variables.
+GitHub provides benefit to users in that it allows them an opportunity to implement better practices in their own code [@Dabbish2012]. The implementation of GitHub in the development of *cchsflow* allows public health professionals across Canada to collaborate and share potential variables that can be useful for health surveillance and health status reporting. Projects that examine health surveillance and health status reporting such as the Public Health Agency of Canada health inequality reports [@Pan-CanadianPublicHealthNetwork2018] can greatly benefit from *cchsflow*'s repository of harmonized variables.
 
 ### Roadmap
 
-A roadmap, also known as next steps or future plans, are recommended for open software projects. _cchsflow_ includes a roadmap and milestones on the [project website](https://github.com/Big-Life-Lab/cchsflow/projects). At the time of writing, the roadmap includes adding the "share" version of CCHS that is used in Statistics Canada Regional Data Centres and other settings, the ability to compare variable frequency across survey cycles, and improved metadata support. _cchsflow_ has been forked by related projects to support other data sets. The expanded use of _cchsflow_ for related projects is a hallmark of open science and demonstration of how open science leads to expanded science and public health resources. 
+A roadmap, also known as next steps or future plans, are recommended for open software projects. *cchsflow* includes a roadmap and milestones on the [project website](https://github.com/Big-Life-Lab/cchsflow/projects). At the time of writing, the roadmap includes adding the "share" version of CCHS that is used in Statistics Canada Regional Data Centres and other settings, the ability to compare variable frequency across survey cycles, and improved metadata support. *cchsflow* has been forked by related projects to support other data sets. The expanded use of *cchsflow* for related projects is a hallmark of open science and demonstration of how open science leads to expanded science and public health resources.
 
 ### Conclusion
 
-_cchsflow_'s open science also allows public health professionals to collaborate and share their work with other colleagues, saving time recoding and cleaning health data. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean and prepare CCHS data for the many CCHS users in health units across Canada.
+*cchsflow*'s open science also allows public health professionals to collaborate and share their work with other colleagues, saving time recoding and cleaning health data. By implementing open science practices, *cchsflow* aims to minimize the amount of time needed to clean and prepare CCHS data for the many CCHS users in health units across Canada.
 
 \pagebreak
 
@@ -236,34 +264,36 @@ grViz("digraph flowchart {
               )
 ```
 
-**Figure 1**: Flowchart of how CCHS variables were added to _cchsflow_. Users can add variables using the same approach.
-
+**Figure 1**: Flowchart of how CCHS variables were added to *cchsflow*. Users can add variables using the same approach.
 
 ![](images/Figure1.png)
 
-**Figure 2:** The homepage for the _cchsflow_ website.
+**Figure 2:** The homepage for the *cchsflow* website.
 
 ```{r, eval=FALSE}
 install.packages("cchsflow")
 ```
-**Figure 3a:** The command line to install the _cchsflow_ package that is currently saved on CRAN.
+
+**Figure 3a:** The command line to install the *cchsflow* package that is currently saved on CRAN.
 
 ```{r, eval=FALSE}
 devtools::install_github("Big-Life-Lab/cchsflow")
 ```
-**Figure 3b:** The command line to install the development version of _cchsflow_ from Github.
+
+**Figure 3b:** The command line to install the development version of *cchsflow* from Github.
 
 ```{r, eval=FALSE}
 library(cchsflow)
 cchs2001 <- read.csv("~/data/cchs2001.csv")
 transformed_cchs <- rec_with_table(cchs2001)
 ```
-**Figure 4a:** The command lines to load the _cchsflow_ package, load the 2001 CCHS PUMF data and then transform the all variables in the worksheets using the _rec_with_table()_ function. 
+
+**Figure 4a:** The command lines to load the *cchsflow* package, load the 2001 CCHS PUMF data and then transform the all variables in the worksheets using the *rec\_with\_table()* function.
 
 ```{r, eval=FALSE}
 library(cchsflow)
 cchs2001 <- read.csv("~/data/cchs2001.csv")
 transformed_cchs2001 <- rec_with_table(cchs2001, c("DHH_SEX", "DHHGAGE_cont"))
 ```
-**Figure 4b:** The command lines to transform the sex & age variables using the _rec_with_table()_ function.
 
+**Figure 4b:** The command lines to transform the sex & age variables using the *rec\_with\_table()* function.
