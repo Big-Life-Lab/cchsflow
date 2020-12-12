@@ -2,10 +2,10 @@
 title: 'cchsflow: An open science approach to transform & combine population health surveys'
 csl: ../apa-6th-edition.csl
 output:
+  word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
-  word_document: default
 bibliography: ../bibliography.bib
 ---
 
@@ -75,9 +75,9 @@ Adopting open science practices comes with well-described benefits.[@hicks2018gu
 
 *cchsflow* follows the approach of the Open Source Initiative and open software for research.[@OpenSourceInitiative2020; @JournalofOpenSourceSoftware2018] *cchsflow* was created in R with provisions to support other program languages such as Stata or SAS.[@cchsflow] The package currently supports the first 10 cycles of the CCHS PUMF surveys from 2001 to 2014, in which the variables of each were harmonized and transformed to use the same set of variables. In *cchsflow*, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014 as they have shown to be the most consistent.
 
-The developers of *cchsflow* are public health researchers who collaborate with federal, provincial and local public health units. *cchsflow* began following publication of several peer-reviewed reports created with Public Health Ontario, ICES and the Ontario Public Health Association.[@ ] We faced several challenges. First, local Public Health Units requested additional analyses and updates which were difficult to support. Second, we used the same variable transformations in additional peer-review studies and reports. As projects evolved and team members changed, we found ourselves having difficulties keeping our variable code organized, consistent and visioned. Third, we translated our reports into on-line calculators at Project Big Life (https://projectbiglife.ca)[<https://projectbiglife.ca>] which required rewriting transformations in other web-enabled languages (JavaScript), survey tools (Lime Survey) and algorithm scoring engines (Predictive Modeling Mark-up Language).[@limesurvey2016][@Grossman1999] [@ProjectBigLife2020]
+The developers of *cchsflow* are public health researchers who collaborate with federal, provincial and local public health units. *cchsflow* began following publication of several peer-reviewed reports created with Public Health Ontario, ICES and the Ontario Public Health Association.[@ ] The development of *cchsflow* faced several challenges. First, local Public Health Units requested additional analyses and updates which were difficult to support. Second, the same variable transformations were used in additional peer-review studies and reports. As projects evolved and team members changed, the development team faced difficulties in keeping the variable code organized, consistent and visioned. Third, reports were translated into on-line calculators at Project Big Life (https://projectbiglife.ca)[<https://projectbiglife.ca>] which required rewriting transformations in other web-enabled languages (JavaScript), survey tools (Lime Survey) and algorithm scoring engines (Predictive Modeling Mark-up Language).[@limesurvey2016; @Grossman1999; @ProjectBigLife2020]
 
-The variables in *cchsflow* are used peer-reviewed studies of our development team and other researchers.[@Manuel2012][\@Manuel2016][\@Manuel2018][\@Manuel2020] Occupation variables are an example that were incorporated from peer-reviewed occupation studies.[@nowrouzi2019] Depression variables are an example of variables where there were not consistent use in peer-review literature, but were added in consultation with mental health researchers. Open discusion with the mental health researchers is included in the package development. <https://github.com/Big-Life-Lab/cchsflow/pull/64> Anyone can participate in the discussions when new variables are added. One of us (DGM) is a part-time employee at Statistics Canada. The *cchsflow* package is not a Statistics Canada product, nor is the package endorsed by Statistics Canada. However, analysts at Statistics Canada use *cchslow* and have contributed to variable transformations.
+The variables in *cchsflow* are used peer-reviewed studies of our development team and other researchers.[@Manuel2012; @Manuel2016; @Manuel2018; @Manuel2020] Occupation variables are an example that were incorporated from peer-reviewed occupation studies.[@nowrouzi2019] Depression variables are an example of variables where there were not consistent use in peer-review literature, but were added in consultation with mental health researchers. Open discussion with the mental health researchers is included in the package development. <https://github.com/Big-Life-Lab/cchsflow/pull/64> Anyone can participate in the discussions when new variables are added. One of us (DGM) is a part-time employee at Statistics Canada. The *cchsflow* package is not a Statistics Canada product, nor is the package endorsed by Statistics Canada. However, analysts at Statistics Canada use *cchslow* and have contributed to variable transformations.
 
 ### Selection of variables
 
@@ -111,7 +111,7 @@ cat("The sections include: \n",
 )
 ```
 
-As an open science addendum, you can use Rmarkdown to add the variables into the text to create dynamic reports that can be regularly and automatically updated. For example, we could have set the above code chunk to `echo = FALSE, results = hide` which hides the above code and then written the text as:
+As an open science addendum, you can use RMarkdown to add the variables into the text to create dynamic reports that can be regularly and automatically updated. For example, the above code chunk could have been set to `echo = FALSE, results = hide` which hides the above code and then written the text as:
 
 ```{markdown eval=FALSE}
 At the time of writing, there are `r variables_total` variables, `r subjects_total` subjects and `r sections_total` sections.
@@ -119,7 +119,7 @@ At the time of writing, there are `r variables_total` variables, `r subjects_tot
 
 Which displays:
 
-At the time of writing, there are `r variables_total` variables, `r subjects_total` subjects and `r sections_total` sections.
+> At the time of writing, there are `r variables_total` variables, `r subjects_total` subjects and `r sections_total` sections.
 
 See code [https://github.com/Big-Life-Lab/cchsflow/blob/516276bcf2d7ff53b2cb8e8e0c7c168ccd70e4f5/papers/CJPH/cjph-paper.Rmd#L122](https://github.com/Big-Life-Lab/cchsflow/blob/516276bcf2d7ff53b2cb8e8e0c7c168ccd70e4f5/papers/CJPH/cjph-paper.Rmd#L122).
 
