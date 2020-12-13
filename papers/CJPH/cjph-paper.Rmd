@@ -74,13 +74,11 @@ Adopting open science practices comes with well-described benefits.[@hicks2018gu
 
 ## Methods
 
-*cchsflow* follows the approach of the Open Source Initiative and open software for research. The developers of *cchsflow* are public health researchers who collaborate with federal, provincial and local public health units. *cchsflow* began following publication of several peer-reviewed reports created with Public Health Ontario, ICES and the Ontario Public Health Association.[@Manuel2012] [@OpenSourceInitiative2020; @JournalofOpenSourceSoftware2018] One of us (DGM) is a part-time employee at Statistics Canada. The *cchsflow* package is not a Statistics Canada product, nor is the package endorsed by Statistics Canada. However, analysts at Statistics Canada use *cchslow* and have contributed to variable transformations.
+*cchsflow* follows the approach of the Open Source Initiative and open software for research. The developers of *cchsflow* are public health researchers who collaborate with federal, provincial and local public health units. *cchsflow* began following the publication of several peer-reviewed reports created with Public Health Ontario, ICES and the Ontario Public Health Association.[@Manuel2012] [@OpenSourceInitiative2020; @JournalofOpenSourceSoftware2018] One of the developers of *cchsflow* (DGM) is a part-time employee at Statistics Canada. The *cchsflow* package is not a Statistics Canada product, nor is the package endorsed by Statistics Canada. However, analysts at Statistics Canada use *cchslow* and have contributed to variable transformations.
 
 [@cchsflow] The package currently supports the first 10 cycles of the CCHS PUMF surveys from 2001 to 2014, in which the variables of each were harmonized and transformed to use the same set of variables. In *cchsflow*, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014.
 
-Many variables in *cchsflow* are used peer-reviewed studies of our development team and other researchers.[@Manuel2012][\@Manuel2016][\@Manuel2018][\@Manuel2020] Occupation variables are an example that were incorporated from peer-reviewed occupation studies.[@nowrouzi2019] Depression variables are an example of variables where there were not consistent use in peer-review literature, but were added in consultation with mental health researchers. Open discusion with the mental health researchers is included in the package development. <https://github.com/Big-Life-Lab/cchsflow/pull/64> Anyone can participate in the discussions when new variables are added.
-
-The variables in *cchsflow* are from peer-reviewed studies of our development team and other researchers.[@Manuel2012][\@Manuel2018][\@Manuel2020] Occupation variables are an example that were incorporated from peer-reviewed occupation studies.[@nowrouzi2019] Depression variables are an example of variables where there were not consistent use in peer-review literature, but were added in consultation with mental health researchers. Open discusion with the mental health researchers is included in the package development. <https://github.com/Big-Life-Lab/cchsflow/pull/64> *cchsflow* was created in R with provisions to support other program languages such as Stata or SAS.
+Many variables in *cchsflow* are used peer-reviewed studies of our development team and other researchers.[@Manuel2012; @Manuel2016; @Manuel2018; @Manuel2020] Occupation variables are an example that were incorporated from peer-reviewed occupation studies.[@nowrouzi2019] Depression variables are an example of variables where there were not consistent use in peer-review literature, but were added in consultation with mental health researchers. Open discussion with the mental health researchers is included in the package development. <https://github.com/Big-Life-Lab/cchsflow/pull/64> Anyone can participate in the discussions when new variables are added. *cchsflow* was created in R with provisions to support other program languages such as Stata or SAS.
 
 ### Selection of variables
 
@@ -118,7 +116,7 @@ Health behaviours include variables smoking, alcohol, diet, and physical activit
 
 Sociodemographic variables include age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status. A harmonized occupation variables were created (`LBFA_31A`, `LBFA_31A_a` and `LBFA_31A_b`) by reviewing studies that used the CCHS to study occupation.[@nowrouzi2019] References to these papers are included in the `notes` section of the variable transformation.
 
-Health status variables including chronic disease, the Health Utility Index, need for help for activities of daily living, mental health, and other measures. There is a new derived variables for the number of ADLs requiring assistance (`ADL_score_5`) that is not available in the original CCHS data.
+Health status variables including chronic disease, the Health Utility Index, need for help for activities of daily living (ADL), mental health, and other measures. There is a new derived variables for the number of ADL requiring assistance (`ADL_score_5`) that is not available in the original CCHS data.
 
 ### Variable mapping
 
@@ -154,7 +152,7 @@ The *cchsflow* package is available on the Comprehensive R Archive Network (CRAN
 
 ### Recode with table
 
-The *rec_with_table()* function is used to recode or transform variables based on the information from the two specification worksheets. The function has the ability to transform an entire data set, or a subset of variables. **Figure 4a** illustrates how to load the *cchsflow* package, the 2001 CCHS data, and then transform all variables in *cchsflow* to their harmonized version. The *cchsflow* package comes with a subsample of CCHS data for 2001 to 2013 versions, made possible with Statistics Canada new Open License [@stc_open]. **Figure 4b** illustrates how to transform a subset of variables from the 2001 survey cycle.
+The *rec_with_table()* function is used to recode or transform variables based on the information from the two specification worksheets. The function has the ability to transform an entire data set, or a subset of variables. **Figure 4a** illustrates how to load the *cchsflow* package, the 2001 CCHS data, and then transform all variables in *cchsflow* to their harmonized version. The *cchsflow* package comes with a subsample of CCHS data for 2001 to 2014 versions, made possible with Statistics Canada new Open License [@stc_open]. **Figure 4b** illustrates how to transform a subset of variables from the 2001 survey cycle.
 
 ## Discussion
 
