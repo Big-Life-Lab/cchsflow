@@ -1,0 +1,26 @@
+---
+title: "cjph-corrections"
+output: html_document
+---
+
+This resubmission addresses the feedback from IPP reviewers. The following are the specific changes made to address each comment by the IPP reviewers:
+
+Comment: Given today's reality, and the importance of getting timely, accurate, comparable and reportable data, it may be useful to expand on line 58/59 of page 3 and elaborate how open data and sharing code may influence public health practice to improve infectious disease control.
+
+Response: To elaborate on the usefulness of open data in public health practice, we have mentioned how the COVID-19 pandemic required the use of open data for researchers to quickly aggregate and analyze data to help drive public health policy.
+
+Comment: It may also be useful to include a couple of real-life examples or projects of how cchsflow was used to understand how the intervention was adapted to a local context (line 33, page 6). This would help the reader understand not only the benefits of open science practices but also how cchsflow would improve public health outcomes and potentially policy decision-making (e.g. what key variables could be shared easily across organizations to improve health surveillance and health status reporting? - see line 58/59 on page 6).
+
+Response: We have referenced the Project Big Life Planning Tool as an example of cchsflow being used in research. Additionally, we have mentioned how projects such as PHAC"s health inequality reports can benefit from the use of harmonized variables when examining health surveillance and health reporting.
+
+Comment: It is recommended not to use contractions ("don't" - see line 13 on page 3) for a journal article or the first-person tense ("we" or "our" - see line 20, 21 and 24 on page 3, line 48 on page 4, line 13 on page 6, etc.).
+
+Response: Contractions and first-person tense has been removed in this resubmission.
+
+Comment: The vignette at the start is great; I would have liked to see a similar description of the use of a cchsflow derived variable - particularly where there are caveats.
+
+Response: An additional vignette has been added that used a CCHS derived variable (ADL) that included caveats, and a newly derived variable had to be created.
+
+Comment: Would like more detail in the methods for creating cchsflow. For example, you indicate the work was verified/communicated with content experts - who were those folks? Did you connect with cchs developers? Some of those folks know it inside and out - their review of your methods/code would be reassuring. Or perhaps a cchs super user, outside and independent of your team, to use the code and verify the results and provide a sentence or two for the paper indicating their thoughts?
+
+Response: We have elaborated in the methods section the collaboration involved in the development of cchsflow. We have discussed how certain variables required the consultation of subject experts, and provided a link of a GitHub pull request as an example of how these consultations were done in an open manner. 
