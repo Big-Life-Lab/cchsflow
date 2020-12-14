@@ -24,7 +24,7 @@ library(cchsflow)
 
 **Setting:** The Canadian Community Health Survey (CCHS) is one of the world's largest onging cross-sectional population health surveys with over 130 000 respondents every two years or over 1.1 million respondents since its inception in 2001. While the survey remains relatively consistent over the years, there are differences between cycles that pose a challenge to analyse the survey over time.
 
-**Intervention:** A program package *cchsflow* was developed to transform & harmonize CCHS variables to consistent formats across multiple survey cycles. An open science approach was used to maintain transparency, reproducibility and collaboration.
+**Intervention:** A program package called *cchsflow* was developed to transform & harmonize CCHS variables to consistent formats across multiple survey cycles. An open science approach was used to maintain transparency, reproducibility and collaboration.
 
 **Outcomes:** The *cchsflow* R package uses CCHS survey data between 2001 and 2014. Worksheets were created that identify variables, their names in previous cycles, their category structure, and their final variable names. These worksheets were then used to recode variables in each CCHS cycle into consistently named and labelled variables. Following, survey cycles can be combined. The package was then added as a GitHub repository to encourage collaboration with other researchers.
 
@@ -38,7 +38,7 @@ library(cchsflow)
 
 **État Actuel:** L'Enquête sur la santé dans les collectivités canadiennes (ESCC) est l'une des plus grandes enquêtes transversales sur la santé de la population avec plus de 130 000 sondés tous les deux ans et plus de 1.1 million de sondés depuis son début en 2001. Tant que l'enquête reste relativement cohérent, il y a des différences entre des cycles qui pose une challenge majeure pour analyser l'enquête au fil du temps.
 
-**Intervention:** Nous avons développé un processus du nom de cchsflow pour transformer et harmoniser les variables de l'ESCC dans des formats cohérents aux travers plusieurs cycles d'enquêtes.
+**Intervention:** Un paquet de programme appelé cchsflow a été développé pour transformer et harmoniser les variables CCHS aux formats cohérents à travers plusieurs cycles de sondage. Une approche de science ouverte était utilisée pour maintenir la transparence, la reproductibilité et la collaboration.
 
 **Résultats:** Le paquet cchsflow R développé utilisait les données d'enquête de l'ESCC entre 2001 et 2014. Les feuilles de travail étaient crées pour identifier des variables, leurs noms dans des cycles précédents, leurs structures de catégories et leurs noms des variables finales. Ces feuilles de travail ont ensuite été utilisées pour ré-coder les variables dans chaque cycle de l'ESCC pour générer les ensembles de données harmonisés qui peuvent être combiner dans un ensemble de données constamment étiqueté pour analyser. Le paquet a ensuite été ajouté comme un entrepôt de GitHub pour encourager la collaboration entre les autres chercheurs.
 
@@ -74,11 +74,11 @@ Adopting open science practices comes with well-described benefits.[@hicks2018gu
 
 ## Methods
 
-*cchsflow* follows the approach of the Open Source Initiative and open software for research. The developers of *cchsflow* are public health researchers who collaborate with federal, provincial and local public health units. *cchsflow* began following the publication of several peer-reviewed reports created with Public Health Ontario, ICES and the Ontario Public Health Association.[@Manuel2012] [@OpenSourceInitiative2020; @JournalofOpenSourceSoftware2018] One of the developers of *cchsflow* (DGM) is a part-time employee at Statistics Canada. The *cchsflow* package is not a Statistics Canada product, nor is the package endorsed by Statistics Canada. However, analysts at Statistics Canada use *cchslow* and have contributed to variable transformations.
+*cchsflow* follows the approach of the Open Source Initiative and open software for research. The developers of *cchsflow* are public health researchers who collaborate with federal, provincial and local public health units. *cchsflow* began following the publication of several peer-reviewed reports created with Public Health Ontario, ICES and the Ontario Public Health Association.[@Manuel2012; @OpenSourceInitiative2020; @JournalofOpenSourceSoftware2018] One of the developers of *cchsflow* (DGM) is a part-time employee at Statistics Canada. The *cchsflow* package is not a Statistics Canada product, nor is the package endorsed by Statistics Canada. However, analysts at Statistics Canada use *cchslow* and have contributed to variable transformations.
 
-[@cchsflow] The package currently supports the first 10 cycles of the CCHS PUMF surveys from 2001 to 2014, in which the variables of each were harmonized and transformed to use the same set of variables. In *cchsflow*, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014.
+The package currently supports the first 10 cycles of the CCHS PUMF surveys from 2001 to 2014, in which the variables of each were harmonized and transformed to use the same set of variables. In *cchsflow*, variables were renamed to the variable names used in CCHS cycles from 2007 to 2014.
 
-Many variables in *cchsflow* are used peer-reviewed studies of our development team and other researchers.[@Manuel2012; @Manuel2016; @Manuel2018; @Manuel2020] Occupation variables are an example that were incorporated from peer-reviewed occupation studies.[@nowrouzi2019] Depression variables are an example of variables where there were not consistent use in peer-review literature, but were added in consultation with mental health researchers. Open discussion with the mental health researchers is included in the package development. <https://github.com/Big-Life-Lab/cchsflow/pull/64> Anyone can participate in the discussions when new variables are added. *cchsflow* was created in R with provisions to support other program languages such as Stata or SAS.
+Many variables in *cchsflow* are used in peer-reviewed studies of our development team and other researchers.[@Manuel2012; @Manuel2016; @Manuel2018; @Manuel2020] Occupation variables are an example that were incorporated from peer-reviewed occupation studies.[@nowrouzi2019] Depression variables are an example of variables where there were not consistent use in peer-reviewed literature, but were added in consultation with mental health researchers. Open discussion with the mental health researchers is included in the package development. <https://github.com/Big-Life-Lab/cchsflow/pull/64> Anyone can participate in the discussions when new variables are added. *cchsflow* was created in R with provisions to support other program languages such as Stata or SAS.
 
 ### Selection of variables
 
@@ -112,9 +112,9 @@ cat("The sections include: \n",
 
 Variables included in *cchsflow* fall into three categories: health behaviours, sociodemographic information, and health status. At the time of writing, there are `r variables_total` variables, `r subjects_total` subjects and `r sections_total` sections. There are provisions and instructions on how users can contribute or request the addition of new variables.
 
-Health behaviours include variables smoking, alcohol, diet, and physical activity.[@Conner2017] There are derived variables such as smoking pack-years (`pack_years_der`) that are not available in the original CCHS data files.
+Health behaviours variables include smoking, alcohol, diet, and physical activity.[@Conner2017] There are derived variables such as smoking pack-years (`pack_years_der`) that are not available in the original CCHS data files.
 
-Sociodemographic variables include age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status. A harmonized occupation variables were created (`LBFA_31A`, `LBFA_31A_a` and `LBFA_31A_b`) by reviewing studies that used the CCHS to study occupation.[@nowrouzi2019] References to these papers are included in the `notes` section of the variable transformation.
+Sociodemographic variables include age, sex, immigration status, country of birth, time spent in Canada, ethnicity, education (individual and highest family), income (adjusted for province and inflation), home ownership, and marital status. Harmonized occupation variables were created (`LBFA_31A`, `LBFA_31A_A` and `LBFA_31A_B`) by reviewing studies that used the CCHS to study occupation.[@nowrouzi2019] References to these papers are included in the `notes` section of the variable transformation.
 
 Health status variables including chronic disease, the Health Utility Index, need for help for activities of daily living (ADL), mental health, and other measures. There is a new derived variables for the number of ADL requiring assistance (`ADL_score_5`) that is not available in the original CCHS data.
 
@@ -146,7 +146,7 @@ Open source, web-based documentation is available at <https://big-life-lab.githu
 
 ## Results
 
-The *cchsflow* package is available on the Comprehensive R Archive Network (CRAN), a network of servers that contain documentation for R packages.[\@cchsflow] The package contains the following items: the *variables.csv* worksheet, the *variable_details.csv* worksheet, the various functions, and subsets of 200 respondents for each CCHS cycle.
+The *cchsflow* package is available on the Comprehensive R Archive Network (CRAN), a network of servers that contain documentation for R packages.[@cchsflow] The package contains the following items: the *variables.csv* worksheet, the *variable_details.csv* worksheet, the various functions, and subsets of 200 respondents for each CCHS cycle.
 
 **Figure 3a** illustrates the command line to install the CRAN version of *cchsflow*, while **Figure 3b** illustrates the command to install the development version of *cchsflow*, which is a more up to date version of the package.
 

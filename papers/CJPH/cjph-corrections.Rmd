@@ -3,7 +3,7 @@ title: "cjph-corrections"
 output: html_document
 ---
 
-We would like to thank the editors and reviewers for their comments. The comments were helpful and we have modified to paper to address all comments. The following are the specific changes made to address each comment by the IPP reviewers:
+We would like to thank the editors and reviewers for their comments. The comments were helpful and we have modified to paper to address all comments. To address the comments, the manuscript is now slightly above the word limit. The following are the specific changes made to address each comment by the IPP reviewers:
 
 Comment: Given today's reality, and the importance of getting timely, accurate, comparable and reportable data, it may be useful to expand on line 58/59 of page 3 and elaborate how open data and sharing code may influence public health practice to improve infectious disease control.
 
