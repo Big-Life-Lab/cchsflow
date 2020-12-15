@@ -17,7 +17,7 @@
 #'  former daily smokers who quit <3 years ago.
 #'
 #' @param SMKG09C number of years since quitting smoking. Variable asked to
-#'  former daily smokers who quit >=3 years ago.
+#'  former daily smokers who quit ≥3 years ago.
 #'
 #' @example
 #' # Using the 'derive_smoke_simple' function to create the derived smoking   
