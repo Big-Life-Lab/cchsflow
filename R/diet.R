@@ -1,0 +1,132 @@
+#' @title Diet score
+#'
+#' @description This function creates a derived diet variable (diet_score) based 
+#' on consumption of fruit, salad, potatoes, carrots, other vegetables and juice. 
+#' 2 baseline points plus summation of total points for diet attributes.
+#' (negative overall scores are recoded to 0, resulting in a range from 0 to 10).
+#' 
+#' \itemize{
+#'   \item 1 point per daily fruit and vegetable consumption, excluding fruit 
+#'   juice (maximum 8 points).
+#'   \item -2 points for high potato intake (≥7 (males), ≥5 (females) times/week)
+#'   \item -2 points for no carrot intake
+#'   \item -2 points per daily frquency of fruit juce consumption greater than 
+#'   once/day (maximum -10 points)
+#'  }
+#'
+#' @param FVCDFRU daily consumption of fruit
+#'
+#' @param FVCDSAL daily consumption of green salad
+#'
+#' @param FVCDPOT daily consumption of potatoes
+#'
+#' @param FVCDCAR daily consumption of carrots
+#'
+#' @param FVCDVEG daily consumption of other vegetables
+#'
+#' @param FVCDJUI daily consumption of fruit juice
+#' 
+#' @param DHH_SEX sex; 1 = male, 2 = female
+#'
+#' @example
+#' # Using the 'diet_score_fun' function to create the derived diet variable  
+#' # across CCHS cycles.
+#' # diet_score_fun() is specified in the variable_details.csv
+#'
+#' # To create a harmonized diet_score variable across CCHS cycles, use 
+#' # rec_with_table() for each CCHS cycle and specify diet_score_fun and the
+#' # required base variables.
+#' # Using bind_rows(), you can combine smoke_simple across cycles
+#'
+#' library(cchsflow)
+#'
+#' diet_score2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
+#'     "DHH_SEX", "diet_score_fun"
+#'   )
+#' )
+#'
+#' head(diet_score2009_2010)
+#'
+#' diet_score2011_2012 <- rec_with_table(
+#'   cchs2011_2012_p,c(
+#'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
+#'     "DHH_SEX", "diet_score_fun"
+#'   )
+#' )
+#'
+#' tail(diet_score2011_2012)
+#'
+#' combined_diet_score <- suppressWarnings(bind_rows(diet_score2009_2010,
+#'  diet_score2011_2012))
+#'
+#' head(combined_diet_score)
+#' tail(combined_diet_score)
+#' @export
+diet_score_fun <-
+  function(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI, DHH_SEX) {
+    
+    # Nested function: total fruit and vegetables, excluding fruit juice
+    derive_total_fruitveg <- function(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, 
+                                      FVCDVEG) {
+      total_fruitveg <- 
+        if_else2(!is.na(FVCDFRU) & !is.na(FVCDSAL) & !is.na(FVCDPOT) & 
+                   !is.na(FVCDCAR)  & !is.na(FVCDVEG), FVCDFRU + FVCDSAL + 
+                   FVCDPOT + FVCDCAR + FVCDVEG, NA)
+      return(total_fruitveg)
+    }
+    total_fruitveg <- derive_total_fruitveg(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, 
+                                            FVCDVEG)
+    
+    # Nested function: maximum total fruit and vegetables = 8
+    derive_max_fruitveg <- function(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, 
+                                    FVCDVEG) {
+      max_fruitveg <-
+        if_else2(total_fruitveg >8, 8,
+               if_else2(!is.na(total_fruitveg), total_fruitveg, NA))
+      return(max_fruitveg)
+    }
+    max_fruitveg <- derive_max_fruitveg(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, 
+                                            FVCDVEG)
+    
+    # Nested function: high potato intake flag
+    potato_fun <- function(FVCDPOT, DHH_SEX) {
+      FVCDPOT_high <-
+        if_else2(DHH_SEX==1 & FVCDPOT>=1,1,
+                 if_else2(DHH_SEX==1 & FVCDPOT<1,0, 
+                          if_else2(DHH_SEX==2 & FVCDPOT>=5/7,1, 
+                                   if_else2(DHH_SEX==2 & FVCDPOT<5/7,0,NA))))
+      return(FVCDPOT_high)
+    }
+    FVCDPOT_high <- potato_fun(FVCDPOT, DHH_SEX)
+    
+    # Nested function: no carrot intake flag
+    carrot_fun <- function(FVCDCAR) {
+      FVCDCAR_nil <-
+        if_else2(FVCDCAR==0, 1,
+                if_else2(!is.na(FVCDCAR), 0, NA))
+    return(FVCDCAR_nil)
+    }
+    FVCDCAR_nil <- carrot_fun(FVCDCAR)
+    
+    # Nested function: high juice intake flag
+    juice_fun <- function(FVCDJUI) {
+      FVCDJUI_high <-
+        if_else2(FVCDJUI <=1, 0,
+                if_else2(!is.na(FVCDJUI), FVCDJUI - 1, NA))
+    return(FVCDJUI_high)
+    }
+    
+   diet_raw_score <- if_else2(!is.na(max_fruitveg) & !is.na(FVCDPOT_high) & 
+                     !is.na(FVCDCAR_nil) & !is.na(FVCDJUI_high),  2 +
+                       max_fruitveg - (2*FVCDPOT_high) - (2*FVCDCAR_nil) - 
+                       (2*FVCDJUI_high), NA)
+   return(diet_raw_score)
+   
+  diet_score <- if_else2(diet_raw_score <0, 0,
+            if_else2(diet_raw_score >10, 10,
+                    if_else2(!is.na(diet_raw_score), diet_raw_score, NA)))
+   return(diet_score)
+  }
+
