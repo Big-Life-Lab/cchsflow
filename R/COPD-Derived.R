@@ -76,7 +76,7 @@ COPD_Emph_der_fun1 <-
           CCC_91E,
           ", CCC_91F:",
           CCC_91F,
-          "one or more of the COPD_Emph arguments was outside the 1:2 allowed
+          "one or more of the arguments was outside the 1:2 allowed
           range however the condition is still calculated",
           sep = ""
         ), call. = FALSE
@@ -171,7 +171,7 @@ COPD_Emph_der_fun2 <-
           DHHGAGE_cont,
           ", CCC_091:",
           CCC_091,
-          "one or more of the COPD/Emphysema arguments was outside the 1:2 allowed
+          "one or more of the arguments was outside the 1:2 allowed
           range however the condition is still calculated",
           sep = ""
         ), call. = FALSE
