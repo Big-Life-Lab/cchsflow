@@ -60,3 +60,7 @@ waryusuf@ohri.ca
 **References:** 27
 
 **Keywords:** Health Surveys, Data Analysis, Data Science, Population Health
+
+**Author Contributions**
+
+All authors contributed to the study conception and design. Data collection, variable selection, and software development were performed by Warsame Yusuf, Douglas G. Manuel, Rostyslav Vyuha, Carol Bennett, Yulric Sequeira, and Courtney Maskerine. The first draft of the manuscript was written by Warsame Yusuf and Douglas G. Manuel, and all authors commented on previous versions of the manuscript. All authors read and approved the final manuscript. 

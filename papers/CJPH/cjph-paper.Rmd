@@ -192,12 +192,6 @@ A roadmap, also known as next steps or future plans, are recommended for open so
 
 \pagebreak
 
-## Author Contributions
-
-All authors contributed to the study conception and design. Data collection, variable selection, and software development were performed by Warsame Yusuf, Douglas G. Manuel, Rostyslav Vyuha, Carol Bennett, Yulric Sequeira, and Courtney Maskerine. The first draft of the manuscript was written by Warsame Yusuf and Douglas G. Manuel, and all authors commented on previous versions of the manuscript. All authors read and approved the final manuscript. 
-
-\pagebreak
-
 ## References
 
 ::: {#refs}
