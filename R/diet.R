@@ -126,7 +126,8 @@ diet_score_fun <-
    
   diet_score <- if_else2(diet_raw_score <0, 0,
             if_else2(diet_raw_score >10, 10,
-                    if_else2(!is.na(diet_raw_score), diet_raw_score, NA)))
+                    if_else2(!is.na(diet_raw_score), diet_raw_score,
+                             tagged_na("b"))))
    return(diet_score)
   }
 
