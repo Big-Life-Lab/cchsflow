@@ -93,7 +93,9 @@ COPD_Emph_der_fun1 <-
         (CCC_91E == 2 & CCC_91F == 2)), 3,
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-        (CCC_91E == 2 & CCC_91F == 2 )), 3, "NA(b)"
+        (CCC_91E == 2 & CCC_91F == 2)), 3,
+    if_else2(
+      (CCC_91E == "NA(a)" & CCC_91F == "NA(a)"), "NA(a)", "NA(b)")
                 )
           )
       )
@@ -188,7 +190,11 @@ COPD_Emph_der_fun2 <-
              (CCC_091 == 2)), 3,
           if_else2(
             ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-               (CCC_091 == 2)), 3, "NA(b)"
+               (CCC_091 == 2)), 3,
+            if_else2(
+              (CCC_091 == "NA(a)"),
+              "NA(a)", "NA(b)"
+              )
           )
         )
       )
