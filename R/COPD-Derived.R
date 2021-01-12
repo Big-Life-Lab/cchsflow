@@ -9,8 +9,6 @@
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
-#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
-#'
 #' @param CCC_91E variable indicating if respondent has Emphysema
 #'
 #' @param CCC_91F variable indicating if respondent has COPD

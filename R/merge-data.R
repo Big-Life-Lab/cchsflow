@@ -9,7 +9,7 @@
 #'  NA(c), indicating that the variable was not asked or included in the CCHS
 #'  cycle of the respondent. 
 #'  
-#'  Click \href{https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html}(here)
+#'  Click \href{https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html}{here}
 #'  for more details on how NA's are treated in cchsflow.
 #' 
 #' @param ... recoded data frames to be merged.
@@ -18,7 +18,7 @@
 #'  labels for variable names and tags for variables not included in particular
 #'  CCHS cycles.
 #' 
-#' @example 
+#' @examples 
 #' # Merging two CCHS cycles with variables missing in each cycle.
 #' 
 #' # INCGHH_A is a cchsflow variable available for the 2001 CCHS cycle, while
@@ -37,7 +37,7 @@
 #' @export
 merge_rec_data <- function(...) {
   # Step 1: bind datasets
-  new_data <- bind_rows(...)
+  new_data <- dplyr::bind_rows(...)
   
   # Step 2: apply NA(c) to untagged NA's
   for (i in names(new_data)) {
@@ -58,7 +58,7 @@ merge_rec_data <- function(...) {
     }
   }
   # Step 3: apply labels to combined dataset
-  labelled_data <- set_data_labels(new_data, variable_details,
-                                   variables)
+  labelled_data <- set_data_labels(new_data, cchsflow::variable_details,
+                                   cchsflow::variables)
   return(labelled_data)
 }
