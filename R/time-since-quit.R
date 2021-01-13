@@ -2,8 +2,8 @@
 #' 
 #' @description This function creates a derived variable (time_quit_der) that
 #'  calculates the approximate time a former smoker has quit smoking based on
-#'  various CCHS smoking variables. This variable for CCHS respondents in CCHS
-#'  surveys 2003-2014.
+#'  various CCHS smoking variables. This variable is for CCHS respondents in
+#'  CCHS surveys 2003-2014.
 #'  
 #' @param SMK_09A_B number of years since quitting smoking. Variable asked to
 #'  former daily smokers who quit <3 years ago.
@@ -54,7 +54,7 @@ time_quit_fun <- function(SMK_09A_B, SMKG09C) {
       if_else2(
         SMKG09C == 2, 8,
         if_else2(SMKG09C == 3, 12,
-                 if_else2(SMKG09C == "NA(a)", "NA(a)", "NA(b)"
+                 if_else2(SMKG09C == "NA(a)", tagged_na("a"), tagged_na("b")
                           )
         )
       )
@@ -67,7 +67,7 @@ time_quit_fun <- function(SMK_09A_B, SMKG09C) {
         if_else2(
           SMK_09A_B == 3, 2.5,
           if_else2(SMK_09A_B == 4, SMKG09C_cont,
-                   if_else2(SMKG09C == "NA(a)", "NA(a)", tagged_na("b")
+                   if_else2(SMK_09A_B == "NA(a)", tagged_na("a"), tagged_na("b")
                             )
           )
         )
