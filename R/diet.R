@@ -75,24 +75,25 @@ diet_score_fun <-
     
     # Maximum total fruit and vegetables = 8
       max_fruitveg <-
-        if_else2(total_fruitveg >8, 8,
+        if_else2(!is.na(total_fruitveg) & total_fruitveg>8, 8,
                if_else2(!is.na(total_fruitveg), total_fruitveg, NA))
     
     # High potato intake flag
+      daily_pot_limit <-
+        if_else2(DHH_SEX==1, 1,
+                 if_else2(DHH_SEX==2, 5/7, NA))
       FVCDPOT_high <-
-        if_else2(DHH_SEX==1 & FVCDPOT>=1,1,
-                 if_else2(DHH_SEX==1 & FVCDPOT<1,0, 
-                          if_else2(DHH_SEX==2 & FVCDPOT>=5/7,1, 
-                                   if_else2(DHH_SEX==2 & FVCDPOT<5/7,0,NA))))
-    
+        if_else2(!is.na(FVCDPOT) & FVCDPOT>=(daily_pot_limit),1,
+                 if_else2(!is.na(FVCDPOT) & FVCDPOT<1,0, NA))
+
     # No carrot intake flag
       FVCDCAR_nil <-
-        if_else2(FVCDCAR==0, 1,
+        if_else2(!is.na(FVCDCAR) & FVCDCAR==0, 1,
                 if_else2(!is.na(FVCDCAR), 0, NA))
 
     # High juice intake flag
       FVCDJUI_high <-
-        if_else2(FVCDJUI <=1, 0,
+        if_else2(!is.na(FVCDJUI) & FVCDJUI <=1, 0,
                 if_else2(!is.na(FVCDJUI), FVCDJUI - 1, NA))
 
    diet_raw_score <- if_else2(!is.na(max_fruitveg) & !is.na(FVCDPOT_high) & 
