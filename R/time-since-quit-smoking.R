@@ -1,8 +1,8 @@
 #' @title Time since quit smoking
 #' 
-#' @description This function creates a derived variable (time_quit_der) that
-#'  calculates the approximate time a former smoker has quit smoking based on
-#'  various CCHS smoking variables. This variable is for CCHS respondents in
+#' @description This function creates a derived variable (time_quit_smoking_der)
+#'  that calculates the approximate time a former smoker has quit smoking based
+#'  on various CCHS smoking variables. This variable is for CCHS respondents in
 #'  CCHS surveys 2003-2014.
 #'  
 #' @param SMK_09A_B number of years since quitting smoking. Variable asked to
@@ -11,12 +11,13 @@
 #' @param SMKG09C number of years since quitting smoking. Variable asked to
 #'  former daily smokers who quit >=3 years ago.
 #'  
-#' @return value for time since quit smoking in time_quit_der.
+#' @return value for time since quit smoking in time_quit_smoking_der.
 #' 
 #' @examples 
-#' # Using time_quit_fun() to create pack-years values across CCHS cycles
-#' # time_quit_fun() is specified in variable_details.csv along with the CCHS
-#' # variables and cycles included.
+#' # Using time_quit_smoking_fun() to create pack-years values across CCHS 
+#' # cycles.
+#' # time_quit_smoking_fun() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
 #'
 #' # To transform time_quit_fun across cycles, use rec_with_table() for each
 #' # CCHS cycle and specify time_quit_fun, along with each smoking variable.
@@ -26,7 +27,7 @@
 #' 
 #' time_quit2009_2010 <- rec_with_table(
 #'   cchs2009_2010_p, c(
-#'     "SMK_09A_B", "SMKG09C", "time_quit_der"
+#'     "SMK_09A_B", "SMKG09C", "time_quit_smoking_der."
 #'   )
 #' )
 #'
@@ -34,7 +35,7 @@
 #'
 #' time_quit2011_2012 <- rec_with_table(
 #'   cchs2011_2012_p, c(
-#'     "SMK_09A_B", "SMKG09C", "time_quit_der"
+#'     "SMK_09A_B", "SMKG09C", "time_quit_smoking_der."
 #'   )
 #' )
 #'
@@ -47,7 +48,7 @@
 #' tail(combined_time_quit)
 #' @export
 
-time_quit_fun <- function(SMK_09A_B, SMKG09C) {
+time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
   SMKG09C_cont <-
     if_else2(
       SMKG09C == 1, 4,
