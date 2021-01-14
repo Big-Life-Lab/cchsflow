@@ -70,7 +70,7 @@ library(kableExtra)
 ```
 
 ```{r, echo=FALSE, message=FALSE}
-combined_bmi <- bind_rows(bmi2003, bmi2010)
+combined_bmi <- merge_rec_data(bmi2003, bmi2010)
 
 kable(combined_bmi[1:10, ])
 ```
