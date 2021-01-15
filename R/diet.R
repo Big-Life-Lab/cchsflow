@@ -1,18 +1,28 @@
 #' @title Diet score
 #'
-#' @description This function creates a derived diet variable (diet_score) based 
-#' on consumption of fruit, salad, potatoes, carrots, other vegetables and juice. 
-#' 2 baseline points plus summation of total points for diet attributes.
-#' (negative overall scores are recoded to 0, resulting in a range from 0 to 10).
+#' @description This function creates a derived diet variable (diet_score)
+#'  based on consumption of fruit, salad, potatoes, carrots, other vegetables
+#'  and juice. 2 baseline points plus summation of total points for diet
+#'  attributes. Negative overall scores are recoded to 0, resulting in a range
+#'  from 0 to 10.
 #' 
 #' \itemize{
 #'   \item 1 point per daily fruit and vegetable consumption, excluding fruit 
 #'   juice (maximum 8 points).
-#'   \item -2 points for high potato intake (≥7 (males), ≥5 (females) times/week)
+#'   \item -2 points for high potato intake (≥7 (males),
+#'    ≥5 (females) times/week)
 #'   \item -2 points for no carrot intake
 #'   \item -2 points per daily frquency of fruit juce consumption greater than 
 #'   once/day (maximum -10 points)
 #'  }
+#'
+#' @details While diet score can be calculated for all survey respondents, in
+#'  the 2005 CCHS survey cycle, fruit and vegetable consumption was an optional
+#'  section in which certain provinces had opted in to be asked to respondents.
+#'  In this survey cycle, fruit and vegetable consumption was asked to
+#'  respondents in British Columbia, Ontario, Alberta, and Prince Edward Island.
+#'  As such, diet score has a large number of missing respondents for this 
+#'  cycle.
 #'
 #' @param FVCDFRU daily consumption of fruit
 #'
