@@ -141,7 +141,8 @@ smoke_simple_fun <-
     derive_current_smoker <- function(SMKDSTY) {
       smoker <-
         ifelse(SMKDSTY %in% c(1, 2, 3), 1,
-               ifelse(SMKDSTY %in% c(4, 5, 6), 0, NA))
+               ifelse(SMKDSTY %in% c(4, 5, 6), 0,
+                      ifelse(SMKDSTY %in% "NA(a)", "NA(b)")))
       return(smoker)
     }
     smoker <- derive_current_smoker(SMKDSTY)
@@ -150,7 +151,8 @@ smoke_simple_fun <-
     derive_ever_smoker <- function(SMKDSTY) {
       eversmoker <-
         ifelse(SMKDSTY %in% c(1, 2, 3, 4, 5), 1,
-               ifelse(SMKDSTY == 6, 0, NA))
+               ifelse(SMKDSTY == 6, 0,
+                      ifelse(SMKDSTY %in% "NA(a)", "NA(b)")))
       return(eversmoker)
     }
     eversmoker <- derive_ever_smoker(SMKDSTY)
@@ -166,7 +168,9 @@ smoke_simple_fun <-
                    SMKDSTY == 5, 2,
       # smoke_simple 3 = former daily smoker quit > 5 years
             ifelse(smoker == 0 & eversmoker == 1 & time_since_quit_smoking > 5,
-                   3, NA))))
+                   3,
+                   ifelse(smoker == "NA(a)" & eversmoker == "NA(a)" &
+                    time_since_quit_smoking == "NA(a)", "NA(a)", "NA(b)")))))
     return(smoke_simple)
   }
 
@@ -269,37 +273,43 @@ pack_years_fun <-
     }
 
     # PackYears for Daily Smoker
-    if_else2(
-      SMKDSTY == 1, pmax(((DHHGAGE_cont - SMKG203_cont) *
-        (SMK_204 / 20)), 0.0137),
-      # PackYears for Occasional Smoker (former daily)
+    pack_years <- 
       if_else2(
-        SMKDSTY == 2, pmax(((DHHGAGE_cont - SMKG207_cont - time_quit_smoking) *
-        (SMK_208 / 20)), 0.0137) + (pmax((SMK_05B * SMK_05C / 30), 1) *
-                                      time_quit_smoking),
-        # PackYears for Occasional Smoker (never daily)
+        SMKDSTY == 1, pmax(((DHHGAGE_cont - SMKG203_cont) *
+                              (SMK_204 / 20)), 0.0137),
+        # PackYears for Occasional Smoker (former daily)
         if_else2(
-          SMKDSTY == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) *
-            (DHHGAGE_cont - SMKG01C_cont),
-          # PackYears for former daily smoker (non-smoker now)
+          SMKDSTY == 2, pmax(((DHHGAGE_cont - SMKG207_cont -
+                                 time_quit_smoking) * (SMK_208 / 20)), 0.0137) +
+            (pmax((SMK_05B * SMK_05C / 30), 1) *time_quit_smoking),
+          # PackYears for Occasional Smoker (never daily)
           if_else2(
-            SMKDSTY == 4, pmax(((DHHGAGE_cont - SMKG207_cont -
-                                   time_quit_smoking) *
-              (SMK_208 / 20)), 0.0137),
-            # PackYears for former occasional smoker (non-smoker now) who
-            # smoked at least 100 cigarettes lifetime
+            SMKDSTY == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) *
+              (DHHGAGE_cont - SMKG01C_cont),
+            # PackYears for former daily smoker (non-smoker now)
             if_else2(
-              SMKDSTY == 5 & SMK_01A == 1, 0.0137,
-              # PackYears for former occasional smoker (non-smoker now) who have
-              # not smoked at least 100 cigarettes lifetime
+              SMKDSTY == 4, pmax(((DHHGAGE_cont - SMKG207_cont -
+                                     time_quit_smoking) *
+                                    (SMK_208 / 20)), 0.0137),
+              # PackYears for former occasional smoker (non-smoker now) who
+              # smoked at least 100 cigarettes lifetime
               if_else2(
-                SMKDSTY == 5 & SMK_01A == 2, 0.007,
-                # Non-smoker
-                if_else2(SMKDSTY == 6, 0, tagged_na("b"))
+                SMKDSTY == 5 & SMK_01A == 1, 0.0137,
+                # PackYears for former occasional smoker (non-smoker now) who 
+                # have not smoked at least 100 cigarettes lifetime
+                if_else2(
+                  SMKDSTY == 5 & SMK_01A == 2, 0.007,
+                  # Non-smoker
+                  if_else2(SMKDSTY == 6, 0,
+                           # Account for NA(a)
+                           if_else2(SMKDSTY == "NA(a)", tagged_na("a"),
+                                    tagged_na("b"))
+                  )
+                )
               )
             )
           )
         )
       )
-    )
+    return(pack_years)
   }
