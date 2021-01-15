@@ -112,7 +112,7 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #'
 #' smoke_simple2009_2010 <- rec_with_table(
 #'   cchs2009_2010_p, c(
-#'     "SMKDSTY", "SMK_09A_B", "SMKG09C", "time_since_quit_smoking",
+#'     "SMKDSTY", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
 #'     "smoke_simple"
 #'   )
 #' )
@@ -121,7 +121,7 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #'
 #' smoke_simple2011_2012 <- rec_with_table(
 #'   cchs2011_2012_p,c(
-#'    "SMKDSTY", "SMK_09A_B", "SMKG09C", "time_since_quit_smoking",
+#'    "SMKDSTY", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
 #'    "smoke_simple"
 #'   )
 #' )
@@ -135,7 +135,7 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #' tail(combined_smoke_simple)
 #' @export
 smoke_simple_fun <-
-  function(SMKDSTY, time_since_quit_smoking) {
+  function(SMKDSTY, time_quit_smoking) {
     
     # Nested function: current smoker status
     derive_current_smoker <- function(SMKDSTY) {
@@ -164,13 +164,13 @@ smoke_simple_fun <-
         ifelse(smoker == 1 & eversmoker == 1, 1,
       # smoke_simple 2 = former daily smoker quit ≤ 5 years or former occasional
       # smoker
-          ifelse(smoker == 0 & eversmoker == 1 & time_since_quit_smoking <= 5 |
+          ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking <= 5 |
                    SMKDSTY == 5, 2,
       # smoke_simple 3 = former daily smoker quit > 5 years
-            ifelse(smoker == 0 & eversmoker == 1 & time_since_quit_smoking > 5,
+            ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking > 5,
                    3,
                    ifelse(smoker == "NA(a)" & eversmoker == "NA(a)" &
-                    time_since_quit_smoking == "NA(a)", "NA(a)", "NA(b)")))))
+                            time_quit_smoking == "NA(a)", "NA(a)", "NA(b)")))))
     return(smoke_simple)
   }
 
