@@ -62,10 +62,8 @@
 resp_condition_fun1 <-
   function(DHHGAGE_cont, CCC_091, CCC_031) {
     # Argument verification
-    if ((!is_equal(CCC_091, 1) &
-         !is_equal(CCC_091, 2)) |
-        (!is_equal(CCC_031, 1) &
-         !is_equal(CCC_031, 2))) {
+    if ((CCC_091 %notin% 1:2) |
+        (CCC_031 %notin% 1:2)) {
       warning(
         paste(
           "In DHHGAGE_cont:",
@@ -166,14 +164,10 @@ resp_condition_fun1 <-
 resp_condition_fun2 <-
   function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A, CCC_031) {
     # Argument verification
-    if ((!is_equal(CCC_91E, 1) &
-         !is_equal(CCC_91E, 2)) |
-        (!is_equal(CCC_91F, 1) &
-         !is_equal(CCC_91F, 2)) |
-        (!is_equal(CCC_91A, 1) &
-         !is_equal(CCC_91A, 2)) |
-        (!is_equal(CCC_031, 1) &
-         !is_equal(CCC_031, 2))) {
+    if ((CCC_91E %notin% 1:2) |
+        (CCC_91F %notin% 1:2) |
+        (CCC_91A %notin% 1:2) |
+        (CCC_031 %notin% 1:2)) {
       warning(
         paste(
           "In DHHGAGE_cont:",
@@ -281,12 +275,9 @@ resp_condition_fun2 <-
 resp_condition_fun3 <-
   function(DHHGAGE_cont, CCC_091, CCC_91A, CCC_031) {
     # Argument verification
-    if ((!is_equal(CCC_091, 1) &
-         !is_equal(CCC_091, 2)) |
-        (!is_equal(CCC_91A, 1) &
-         !is_equal(CCC_91A, 2)) |
-        (!is_equal(CCC_031, 1) &
-         !is_equal(CCC_031, 2))) {
+    if ((CCC_091 %notin% 1:2) |
+        (CCC_91A %notin% 1:2) |
+        (CCC_031 %notin% 1:2)) {
       warning(
         paste(
           "In DHHGAGE_cont:",
@@ -392,10 +383,8 @@ resp_condition_fun3 <-
 COPD_Emph_der_fun1 <-
   function(DHHGAGE_cont, CCC_91E, CCC_91F) {
     # Argument verification
-    if ((!is_equal(CCC_91E, 1) &
-         !is_equal(CCC_91E, 2)) |
-        (!is_equal(CCC_91F, 1) &
-         !is_equal(CCC_91F, 2))) {
+    if ((CCC_91E %notin% 1:2) |
+        (CCC_91F %notin% 1:2)) {
       warning(
         paste(
           "In DHHGAGE_cont:",
@@ -493,8 +482,7 @@ COPD_Emph_der_fun1 <-
 COPD_Emph_der_fun2 <-
   function(DHHGAGE_cont, CCC_091) {
     # Argument verification
-    if ((!is_equal(CCC_091, 1) &
-         !is_equal(CCC_091, 2))) {
+    if (CCC_091 %notin% 1:2) {
       warning(
         paste(
           "In DHHGAGE_cont:",
