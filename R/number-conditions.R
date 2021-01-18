@@ -59,7 +59,7 @@
 #'  conditions_2001 <- suppressWarnings(rec_with_table(cchs2001_p,
 #'  c("DHHGAGE_cont", "CCC_091",
 #'  "CCC_91A", "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
-#'  "resp_condition_der","CCC_051", "numbers_conditions")))
+#'  "resp_condition_der","CCC_051", "number_conditions")))
 #'  
 #'  head(conditions_2001)
 #'  
