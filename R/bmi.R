@@ -47,7 +47,7 @@
 #'
 #' # To transform the derived BMI variable, use rec_with_table() for each cycle
 #' # and specify HWTGBMI_der, along with height (HWTGHTM) and weight (HWTGWTK).
-#' # Then by using dplyr::bind_rows(), you can combined HWTGBMI_der across
+#' # Then by using merge_rec_data(), you can combined HWTGBMI_der across
 #' # cycles.
 #'
 #' library(cchsflow)
@@ -69,7 +69,7 @@
 #'
 #' tail(bmi2011_2012)
 #'
-#' combined_bmi <- bind_rows(bmi2001, bmi2011_2012)
+#' combined_bmi <- merge_rec_data(bmi2001, bmi2011_2012)
 #' head(combined_bmi)
 #' tail(combined_bmi)
 #'

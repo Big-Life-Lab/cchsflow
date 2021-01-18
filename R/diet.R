@@ -46,7 +46,7 @@
 #' # To create a harmonized diet_score variable across CCHS cycles, use 
 #' # rec_with_table() for each CCHS cycle and specify diet_score_fun and the
 #' # required base variables.
-#' # Using bind_rows(), you can combine smoke_simple across cycles
+#' # Using merge_rec_data(), you can combine smoke_simple across cycles
 #'
 #' library(cchsflow)
 #'
@@ -68,7 +68,7 @@
 #'
 #' tail(diet_score2011_2012)
 #'
-#' combined_diet_score <- suppressWarnings(bind_rows(diet_score2009_2010,
+#' combined_diet_score <- suppressWarnings(merge_rec_data(diet_score2009_2010,
 #'  diet_score2011_2012))
 #'
 #' head(combined_diet_score)

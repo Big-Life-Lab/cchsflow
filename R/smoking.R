@@ -21,7 +21,7 @@
 #'
 #' # To transform time_quit_fun across cycles, use rec_with_table() for each
 #' # CCHS cycle and specify time_quit_fun, along with each smoking variable.
-#' # Then by using bind_rows(), you can combine time_quit_fun across cycles
+#' # Then by using merge_rec_data(), you can combine time_quit_fun across cycles
 #' 
 #' library(cchsflow)
 #' 
@@ -41,7 +41,7 @@
 #'
 #' tail(time_quit2011_2012)
 #'
-#' combined_time_quit <- suppressWarnings(bind_rows(time_quit2009_2010,
+#' combined_time_quit <- suppressWarnings(merge_rec_data(time_quit2009_2010,
 #'  time_quit2011_2012))
 #'
 #' head(combined_time_quit)
@@ -106,7 +106,7 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #' # rec_with_table() for each CCHS cycle and specify smoke_simple_fun and 
 #' # the required base variables. Since time_quit_smoking_der is also a derived 
 #' # variable, you will have to specify the variables that are derived from it.
-#' # Using bind_rows(), you can combine smoke_simple across cycles
+#' # Using merge_rec_data(), you can combine smoke_simple across cycles.
 #'
 #' library(cchsflow)
 #'
@@ -128,8 +128,8 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #'
 #' tail(smoke_simple2011_2012)
 #'
-#' combined_smoke_simple <- suppressWarnings(bind_rows(smoke_simple2009_2010,
-#'  smoke_simple2011_2012))
+#' combined_smoke_simple <- 
+#' suppressWarnings(merge_rec_data(smoke_simple2009_2010,smoke_simple2011_2012))
 #'
 #' head(combined_smoke_simple)
 #' tail(combined_smoke_simple)
@@ -231,7 +231,8 @@ smoke_simple_fun <-
 #' # CCHS cycle and specify pack_years_der, along with each smoking variable.
 #' # Since time_quit_smoking_der is also a derived 
 #' # variable, you will have to specify the variables that are derived from it.
-#' # Then by using bind_rows(), you can combine pack_years_der across cycles
+#' # Then by using merge_rec_data(), you can combine pack_years_der across
+#' # cycles
 #'
 #' library(cchsflow)
 #'
@@ -255,7 +256,7 @@ smoke_simple_fun <-
 #'
 #' tail(pack_years2011_2012)
 #'
-#' combined_pack_years <- suppressWarnings(bind_rows(pack_years2009_2010,
+#' combined_pack_years <- suppressWarnings(merge_rec_data(pack_years2009_2010,
 #'  pack_years2011_2012))
 #'
 #' head(combined_pack_years)

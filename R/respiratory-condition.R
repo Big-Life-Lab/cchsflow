@@ -29,8 +29,8 @@
 #'
 #' # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
 #' # and specify resp_condition_der, along with the various respiratory
-#' # variables. Then by using bind_rows() you can combine resp_condition_der
-#' # across cycles.
+#' # variables. Then by using merge_rec_data() you can combine
+#' # resp_condition_der across cycles.
 #'
 #' library(cchsflow)
 #'
@@ -52,7 +52,8 @@
 #'
 #' tail(resp2011_2012)
 #'
-#' combined_resp <- suppressWarnings(bind_rows(resp2009_2010, resp2011_2012))
+#' combined_resp <-
+#'  suppressWarnings(merge_rec_data(resp2009_2010, resp2011_2012))
 #'
 #' head(combined_resp)
 #' tail(combined_resp)
@@ -131,8 +132,8 @@ resp_condition_fun1 <-
 #'
 #' # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
 #' # and specify resp_condition_der, along with the various respiratory
-#' # variables. Then by using bind_rows() you can combine resp_condition_der
-#' # across cycles.
+#' # variables. Then by using merge_rec_data() you can combine
+#' # resp_condition_der across cycles.
 #'
 #' library(cchsflow)
 #'
@@ -154,7 +155,7 @@ resp_condition_fun1 <-
 #'
 #' tail(resp2007_2008)
 #'
-#' combined_resp <- suppressWarnings(bind_rows(resp2005, resp2007_2008))
+#' combined_resp <- suppressWarnings(merge_rec_data(resp2005, resp2007_2008))
 #'
 #' head(combined_resp)
 #' tail(combined_resp)
@@ -242,8 +243,8 @@ resp_condition_fun2 <-
 #'
 #' # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
 #' # and specify resp_condition_der, along with the various respiratory
-#' # variables. Then by using bind_rows() you can combine resp_condition_der
-#' # across cycles.
+#' # variables. Then by using merge_rec_data() you can combine
+#' # resp_condition_der across cycles.
 #'
 #' library(cchsflow)
 #'
@@ -265,7 +266,7 @@ resp_condition_fun2 <-
 #'
 #' tail(resp2003)
 #'
-#' combined_resp <- suppressWarnings(bind_rows(resp2001, resp2003))
+#' combined_resp <- suppressWarnings(merge_rec_data(resp2001, resp2003))
 #'
 #' head(combined_resp)
 #' tail(combined_resp)
@@ -349,7 +350,7 @@ resp_condition_fun3 <-
 #'
 #' # To transform COPD_Emph_der, use rec_with_table() for each CCHS cycle
 #' # and specify COPD_Emph_der, along with the various respiratory
-#' # variables. Then by using bind_rows() you can combine COPD_Emph_der
+#' # variables. Then by using merge_rec_data() you can combine COPD_Emph_der
 #' # across cycles.
 #'
 #' library(cchsflow)
@@ -372,7 +373,7 @@ resp_condition_fun3 <-
 #'
 #' tail(COPD2007_2008)
 #'
-#' combined_COPD <- suppressWarnings(bind_rows(COPD2005, COPD2007_2008))
+#' combined_COPD <- suppressWarnings(merge_rec_data(COPD2005, COPD2007_2008))
 #'
 #' head(combined_COPD)
 #' tail(combined_COPD)
@@ -425,8 +426,8 @@ COPD_Emph_der_fun1 <-
 #'  (COPD_Emph_der) that determines if a respondents has either COPD or 
 #'  Emphysema. 2 different functions have been created to account for the fact
 #'  that different respiratory variables are used across CCHS cycles. This
-#'  function is for CCHS cycles (2001-2003, 2009-2014) that use COPD and Emphysema as
-#'  a combined variable. 
+#'  function is for CCHS cycles (2001-2003, 2009-2014) that use COPD and
+#'  Emphysema as a combined variable. 
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
@@ -447,7 +448,7 @@ COPD_Emph_der_fun1 <-
 #'
 #' # To transform COPD_Emph_der, use rec_with_table() for each CCHS cycle
 #' # and specify COPD_Emph_der, along with the various respiratory
-#' # variables. Then by using bind_rows() you can combine COPD_Emph_der
+#' # variables. Then by using merge_rec_data() you can combine COPD_Emph_der
 #' # across cycles.
 #'
 #' library(cchsflow)
@@ -470,7 +471,7 @@ COPD_Emph_der_fun1 <-
 #'
 #' tail(COPD2014)
 #'
-#' combined_COPD <- suppressWarnings(bind_rows(COPD2001, COPD2014))
+#' combined_COPD <- suppressWarnings(merge_rec_data(COPD2001, COPD2014))
 #'
 #' head(combined_COPD)
 #' tail(combined_COPD)

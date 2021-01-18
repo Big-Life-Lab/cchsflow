@@ -29,8 +29,8 @@
 #' # To transform pct_time_der across cycles, use rec_with_table() for each CCHS
 #' # cycle and specify pct_time_der, along with age (DHHGAGE_cont), whether or
 #' # not someone was born in Canada (SDCGCBG), how long someone has lived in
-#' # Canada (SDCGRES). Then by using bind_rows(), you can combine Pct_time_der
-#' # across cycles
+#' # Canada (SDCGRES). Then by using merge_rec_data(), you can combine
+#' # pct_time_der across cycles
 #'
 #' library(cchsflow)
 #' pct_time2009_2010 <- rec_with_table(
@@ -49,7 +49,7 @@
 #' )
 #' tail(pct_time2011_2012)
 #'
-#' combined_pct_time <- bind_rows(pct_time2009_2010, pct_time2011_2012)
+#' combined_pct_time <- merge_rec_data(pct_time2009_2010, pct_time2011_2012)
 #' head(combined_pct_time)
 #' tail(combined_pct_time)
 #'
