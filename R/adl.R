@@ -206,8 +206,6 @@ adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 adl_score_5_fun <-
   function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
     # For each row in the ADL variables, count the total number of "missing"
-    # values in each row
-    count_missing_adl <- rep(0, length(ADL_01))
     
     all_adl_vector <- c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
     
@@ -215,55 +213,6 @@ adl_score_5_fun <-
     count_not_applicable_adl <- sum(all_adl_vector == "NA(a)")
     count_adl <- sum(all_adl_vector == 2)
     
-    # For each row of each of the above ADL variables, if they have a value of 
-    # "missing" then increment the count for that row in the above
-    # vector by one
-    count_missing_adl <-
-      ifelse(ADL_01 == "NA(b)", count_missing_adl + 1, count_missing_adl)
-    count_missing_adl <-
-      ifelse(ADL_02 == "NA(b)", count_missing_adl + 1, count_missing_adl)
-    count_missing_adl <-
-      ifelse(ADL_03 == "NA(b)", count_missing_adl + 1, count_missing_adl)
-    count_missing_adl <-
-      ifelse(ADL_04 == "NA(b)", count_missing_adl + 1, count_missing_adl)
-    count_missing_adl <-
-      ifelse(ADL_05 == "NA(b)", count_missing_adl + 1, count_missing_adl)
-    
-    # For each row in the ADL variables, count the total number of "not
-    # applicable" values in each row
-    count_not_applicable_adl <- rep(0, length(ADL_01))
-    # For each row of each of the above ADL variables, if they have a value of 
-    # "not applicable" then increment the count for that row in the above
-    # vector by one
-    count_not_applicable_adl <-
-      ifelse(ADL_01 == "NA(a)",
-             count_not_applicable_adl + 1,
-             count_not_applicable_adl)
-    count_not_applicable_adl <-
-      ifelse(ADL_02 == "NA(a)",
-             count_not_applicable_adl + 1,
-             count_not_applicable_adl)
-    count_not_applicable_adl <-
-      ifelse(ADL_03 == "NA(a)",
-             count_not_applicable_adl + 1,
-             count_not_applicable_adl)
-    count_not_applicable_adl <-
-      ifelse(ADL_04 == "NA(a)",
-             count_not_applicable_adl + 1,
-             count_not_applicable_adl)
-    count_not_applicable_adl <-
-      ifelse(ADL_05 == "NA(a)",
-             count_not_applicable_adl + 1,
-             count_not_applicable_adl)
-    
-    # For each row in the ADL variables, count the total number of values
-    # where the individual needed help with the task
-    count_adl <- rep(0, length(ADL_01))
-    count_adl <- ifelse(ADL_01 == "2", count_adl + 1, count_adl)
-    count_adl <- ifelse(ADL_02 == "2", count_adl + 1, count_adl)
-    count_adl <- ifelse(ADL_03 == "2", count_adl + 1, count_adl)
-    count_adl <- ifelse(ADL_04 == "2", count_adl + 1, count_adl)
-    count_adl <- ifelse(ADL_05 == "2", count_adl + 1, count_adl)
     
     # If the individual had missing data for any of the variables then set
     # the score to missing
