@@ -84,7 +84,8 @@ age_cat_fun <- function(DHHGAGE_cont) {
                               (DHHGAGE_cont %in% 70:74), 14,
                               if_else2(
                                 (DHHGAGE_cont %in% 75:79), 15,
-                                if_else2((DHHGAGE_cont >= 80), 16, NA)
+                                if_else2((DHHGAGE_cont >= 80), 16,
+                                         "NA(b)")
                               )
                             )
                           )
