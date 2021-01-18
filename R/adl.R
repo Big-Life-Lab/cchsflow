@@ -126,23 +126,16 @@ adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #' @title The number of activities of daily living tasks that require help.
 #'
 #' @description A 6 category variable (ADL_score_5) representing the number of
-#'  activities of daily living tasks that require help. The following five ADL
-#'  variables are used. All variables are common across CCHS cycles from 2001
-#'  to 2014:
-#' \enumerate{
-#'   \item ADL_01 - Needs help preparing meals
-#'   \item ADL_02 - Needs help getting to appointments/errands
-#'   \item ADL_03 - Needs help doing housework
-#'   \item ADL_04 - Needs help doing personal care
-#'   \item ADL_05 - Needs help moving inside house
-#' }
-#' There are two categories to represent "missing" and "not applicable". 
+#'  activities of daily living tasks that require help. This variable tallies
+#'  the number of daily living tasks that a respondent requires help with based
+#'  on various ADL variables that a respondent answered yes or no to. The ADL
+#'  variables used are common across all CCHS cycles from 2001 to 2014.
 #'
-#' @param ADL_01 Needs help preparing meals
-#' @param ADL_02 Needs help getting to appointments/errands
-#' @param ADL_03 Needs help doing housework
-#' @param ADL_04 Needs help doing personal care
-#' @param ADL_05 Needs help moving inside house
+#' @param ADL_01 Needs help preparing meals.
+#' @param ADL_02 Needs help getting to appointments/errands.
+#' @param ADL_03 Needs help doing housework.
+#' @param ADL_04 Needs help doing personal care.
+#' @param ADL_05 Needs help moving inside house.
 #'
 #' @return A derived variable (ADL_score_5) with 6 categories:
 #' \enumerate{
@@ -152,13 +145,8 @@ adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #'   \item 3 - Needs help with at least 3 tasks
 #'   \item 4 - Needs help with at least 4 tasks
 #'   \item 5 - Needs help with at least 5 tasks
-#'   \item NA(a) - Not applicable. At least one of the component variables
-#'    had a value of not applicable
-#'   \item NA(b) - Missing. At least one of the component variables had a value
-#'    of missing, but none of had a **not applicable** value
 #' }
 #'
-#' @export
 #'
 #' @examples
 #' # Use adl_score_5_fun() to create the variable ADL_score_5 across CCHS 
@@ -192,8 +180,8 @@ adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #'
 #' tail(combined_adl)
 #'
-#' # Using adl_score_5_fun() to generate to ADL_score_5 based on user inputted values.
-#' #
+#' # Using adl_score_5_fun() to generate to ADL_score_5 based on user inputted
+#' # values.
 #' # Let's say you do not need help preparing meals, you need help getting to
 #' # appointments or errands, you need help doing housework, do not need help
 #' # doing personal care, and do not need help moving inside the house. Using
@@ -203,14 +191,17 @@ adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #'
 #' print(ADL_score_5)
 #'
+#' @export
 adl_score_5_fun <-
   function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-    # For each row in the ADL variables, count the total number of "missing"
     
+    # Create vector of ADL input variables
     all_adl_vector <- c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
-    
+    # Count the number of missing values in vector
     count_missing_adl <- sum(all_adl_vector == "NA(b)")
+    # Count the number of not applicable values in vector
     count_not_applicable_adl <- sum(all_adl_vector == "NA(a)")
+    # Count the number of ADLs that require help (value of 2)
     count_adl <- sum(all_adl_vector == 2)
     
     
