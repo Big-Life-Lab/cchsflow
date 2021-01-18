@@ -208,6 +208,13 @@ adl_score_5_fun <-
     # For each row in the ADL variables, count the total number of "missing"
     # values in each row
     count_missing_adl <- rep(0, length(ADL_01))
+    
+    all_adl_vector <- c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
+    
+    count_missing_adl <- sum(all_adl_vector == "NA(b)")
+    count_not_applicable_adl <- sum(all_adl_vector == "NA(a)")
+    count_adl <- sum(all_adl_vector == 2)
+    
     # For each row of each of the above ADL variables, if they have a value of 
     # "missing" then increment the count for that row in the above
     # vector by one
