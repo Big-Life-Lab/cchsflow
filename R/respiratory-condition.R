@@ -85,13 +85,14 @@ resp_condition_fun1 <-
         (CCC_091 == 1 | CCC_031 == 1)), 1,
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-        (CCC_031 == 1)), 2,
+        (CCC_091 == 1 | CCC_031 == 1)), 2,
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-        (CCC_031 == 2)), 3,
+        (CCC_091 == 2 | CCC_031 == 2)), 3,
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-        (CCC_091 == 2 & CCC_031 == 2)), 3, "NA(b)"
+        (CCC_091 == 2 & CCC_031 == 2)), 3, 
+      if_else2((CCC_091 == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)", "NA(b)")
                 )
           )
       )
@@ -207,7 +208,9 @@ resp_condition_fun2 <-
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) &
         (CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2 & CCC_031 == 2)), 3,
-          "NA(b)")
+    if_else2((CCC_91E == "NA(a)" & CCC_91F == "NA(a)" &
+                 CCC_91A == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)", "NA(b)")
+            )
           )
         )
       )
@@ -315,7 +318,10 @@ resp_condition_fun3 <-
         (CCC_91A == 2 & CCC_031 == 2)), 3,
     if_else2(
       ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) & 
-        (CCC_091 == 2 & CCC_91A == 2 & CCC_031 == 2)), 3, "NA(b)")
+        (CCC_091 == 2 & CCC_91A == 2 & CCC_031 == 2)), 3,
+    if_else2((CCC_091 == "NA(a)" & CCC_91A == "NA(a)" & CCC_031 == "NA(a)"), 
+             "NA(a)", "NA(b)")
+            )
           )
         )
       )
