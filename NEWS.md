@@ -7,6 +7,8 @@
 ## Minor improvements
 - Improved support for `tagged_na` in derived variables. Additional
 documentation added for creating derived variables in the [tagged_na](./docs/articles/tagged_na_usage.html) article.
+- Updates to labels and variable classification on `variables.csv` and
+`variable_details.csv`.
 
 ## New variables
 - [**COPD_Emph_der:**](COPD_Emph_der_fun1()) derived variable that determines
