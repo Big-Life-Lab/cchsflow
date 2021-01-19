@@ -1,4 +1,33 @@
-# cchsflow 1.7.1 (Latest build)
+# cchsflow 1.8.0
+2021-01-20
+
+## Features
+- New function `merge_data_fun()` that merges and labels transformed CCHS datasets.
+
+## Minor improvements
+- Improved support for `tagged_na` in derived variables. Additional
+documentation added for creating derived variables in the [tagged_na](./docs/articles/tagged_na_usage.html) article.
+
+## New variables
+- [**COPD_Emph_der:**](COPD_Emph_der_fun1()) derived variable that determines
+if a respondent has either COPD or Emphysema.
+- [**ADL_score_5:**](adl_score_5_fun()) derived variable the scores the number
+of daily tasks that a respondent needs help with
+- [**diet_score:**](diet_score_fun()) derived variable that scores respondents
+based on daily consumption of fruit, vegetables and fruit juice.
+- [**smoke_simple:**](smoke_simple_fun()) derived variable that classifies
+respondents smoking status.
+- [**time_quit_smoking:**](time_quit_smoking_fun()) derived variable that
+estimates approximate time since respondent has quit smoking if they are former
+smoker.
+- **LBFA_31A/LBFA_31A_a/LBFA_31A_b:** Occupation group. 3 different variables
+with differing categories were created to harmonize between CCHS cycles.
+- **CCC_041:** Fibromyalgia.
+- **CCC_061:** Back problems.
+- **CCC_081:** Migraine headaches.
+- **CCC_290:** Anxiety disorder.
+
+# cchsflow 1.7.1
 2020-09-16
 
 ## Minor improvements
