@@ -5,7 +5,7 @@
 \alias{cchs2013_2014_p}
 \title{2013-2014 CCHS PUMF subset data (200 respondents)}
 \source{
-\url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=144170}
+\url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=144170}
 }
 \value{
 \item{cchs2013_2014_p}{a data frame}
