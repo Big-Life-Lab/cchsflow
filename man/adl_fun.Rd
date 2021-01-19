@@ -80,7 +80,7 @@ The CCHS derived variable ADLF6R uses different ADL variables across
 
 # To transform ADL_der, use rec_with_table() for each CCHS cycle
 # and specify ADL_der, along with the various ADL variables.
-# Then by using bind_rows() you can combine ADL_der across cycles.
+# Then by using merge_rec_data() you can combine ADL_der across cycles.
 
 library(cchsflow)
 adl2001 <- rec_with_table(
@@ -99,7 +99,7 @@ adl2009_2010 <- rec_with_table(
 
 tail(adl2009_2010)
 
-combined_adl <- bind_rows(adl2001, adl2009_2010)
+combined_adl <- merge_rec_data(adl2001, adl2009_2010)
 
 head(combined_adl)
 
