@@ -31,10 +31,10 @@ This function creates a derived diet variable (diet_score)
 \itemize{
   \item 1 point per daily fruit and vegetable consumption, excluding fruit 
   juice (maximum 8 points).
-  \item -2 points for high potato intake (≥7 (males),
-   ≥5 (females) times/week)
+  \item -2 points for high potato intake (>=7 (males),
+   >=5 (females) times/week)
   \item -2 points for no carrot intake
-  \item -2 points per daily frquency of fruit juce consumption greater than 
+  \item -2 points per daily frequency of fruit juice consumption greater than 
   once/day (maximum -10 points)
  }
 }

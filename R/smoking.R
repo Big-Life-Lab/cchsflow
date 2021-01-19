@@ -85,7 +85,7 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #' \itemize{
 #'   \item non-smoker (never smoked)
 #'   \item current smoker (daily and occasional?)
-#'   \item former daily smoker quit ≤5 years or former occasional smoker 
+#'   \item former daily smoker quit =<5 years or former occasional smoker 
 #'   \item former daily smoker quit >5 years
 #'  }
 #'
@@ -162,7 +162,7 @@ smoke_simple_fun <-
       ifelse(smoker == 0 & eversmoker == 0, 0,
       # smoke_simple 1 = current smoker
         ifelse(smoker == 1 & eversmoker == 1, 1,
-      # smoke_simple 2 = former daily smoker quit ≤ 5 years or former occasional
+      # smoke_simple 2 = former daily smoker quit =<5 years or former occasional
       # smoker
           ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking <= 5 |
                    SMKDSTY == 5, 2,

@@ -22,7 +22,7 @@ This function creates a derived smoking variable (smoke_simple)
 \itemize{
   \item non-smoker (never smoked)
   \item current smoker (daily and occasional?)
-  \item former daily smoker quit ≤5 years or former occasional smoker 
+  \item former daily smoker quit =<5 years or former occasional smoker 
   \item former daily smoker quit >5 years
  }
 }
