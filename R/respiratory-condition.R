@@ -80,23 +80,26 @@ resp_condition_fun1 <-
         ), call. = FALSE
       )
     }
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-        (CCC_091 == 1 | CCC_031 == 1)), 1,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-        (CCC_091 == 1 | CCC_031 == 1)), 2,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-        (CCC_091 == 2 | CCC_031 == 2)), 3,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-        (CCC_091 == 2 & CCC_031 == 2)), 3, 
-      if_else2((CCC_091 == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)", "NA(b)")
-                )
+    resp_condition <-
+      if_else2(
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+           (CCC_091 == 1 | CCC_031 == 1)), 1,
+        if_else2(
+          ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
+             (CCC_091 == 1 | CCC_031 == 1)), 2,
+          if_else2(
+            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
+               (CCC_091 == 2 | CCC_031 == 2)), 3,
+            if_else2(
+              ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+                 (CCC_091 == 2 & CCC_031 == 2)), 3, 
+              if_else2((CCC_091 == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)",
+                       "NA(b)")
+            )
           )
+        )
       )
-    )
+    return(resp_condition)
   }
 
 #' @title resp_condition_fun2
@@ -190,28 +193,32 @@ resp_condition_fun2 <-
       )
     }
 
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-        (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
-    if_else2(
-      ((DHHGAGE_cont >= 30 & DHHGAGE_cont < 35) &
-        (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
-        (CCC_91A == 1 | CCC_031 == 1)), 2,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
-        (CCC_91A == 2 & CCC_031 == 2)), 3,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) &
-        (CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2 & CCC_031 == 2)), 3,
-    if_else2((CCC_91E == "NA(a)" & CCC_91F == "NA(a)" &
-                 CCC_91A == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)", "NA(b)")
+    resp_condition <-
+      if_else2(
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+           (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
+        if_else2(
+          ((DHHGAGE_cont >= 30 & DHHGAGE_cont < 35) &
+             (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
+          if_else2(
+            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
+               (CCC_91A == 1 | CCC_031 == 1)), 2,
+            if_else2(
+              ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
+                 (CCC_91A == 2 & CCC_031 == 2)), 3,
+              if_else2(
+                ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) &
+                   (CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2 &
+                      CCC_031 == 2)), 3,
+                if_else2((CCC_91E == "NA(a)" & CCC_91F == "NA(a)" &
+                            CCC_91A == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)",
+                         "NA(b)")
+              )
             )
           )
         )
       )
-    )
+    return(resp_condition)
   }
 
 #' @title resp_condition_fun3
@@ -299,28 +306,31 @@ resp_condition_fun3 <-
       )
     }
 
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-        (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
-    if_else2(
-      ((DHHGAGE_cont >= 30 & DHHGAGE_cont < 35) &
-        (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
-        (CCC_91A == 1 | CCC_031 == 1)), 2,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
-        (CCC_91A == 2 & CCC_031 == 2)), 3,
-    if_else2(
-      ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) & 
-        (CCC_091 == 2 & CCC_91A == 2 & CCC_031 == 2)), 3,
-    if_else2((CCC_091 == "NA(a)" & CCC_91A == "NA(a)" & CCC_031 == "NA(a)"), 
-             "NA(a)", "NA(b)")
+    resp_condition <-
+      if_else2(
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+           (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
+        if_else2(
+          ((DHHGAGE_cont >= 30 & DHHGAGE_cont < 35) &
+             (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
+          if_else2(
+            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
+               (CCC_91A == 1 | CCC_031 == 1)), 2,
+            if_else2(
+              ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
+                 (CCC_91A == 2 & CCC_031 == 2)), 3,
+              if_else2(
+                ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) & 
+                   (CCC_091 == 2 & CCC_91A == 2 & CCC_031 == 2)), 3,
+                if_else2((CCC_091 == "NA(a)" & CCC_91A == "NA(a)" &
+                            CCC_031 == "NA(a)"), 
+                         "NA(a)", "NA(b)")
+              )
             )
           )
         )
       )
-    )
+    return(resp_condition)
   }
 
 #' @title COPD_Emph_der_fun1
@@ -404,24 +414,27 @@ COPD_Emph_der_fun1 <-
         ), call. = FALSE
       )
     }
-    if_else2(
-      (DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-        (CCC_91E == 1 | CCC_91F == 1), 1,
+    
+    COPD_Emph <-
       if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-           (CCC_91E == 1) | CCC_91F == 1), 2,
+        ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+          (CCC_91E == 1 | CCC_91F == 1)), 1,
         if_else2(
           ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-             (CCC_91E == 2 & CCC_91F == 2)), 3,
+             (CCC_91E == 1 | CCC_91F == 1)), 2,
           if_else2(
-            ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
                (CCC_91E == 2 & CCC_91F == 2)), 3,
             if_else2(
-              (CCC_91E == "NA(a)" & CCC_91F == "NA(a)"), "NA(a)", "NA(b)")
+              ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+                 (CCC_91E == 2 & CCC_91F == 2)), 3,
+              if_else2(
+                (CCC_91E == "NA(a)" & CCC_91F == "NA(a)"), "NA(a)", "NA(b)")
+            )
           )
         )
       )
-    )
+    return(COPD_Emph)
   }
 
 #' @title COPD_Emph_der_fun2
@@ -487,38 +500,26 @@ COPD_Emph_der_fun1 <-
 COPD_Emph_der_fun2 <-
   function(DHHGAGE_cont, CCC_091) {
     `%notin%` <- Negate(`%in%`)
-    # Argument verification
-    if (CCC_091 %notin% 1:2) {
-      warning(
-        paste(
-          "In DHHGAGE_cont:",
-          DHHGAGE_cont,
-          ", CCC_091:",
-          CCC_091,
-          "one or more of the arguments was outside the 1:2 allowed
-          range however the condition is still calculated",
-          sep = ""
-        ), call. = FALSE
-      )
-    }
-    if_else2(
-      (DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-        (CCC_091 == 1), 1,
+    COPD_Emph <-
       if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-           (CCC_091 == 1)), 2,
+        (DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+          (CCC_091 == 1), 1,
         if_else2(
           ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-             (CCC_091 == 2)), 3,
+             (CCC_091 == 1)), 2,
           if_else2(
-            ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
                (CCC_091 == 2)), 3,
             if_else2(
-              (CCC_091 == "NA(a)"),
-              "NA(a)", "NA(b)"
+              ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
+                 (CCC_091 == 2)), 3,
+              if_else2(
+                (CCC_091 == "NA(a)"),
+                "NA(a)", "NA(b)"
+              )
             )
           )
         )
       )
-    )
+    return(COPD_Emph)
   }
