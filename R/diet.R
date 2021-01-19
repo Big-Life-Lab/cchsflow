@@ -38,7 +38,7 @@
 #' 
 #' @param DHH_SEX sex; 1 = male, 2 = female
 #'
-#' @example
+#' @examples
 #' # Using the 'diet_score_fun' function to create the derived diet variable  
 #' # across CCHS cycles.
 #' # diet_score_fun() is specified in the variable_details.csv

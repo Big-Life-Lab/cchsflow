@@ -62,6 +62,7 @@
 #' @export
 resp_condition_fun1 <-
   function(DHHGAGE_cont, CCC_091, CCC_031) {
+    `%notin%` <- Negate(`%in%`)
     # Argument verification
     if ((CCC_091 %notin% 1:2) |
         (CCC_031 %notin% 1:2)) {
@@ -164,6 +165,7 @@ resp_condition_fun1 <-
 #' @export
 resp_condition_fun2 <-
   function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A, CCC_031) {
+    `%notin%` <- Negate(`%in%`)
     # Argument verification
     if ((CCC_91E %notin% 1:2) |
         (CCC_91F %notin% 1:2) |
@@ -275,6 +277,7 @@ resp_condition_fun2 <-
 #' @export
 resp_condition_fun3 <-
   function(DHHGAGE_cont, CCC_091, CCC_91A, CCC_031) {
+    `%notin%` <- Negate(`%in%`)
     # Argument verification
     if ((CCC_091 %notin% 1:2) |
         (CCC_91A %notin% 1:2) |
@@ -383,6 +386,7 @@ resp_condition_fun3 <-
 #' 
 COPD_Emph_der_fun1 <-
   function(DHHGAGE_cont, CCC_91E, CCC_91F) {
+    `%notin%` <- Negate(`%in%`)
     # Argument verification
     if ((CCC_91E %notin% 1:2) |
         (CCC_91F %notin% 1:2)) {
@@ -482,6 +486,7 @@ COPD_Emph_der_fun1 <-
 
 COPD_Emph_der_fun2 <-
   function(DHHGAGE_cont, CCC_091) {
+    `%notin%` <- Negate(`%in%`)
     # Argument verification
     if (CCC_091 %notin% 1:2) {
       warning(
