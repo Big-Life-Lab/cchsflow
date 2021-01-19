@@ -142,7 +142,7 @@ smoke_simple_fun <-
       smoker <-
         ifelse(SMKDSTY %in% c(1, 2, 3), 1,
                ifelse(SMKDSTY %in% c(4, 5, 6), 0,
-                      ifelse(SMKDSTY %in% "NA(a)", "NA(a)", "NA(b)")))
+                      ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
       return(smoker)
     }
     smoker <- derive_current_smoker(SMKDSTY)
@@ -152,7 +152,7 @@ smoke_simple_fun <-
       eversmoker <-
         ifelse(SMKDSTY %in% c(1, 2, 3, 4, 5), 1,
                ifelse(SMKDSTY == 6, 0,
-                      ifelse(SMKDSTY %in% "NA(a)", "NA(a)", "NA(b)")))
+                      ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
       return(eversmoker)
     }
     eversmoker <- derive_ever_smoker(SMKDSTY)
