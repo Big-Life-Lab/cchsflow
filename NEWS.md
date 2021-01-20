@@ -6,7 +6,7 @@
 
 ## Minor improvements
 - Improved support for `tagged_na` in derived variables. Additional
-documentation added for creating derived variables in the [tagged_na](./docs/articles/tagged_na_usage.html) article.
+documentation added for creating derived variables in the [tagged_na](https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html) article.
 - Updates to labels and variable classification on `variables.csv` and
 `variable_details.csv`.
 
@@ -22,8 +22,9 @@ respondents smoking status.
 - [**time_quit_smoking:**](time_quit_smoking_fun()) derived variable that
 estimates approximate time since respondent has quit smoking if they are former
 smoker.
-- **LBFA_31A/LBFA_31A_a/LBFA_31A_b:** Occupation group. 3 different variables
-with differing categories were created to harmonize between CCHS cycles.
+- [**LBFA_31A/LBFA_31A_a/LBFA_31A_b:**](LBFA_31A()) Occupation group. 3 
+different variables with differing categories were created to harmonize between
+CCHS cycles.
 - **CCC_041:** Fibromyalgia.
 - **CCC_061:** Back problems.
 - **CCC_081:** Migraine headaches.
