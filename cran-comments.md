@@ -1,12 +1,12 @@
 ## Resubmission
 
 This is a resubmission. In this version we have:
-* Fixed a breaking bug in `variable_details()` that halted variable
-transformation with the 2007-2008 CCHS cycle
-* Fixed bug in `resp_condition_fun1()`
-* Refactored derived variable functions to handle tagged_na
-* Added new parameter ALW_1 to `binge_drinker_fun()`
-* Added language variables to library
+* Added a new function `merge_rec_data()` that merges and labels transformed
+CCHS datasets.
+* Improved support for `tagged_na` in derived variables.
+* Improved labels for certain variables in `variables.csv` and
+`variable_details.csv`.
+* Added new CCHS and derived variables to library.
 
 ## Test environments
 * local OS X install, R 4.0.0

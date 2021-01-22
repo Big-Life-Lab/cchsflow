@@ -1,3 +1,179 @@
+#' @title Time since quit smoking
+#' 
+#' @description This function creates a derived variable (time_quit_smoking_der)
+#'  that calculates the approximate time a former smoker has quit smoking based
+#'  on various CCHS smoking variables. This variable is for CCHS respondents in
+#'  CCHS surveys 2003-2014.
+#'  
+#' @param SMK_09A_B number of years since quitting smoking. Variable asked to
+#'  former daily smokers who quit <3 years ago.
+#' 
+#' @param SMKG09C number of years since quitting smoking. Variable asked to
+#'  former daily smokers who quit >=3 years ago.
+#'  
+#' @return value for time since quit smoking in time_quit_smoking_der.
+#' 
+#' @examples 
+#' # Using time_quit_smoking_fun() to create pack-years values across CCHS 
+#' # cycles.
+#' # time_quit_smoking_fun() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
+#'
+#' # To transform time_quit_fun across cycles, use rec_with_table() for each
+#' # CCHS cycle and specify time_quit_fun, along with each smoking variable.
+#' # Then by using merge_rec_data(), you can combine time_quit_fun across cycles
+#' 
+#' library(cchsflow)
+#' 
+#' time_quit2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "SMK_09A_B", "SMKG09C", "time_quit_smoking_der."
+#'   )
+#' )
+#'
+#' head(time_quit2009_2010)
+#'
+#' time_quit2011_2012 <- rec_with_table(
+#'   cchs2011_2012_p, c(
+#'     "SMK_09A_B", "SMKG09C", "time_quit_smoking_der."
+#'   )
+#' )
+#'
+#' tail(time_quit2011_2012)
+#'
+#' combined_time_quit <- suppressWarnings(merge_rec_data(time_quit2009_2010,
+#'  time_quit2011_2012))
+#'
+#' head(combined_time_quit)
+#' tail(combined_time_quit)
+#' @export
+
+time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
+  SMKG09C_cont <-
+    if_else2(
+      SMKG09C == 1, 4,
+      if_else2(
+        SMKG09C == 2, 8,
+        if_else2(SMKG09C == 3, 12,
+                 if_else2(SMKG09C == "NA(a)", tagged_na("a"), tagged_na("b")
+                 )
+        )
+      )
+    )
+  tsq_ds <-
+    if_else2(
+      SMK_09A_B == 1, 0.5,
+      if_else2(
+        SMK_09A_B == 2, 1.5,
+        if_else2(
+          SMK_09A_B == 3, 2.5,
+          if_else2(SMK_09A_B == 4, SMKG09C_cont,
+                   if_else2(SMK_09A_B == "NA(a)", tagged_na("a"), tagged_na("b")
+                   )
+          )
+        )
+      )
+    )
+  return(tsq_ds)
+}
+
+#' @title Simple smoking status
+#'
+#' @description This function creates a derived smoking variable (smoke_simple)  
+#'  with four categories: 
+#'  
+#' \itemize{
+#'   \item non-smoker (never smoked)
+#'   \item current smoker (daily and occasional?)
+#'   \item former daily smoker quit =<5 years or former occasional smoker 
+#'   \item former daily smoker quit >5 years
+#'  }
+#'
+#' @param SMKDSTY derived variable that classifies an individual's smoking
+#'  status.
+#'
+#' @param time_quit_smoking derived variable that calculates the approximate
+#'  time a former smoker has quit smoking. 
+#'  See \code{\link{time_quit_smoking_fun}} for documentation on how variable
+#'  was derived.
+#'
+#' @examples
+#' # Using the 'smoke_simple_fun' function to create the derived smoking   
+#' # variable across CCHS cycles.
+#' # smoke_simple_fun() is specified in the variable_details.csv
+#'
+#' # To create a harmonized smoke_simple variable across CCHS cycles, use 
+#' # rec_with_table() for each CCHS cycle and specify smoke_simple_fun and 
+#' # the required base variables. Since time_quit_smoking_der is also a derived 
+#' # variable, you will have to specify the variables that are derived from it.
+#' # Using merge_rec_data(), you can combine smoke_simple across cycles.
+#'
+#' library(cchsflow)
+#'
+#' smoke_simple2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "SMKDSTY", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+#'     "smoke_simple"
+#'   )
+#' )
+#'
+#' head(smoke_simple2009_2010)
+#'
+#' smoke_simple2011_2012 <- rec_with_table(
+#'   cchs2011_2012_p,c(
+#'    "SMKDSTY", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+#'    "smoke_simple"
+#'   )
+#' )
+#'
+#' tail(smoke_simple2011_2012)
+#'
+#' combined_smoke_simple <- 
+#' suppressWarnings(merge_rec_data(smoke_simple2009_2010,smoke_simple2011_2012))
+#'
+#' head(combined_smoke_simple)
+#' tail(combined_smoke_simple)
+#' @export
+smoke_simple_fun <-
+  function(SMKDSTY, time_quit_smoking) {
+    
+    # Nested function: current smoker status
+    derive_current_smoker <- function(SMKDSTY) {
+      smoker <-
+        ifelse(SMKDSTY %in% c(1, 2, 3), 1,
+               ifelse(SMKDSTY %in% c(4, 5, 6), 0,
+                      ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
+      return(smoker)
+    }
+    smoker <- derive_current_smoker(SMKDSTY)
+    
+    # Nested function: ever smoker status
+    derive_ever_smoker <- function(SMKDSTY) {
+      eversmoker <-
+        ifelse(SMKDSTY %in% c(1, 2, 3, 4, 5), 1,
+               ifelse(SMKDSTY == 6, 0,
+                      ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
+      return(eversmoker)
+    }
+    eversmoker <- derive_ever_smoker(SMKDSTY)
+    
+    # smoke_simple 0 = non-smoker
+    smoke_simple <- 
+      ifelse(smoker == 0 & eversmoker == 0, 0,
+      # smoke_simple 1 = current smoker
+        ifelse(smoker == 1 & eversmoker == 1, 1,
+      # smoke_simple 2 = former daily smoker quit =<5 years or former occasional
+      # smoker
+          ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking <= 5 |
+                   SMKDSTY == 5, 2,
+      # smoke_simple 3 = former daily smoker quit > 5 years
+            ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking > 5,
+                   3,
+                   ifelse(smoker == "NA(a)" & eversmoker == "NA(a)" &
+                            time_quit_smoking == "NA(a)", "NA(a)", "NA(b)")))))
+    return(smoke_simple)
+  }
+
 #' @title Smoking pack-years
 #'
 #' @description This function creates a derived variable (pack_years_der) that
@@ -18,11 +194,10 @@
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
-#' @param SMK_09A_B number of years since quitting smoking. Variable asked to
-#'  former daily smokers who quit <3 years ago.
-#'
-#' @param SMKG09C number of years since quitting smoking. Variable asked to
-#'  former daily smokers who quit >=3 years ago.
+#' @param time_quit_smoking derived variable that calculates the approximate
+#'  time a former smoker has quit smoking. 
+#'  See \code{\link{time_quit_smoking_fun}} for documentation on how variable
+#'  was derived
 #'
 #' @param SMKG203_cont age started smoking daily. Variable asked to daily
 #'  smokers.
@@ -54,13 +229,16 @@
 #'
 #' # To transform pack_years_der across cycles, use rec_with_table() for each
 #' # CCHS cycle and specify pack_years_der, along with each smoking variable.
-#' # Then by using bind_rows(), you can combine pack_years_der across cycles
+#' # Since time_quit_smoking_der is also a derived 
+#' # variable, you will have to specify the variables that are derived from it.
+#' # Then by using merge_rec_data(), you can combine pack_years_der across
+#' # cycles
 #'
 #' library(cchsflow)
 #'
 #' pack_years2009_2010 <- rec_with_table(
 #'   cchs2009_2010_p, c(
-#'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
+#'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
 #'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
 #'   )
@@ -70,7 +248,7 @@
 #'
 #' pack_years2011_2012 <- rec_with_table(
 #'   cchs2011_2012_p,c(
-#'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
+#'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
 #'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
 #'   )
@@ -78,14 +256,14 @@
 #'
 #' tail(pack_years2011_2012)
 #'
-#' combined_pack_years <- suppressWarnings(bind_rows(pack_years2009_2010,
+#' combined_pack_years <- suppressWarnings(merge_rec_data(pack_years2009_2010,
 #'  pack_years2011_2012))
 #'
 #' head(combined_pack_years)
 #' tail(combined_pack_years)
 #' @export
 pack_years_fun <-
-  function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont,
+  function(SMKDSTY, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
            SMKG207_cont, SMK_204, SMK_05B,
            SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
     # Age verification
@@ -95,59 +273,44 @@ pack_years_fun <-
       return(tagged_na("b"))
     }
 
-    # Time since quit for former daily smokers
-    tsq_ds_fun <- function(SMK_09A_B, SMKG09C) {
-      SMKG09C <-
-        if_else2(
-          SMKG09C == 1, 4,
-          if_else2(
-            SMKG09C == 2, 8,
-            if_else2(SMKG09C == 3, 12, NA)
-          )
-        )
-      tsq_ds <-
-        if_else2(
-          SMK_09A_B == 1, 0.5,
-          if_else2(
-            SMK_09A_B == 2, 1.5,
-            if_else2(
-              SMK_09A_B == 3, 2.5,
-              if_else2(SMK_09A_B == 4, SMKG09C, NA)
-            )
-          )
-        )
-    }
-    tsq_ds <- tsq_ds_fun(SMK_09A_B, SMKG09C)
     # PackYears for Daily Smoker
-    if_else2(
-      SMKDSTY == 1, pmax(((DHHGAGE_cont - SMKG203_cont) *
-        (SMK_204 / 20)), 0.0137),
-      # PackYears for Occasional Smoker (former daily)
+    pack_years <- 
       if_else2(
-        SMKDSTY == 2, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds) *
-        (SMK_208 / 20)), 0.0137) + (pmax((SMK_05B * SMK_05C / 30), 1) * tsq_ds),
-        # PackYears for Occasional Smoker (never daily)
+        SMKDSTY == 1, pmax(((DHHGAGE_cont - SMKG203_cont) *
+                              (SMK_204 / 20)), 0.0137),
+        # PackYears for Occasional Smoker (former daily)
         if_else2(
-          SMKDSTY == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) *
-            (DHHGAGE_cont - SMKG01C_cont),
-          # PackYears for former daily smoker (non-smoker now)
+          SMKDSTY == 2, pmax(((DHHGAGE_cont - SMKG207_cont -
+                                 time_quit_smoking) * (SMK_208 / 20)), 0.0137) +
+            (pmax((SMK_05B * SMK_05C / 30), 1) *time_quit_smoking),
+          # PackYears for Occasional Smoker (never daily)
           if_else2(
-            SMKDSTY == 4, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds) *
-              (SMK_208 / 20)), 0.0137),
-            # PackYears for former occasional smoker (non-smoker now) who
-            # smoked at least 100 cigarettes lifetime
+            SMKDSTY == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) *
+              (DHHGAGE_cont - SMKG01C_cont),
+            # PackYears for former daily smoker (non-smoker now)
             if_else2(
-              SMKDSTY == 5 & SMK_01A == 1, 0.0137,
-              # PackYears for former occasional smoker (non-smoker now) who have
-              # not smoked at least 100 cigarettes lifetime
+              SMKDSTY == 4, pmax(((DHHGAGE_cont - SMKG207_cont -
+                                     time_quit_smoking) *
+                                    (SMK_208 / 20)), 0.0137),
+              # PackYears for former occasional smoker (non-smoker now) who
+              # smoked at least 100 cigarettes lifetime
               if_else2(
-                SMKDSTY == 5 & SMK_01A == 2, 0.007,
-                # Non-smoker
-                if_else2(SMKDSTY == 6, 0, tagged_na("b"))
+                SMKDSTY == 5 & SMK_01A == 1, 0.0137,
+                # PackYears for former occasional smoker (non-smoker now) who 
+                # have not smoked at least 100 cigarettes lifetime
+                if_else2(
+                  SMKDSTY == 5 & SMK_01A == 2, 0.007,
+                  # Non-smoker
+                  if_else2(SMKDSTY == 6, 0,
+                           # Account for NA(a)
+                           if_else2(SMKDSTY == "NA(a)", tagged_na("a"),
+                                    tagged_na("b"))
+                  )
+                )
               )
             )
           )
         )
       )
-    )
+    return(pack_years)
   }

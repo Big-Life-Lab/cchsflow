@@ -1,6 +1,6 @@
-#' @title Multiple chronic conditions (5 chronic conditions)
+#' @title Number of chronic conditions (5 chronic conditions)
 #' 
-#' @description This function generates a derived variable (multiple_conditions)
+#' @description This function generates a derived variable (number_conditions)
 #'  that counts the number of chronic conditions a respondent has. This function
 #'  takes 5 CCHS-defined conditions (heart disease, cancer, stroke, bowel
 #'  disorder, and arthritis), and well one derived variable (respiratory
@@ -59,7 +59,7 @@
 #'  conditions_2001 <- suppressWarnings(rec_with_table(cchs2001_p,
 #'  c("DHHGAGE_cont", "CCC_091",
 #'  "CCC_91A", "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
-#'  "resp_condition_der","CCC_051", "multiple_conditions")))
+#'  "resp_condition_der","CCC_051", "number_conditions")))
 #'  
 #'  head(conditions_2001)
 #'  
@@ -108,9 +108,9 @@ multiple_conditions_fun1 <-
     if_else2(conditions>= 5, "5+", conditions)
   }
 
-#' @title Multiple chronic conditions (6 chronic conditions)
+#' @title Number of chronic conditions (6 chronic conditions)
 #' 
-#' @description This function generates a derived variable (multiple_conditions)
+#' @description This function generates a derived variable (number_conditions)
 #'  that counts the number of chronic conditions a respondent has. This function
 #'  takes 6 CCHS-defined conditions (heart disease, cancer, stroke, bowel
 #'  disorder, mood disorder and arthritis), and well one derived variable
@@ -174,7 +174,7 @@ multiple_conditions_fun1 <-
 #'  conditions_2009_2010 <- suppressWarnings(rec_with_table(cchs2009_2010_p,
 #'  c("DHHGAGE_cont", "CCC_091",
 #'  "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
-#'  "resp_condition_der","CCC_051", "multiple_conditions")))
+#'  "resp_condition_der","CCC_051", "number_conditions")))
 #'  
 #'  head(conditions_2009_2010)
 #'  

@@ -58,7 +58,7 @@ NULL
 #' @return \item{cchs2001_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=3359}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=3359}
 #'
 #' @keywords datasets
 #' @examples
@@ -89,7 +89,7 @@ NULL
 #' @return \item{cchs2003_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=4995}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=4995}
 #'
 #' @keywords datasets
 #' @examples
@@ -120,7 +120,7 @@ NULL
 #' @return \item{cchs2005_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=22642}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=22642}
 #'
 #' @keywords datasets
 #' @examples
@@ -151,7 +151,7 @@ NULL
 #' @return \item{cchs2007_2008_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
 #'
 #' @keywords datasets
 #' @examples
@@ -182,7 +182,7 @@ NULL
 #' @return \item{cchs2009_2010_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=67251}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=67251}
 #'
 #' @keywords datasets
 #' @examples
@@ -217,7 +217,7 @@ NULL
 #' @return \item{cchs2010_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=81424}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=81424}
 #'
 #' @keywords datasets
 #' @examples
@@ -248,7 +248,7 @@ NULL
 #' @return \item{cchs2011_2012_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=114112}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=114112}
 #'
 #' @keywords datasets
 #' @examples
@@ -283,7 +283,7 @@ NULL
 #' @return \item{cchs2012_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=135927}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=135927}
 #'
 #' @keywords datasets
 #' @examples
@@ -314,7 +314,7 @@ NULL
 #' @return \item{cchs2013_2014_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=144170}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=144170}
 #'
 #' @keywords datasets
 #' @examples
@@ -349,7 +349,7 @@ NULL
 #' @return \item{cchs2014_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=164081}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=164081}
 #'
 #' @keywords datasets
 #' @examples

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Multiple chronic conditions (6 chronic conditions) — multiple_conditions_fun2 • cchsflow</title>
+<title>Number of chronic conditions (6 chronic conditions) — multiple_conditions_fun2 • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,8 @@
 
 
 
-<meta property="og:title" content="Multiple chronic conditions (6 chronic conditions) — multiple_conditions_fun2" />
-<meta property="og:description" content="This function generates a derived variable (multiple_conditions)
+<meta property="og:title" content="Number of chronic conditions (6 chronic conditions) — multiple_conditions_fun2" />
+<meta property="og:description" content="This function generates a derived variable (number_conditions)
  that counts the number of chronic conditions a respondent has. This function
  takes 6 CCHS-defined conditions (heart disease, cancer, stroke, bowel
  disorder, mood disorder and arthritis), and well one derived variable
@@ -87,7 +87,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.8.0</span>
       </span>
     </div>
 
@@ -162,13 +162,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Multiple chronic conditions (6 chronic conditions)</h1>
-    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/multiple-conditions.R'><code>R/multiple-conditions.R</code></a></small>
+    <h1>Number of chronic conditions (6 chronic conditions)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/number-conditions.R'><code>R/number-conditions.R</code></a></small>
     <div class="hidden name"><code>multiple_conditions_fun2.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function generates a derived variable (multiple_conditions)
+    <p>This function generates a derived variable (number_conditions)
  that counts the number of chronic conditions a respondent has. This function
  takes 6 CCHS-defined conditions (heart disease, cancer, stroke, bowel
  disorder, mood disorder and arthritis), and well one derived variable
@@ -268,7 +268,7 @@ not have arthritis or rheumatism)</p></td>
  <span class='no'>conditions_2009_2010</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span>(<span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(<span class='no'>cchs2009_2010_p</span>,
  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>,
  <span class='st'>"CCC_031"</span>, <span class='st'>"CCC_121"</span>,<span class='st'>"CCC_131"</span>,<span class='st'>"CCC_151"</span>, <span class='st'>"CCC_171"</span>,<span class='st'>"CCC_280"</span>,
- <span class='st'>"resp_condition_der"</span>,<span class='st'>"CCC_051"</span>, <span class='st'>"multiple_conditions"</span>)))</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+ <span class='st'>"resp_condition_der"</span>,<span class='st'>"CCC_051"</span>, <span class='st'>"number_conditions"</span>)))</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
 #&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='input'>
  <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>conditions_2009_2010</span>)</div><div class='output co'>#&gt;   CCC_031 CCC_051 CCC_091 CCC_121 CCC_131 CCC_151 CCC_171 CCC_280 DHHGAGE_cont
 #&gt; 1       2   NA(a)   NA(a)       2       2       2       2       2           13
@@ -277,13 +277,13 @@ not have arthritis or rheumatism)</p></td>
 #&gt; 4       2       2       2       2       2       2       2       2           52
 #&gt; 5       2       2       2       2       2       2       2       2           67
 #&gt; 6       2       1       2       2       2       2       2       2           62
-#&gt;   resp_condition_der
-#&gt; 1                  3
-#&gt; 2                  3
-#&gt; 3                  3
-#&gt; 4                  3
-#&gt; 5                  3
-#&gt; 6                  3</div><div class='input'>
+#&gt;   resp_condition_der number_conditions
+#&gt; 1                  3                 1
+#&gt; 2                  3                 1
+#&gt; 3                  3                 3
+#&gt; 4                  3                 1
+#&gt; 5                  3                 1
+#&gt; 6                  3                 2</div><div class='input'>
  <span class='co'># Generating multiple_conditions with user inputted values</span>
  <span class='co'># Let's say you are an individual that has heart disease, bowel disorder,</span>
  <span class='co'># and arthritis. multiple_conditions_fun2() can be used to count the number</span>
