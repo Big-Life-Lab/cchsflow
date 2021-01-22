@@ -21,7 +21,7 @@ in a single cycle.
 
 The CCHS is one of the largest and most robust ongoing population health surveys 
 worldwide. The CCHS, administered by Statistics Canada, is Canada's main general 
-population health survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
+population health survey. Information about the survey is found [here](https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
 The CCHS has a [Statistic Canada Open Licence](https://www.statcan.gc.ca/eng/reference/licence).
 
 ## Concept
