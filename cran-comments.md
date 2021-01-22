@@ -1,7 +1,7 @@
 ## Resubmission
 
 This is a resubmission. In this version we have:
-* Added a new function `merge_data_fun()` that merges and labels transformed
+* Added a new function `merge_rec_data()` that merges and labels transformed
 CCHS datasets.
 * Improved support for `tagged_na` in derived variables.
 * Improved labels for certain variables in `variables.csv` and
