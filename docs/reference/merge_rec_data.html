@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compare Value Based On Interval — compare_value_based_on_interval • cchsflow</title>
+<title>Merge recoded data — merge_rec_data • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,10 @@
 
 
 
-<meta property="og:title" content="Compare Value Based On Interval — compare_value_based_on_interval" />
-<meta property="og:description" content="Compare values on the scientific notation interval" />
+<meta property="og:title" content="Merge recoded data — merge_rec_data" />
+<meta property="og:description" content="This function allows users to merge CCHS data transformed by the
+ rec_with_table function. This function generates a labelled
+ merged data frame with multiple transformed CCHS cycles." />
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -158,59 +160,77 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compare Value Based On Interval</h1>
-    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/recode-with-table.R'><code>R/recode-with-table.R</code></a></small>
-    <div class="hidden name"><code>compare_value_based_on_interval.Rd</code></div>
+    <h1>Merge recoded data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/merge-data.R'><code>R/merge-data.R</code></a></small>
+    <div class="hidden name"><code>merge_rec_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compare values on the scientific notation interval</p>
+    <p>This function allows users to merge CCHS data transformed by the
+ <code><a href='rec_with_table.html'>rec_with_table</a></code> function. This function generates a labelled
+ merged data frame with multiple transformed CCHS cycles.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compare_value_based_on_interval</span>(
-  <span class='no'>left_boundary</span>,
-  <span class='no'>right_boundary</span>,
-  <span class='no'>data</span>,
-  <span class='no'>compare_columns</span>,
-  <span class='no'>interval</span>
-)</pre>
+    <pre class="usage"><span class='fu'>merge_rec_data</span>(<span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>left_boundary</th>
-      <td><p>the min value</p></td>
-    </tr>
-    <tr>
-      <th>right_boundary</th>
-      <td><p>the max value</p></td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td><p>the data that contains values being compared</p></td>
-    </tr>
-    <tr>
-      <th>compare_columns</th>
-      <td><p>The columns inside data being checked</p></td>
-    </tr>
-    <tr>
-      <th>interval</th>
-      <td><p>The scientific notation interval</p></td>
+      <th>...</th>
+      <td><p>recoded data frames to be merged.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a boolean vector containing true for rows where the
-comparison is true</p>
+    <p>a merged data frame consisting of multiple recoded CCHS cycles with
+ labels for variable names and tags for variables not included in particular
+ CCHS cycles.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
+    <p>When merging recoded CCHS data, there are variables that are missing
+ in certain CCHS cycles. This function tags missing variable observations as
+ NA(c), indicating that the variable was not asked or included in the CCHS
+ cycle of the respondent.</p> 
+<p>Click <a href='https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html'>here</a>
+ for more details on how NA's are treated in cchsflow.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># Merging two CCHS cycles with variables missing in each cycle.</span>
+
+<span class='co'># INCGHH_A is a cchsflow variable available for the 2001 CCHS cycle, while</span>
+<span class='co'># INCGHH_B is a cchsflow variable available for the 2003 CCHS cycle. </span>
+<span class='co'># Using merge_rec_data(), datasets containing INCGHH_A &amp; INCGHH_B can be</span>
+<span class='co'># merged and tagged.</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
+<span class='no'>income2001</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(<span class='no'>cchs2001_p</span>, <span class='st'>"INCGHH_A"</span>)</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for INCGHH_A: CCHS 2001 classifies no income and less than $15,000 as separate categories</span></div><div class='input'><span class='no'>income2003</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(<span class='no'>cchs2001_p</span>, <span class='st'>"INCGHH_B"</span>)</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='input'>
+<span class='no'>income_merged</span> <span class='kw'>&lt;-</span> <span class='fu'>merge_rec_data</span>(<span class='no'>income2001</span>, <span class='no'>income2003</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>income_merged</span>)</div><div class='output co'>#&gt;   INCGHH_A
+#&gt; 1        3
+#&gt; 2        3
+#&gt; 3        6
+#&gt; 4        3
+#&gt; 5        4
+#&gt; 6        4</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>income_merged</span>)</div><div class='output co'>#&gt;     INCGHH_A
+#&gt; 395    NA(c)
+#&gt; 396    NA(c)
+#&gt; 397    NA(c)
+#&gt; 398    NA(c)
+#&gt; 399    NA(c)
+#&gt; 400    NA(c)</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

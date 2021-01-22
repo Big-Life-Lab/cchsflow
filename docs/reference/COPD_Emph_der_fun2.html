@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compare Value Based On Interval — compare_value_based_on_interval • cchsflow</title>
+<title>COPD_Emph_der_fun2 — COPD_Emph_der_fun2 • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,13 @@
 
 
 
-<meta property="og:title" content="Compare Value Based On Interval — compare_value_based_on_interval" />
-<meta property="og:description" content="Compare values on the scientific notation interval" />
+<meta property="og:title" content="COPD_Emph_der_fun2 — COPD_Emph_der_fun2" />
+<meta property="og:description" content="This is one of 2 functions used to create a derived variable
+ (COPD_Emph_der) that determines if a respondents has either COPD or 
+ Emphysema. 2 different functions have been created to account for the fact
+ that different respiratory variables are used across CCHS cycles. This
+ function is for CCHS cycles (2001-2003, 2009-2014) that use COPD and
+ Emphysema as a combined variable." />
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -158,59 +163,111 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compare Value Based On Interval</h1>
-    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/recode-with-table.R'><code>R/recode-with-table.R</code></a></small>
-    <div class="hidden name"><code>compare_value_based_on_interval.Rd</code></div>
+    <h1>COPD_Emph_der_fun2</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/respiratory-condition.R'><code>R/respiratory-condition.R</code></a></small>
+    <div class="hidden name"><code>COPD_Emph_der_fun2.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compare values on the scientific notation interval</p>
+    <p>This is one of 2 functions used to create a derived variable
+ (COPD_Emph_der) that determines if a respondents has either COPD or 
+ Emphysema. 2 different functions have been created to account for the fact
+ that different respiratory variables are used across CCHS cycles. This
+ function is for CCHS cycles (2001-2003, 2009-2014) that use COPD and
+ Emphysema as a combined variable.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compare_value_based_on_interval</span>(
-  <span class='no'>left_boundary</span>,
-  <span class='no'>right_boundary</span>,
-  <span class='no'>data</span>,
-  <span class='no'>compare_columns</span>,
-  <span class='no'>interval</span>
-)</pre>
+    <pre class="usage"><span class='fu'>COPD_Emph_der_fun2</span>(<span class='no'>DHHGAGE_cont</span>, <span class='no'>CCC_091</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>left_boundary</th>
-      <td><p>the min value</p></td>
+      <th>DHHGAGE_cont</th>
+      <td><p>continuous age variable.</p></td>
     </tr>
     <tr>
-      <th>right_boundary</th>
-      <td><p>the max value</p></td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td><p>the data that contains values being compared</p></td>
-    </tr>
-    <tr>
-      <th>compare_columns</th>
-      <td><p>The columns inside data being checked</p></td>
-    </tr>
-    <tr>
-      <th>interval</th>
-      <td><p>The scientific notation interval</p></td>
+      <th>CCC_091</th>
+      <td><p>variable indicating if respondent has either COPD or Emphysema</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a boolean vector containing true for rows where the
-comparison is true</p>
+    <p>a categorical variable (COPD_Emph_der) with 3 levels:</p>
+<p></p><ol>
+<li><p>respondent is over the age of 35 and has a respiratory condition</p></li>
+<li><p>respondent is under the age of 35 and has a respiratory condition</p></li>
+<li><p>respondent does not have a respiratory condition</p></li>
+</ol>
 
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code>COPD_Emph_der_fun2</code></p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># COPD_Emph_der_fun2() to create values across CCHS cycles</span>
+<span class='co'># (2001-2003, 2009-2014) COPD_Emph_der_fun2() is specified in</span>
+<span class='co'># variable_details.csv along with the CCHS variables and cycles included.</span>
+
+<span class='co'># To transform COPD_Emph_der, use rec_with_table() for each CCHS cycle</span>
+<span class='co'># and specify COPD_Emph_der, along with the various respiratory</span>
+<span class='co'># variables. Then by using merge_rec_data() you can combine COPD_Emph_der</span>
+<span class='co'># across cycles.</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
+
+<span class='no'>COPD2001</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span>(<span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
+  <span class='no'>cchs2001_p</span>,  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+    <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>,
+    <span class='st'>"COPD_Emph_der"</span>
+  )
+))</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for DHHGAGE_cont: Not applicable, don't know, refusal, not stated (96-99) were options in CCHS 2003, but had zero responses</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>COPD2001</span>)</div><div class='output co'>#&gt;   CCC_091 DHHGAGE_cont COPD_Emph_der
+#&gt; 1       2           85             3
+#&gt; 2       2           85             3
+#&gt; 3       2           32             3
+#&gt; 4       2           77             3
+#&gt; 5   NA(a)           22         NA(a)
+#&gt; 6       2           77             3</div><div class='input'>
+<span class='no'>COPD2014</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span>(<span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
+  <span class='no'>cchs2007_2008_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+    <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>,
+    <span class='st'>"COPD_Emph_der"</span>
+  )
+))</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>COPD2014</span>)</div><div class='output co'>#&gt;     DHHGAGE_cont
+#&gt; 195           62
+#&gt; 196           37
+#&gt; 197           77
+#&gt; 198           42
+#&gt; 199           32
+#&gt; 200           72</div><div class='input'>
+<span class='no'>combined_COPD</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span>(<span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span>(<span class='no'>COPD2001</span>, <span class='no'>COPD2014</span>))
+
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_COPD</span>)</div><div class='output co'>#&gt;   CCC_091 DHHGAGE_cont COPD_Emph_der
+#&gt; 1       2           85             3
+#&gt; 2       2           85             3
+#&gt; 3       2           32             3
+#&gt; 4       2           77             3
+#&gt; 5   NA(a)           22         NA(a)
+#&gt; 6       2           77             3</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_COPD</span>)</div><div class='output co'>#&gt;     CCC_091 DHHGAGE_cont COPD_Emph_der
+#&gt; 395   NA(c)           62         NA(c)
+#&gt; 396   NA(c)           37         NA(c)
+#&gt; 397   NA(c)           77         NA(c)
+#&gt; 398   NA(c)           42         NA(c)
+#&gt; 399   NA(c)           32         NA(c)
+#&gt; 400   NA(c)           72         NA(c)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

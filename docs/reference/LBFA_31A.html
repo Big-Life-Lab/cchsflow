@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compare Value Based On Interval — compare_value_based_on_interval • cchsflow</title>
+<title>Occupation Group (9 categories) — LBFA_31A • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,11 @@
 
 
 
-<meta property="og:title" content="Compare Value Based On Interval — compare_value_based_on_interval" />
-<meta property="og:description" content="Compare values on the scientific notation interval" />
+<meta property="og:title" content="Occupation Group (9 categories) — LBFA_31A" />
+<meta property="og:description" content="NOTE: this is not a function.
+This is a 9 category variable (LBFA_31A) that is in the CCHS that asks
+ which occupation group best describes a respondent. Occupation group is
+ asked in the 2001 CCHS cycle and in CCHS cycles from 2007-2014." />
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -158,59 +161,61 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compare Value Based On Interval</h1>
-    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/recode-with-table.R'><code>R/recode-with-table.R</code></a></small>
-    <div class="hidden name"><code>compare_value_based_on_interval.Rd</code></div>
+    <h1>Occupation Group (9 categories)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/occupation.R'><code>R/occupation.R</code></a></small>
+    <div class="hidden name"><code>LBFA_31A.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compare values on the scientific notation interval</p>
+    <p><strong>NOTE:</strong> this is not a function.</p>
+<p>This is a 9 category variable (LBFA_31A) that is in the CCHS that asks
+ which occupation group best describes a respondent. Occupation group is
+ asked in the 2001 CCHS cycle and in CCHS cycles from 2007-2014.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compare_value_based_on_interval</span>(
-  <span class='no'>left_boundary</span>,
-  <span class='no'>right_boundary</span>,
-  <span class='no'>data</span>,
-  <span class='no'>compare_columns</span>,
-  <span class='no'>interval</span>
-)</pre>
+    <pre class="usage"><span class='fu'>LBFA_31A</span>(<span class='no'>LBFA_31A</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>left_boundary</th>
-      <td><p>the min value</p></td>
-    </tr>
-    <tr>
-      <th>right_boundary</th>
-      <td><p>the max value</p></td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td><p>the data that contains values being compared</p></td>
-    </tr>
-    <tr>
-      <th>compare_columns</th>
-      <td><p>The columns inside data being checked</p></td>
-    </tr>
-    <tr>
-      <th>interval</th>
-      <td><p>The scientific notation interval</p></td>
+      <th>LBFA_31A</th>
+      <td><p>cchsflow variable name for Occupation Group (9 categories)</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>a boolean vector containing true for rows where the
-comparison is true</p>
+    <p>While occupation group is asked in many survey cycles, the 2001
+ CCHS survey cycle is the only survey that has 9 categories. The categories
+ are as follows:</p><ol>
+<li><p>Management</p></li>
+<li><p>Professional (including accountants)</p></li>
+<li><p>Technologist, Technician or Tech Occupation</p></li>
+<li><p>Administrative, Financial or Clerical</p></li>
+<li><p>Sales or Service</p></li>
+<li><p>Trades, Transport or Equipment Operator</p></li>
+<li><p>Farming, Forestry, Fishing, Mining</p></li>
+<li><p>Processing, Manufacturing, Utilities</p></li>
+<li><p>Other</p></li>
+</ol><p>To harmonize the 2001 CCHS cycle with other survey cycles,
+ <code><a href='LBFA_31A_a.html'>LBFA_31A_a</a></code> and <code><a href='LBFA_31A_b.html'>LBFA_31A_b</a></code> were created in which
+ categories in the 2001 survey cycle were collapsed.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
+    <div class='dont-index'><p><code><a href='LBFA_31A_a.html'>LBFA_31A_a</a></code>, <code><a href='LBFA_31A_b.html'>LBFA_31A_b</a></code></p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
+ ?<span class='no'>LBFA_31A</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
+      <li><a href="#see-also">See also</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

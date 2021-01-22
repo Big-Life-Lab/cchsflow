@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.8.0</span>
       </span>
     </div>
 
@@ -112,7 +112,7 @@
 
       
 
-      </header><script src="tagged_na_usage_files/header-attrs-2.3/header-attrs.js"></script><script src="tagged_na_usage_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>missing data (tagged_na)</h1>
@@ -215,6 +215,14 @@
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(x)</span></code></pre></div>
 <pre><code>## [1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE</code></pre>
 </div>
+<div id="using-tagged_na-for-creating-derived-variables" class="section level2">
+<h2 class="hasAnchor">
+<a href="#using-tagged_na-for-creating-derived-variables" class="anchor"></a>Using tagged_na for creating derived variables</h2>
+<p>See the <a href="derived_variables.html">derived variables</a> and <a href="how_to_add_variables.html">how to add variables</a> for details on derived variables and how to add them.</p>
+<p>When creating derived variables from CCHS variables, it is important to distinguish the different NA values. Certain derived variables include the use of variables that may not be applicable to respondents. For example, <a href="https://big-life-lab.github.io/cchsflow/reference/pack_years_fun.html">smoking pack-years</a> involves the use of smoking variables that may not be applicable to all CCHS respondents (i.e. non-smokers who have never smoked). In this scenario, respondents who had values of <code>NA(a)</code> for the various base smoking variables would have a value of <code>NA(a)</code> for smoking pack-years. Respondents who had identified as having smoked at one point in their lives, but had values of <code>NA(b)</code> in the base smoking variables would have a value of <code>NA(b)</code> for smoking pack-years as pack-years cannot be calculated due to missing values.</p>
+<p>On the other hand, there are certain derived variables that use variables that are applicable to all respondents. For example, <a href="https://big-life-lab.github.io/cchsflow/reference/bmi_fun.html">BMI</a> uses CCHS height and weight variables which are asked to all CCHS respondents. In this scenario, all NA variables would be tagged as <code>NA(b)</code> as these variables are applicable to everyone, and respondents with NA values would be classified as missing.</p>
+<p>When creating deriving variables, it is important to examine the base CCHS variables to check for the presence of <code>NA(a)</code> and <code>NA(b)</code>. This can be done by reviewing the <a href="https://osf.io/g6d84/">CCHS documentation</a>.</p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -226,6 +234,7 @@
 <li><a href="#missing-data-na-tagged_na">Missing data (<code>NA</code> –&gt; <code>tagged_na</code>)</a></li>
       <li><a href="#cchs-approach-to-coding-missing-data">CCHS approach to coding missing data</a></li>
       <li><a href="#example-haventagged_na">Example <code>haven::tagged_na()</code></a></li>
+      <li><a href="#using-tagged_na-for-creating-derived-variables">Using tagged_na for creating derived variables</a></li>
       </ul>
 </div>
       </div>

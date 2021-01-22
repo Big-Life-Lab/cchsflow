@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Derived needs help with tasks — adl_fun • cchsflow</title>
+<title>The number of activities of daily living tasks that require help. — adl_score_5_fun • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,10 +48,12 @@
 
 
 
-<meta property="og:title" content="Derived needs help with tasks — adl_fun" />
-<meta property="og:description" content="This derived variable (ADL_der) is based on the CCHS derived
- variable ADLF6R which flags respondents who need help with tasks based on
- their response to the various activities of daily living (ADL) variables." />
+<meta property="og:title" content="The number of activities of daily living tasks that require help. — adl_score_5_fun" />
+<meta property="og:description" content="A 6 category variable (ADL_score_5) representing the number of
+ activities of daily living tasks that require help. This variable tallies
+ the number of daily living tasks that a respondent requires help with based
+ on various ADL variables that a respondent answered yes or no to. The ADL
+ variables used are common across all CCHS cycles from 2001 to 2014." />
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -160,153 +162,119 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Derived needs help with tasks</h1>
+    <h1>The number of activities of daily living tasks that require help.</h1>
     <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/adl.R'><code>R/adl.R</code></a></small>
-    <div class="hidden name"><code>adl_fun.Rd</code></div>
+    <div class="hidden name"><code>adl_score_5_fun.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This derived variable (ADL_der) is based on the CCHS derived
- variable ADLF6R which flags respondents who need help with tasks based on
- their response to the various activities of daily living (ADL) variables.</p>
+    <p>A 6 category variable (ADL_score_5) representing the number of
+ activities of daily living tasks that require help. This variable tallies
+ the number of daily living tasks that a respondent requires help with based
+ on various ADL variables that a respondent answered yes or no to. The ADL
+ variables used are common across all CCHS cycles from 2001 to 2014.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>adl_fun</span>(<span class='no'>ADL_01</span>, <span class='no'>ADL_02</span>, <span class='no'>ADL_03</span>, <span class='no'>ADL_04</span>, <span class='no'>ADL_05</span>)</pre>
+    <pre class="usage"><span class='fu'>adl_score_5_fun</span>(<span class='no'>ADL_01</span>, <span class='no'>ADL_02</span>, <span class='no'>ADL_03</span>, <span class='no'>ADL_04</span>, <span class='no'>ADL_05</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>ADL_01</th>
-      <td><p>Needs help preparing meals</p></td>
+      <td><p>Needs help preparing meals.</p></td>
     </tr>
     <tr>
       <th>ADL_02</th>
-      <td><p>Needs help getting to appointments/errands</p></td>
+      <td><p>Needs help getting to appointments/errands.</p></td>
     </tr>
     <tr>
       <th>ADL_03</th>
-      <td><p>Needs help doing housework</p></td>
+      <td><p>Needs help doing housework.</p></td>
     </tr>
     <tr>
       <th>ADL_04</th>
-      <td><p>Needs help doing personal care</p></td>
+      <td><p>Needs help doing personal care.</p></td>
     </tr>
     <tr>
       <th>ADL_05</th>
-      <td><p>Needs help moving inside house</p></td>
+      <td><p>Needs help moving inside house.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A derived variable (ADL_der) with 2 categories:</p><ol>
-<li><p>- Needs help with tasks</p></li>
-<li><p>- Does not need help with tasks</p></li>
+    <p>A derived variable (ADL_score_5) with 6 categories:</p><ol>
+<li><p>0 - Needs help with 0 tasks</p></li>
+<li><p>1 - Needs help with at least 1 task</p></li>
+<li><p>2 - Needs help with at least 2 tasks</p></li>
+<li><p>3 - Needs help with at least 3 tasks</p></li>
+<li><p>4 - Needs help with at least 4 tasks</p></li>
+<li><p>5 - Needs help with at least 5 tasks</p></li>
 </ol>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>The CCHS derived variable ADLF6R uses different ADL variables across
- the various CCHS survey cycles. This newly derived variable (ADL_der) uses
- ADL variables that are consistent across CCHS cycles.</p> 
-<p>In the 2001 CCHS survey cycle, the ADLF6R variable examines the following
- ADL variables:</p><ol>
-<li><p>ADL_01 - Needs help preparing meals</p></li>
-<li><p>ADL_02 - Needs help getting to appointments/errands</p></li>
-<li><p>ADL_03 - Needs help doing housework</p></li>
-<li><p>ADL_04 - Needs help doing personal care</p></li>
-<li><p>ADL_05 - Needs help moving inside house</p></li>
-<li><p>ADL_07 - Needs help doing heavy household chores</p></li>
-</ol>  
-
-<p>In the 2003-2005 CCHS survey cycles, the ADLF6R variable examines the
- following ADL variables:</p><ol>
-<li><p>ADL_01 - Needs help preparing meals</p></li>
-<li><p>ADL_02 - Needs help getting to appointments/errands</p></li>
-<li><p>ADL_03 - Needs help doing housework</p></li>
-<li><p>ADL_04 - Needs help doing personal care</p></li>
-<li><p>ADL_05 - Needs help moving inside house</p></li>
-<li><p>ADL_06 - Needs help doing finances</p></li>
-<li><p>ADL_07 - Needs help doing heavy household chores</p></li>
-</ol>
- 
-<p>In the 2007-2014 CCHS survey cycles, the ADLF6R variable examines the
- following ADL variables:</p><ol>
-<li><p>ADL_01 - Needs help preparing meals</p></li>
-<li><p>ADL_02 - Needs help getting to appointments/errands</p></li>
-<li><p>ADL_03 - Needs help doing housework</p></li>
-<li><p>ADL_04 - Needs help doing personal care</p></li>
-<li><p>ADL_05 - Needs help moving inside house</p></li>
-<li><p>ADL_06 - Needs help doing finances</p></li>
-</ol>
- 
-<p>This newly derived variable (ADL_der) uses ADL_01 to ADL_05 which are
- consistent across all survey cycles. For any single CCHS survey year,
- it is appropriate to use ADLF6R. ADL_der is recommended when using multiple
- survey cycles.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Using adl_fun() to create ADL_der values across CCHS cycles</span>
-<span class='co'># adl_fun() is specified in variable_details.csv along with the</span>
-<span class='co'># CCHS variables and cycles included.</span>
+    <pre class="examples"><div class='input'><span class='co'># Use adl_score_5_fun() to create the variable ADL_score_5 across CCHS </span>
+<span class='co'># cycles adl_score_5_fun() is specified in variable_details.csv along with </span>
+<span class='co'># the CCHS variables and cycles included.</span>
 
-<span class='co'># To transform ADL_der, use rec_with_table() for each CCHS cycle</span>
-<span class='co'># and specify ADL_der, along with the various ADL variables.</span>
+<span class='co'># To transform ADL_score_5, use rec_with_table() for each CCHS cycle</span>
+<span class='co'># and specify ADL_score_5, along with the various ADL variables.</span>
 <span class='co'># Then by using merge_rec_data() you can combine ADL_der across cycles.</span>
 
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
 <span class='no'>adl2001</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
   <span class='no'>cchs2001_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-    <span class='st'>"ADL_01"</span>, <span class='st'>"ADL_02"</span>, <span class='st'>"ADL_03"</span>, <span class='st'>"ADL_04"</span>, <span class='st'>"ADL_05"</span>, <span class='st'>"ADL_der"</span>
+    <span class='st'>"ADL_01"</span>, <span class='st'>"ADL_02"</span>, <span class='st'>"ADL_03"</span>, <span class='st'>"ADL_04"</span>, <span class='st'>"ADL_05"</span>, <span class='st'>"ADL_score_5"</span>
   )
 )</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
 #&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for ADL_02: In the 2001 CCHS, respondents were asked, "Because of any condition or health problem, do you need the help of another person in shopping for groceries or other necessities?"</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>adl2001</span>)</div><div class='output co'>#&gt;   ADL_01 ADL_02 ADL_03 ADL_04 ADL_05 ADL_der
-#&gt; 1      2      2      2      2      2       2
-#&gt; 2      2      1      1      2      2       1
-#&gt; 3      2      2      2      2      2       2
-#&gt; 4      2      2      2      2      2       2
-#&gt; 5      2      2      2      2      2       2
-#&gt; 6      2      1      1      2      2       1</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>adl2001</span>)</div><div class='output co'>#&gt;   ADL_01 ADL_02 ADL_03 ADL_04 ADL_05 ADL_score_5
+#&gt; 1      2      2      2      2      2           5
+#&gt; 2      2      1      1      2      2           3
+#&gt; 3      2      2      2      2      2           5
+#&gt; 4      2      2      2      2      2           5
+#&gt; 5      2      2      2      2      2           5
+#&gt; 6      2      1      1      2      2           3</div><div class='input'>
 <span class='no'>adl2009_2010</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
   <span class='no'>cchs2009_2010_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-    <span class='st'>"ADL_01"</span>, <span class='st'>"ADL_02"</span>, <span class='st'>"ADL_03"</span>, <span class='st'>"ADL_04"</span>, <span class='st'>"ADL_05"</span>, <span class='st'>"ADL_der"</span>
+    <span class='st'>"ADL_01"</span>, <span class='st'>"ADL_02"</span>, <span class='st'>"ADL_03"</span>, <span class='st'>"ADL_04"</span>, <span class='st'>"ADL_05"</span>, <span class='st'>"ADL_score_5"</span>
   )
 )</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
 #&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for ADL_02: In the 2001 CCHS, respondents were asked, "Because of any condition or health problem, do you need the help of another person in shopping for groceries or other necessities?"</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>adl2009_2010</span>)</div><div class='output co'>#&gt;     ADL_01 ADL_02 ADL_03 ADL_04 ADL_05 ADL_der
-#&gt; 195      2      2      2      2      2       2
-#&gt; 196      2      2      2      2      2       2
-#&gt; 197      2      2      2      2      2       2
-#&gt; 198      2      2      2      2      2       2
-#&gt; 199      2      2      2      2      2       2
-#&gt; 200      2      2      2      2      2       2</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>adl2009_2010</span>)</div><div class='output co'>#&gt;     ADL_01 ADL_02 ADL_03 ADL_04 ADL_05 ADL_score_5
+#&gt; 195      2      2      2      2      2           5
+#&gt; 196      2      2      2      2      2           5
+#&gt; 197      2      2      2      2      2           5
+#&gt; 198      2      2      2      2      2           5
+#&gt; 199      2      2      2      2      2           5
+#&gt; 200      2      2      2      2      2           5</div><div class='input'>
 <span class='no'>combined_adl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span>(<span class='no'>adl2001</span>, <span class='no'>adl2009_2010</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Unequal factor levels: coercing to character</span></div><div class='output co'>#&gt; <span class='warning'>Warning: binding character and factor vector, coercing into character vector</span></div><div class='output co'>#&gt; <span class='warning'>Warning: binding character and factor vector, coercing into character vector</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Unequal factor levels: coercing to character</span></div><div class='output co'>#&gt; <span class='warning'>Warning: binding character and factor vector, coercing into character vector</span></div><div class='output co'>#&gt; <span class='warning'>Warning: binding character and factor vector, coercing into character vector</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_adl</span>)</div><div class='output co'>#&gt;   ADL_01 ADL_02 ADL_03 ADL_04 ADL_05 ADL_der
-#&gt; 1      2      2      2      2      2       2
-#&gt; 2      2      1      1      2      2       1
-#&gt; 3      2      2      2      2      2       2
-#&gt; 4      2      2      2      2      2       2
-#&gt; 5      2      2      2      2      2       2
-#&gt; 6      2      1      1      2      2       1</div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_adl</span>)</div><div class='output co'>#&gt;     ADL_01 ADL_02 ADL_03 ADL_04 ADL_05 ADL_der
-#&gt; 395      2      2      2      2      2       2
-#&gt; 396      2      2      2      2      2       2
-#&gt; 397      2      2      2      2      2       2
-#&gt; 398      2      2      2      2      2       2
-#&gt; 399      2      2      2      2      2       2
-#&gt; 400      2      2      2      2      2       2</div><div class='input'>
-<span class='co'># Using adl_fun() to generate to ADL_der based on user inputted values.</span>
-<span class='co'># </span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_adl</span>)</div><div class='output co'>#&gt;   ADL_01 ADL_02 ADL_03 ADL_04 ADL_05 ADL_score_5
+#&gt; 1      2      2      2      2      2           5
+#&gt; 2      2      1      1      2      2           3
+#&gt; 3      2      2      2      2      2           5
+#&gt; 4      2      2      2      2      2           5
+#&gt; 5      2      2      2      2      2           5
+#&gt; 6      2      1      1      2      2           3</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_adl</span>)</div><div class='output co'>#&gt;     ADL_01 ADL_02 ADL_03 ADL_04 ADL_05 ADL_score_5
+#&gt; 395      2      2      2      2      2           5
+#&gt; 396      2      2      2      2      2           5
+#&gt; 397      2      2      2      2      2           5
+#&gt; 398      2      2      2      2      2           5
+#&gt; 399      2      2      2      2      2           5
+#&gt; 400      2      2      2      2      2           5</div><div class='input'>
+<span class='co'># Using adl_score_5_fun() to generate to ADL_score_5 based on user inputted</span>
+<span class='co'># values.</span>
 <span class='co'># Let's say you do not need help preparing meals, you need help getting to</span>
 <span class='co'># appointments or errands, you need help doing housework, do not need help</span>
 <span class='co'># doing personal care, and do not need help moving inside the house. Using</span>
-<span class='co'># adl_fun() we can check if you need help doing tasks</span>
+<span class='co'># adl_score_5_fun() we can check the number of tasks you need help with</span>
 
-<span class='no'>ADL_der</span> <span class='kw'>&lt;-</span> <span class='fu'>adl_fun</span>(<span class='fl'>2</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>2</span>)
+<span class='no'>ADL_score_5</span> <span class='kw'>&lt;-</span> <span class='fu'>adl_score_5_fun</span>(<span class='fl'>2</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>2</span>)
 
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ADL_der</span>)</div><div class='output co'>#&gt; [1] 1</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ADL_score_5</span>)</div><div class='output co'>#&gt; [1] 3</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -314,7 +282,6 @@
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

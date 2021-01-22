@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compare Value Based On Interval — compare_value_based_on_interval • cchsflow</title>
+<title>Simple smoking status — smoke_simple_fun • cchsflow</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,16 @@
 
 
 
-<meta property="og:title" content="Compare Value Based On Interval — compare_value_based_on_interval" />
-<meta property="og:description" content="Compare values on the scientific notation interval" />
+<meta property="og:title" content="Simple smoking status — smoke_simple_fun" />
+<meta property="og:description" content="This function creates a derived smoking variable (smoke_simple)  
+ with four categories: 
+
+non-smoker (never smoked)
+current smoker (daily and occasional?)
+former daily smoker quit =&amp;lt;5 years or former occasional smoker
+former daily smoker quit &amp;gt;5 years
+
+" />
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -158,59 +166,106 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compare Value Based On Interval</h1>
-    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/recode-with-table.R'><code>R/recode-with-table.R</code></a></small>
-    <div class="hidden name"><code>compare_value_based_on_interval.Rd</code></div>
+    <h1>Simple smoking status</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/R/smoking.R'><code>R/smoking.R</code></a></small>
+    <div class="hidden name"><code>smoke_simple_fun.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compare values on the scientific notation interval</p>
+    <p>This function creates a derived smoking variable (smoke_simple)  
+ with four categories:</p> 
+<ul>
+<li><p>non-smoker (never smoked)</p></li>
+<li><p>current smoker (daily and occasional?)</p></li>
+<li><p>former daily smoker quit =&lt;5 years or former occasional smoker</p></li>
+<li><p>former daily smoker quit &gt;5 years</p></li>
+</ul>
+
     </div>
 
-    <pre class="usage"><span class='fu'>compare_value_based_on_interval</span>(
-  <span class='no'>left_boundary</span>,
-  <span class='no'>right_boundary</span>,
-  <span class='no'>data</span>,
-  <span class='no'>compare_columns</span>,
-  <span class='no'>interval</span>
-)</pre>
+    <pre class="usage"><span class='fu'>smoke_simple_fun</span>(<span class='no'>SMKDSTY</span>, <span class='no'>time_quit_smoking</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>left_boundary</th>
-      <td><p>the min value</p></td>
+      <th>SMKDSTY</th>
+      <td><p>derived variable that classifies an individual's smoking
+status.</p></td>
     </tr>
     <tr>
-      <th>right_boundary</th>
-      <td><p>the max value</p></td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td><p>the data that contains values being compared</p></td>
-    </tr>
-    <tr>
-      <th>compare_columns</th>
-      <td><p>The columns inside data being checked</p></td>
-    </tr>
-    <tr>
-      <th>interval</th>
-      <td><p>The scientific notation interval</p></td>
+      <th>time_quit_smoking</th>
+      <td><p>derived variable that calculates the approximate
+time a former smoker has quit smoking. 
+See <code><a href='time_quit_smoking_fun.html'>time_quit_smoking_fun</a></code> for documentation on how variable
+was derived.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a boolean vector containing true for rows where the
-comparison is true</p>
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># Using the 'smoke_simple_fun' function to create the derived smoking   </span>
+<span class='co'># variable across CCHS cycles.</span>
+<span class='co'># smoke_simple_fun() is specified in the variable_details.csv</span>
 
+<span class='co'># To create a harmonized smoke_simple variable across CCHS cycles, use </span>
+<span class='co'># rec_with_table() for each CCHS cycle and specify smoke_simple_fun and </span>
+<span class='co'># the required base variables. Since time_quit_smoking_der is also a derived </span>
+<span class='co'># variable, you will have to specify the variables that are derived from it.</span>
+<span class='co'># Using merge_rec_data(), you can combine smoke_simple across cycles.</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
+
+<span class='no'>smoke_simple2009_2010</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
+  <span class='no'>cchs2009_2010_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+    <span class='st'>"SMKDSTY"</span>, <span class='st'>"SMK_09A_B"</span>, <span class='st'>"SMKG09C"</span>, <span class='st'>"time_quit_smoking"</span>,
+    <span class='st'>"smoke_simple"</span>
+  )
+)</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>smoke_simple2009_2010</span>)</div><div class='output co'>#&gt;   SMK_09A_B SMKDSTY SMKG09C time_quit_smoking smoke_simple
+#&gt; 1     NA(a)       6   NA(a)                NA            0
+#&gt; 2     NA(a)       6   NA(a)                NA            0
+#&gt; 3     NA(a)       5   NA(a)                NA            2
+#&gt; 4         4       4       2                 8            3
+#&gt; 5         4       4       3                12            3
+#&gt; 6         4       4       3                12            3</div><div class='input'>
+<span class='no'>smoke_simple2011_2012</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
+  <span class='no'>cchs2011_2012_p</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+   <span class='st'>"SMKDSTY"</span>, <span class='st'>"SMK_09A_B"</span>, <span class='st'>"SMKG09C"</span>, <span class='st'>"time_quit_smoking"</span>,
+   <span class='st'>"smoke_simple"</span>
+  )
+)</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>smoke_simple2011_2012</span>)</div><div class='output co'>#&gt;     SMK_09A_B SMKDSTY SMKG09C time_quit_smoking smoke_simple
+#&gt; 195         4       4       3                12            3
+#&gt; 196     NA(a)       5   NA(a)                NA            2
+#&gt; 197     NA(a)       6   NA(a)                NA            0
+#&gt; 198         4       4       2                 8            3
+#&gt; 199     NA(a)       1   NA(a)                NA            1
+#&gt; 200     NA(a)       1   NA(a)                NA            1</div><div class='input'>
+<span class='no'>combined_smoke_simple</span> <span class='kw'>&lt;-</span>
+<span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span>(<span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span>(<span class='no'>smoke_simple2009_2010</span>,<span class='no'>smoke_simple2011_2012</span>))
+
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_smoke_simple</span>)</div><div class='output co'>#&gt;   SMK_09A_B SMKDSTY SMKG09C time_quit_smoking smoke_simple
+#&gt; 1     NA(a)       6   NA(a)                NA            0
+#&gt; 2     NA(a)       6   NA(a)                NA            0
+#&gt; 3     NA(a)       5   NA(a)                NA            2
+#&gt; 4         4       4       2                 8            3
+#&gt; 5         4       4       3                12            3
+#&gt; 6         4       4       3                12            3</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_smoke_simple</span>)</div><div class='output co'>#&gt;     SMK_09A_B SMKDSTY SMKG09C time_quit_smoking smoke_simple
+#&gt; 395         4       4       3                12            3
+#&gt; 396     NA(a)       5   NA(a)                NA            2
+#&gt; 397     NA(a)       6   NA(a)                NA            0
+#&gt; 398         4       4       2                 8            3
+#&gt; 399     NA(a)       1   NA(a)                NA            1
+#&gt; 400     NA(a)       1   NA(a)                NA            1</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
