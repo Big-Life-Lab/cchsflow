@@ -13,20 +13,20 @@ article.
 `variable_details.csv`.
 
 ## New variables
-- [**COPD_Emph_der:**](https://big-life-lab.github.io/reference/COPD_Emph_der_fun1.html)
+- [**COPD_Emph_der:**](https://big-life-lab.github.io/cchsflow/reference/COPD_Emph_der_fun1.html)
 derived variable that determines if a respondent has either COPD or Emphysema.
-- [**ADL_score_5:**](https://big-life-lab.github.io/reference/adl_score_5_fun.html)
+- [**ADL_score_5:**](https://big-life-lab.github.io/cchsflow/reference/adl_score_5_fun.html)
 derived variable that scores the number of daily tasks that a respondent needs
 help with.
-- [**diet_score:**](https://big-life-lab.github.io/reference/diet_score_fun.html)
+- [**diet_score:**](https://big-life-lab.github.io/cchsflow/reference/diet_score_fun.html)
 derived variable that scores respondents based on daily consumption of fruit,
 vegetables, and fruit juice.
-- [**smoke_simple:**](https://big-life-lab.github.io/reference/smoke_simple_fun.html)
+- [**smoke_simple:**](https://big-life-lab.github.io/cchsflow/reference/smoke_simple_fun.html)
 derived variable that identifies respondents smoking status.
-- [**time_quit_smoking:**](https://big-life-lab.github.io/reference/time_quit_smoking_fun.html)
+- [**time_quit_smoking:**](https://big-life-lab.github.io/cchsflow/reference/time_quit_smoking_fun.html)
 derived variable that estimates approximate time since respondent has quit
 smoking if they are a former smoker.
-- [**LBFA_31A/LBFA_31A_a/LBFA_31A_b:**](https://big-life-lab.github.io/reference/LBFA_31A.html)
+- [**LBFA_31A/LBFA_31A_a/LBFA_31A_b:**](https://big-life-lab.github.io/cchsflow/reference/LBFA_31A.html)
 Occupation group. 3 different variables with differing categories were created
 to harmonize between CCHS cycles.
 - **CCC_041:** Fibromyalgia.
