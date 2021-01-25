@@ -1,3 +1,9 @@
+# cchsflow 1.8.1
+2021-01-25
+
+## Bug Fixes
+- Correct breaking specification errors for [diet_score](https://big-life-lab.github.io/cchsflow/reference/diet_score_fun.html).
+
 # cchsflow 1.8.0
 2021-01-22
 
