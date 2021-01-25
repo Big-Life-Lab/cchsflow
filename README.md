@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 [![Lifecycle:
-development](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+development](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable-1)
 [![](https://img.shields.io/cran/v/cchsflow?color=green)](https://CRAN.R-project.org/package=cchsflow)
 ![](https://img.shields.io/github/v/release/big-life-lab/cchsflow?color=green&label=GitHub)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -21,7 +21,7 @@ in a single cycle.
 
 The CCHS is one of the largest and most robust ongoing population health surveys 
 worldwide. The CCHS, administered by Statistics Canada, is Canada's main general 
-population health survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
+population health survey. Information about the survey is found [here](https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
 The CCHS has a [Statistic Canada Open Licence](https://www.statcan.gc.ca/eng/reference/licence).
 
 ## Concept
