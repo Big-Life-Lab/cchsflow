@@ -83,7 +83,7 @@ in 2001 CCHS"
 other forms of bias that affects studies in different ways.* The transformations 
 that are described in this repository have been used in several research 
 projects, but there are no guarantees regarding the accuracy or appropriate 
-uses.
+uses. [Thomas and Wannell](https://www150.statcan.gc.ca/n1/en/pub/82-003-x/82-003-x2009001-eng.pdf?st=_n9lb9N4) describe methodolgy issues when combining CCHS cycles.
 
 Care must be taken to understand how specific variable transformation and 
 harmonization with `cchsflow` affect your study or use of CCHS data. Across 
@@ -102,7 +102,7 @@ affect responses.
     devtools::install_github("Big-Life-Lab/cchsflow")
 ```
 
-Do you just want new variables not yet added to the CRAN version?
+#### New variables not yet added to the CRAN version
 
 You can download and use the latest version of 
 [`variables.csv`](https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variables.csv)
