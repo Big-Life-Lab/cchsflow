@@ -5,6 +5,9 @@
 - Fixes to `age_cat_fun()` to support decimal values from `DHHGAGE_cont`.
 - Documentation corrections to `pack_years_fun()` and `time_quit_smoking_fun()`.
 
+## New variable
+- **SMKDSTY_cat3**: 3 category smoking status derived variable.
+
 # cchsflow 1.8.1
 2021-01-25
 
