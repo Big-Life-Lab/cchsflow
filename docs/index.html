@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.8.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.8.2</span>
       </span>
     </div>
 
@@ -159,7 +159,7 @@ in 2001 CCHS"</code></pre>
 <div id="important-notes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#important-notes" class="anchor"></a>Important notes</h2>
-<p><em>Combining CCHS across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.</em> The transformations that are described in this repository have been used in several research projects, but there are no guarantees regarding the accuracy or appropriate uses.</p>
+<p><em>Combining CCHS across survey cycles will result in misclassification error and other forms of bias that affects studies in different ways.</em> The transformations that are described in this repository have been used in several research projects, but there are no guarantees regarding the accuracy or appropriate uses. <a href="https://www150.statcan.gc.ca/n1/en/pub/82-003-x/82-003-x2009001-eng.pdf?st=_n9lb9N4">Thomas and Wannell</a> describe methodolgy issues when combining CCHS cycles.</p>
 <p>Care must be taken to understand how specific variable transformation and harmonization with <code>cchsflow</code> affect your study or use of CCHS data. Across survey cycles, almost all CCHS variables have had at least some change in wording and category responses. Furthermore, there have been changes in survey sampling, response rates, weighting methods and other survey design changes that affect responses.</p>
 </div>
 <div id="installation" class="section level2">
@@ -170,8 +170,11 @@ in 2001 CCHS"</code></pre>
 
     # Install the most recent version from GitHub
     devtools::install_github("Big-Life-Lab/cchsflow")</a></code></pre>
-<p>Do you just want new variables not yet added to the CRAN version?</p>
+<div id="new-variables-not-yet-added-to-the-cran-version" class="section level4">
+<h4 class="hasAnchor">
+<a href="#new-variables-not-yet-added-to-the-cran-version" class="anchor"></a>New variables not yet added to the CRAN version</h4>
 <p>You can download and use the latest version of <a href="https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variables.csv"><code>variables.csv</code></a> and <a href="https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variable_details.csv"><code>variable_details.csv</code></a> from GitHub.</p>
+</div>
 </div>
 <div id="what-is-in-the-cchsflow-package" class="section level2">
 <h2 class="hasAnchor">
