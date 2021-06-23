@@ -56,35 +56,35 @@
 age_cat_fun <- function(DHHGAGE_cont) {
   age_cat <-
     if_else2(
-      between(DHHGAGE_cont, 12, 14), 1,
+      dplyr::between(DHHGAGE_cont, 12, 14), 1,
       if_else2(
-        between(DHHGAGE_cont, 15, 17), 2,
+        dplyr::between(DHHGAGE_cont, 15, 17), 2,
         if_else2(
-          between(DHHGAGE_cont, 18, 19), 3,
+          dplyr::between(DHHGAGE_cont, 18, 19), 3,
           if_else2(
-            between(DHHGAGE_cont, 20, 24), 4,
+            dplyr::between(DHHGAGE_cont, 20, 24), 4,
             if_else2(
-              between(DHHGAGE_cont, 25, 29), 5,
+              dplyr::between(DHHGAGE_cont, 25, 29), 5,
               if_else2(
-                between(DHHGAGE_cont, 30, 34), 6,
+                dplyr::between(DHHGAGE_cont, 30, 34), 6,
                 if_else2(
-                  between(DHHGAGE_cont, 35, 39), 7,
+                  dplyr::between(DHHGAGE_cont, 35, 39), 7,
                   if_else2(
-                    between(DHHGAGE_cont, 40, 44), 8,
+                    dplyr::between(DHHGAGE_cont, 40, 44), 8,
                     if_else2(
-                      between(DHHGAGE_cont, 45, 49), 9,
+                      dplyr::between(DHHGAGE_cont, 45, 49), 9,
                       if_else2(
-                        between(DHHGAGE_cont, 50, 54), 10,
+                        dplyr::between(DHHGAGE_cont, 50, 54), 10,
                         if_else2(
-                          between(DHHGAGE_cont, 55, 59), 11,
+                          dplyr::between(DHHGAGE_cont, 55, 59), 11,
                           if_else2(
-                            between(DHHGAGE_cont, 60, 64), 12,
+                            dplyr::between(DHHGAGE_cont, 60, 64), 12,
                             if_else2(
-                              between(DHHGAGE_cont, 65, 69), 13,
+                              dplyr::between(DHHGAGE_cont, 65, 69), 13,
                               if_else2(
-                                between(DHHGAGE_cont, 70, 74), 14,
+                                dplyr::between(DHHGAGE_cont, 70, 74), 14,
                                 if_else2(
-                                  between(DHHGAGE_cont, 75, 79), 15,
+                                  dplyr::between(DHHGAGE_cont, 75, 79), 15,
                                   if_else2((DHHGAGE_cont >= 80), 16,
                                            "NA(b)")
                                 )
