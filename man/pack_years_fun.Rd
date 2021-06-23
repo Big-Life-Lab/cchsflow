@@ -51,7 +51,7 @@ daily smokers}
 \item{SMK_01A}{smoked 100 cigarettes in lifetime (y/n)}
 }
 \value{
-value for smoking pack-years in the Pack_years_der variable
+value for smoking pack-years in the pack_years_der variable
 }
 \description{
 This function creates a derived variable (pack_years_der) that

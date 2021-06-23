@@ -19,15 +19,16 @@
 #' # time_quit_smoking_fun() is specified in variable_details.csv along with the
 #' # CCHS variables and cycles included.
 #'
-#' # To transform time_quit_fun across cycles, use rec_with_table() for each
-#' # CCHS cycle and specify time_quit_fun, along with each smoking variable.
-#' # Then by using merge_rec_data(), you can combine time_quit_fun across cycles
+#' # To transform time_quit_smoking across cycles, use rec_with_table() for each
+#' # CCHS cycle and specify time_quit_smoking, along with each smoking variable.
+#' # Then by using merge_rec_data(), you can combine time_quit_smoking across
+#' # cycles.
 #' 
 #' library(cchsflow)
 #' 
 #' time_quit2009_2010 <- rec_with_table(
 #'   cchs2009_2010_p, c(
-#'     "SMK_09A_B", "SMKG09C", "time_quit_smoking_der."
+#'     "SMK_09A_B", "SMKG09C", "time_quit_smoking"
 #'   )
 #' )
 #'
@@ -35,7 +36,7 @@
 #'
 #' time_quit2011_2012 <- rec_with_table(
 #'   cchs2011_2012_p, c(
-#'     "SMK_09A_B", "SMKG09C", "time_quit_smoking_der."
+#'     "SMK_09A_B", "SMKG09C", "time_quit_smoking"
 #'   )
 #' )
 #'
@@ -220,7 +221,7 @@ smoke_simple_fun <-
 #'
 #' @param SMKG01C_cont age smoked first cigarette
 #'
-#' @return value for smoking pack-years in the Pack_years_der variable
+#' @return value for smoking pack-years in the pack_years_der variable
 #'
 #' @examples
 #' # Using pack_years_fun() to create pack-years values across CCHS cycles
