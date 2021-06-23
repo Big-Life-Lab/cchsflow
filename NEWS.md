@@ -1,3 +1,10 @@
+# cchsflow 1.8.2
+2021-06-23
+
+## Bug Fixes
+- Fixes to `age_cat_fun()` to support decimal values from `DHHGAGE_cont`.
+- Documentation corrections to `pack_years_fun()` and `time_quit_smoking_fun()`.
+
 # cchsflow 1.8.1
 2021-01-25
 

@@ -1,7 +1,8 @@
 ## Resubmission
 
 This is a resubmission. In this version we have:
-* Fixed a breaking specification for a derived variable. 
+* Fixed a breaking error for a derived variable function.
+* Corrected documentations to two functions.
 
 ## Test environments
 * local OS X install, R 4.0.0
