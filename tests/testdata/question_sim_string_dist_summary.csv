@@ -1,0 +1,212 @@
+,dist,str1,str2,similarity
+205,0,"Total household income from all sources (D, G)","Total household income from all sources (D, G)",1
+197,5,"Does a long-term physical condition or mental condition or health problem, reduce the amount or the kind of activity you can do at school?","Does a long-term physical condition or mental condition or health problem, reduce the amount or the kind of activity you can do at work?",0.963768116
+34,2,Number of drinks on Tuesday,Number of drinks on Thursday,0.928571429
+22,2,Number of drinks on Sunday,Number of drinks on Monday,0.923076923
+194,12,Does a long-term physical condition or mental condition or health problem reduce the amount or the kind of activity you can do at work or at school?,"Does a long-term physical condition or mental condition or health problem, reduce the amount or the kind of activity you can do at school?",0.918918919
+201,4,Years since stopped smoking daily - never daily,Years since stopped smoking daily - former daily,0.916666667
+195,14,Does a long-term physical condition or mental condition or health problem reduce the amount or the kind of activity you can do at work or at school?,"Does a long-term physical condition or mental condition or health problem, reduce the amount or the kind of activity you can do at work?",0.905405405
+27,3,Number of drinks on Sunday,Number of drinks on Saturday,0.892857143
+23,3,Number of drinks on Sunday,Number of drinks on Tuesday,0.888888889
+203,5,household inc. distribution-prov. level - (D),household inc. distribution- hr level - (D),0.888888889
+26,3,Number of drinks on Sunday,Number of drinks on Friday,0.884615385
+31,3,Number of drinks on Monday,Number of drinks on Friday,0.884615385
+33,4,Number of drinks on Tuesday,Number of drinks on Wednesday,0.862068966
+25,4,Number of drinks on Sunday,Number of drinks on Thursday,0.857142857
+40,4,Number of drinks on Thursday,Number of drinks on Friday,0.857142857
+41,4,Number of drinks on Thursday,Number of drinks on Saturday,0.857142857
+28,4,Number of drinks on Monday,Number of drinks on Tuesday,0.851851852
+35,4,Number of drinks on Tuesday,Number of drinks on Friday,0.851851852
+185,6,"Dexterity trouble - function code (D, G)","Mobility trouble - function code (D, G)",0.85
+163,5,Daily consumption - carrots - (D),Daily consumption - fruit - (D),0.848484848
+193,6,"Speech trouble - function code - (D, G)","Vision trouble - function code - (D, G)",0.846153846
+169,6,Daily consumption - fruit - (D),Daily consumption - fruit juice - (D),0.837837838
+24,5,Number of drinks on Sunday,Number of drinks on Wednesday,0.827586207
+29,5,Number of drinks on Monday,Number of drinks on Wednesday,0.827586207
+37,5,Number of drinks on Wednesday,Number of drinks on Thursday,0.827586207
+165,6,Daily consumption - carrots - (D),Daily consumption - potatoes - (D),0.823529412
+13,21,"Because of any condition or health problem, do you need the help of another person in doing normal everyday housework?","Because of any condition or health problem, do you need the help of another person in moving about inside the house?",0.822033898
+30,5,Number of drinks on Monday,Number of drinks on Thursday,0.821428571
+32,5,Number of drinks on Monday,Number of drinks on Saturday,0.821428571
+36,5,Number of drinks on Tuesday,Number of drinks on Saturday,0.821428571
+42,5,Number of drinks on Friday,Number of drinks on Saturday,0.821428571
+4,23,"Because of any condition or health problem, do you need the help of another person in preparing meals?","Because of any condition or health problem, do you need the help of another person in moving about inside the house?",0.801724138
+192,8,"Mobility trouble - function code (D, G)","Vision trouble - function code - (D, G)",0.794871795
+170,7,Daily consumption - fruit - (D),Daily consumption - potatoes - (D),0.794117647
+38,6,Number of drinks on Wednesday,Number of drinks on Friday,0.793103448
+39,6,Number of drinks on Wednesday,Number of drinks on Saturday,0.793103448
+2,26,"Because of any condition or health problem, do you need the help of another person in preparing meals?","Because of any condition or health problem, do you need the help of another person in doing normal everyday housework?",0.779661017
+21,49,"Because of any physical condition or mental condition or health problem, do you need the help of another person with looking after your personal finances such as making bank transactions or paying bills?","Because of any physical condition or mental condition or health problem, do you need the help of another person with doing heavy household chores such as spring cleaning or yard work?",0.75862069
+175,9,Daily consumption - fruit juice - (D),Daily consumption - green salad - (D),0.756756757
+204,13,"Total pers. inc. from all sources (D, G)","Total pers. inc. from all sources (D, G) - continuous",0.754716981
+184,10,"Dexterity trouble - function code (D, G)","Hearing problems - function code (D, G)",0.75
+186,10,"Dexterity trouble - function code (D, G)","Speech trouble - function code - (D, G)",0.75
+187,10,"Dexterity trouble - function code (D, G)","Vision trouble - function code - (D, G)",0.75
+196,47,Does a long-term physical condition or mental condition or health problem reduce the amount or the kind of activity you can do at work or at school?,"Does a long-term physical condition or mental condition or health problem reduce the amount or the kind of activity you can do in other activities, for example, transportation or leisure?",0.748663102
+191,10,"Mobility trouble - function code (D, G)","Speech trouble - function code - (D, G)",0.743589744
+200,12,Age started to smoke daily - daily smoker (G),Age started to smoke daily - former daily (G),0.733333333
+164,10,Daily consumption - carrots - (D),Daily consumption - fruit juice - (D),0.72972973
+166,10,Daily consumption - carrots - (D),Daily consumption - green salad - (D),0.72972973
+171,10,Daily consumption - fruit - (D),Daily consumption - green salad - (D),0.72972973
+174,10,Daily consumption - fruit juice - (D),Daily consumption - potatoes - (D),0.72972973
+209,35,"In a typical week in the past 3 months, how many hours did you usually spend walking to work or to school or while doing errands?","In a typical week, how much time did you usually spend bicycling to work or to school or while doing errands?",0.728682171
+154,6,Do you have emphysema?,Do you have asthma?,0.727272727
+180,11,Daily consumption - potatoes - (D),Daily consumption other vegetables - (D),0.725
+3,38,"Because of any condition or health problem, do you need the help of another person in preparing meals?","Because of any condition or health problem, do you need the help of another person in personal care such as washing, dressing or eating?",0.720588235
+16,38,"Because of any condition or health problem, do you need the help of another person in personal care such as washing, dressing or eating?","Because of any condition or health problem, do you need the help of another person in moving about inside the house?",0.720588235
+11,54,"Because of any physical condition or mental condition or health problem, do you need the help of another person with getting to appointments and running errands such as shopping for groceries?","Because of any physical condition or mental condition or health problem, do you need the help of another person with doing heavy household chores such as spring cleaning or yard work?",0.71875
+188,11,"Hearing problems - function code (D, G)","Mobility trouble - function code (D, G)",0.717948718
+198,53,"Does a long-term physical condition or mental condition or health problem, reduce the amount or the kind of activity you can do at school?","Does a long-term physical condition or mental condition or health problem reduce the amount or the kind of activity you can do in other activities, for example, transportation or leisure?",0.71657754
+210,53,"Thinking about the amount of stress in your life, would you say that most days are (not at all stressful, not very stressful, a bit stressful, quite a bit stressful, extremely stressful)?","Would you say that most days were (not at all stressful, not very stressful, a bit stressful, quite a bit stressful, extremely stressful)?",0.71657754
+12,40,"Because of any condition or health problem, do you need the help of another person in doing normal everyday housework?","Because of any condition or health problem, do you need the help of another person in personal care such as washing, dressing or eating?",0.705882353
+199,55,"Does a long-term physical condition or mental condition or health problem, reduce the amount or the kind of activity you can do at work?","Does a long-term physical condition or mental condition or health problem reduce the amount or the kind of activity you can do in other activities, for example, transportation or leisure?",0.705882353
+178,11,Daily consumption - potatoes - (D),Daily consumption - green salad - (D),0.702702703
+176,14,Daily consumption - fruit juice - (D),Daily consumption - total fruits and veg. - (D),0.70212766
+60,6,Do you have diabetes,Do you have cancer,0.7
+182,12,Daily consumption - green salad - (D),Daily consumption other vegetables - (D),0.7
+10,62,"Because of any physical condition or mental condition or health problem, do you need the help of another person with getting to appointments and running errands such as shopping for groceries?","Because of any physical condition or mental condition or health problem, do you need the help of another person with looking after your personal finances such as making bank transactions or paying bills?",0.694581281
+190,12,"Hearing problems - function code (D, G)","Vision trouble - function code - (D, G)",0.692307692
+157,6,Do you have COPD?,Do you have asthma?,0.684210526
+80,7,Do you have epilepsy?,Do you have emphysema?,0.681818182
+168,13,Daily consumption - carrots - (D),Daily consumption other vegetables - (D),0.675
+104,6,Do you have cancer,Do you have COPD?,0.666666667
+189,13,"Hearing problems - function code (D, G)","Speech trouble - function code - (D, G)",0.666666667
+172,16,Daily consumption - fruit - (D),Daily consumption - total fruits and veg. - (D),0.659574468
+179,16,Daily consumption - potatoes - (D),Daily consumption - total fruits and veg. - (D),0.659574468
+173,14,Daily consumption - fruit - (D),Daily consumption other vegetables - (D),0.65
+177,14,Daily consumption - fruit juice - (D),Daily consumption other vegetables - (D),0.65
+167,17,Daily consumption - carrots - (D),Daily consumption - total fruits and veg. - (D),0.638297872
+105,7,Do you have cancer,Do you have asthma?,0.631578947
+89,10,Do you have heart disease,Do you have a mood disorder,0.62962963
+18,69,"Because of any condition or health problem, do you need the help of another person in personal care such as washing, dressing or eating?","Because of any physical condition or mental condition or health problem, do you need the help of another person with doing heavy household chores such as spring cleaning or yard work?",0.62295082
+58,8,Do you have diabetes,Do you have epilepsy?,0.619047619
+73,8,Do you have epilepsy?,Do you have cancer,0.619047619
+81,8,Do you have epilepsy?,Do you have COPD?,0.619047619
+82,8,Do you have epilepsy?,Do you have asthma?,0.619047619
+181,18,Daily consumption - green salad - (D),Daily consumption - total fruits and veg. - (D),0.617021277
+183,18,Daily consumption - total fruits and veg. - (D),Daily consumption other vegetables - (D),0.617021277
+17,80,"Because of any condition or health problem, do you need the help of another person in personal care such as washing, dressing or eating?","Because of any physical condition or mental condition or health problem, do you need the help of another person with looking after your personal finances such as making bank transactions or paying bills?",0.60591133
+59,10,Do you have diabetes,Do you have heart disease,0.6
+68,8,Do you have diabetes,Do you have COPD?,0.6
+69,8,Do you have diabetes,Do you have asthma?,0.6
+72,10,Do you have epilepsy?,Do you have heart disease,0.6
+92,10,Do you have heart disease,Do you have emphysema?,0.6
+94,10,Do you have heart disease,Do you have asthma?,0.6
+67,9,Do you have diabetes,Do you have emphysema?,0.590909091
+103,9,Do you have cancer,Do you have emphysema?,0.590909091
+153,9,Do you have emphysema?,Do you have COPD?,0.590909091
+151,15,Do you have chronic bronchitis?,Do you have arthritis or rheumatism?,0.583333333
+141,13,Do you have a mood disorder,Do you have high blood pressure,0.580645161
+129,16,Do you have chronic fatigue syndrome?,Do you have chronic bronchitis?,0.567567568
+15,80,"Because of any condition or health problem, do you need the help of another person in doing normal everyday housework?","Because of any physical condition or mental condition or health problem, do you need the help of another person with doing heavy household chores such as spring cleaning or yard work?",0.56284153
+211,14,Type of drinker (last 12 months),Type of drinker - (D),0.5625
+202,25,When did you stop smoking - never daily,When did you stop smoking daily - occasional smoker - (G),0.561403509
+52,18,"Do you have COPD(eg bronchitis,emphysema)",Do you have chronic bronchitis?,0.56097561
+85,11,Do you have heart disease,Do you have cancer,0.56
+64,12,Do you have diabetes,Do you have a mood disorder,0.555555556
+8,86,"Because of any physical condition or mental condition or health problem, do you need the help of another person with getting to appointments and running errands such as shopping for groceries?","Because of any condition or health problem, do you need the help of another person in personal care such as washing, dressing or eating?",0.552083333
+96,14,Do you have heart disease,Do you have high blood pressure,0.548387097
+20,84,"Because of any condition or health problem, do you need the help of another person in moving about inside the house?","Because of any physical condition or mental condition or health problem, do you need the help of another person with doing heavy household chores such as spring cleaning or yard work?",0.540983607
+7,89,"Because of any physical condition or mental condition or health problem, do you need the help of another person with getting to appointments and running errands such as shopping for groceries?","Because of any condition or health problem, do you need the help of another person in doing normal everyday housework?",0.536458333
+9,89,"Because of any physical condition or mental condition or health problem, do you need the help of another person with getting to appointments and running errands such as shopping for groceries?","Because of any condition or health problem, do you need the help of another person in moving about inside the house?",0.536458333
+6,86,"Because of any condition or health problem, do you need the help of another person in preparing meals?","Because of any physical condition or mental condition or health problem, do you need the help of another person with doing heavy household chores such as spring cleaning or yard work?",0.530054645
+100,13,Do you have cancer,Do you have a mood disorder,0.518518519
+137,13,Do you have a mood disorder,Do you have emphysema?,0.518518519
+139,13,Do you have a mood disorder,Do you have asthma?,0.518518519
+66,15,Do you have diabetes,Do you have chronic bronchitis?,0.516129032
+71,15,Do you have diabetes,Do you have high blood pressure,0.516129032
+102,15,Do you have cancer,Do you have chronic bronchitis?,0.516129032
+53,20,"Do you have COPD(eg bronchitis,emphysema)",Do you have emphysema?,0.512195122
+19,100,"Because of any condition or health problem, do you need the help of another person in moving about inside the house?","Because of any physical condition or mental condition or health problem, do you need the help of another person with looking after your personal finances such as making bank transactions or paying bills?",0.507389163
+1,95,"Because of any condition or health problem, do you need the help of another person in preparing meals?","Because of any physical condition or mental condition or health problem, do you need the help of another person with getting to appointments and running errands such as shopping for groceries?",0.505208333
+14,101,"Because of any condition or health problem, do you need the help of another person in doing normal everyday housework?","Because of any physical condition or mental condition or health problem, do you need the help of another person with looking after your personal finances such as making bank transactions or paying bills?",0.502463054
+95,18,Do you have heart disease,Do you have arthritis or rheumatism?,0.5
+155,18,Do you have emphysema?,Do you have arthritis or rheumatism?,0.5
+160,18,Do you have asthma?,Do you have arthritis or rheumatism?,0.5
+206,32,How often do you have trouble going to sleep or staying asleep?,How often do you find your sleep refreshing?,0.492063492
+88,19,Do you have heart disease,Do you have chronic fatigue syndrome?,0.486486486
+127,19,Do you have chronic fatigue syndrome?,Do you have a mood disorder,0.486486486
+84,16,Do you have epilepsy?,Do you have high blood pressure,0.483870968
+91,16,Do you have heart disease,Do you have chronic bronchitis?,0.483870968
+5,105,"Because of any condition or health problem, do you need the help of another person in preparing meals?","Because of any physical condition or mental condition or health problem, do you need the help of another person with looking after your personal finances such as making bank transactions or paying bills?",0.482758621
+77,14,Do you have epilepsy?,Do you have a mood disorder,0.481481481
+93,13,Do you have heart disease,Do you have COPD?,0.48
+140,19,Do you have a mood disorder,Do you have arthritis or rheumatism?,0.472222222
+45,22,"Do you have COPD(eg bronchitis,emphysema)",Do you have heart disease,0.463414634
+76,20,Do you have epilepsy?,Do you have chronic fatigue syndrome?,0.459459459
+99,20,Do you have cancer,Do you have chronic fatigue syndrome?,0.459459459
+133,20,Do you have chronic fatigue syndrome?,Do you have arthritis or rheumatism?,0.459459459
+134,20,Do you have chronic fatigue syndrome?,Do you have high blood pressure,0.459459459
+79,17,Do you have epilepsy?,Do you have chronic bronchitis?,0.451612903
+107,17,Do you have cancer,Do you have high blood pressure,0.451612903
+136,17,Do you have a mood disorder,Do you have chronic bronchitis?,0.451612903
+150,17,Do you have chronic bronchitis?,Do you have asthma?,0.451612903
+152,17,Do you have chronic bronchitis?,Do you have high blood pressure,0.451612903
+156,17,Do you have emphysema?,Do you have high blood pressure,0.451612903
+70,20,Do you have diabetes,Do you have arthritis or rheumatism?,0.444444444
+83,20,Do you have epilepsy?,Do you have arthritis or rheumatism?,0.444444444
+138,15,Do you have a mood disorder,Do you have COPD?,0.444444444
+162,20,Do you have arthritis or rheumatism?,Do you have high blood pressure,0.444444444
+208,37,How often do you find your sleep refreshing?,How often do you find it difficult to stay awake when you want to?,0.439393939
+63,21,Do you have diabetes,Do you have chronic fatigue syndrome?,0.432432432
+132,21,Do you have chronic fatigue syndrome?,Do you have asthma?,0.432432432
+148,18,Do you have chronic bronchitis?,Do you have emphysema?,0.419354839
+149,18,Do you have chronic bronchitis?,Do you have COPD?,0.419354839
+161,18,Do you have asthma?,Do you have high blood pressure,0.419354839
+44,24,"Do you have COPD(eg bronchitis,emphysema)",Do you have epilepsy?,0.414634146
+49,24,"Do you have COPD(eg bronchitis,emphysema)",Do you have chronic fatigue syndrome?,0.414634146
+50,24,"Do you have COPD(eg bronchitis,emphysema)",Do you have a mood disorder,0.414634146
+57,24,"Do you have COPD(eg bronchitis,emphysema)",Do you have high blood pressure,0.414634146
+109,22,Do you suffer from effects of stroke,Do you have chronic fatigue syndrome?,0.405405405
+130,22,Do you have chronic fatigue syndrome?,Do you have emphysema?,0.405405405
+207,40,How often do you have trouble going to sleep or staying asleep?,How often do you find it difficult to stay awake when you want to?,0.393939394
+121,39,Do you have a bowel disorder such as Crohn's Disease or colitis?,Do you have chronic bronchitis?,0.390625
+43,25,"Do you have COPD(eg bronchitis,emphysema)",Do you have diabetes,0.390243902
+54,25,"Do you have COPD(eg bronchitis,emphysema)",Do you have COPD?,0.390243902
+55,25,"Do you have COPD(eg bronchitis,emphysema)",Do you have asthma?,0.390243902
+56,25,"Do you have COPD(eg bronchitis,emphysema)",Do you have arthritis or rheumatism?,0.390243902
+86,22,Do you have heart disease,Do you suffer from effects of stroke,0.388888889
+159,19,Do you have COPD?,Do you have high blood pressure,0.387096774
+119,40,Do you have a bowel disorder such as Crohn's Disease or colitis?,Do you have a mood disorder,0.375
+46,26,"Do you have COPD(eg bronchitis,emphysema)",Do you have cancer,0.365853659
+106,23,Do you have cancer,Do you have arthritis or rheumatism?,0.361111111
+110,23,Do you suffer from effects of stroke,Do you have a mood disorder,0.361111111
+117,23,Do you suffer from effects of stroke,Do you have high blood pressure,0.361111111
+158,23,Do you have COPD?,Do you have arthritis or rheumatism?,0.361111111
+125,41,Do you have a bowel disorder such as Crohn's Disease or colitis?,Do you have arthritis or rheumatism?,0.359375
+131,24,Do you have chronic fatigue syndrome?,Do you have COPD?,0.351351351
+87,42,Do you have heart disease,Do you have a bowel disorder such as Crohn's Disease or colitis?,0.34375
+90,27,Do you have heart disease,Have you ever been diagnosed with cancer?,0.341463415
+101,27,Do you have cancer,Have you ever been diagnosed with cancer?,0.341463415
+135,27,Do you have a mood disorder,Have you ever been diagnosed with cancer?,0.341463415
+61,24,Do you have diabetes,Do you suffer from effects of stroke,0.333333333
+112,24,Do you suffer from effects of stroke,Do you have chronic bronchitis?,0.333333333
+118,43,Do you have a bowel disorder such as Crohn's Disease or colitis?,Do you have chronic fatigue syndrome?,0.328125
+65,28,Do you have diabetes,Have you ever been diagnosed with cancer?,0.317073171
+145,28,Have you ever been diagnosed with cancer?,Do you have asthma?,0.317073171
+48,44,"Do you have COPD(eg bronchitis,emphysema)",Do you have a bowel disorder such as Crohn's Disease or colitis?,0.3125
+126,44,Do you have a bowel disorder such as Crohn's Disease or colitis?,Do you have high blood pressure,0.3125
+74,25,Do you have epilepsy?,Do you suffer from effects of stroke,0.305555556
+97,25,Do you have cancer,Do you suffer from effects of stroke,0.305555556
+113,25,Do you suffer from effects of stroke,Do you have emphysema?,0.305555556
+115,25,Do you suffer from effects of stroke,Do you have asthma?,0.305555556
+108,45,Do you suffer from effects of stroke,Do you have a bowel disorder such as Crohn's Disease or colitis?,0.296875
+143,29,Have you ever been diagnosed with cancer?,Do you have emphysema?,0.292682927
+147,29,Have you ever been diagnosed with cancer?,Do you have high blood pressure,0.292682927
+62,46,Do you have diabetes,Do you have a bowel disorder such as Crohn's Disease or colitis?,0.28125
+120,46,Do you have a bowel disorder such as Crohn's Disease or colitis?,Have you ever been diagnosed with cancer?,0.28125
+116,26,Do you suffer from effects of stroke,Do you have arthritis or rheumatism?,0.277777778
+47,30,"Do you have COPD(eg bronchitis,emphysema)",Do you suffer from effects of stroke,0.268292683
+78,30,Do you have epilepsy?,Have you ever been diagnosed with cancer?,0.268292683
+128,30,Do you have chronic fatigue syndrome?,Have you ever been diagnosed with cancer?,0.268292683
+142,30,Have you ever been diagnosed with cancer?,Do you have chronic bronchitis?,0.268292683
+146,30,Have you ever been diagnosed with cancer?,Do you have arthritis or rheumatism?,0.268292683
+75,47,Do you have epilepsy?,Do you have a bowel disorder such as Crohn's Disease or colitis?,0.265625
+98,47,Do you have cancer,Do you have a bowel disorder such as Crohn's Disease or colitis?,0.265625
+122,47,Do you have a bowel disorder such as Crohn's Disease or colitis?,Do you have emphysema?,0.265625
+124,47,Do you have a bowel disorder such as Crohn's Disease or colitis?,Do you have asthma?,0.265625
+114,27,Do you suffer from effects of stroke,Do you have COPD?,0.25
+111,31,Do you suffer from effects of stroke,Have you ever been diagnosed with cancer?,0.243902439
+123,49,Do you have a bowel disorder such as Crohn's Disease or colitis?,Do you have COPD?,0.234375
+144,32,Have you ever been diagnosed with cancer?,Do you have COPD?,0.219512195
+51,33,"Do you have COPD(eg bronchitis,emphysema)",Have you ever been diagnosed with cancer?,0.195121951
