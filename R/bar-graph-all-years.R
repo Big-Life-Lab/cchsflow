@@ -1,9 +1,3 @@
-setwd("~/GitHub/cchsflow")
-library(cchsflow)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-
 variables <- read.csv("inst/extdata/variables.csv", header = TRUE)
 # variables$databaseStart[1]
 i <- 1

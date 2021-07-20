@@ -1,6 +1,3 @@
-library(stringdist)
-library(dplyr)
-setwd("~/GitHub/cchsflow")
 test_different <- read.csv("tests/testdata/test_different.csv", header = FALSE, fileEncoding="UTF-8-BOM")
 test_similar <- read.csv("tests/testdata/test_similar.csv", header = FALSE, fileEncoding="UTF-8-BOM")
 
@@ -17,7 +14,7 @@ loop_distance <- function(test_data)
       str2 <- test_data[j,1]
       nchar2 <- nchar(str2)
       if (nchar1 > 0 && nchar2 > 0) {
-        dist <- stringdist(str1, str2, method = "dl")
+        dist <- stringdist::stringdist(str1, str2, method = "dl")
         max_chars <- max(nchar1, nchar2)
         similarity <- 1 - (dist/max_chars)
         if (k == 1) {
