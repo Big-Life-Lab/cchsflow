@@ -1,3 +1,9 @@
+# cchsflow 1.8.3
+2021-08-20
+
+## Bug Fixes
+- Documentation corrections to `pct_time_fun()` and [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html).
+
 # cchsflow 1.8.2
 2021-06-23
 
