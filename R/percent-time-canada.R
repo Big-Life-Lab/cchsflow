@@ -18,7 +18,7 @@
 #'  for 0-9 years is assigned a value of 4.5 years, and someone who has been in
 #'  Canada for over 10 years is assigned a value of 15 years.
 #'
-#' @return Numeric value that is a fraction between 0 and 1 that represents
+#' @return Numeric value between 0 and 100 that represents
 #'  percentage of a respondent's time in Canada
 #'
 #' @examples

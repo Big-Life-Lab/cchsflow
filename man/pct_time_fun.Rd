@@ -17,7 +17,7 @@ datasets, this is a categorical variable with two categories (1 - 0-9 years;
 2 - 10+ years).}
 }
 \value{
-Numeric value that is a fraction between 0 and 1 that represents
+Numeric value between 0 and 100 that represents
  percentage of a respondent's time in Canada
 }
 \description{
