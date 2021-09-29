@@ -315,3 +315,18 @@ pack_years_fun <-
       )
     return(pack_years)
   }
+
+#' @title Age started smoking daily
+#' 
+#' @export
+SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
+  SMKG040_cont <-
+    if_else2((SMKG203_cont == tagged_na("a") & SMKG207_cont == tagged_na("a")),
+             tagged_na("a"),
+             if_else2((SMKG203_cont == tagged_na("b") &
+                         SMKG207_cont == tagged_na("b")), tagged_na("b"),
+                      if_else2(!is.na(SMKG203_cont), SMKG203_cont,
+                               if_else2(!is.na(SMKG207_cont), SMKG207_cont,
+                                        tagged_na("b")))))
+  return(SMKG040_cont)
+}
