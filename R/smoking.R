@@ -190,8 +190,8 @@ smoke_simple_fun <-
 #'  20 years and smoked half a pack of cigarettes until age 40 years smoked for
 #'  10 pack-years.
 #'
-#' @param SMKDSTY_A derived variable used in CCHS cycles 2001-2014 that
-#'  classifies an individual's smoking status.
+#' @param SMKDSTY_A variable used in CCHS cycles 2001-2014 that classifies an 
+#' individual's smoking status.
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
@@ -340,12 +340,15 @@ pack_years_fun <-
 #' @param SMKG207_cont age started smoking daily. Variable asked to former
 #'  daily smokers.
 #'  
+#' @return value for age started smoking daily for daily/former daily smokers in
+#' the SMKG040_cont
+#'  
 #' @examples  
-#' Using SMKG040_fun() to create age values across CCHS cycles
-#' SMKG040_fun() is specified in variable_details.csv under SMKG040_cont.
+#' # Using SMKG040_fun() to create age values across CCHS cycles
+#' # SMKG040_fun() is specified in variable_details.csv under SMKG040_cont.
 #' 
-#' To create a continuous harmonized variable for SMKG040, use rec_with_table() 
-#' for each CCHS cycle and specify SMKG040_cont.
+#' # To create a continuous harmonized variable for SMKG040, use rec_with_table() 
+#' # for each CCHS cycle and specify SMKG040_cont.
 #' 
 #' library(cchsflow)
 #'
@@ -389,22 +392,35 @@ SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
 #' @description This function creates a categorical derived variable
 #' (pack_years_cat) that categorizes smoking pack-years (pack_years_der).
 #' 
-#' @details The categories were based on the Cardiovascular Disease Population
-#' Risk Tool (Douglas Manuel et al. 2018). 
+#' @details pack-years is calculated by multiplying the number of cigarette 
+#' packs per day (20 cigarettes per pack) by the number of years.The categories 
+#' were based on the Cardiovascular Disease Population Risk Tool 
+#' (Douglas Manuel et al. 2018). 
 #' 
 #' pack_years_cat uses the derived variable pack_years_der. Pack_years_der uses
 #' age and various smoking variables that have been transformed by cchsflow (see
 #' documentation on pack_year_der). In order to categorize pack years across CCHS
 #' cycles, age and smoking variables must be transformed and harmonized.
 #' 
-#' @param pack_years_der Smoking pack-years
+#' @param pack_years_der derived variable that calculates smoking pack-years
+#'  See \code{\link{pack_years_fun}} for documentation on how variable
+#'  was derived.
+#'  
+#' @return value for pack year categories in the pack_years_cat variable
 #' 
 #' @examples  
-#' Using pack_years_fun_cat() to categorize pack year values across CCHS cycles
-#' pack_years_fun_cat() is specified in variable_details.csv.
-#' 
-#' To create a harmonized categorical variable for pack years, use rec_with_table() 
-#' for each CCHS cycle.
+#' # Using pack_years_fun_cat() to categorize pack year values across CCHS cycles
+#' # pack_years_fun_cat() is specified in variable_details.csv along with the 
+#' # CCHS variables and cycles included.
+#'
+#' # To transform pack_years_cat across cycles, use rec_with_table() for each
+#' # CCHS cycle and specify pack_years_cat.
+#' # Since pack_year_der is also also derived variable, you will have to specify 
+#' # the variables that are derived from it.
+#' # Since time_quit_smoking_der is also a derived variable in pack_year_der, 
+#' # you will have to specify the variables that are derived from it.
+#' # Then by using merge_rec_data(), you can combine pack_years_cat across
+#' # cycles
 #' 
 #' library(cchsflow)
 #'
