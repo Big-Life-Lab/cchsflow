@@ -90,8 +90,8 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #'   \item former daily smoker quit >5 years
 #'  }
 #'
-#' @param SMKDSTY derived variable that classifies an individual's smoking
-#'  status.
+#' @param SMKDSTY_cat5 derived variable that classifies an individual's smoking
+#'  status. This variable captures cycles 2001-2018.
 #'
 #' @param time_quit_smoking derived variable that calculates the approximate
 #'  time a former smoker has quit smoking. 
@@ -190,8 +190,8 @@ smoke_simple_fun <-
 #'  20 years and smoked half a pack of cigarettes until age 40 years smoked for
 #'  10 pack-years.
 #'
-#' @param SMKDSTY derived variable that classifies an individual's smoking
-#'  status.
+#' @param SMKDSTY_A derived variable used in CCHS cycles 2001-2014 that
+#'  classifies an individual's smoking status.
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
@@ -264,7 +264,7 @@ smoke_simple_fun <-
 #' tail(combined_pack_years)
 #' @export
 pack_years_fun <-
-  function(SMKDSTY, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
+  function(SMKDSTY_A, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
            SMKG207_cont, SMK_204, SMK_05B,
            SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
     # Age verification
