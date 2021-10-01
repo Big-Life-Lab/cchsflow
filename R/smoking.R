@@ -90,8 +90,8 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #'   \item former daily smoker quit >5 years
 #'  }
 #'
-#' @param SMKDSTY derived variable that classifies an individual's smoking
-#'  status.
+#' @param SMKDSTY_cat5 derived variable that classifies an individual's smoking
+#'  status. This variable captures cycles 2001-2018.
 #'
 #' @param time_quit_smoking derived variable that calculates the approximate
 #'  time a former smoker has quit smoking. 
@@ -136,27 +136,27 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #' tail(combined_smoke_simple)
 #' @export
 smoke_simple_fun <-
-  function(SMKDSTY, time_quit_smoking) {
+  function(SMKDSTY_cat5, time_quit_smoking) {
     
     # Nested function: current smoker status
-    derive_current_smoker <- function(SMKDSTY) {
+    derive_current_smoker <- function(SMKDSTY_cat5) {
       smoker <-
-        ifelse(SMKDSTY %in% c(1, 2, 3), 1,
-               ifelse(SMKDSTY %in% c(4, 5, 6), 0,
+        ifelse(SMKDSTY %in% c(1, 2), 1,
+               ifelse(SMKDSTY %in% c(3, 4, 5), 0,
                       ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
       return(smoker)
     }
-    smoker <- derive_current_smoker(SMKDSTY)
+    smoker <- derive_current_smoker(SMKDSTY_cat5)
     
     # Nested function: ever smoker status
-    derive_ever_smoker <- function(SMKDSTY) {
+    derive_ever_smoker <- function(SMKDSTY_cat5) {
       eversmoker <-
-        ifelse(SMKDSTY %in% c(1, 2, 3, 4, 5), 1,
-               ifelse(SMKDSTY == 6, 0,
+        ifelse(SMKDSTY %in% c(1, 2, 3, 4), 1,
+               ifelse(SMKDSTY == 5, 0,
                       ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
       return(eversmoker)
     }
-    eversmoker <- derive_ever_smoker(SMKDSTY)
+    eversmoker <- derive_ever_smoker(SMKDSTY_cat5)
     
     # smoke_simple 0 = non-smoker
     smoke_simple <- 
@@ -166,7 +166,7 @@ smoke_simple_fun <-
       # smoke_simple 2 = former daily smoker quit =<5 years or former occasional
       # smoker
           ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking <= 5 |
-                   SMKDSTY == 5, 2,
+                   SMKDSTY_cat5 == 4, 2,
       # smoke_simple 3 = former daily smoker quit > 5 years
             ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking > 5,
                    3,
@@ -190,8 +190,8 @@ smoke_simple_fun <-
 #'  20 years and smoked half a pack of cigarettes until age 40 years smoked for
 #'  10 pack-years.
 #'
-#' @param SMKDSTY derived variable that classifies an individual's smoking
-#'  status.
+#' @param SMKDSTY_A derived variable used in CCHS cycles 2001-2014 that
+#'  classifies an individual's smoking status.
 #'
 #' @param DHHGAGE_cont continuous age variable.
 #'
@@ -264,7 +264,7 @@ smoke_simple_fun <-
 #' tail(combined_pack_years)
 #' @export
 pack_years_fun <-
-  function(SMKDSTY, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
+  function(SMKDSTY_A, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
            SMKG207_cont, SMK_204, SMK_05B,
            SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
     # Age verification
