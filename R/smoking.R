@@ -136,27 +136,27 @@ time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C) {
 #' tail(combined_smoke_simple)
 #' @export
 smoke_simple_fun <-
-  function(SMKDSTY, time_quit_smoking) {
+  function(SMKDSTY_cat5, time_quit_smoking) {
     
     # Nested function: current smoker status
-    derive_current_smoker <- function(SMKDSTY) {
+    derive_current_smoker <- function(SMKDSTY_cat5) {
       smoker <-
-        ifelse(SMKDSTY %in% c(1, 2, 3), 1,
-               ifelse(SMKDSTY %in% c(4, 5, 6), 0,
+        ifelse(SMKDSTY %in% c(1, 2), 1,
+               ifelse(SMKDSTY %in% c(3, 4, 5), 0,
                       ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
       return(smoker)
     }
-    smoker <- derive_current_smoker(SMKDSTY)
+    smoker <- derive_current_smoker(SMKDSTY_cat5)
     
     # Nested function: ever smoker status
-    derive_ever_smoker <- function(SMKDSTY) {
+    derive_ever_smoker <- function(SMKDSTY_cat5) {
       eversmoker <-
-        ifelse(SMKDSTY %in% c(1, 2, 3, 4, 5), 1,
-               ifelse(SMKDSTY == 6, 0,
+        ifelse(SMKDSTY %in% c(1, 2, 3, 4), 1,
+               ifelse(SMKDSTY == 5, 0,
                       ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
       return(eversmoker)
     }
-    eversmoker <- derive_ever_smoker(SMKDSTY)
+    eversmoker <- derive_ever_smoker(SMKDSTY_cat5)
     
     # smoke_simple 0 = non-smoker
     smoke_simple <- 
@@ -166,7 +166,7 @@ smoke_simple_fun <-
       # smoke_simple 2 = former daily smoker quit =<5 years or former occasional
       # smoker
           ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking <= 5 |
-                   SMKDSTY == 5, 2,
+                   SMKDSTY_cat5 == 4, 2,
       # smoke_simple 3 = former daily smoker quit > 5 years
             ifelse(smoker == 0 & eversmoker == 1 & time_quit_smoking > 5,
                    3,
