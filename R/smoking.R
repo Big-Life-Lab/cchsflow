@@ -392,9 +392,49 @@ SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
 #' @details The categories were based on the Cardiovascular Disease Population
 #' Risk Tool (Douglas Manuel et al. 2018). 
 #' 
+#' pack_years_cat uses the derived variable pack_years_der. Pack_years_der uses
+#' age and various smoking variables that have been transformed by cchsflow (see
+#' documentation on pack_year_der). In order to categorize pack years across CCHS
+#' cycles, age and smoking variables must be transformed and harmonized.
+#' 
 #' @param pack_years_der Smoking pack-years
 #' 
+#' @examples  
+#' Using pack_years_fun_cat() to categorize pack year values across CCHS cycles
+#' pack_years_fun_cat() is specified in variable_details.csv.
+#' 
+#' To create a harmonized categorical variable for pack years, use rec_with_table() 
+#' for each CCHS cycle.
+#' 
+#' library(cchsflow)
+#'
+#' pack_years_cat_2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+#'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
+#'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der", "pack_years_cat"
+#'   )
+#' )
+#'
+#' head(pack_years_cat_2009_2010)
+#'
+#' pack_years_cat_2011_2012 <- rec_with_table(
+#'   cchs2011_2012_p,c(
+#'     "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+#'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
+#'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der", "pack_years_cat"
+#'   )
+#' )
+#'
+#' tail(pack_years_cat_2011_2012)
+#'
+#' combined_pack_years_cat <- suppressWarnings(merge_rec_data
+#' (pack_years_cat_2009_2010,pack_years_cat_2011_2012))
+#'
+#' head(combined_pack_years_cat)
+#' tail(combined_pack_years_cat)
 #' @export
+#' 
 pack_years_fun_cat <- function(pack_years_der){
   pack_years_cat <-
     if_else2(pack_years_der == 0, 1,
