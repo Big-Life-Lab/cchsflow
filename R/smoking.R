@@ -141,9 +141,9 @@ smoke_simple_fun <-
     # Nested function: current smoker status
     derive_current_smoker <- function(SMKDSTY_cat5) {
       smoker <-
-        ifelse(SMKDSTY %in% c(1, 2), 1,
-               ifelse(SMKDSTY %in% c(3, 4, 5), 0,
-                      ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
+        ifelse(SMKDSTY_cat5 %in% c(1, 2), 1,
+               ifelse(SMKDSTY_cat5 %in% c(3, 4, 5), 0,
+                      ifelse(SMKDSTY_cat5 == "NA(a)", "NA(a)", "NA(b)")))
       return(smoker)
     }
     smoker <- derive_current_smoker(SMKDSTY_cat5)
@@ -151,9 +151,9 @@ smoke_simple_fun <-
     # Nested function: ever smoker status
     derive_ever_smoker <- function(SMKDSTY_cat5) {
       eversmoker <-
-        ifelse(SMKDSTY %in% c(1, 2, 3, 4), 1,
-               ifelse(SMKDSTY == 5, 0,
-                      ifelse(SMKDSTY == "NA(a)", "NA(a)", "NA(b)")))
+        ifelse(SMKDSTY_cat5 %in% c(1, 2, 3, 4), 1,
+               ifelse(SMKDSTY_cat5 == 5, 0,
+                      ifelse(SMKDSTY_cat5 == "NA(a)", "NA(a)", "NA(b)")))
       return(eversmoker)
     }
     eversmoker <- derive_ever_smoker(SMKDSTY_cat5)
@@ -239,7 +239,7 @@ smoke_simple_fun <-
 #'
 #' pack_years2009_2010 <- rec_with_table(
 #'   cchs2009_2010_p, c(
-#'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+#'     "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
 #'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
 #'   )
@@ -249,7 +249,7 @@ smoke_simple_fun <-
 #'
 #' pack_years2011_2012 <- rec_with_table(
 #'   cchs2011_2012_p,c(
-#'     "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+#'     "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
 #'     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
 #'     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
 #'   )
@@ -277,34 +277,34 @@ pack_years_fun <-
     # PackYears for Daily Smoker
     pack_years <- 
       if_else2(
-        SMKDSTY == 1, pmax(((DHHGAGE_cont - SMKG203_cont) *
+        SMKDSTY_A == 1, pmax(((DHHGAGE_cont - SMKG203_cont) *
                               (SMK_204 / 20)), 0.0137),
         # PackYears for Occasional Smoker (former daily)
         if_else2(
-          SMKDSTY == 2, pmax(((DHHGAGE_cont - SMKG207_cont -
+          SMKDSTY_A == 2, pmax(((DHHGAGE_cont - SMKG207_cont -
                                  time_quit_smoking) * (SMK_208 / 20)), 0.0137) +
             (pmax((SMK_05B * SMK_05C / 30), 1) *time_quit_smoking),
           # PackYears for Occasional Smoker (never daily)
           if_else2(
-            SMKDSTY == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) *
+            SMKDSTY_A == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) *
               (DHHGAGE_cont - SMKG01C_cont),
             # PackYears for former daily smoker (non-smoker now)
             if_else2(
-              SMKDSTY == 4, pmax(((DHHGAGE_cont - SMKG207_cont -
+              SMKDSTY_A == 4, pmax(((DHHGAGE_cont - SMKG207_cont -
                                      time_quit_smoking) *
                                     (SMK_208 / 20)), 0.0137),
               # PackYears for former occasional smoker (non-smoker now) who
               # smoked at least 100 cigarettes lifetime
               if_else2(
-                SMKDSTY == 5 & SMK_01A == 1, 0.0137,
+                SMKDSTY_A == 5 & SMK_01A == 1, 0.0137,
                 # PackYears for former occasional smoker (non-smoker now) who 
                 # have not smoked at least 100 cigarettes lifetime
                 if_else2(
-                  SMKDSTY == 5 & SMK_01A == 2, 0.007,
+                  SMKDSTY_A == 5 & SMK_01A == 2, 0.007,
                   # Non-smoker
-                  if_else2(SMKDSTY == 6, 0,
+                  if_else2(SMKDSTY_A == 6, 0,
                            # Account for NA(a)
-                           if_else2(SMKDSTY == "NA(a)", tagged_na("a"),
+                           if_else2(SMKDSTY_A == "NA(a)", tagged_na("a"),
                                     tagged_na("b"))
                   )
                 )
@@ -382,4 +382,30 @@ SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
                                if_else2(!is.na(SMKG207_cont), SMKG207_cont,
                                         tagged_na("b")))))
   return(SMKG040_cont)
+}
+
+#' @title Categorical smoking pack-years
+#' 
+#' @description This function creates a categorical derived variable
+#' (pack_years_cat) that categorizes smoking pack-years (pack_years_der).
+#' 
+#' @details The categories were based on the Cardiovascular Disease Population
+#' Risk Tool (Douglas Manuel et al. 2018). 
+#' 
+#' @param pack_years_der Smoking pack-years
+#' 
+#' @export
+pack_years_fun_cat <- function(pack_years_der){
+  pack_years_cat <-
+    if_else2(pack_years_der == 0, 1,
+    if_else2(pack_years_der >0 & pack_years_der <= 0.01, 2,
+    if_else2(pack_years_der >0.01 & pack_years_der <= 3.0, 3,
+    if_else2(pack_years_der > 3.0 & pack_years_der <= 9.0, 4,
+    if_else2(pack_years_der > 9.0 & pack_years_der <= 16.2, 5,
+    if_else2(pack_years_der > 16.2 & pack_years_der <= 25.7, 6,
+    if_else2(pack_years_der > 25.7 & pack_years_der <= 40.0, 7,
+    if_else2(pack_years_der > 40.0, 8,
+    if_else2(pack_years_der == tagged_na("a"), "NA(a)", "NA(b)")))))))))
+  
+  return(pack_years_cat)
 }
