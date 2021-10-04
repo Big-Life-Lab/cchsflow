@@ -62,7 +62,7 @@ library(cchsflow)
 diet_score2009_2010 <- rec_with_table(
   cchs2009_2010_p, c(
     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-    "DHH_SEX", "diet_score_fun"
+    "DHH_SEX", "diet_score"
   )
 )
 
@@ -71,7 +71,7 @@ head(diet_score2009_2010)
 diet_score2011_2012 <- rec_with_table(
   cchs2011_2012_p,c(
     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-    "DHH_SEX", "diet_score_fun"
+    "DHH_SEX", "diet_score"
   )
 )
 

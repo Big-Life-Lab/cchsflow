@@ -53,7 +53,7 @@
 #' diet_score2009_2010 <- rec_with_table(
 #'   cchs2009_2010_p, c(
 #'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-#'     "DHH_SEX", "diet_score_fun"
+#'     "DHH_SEX", "diet_score"
 #'   )
 #' )
 #'
@@ -62,7 +62,7 @@
 #' diet_score2011_2012 <- rec_with_table(
 #'   cchs2011_2012_p,c(
 #'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-#'     "DHH_SEX", "diet_score_fun"
+#'     "DHH_SEX", "diet_score"
 #'   )
 #' )
 #'
@@ -118,3 +118,74 @@ diet_score_fun <-
    return(diet_score)
   }
 
+
+#' @title Categorized diet score
+#' 
+#' @description This function creates a categorical derived diet variable 
+#' (diet_score_cat3) that categorizes derived diet score (diet_score).
+#' 
+#' @details The diet score is based on consumption of fruit, salad, potatoes, 
+#' carrots, other vegetables and juice. 2 baseline points plus summation of 
+#' total points for diet attributes. Negative overall scores are recoded to 0, 
+#' resulting in a range from 0 to 10.The categories were based on the 
+#' Mortality Population Risk Tool (Douglas Manuel et al. 2016). 
+#' 
+#' diet_score_cat3 uses the derived variable diet_score. diet_score uses 
+#' sex, and fruit and vegetable variables that have been transformed by 
+#' cchsflow (see documentation on diet_score). In order to categorize diet 
+#' across CCHS cycles, sex, and fruit and vegetable variables must be 
+#' transformed and harmonized.
+#' 
+#' @param diet_score derived variable that calculates diet score.
+#' See \code{\link{diet_score_fun}} for documentation on how variable 
+#' was derived.
+#' 
+#' @return value for diet score categories using diet_score_cat4 variable
+#' 
+#' @examples
+#' # Using the 'diet_score_fun_cat' function to create the categorized 
+#' # derived diet variable across CCHS cycles.
+#' # diet_score_fun_cat() is specified in the variable_details.csv
+#' 
+#' # To transform diet_score_cat3, use rec_with_table() for each CCHS cycle 
+#' # and specify diet_score_fun_cat and the required base variables.
+#' # Using merge_rec_data(), you can combine diet_score_cat3 across cycles
+#' 
+#' library(cchsflow)
+#'
+#' diet_score_cat2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
+#'     "DHH_SEX", "diet_score", "diet_score_cat3"
+#'   )
+#' )
+#' 
+#' head(diet_score_cat2009_2010)
+#'
+#' diet_score_cat2011_2012 <- rec_with_table(
+#'   cchs2011_2012_p,c(
+#'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
+#'     "DHH_SEX", ""diet_score", "diet_score_cat3"
+#'   )
+#' )
+#'
+#' tail(diet_score_cat2011_2012)
+#' 
+#' combined_diet_score_cat <- suppressWarnings(merge_rec_data(
+#' diet_score_cat2009_2010, diet_score_cat2011_2012))
+#' 
+#' head(combined_diet_score_cat)
+#' tail(combined_diet_score_cat)
+#' @export
+#' 
+diet_score_fun_cat <-
+  function(diet_score){
+    # Poor diet
+    if_else2(diet_score < 2, 1,
+    # Fair diet 
+    if_else2(diet_score >=2 & diet_score < 8, 2,
+    # Adequate diet 
+    if_else2(diet_score >=8 & diet_score <= 10, 3,
+    # No response
+    if_else2(diet_score == tagged_na("a"), "NA(a)", "NA(b)"))))
+  }

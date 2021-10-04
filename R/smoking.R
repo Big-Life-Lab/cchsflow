@@ -465,5 +465,3 @@ pack_years_fun_cat <- function(pack_years_der){
   
   return(pack_years_cat)
 }
-
-devtools::document()
