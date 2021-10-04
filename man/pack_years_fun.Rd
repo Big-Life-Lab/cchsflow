@@ -19,8 +19,8 @@ pack_years_fun(
 )
 }
 \arguments{
-\item{SMKDSTY_A}{derived variable used in CCHS cycles 2001-2014 that
-classifies an individual's smoking status.}
+\item{SMKDSTY_A}{variable used in CCHS cycles 2001-2014 that classifies an 
+individual's smoking status.}
 
 \item{DHHGAGE_cont}{continuous age variable.}
 

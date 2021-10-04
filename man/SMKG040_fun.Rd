@@ -13,6 +13,10 @@ smokers.}
 \item{SMKG207_cont}{age started smoking daily. Variable asked to former
 daily smokers.}
 }
+\value{
+value for age started smoking daily for daily/former daily smokers in
+the SMKG040_cont
+}
 \description{
 This function creates a continuous derived variable 
 (SMKG040_fun) that calculates the approximate age that a daily or former 
@@ -34,11 +38,11 @@ survey cycles and onward.
 }
 \examples{
  
-Using SMKG040_fun() to create age values across CCHS cycles
-SMKG040_fun() is specified in variable_details.csv under SMKG040_cont.
+# Using SMKG040_fun() to create age values across CCHS cycles
+# SMKG040_fun() is specified in variable_details.csv under SMKG040_cont.
 
-To create a continuous harmonized variable for SMKG040, use rec_with_table() 
-for each CCHS cycle and specify SMKG040_cont.
+# To create a continuous harmonized variable for SMKG040, use rec_with_table() 
+# for each CCHS cycle and specify SMKG040_cont.
 
 library(cchsflow)
 
