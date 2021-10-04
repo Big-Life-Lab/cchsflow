@@ -213,7 +213,7 @@ adjusted_bmi_fun <-
 #'  See \code{\link{bmi_fun}} for documentation on how variable
 #'  was derived.
 #'  
-#' @return value for BMI categories in the HWTGBMI_der_cat4 variable
+#' @return value for BMI categories in the HWTGBMI_der_cat4 variable.
 #'  
 #' @examples  
 #' # Using bmi_fun_cat() to categorize BMI across CCHS cycles
@@ -222,7 +222,7 @@ adjusted_bmi_fun <-
 #' 
 #' # To transform HWTGBMI_der_cat4 across all cycles, use rec_with_table() for 
 #' # each CCHS cycle.
-#' # Since HWTGBMI_der is also also derived variable, you will have to specify 
+#' # Since HWTGBMI_der is also a derived variable, you will have to specify 
 #' # the variables that are derived from it.
 #' 
 #' library(cchsflow)

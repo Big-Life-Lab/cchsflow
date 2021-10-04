@@ -12,7 +12,7 @@ See \code{\link{pack_years_fun}} for documentation on how variable
 was derived.}
 }
 \value{
-value for pack year categories in the pack_years_cat variable
+value for pack year categories in the pack_years_cat variable.
 }
 \description{
 This function creates a categorical derived variable
@@ -42,7 +42,7 @@ cycles, age and smoking variables must be transformed and harmonized.
 # Since time_quit_smoking_der is also a derived variable in pack_year_der, 
 # you will have to specify the variables that are derived from it.
 # Then by using merge_rec_data(), you can combine pack_years_cat across
-# cycles
+# cycles.
 
 library(cchsflow)
 

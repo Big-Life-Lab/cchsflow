@@ -12,7 +12,7 @@ See \code{\link{bmi_fun}} for documentation on how variable
 was derived.}
 }
 \value{
-value for BMI categories in the HWTGBMI_der_cat4 variable
+value for BMI categories in the HWTGBMI_der_cat4 variable.
 }
 \description{
 This function creates a categorical derived variable
@@ -37,7 +37,7 @@ transformed and harmonized.
 
 # To transform HWTGBMI_der_cat4 across all cycles, use rec_with_table() for 
 # each CCHS cycle.
-# Since HWTGBMI_der is also also derived variable, you will have to specify 
+# Since HWTGBMI_der is also a derived variable, you will have to specify 
 # the variables that are derived from it.
 
 library(cchsflow)

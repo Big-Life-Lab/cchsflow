@@ -16,7 +16,8 @@
 #'   once/day (maximum -10 points)
 #'  }
 #'
-#' @details While diet score can be calculated for all survey respondents, in
+#' @details 
+#'  While diet score can be calculated for all survey respondents, in
 #'  the 2005 CCHS survey cycle, fruit and vegetable consumption was an optional
 #'  section in which certain provinces had opted in to be asked to respondents.
 #'  In this survey cycle, fruit and vegetable consumption was asked to
@@ -38,15 +39,15 @@
 #' 
 #' @param DHH_SEX sex; 1 = male, 2 = female
 #'
-#' @examples
-#' # Using the 'diet_score_fun' function to create the derived diet variable  
+#' @examples 
+#' # Using the diet_score_fun function to create the derived diet variable  
 #' # across CCHS cycles.
-#' # diet_score_fun() is specified in the variable_details.csv
+#' # diet_score_fun() is specified in the variable_details.csv.
 #'
 #' # To create a harmonized diet_score variable across CCHS cycles, use 
 #' # rec_with_table() for each CCHS cycle and specify diet_score_fun and the
 #' # required base variables.
-#' # Using merge_rec_data(), you can combine smoke_simple across cycles
+#' # Using merge_rec_data(), you can combine diet_score across cycles.
 #'
 #' library(cchsflow)
 #'
@@ -140,17 +141,19 @@ diet_score_fun <-
 #' See \code{\link{diet_score_fun}} for documentation on how variable 
 #' was derived.
 #' 
-#' @return value for diet score categories using diet_score_cat4 variable
+#' @return value for diet score categories using diet_score_cat4 variable.
 #' 
-#' @examples
-#' # Using the 'diet_score_fun_cat' function to create the categorized 
-#' # derived diet variable across CCHS cycles.
-#' # diet_score_fun_cat() is specified in the variable_details.csv
-#' 
-#' # To transform diet_score_cat3, use rec_with_table() for each CCHS cycle 
-#' # and specify diet_score_fun_cat and the required base variables.
-#' # Using merge_rec_data(), you can combine diet_score_cat3 across cycles
-#' 
+#' @examples 
+#' # Using the diet_score_fun_cat function to categorize the derived diet 
+#' # variable across CCHS cycles.
+#' # diet_score_fun_cat() is specified in the variable_details.csv.
+#'
+#' # To create a harmonized diet_score_cat3 variable across CCHS cycles, use 
+#' # rec_with_table() for each CCHS cycle.
+#' # Since diet_score is also a derived variable, you will have to specify 
+#' # the variables that are derived from it.
+#' # Using merge_rec_data(), you can combine diet_score_cat3 across cycles.
+#'
 #' library(cchsflow)
 #'
 #' diet_score_cat2009_2010 <- rec_with_table(
@@ -159,29 +162,29 @@ diet_score_fun <-
 #'     "DHH_SEX", "diet_score", "diet_score_cat3"
 #'   )
 #' )
-#' 
+#'
 #' head(diet_score_cat2009_2010)
 #'
 #' diet_score_cat2011_2012 <- rec_with_table(
 #'   cchs2011_2012_p,c(
 #'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-#'     "DHH_SEX", ""diet_score", "diet_score_cat3"
+#'     "DHH_SEX", "diet_score", "diet_score_cat3"
 #'   )
 #' )
 #'
 #' tail(diet_score_cat2011_2012)
-#' 
+#'
 #' combined_diet_score_cat <- suppressWarnings(merge_rec_data(
 #' diet_score_cat2009_2010, diet_score_cat2011_2012))
-#' 
+#'
 #' head(combined_diet_score_cat)
 #' tail(combined_diet_score_cat)
 #' @export
-#' 
+
 diet_score_fun_cat <-
   function(diet_score){
     # Poor diet
-    if_else2(diet_score < 2, 1,
+    if_else2(diet_score >=0 & diet_score < 2, 1,
     # Fair diet 
     if_else2(diet_score >=2 & diet_score < 8, 2,
     # Adequate diet 

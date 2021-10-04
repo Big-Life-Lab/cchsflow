@@ -406,7 +406,7 @@ SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
 #'  See \code{\link{pack_years_fun}} for documentation on how variable
 #'  was derived.
 #'  
-#' @return value for pack year categories in the pack_years_cat variable
+#' @return value for pack year categories in the pack_years_cat variable.
 #' 
 #' @examples  
 #' # Using pack_years_fun_cat() to categorize pack year values across CCHS cycles
@@ -420,7 +420,7 @@ SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
 #' # Since time_quit_smoking_der is also a derived variable in pack_year_der, 
 #' # you will have to specify the variables that are derived from it.
 #' # Then by using merge_rec_data(), you can combine pack_years_cat across
-#' # cycles
+#' # cycles.
 #' 
 #' library(cchsflow)
 #'
@@ -454,8 +454,8 @@ SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
 pack_years_fun_cat <- function(pack_years_der){
   pack_years_cat <-
     if_else2(pack_years_der == 0, 1,
-    if_else2(pack_years_der >0 & pack_years_der <= 0.01, 2,
-    if_else2(pack_years_der >0.01 & pack_years_der <= 3.0, 3,
+    if_else2(pack_years_der > 0 & pack_years_der <= 0.01, 2,
+    if_else2(pack_years_der > 0.01 & pack_years_der <= 3.0, 3,
     if_else2(pack_years_der > 3.0 & pack_years_der <= 9.0, 4,
     if_else2(pack_years_der > 9.0 & pack_years_der <= 16.2, 5,
     if_else2(pack_years_der > 16.2 & pack_years_der <= 25.7, 6,
