@@ -227,3 +227,258 @@ binge_drinker_fun <-
       # Respondents who didn't indicate they had alcohol in the last week
       "NA(a)")
   }
+
+#' @title Short term risks due to drinking
+#' 
+#' @description This function creates a categorical variable that
+#'  flags for increased short term health risks due to their drinking habits,
+#'  according to Canada's Low-Risk Alcohol Drinking Guideline.
+#'
+#' @details The classification of drinkers according to their short term health 
+#' risks comes from guidelines in Alcohol and Health in Canada: A Summary of 
+#' Evidence and Guidelines for Low-risk Drinking, and is based on the alcohol 
+#' consumption reported over the past week. Short-term or acute risks include 
+#' injury and overdose.
+#' 
+#' Categories are based on CCHS 2015-2016's variable (ALWDVSTR) where short 
+#' term health risk are increased when drinking more than 3 drinks (for women) 
+#' or 4 drinks (for men) on any single occasion.
+#' 
+#' See \url{https://osf.io/ykau5/} for more details on the guideline. 
+#' See \url{https://osf.io/ycxaq/} for more details on derivation of the 
+#' function on page 9.
+#' 
+#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
+#' 
+#' @param ALW_1 Drinks in the last week (1 - yes, 2 - no)
+#' 
+#' @param ALC_1 Drinks in the past year (1 - yes, 2 - no)
+#' 
+#' @param ALW_2A1 Number of drinks on Sunday
+#' 
+#' @param ALW_2A2 Number of drinks on Monday
+#' 
+#' @param ALW_2A3 Number of drinks on Tuesday
+#' 
+#' @param ALW_2A4 Number of drinks on Wednesday
+#' 
+#' @param ALW_2A5 Number of drinks on Thursday
+#' 
+#' @param ALW_2A6 Number of drinks on Friday
+#' 
+#' @param ALW_2A7 Number of drinks on Saturday
+#' 
+#' @param ALWDWKY Number of drinks consumed in the past week
+#' 
+#' @return Categorical variable (ALWDVSTR_der) with two categories:
+#' 
+#'  \enumerate{
+#'   \item 1 - Increased short term health risk
+#'   \item 2 - No increased short term health risk
+#'  }
+#' 
+#' @examples
+#'  
+#' # Using low_drink_short_fun() to create ALWDVSTR_der values across CCHS cycles
+#' # low_drink_short_fun() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
+#' 
+#' # To transform ALWDVSTR_der, use rec_with_table() for each CCHS cycle
+#' # and specify ALWDVSTR_der, along with the various alcohol and sex
+#' # variables. 
+#' # Using merge_rec_data(), you can combine ALWDVSTR_der across cycles.
+#' 
+#' library(cchsflow)
+#' short_low_drink2001 <- rec_with_table(
+#'   cchs2001_p, c(
+#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVSTR_der"
+#'   )
+#' )
+#' 
+#' head(short_low_drink2001)
+#' 
+#' short_low_drink2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVSTR_der"
+#'   )
+#' )
+#' 
+#' tail(short_low_drink2009_2010)
+#' 
+#' combined_short_low_drink <- bind_rows(short_low_drink2001, 
+#' short_low_drink2009_2010)
+#' 
+#' head(combined_short_low_drink)
+#' 
+#' tail(combined_short_low_drink)
+#' 
+#' # Using low_drink_short_fun() to generate ALWDVSTR_der with user-inputted
+#' # values.
+#' #
+#' # Let's say you are a male, you had drinks in the last week and in the last 
+#' # year. Let's say you had 5 drinks on Sunday, 1 drink on Monday, 6 drinks on 
+#' # Tuesday, 4 drinks on Wednesday, 4 drinks on Thursday, 8 drinks on Friday, 
+#' # and 2 drinks on Saturday with a total of 30 drinks in a week. 
+#' # Using low_drink_short_fun(), we can check if you would be classified as
+#' # having an increased short term health risk due to drinking.
+#' 
+#' short_term_drink <- low_drink_short_fun(DHH_SEX = 1, ALWDWKY = 30, ALC_1 = 1,
+#'  ALW_1 = 1, ALW_2A1 = 5, ALW_2A2 = 1, ALW_2A3 = 6, ALW_2A4 = 4, ALW_2A5 = 4, 
+#'  ALW_2A6 = 8, ALW_2A7 = 2)
+#'
+#' print(short_term_drink)
+#' @export
+#' 
+low_drink_short_fun <-
+  function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, 
+           ALW_2A5, ALW_2A6, ALW_2A7){
+    # Increased short term risk from due to drinking (1)
+    if_else2(DHH_SEX == 1 & (ALW_2A1 %in%(5:995) | ALW_2A2 %in%(5:995) | 
+                             ALW_2A3 %in%(5:995) | ALW_2A4 %in%(5:995) | 
+                             ALW_2A5 %in%(5:995) | ALW_2A6 %in%(5:995) |
+                             ALW_2A7 %in%(5:995) | ALWDWKY %in%(16:995)), 1,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(4:995) | ALW_2A2 %in%(4:995) | 
+                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) | 
+                             ALW_2A5 %in%(4:995) | ALW_2A6 %in%(4:995) |
+                             ALW_2A7 %in%(4:995) | ALWDWKY %in%(11:995)), 1,
+    # No increased short term health risks due to drinking (2)
+    # Includes those who did not drink in past 7 days or past 12 months
+    if_else2(ALC_1 == 2 |ALW_1 ==2, 2,
+    if_else2(DHH_SEX == 1 & (ALW_2A1 <= 4 & ALW_2A2 <= 4 & ALW_2A3 <= 4 &
+                             ALW_2A4 <= 4 & ALW_2A5 <= 4 & ALW_2A6 <= 4 &
+                             ALW_2A7 <= 4) & ALWDWKY <= 15, 2,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 <= 3 & ALW_2A2 <= 3 & ALW_2A3 <= 3 &
+                             ALW_2A4 <= 3 & ALW_2A5 <= 3 & ALW_2A6 <= 3 &
+                             ALW_2A7 <= 3) & ALWDWKY <= 10, 2,"NA(b)")))))
+    
+  }
+
+#' @title Long term risks due to drinking
+#' 
+#' @description This function creates a categorical variable that
+#'  flags for increased long term health risks due to their drinking habits,
+#'  according to Canada's Low-Risk Alcohol Drinking Guideline.
+#'
+#' @details The classification of drinkers according to their long term health 
+#' risks comes from guidelines in Alcohol and Health in Canada: A Summary of 
+#' Evidence and Guidelines for Low-risk Drinking, and is based on the alcohol 
+#' consumption reported over the past week. Short-term or acute risks include 
+#' injury and overdose.
+#' 
+#' Categories are based on CCHS 2015-2016's variable (ALWDVLTR) where long 
+#' term health risk are increased when drinking more than 10 drinks a week for 
+#' women, with no more than 2 drinks a day most days, and more than 15 drinks a 
+#' week for men, with no more than 3 drinks a day most days.
+#' 
+#' See \url{https://osf.io/ykau5/} for more details on the guideline. 
+#' See \url{https://osf.io/ycxaq/} for more details on the derivation of the 
+#' function on page 8.
+#' 
+#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
+#' 
+#' @param ALW_1 Drinks in the last week (1 - yes, 2 - no)
+#' 
+#' @param ALC_1 Drinks in the past year (1 - yes, 2 - no)
+#' 
+#' @param ALW_2A1 Number of drinks on Sunday
+#' 
+#' @param ALW_2A2 Number of drinks on Monday
+#' 
+#' @param ALW_2A3 Number of drinks on Tuesday
+#' 
+#' @param ALW_2A4 Number of drinks on Wednesday
+#' 
+#' @param ALW_2A5 Number of drinks on Thursday
+#' 
+#' @param ALW_2A6 Number of drinks on Friday
+#' 
+#' @param ALW_2A7 Number of drinks on Saturday
+#' 
+#' @param ALWDWKY Number of drinks consumed in the past week
+#' 
+#' @return Categorical variable (ALWDVLTR_der) with two categories:
+#' 
+#'  \enumerate{
+#'   \item 1 - Increased long term health risk
+#'   \item 2 - No increased long term health risk
+#'  }
+#' 
+#' @examples
+#'  
+#' # Using low_drink_long_fun() to create ALWDVLTR_der values across CCHS cycles
+#' # low_drink_long_fun() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
+#' 
+#' # To transform ALWDVLTR_der, use rec_with_table() for each CCHS cycle
+#' # and specify ALWDVLTR_der, along with the various alcohol and sex
+#' # variables. 
+#' # Using merge_rec_data(), you can combine ALWDVLTR_der across cycles.
+#' 
+#' library(cchsflow)
+#' long_low_drink2001 <- rec_with_table(
+#'   cchs2001_p, c(
+#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVLTR_der"
+#'   )
+#' )
+#' 
+#' head(long_low_drink2001)
+#' 
+#' long_low_drink2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVLTR_der"
+#'   )
+#' )
+#' 
+#' tail(long_low_drink2009_2010)
+#' 
+#' combined_long_low_drink <- bind_rows(long_low_drink2001, 
+#' long_low_drink2009_2010)
+#' 
+#' head(combined_long_low_drink)
+#' 
+#' tail(combined_long_low_drink)
+#' 
+#' # Using low_drink_long_fun() to generate ALWDVLTR_der with user-inputted
+#' # values.
+#' #
+#' # Let's say you are a male, you had drinks in the last week and in the last 
+#' # year. Let's say you had 5 drinks on Sunday, 1 drink on Monday, 6 drinks on 
+#' # Tuesday, 4 drinks on Wednesday, 4 drinks on Thursday, 8 drinks on Friday, 
+#' # and 2 drinks on Saturday with a total of 30 drinks in a week. 
+#' # Using low_drink_long_fun(), we can check if you would be classified as
+#' # having an increased long term health risk due to drinking.
+#' 
+#' long_term_drink <- low_drink_long_fun(DHH_SEX = 1, ALWDWKY = 30, ALC_1 = 1,
+#'  ALW_1 = 1, ALW_2A1 = 5, ALW_2A2 = 1, ALW_2A3 = 6, ALW_2A4 = 4, ALW_2A5 = 4, 
+#'  ALW_2A6 = 8, ALW_2A7 = 2)
+#'
+#' print(long_term_drink)
+#' @export
+#' 
+low_drink_long_fun <-
+  function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, 
+           ALW_2A5, ALW_2A6, ALW_2A7){
+    # Increased long term risk from due to drinking (1)
+    if_else2(DHH_SEX == 1 & (ALW_2A1 %in%(4:995) | ALW_2A2 %in%(4:995) | 
+                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) | 
+                             ALW_2A5 %in%(4:995) | ALW_2A6 %in%(4:995) |
+                             ALW_2A7 %in%(4:995) | ALWDWKY %in%(16:995)), 1,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(3:995) | ALW_2A2 %in%(3:995) | 
+                             ALW_2A3 %in%(3:995) | ALW_2A4 %in%(3:995) | 
+                             ALW_2A5 %in%(3:995) | ALW_2A6 %in%(3:995) |
+                             ALW_2A7 %in%(3:995) | ALWDWKY %in%(11:995)), 1,
+    # No increased long term health risks due to drinking (2)
+    # Includes those who did not drink in past 7 days or past 12 months
+    if_else2(ALC_1 == 2 |ALW_1 ==2, 2,
+    if_else2(DHH_SEX == 1 & (ALW_2A1 <= 3 & ALW_2A2 <= 3 & ALW_2A3 <= 3 &
+                             ALW_2A4 <= 3 & ALW_2A5 <= 3 & ALW_2A6 <= 3 &
+                             ALW_2A7 <= 3) & ALWDWKY <= 15, 2,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 <= 2 & ALW_2A2 <= 2 & ALW_2A3 <= 2 &
+                             ALW_2A4 <= 2 & ALW_2A5 <= 2 & ALW_2A6 <= 2 &
+                             ALW_2A7 <= 2) & ALWDWKY <= 10, 2,"NA(b)")))))
+    
+  }
