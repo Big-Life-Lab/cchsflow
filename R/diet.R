@@ -141,7 +141,7 @@ diet_score_fun <-
 #' See \code{\link{diet_score_fun}} for documentation on how variable 
 #' was derived.
 #' 
-#' @return value for diet score categories using diet_score_cat4 variable.
+#' @return value for diet score categories using diet_score_cat3 variable.
 #' 
 #' @examples 
 #' # Using the diet_score_fun_cat function to categorize the derived diet 

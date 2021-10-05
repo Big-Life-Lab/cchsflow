@@ -12,7 +12,7 @@ See \code{\link{diet_score_fun}} for documentation on how variable
 was derived.}
 }
 \value{
-value for diet score categories using diet_score_cat4 variable.
+value for diet score categories using diet_score_cat3 variable.
 }
 \description{
 This function creates a categorical derived diet variable 
