@@ -1,3 +1,105 @@
+# cchsflow 2.0.0
+2021-10-06
+
+## Variables
+cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html) and [variable](https://big-life-lab.github.io/cchsflow/articles/variables_sheet.html).
+
+
+- <font color = blue> **Updated**</font> **ALC_1**: Past year, have you drank alcohol
+- <font color = blue> **Updated**</font> **ALCDTTM**: Type of drinker (12 months)
+- <font color = blue> **Updated**</font> **ALW_1**: Past week, had any alcohol
+- <font color = blue> **Updated**</font> **ALW_2A1**: Number of drinks on Sunday
+- <font color = blue> **Updated**</font> **ALW_2A2**: Number of drinks on Monday
+- <font color = blue> **Updated**</font> **ALW_2A3**: Number of drinks on Tuesday
+- <font color = blue> **Updated**</font> **ALW_2A4**: Number of drinks on Wednesday
+- <font color = blue> **Updated**</font> **ALW_2A5**: Number of drinks on Thursday
+- <font color = blue> **Updated**</font> **ALW_2A6**: Number of drinks on Friday
+- <font color = blue> **Updated**</font> **ALW_2A7**: Number of drinks on Saturday
+- <font color = blue> **Updated**</font> **ALWDDLY**: Average daily alcohol consumption
+- <font color = blue> **Updated**</font> **ALWDWKY**: Weekly consumption of alcohol
+- <font color = blue> **Updated**</font> **CCC_031**: Do you have asthma?
+- <font color = blue> **Updated**</font> **CCC_041**: Do you have Fibromyalgia?
+- <font color = blue> **Updated**</font> **CCC_051**: Do you have arthritis or rheumatism?
+- <font color = blue> **Updated**</font> **CCC_061**: Do you have back problems?
+- <font color = blue> **Updated**</font> **CCC_071**: Do you have high blood pressure?
+- <font color = blue> **Updated**</font> **CCC_073**: In the past month have you taken any medicine for high blood pressure?
+- <font color = blue> **Updated**</font> **CCC_081**: Do you have migraine headaches?
+- <font color = blue> **Updated**</font> **CCC_091**: Do you have COPD (eg bronchitis, emphysema)?
+- <font color = blue> **Updated**</font> **CCC_101**: Do you have diabetes?
+- <font color = blue> **Updated**</font> **CCC_121**: Do you have heart disease?
+- <font color = blue> **Updated**</font> **CCC_131**: Do you have cancer?
+- <font color = blue> **Updated**</font> **CCC_151**: Do you suffer from effects of stroke?
+- <font color = blue> **Updated**</font> **CCC_280**: Do you have a mood disorder?
+- <font color = blue> **Updated**</font> **CCC_290**: Do you have an anxiety disorder?
+- <font color = blue> **Updated**</font> **CCC_31A**: Have you ever been diagnosed with cancer?
+- <font color = blue> **Updated**</font> **DHH_OWN**: Dwelling - owned by a member of hsld
+- <font color = blue> **Updated**</font> **DHH_SEX**: Sex
+- <font color = blue> **Updated**</font> **DHHGAGE_5**: Age (20-year age groups)
+- <font color = blue> **Updated**</font> **DHHGAGE_B**: Age
+- <font color = blue> **Updated**</font> **DHHGAGE_C**: Categorical age
+- <font color = blue> **Updated**</font> **DHHGAGE_cont**: Converted categorical age
+- <font color = blue> **Updated**</font> **DHHGAGE_D**: Age (10-year age groups)
+- <font color = blue> **Updated**</font> **DHHGHSZ**: Household size
+- <font color = blue> **Updated**</font> **DHHGMS**: Marital status
+- <font color = blue> **Updated**</font> **diet_score**: Diet score (0 to 10) based on daily consumption of fruit, vegetables and fruit juice
+- <font color = blue> **Updated**</font> **FVCDCAR**: Daily consumption - carrots
+- <font color = blue> **Updated**</font> **FVCDFRU**: Daily consumption - fruit
+- <font color = blue> **Updated**</font> **FVCDJUI**: Daily consumption - fruit juice
+- <font color = blue> **Updated**</font> **FVCDPOT**: Daily consumption - potatoes
+- <font color = blue> **Updated**</font> **FVCDSAL**: Daily consumption - green salad
+- <font color = blue> **Updated**</font> **FVCDTOT**: Daily consumptoin - total fruits and veg.
+- <font color = blue> **Updated**</font> **FVCDVEG**: Daily consumption other vegetables
+- <font color = blue> **Updated**</font> **GEOGPRV**: Province of residence of respondent
+- <font color = blue> **Updated**</font> **HUIDHSI**: Categorical Health Utility Index (HUI3)
+- <font color = blue> **Updated**</font> **HWTGBMI**: BMI
+- <font color = blue> **Updated**</font> **HWTGBMI_der**: Derived Body Mass Index
+- <font color = blue> **Updated**</font> **HWTGHTM**: Height (metres)
+- <font color = blue> **Updated**</font> **HWTGWTK**: Weight - kilograms
+- <font color = blue> **Updated**</font> **INCDRCA**: Household income distribution
+- <font color = blue> **Updated**</font> **INCDRPR**: Hhld inc. distribution-prov. level
+- <font color = blue> **Updated**</font> **INCDRRS**: Hhld inc. distribution- hr level
+- <font color = blue> **Updated**</font> **INCGHH_C**: Total household income from all sources
+- <font color = blue> **Updated**</font> **INCGHH_cont**: Total household income from all sources - continuous
+- <font color = blue> **Updated**</font> **pct_time_der**: Percentage of time in Canada
+- <font color = blue> **Updated**</font> **SDC_5A_1**: Knowledge of official languages
+- <font color = blue> **Updated**</font> **SDCDFOLS**: First official language spoken
+- <font color = blue> **Updated**</font> **SDCFIMM**: Immigrant Status
+- <font color = blue> **Updated**</font> **SDCGCBG**: Country of birth
+- <font color = blue> **Updated**</font> **SDCGCGT**: Cultural or racial origin
+- <font color = blue> **Updated**</font> **SDCGLHM**: Language(s) spoken at home
+- <font color = blue> **Updated**</font> **SDCGRES**: Length/time in Canada since immigration
+- <font color = blue> **Updated**</font> **SMK_01A**: In lifetime, smoked 100 or more cigarettes
+- <font color = blue> **Updated**</font> **SMK_05B**: # of cigarettes smoked daily - occasional smoker
+- <font color = blue> **Updated**</font> **SMK_05C**: In the past month, on how many days have you smoked 1 or more cigarettes?
+- <font color = blue> **Updated**</font> **SMK_05D**: Ever smoked cigarettes daily - occasional smoker
+- <font color = blue> **Updated**</font> **SMK_06A_B**: When did you stop smoking daily - occasional
+- <font color = blue> **Updated**</font> **SMK_06A_cont**: When did you stop smoking daily - occasional
+- <font color = blue> **Updated**</font> **SMK_09A_B**: When did you stop smoking daily - former daily
+- <font color = blue> **Updated**</font> **SMK_09A_cont**: When did you stop smoking daily - former daily
+- <font color = blue> **Updated**</font> **SMK_204**: # of cigarettes smoked daily - daily smoker
+- <font color = blue> **Updated**</font> **SMKDSTY_cat3**: Type of smoker: current, former, never
+- <font color = blue> **Updated**</font> **SMKG01C_B**: Age smoked first cigarette
+- <font color = blue> **Updated**</font> **SMKG01C_cont**: Age smoked first cigarette
+- <font color = blue> **Updated**</font> **SMKG09C**: Years since stopped smoking daily - former daily
+- <font color = blue> **Updated**</font> **smoke_simple**: Simple smoking status
+- <font color = blue> **Updated**</font> **WTS_M**: Weights
+
+- <font color = green> **New**</font> **ALWDVSTR_der**: Derived variable for short term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **ALWDVLTR_der**: Derived variable for long term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **diet_score_cat3**: Derived variable for categorical diet score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **HUIDHSI_cat10**: Categorical Health Utility Index into 10 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HUIDHSI_cat20**: Categorical Health Utility Index into 20 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HUIDHSI_cat50**: Categorical Health Utility Index into 50 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HWTGBMI_der_cat4**: Derived variable for categorical body mass index into 4 categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **HWTGCOR**: Adjusted BMI. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **HWTGCOR_der**: Derived variable for adjusted BMI. Used for all CCHS cycles.
+- <font color = green> **New**</font> **pct_time_der_cat10**: Categorical percentage of time in Canada. Used for all CCHS cycles.
+- <font color = green> **New**</font> **SMKDSTY_B**: Smoker status into 5 categories. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **SMKDSTY_cat5**: Smoker status into 5 categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **SMKG040**: Age started to smoke daily - daily/former daily smoker. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **SMKG040_cont**: Derived variable for age started to smoke daily - daily/former daily smoker. Used for all CCHS cycles.
+
+
 # cchsflow 1.8.3
 2021-08-20
 
