@@ -1,5 +1,5 @@
 # cchsflow 2.0.0
-2021-10-06
+2021-10-13
 
 ## Variables
 cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html) and [variable](https://big-life-lab.github.io/cchsflow/articles/variables_sheet.html).
@@ -16,6 +16,7 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = green> **New**</font> **HWTGCOR_der**: Derived variable for adjusted BMI. Used for all CCHS cycles.
 - <font color = green> **New**</font> **immigration_der**: Derived variable for immigration categories. Used for all CCHS cycles.
 - <font color = green> **New**</font> **low_drink_score**: Derived variable for low risk drinking score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **low_drink_score1**: Derived variable for low risk drinking score that includes never drank and former drinker categories. Used for CCHS 2001-2008 and 2015-2018.
 - <font color = green> **New**</font> **pct_time_der_cat10**: Categorical percentage of time in Canada. Used for all CCHS cycles.
 - <font color = green> **New**</font> **SMKDSTY_B**: Smoker status into 5 categories. Used for CCHS 2015-2018.
 - <font color = green> **New**</font> **SMKDSTY_cat5**: Smoker status into 5 categories. Used for all CCHS cycles.
