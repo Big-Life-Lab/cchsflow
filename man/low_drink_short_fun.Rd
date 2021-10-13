@@ -44,7 +44,7 @@ low_drink_short_fun(
 \value{
 Categorical variable (ALWDVSTR_der) with two categories:
 
- \enumerate{
+ \itemize{
   \item 1 - Increased short term health risk
   \item 2 - No increased short term health risk
  }

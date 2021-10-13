@@ -4,6 +4,25 @@
 ## Variables
 cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html) and [variable](https://big-life-lab.github.io/cchsflow/articles/variables_sheet.html).
 
+- <font color = green> **New**</font> **ALC_005**: In lifetime, ever drank alcohol? Used for CCHS 2001-2008 and 2015-2018.
+- <font color = green> **New**</font> **ALWDVSTR_der**: Derived variable for short term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **ALWDVLTR_der**: Derived variable for long term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **diet_score_cat3**: Derived variable for categorical diet score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **HUIDHSI_cat10**: Categorical Health Utility Index into 10 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HUIDHSI_cat20**: Categorical Health Utility Index into 20 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HUIDHSI_cat50**: Categorical Health Utility Index into 50 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HWTGBMI_der_cat4**: Derived variable for categorical body mass index into 4 categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **HWTGCOR**: Adjusted BMI. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **HWTGCOR_der**: Derived variable for adjusted BMI. Used for all CCHS cycles.
+- <font color = green> **New**</font> **immigration_der**: Derived variable for immigration categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **low_drink_score**: Derived variable for low risk drinking score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **pct_time_der_cat10**: Categorical percentage of time in Canada. Used for all CCHS cycles.
+- <font color = green> **New**</font> **SMKDSTY_B**: Smoker status into 5 categories. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **SMKDSTY_cat5**: Smoker status into 5 categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **SMKG040**: Age started to smoke daily - daily/former daily smoker. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **SMKG040_cont**: Derived variable for age started to smoke daily - daily/former daily smoker. Used for all CCHS cycles.
+- <font color = green> **New**</font> **CCC_075**: Do you have high blood cholesterol or lipids? Used for CCHS 2015-2018.
+
 
 - <font color = blue> **Updated**</font> **ALC_1**: Past year, have you drank alcohol
 - <font color = blue> **Updated**</font> **ALCDTTM**: Type of drinker (12 months)
@@ -83,22 +102,6 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = blue> **Updated**</font> **SMKG09C**: Years since stopped smoking daily - former daily
 - <font color = blue> **Updated**</font> **smoke_simple**: Simple smoking status
 - <font color = blue> **Updated**</font> **WTS_M**: Weights
-
-- <font color = green> **New**</font> **ALWDVSTR_der**: Derived variable for short term risks due to drinking. Used for all CCHS cycles.
-- <font color = green> **New**</font> **ALWDVLTR_der**: Derived variable for long term risks due to drinking. Used for all CCHS cycles.
-- <font color = green> **New**</font> **diet_score_cat3**: Derived variable for categorical diet score. Used for all CCHS cycles.
-- <font color = green> **New**</font> **HUIDHSI_cat10**: Categorical Health Utility Index into 10 categories. Used for CCHS 2001-2016.
-- <font color = green> **New**</font> **HUIDHSI_cat20**: Categorical Health Utility Index into 20 categories. Used for CCHS 2001-2016.
-- <font color = green> **New**</font> **HUIDHSI_cat50**: Categorical Health Utility Index into 50 categories. Used for CCHS 2001-2016.
-- <font color = green> **New**</font> **HWTGBMI_der_cat4**: Derived variable for categorical body mass index into 4 categories. Used for all CCHS cycles.
-- <font color = green> **New**</font> **HWTGCOR**: Adjusted BMI. Used for CCHS 2015-2018.
-- <font color = green> **New**</font> **HWTGCOR_der**: Derived variable for adjusted BMI. Used for all CCHS cycles.
-- <font color = green> **New**</font> **pct_time_der_cat10**: Categorical percentage of time in Canada. Used for all CCHS cycles.
-- <font color = green> **New**</font> **SMKDSTY_B**: Smoker status into 5 categories. Used for CCHS 2015-2018.
-- <font color = green> **New**</font> **SMKDSTY_cat5**: Smoker status into 5 categories. Used for all CCHS cycles.
-- <font color = green> **New**</font> **SMKG040**: Age started to smoke daily - daily/former daily smoker. Used for CCHS 2015-2018.
-- <font color = green> **New**</font> **SMKG040_cont**: Derived variable for age started to smoke daily - daily/former daily smoker. Used for all CCHS cycles.
-
 
 # cchsflow 1.8.3
 2021-08-20

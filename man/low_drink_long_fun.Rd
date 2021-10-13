@@ -44,7 +44,7 @@ low_drink_long_fun(
 \value{
 Categorical variable (ALWDVLTR_der) with two categories:
 
- \enumerate{
+ \itemize{
   \item 1 - Increased long term health risk
   \item 2 - No increased long term health risk
  }
