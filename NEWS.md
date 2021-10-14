@@ -7,7 +7,9 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = green> **New**</font> **ALC_005**: In lifetime, ever drank alcohol? Used for CCHS 2001-2008 and 2015-2018.
 - <font color = green> **New**</font> **ALWDVSTR_der**: Derived variable for short term risks due to drinking. Used for all CCHS cycles.
 - <font color = green> **New**</font> **ALWDVLTR_der**: Derived variable for long term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **DEPDVSEV**: Depression scale - severity of depression. Used for CCHS 2015-2018.
 - <font color = green> **New**</font> **diet_score_cat3**: Derived variable for categorical diet score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **EDUDR03**: Derived variable for highest level/education - 3 categories. Used for all cycles.
 - <font color = green> **New**</font> **HUIDHSI_cat10**: Categorical Health Utility Index into 10 categories. Used for CCHS 2001-2016.
 - <font color = green> **New**</font> **HUIDHSI_cat20**: Categorical Health Utility Index into 20 categories. Used for CCHS 2001-2016.
 - <font color = green> **New**</font> **HUIDHSI_cat50**: Categorical Health Utility Index into 50 categories. Used for CCHS 2001-2016.
@@ -24,7 +26,7 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = green> **New**</font> **SMKG040_cont**: Derived variable for age started to smoke daily - daily/former daily smoker. Used for all CCHS cycles.
 - <font color = green> **New**</font> **CCC_075**: Do you have high blood cholesterol or lipids? Used for CCHS 2015-2018.
 
-
+- <font color = blue> **Updated**</font> **ADM_RNO**: Sequential record number
 - <font color = blue> **Updated**</font> **ALC_1**: Past year, have you drank alcohol
 - <font color = blue> **Updated**</font> **ALCDTTM**: Type of drinker (12 months)
 - <font color = blue> **Updated**</font> **ALW_1**: Past week, had any alcohol
@@ -37,6 +39,7 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = blue> **Updated**</font> **ALW_2A7**: Number of drinks on Saturday
 - <font color = blue> **Updated**</font> **ALWDDLY**: Average daily alcohol consumption
 - <font color = blue> **Updated**</font> **ALWDWKY**: Weekly consumption of alcohol
+- <font color = blue> **Updated**</font> **binge_drinker**: Binge drinker
 - <font color = blue> **Updated**</font> **CCC_031**: Do you have asthma?
 - <font color = blue> **Updated**</font> **CCC_041**: Do you have Fibromyalgia?
 - <font color = blue> **Updated**</font> **CCC_051**: Do you have arthritis or rheumatism?
@@ -51,7 +54,8 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = blue> **Updated**</font> **CCC_151**: Do you suffer from effects of stroke?
 - <font color = blue> **Updated**</font> **CCC_280**: Do you have a mood disorder?
 - <font color = blue> **Updated**</font> **CCC_290**: Do you have an anxiety disorder?
-- <font color = blue> **Updated**</font> **CCC_31A**: Have you ever been diagnosed with cancer?
+- <font color = blue> **Updated**</font> **CCC_31A**: Have you ever been diagnosed with cancer
+- <font color = blue> **Updated**</font> **COPD_Emph_der**: COPD/Emphysema
 - <font color = blue> **Updated**</font> **DHH_OWN**: Dwelling - owned by a member of hsld
 - <font color = blue> **Updated**</font> **DHH_SEX**: Sex
 - <font color = blue> **Updated**</font> **DHHGAGE_5**: Age (20-year age groups)
@@ -61,7 +65,13 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = blue> **Updated**</font> **DHHGAGE_D**: Age (10-year age groups)
 - <font color = blue> **Updated**</font> **DHHGHSZ**: Household size
 - <font color = blue> **Updated**</font> **DHHGMS**: Marital status
+- <font color = blue> **Updated**</font> **DIS_10G**: During the past month, about how often did you feel sad or depressed?
+- <font color = blue> **Updated**</font> **DIS_10H**: During the past month, about how often did you feel so depressed that nothing could cheer you up?
 - <font color = blue> **Updated**</font> **diet_score**: Diet score (0 to 10) based on daily consumption of fruit, vegetables and fruit juice
+- <font color = blue> **Updated**</font> **FLU_160**: Have you ever had a flu shot?
+- <font color = blue> **Updated**</font> **FLU_162**: When did you have your last flu shot?
+- <font color = blue> **Updated**</font> **food_insecurity_der**: Derived food insecurity
+- <font color = blue> **Updated**</font> **FSCDHFS2**: Household food security status
 - <font color = blue> **Updated**</font> **FVCDCAR**: Daily consumption - carrots
 - <font color = blue> **Updated**</font> **FVCDFRU**: Daily consumption - fruit
 - <font color = blue> **Updated**</font> **FVCDJUI**: Daily consumption - fruit juice
@@ -69,17 +79,36 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = blue> **Updated**</font> **FVCDSAL**: Daily consumption - green salad
 - <font color = blue> **Updated**</font> **FVCDTOT**: Daily consumptoin - total fruits and veg.
 - <font color = blue> **Updated**</font> **FVCDVEG**: Daily consumption other vegetables
+- <font color = blue> **Updated**</font> **GEN_01**: Self-perceived health
+- <font color = blue> **Updated**</font> **GEN_02A2**: Satisfaction with life in general
+- <font color = blue> **Updated**</font> **GEN_02B**: Self-perceived mental health
+- <font color = blue> **Updated**</font> **GEN_07**: Self-perceived life stress
+- <font color = blue> **Updated**</font> **GEN_09**: Self-perceived work stress
+- <font color = blue> **Updated**</font> **GEN_10**: Sense of belonging in the community
 - <font color = blue> **Updated**</font> **GEOGPRV**: Province of residence of respondent
+- <font color = blue> **Updated**</font> **HCU_1AA**: Do you have a regular medical doctor?
+- <font color = blue> **Updated**</font> **HUIDCOG**: HUI Cognition
+- <font color = blue> **Updated**</font> **HUIDEMO**: HUI Emotion
+- <font color = blue> **Updated**</font> **HUIDHSI**: Overall HUI
+- <font color = blue> **Updated**</font> **HUIGDEX**: HUI Dexterity
+- <font color = blue> **Updated**</font> **HUIGHER**: HUI Hearing
+- <font color = blue> **Updated**</font> **HUIGMOB**: HUI Mobility
+- <font color = blue> **Updated**</font> **HUIGSPE**: HUI Speech
+- <font color = blue> **Updated**</font> **HUIGVIS**: HUI Vision
+- <font color = blue> **Updated**</font> **HUPDPAD**: HUI Pain
 - <font color = blue> **Updated**</font> **HUIDHSI**: Categorical Health Utility Index (HUI3)
 - <font color = blue> **Updated**</font> **HWTGBMI**: BMI
 - <font color = blue> **Updated**</font> **HWTGBMI_der**: Derived Body Mass Index
 - <font color = blue> **Updated**</font> **HWTGHTM**: Height (metres)
 - <font color = blue> **Updated**</font> **HWTGWTK**: Weight - kilograms
+- <font color = blue> **Updated**</font> **id_year**: Unique ID
 - <font color = blue> **Updated**</font> **INCDRCA**: Household income distribution
 - <font color = blue> **Updated**</font> **INCDRPR**: Hhld inc. distribution-prov. level
 - <font color = blue> **Updated**</font> **INCDRRS**: Hhld inc. distribution- hr level
 - <font color = blue> **Updated**</font> **INCGHH_C**: Total household income from all sources
 - <font color = blue> **Updated**</font> **INCGHH_cont**: Total household income from all sources - continuous
+- <font color = blue> **Updated**</font> **LBFA_31A_a**: Occupation Group
+- <font color = blue> **Updated**</font> **LBFA_31A_b**: Occupation Group
 - <font color = blue> **Updated**</font> **pct_time_der**: Percentage of time in Canada
 - <font color = blue> **Updated**</font> **SDC_5A_1**: Knowledge of official languages
 - <font color = blue> **Updated**</font> **SDCDFOLS**: First official language spoken
@@ -88,6 +117,11 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = blue> **Updated**</font> **SDCGCGT**: Cultural or racial origin
 - <font color = blue> **Updated**</font> **SDCGLHM**: Language(s) spoken at home
 - <font color = blue> **Updated**</font> **SDCGRES**: Length/time in Canada since immigration
+- <font color = blue> **Updated**</font> **SLP_02**: Freq. - trouble sleeping
+- <font color = blue> **Updated**</font> **SLP_03**: Freq. - find sleep refreshing
+- <font color = blue> **Updated**</font> **SLP_04**: Freq. - difficult to stay awake
+- <font color = blue> **Updated**</font> **SLPG01**: No./hours spent sleeping each night
+- <font color = blue> **Updated**</font> **SLPG01_cont**: No./hours spent sleeping each night
 - <font color = blue> **Updated**</font> **SMK_01A**: In lifetime, smoked 100 or more cigarettes
 - <font color = blue> **Updated**</font> **SMK_05B**: # of cigarettes smoked daily - occasional smoker
 - <font color = blue> **Updated**</font> **SMK_05C**: In the past month, on how many days have you smoked 1 or more cigarettes?
@@ -102,6 +136,7 @@ cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable
 - <font color = blue> **Updated**</font> **SMKG01C_cont**: Age smoked first cigarette
 - <font color = blue> **Updated**</font> **SMKG09C**: Years since stopped smoking daily - former daily
 - <font color = blue> **Updated**</font> **smoke_simple**: Simple smoking status
+- <font color = blue> **Updated**</font> **time_quit_smoking**: Time since quit smoking
 - <font color = blue> **Updated**</font> **WTS_M**: Weights
 
 # cchsflow 1.8.3
