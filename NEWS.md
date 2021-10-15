@@ -1,6 +1,10 @@
 # cchsflow 2.0.0
 2021-10-15
 
+## Features
+- Added cchs2015_2016_p and cchs2017_2018_p datasets with 200 respondents
+- Updates to variables.csv & variableDetails.csv
+
 ## Variables
 cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html) and [variable](https://big-life-lab.github.io/cchsflow/articles/variables_sheet.html).
 
