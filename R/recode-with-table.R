@@ -565,7 +565,9 @@ recode_columns <-
             from_values <- list()
             interval <- ""
             if (grepl("\\[*\\]", as.character(row_being_checked[[
-              pkg.globals$argument.From]]))) {
+              pkg.globals$argument.From]])) ||
+              grepl("\\(*\\)", as.character(row_being_checked[[
+                pkg.globals$argument.From]]))) {
               from_values <-
                 strsplit(as.character(row_being_checked[[
                   pkg.globals$argument.From]]), ",")[[1]]
@@ -574,9 +576,20 @@ recode_columns <-
               interval_left <- substr(from_values[[1]], 1, 1)
               interval_right <- substr(from_values[[2]], nchar(from_values[[2]]), nchar(from_values[[2]]))
               interval <- paste0(interval_left,",",interval_right)
-              from_values[[1]] <- gsub("\\[|\\]", "", from_values[[1]])
-              from_values[[2]] <- gsub("\\[|\\]", "", from_values[[2]])
-            } else {
+              if(grepl("\\[", from_values[[1]])){
+                from_values[[1]] <- gsub("\\[", "", from_values[[1]])
+              }
+              else{
+                from_values[[1]] <- gsub("\\(", "", from_values[[1]])
+              }
+              if(grepl("\\]", from_values[[2]])){
+                from_values[[2]] <- gsub("|]", "", from_values[[2]])
+              }
+              else{
+                from_values[[2]] <- gsub("|)", "", from_values[[2]])
+              }
+            } 
+            else {
               temp_from <-
                 as.character(row_being_checked[[pkg.globals$argument.From]])
               from_values[[1]] <- temp_from
@@ -719,7 +732,16 @@ compare_value_based_on_interval <-
               as.numeric(left_boundary) < data[[compare_columns]] &
                 data[[compare_columns]] <= as.numeric(right_boundary)
             )]
-      } else {
+      } 
+      else if (interval == "(,)") {
+        return_boolean <-
+          data[[compare_columns]] %in% data[[
+            compare_columns]][which(
+              as.numeric(left_boundary) < data[[compare_columns]] &
+                data[[compare_columns]] < as.numeric(right_boundary)
+            )]
+      }
+      else {
         stop("Invalid Argument was passed")
       }
     }
