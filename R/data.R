@@ -378,18 +378,18 @@ NULL
 #'
 #' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
 #'
-#' @name cchs2015-2016_p
-#' @aliases cchs2015-2016_p
+#' @name cchs2015_2016_p
+#' @aliases cchs2015_2016_p
 #' @docType data
-#' @return \item{cchs2015-2016_p}{a data frame}
+#' @return \item{cchs2015_2016_p}{a data frame}
 #'
 #' @source
 #'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=238854}
 #'
 #' @keywords datasets
 #' @examples
-#' data(cchs2015-2016_p)
-#' str(cchs2015-2016_p)
+#' data(cchs2015_2016_p)
+#' str(cchs2015_2016_p)
 NULL
 
 
@@ -414,16 +414,16 @@ NULL
 #'
 #' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
 #'
-#' @name cchs2017-2018_p
-#' @aliases cchs2017-2018_p
+#' @name cchs2017_2018_p
+#' @aliases cchs2017_2018_p
 #' @docType data
-#' @return \item{cchs2017-2018_p}{a data frame}
+#' @return \item{cchs2017_2018_p}{a data frame}
 #'
 #' @source
 #'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=329241}
 #'
 #' @keywords datasets
 #' @examples
-#' data(cchs2017-2018_p)
-#' str(cchs2017-2018_p)
+#' data(cchs2017_2018_p)
+#' str(cchs2017_2018_p)
 NULL
