@@ -51,7 +51,7 @@ If a categorical variable has 4 distinct categories, along with a "not applicabl
 ### Columns
 The following are the columns that are listed in `variable_details.csv`. Many of these columns need to be specified in order for `rec_with_table()` to be functional. We will use the `sex` variable to illustrate how each column is specified:
 
-1. **variable:** the name of the final transformed variable. In `variable_details.csv`, we have designated the variable names used in CCHS cycles from 2007 to 2014 as the final transformed variable name.
+1. **variable:** the name of the final transformed variable. In `variable_details.csv`, we have designated the variable names used in CCHS cycles from 2007 to 2018 as the final transformed variable name.
 
 ```{r, echo=FALSE, warning=FALSE}
 kable(variable_details[variable_details$variable == "DHH_SEX", 1], col.names = 'variable')
@@ -83,7 +83,7 @@ kable(variable_details[variable_details$variable == "DHH_SEX", c(1:5)])
 
 + The categorical `sex` variable in the 2001 CCHS survey is `DHHA_SEX`. If the final variable name for categorical age in the **variable** column is `DHH_SEX`, you would write the following in this column: `cchs2001::DHH_SEX`
 
-+ The categorical age variable in the CCHS surveys from 2007 to 2014 is `DHH_SEX`. Since it is the same as the final variable name, you would write in this column `[DHH_SEX]` **once**. The variable name that is denoted within the square brackets is the default variable name.
++ The categorical age variable in the CCHS surveys from 2007 to 2018 is `DHH_SEX`. Since it is the same as the final variable name, you would write in this column `[DHH_SEX]` **once**. The variable name that is denoted within the square brackets is the default variable name.
 
 6. **fromType:** the variable type as indicated in the CCHS surveys. As indicated in the **toType** column, categorical variables are denoted as `cat` and continuous variables are denoted as `cont`.
 

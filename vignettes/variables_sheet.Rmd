@@ -26,7 +26,7 @@ variables <- read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))
 
 cat("There are", nrow(variables), "variables, grouped in", sum(!duplicated(variables$subject)),
     "subjects and", sum(!duplicated(variables$section)), "sections that are available for
-    transformation in CCHS cycles from 2001 to 2014.", "\n\n")
+    transformation in CCHS cycles from 2001 to 2018.", "\n\n")
 
 ```
 
