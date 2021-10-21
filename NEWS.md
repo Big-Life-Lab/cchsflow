@@ -2,11 +2,12 @@
 2021-10-15
 
 ## Features
-- Added cchs2015_2016_p and cchs2017_2018_p datasets with 200 respondents
-- Updates to variables.csv & variableDetails.csv
+- Support for CCHS cycles up to 2018.
+
+## Bug Fixes
+- Fixes to `rec_with_table()` to support round bracket interval notation.
 
 ## Variables
-cchsflow variables have been updated up to the CCHS 2017-2018 cycle in [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html) and [variable](https://big-life-lab.github.io/cchsflow/articles/variables_sheet.html).
 
 - <font color = green> **New**</font> **ADL_01_A**: Help preparing meals. Used for CCHS 2015-2016.
 - <font color = green> **New**</font> **ADL_02_A**: Help appointments/errands. Used for CCHS 2015-2016.

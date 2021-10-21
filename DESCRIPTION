@@ -1,8 +1,8 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and Harmonizing CCHS Variables
-Version: 1.8.3
-Date: 2021-08-20
+Version: 2.0.0
+Date: 2021-10-21
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -17,6 +17,10 @@ Authors@R: c(
            family = "Vyuha",
            role = c("aut"),
            email = "rostikvyuha@gmail.com"),
+    person(given = "Kitty", 
+           family = "Chen",
+           role = c("aut"),
+           email = "kitchen@ohri.ca"),       
     person(given = "Carol", 
            family = "Bennett",
            role = c("aut"),
@@ -38,7 +42,7 @@ Depends:
 Description: Supporting the use of the Canadian Community Health Survey 
              (CCHS) by transforming variables from each cycle into harmonized, 
              consistent versions that span survey cycles (currently, 2001 to 
-             2014). CCHS data used in this library is accessed and adapted in 
+             2018). CCHS data used in this library is accessed and adapted in 
              accordance to the Statistics Canada Open Licence Agreement. This 
              package uses rec_with_table(), which was developed from 'sjmisc' 
              rec(). Lüdecke D (2018). "sjmisc: Data and Variable Transformation 
