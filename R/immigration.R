@@ -80,6 +80,6 @@ immigration_fun <-
     if_else2(SDCFIMM == 1 & SDCGCBG ==2 & SDCGCGT ==2 & SDCGRES ==2, 6,
              
     if_else2(SDCFIMM =="NA(a)"|SDCGCBG =="NA(a)"|SDCGCGT =="NA(a)"
-             |SDCGRES =="NA(a)",tagged_na("a"), tagged_na("b")
+             |SDCGRES =="NA(a)","NA(a)", "NA(b)"
              )))))))
   }
