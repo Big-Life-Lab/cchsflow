@@ -114,7 +114,7 @@ energy_exp_fun <-
     leisure_youth <- 
       if_else2(DHHGAGE_cont < 18 & !is.na(PAYDVTOA) & !is.na(PAYDVADL), 
                ((PAYDVTOA) + (PAYDVADL)),
-               if_else2(PAYDVTOA == "NA(a)"|PAYDVADAL == "NA(a)", 
+               if_else2(PAYDVTOA == "NA(a)"|PAYDVADL == "NA(a)", 
                         tagged_na("a"), tagged_na("b")))
     
     # Energy expenditure calculation
