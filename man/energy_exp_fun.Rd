@@ -14,7 +14,7 @@ energy_exp_fun(
   PAADVVIG,
   PAYDVTOA,
   PAYDVADL,
-  PAY_105,
+  PAYDVVIG,
   PAYDVDYS
 )
 }
@@ -45,11 +45,11 @@ for 12-17 years old.}
 \item{PAYDVADL}{total minutes of physical activity - leisure - 7 day for 
 CCHS 2015-2018 for 12-17 years old.}
 
-\item{PAYDVDYS}{total days physically active - 7 day for CCHS 2015-2018 for 
-12-17 years old.}
-
 \item{PAYDVVIG}{total minutes - vigorous physical activity - 7 d for CCHS 
 2015-2018 for 12-17 years old.}
+
+\item{PAYDVDYS}{total days physically active - 7 day for CCHS 2015-2018 for 
+12-17 years old.}
 }
 \value{
 Continuous variable for energy expenditure (energy_exp)
@@ -96,7 +96,7 @@ library(cchsflow)
 energy_exp2015_2016 <- rec_with_table(
   cchs2015_2016_p, c(
     "DHHGAGE_cont", "PAA_045", "PAA_050", "PAA_075", "PAA_080", "PAADVDYS", 
-    "PAADVVIG", "PAYDVTOA", "PAYDVADL", "PAY_105", "PAYDVDYS", "energy_exp"
+    "PAADVVIG", "PAYDVTOA", "PAYDVADL", "PAYDVVIG", "PAYDVDYS", "energy_exp"
   )
 )
 

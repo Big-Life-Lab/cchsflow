@@ -76,7 +76,7 @@
 #' energy_exp2015_2016 <- rec_with_table(
 #'   cchs2015_2016_p, c(
 #'     "DHHGAGE_cont", "PAA_045", "PAA_050", "PAA_075", "PAA_080", "PAADVDYS", 
-#'     "PAADVVIG", "PAYDVTOA", "PAYDVADL", "PAY_105", "PAYDVDYS", "energy_exp"
+#'     "PAADVVIG", "PAYDVTOA", "PAYDVADL", "PAYDVVIG", "PAYDVDYS", "energy_exp"
 #'   )
 #' )
 #' 
@@ -100,7 +100,7 @@
 
 energy_exp_fun <-
   function(DHHGAGE_cont, PAA_045, PAA_050, PAA_075, PAA_080, PAADVDYS, 
-           PAADVVIG, PAYDVTOA, PAYDVADL, PAY_105, PAYDVDYS){
+           PAADVVIG, PAYDVTOA, PAYDVADL, PAYDVVIG, PAYDVDYS){
     # Leisure activity for adults
     leisure_adult <- 
       if_else2(DHHGAGE_cont >= 18 & !is.na(PAA_045) & !is.na(PAA_050) & 
@@ -124,7 +124,7 @@ energy_exp_fun <-
       if_else2(!is.na(PAADVDYS) & !is.na(PAADVVIG) & 
                !is.na(leisure_adult) & !is.na(PAADVVIG),
                ((((leisure_adult) - (PAADVVIG))*3 + (PAADVVIG)*6)/7*(PAADVDYS)/60), 
-                    if_else2(PAY_105 == "NA(a)"|leisure_youth == "NA(a)"|
+                    if_else2(leisure_youth == "NA(a)"|
                              PAYDVDYS == "NA(a)"|PAADVVIG == "NA(a)"|
                              leisure_adult == "NA(a)"|PAADVDYS == "NA(a)", 
                                  tagged_na("a"), tagged_na("b"))))
