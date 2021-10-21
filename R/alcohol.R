@@ -334,25 +334,34 @@ binge_drinker_fun <-
 low_drink_short_fun <-
   function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, 
            ALW_2A5, ALW_2A6, ALW_2A7){
+    # Test if inputs are in valid range
+    if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_1 %in% (1:2) &
+               ALW_1 %in% (1:2) & ALW_2A1 %in% (0:995) & ALW_2A2 %in% (0:995) &
+               ALW_2A3 %in% (0:995) & ALW_2A4 %in% (0:995) &
+               ALW_2A5 %in% (0:995) & ALW_2A6 %in% (0:995) &
+               ALW_2A7 %in% (0:995),
     # Increased short term risk from due to drinking (1)
     if_else2(DHH_SEX == 1 & (ALW_2A1 %in%(5:995) | ALW_2A2 %in%(5:995) | 
                              ALW_2A3 %in%(5:995) | ALW_2A4 %in%(5:995) | 
                              ALW_2A5 %in%(5:995) | ALW_2A6 %in%(5:995) |
                              ALW_2A7 %in%(5:995) | ALWDWKY %in%(16:995)), 1,
     if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(4:995) | ALW_2A2 %in%(4:995) | 
-                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) | 
+                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) |
                              ALW_2A5 %in%(4:995) | ALW_2A6 %in%(4:995) |
                              ALW_2A7 %in%(4:995) | ALWDWKY %in%(11:995)), 1,
     # No increased short term health risks due to drinking (2)
     # Includes those who did not drink in past 7 days or past 12 months
     if_else2(ALC_1 == 2 |ALW_1 ==2, 2,
-    if_else2(DHH_SEX == 1 & (ALW_2A1 <= 4 & ALW_2A2 <= 4 & ALW_2A3 <= 4 &
-                             ALW_2A4 <= 4 & ALW_2A5 <= 4 & ALW_2A6 <= 4 &
-                             ALW_2A7 <= 4) & ALWDWKY <= 15, 2,
-    if_else2(DHH_SEX == 2 & (ALW_2A1 <= 3 & ALW_2A2 <= 3 & ALW_2A3 <= 3 &
-                             ALW_2A4 <= 3 & ALW_2A5 <= 3 & ALW_2A6 <= 3 &
-                             ALW_2A7 <= 3) & ALWDWKY <= 10, 2,"NA(b)")))))
-    
+    if_else2(DHH_SEX == 1 & (ALW_2A1 %in% (0:4) & ALW_2A2 %in% (0:4) &
+                             ALW_2A3 %in% (0:4) & ALW_2A4 %in% (0:4) &
+                             ALW_2A5 %in% (0:4) & ALW_2A6 %in% (0:4) &
+                             ALW_2A7 %in% (0:4)) & ALWDWKY %in% (0:15), 2,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
+                             ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
+                             ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
+                             ALW_2A7 %in% (0:3)) & ALWDWKY %in% (0:10), 2,
+                                                          "NA(b)"))))),
+    "NA(b)")
   }
 
 #' @title Long term risks due to drinking
@@ -462,24 +471,35 @@ low_drink_short_fun <-
 low_drink_long_fun <-
   function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, 
            ALW_2A5, ALW_2A6, ALW_2A7){
+    # Test if inputs are in valid range
+    if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_1 %in% (1:2) &
+               ALW_1 %in% (1:2) & ALW_2A1 %in% (0:995) & ALW_2A2 %in% (0:995) &
+               ALW_2A3 %in% (0:995) & ALW_2A4 %in% (0:995) &
+               ALW_2A5 %in% (0:995) & ALW_2A6 %in% (0:995) &
+               ALW_2A7 %in% (0:995),
     # Increased long term risk from due to drinking (1)
     if_else2(DHH_SEX == 1 & (ALW_2A1 %in%(4:995) | ALW_2A2 %in%(4:995) | 
-                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) | 
+                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) |
                              ALW_2A5 %in%(4:995) | ALW_2A6 %in%(4:995) |
                              ALW_2A7 %in%(4:995) | ALWDWKY %in%(16:995)), 1,
-    if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(3:995) | ALW_2A2 %in%(3:995) | 
-                             ALW_2A3 %in%(3:995) | ALW_2A4 %in%(3:995) | 
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(3:995) | ALW_2A2 %in%(3:995) |
+                             ALW_2A3 %in%(3:995) | ALW_2A4 %in%(3:995) |
                              ALW_2A5 %in%(3:995) | ALW_2A6 %in%(3:995) |
                              ALW_2A7 %in%(3:995) | ALWDWKY %in%(11:995)), 1,
     # No increased long term health risks due to drinking (2)
     # Includes those who did not drink in past 7 days or past 12 months
     if_else2(ALC_1 == 2 |ALW_1 ==2, 2,
-    if_else2(DHH_SEX == 1 & (ALW_2A1 <= 3 & ALW_2A2 <= 3 & ALW_2A3 <= 3 &
-                             ALW_2A4 <= 3 & ALW_2A5 <= 3 & ALW_2A6 <= 3 &
-                             ALW_2A7 <= 3) & ALWDWKY <= 15, 2,
-    if_else2(DHH_SEX == 2 & (ALW_2A1 <= 2 & ALW_2A2 <= 2 & ALW_2A3 <= 2 &
-                             ALW_2A4 <= 2 & ALW_2A5 <= 2 & ALW_2A6 <= 2 &
-                             ALW_2A7 <= 2) & ALWDWKY <= 10, 2,"NA(b)")))))
+    if_else2(DHH_SEX == 1 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
+                             ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
+                             ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
+                             ALW_2A7 %in% (0:3)) & ALWDWKY %in% (0:15), 2,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in% (0:2) & ALW_2A2 %in% (0:2) &
+                             ALW_2A3 %in% (0:2) & ALW_2A4 %in% (0:2) &
+                             ALW_2A5 %in% (0:2) & ALW_2A6 %in% (0:2) &
+                             ALW_2A7 %in% (0:2)) & ALWDWKY %in% (0:10), 2,
+             "NA(b)"))))),
+    "NA(b)")
+    
     
   }
 
@@ -556,12 +576,14 @@ low_drink_score_fun <-
     ## Step 1
     # How many standard drinks did you have in a week?
     step1<- 
-      if_else2(ALWDWKY <= 10, 0,
+      if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995),
+      if_else2(ALWDWKY %in% (0:10), 0,
       if_else2(DHH_SEX == 1 & ALWDWKY > 10 & ALWDWKY <= 15, 0,
       if_else2(DHH_SEX == 2 & ALWDWKY > 10 & ALWDWKY <= 15, 1,
       if_else2(DHH_SEX == 1 & ALWDWKY > 15 & ALWDWKY <= 20, 1,
       if_else2(DHH_SEX == 2 & ALWDWKY > 15 & ALWDWKY <= 20, 3,
-      if_else2(ALWDWKY >20, 3, NA))))))
+      if_else2(ALWDWKY >20, 3, NA)))))),
+      NA)
     
     ## Categorical score
     low_drink_score <-
@@ -607,6 +629,8 @@ low_drink_score_fun <-
 #' @param ALWDWKY Number of drinks consumed in the past week 
 #' 
 #' @param ALC_005 In lifetime, ever had a drink? (1 - yes, 2 - no)
+#' 
+#' @param ALC_1 Past year, have you drank alcohol? (1 - yes, 2 - no)
 #' 
 #' @return Low risk drinking score (low_drink_score1) with four categories:
 #' \itemize{
@@ -659,12 +683,15 @@ low_drink_score_fun1 <-
     ## Step 1
     # How many standard drinks did you have in a week?
     step1<- 
-      if_else2(ALWDWKY <= 10, 0,
-      if_else2(DHH_SEX == 1 & ALWDWKY > 10 & ALWDWKY <= 15, 0,
-      if_else2(DHH_SEX == 2 & ALWDWKY > 10 & ALWDWKY <= 15, 1,
-      if_else2(DHH_SEX == 1 & ALWDWKY > 15 & ALWDWKY <= 20, 1,
-      if_else2(DHH_SEX == 2 & ALWDWKY > 15 & ALWDWKY <= 20, 3,
-      if_else2(ALWDWKY >20, 3, NA))))))
+     if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_005 %in% (1:2) &
+               ALC_1 %in% (1:2),
+     if_else2(ALWDWKY %in% (0:10), 0,
+     if_else2(DHH_SEX == 1 & ALWDWKY > 10 & ALWDWKY <= 15, 0,
+     if_else2(DHH_SEX == 2 & ALWDWKY > 10 & ALWDWKY <= 15, 1,
+     if_else2(DHH_SEX == 1 & ALWDWKY > 15 & ALWDWKY <= 20, 1,
+     if_else2(DHH_SEX == 2 & ALWDWKY > 15 & ALWDWKY <= 20, 3,
+     if_else2(ALWDWKY >20, 3, NA)))))),
+     NA)
     
     ## Categorical score
     low_drink_score1 <-

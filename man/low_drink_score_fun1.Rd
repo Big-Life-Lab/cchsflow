@@ -12,6 +12,8 @@ low_drink_score_fun1(DHH_SEX, ALWDWKY, ALC_005, ALC_1)
 \item{ALWDWKY}{Number of drinks consumed in the past week}
 
 \item{ALC_005}{In lifetime, ever had a drink? (1 - yes, 2 - no)}
+
+\item{ALC_1}{Past year, have you drank alcohol? (1 - yes, 2 - no)}
 }
 \value{
 Low risk drinking score (low_drink_score1) with four categories:
