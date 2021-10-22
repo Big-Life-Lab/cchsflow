@@ -86,12 +86,12 @@ adjustedbmi2011_2012 <- rec_with_table(
 tail(adjustedbmi2011_2012)
 
 combined_bmi <- merge_rec_data(adjustedbmi2001, adjustedbmi2011_2012)
-head(combined_adjustedbmi)
-tail(combined_adjustedbmi)
+head(combined_bmi)
+tail(combined_bmi)
 
 # adjusted_bmi_fun() can also generate a value for BMI if you input your sex, 
 # and a value for height and weight. Let's say your sex is male, height is 
-170cm (1.7m) and your weight is 50kg, your BMI can be calculated as follows:
+# 170cm (1.7m) and your weight is 50kg, your BMI can be calculated as follows:
 
 library(cchsflow)
 adjusted_BMI <- adjusted_bmi_fun(DHH_SEX = 1, HWTGHTM = 1.7, HWTGWTK = 50)

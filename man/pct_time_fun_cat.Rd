@@ -57,7 +57,7 @@ pct_time_cat2011_2012 <- rec_with_table(
     "SDCGRES", "pct_time_der", "pct_time_der_cat10"
   )
 )
-tail(pct_time2011_2012)
+tail(pct_time_cat2011_2012)
 
 combined_pct_time_cat <- merge_rec_data(pct_time_cat2009_2010, 
 pct_time_cat2011_2012)
