@@ -1,8 +1,9 @@
 ## Resubmission
 
 This is a resubmission. In this version we have:
-* Fixed a breaking error for a derived variable function.
-* Corrected documentations to two functions.
+* Added support for CCHS survey up to 2018.
+* Fixed `rec_with_table()` to support round bracket interval notation.
+* Added new variables and derived functions.
 
 ## Test environments
 * local OS X install, R 4.0.0
