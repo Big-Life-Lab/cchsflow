@@ -50,7 +50,7 @@ test_that("pack_years_fun_cat() has expected outputs when
 
 test_that("pack_years_fun_cat() has expected outputs when
           pack_years_der is in range", {
-            expect_equal(pack_years_fun(1),
+            expect_equal(pack_years_fun_cat(1),
                          3)
           })
 
