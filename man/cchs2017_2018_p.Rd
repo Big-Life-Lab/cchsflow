@@ -20,7 +20,7 @@ The CCHS survey is conducted by Statistics Canada.
 subset. Please see the "CCHS datasets that overlap each other" article to see
 how the two datasets contain overlap.
 
-See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 license. Source from Statistics Canada, Canadian Community Health Survey 
 PUMF, accessed Oct 2021. Reproduced and distributed on an "as is" basis with 
 the permission of Statistics Canada.
