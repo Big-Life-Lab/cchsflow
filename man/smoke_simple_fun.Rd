@@ -4,11 +4,11 @@
 \alias{smoke_simple_fun}
 \title{Simple smoking status}
 \usage{
-smoke_simple_fun(SMKDSTY, time_quit_smoking)
+smoke_simple_fun(SMKDSTY_cat5, time_quit_smoking)
 }
 \arguments{
-\item{SMKDSTY}{derived variable that classifies an individual's smoking
-status.}
+\item{SMKDSTY_cat5}{derived variable that classifies an individual's smoking
+status. This variable captures cycles 2001-2018.}
 
 \item{time_quit_smoking}{derived variable that calculates the approximate
 time a former smoker has quit smoking. 

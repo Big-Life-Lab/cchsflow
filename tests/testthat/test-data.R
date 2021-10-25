@@ -42,7 +42,7 @@ test_that("variable_details included with cchsflow is not empty", {
   expect_true(nrow(variable_details) > 0)
 })
 
-# Testing cchs2001
+# Testing cchs2001_p
 test_that("cchs2001_p dataset included with cchsflow
           is saved in correct format", {
             expect_s3_class(cchs2001_p, "data.frame", exact = TRUE)
@@ -52,7 +52,7 @@ test_that("cchs2001_p dataset included with cchsflow contains
             expect_true(nrow(cchs2001_p) == 200)
           })
 
-# Testing cchs2003
+# Testing cchs2003_p
 test_that("cchs2003_p dataset included with cchsflow
           is saved in correct format", {
             expect_s3_class(cchs2003_p, "data.frame", exact = TRUE)
@@ -62,7 +62,7 @@ test_that("cchs2003_p dataset included with cchsflow contains
             expect_true(nrow(cchs2003_p) == 200)
           })
 
-# Testing cchs2005
+# Testing cchs2005_p
 test_that("cchs2005_p dataset included with cchsflow
           is saved in correct format", {
             expect_s3_class(cchs2005_p, "data.frame", exact = TRUE)
@@ -72,7 +72,7 @@ test_that("cchs2005_p dataset included with cchsflow contains
             expect_true(nrow(cchs2005_p) == 200)
           })
 
-# Testing cchs2007_2008
+# Testing cchs2007_2008_p
 test_that("cchs2007_2008_p dataset included with cchsflow
           is saved in correct format", {
             expect_s3_class(cchs2007_2008_p, "data.frame", exact = TRUE)
@@ -82,7 +82,7 @@ test_that("cchs2007_2008_p dataset included with cchsflow
             expect_true(nrow(cchs2007_2008_p) == 200)
           })
 
-# Testing cchs2009_2010
+# Testing cchs2009_2010_p
 test_that("cchs2009_2010_p dataset included with cchsflow
           is saved in correct format", {
             expect_s3_class(cchs2009_2010_p, "data.frame", exact = TRUE)
@@ -92,7 +92,7 @@ test_that("cchs2009_2010_p dataset included with cchsflow
             expect_true(nrow(cchs2009_2010_p) == 200)
           })
 
-# Testing cchs2011_2012
+# Testing cchs2011_2012_p
 test_that("cchs2011_2012_p dataset included with cchsflow
           is saved in correct format", {
             expect_s3_class(cchs2011_2012_p, "data.frame", exact = TRUE)
@@ -102,7 +102,7 @@ test_that("cchs2011_2012_p dataset included with cchsflow
             expect_true(nrow(cchs2011_2012_p) == 200)
           })
 
-# Testing cchs2013_2014
+# Testing cchs2013_2014_p
 test_that("cchs2013_2014_p dataset included with cchsflow
           is saved in correct format", {
             expect_s3_class(cchs2013_2014_p, "data.frame", exact = TRUE)
@@ -110,4 +110,34 @@ test_that("cchs2013_2014_p dataset included with cchsflow
 test_that("cchs2013_2014_p dataset included with cchsflow
           contains only the 200 sample rows", {
             expect_true(nrow(cchs2013_2014_p) == 200)
+          })
+
+# Testing cchs2014_p
+test_that("cchs2013_2014_p dataset included with cchsflow
+          is saved in correct format", {
+            expect_s3_class(cchs2014_p, "data.frame", exact = TRUE)
+          })
+test_that("cchs2013_2014_p dataset included with cchsflow
+          contains only the 200 sample rows", {
+            expect_true(nrow(cchs2014_p) == 200)
+          })
+
+# Testing cchs2015_2016_p
+test_that("cchs2015_2016_p dataset included with cchsflow
+          is saved in correct format", {
+            expect_s3_class(cchs2015_2016_p, "data.frame", exact = TRUE)
+          })
+test_that("cchs2015_2016_p dataset included with cchsflow
+          contains only the 200 sample rows", {
+            expect_true(nrow(cchs2015_2016_p) == 200)
+          })
+
+# Testing cchs2017_2018_p
+test_that("cchs2017_2018_p dataset included with cchsflow
+          is saved in correct format", {
+            expect_s3_class(cchs2017_2018_p, "data.frame", exact = TRUE)
+          })
+test_that("cchs2017_2018_p dataset included with cchsflow
+          contains only the 200 sample rows", {
+            expect_true(nrow(cchs2017_2018_p) == 200)
           })

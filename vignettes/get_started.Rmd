@@ -274,7 +274,7 @@ therefore it is not possible to have the same `age` categories across all CCHS
 cycles.
 
 `DHHGAGE_A` is the age variable for CCHS cycles 2001-2003, and `DHHGAGE_B` is
-the age variable for CCHS cycles 2005-2014.
+the age variable for CCHS cycles 2005-2018.
 
 ```{r, warning=FALSE}
 age2001 <- rec_with_table(cchs2001_p, "DHHGAGE_A")

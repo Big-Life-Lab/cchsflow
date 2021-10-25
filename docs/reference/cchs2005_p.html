@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,7 +46,7 @@
 
 <!-- docsearch -->
 <script src="../docsearch.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
@@ -52,8 +56,7 @@
 <meta property="og:description" content="This is a subset of 200 observations from the 2005 cycle of the Canadian
 Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 The CCHS survey is conducted by Statistics Canada." />
-<meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="/logo.svg" />
 
 
 
@@ -71,7 +74,7 @@ The CCHS survey is conducted by Statistics Canada." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -85,7 +88,7 @@ The CCHS survey is conducted by Statistics Canada." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.8.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -93,7 +96,7 @@ The CCHS survey is conducted by Statistics Canada." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -136,8 +139,8 @@ The CCHS survey is conducted by Statistics Canada." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/Big-Life-Lab/cchsflow">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/Big-Life-Lab/cchsflow/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -184,7 +187,7 @@ The CCHS survey is conducted by Statistics Canada.</p>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>See <a href='https://www.statcan.gc.ca/eng/reference/licence'>here</a> for the open
+    <p>See <a href='https://www.statcan.gc.ca/en/reference/licence'>here</a> for the open
 license. Source from Statistics Canada, Canadian Community Health Survey 
 PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 the permission of Statistics Canada.</p>
@@ -193,129 +196,126 @@ the permission of Statistics Canada.</p>
 <p>Additional documentation (PDFs): <a href='https://osf.io/hkuy3/'>https://osf.io/hkuy3/</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>cchs2005_p</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>cchs2005_p</span>)</div><div class='output co'>#&gt; 'data.frame':	200 obs. of  1284 variables:
-#&gt;  $ ADME_RNO: int  1 2 3 4 5 6 7 8 9 10 ...
-#&gt;  $ GEOEGPRV: int  59 35 24 24 35 24 35 24 35 48 ...
-#&gt;  $ GEOEDPMF: int  59914 35938 24908 24901 35952 24909 35933 24912 35942 48924 ...
-#&gt;  $ GEOEGSHR: int  9999996 9999996 9999996 2490101 9999996 9999996 9999996 9999996 9999996 9999996 ...
-#&gt;  $ SAME_TYP: int  1 2 1 2 1 2 2 2 2 1 ...
-#&gt;  $ ADME_PRX: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ ADME_N09: int  2 6 2 6 2 6 6 6 6 1 ...
-#&gt;  $ ADME_N10: int  1 1 1 1 1 1 1 1 1 1 ...
-#&gt;  $ ADME_N11: int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ DHHEGAGE: int  5 15 6 15 16 1 12 6 5 4 ...
-#&gt;  $ DHHE_SEX: int  1 2 1 2 2 1 2 1 1 2 ...
-#&gt;  $ DHHEGMS : int  1 3 4 3 3 4 3 1 4 4 ...
-#&gt;  $ GENE_01 : int  2 2 3 3 4 1 5 1 3 2 ...
-#&gt;  $ GENE_02 : int  3 3 3 3 3 3 3 3 3 3 ...
-#&gt;  $ GENE_02A: int  2 1 3 2 5 1 2 2 2 1 ...
-#&gt;  $ GENE_02B: int  2 1 1 2 3 1 3 2 3 1 ...
-#&gt;  $ GENE_07 : int  3 1 1 2 4 6 3 3 2 2 ...
-#&gt;  $ GENE_08 : int  1 6 1 6 6 6 1 1 1 1 ...
-#&gt;  $ GENE_09 : int  3 6 1 6 6 6 3 3 3 3 ...
-#&gt;  $ GENE_10 : int  1 1 2 2 4 2 3 3 3 4 ...
-#&gt;  $ GENEDHDI: int  3 3 2 2 1 4 0 4 2 3 ...
-#&gt;  $ GENEDMHI: int  3 4 4 3 2 4 2 3 2 4 ...
-#&gt;  $ ORGEFOPT: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ ORGE_1  : int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ ORGE_2  : int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHEFOPT: int  2 1 2 2 1 2 1 2 1 2 ...
-#&gt;  $ CIHE_1  : int  6 1 6 6 2 6 2 6 2 6 ...
-#&gt;  $ CIHE_2  : int  96 3 96 96 96 96 96 96 96 96 ...
-#&gt;  $ CIHE_3  : int  6 1 6 6 2 6 2 6 1 6 ...
-#&gt;  $ CIHE_4  : int  96 1 96 96 96 96 96 96 1 96 ...
-#&gt;  $ CIHE_5  : int  6 1 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CIHE_6A : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6I : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6B : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6J : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6K : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6G : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6F : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6E : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6L : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6M : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6N : int  6 1 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_6H : int  6 2 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CIHE_7  : int  6 1 6 6 6 6 6 6 1 6 ...
-#&gt;  $ CIHE_8A : int  6 1 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CIHE_8B : int  6 2 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CIHE_8C : int  6 2 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CIHE_8J : int  6 2 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CIHE_8K : int  6 2 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CIHE_8G : int  6 2 6 6 6 6 6 6 1 6 ...
-#&gt;  $ CIHE_8L : int  6 2 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CIHE_8H : int  6 2 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CIHE_8I : int  6 2 6 6 6 6 6 6 2 6 ...
-#&gt;  $ HCSEFOPT: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ HCSE_1  : int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ HCSE_2  : int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ HCSE_3  : int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ HCSE_4  : int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ HWTE_4  : int  1 3 1 1 3 3 2 3 3 3 ...
-#&gt;  $ HWTEGHTM: num  1.85 1.57 1.65 1.57 1.57 ...
-#&gt;  $ HWTEGWTK: num  90 56.7 108 69.8 58.5 ...
-#&gt;  $ HWTEGBMI: num  26.2 22.9 39.6 28.1 23.6 ...
-#&gt;  $ HWTEGISW: int  3 2 4 3 2 6 2 2 2 2 ...
-#&gt;  $ HWTEDCOL: int  6 6 6 6 6 1 6 6 6 6 ...
-#&gt;  $ CCCE_011: int  2 2 1 2 2 2 2 1 1 2 ...
-#&gt;  $ CCCE_021: int  2 2 1 2 2 2 2 2 2 1 ...
-#&gt;  $ CCCE_031: int  2 2 2 2 2 2 2 2 1 2 ...
-#&gt;  $ CCCE_035: int  6 6 6 6 6 6 6 6 2 6 ...
-#&gt;  $ CCCE_036: int  6 6 6 6 6 6 6 6 1 6 ...
-#&gt;  $ CCCE_041: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_051: int  2 1 2 2 1 2 2 2 2 2 ...
-#&gt;  $ CCCE_05A: int  6 2 6 6 2 6 6 6 6 6 ...
-#&gt;  $ CCCE_061: int  2 2 2 2 2 2 1 2 2 1 ...
-#&gt;  $ CCCE_071: int  2 2 1 1 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_072: int  2 2 6 6 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_073: int  6 6 1 1 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_074: int  6 6 1 2 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_75A: int  6 6 1 6 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_75B: int  6 6 2 6 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_75C: int  6 6 2 6 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_75D: int  6 6 2 6 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_081: int  2 2 2 2 2 1 1 2 2 2 ...
-#&gt;  $ CCCE_91A: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_91E: int  6 2 2 2 2 6 2 2 6 6 ...
-#&gt;  $ CCCE_91F: int  6 2 2 2 2 6 2 2 6 6 ...
-#&gt;  $ CCCE_101: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCEG102: int  96 96 96 96 96 96 96 96 96 96 ...
-#&gt;  $ CCCE_10A: int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_10B: int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_10C: int  96 96 96 96 96 96 96 96 96 96 ...
-#&gt;  $ CCCE_105: int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_106: int  6 6 6 6 6 6 6 6 6 6 ...
-#&gt;  $ CCCE_111: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_121: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_131: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_31A: int  2 1 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_141: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_151: int  2 2 2 2 2 2 2 2 2 2 ...
-#&gt;  $ CCCE_161: int  2 2 2 1 2 2 2 2 2 2 ...
-#&gt;   [list output truncated]</div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>cchs2005_p</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>cchs2005_p</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 'data.frame':	200 obs. of  1284 variables:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ ADME_RNO: int  1 2 3 4 5 6 7 8 9 10 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GEOEGPRV: int  59 35 24 24 35 24 35 24 35 48 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GEOEDPMF: int  59914 35938 24908 24901 35952 24909 35933 24912 35942 48924 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GEOEGSHR: int  9999996 9999996 9999996 2490101 9999996 9999996 9999996 9999996 9999996 9999996 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ SAME_TYP: int  1 2 1 2 1 2 2 2 2 1 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ ADME_PRX: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ ADME_N09: int  2 6 2 6 2 6 6 6 6 1 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ ADME_N10: int  1 1 1 1 1 1 1 1 1 1 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ ADME_N11: int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ DHHEGAGE: int  5 15 6 15 16 1 12 6 5 4 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ DHHE_SEX: int  1 2 1 2 2 1 2 1 1 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ DHHEGMS : int  1 3 4 3 3 4 3 1 4 4 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENE_01 : int  2 2 3 3 4 1 5 1 3 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENE_02 : int  3 3 3 3 3 3 3 3 3 3 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENE_02A: int  2 1 3 2 5 1 2 2 2 1 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENE_02B: int  2 1 1 2 3 1 3 2 3 1 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENE_07 : int  3 1 1 2 4 6 3 3 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENE_08 : int  1 6 1 6 6 6 1 1 1 1 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENE_09 : int  3 6 1 6 6 6 3 3 3 3 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENE_10 : int  1 1 2 2 4 2 3 3 3 4 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENEDHDI: int  3 3 2 2 1 4 0 4 2 3 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ GENEDMHI: int  3 4 4 3 2 4 2 3 2 4 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ ORGEFOPT: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ ORGE_1  : int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ ORGE_2  : int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHEFOPT: int  2 1 2 2 1 2 1 2 1 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_1  : int  6 1 6 6 2 6 2 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_2  : int  96 3 96 96 96 96 96 96 96 96 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_3  : int  6 1 6 6 2 6 2 6 1 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_4  : int  96 1 96 96 96 96 96 96 1 96 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_5  : int  6 1 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6A : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6I : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6B : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6J : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6K : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6G : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6F : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6E : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6L : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6M : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6N : int  6 1 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_6H : int  6 2 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_7  : int  6 1 6 6 6 6 6 6 1 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8A : int  6 1 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8B : int  6 2 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8C : int  6 2 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8J : int  6 2 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8K : int  6 2 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8G : int  6 2 6 6 6 6 6 6 1 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8L : int  6 2 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8H : int  6 2 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CIHE_8I : int  6 2 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HCSEFOPT: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HCSE_1  : int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HCSE_2  : int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HCSE_3  : int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HCSE_4  : int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HWTE_4  : int  1 3 1 1 3 3 2 3 3 3 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HWTEGHTM: num  1.85 1.57 1.65 1.57 1.57 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HWTEGWTK: num  90 56.7 108 69.8 58.5 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HWTEGBMI: num  26.2 22.9 39.6 28.1 23.6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HWTEGISW: int  3 2 4 3 2 6 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ HWTEDCOL: int  6 6 6 6 6 1 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_011: int  2 2 1 2 2 2 2 1 1 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_021: int  2 2 1 2 2 2 2 2 2 1 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_031: int  2 2 2 2 2 2 2 2 1 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_035: int  6 6 6 6 6 6 6 6 2 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_036: int  6 6 6 6 6 6 6 6 1 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_041: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_051: int  2 1 2 2 1 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_05A: int  6 2 6 6 2 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_061: int  2 2 2 2 2 2 1 2 2 1 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_071: int  2 2 1 1 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_072: int  2 2 6 6 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_073: int  6 6 1 1 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_074: int  6 6 1 2 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_75A: int  6 6 1 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_75B: int  6 6 2 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_75C: int  6 6 2 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_75D: int  6 6 2 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_081: int  2 2 2 2 2 1 1 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_91A: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_91E: int  6 2 2 2 2 6 2 2 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_91F: int  6 2 2 2 2 6 2 2 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_101: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCEG102: int  96 96 96 96 96 96 96 96 96 96 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_10A: int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_10B: int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_10C: int  96 96 96 96 96 96 96 96 96 96 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_105: int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_106: int  6 6 6 6 6 6 6 6 6 6 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_111: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_121: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_131: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_31A: int  2 1 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_141: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_151: int  2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  $ CCCE_161: int  2 2 2 1 2 2 2 2 2 2 ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [list output truncated]</span>
+</pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#source">Source</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Carol Bennett.</p>
+  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Kitty Chen, Carol Bennett.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

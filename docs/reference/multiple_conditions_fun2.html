@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,7 +46,7 @@
 
 <!-- docsearch -->
 <script src="../docsearch.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
@@ -54,8 +58,7 @@
  takes 6 CCHS-defined conditions (heart disease, cancer, stroke, bowel
  disorder, mood disorder and arthritis), and well one derived variable
  (respiratory condition) to count the number of conditions a respondent has." />
-<meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="/logo.svg" />
 
 
 
@@ -73,7 +76,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -87,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.8.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -95,7 +98,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -138,8 +141,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/Big-Life-Lab/cchsflow">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/Big-Life-Lab/cchsflow/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -175,15 +178,15 @@
  (respiratory condition) to count the number of conditions a respondent has.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>multiple_conditions_fun2</span>(
-  <span class='no'>CCC_121</span>,
-  <span class='no'>CCC_131</span>,
-  <span class='no'>CCC_151</span>,
-  <span class='no'>CCC_171</span>,
-  <span class='no'>CCC_280</span>,
-  <span class='no'>resp_condition_der</span>,
-  <span class='no'>CCC_051</span>
-)</pre>
+    <pre class="usage"><span class='fu'>multiple_conditions_fun2</span><span class='op'>(</span>
+  <span class='va'>CCC_121</span>,
+  <span class='va'>CCC_131</span>,
+  <span class='va'>CCC_151</span>,
+  <span class='va'>CCC_171</span>,
+  <span class='va'>CCC_280</span>,
+  <span class='va'>resp_condition_der</span>,
+  <span class='va'>CCC_051</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -251,72 +254,73 @@ not have arthritis or rheumatism)</p></td>
     <div class='dont-index'><p><code><a href='multiple_conditions_fun1.html'>multiple_conditions_fun1</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'> <span class='co'># Using rec_with_table() to generate multiple_conditions in a CCHS</span>
- <span class='co'># cycle.</span>
-
- <span class='co'># multiple_conditions_fun2() is specified in variable_details.csv along with</span>
- <span class='co'># the CCHS variables and cycles included.</span>
-
- <span class='co'># To generate multiple_conditions, use rec_with_table() and specify the</span>
- <span class='co'># multiple_conditions, along with the variables that are derived from it.</span>
- <span class='co'># Since resp_condition_der is also a derived variable, you will have to</span>
- <span class='co'># specify the variables that are derived from it. In this example, data</span>
- <span class='co'># from the 2010 CCHS will be used, so DHHGAGE_cont, CCC_091, and CCC_031</span>
- <span class='co'># will be specified along with resp_condition_der.</span>
-
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
- <span class='no'>conditions_2009_2010</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span>(<span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(<span class='no'>cchs2009_2010_p</span>,
- <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>,
- <span class='st'>"CCC_031"</span>, <span class='st'>"CCC_121"</span>,<span class='st'>"CCC_131"</span>,<span class='st'>"CCC_151"</span>, <span class='st'>"CCC_171"</span>,<span class='st'>"CCC_280"</span>,
- <span class='st'>"resp_condition_der"</span>,<span class='st'>"CCC_051"</span>, <span class='st'>"number_conditions"</span>)))</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
-#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='input'>
- <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>conditions_2009_2010</span>)</div><div class='output co'>#&gt;   CCC_031 CCC_051 CCC_091 CCC_121 CCC_131 CCC_151 CCC_171 CCC_280 DHHGAGE_cont
-#&gt; 1       2   NA(a)   NA(a)       2       2       2       2       2           13
-#&gt; 2       2       2   NA(a)       2       2       2       2       2           27
-#&gt; 3       2       1       2       2       2       2       2       1           62
-#&gt; 4       2       2       2       2       2       2       2       2           52
-#&gt; 5       2       2       2       2       2       2       2       2           67
-#&gt; 6       2       1       2       2       2       2       2       2           62
-#&gt;   resp_condition_der number_conditions
-#&gt; 1                  3                 1
-#&gt; 2                  3                 1
-#&gt; 3                  3                 3
-#&gt; 4                  3                 1
-#&gt; 5                  3                 1
-#&gt; 6                  3                 2</div><div class='input'>
- <span class='co'># Generating multiple_conditions with user inputted values</span>
- <span class='co'># Let's say you are an individual that has heart disease, bowel disorder,</span>
- <span class='co'># and arthritis. multiple_conditions_fun2() can be used to count the number</span>
- <span class='co'># of chronic conditions you have</span>
-
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
- <span class='no'>num_conditions</span> <span class='kw'>&lt;-</span> <span class='fu'>multiple_conditions_fun2</span>(<span class='kw'>CCC_121</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>CCC_131</span> <span class='kw'>=</span> <span class='fl'>2</span>,
- <span class='kw'>CCC_151</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>CCC_171</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>CCC_280</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>resp_condition_der</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>CCC_051</span> <span class='kw'>=</span> <span class='fl'>1</span>)
-
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>num_conditions</span>)</div><div class='output co'>#&gt; [1] 3</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'> <span class='co'># Using rec_with_table() to generate multiple_conditions in a CCHS</span></span>
+<span class='r-in'> <span class='co'># cycle.</span></span>
+<span class='r-in'> </span>
+<span class='r-in'> <span class='co'># multiple_conditions_fun2() is specified in variable_details.csv along with</span></span>
+<span class='r-in'> <span class='co'># the CCHS variables and cycles included.</span></span>
+<span class='r-in'> </span>
+<span class='r-in'> <span class='co'># To generate multiple_conditions, use rec_with_table() and specify the</span></span>
+<span class='r-in'> <span class='co'># multiple_conditions, along with the variables that are derived from it.</span></span>
+<span class='r-in'> <span class='co'># Since resp_condition_der is also a derived variable, you will have to</span></span>
+<span class='r-in'> <span class='co'># specify the variables that are derived from it. In this example, data</span></span>
+<span class='r-in'> <span class='co'># from the 2010 CCHS will be used, so DHHGAGE_cont, CCC_091, and CCC_031</span></span>
+<span class='r-in'> <span class='co'># will be specified along with resp_condition_der.</span></span>
+<span class='r-in'> </span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span></span>
+<span class='r-in'> <span class='va'>conditions_2009_2010</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span><span class='op'>(</span><span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span><span class='va'>cchs2009_2010_p</span>,</span>
+<span class='r-in'> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"CCC_091"</span>,</span>
+<span class='r-in'> <span class='st'>"CCC_031"</span>, <span class='st'>"CCC_121"</span>,<span class='st'>"CCC_131"</span>,<span class='st'>"CCC_151"</span>, <span class='st'>"CCC_171"</span>,<span class='st'>"CCC_280"</span>,</span>
+<span class='r-in'> <span class='st'>"resp_condition_der"</span>,<span class='st'>"CCC_051"</span>, <span class='st'>"number_conditions"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
+<span class='r-in'> </span>
+<span class='r-in'> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>conditions_2009_2010</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   CCC_031 CCC_051 CCC_091 CCC_121 CCC_131 CCC_151 CCC_171 CCC_280 DHHGAGE_cont</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1       2   NA(a)   NA(a)       2       2       2       2       2           13</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2       2       2   NA(a)       2       2       2       2       2           27</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3       2       1       2       2       2       2       2       1           62</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4       2       2       2       2       2       2       2       2           52</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5       2       2       2       2       2       2       2       2           67</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6       2       1       2       2       2       2       2       2           62</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   resp_condition_der number_conditions</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1                  3                 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2                  3                 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3                  3                 3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4                  3                 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5                  3                 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6                  3                 2</span>
+<span class='r-in'> </span>
+<span class='r-in'> <span class='co'># Generating multiple_conditions with user inputted values</span></span>
+<span class='r-in'> <span class='co'># Let's say you are an individual that has heart disease, bowel disorder,</span></span>
+<span class='r-in'> <span class='co'># and arthritis. multiple_conditions_fun2() can be used to count the number</span></span>
+<span class='r-in'> <span class='co'># of chronic conditions you have</span></span>
+<span class='r-in'> </span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span></span>
+<span class='r-in'> <span class='va'>num_conditions</span> <span class='op'>&lt;-</span> <span class='fu'>multiple_conditions_fun2</span><span class='op'>(</span>CCC_121 <span class='op'>=</span> <span class='fl'>1</span>, CCC_131 <span class='op'>=</span> <span class='fl'>2</span>, </span>
+<span class='r-in'> CCC_151 <span class='op'>=</span> <span class='fl'>2</span>, CCC_171 <span class='op'>=</span> <span class='fl'>1</span>, CCC_280 <span class='op'>=</span> <span class='fl'>2</span>, resp_condition_der <span class='op'>=</span> <span class='fl'>3</span>, CCC_051 <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>num_conditions</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 3</span>
+<span class='r-in'></span>
+</pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Carol Bennett.</p>
+  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Kitty Chen, Carol Bennett.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

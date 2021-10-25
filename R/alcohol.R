@@ -227,3 +227,485 @@ binge_drinker_fun <-
       # Respondents who didn't indicate they had alcohol in the last week
       "NA(a)")
   }
+
+#' @title Short term risks due to drinking
+#' 
+#' @description This function creates a categorical variable that
+#'  flags for increased short term health risks due to their drinking habits,
+#'  according to Canada's Low-Risk Alcohol Drinking Guideline.
+#'
+#' @details The classification of drinkers according to their short term health 
+#' risks comes from guidelines in Alcohol and Health in Canada: A Summary of 
+#' Evidence and Guidelines for Low-risk Drinking, and is based on the alcohol 
+#' consumption reported over the past week. Short-term or acute risks include 
+#' injury and overdose.
+#' 
+#' Categories are based on CCHS 2015-2016's variable (ALWDVSTR) where short 
+#' term health risk are increased when drinking more than 3 drinks (for women) 
+#' or 4 drinks (for men) on any single occasion.
+#' 
+#' See \url{https://osf.io/ykau5/} for more details on the guideline. 
+#' See \url{https://osf.io/ycxaq/} for more details on derivation of the 
+#' function on page 9.
+#' 
+#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
+#' 
+#' @param ALW_1 Drinks in the last week (1 - yes, 2 - no)
+#' 
+#' @param ALC_1 Drinks in the past year (1 - yes, 2 - no)
+#' 
+#' @param ALW_2A1 Number of drinks on Sunday
+#' 
+#' @param ALW_2A2 Number of drinks on Monday
+#' 
+#' @param ALW_2A3 Number of drinks on Tuesday
+#' 
+#' @param ALW_2A4 Number of drinks on Wednesday
+#' 
+#' @param ALW_2A5 Number of drinks on Thursday
+#' 
+#' @param ALW_2A6 Number of drinks on Friday
+#' 
+#' @param ALW_2A7 Number of drinks on Saturday
+#' 
+#' @param ALWDWKY Number of drinks consumed in the past week
+#' 
+#' @return Categorical variable (ALWDVSTR_der) with two categories:
+#' 
+#'  \itemize{
+#'   \item 1 - Increased short term health risk
+#'   \item 2 - No increased short term health risk
+#'  }
+#' 
+#' @examples
+#'  
+#' # Using low_drink_short_fun() to create ALWDVSTR_der values across CCHS cycles
+#' # low_drink_short_fun() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
+#' 
+#' # To transform ALWDVSTR_der, use rec_with_table() for each CCHS cycle
+#' # and specify ALWDVSTR_der, along with the various alcohol and sex
+#' # variables. 
+#' # Using merge_rec_data(), you can combine ALWDVSTR_der across cycles.
+#' 
+#' library(cchsflow)
+#' short_low_drink2001 <- rec_with_table(
+#'   cchs2001_p, c(
+#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVSTR_der"
+#'   )
+#' )
+#' 
+#' head(short_low_drink2001)
+#' 
+#' short_low_drink2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVSTR_der"
+#'   )
+#' )
+#' 
+#' tail(short_low_drink2009_2010)
+#' 
+#' combined_short_low_drink <- bind_rows(short_low_drink2001, 
+#' short_low_drink2009_2010)
+#' 
+#' head(combined_short_low_drink)
+#' 
+#' tail(combined_short_low_drink)
+#' 
+#' # Using low_drink_short_fun() to generate ALWDVSTR_der with user-inputted
+#' # values.
+#' #
+#' # Let's say you are a male, you had drinks in the last week and in the last 
+#' # year. Let's say you had 5 drinks on Sunday, 1 drink on Monday, 6 drinks on 
+#' # Tuesday, 4 drinks on Wednesday, 4 drinks on Thursday, 8 drinks on Friday, 
+#' # and 2 drinks on Saturday with a total of 30 drinks in a week. 
+#' # Using low_drink_short_fun(), we can check if you would be classified as
+#' # having an increased short term health risk due to drinking.
+#' 
+#' short_term_drink <- low_drink_short_fun(DHH_SEX = 1, ALWDWKY = 30, ALC_1 = 1,
+#'  ALW_1 = 1, ALW_2A1 = 5, ALW_2A2 = 1, ALW_2A3 = 6, ALW_2A4 = 4, ALW_2A5 = 4, 
+#'  ALW_2A6 = 8, ALW_2A7 = 2)
+#'
+#' print(short_term_drink)
+#' @export
+#' 
+low_drink_short_fun <-
+  function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, 
+           ALW_2A5, ALW_2A6, ALW_2A7){
+    # Test if inputs are in valid range
+    if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_1 %in% (1:2) &
+               ALW_1 %in% (1:2) & ALW_2A1 %in% (0:995) & ALW_2A2 %in% (0:995) &
+               ALW_2A3 %in% (0:995) & ALW_2A4 %in% (0:995) &
+               ALW_2A5 %in% (0:995) & ALW_2A6 %in% (0:995) &
+               ALW_2A7 %in% (0:995),
+    # Increased short term risk from due to drinking (1)
+    if_else2(DHH_SEX == 1 & (ALW_2A1 %in%(5:995) | ALW_2A2 %in%(5:995) | 
+                             ALW_2A3 %in%(5:995) | ALW_2A4 %in%(5:995) | 
+                             ALW_2A5 %in%(5:995) | ALW_2A6 %in%(5:995) |
+                             ALW_2A7 %in%(5:995) | ALWDWKY %in%(16:995)), 1,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(4:995) | ALW_2A2 %in%(4:995) | 
+                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) |
+                             ALW_2A5 %in%(4:995) | ALW_2A6 %in%(4:995) |
+                             ALW_2A7 %in%(4:995) | ALWDWKY %in%(11:995)), 1,
+    # No increased short term health risks due to drinking (2)
+    # Includes those who did not drink in past 7 days or past 12 months
+    if_else2(ALC_1 == 2 |ALW_1 ==2, 2,
+    if_else2(DHH_SEX == 1 & (ALW_2A1 %in% (0:4) & ALW_2A2 %in% (0:4) &
+                             ALW_2A3 %in% (0:4) & ALW_2A4 %in% (0:4) &
+                             ALW_2A5 %in% (0:4) & ALW_2A6 %in% (0:4) &
+                             ALW_2A7 %in% (0:4)) & ALWDWKY %in% (0:15), 2,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
+                             ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
+                             ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
+                             ALW_2A7 %in% (0:3)) & ALWDWKY %in% (0:10), 2,
+                                                          "NA(b)"))))),
+    "NA(b)")
+  }
+
+#' @title Long term risks due to drinking
+#' 
+#' @description This function creates a categorical variable that
+#'  flags for increased long term health risks due to their drinking habits,
+#'  according to Canada's Low-Risk Alcohol Drinking Guideline.
+#'
+#' @details The classification of drinkers according to their long term health 
+#' risks comes from guidelines in Alcohol and Health in Canada: A Summary of 
+#' Evidence and Guidelines for Low-risk Drinking, and is based on the alcohol 
+#' consumption reported over the past week. Short-term or acute risks include 
+#' injury and overdose.
+#' 
+#' Categories are based on CCHS 2015-2016's variable (ALWDVLTR) where long 
+#' term health risk are increased when drinking more than 10 drinks a week for 
+#' women, with no more than 2 drinks a day most days, and more than 15 drinks a 
+#' week for men, with no more than 3 drinks a day most days.
+#' 
+#' See \url{https://osf.io/ykau5/} for more details on the guideline. 
+#' See \url{https://osf.io/ycxaq/} for more details on the derivation of the 
+#' function on page 8.
+#' 
+#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
+#' 
+#' @param ALW_1 Drinks in the last week (1 - yes, 2 - no)
+#' 
+#' @param ALC_1 Drinks in the past year (1 - yes, 2 - no)
+#' 
+#' @param ALW_2A1 Number of drinks on Sunday
+#' 
+#' @param ALW_2A2 Number of drinks on Monday
+#' 
+#' @param ALW_2A3 Number of drinks on Tuesday
+#' 
+#' @param ALW_2A4 Number of drinks on Wednesday
+#' 
+#' @param ALW_2A5 Number of drinks on Thursday
+#' 
+#' @param ALW_2A6 Number of drinks on Friday
+#' 
+#' @param ALW_2A7 Number of drinks on Saturday
+#' 
+#' @param ALWDWKY Number of drinks consumed in the past week
+#' 
+#' @return Categorical variable (ALWDVLTR_der) with two categories:
+#' 
+#'  \itemize{
+#'   \item 1 - Increased long term health risk
+#'   \item 2 - No increased long term health risk
+#'  }
+#' 
+#' @examples
+#'  
+#' # Using low_drink_long_fun() to create ALWDVLTR_der values across CCHS cycles
+#' # low_drink_long_fun() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
+#' 
+#' # To transform ALWDVLTR_der, use rec_with_table() for each CCHS cycle
+#' # and specify ALWDVLTR_der, along with the various alcohol and sex
+#' # variables. 
+#' # Using merge_rec_data(), you can combine ALWDVLTR_der across cycles.
+#' 
+#' library(cchsflow)
+#' long_low_drink2001 <- rec_with_table(
+#'   cchs2001_p, c(
+#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVLTR_der"
+#'   )
+#' )
+#' 
+#' head(long_low_drink2001)
+#' 
+#' long_low_drink2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
+#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVLTR_der"
+#'   )
+#' )
+#' 
+#' tail(long_low_drink2009_2010)
+#' 
+#' combined_long_low_drink <- bind_rows(long_low_drink2001, 
+#' long_low_drink2009_2010)
+#' 
+#' head(combined_long_low_drink)
+#' 
+#' tail(combined_long_low_drink)
+#' 
+#' # Using low_drink_long_fun() to generate ALWDVLTR_der with user-inputted
+#' # values.
+#' #
+#' # Let's say you are a male, you had drinks in the last week and in the last 
+#' # year. Let's say you had 5 drinks on Sunday, 1 drink on Monday, 6 drinks on 
+#' # Tuesday, 4 drinks on Wednesday, 4 drinks on Thursday, 8 drinks on Friday, 
+#' # and 2 drinks on Saturday with a total of 30 drinks in a week. 
+#' # Using low_drink_long_fun(), we can check if you would be classified as
+#' # having an increased long term health risk due to drinking.
+#' 
+#' long_term_drink <- low_drink_long_fun(DHH_SEX = 1, ALWDWKY = 30, ALC_1 = 1,
+#'  ALW_1 = 1, ALW_2A1 = 5, ALW_2A2 = 1, ALW_2A3 = 6, ALW_2A4 = 4, ALW_2A5 = 4, 
+#'  ALW_2A6 = 8, ALW_2A7 = 2)
+#'
+#' print(long_term_drink)
+#' @export
+#' 
+low_drink_long_fun <-
+  function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, 
+           ALW_2A5, ALW_2A6, ALW_2A7){
+    # Test if inputs are in valid range
+    if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_1 %in% (1:2) &
+               ALW_1 %in% (1:2) & ALW_2A1 %in% (0:995) & ALW_2A2 %in% (0:995) &
+               ALW_2A3 %in% (0:995) & ALW_2A4 %in% (0:995) &
+               ALW_2A5 %in% (0:995) & ALW_2A6 %in% (0:995) &
+               ALW_2A7 %in% (0:995),
+    # Increased long term risk from due to drinking (1)
+    if_else2(DHH_SEX == 1 & (ALW_2A1 %in%(4:995) | ALW_2A2 %in%(4:995) | 
+                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) |
+                             ALW_2A5 %in%(4:995) | ALW_2A6 %in%(4:995) |
+                             ALW_2A7 %in%(4:995) | ALWDWKY %in%(16:995)), 1,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(3:995) | ALW_2A2 %in%(3:995) |
+                             ALW_2A3 %in%(3:995) | ALW_2A4 %in%(3:995) |
+                             ALW_2A5 %in%(3:995) | ALW_2A6 %in%(3:995) |
+                             ALW_2A7 %in%(3:995) | ALWDWKY %in%(11:995)), 1,
+    # No increased long term health risks due to drinking (2)
+    # Includes those who did not drink in past 7 days or past 12 months
+    if_else2(ALC_1 == 2 |ALW_1 ==2, 2,
+    if_else2(DHH_SEX == 1 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
+                             ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
+                             ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
+                             ALW_2A7 %in% (0:3)) & ALWDWKY %in% (0:15), 2,
+    if_else2(DHH_SEX == 2 & (ALW_2A1 %in% (0:2) & ALW_2A2 %in% (0:2) &
+                             ALW_2A3 %in% (0:2) & ALW_2A4 %in% (0:2) &
+                             ALW_2A5 %in% (0:2) & ALW_2A6 %in% (0:2) &
+                             ALW_2A7 %in% (0:2)) & ALWDWKY %in% (0:10), 2,
+             "NA(b)"))))),
+    "NA(b)")
+    
+    
+  }
+
+#' @title Low drinking score (all cycles)
+#' 
+#' @description This function creates a derived variable based on their drinking 
+#' habits and flags for health and social problems from their pattern of 
+#' alcohol use according to Canada's Low-Risk Alcohol Drinking Guideline.
+#'
+#' @details The low risk drinking score is based on the scoring system in 
+#' Canada's Low-Risk Alcohol Drinking Guideline. The score is divided into two 
+#' steps. Step 1 allocates points based on sex and the number of drinks 
+#' that you usually have each week. In step 2, one point will be awarded for 
+#' each item that is true related to drinking habits. The total score is 
+#' obtained from adding the points in step 1 and step 2.
+#' 
+#' @note Step 2 is not included in this function because the questions in 
+#' step 2 are not asked in any of the CCHS cycles. The score is only based on 
+#' step 1.
+#' 
+#' See \url{https://osf.io/eprg7/} for more details on the guideline and score. 
+#' 
+#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
+#' 
+#' @param ALWDWKY Number of drinks consumed in the past week 
+#' 
+#' @return Low risk drinking score (low_drink_score) with four categories:
+#' \itemize{
+#'   \item 1 - Low risk (0 points)
+#'   \item 2 - Marginal risk (1-2 points)
+#'   \item 3 - Medium risk (3-4 points)
+#'   \item 4 - High risk (5-9 points)
+#'  }
+#' 
+#' @examples
+#'  
+#' # Using low_drink_score_fun() to create low_drink_score values across 
+#' # CCHS cycles low_drink_score_fun() is specified in variable_details.csv 
+#' # along with the CCHS variables and cycles included.
+#' 
+#' # To transform low_drink_score, use rec_with_table() for each CCHS cycle
+#' # and specify low_drink_score, along with the various alcohol and sex
+#' # variables. 
+#' # Using merge_rec_data(), you can combine low_drink_score across cycles.
+#' 
+#' library(cchsflow)
+#' low_drink2001 <- rec_with_table(
+#'   cchs2001_p, c(
+#'     "DHH_SEX", "ALWDWKY", "low_risk_score"
+#'   )
+#' )
+#' 
+#' head(low_drink2001)
+#' 
+#' low_drink2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "DHH_SEX", "ALWDWKY", "low_risk_score"
+#'   )
+#' )
+#' 
+#' tail(low_drink2009_2010)
+#' 
+#' combined_low_drink <- bind_rows(low_drink2001, 
+#' low_drink2009_2010)
+#' 
+#' head(combined_low_drink)
+#' 
+#' tail(combined_low_drink)
+#' 
+#' @export
+#' 
+low_drink_score_fun <-
+  function(DHH_SEX, ALWDWKY){
+    ## Step 1
+    # How many standard drinks did you have in a week?
+    step1<- 
+      if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995),
+      if_else2(ALWDWKY %in% (0:10), 0,
+      if_else2(DHH_SEX == 1 & ALWDWKY > 10 & ALWDWKY <= 15, 0,
+      if_else2(DHH_SEX == 2 & ALWDWKY > 10 & ALWDWKY <= 15, 1,
+      if_else2(DHH_SEX == 1 & ALWDWKY > 15 & ALWDWKY <= 20, 1,
+      if_else2(DHH_SEX == 2 & ALWDWKY > 15 & ALWDWKY <= 20, 3,
+      if_else2(ALWDWKY >20, 3, NA)))))),
+      NA)
+    
+    ## Categorical score
+    low_drink_score <-
+      # Low risk
+      if_else2(step1 == 0, 1,
+      # Marginal risk
+      if_else2(step1 %in% (1:2), 2,
+      # Medium risk
+      if_else2(step1 %in% (3:4), 3,
+      # High risk
+      if_else2(step1 %in% (5:9), 4, tagged_na("b")))))
+    
+    return(low_drink_score)
+  }
+
+#' @title Low drinking score (select cycles)
+#' 
+#' @description This function creates a derived variable based on their drinking 
+#' habits and flags for health and social problems from their pattern of 
+#' alcohol use according to Canada's Low-Risk Alcohol Drinking Guideline.
+#'
+#' @details The low risk drinking score is based on the scoring system in 
+#' Canada's Low-Risk Alcohol Drinking Guideline. The score is divided into two 
+#' steps. Step 1 allocates points based on sex and the number of drinks 
+#' that you usually have each week. In step 2, one point will be awarded for 
+#' each item that is true related to drinking habits. The total score is 
+#' obtained from adding the points in step 1 and step 2.
+#' 
+#' This score has two 0 point categories: low risk (never drank) and low risk 
+#' (former drinker). The two drinking groups are derived from 'ever had a drink 
+#' in lifetime'. 'Ever had a drink in lifetime' is only available in CCHS 
+#' 2001-2008 and 2015-2018.
+#' 
+#' 
+#' @note Step 2 is not included in this function because the questions in 
+#' step 2 are not asked in any of the CCHS cycles. The score is only based on 
+#' step 1.
+#' 
+#' See \url{https://osf.io/eprg7/} for more details on the guideline and score. 
+#' 
+#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
+#' 
+#' @param ALWDWKY Number of drinks consumed in the past week 
+#' 
+#' @param ALC_005 In lifetime, ever had a drink? (1 - yes, 2 - no)
+#' 
+#' @param ALC_1 Past year, have you drank alcohol? (1 - yes, 2 - no)
+#' 
+#' @return Low risk drinking score (low_drink_score1) with four categories:
+#' \itemize{
+#'   \item 1 - Low risk - never drank (0 points)
+#'   \item 2 - Low risk - former drinker (0 points)
+#'   \item 3 - Marginal risk (1-2 points)
+#'   \item 4 - Medium risk (3-4 points)
+#'   \item 5 - High risk (5-9 points)
+#'  }
+#' 
+#' @examples
+#'  
+#' # Using low_drink_score_fun1() to create low_drink_score values across 
+#' # CCHS cycles low_drink_score_fun1() is specified in variable_details.csv 
+#' # along with the CCHS variables and cycles included.
+#' 
+#' # To transform low_drink_score1, use rec_with_table() for each CCHS cycle
+#' # and specify low_drink_score1, along with the various alcohol and sex
+#' # variables. 
+#' # Using merge_rec_data(), you can combine low_drink_score1 across cycles.
+#' 
+#' library(cchsflow)
+#' low_drink2001 <- rec_with_table(
+#'   cchs2001_p, c(
+#'     "DHH_SEX", "ALWDWKY", "ALC_005", "ALC_1", "low_risk_score"
+#'   )
+#' )
+#' 
+#' head(low_drink2001)
+#' 
+#' low_drink2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "DHH_SEX", "ALWDWKY", "ALC_005", "ALC_1", "low_risk_score"
+#'   )
+#' )
+#' 
+#' tail(low_drink2009_2010)
+#' 
+#' combined_low_drink1 <- bind_rows(low_drink2001, 
+#' low_drink2009_2010)
+#' 
+#' head(combined_low_drink1)
+#' 
+#' tail(combined_low_drink1)
+#' 
+#' @export
+#' 
+low_drink_score_fun1 <-
+  function(DHH_SEX, ALWDWKY, ALC_005, ALC_1){
+    ## Step 1
+    # How many standard drinks did you have in a week?
+    step1<- 
+     if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_005 %in% (1:2) &
+               ALC_1 %in% (1:2),
+     if_else2(ALWDWKY %in% (0:10), 0,
+     if_else2(DHH_SEX == 1 & ALWDWKY > 10 & ALWDWKY <= 15, 0,
+     if_else2(DHH_SEX == 2 & ALWDWKY > 10 & ALWDWKY <= 15, 1,
+     if_else2(DHH_SEX == 1 & ALWDWKY > 15 & ALWDWKY <= 20, 1,
+     if_else2(DHH_SEX == 2 & ALWDWKY > 15 & ALWDWKY <= 20, 3,
+     if_else2(ALWDWKY >20, 3, NA)))))),
+     NA)
+    
+    ## Categorical score
+    low_drink_score1 <-
+      # Low risk - never drank
+      if_else2(step1 == 0 & ALC_005 == 2 & ALC_1 ==2, 1,
+      # Low risk - former drinker
+      if_else2(step1 == 0 & ALC_005 == 1 & ALC_1 ==2, 2,
+      # Marginal risk
+      if_else2(step1 %in% (1:2), 3,
+      # Medium risk
+      if_else2(step1 %in% (3:4), 4,
+      # High risk
+      if_else2(step1 %in% (5:9), 5, tagged_na("b"))))))
+    
+    return(low_drink_score1)
+  }
+
