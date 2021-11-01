@@ -1,8 +1,8 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and Harmonizing CCHS Variables
-Version: 2.0.0
-Date: 2021-10-25
+Version: 2.0.1
+Date: 2021-11-01
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",

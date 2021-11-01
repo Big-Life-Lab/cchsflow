@@ -1,3 +1,10 @@
+# cchsflow 2.0.1
+2021-11-01
+
+## Bug Fixes
+- Bug fixes to labelling in `rec_with_table()`.
+- Corrections to specifications on `variables.csv` and `variable_details.csv`.
+
 # cchsflow 2.0.0
 2021-10-25
 
