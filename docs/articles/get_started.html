@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
       </span>
     </div>
 
@@ -192,7 +192,7 @@
   <span class="st">"cchsflow includes "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">variable_details</span><span class="op">$</span><span class="va">notes</span><span class="op">)</span><span class="op">)</span>,
   <span class="st">" variables with notes."</span>
 <span class="op">)</span>
-<span class="co">#&gt; Warning: cchsflow includes 95 variables with notes.</span></code></pre></div>
+<span class="co">#&gt; Warning: cchsflow includes 94 variables with notes.</span></code></pre></div>
 <p>For example, for <code>DHHGAGE_A</code> the category <code>NA::b</code> has the following <code>note</code>:</p>
 <p><code>Not applicable, don't know, refusal, not stated (96-99) were options only in CCHS 2003, but had zero responses</code>.</p>
 <p>This note informs the decision to combine values 96 to 99 in <code>DHHGAGE_A</code> for CCHS2003 into one common missing value <code>NA::b</code>. The label for the <code>NA::b</code> category is, “<code>don't know (97); refusal (98); not stated (99)</code>”.</p>
@@ -292,7 +292,7 @@
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/as_label.html">as_label</a></span><span class="op">(</span><span class="va">sex2001</span><span class="op">$</span><span class="va">DHH_SEX</span><span class="op">)</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/tidyeval-compat.html">as_label</a></span><span class="op">(</span><span class="va">sex2001</span><span class="op">$</span><span class="va">DHH_SEX</span><span class="op">)</span><span class="op">)</span>,
   col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html">cm.colors</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>,
   ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">140</span><span class="op">)</span>,
   legend <span class="op">=</span> <span class="cn">TRUE</span>,
