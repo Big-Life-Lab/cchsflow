@@ -437,8 +437,8 @@ recode_columns <-
         pkg.globals$argument.CatValue]]), ]
     
     func_variables_to_process <-
-      variables_to_process[grepl("Func::", variables_to_process[[
-        pkg.globals$argument.CatValue]]), ]
+      variables_to_process[grepl("DerivedVar::", variables_to_process[[
+        pkg.globals$argument.VariableStart]]), ]
     
     rec_variables_to_process <-
       variables_to_process[(!grepl("Func::|map::", variables_to_process[[
@@ -837,10 +837,13 @@ recode_derived_variables <-
     variable_rows <-
       variables_to_process[variables_to_process[[
         pkg.globals$argument.Variables]] == variable_being_processed, ]
+    fun_variable_rows <-
+      variable_rows[grepl("Func::", variable_rows[[
+        pkg.globals$argument.CatValue]]), ]
     variables_to_process <-
       variables_to_process[variables_to_process[[
         pkg.globals$argument.Variables]] != variable_being_processed, ]
-    for (row_num in seq_len(nrow(variable_rows))) {
+    for (row_num in seq_len(nrow(fun_variable_rows))) {
       # Check for presence of feeder variables in data and in the
       # variable being processed stack
       feeder_vars <-
@@ -918,8 +921,6 @@ recode_derived_variables <-
       }
       
       # Obtain the function for each row
-      append(label_list, create_label_list_element(variable_rows))
-      
       row_being_checked <- variable_rows[row_num, ]
       func_cell <-
         as.character(row_being_checked[[pkg.globals$argument.CatValue]])
@@ -950,6 +951,9 @@ recode_derived_variables <-
       var_stack <-
         var_stack[!(var_stack == variable_being_processed)]
     }
+    
+    label_list[[as.character(variable_being_processed)]] <-
+      assign(variable_being_processed, create_label_list_element(variable_rows))
     
     return(
       list(
