@@ -88,7 +88,7 @@ variable (pct_time_der)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
       </span>
     </div>
 
@@ -225,14 +225,9 @@ cycles, the variables must be transformed and harmonized.</p>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SDCGCBG: CCHS 2001 does not have don't know (7) or refusal (8)</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SDCGRES: CCHS 2001 missing don't know (7), refusal (8)</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in create_label_list_element(variable_rows)</span> pct_time_der_cat10 does not contain all identical units variable cant change unit type for different values</span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>pct_time_cat2009_2010</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   DHHGAGE_cont SDCGCBG SDCGRES pct_time_der pct_time_der_cat10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1           13       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2           27       2       2     55.55556                  6</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3           62       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4           52       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5           67       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6           62       1   NA(a)    100.00000                 10</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in head(pct_time_cat2009_2010)</span> object 'pct_time_cat2009_2010' not found</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>pct_time_cat2011_2012</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span></span>
 <span class='r-in'>  <span class='va'>cchs2011_2012_p</span>,  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
@@ -245,33 +240,17 @@ cycles, the variables must be transformed and harmonized.</p>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SDCGCBG: CCHS 2001 does not have don't know (7) or refusal (8)</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SDCGRES: CCHS 2001 missing don't know (7), refusal (8)</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in create_label_list_element(variable_rows)</span> pct_time_der_cat10 does not contain all identical units variable cant change unit type for different values</span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>pct_time_cat2011_2012</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     DHHGAGE_cont SDCGCBG SDCGRES pct_time_der pct_time_der_cat10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 195         72.0       2       2     20.83333                  3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 196         22.0       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 197         18.5       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 198         42.0       2       2     35.71429                  4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 199         62.0       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 200         52.0       1   NA(a)    100.00000                 10</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in tail(pct_time_cat2011_2012)</span> object 'pct_time_cat2011_2012' not found</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>combined_pct_time_cat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span><span class='op'>(</span><span class='va'>pct_time_cat2009_2010</span>, </span>
 <span class='r-in'><span class='va'>pct_time_cat2011_2012</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in list2(...)</span> object 'pct_time_cat2009_2010' not found</span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>combined_pct_time_cat</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   DHHGAGE_cont SDCGCBG SDCGRES pct_time_der pct_time_der_cat10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1           13       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2           27       2       2     55.55556                  6</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3           62       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4           52       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5           67       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6           62       1   NA(a)    100.00000                 10</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in head(combined_pct_time_cat)</span> object 'combined_pct_time_cat' not found</span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>combined_pct_time_cat</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     DHHGAGE_cont SDCGCBG SDCGRES pct_time_der pct_time_der_cat10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 395         72.0       2       2     20.83333                  3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 396         22.0       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 397         18.5       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 398         42.0       2       2     35.71429                  4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 399         62.0       1   NA(a)    100.00000                 10</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 400         52.0       1   NA(a)    100.00000                 10</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in tail(combined_pct_time_cat)</span> object 'combined_pct_time_cat' not found</span>
 <span class='r-in'></span>
 </pre>
   </div>

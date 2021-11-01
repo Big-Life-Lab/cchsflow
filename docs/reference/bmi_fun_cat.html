@@ -87,7 +87,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
       </span>
     </div>
 
@@ -224,15 +224,10 @@ transformed and harmonized.</p>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for HWTGHTM: Height is a reported in meters from 2005 CCHS onwards</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in create_label_list_element(variable_rows)</span> HWTGBMI_der_cat4 does not contain all identical units variable cant change unit type for different values</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>bmi_cat_2009_2010</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   HWTGHTM HWTGWTK HWTGBMI_der HWTGBMI_der_cat4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1   1.778   54.45    17.22401                1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2   1.702   56.00    19.33165                2</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3   1.626   90.00    34.04093                4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4      NA      NA          NA            NA(b)</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5   1.880   99.00    28.01041                3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6   1.575   72.00    29.02494                3</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in head(bmi_cat_2009_2010)</span> object 'bmi_cat_2009_2010' not found</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>bmi_cat_2011_2012</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span></span>
 <span class='r-in'>  <span class='va'>cchs2011_2012_p</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
@@ -246,35 +241,19 @@ transformed and harmonized.</p>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for HWTGHTM: Height is a reported in meters from 2005 CCHS onwards</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in create_label_list_element(variable_rows)</span> HWTGBMI_der_cat4 does not contain all identical units variable cant change unit type for different values</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>bmi_cat_2011_2012</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     HWTGHTM HWTGWTK HWTGBMI_der HWTGBMI_der_cat4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 195   1.600   64.35    25.13672                3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 196   1.880   80.10    22.66297                2</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 197   1.753   78.75    25.62635                3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 198   1.651   83.70    30.70657                4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 199   1.930   74.25    19.93342                2</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 200   1.575   76.50    30.83900                4</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in tail(bmi_cat_2011_2012)</span> object 'bmi_cat_2011_2012' not found</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>combined_bmi_cat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span><span class='op'>(</span><span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span></span>
 <span class='r-in'><span class='op'>(</span><span class='va'>bmi_cat_2009_2010</span>,<span class='va'>bmi_cat_2011_2012</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in list2(...)</span> object 'bmi_cat_2009_2010' not found</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>combined_bmi_cat</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   HWTGHTM HWTGWTK HWTGBMI_der HWTGBMI_der_cat4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1   1.778   54.45    17.22401                1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2   1.702   56.00    19.33165                2</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3   1.626   90.00    34.04093                4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4      NA      NA          NA            NA(b)</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5   1.880   99.00    28.01041                3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6   1.575   72.00    29.02494                3</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in head(combined_bmi_cat)</span> object 'combined_bmi_cat' not found</span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>combined_bmi_cat</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     HWTGHTM HWTGWTK HWTGBMI_der HWTGBMI_der_cat4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 395   1.600   64.35    25.13672                3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 396   1.880   80.10    22.66297                2</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 397   1.753   78.75    25.62635                3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 398   1.651   83.70    30.70657                4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 399   1.930   74.25    19.93342                2</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 400   1.575   76.50    30.83900                4</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in tail(combined_bmi_cat)</span> object 'combined_bmi_cat' not found</span>
 </pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
