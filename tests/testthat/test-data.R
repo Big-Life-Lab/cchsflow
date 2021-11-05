@@ -25,14 +25,14 @@ test_that(
   "variable_details included with cchsflow contains the needed columns for
   rec_with_table()", {
     expect_false(is.null(variable_details$variable))
-    expect_false(is.null(variable_details$toType))
+    expect_false(is.null(variable_details$typeEnd))
     expect_false(is.null(variable_details$databaseStart))
     expect_false(is.null(variable_details$variableStart))
-    expect_false(is.null(variable_details$fromType))
-    expect_false(is.null(variable_details$recTo))
+    expect_false(is.null(variable_details$typeStart))
+    expect_false(is.null(variable_details$recEnd))
     expect_false(is.null(variable_details$catLabel))
     expect_false(is.null(variable_details$catLabelLong))
-    expect_false(is.null(variable_details$recFrom))
+    expect_false(is.null(variable_details$recStart))
     expect_false(is.null(variable_details$units))
     expect_false(is.null(variable_details$catStartLabel))
     expect_false(is.null(variable_details$notes))
