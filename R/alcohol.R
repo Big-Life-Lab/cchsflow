@@ -112,6 +112,254 @@ ALCDTTM <- function(ALCDTTM) {
   # this is for documentation purposes only
 }
 
+#' @title Any alcohol past week
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a categorical variable derived by Statistics Canada that determines 
+#'  if alcohol was consumed in the past week. The variable is optional in 
+#'  selected provinces and territories.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow. In 
+#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
+#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
+#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
+#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
+#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
+#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
+#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
+#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
+#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
+#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#'
+#' @param ALW_1 cchsflow variable name for any alcohol past week
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALW_1
+#'
+#' @export
+ALW_1 <- function(ALW_1) {
+  # this is for documentation purposes only
+} 
+
+#' @title Number of drinks - Sunday
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a continuous variable derived by Statistics Canada that quantifies 
+#'  the number of alcoholic drinks consumed on Sunday. The variable is 
+#'  optional in selected provinces and territories.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow. In 
+#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
+#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
+#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
+#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
+#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
+#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
+#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
+#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
+#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
+#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#'
+#' @param ALW_2A1 cchsflow variable name for number of drinks on Sunday
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALW_2A1
+#'
+#' @export
+ALW_2A1 <- function(ALW_2A1) {
+  # this is for documentation purposes only
+}  
+
+#' @title Number of drinks - Monday
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a continuous variable derived by Statistics Canada that quantifies 
+#'  the number of alcoholic drinks consumed on Monday. The variable is 
+#'  optional in selected provinces and territories.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow. In 
+#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
+#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
+#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
+#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
+#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
+#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
+#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
+#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
+#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
+#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#'
+#' @param ALW_2A2 cchsflow variable name for number of drinks on Monday
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALW_2A2
+#'
+#' @export
+ALW_2A2 <- function(ALW_2A2) {
+  # this is for documentation purposes only
+} 
+
+#' @title Number of drinks - Tuesday
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a continuous variable derived by Statistics Canada that quantifies 
+#'  the number of alcoholic drinks consumed on Tuesday. The variable is 
+#'  optional in selected provinces and territories.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow. In 
+#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
+#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
+#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
+#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
+#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
+#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
+#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
+#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
+#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
+#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#'
+#' @param ALW_2A3 cchsflow variable name for number of drinks on Tuesday
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALW_2A3
+#'
+#' @export
+ALW_2A3 <- function(ALW_2A3) {
+  # this is for documentation purposes only
+} 
+
+#' @title Number of drinks - Wednesday
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a continuous variable derived by Statistics Canada that quantifies 
+#'  the number of alcoholic drinks consumed on Wednesday. The variable is 
+#'  optional in selected provinces and territories.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow. In 
+#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
+#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
+#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
+#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
+#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
+#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
+#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
+#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
+#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
+#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#'
+#' @param ALW_2A4 cchsflow variable name for number of drinks on Wednesday
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALW_2A4
+#'
+#' @export
+ALW_2A4 <- function(ALW_2A4) {
+  # this is for documentation purposes only
+} 
+
+#' @title Number of drinks - Thursday
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a continuous variable derived by Statistics Canada that quantifies 
+#'  the number of alcoholic drinks consumed on Thursday. The variable is 
+#'  optional in selected provinces and territories.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow. In 
+#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
+#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
+#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
+#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
+#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
+#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
+#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
+#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
+#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
+#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#'
+#' @param ALW_2A5 cchsflow variable name for number of drinks on Thursday
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALW_2A5
+#'
+#' @export
+ALW_2A5 <- function(ALW_2A5) {
+  # this is for documentation purposes only
+} 
+
+#' @title Number of drinks - Friday
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a continuous variable derived by Statistics Canada that quantifies 
+#'  the number of alcoholic drinks consumed on Friday. The variable is 
+#'  optional in selected provinces and territories.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow. In 
+#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
+#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
+#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
+#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
+#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
+#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
+#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
+#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
+#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
+#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#'
+#' @param ALW_2A6 cchsflow variable name for number of drinks on Friday
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALW_2A6
+#'
+#' @export
+ALW_2A6 <- function(ALW_2A6) {
+  # this is for documentation purposes only
+}
+
+#' @title Number of drinks - Saturday
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a continuous variable derived by Statistics Canada that quantifies 
+#'  the number of alcoholic drinks consumed on Saturday. The variable is 
+#'  optional in selected provinces and territories.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow. In 
+#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
+#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
+#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
+#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
+#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
+#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
+#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
+#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
+#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
+#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#'
+#' @param ALW_2A7 cchsflow variable name for number of drinks on Saturday
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALW_2A7
+#'
+#' @export
+ALW_2A7 <- function(ALW_2A7) {
+  # this is for documentation purposes only
+}
+
 #' @title Binge drinking
 #' 
 #' @description This function creates a derived categorical variable that
