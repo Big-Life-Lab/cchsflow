@@ -32,12 +32,7 @@ social support while maintaining adequate measurement properties
 (Orpana et al., 2019). Validation of SDS-5 using Canadian national survey 
 data can be found \href{https://doi.org/10.24095/hpcdp.39.12.02}{here}. 
 
-SPS-10 and their items were available in CCHS from 2007-2018. The Medical 
-Outcomes Study (MOS) Social Support Scale was previously used in CCHS from 
-2000-2010.  The MOS Social support Scale has nineteen items. The 
-overall score variable was present from 2000-2010, but their items were only 
-present from 2007-2010. The items were matched from the MOS scale and SPS-10 
-scale to derive SPS-5.
+SPS-10 and their items were available in CCHS from 2011-2018.
 }
 \examples{
 # Using the SPS_5_fun function to create the derived SPS5_der variable  
@@ -51,13 +46,13 @@ scale to derive SPS-5.
 
 library(cchsflow)
 
-SPS5_2009_2010 <- rec_with_table(
-  cchs2009_2010_p, c(
+SPS5_2011_2012 <- rec_with_table(
+  cchs2011_2012_p, c(
     "SPS_03", "SPS_04", "SPS_05", "SPS_07", "SPS_10", "SPS5_der"
   )
 )
 
-head(SPS5_2009_2010)
+head(SPS5_2011_2012)
 
 SPS5_2017_2018 <- rec_with_table(
   cchs2017_2018_p,c(
@@ -68,7 +63,7 @@ SPS5_2017_2018 <- rec_with_table(
 
 tail(SPS5_2017_2018)
 
-combined_SPS5 <- suppressWarnings(merge_rec_data(SPS5_2009_2010,
+combined_SPS5 <- suppressWarnings(merge_rec_data(SPS5_2011_2012,
  SPS5_2017_2018))
 
 head(combined_SPS5)
