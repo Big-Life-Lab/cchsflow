@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,7 +46,7 @@
 
 <!-- docsearch -->
 <script src="../docsearch.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
@@ -62,8 +66,7 @@
  0-260kg for weight) were excluded from HWTGBMI.
 bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
  all CCHS cycles. This function divides weight by the square of height." />
-<meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="/logo.svg" />
 
 
 
@@ -81,7 +84,7 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -95,7 +98,7 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.8.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
       </span>
     </div>
 
@@ -103,7 +106,7 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -146,8 +149,8 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/Big-Life-Lab/cchsflow">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/Big-Life-Lab/cchsflow/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -191,7 +194,7 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
  all CCHS cycles. This function divides weight by the square of height.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bmi_fun</span>(<span class='no'>HWTGHTM</span>, <span class='no'>HWTGWTK</span>)</pre>
+    <pre class="usage"><span class='fu'>bmi_fun</span><span class='op'>(</span><span class='va'>HWTGHTM</span>, <span class='va'>HWTGWTK</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -230,88 +233,101 @@ bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
  transformations were required in the harmonization process.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Using bmi_fun() to create BMI values between cycles</span>
-<span class='co'># bmi_fun() is specified in variable_details.csv along with the</span>
-<span class='co'># CCHS variables and cycles included.</span>
-
-<span class='co'># To transform the derived BMI variable, use rec_with_table() for each cycle</span>
-<span class='co'># and specify HWTGBMI_der, along with height (HWTGHTM) and weight (HWTGWTK).</span>
-<span class='co'># Then by using merge_rec_data(), you can combined HWTGBMI_der across</span>
-<span class='co'># cycles.</span>
-
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
-<span class='no'>bmi2001</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='no'>cchs2001_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-    <span class='st'>"HWTGHTM"</span>,
-    <span class='st'>"HWTGWTK"</span>, <span class='st'>"HWTGBMI_der"</span>
-  )
-)</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
-#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: 2001 and 2003 CCHS use inches, values converted to meters to 3 decimal points</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: 74+ inches converted to 76 inches</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>bmi2001</span>)</div><div class='output co'>#&gt;   HWTGHTM HWTGWTK HWTGBMI_der
-#&gt; 1   1.422   56.25    27.81784
-#&gt; 2   1.549   51.75    21.56788
-#&gt; 3   1.803   78.75    24.22474
-#&gt; 4   1.575   60.75    24.48980
-#&gt; 5   1.727   63.00    21.12301
-#&gt; 6   1.829   91.80    27.44197</div><div class='input'>
-<span class='no'>bmi2011_2012</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='no'>cchs2011_2012_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-    <span class='st'>"HWTGHTM"</span>,
-    <span class='st'>"HWTGWTK"</span>, <span class='st'>"HWTGBMI_der"</span>
-  )
-)</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
-#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for HWTGHTM: Height is a reported in meters from 2005 CCHS onwards</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>bmi2011_2012</span>)</div><div class='output co'>#&gt;     HWTGHTM HWTGWTK HWTGBMI_der
-#&gt; 195   1.600   64.35    25.13672
-#&gt; 196   1.880   80.10    22.66297
-#&gt; 197   1.753   78.75    25.62635
-#&gt; 198   1.651   83.70    30.70657
-#&gt; 199   1.930   74.25    19.93342
-#&gt; 200   1.575   76.50    30.83900</div><div class='input'>
-<span class='no'>combined_bmi</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span>(<span class='no'>bmi2001</span>, <span class='no'>bmi2011_2012</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_bmi</span>)</div><div class='output co'>#&gt;   HWTGHTM HWTGWTK HWTGBMI_der
-#&gt; 1   1.422   56.25    27.81784
-#&gt; 2   1.549   51.75    21.56788
-#&gt; 3   1.803   78.75    24.22474
-#&gt; 4   1.575   60.75    24.48980
-#&gt; 5   1.727   63.00    21.12301
-#&gt; 6   1.829   91.80    27.44197</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_bmi</span>)</div><div class='output co'>#&gt;     HWTGHTM HWTGWTK HWTGBMI_der
-#&gt; 395   1.600   64.35    25.13672
-#&gt; 396   1.880   80.10    22.66297
-#&gt; 397   1.753   78.75    25.62635
-#&gt; 398   1.651   83.70    30.70657
-#&gt; 399   1.930   74.25    19.93342
-#&gt; 400   1.575   76.50    30.83900</div><div class='input'>
-<span class='co'># Using bmi_fun() to generate a BMI value with user inputted height and</span>
-<span class='co'># weight values. bmi_fun() can also generate a value for BMI if you input a</span>
-<span class='co'># value for height and weight. Let's say your height is 170cm (1.7m) and</span>
-<span class='co'># your weight is 50kg, your BMI can be calculated as follows:</span>
-
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
-<span class='no'>BMI</span> <span class='kw'>&lt;-</span> <span class='fu'>bmi_fun</span>(<span class='kw'>HWTGHTM</span> <span class='kw'>=</span> <span class='fl'>1.7</span>, <span class='kw'>HWTGWTK</span> <span class='kw'>=</span> <span class='fl'>50</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>BMI</span>)</div><div class='output co'>#&gt; [1] 17.30104</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># Using bmi_fun() to create BMI values between cycles</span></span>
+<span class='r-in'><span class='co'># bmi_fun() is specified in variable_details.csv along with the</span></span>
+<span class='r-in'><span class='co'># CCHS variables and cycles included.</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># To transform the derived BMI variable, use rec_with_table() for each cycle</span></span>
+<span class='r-in'><span class='co'># and specify HWTGBMI_der, along with height (HWTGHTM) and weight (HWTGWTK).</span></span>
+<span class='r-in'><span class='co'># Then by using merge_rec_data(), you can combined HWTGBMI_der across</span></span>
+<span class='r-in'><span class='co'># cycles.</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>bmi2001</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span></span>
+<span class='r-in'>  <span class='va'>cchs2001_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='st'>"HWTGHTM"</span>,</span>
+<span class='r-in'>    <span class='st'>"HWTGWTK"</span>, <span class='st'>"HWTGBMI_der"</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for HWTGHTM: 2001 and 2003 CCHS use inches, values converted to meters to 3 decimal points</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for HWTGHTM: 74+ inches converted to 76 inches</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>bmi2001</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   HWTGHTM HWTGWTK HWTGBMI_der</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1   1.422   56.25    27.81784</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2   1.549   51.75    21.56788</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3   1.803   78.75    24.22474</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4   1.575   60.75    24.48980</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5   1.727   63.00    21.12301</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6   1.829   91.80    27.44197</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>bmi2011_2012</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span></span>
+<span class='r-in'>  <span class='va'>cchs2011_2012_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='st'>"HWTGHTM"</span>,</span>
+<span class='r-in'>    <span class='st'>"HWTGWTK"</span>, <span class='st'>"HWTGBMI_der"</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for HWTGHTM: Height is a reported in meters from 2005 CCHS onwards</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>bmi2011_2012</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     HWTGHTM HWTGWTK HWTGBMI_der</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 195   1.600   64.35    25.13672</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 196   1.880   80.10    22.66297</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 197   1.753   78.75    25.62635</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 198   1.651   83.70    30.70657</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 199   1.930   74.25    19.93342</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 200   1.575   76.50    30.83900</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>combined_bmi</span> <span class='op'>&lt;-</span> <span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span><span class='op'>(</span><span class='va'>bmi2001</span>, <span class='va'>bmi2011_2012</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>combined_bmi</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   HWTGHTM HWTGWTK HWTGBMI_der</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1   1.422   56.25    27.81784</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2   1.549   51.75    21.56788</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3   1.803   78.75    24.22474</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4   1.575   60.75    24.48980</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5   1.727   63.00    21.12301</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6   1.829   91.80    27.44197</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>combined_bmi</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     HWTGHTM HWTGWTK HWTGBMI_der</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 395   1.600   64.35    25.13672</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 396   1.880   80.10    22.66297</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 397   1.753   78.75    25.62635</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 398   1.651   83.70    30.70657</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 399   1.930   74.25    19.93342</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 400   1.575   76.50    30.83900</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Using bmi_fun() to generate a BMI value with user inputted height and</span></span>
+<span class='r-in'><span class='co'># weight values. bmi_fun() can also generate a value for BMI if you input a</span></span>
+<span class='r-in'><span class='co'># value for height and weight. Let's say your height is 170cm (1.7m) and</span></span>
+<span class='r-in'><span class='co'># your weight is 50kg, your BMI can be calculated as follows:</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>BMI</span> <span class='op'>&lt;-</span> <span class='fu'>bmi_fun</span><span class='op'>(</span>HWTGHTM <span class='op'>=</span> <span class='fl'>1.7</span>, HWTGWTK <span class='op'>=</span> <span class='fl'>50</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>BMI</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 17.30104</span>
+</pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#note">Note</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Carol Bennett.</p>
+  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Kitty Chen, Carol Bennett.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

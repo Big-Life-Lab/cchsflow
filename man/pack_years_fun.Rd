@@ -5,7 +5,7 @@
 \title{Smoking pack-years}
 \usage{
 pack_years_fun(
-  SMKDSTY,
+  SMKDSTY_A,
   DHHGAGE_cont,
   time_quit_smoking,
   SMKG203_cont,
@@ -19,8 +19,8 @@ pack_years_fun(
 )
 }
 \arguments{
-\item{SMKDSTY}{derived variable that classifies an individual's smoking
-status.}
+\item{SMKDSTY_A}{variable used in CCHS cycles 2001-2014 that classifies an 
+individual's smoking status.}
 
 \item{DHHGAGE_cont}{continuous age variable.}
 
@@ -84,7 +84,7 @@ library(cchsflow)
 
 pack_years2009_2010 <- rec_with_table(
   cchs2009_2010_p, c(
-    "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
   )
@@ -94,7 +94,7 @@ head(pack_years2009_2010)
 
 pack_years2011_2012 <- rec_with_table(
   cchs2011_2012_p,c(
-    "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
   )

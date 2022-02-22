@@ -41,3 +41,27 @@ test_that("pack_years_fun() has expected outputs when
   expect_equal(pack_years_fun(1, 40, 96, 16, 96, 10, 5, 996, 996, 96, 96),
                12)
 })
+
+test_that("pack_years_fun_cat() has expected outputs when
+          pack_years_der is out of range", {
+            expect_equal(pack_years_fun_cat(-1),
+                         "NA(b)")
+          })
+
+test_that("pack_years_fun_cat() has expected outputs when
+          pack_years_der is in range", {
+            expect_equal(pack_years_fun_cat(1),
+                         3)
+          })
+
+test_that("SMKG040_fun() has expected outputs when
+          both inputs are out of range", {
+            expect_equal(SMKG040_fun(NA, NA),
+                         tagged_na("b"))
+          })
+
+test_that("SMKG040_fun() has expected outputs when
+          both inputs are in range", {
+            expect_equal(SMKG040_fun(1, 1),
+                         1)
+          })

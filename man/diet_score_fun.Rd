@@ -48,21 +48,21 @@ While diet score can be calculated for all survey respondents, in
  cycle.
 }
 \examples{
-# Using the 'diet_score_fun' function to create the derived diet variable  
+# Using the diet_score_fun function to create the derived diet variable  
 # across CCHS cycles.
-# diet_score_fun() is specified in the variable_details.csv
+# diet_score_fun() is specified in the variable_details.csv.
 
 # To create a harmonized diet_score variable across CCHS cycles, use 
 # rec_with_table() for each CCHS cycle and specify diet_score_fun and the
 # required base variables.
-# Using merge_rec_data(), you can combine smoke_simple across cycles
+# Using merge_rec_data(), you can combine diet_score across cycles.
 
 library(cchsflow)
 
 diet_score2009_2010 <- rec_with_table(
   cchs2009_2010_p, c(
     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-    "DHH_SEX", "diet_score_fun"
+    "DHH_SEX", "diet_score"
   )
 )
 
@@ -71,7 +71,7 @@ head(diet_score2009_2010)
 diet_score2011_2012 <- rec_with_table(
   cchs2011_2012_p,c(
     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-    "DHH_SEX", "diet_score_fun"
+    "DHH_SEX", "diet_score"
   )
 )
 

@@ -1,3 +1,60 @@
+# cchsflow 2.0.1
+2021-11-01
+
+## Bug Fixes
+- Bug fixes to labelling in `rec_with_table()`.
+- Corrections to specifications on `variables.csv` and `variable_details.csv`.
+
+# cchsflow 2.0.0
+2021-10-25
+
+## Features
+- Support for CCHS cycles up to 2018.
+
+## Bug Fixes
+- Fixes to `rec_with_table()` to support round bracket interval notation.
+
+## Variables
+
+- <font color = green> **New**</font> **ADL_01_A**: Help preparing meals. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_02_A**: Help appointments/errands. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_03_A**: Help housework. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_04_A**: Help personal care. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_05_A**: Help move inside house. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_06_A**: Help personal finances. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ALC_005**: In lifetime, ever drank alcohol? Used for CCHS 2001-2008 and 2015-2018.
+- <font color = green> **New**</font> **ALWDVSTR_der**: Derived variable for short term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **ALWDVLTR_der**: Derived variable for long term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **DEPDVSEV**: Depression scale - severity of depression. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **diet_score_cat3**: Derived variable for categorical diet score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **EDUDR03**: Derived variable for highest level/education - 3 categories. Used for all cycles.
+- <font color = green> **New**</font> **energy_exp**: Daily energy expenditure. Used for all cycles.
+- <font color = green> **New**</font> **HUIDHSI_cat10**: Categorical Health Utility Index into 10 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HUIDHSI_cat20**: Categorical Health Utility Index into 20 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HUIDHSI_cat50**: Categorical Health Utility Index into 50 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HWTGBMI_der_cat4**: Derived variable for categorical body mass index into 4 categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **HWTGCOR**: Adjusted BMI. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **HWTGCOR_der**: Derived variable for adjusted BMI. Used for all CCHS cycles.
+- <font color = green> **New**</font> **immigration_der**: Derived variable for immigration categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **low_drink_score**: Derived variable for low risk drinking score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **low_drink_score1**: Derived variable for low risk drinking score that includes never drank and former drinker categories. Used for CCHS 2001-2008 and 2015-2018.
+- <font color = green> **New**</font> **PAA_045**: Sweat/breathe harder exercises - hours - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAA_050**: Sweat/breathe harder exercises - minutes - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAA_075**: Other physical activities - hours - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAA_080**: Other physical activities - minutes - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAADVDYS**: Active days - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAADVVIG**: Vigorous activity over a week (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAYDVADL**: Leisure activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAYDVDYS**: Active days - 7d (12-17 years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAYDVTOA**: Other physical activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAYDVVIG**: Vigorous activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **pct_time_der_cat10**: Categorical percentage of time in Canada. Used for all CCHS cycles.
+- <font color = green> **New**</font> **SMKDSTY_B**: Smoker status into 5 categories. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **SMKDSTY_cat5**: Smoker status into 5 categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **SMKG040**: Age started to smoke daily - daily/former daily smoker. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **SMKG040_cont**: Derived variable for age started to smoke daily - daily/former daily smoker. Used for all CCHS cycles.
+- <font color = green> **New**</font> **CCC_075**: Do you have high blood cholesterol or lipids? Used for CCHS 2015-2018.
+
 # cchsflow 1.8.3
 2021-08-20
 

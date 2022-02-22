@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,15 +46,14 @@
 
 <!-- docsearch -->
 <script src="../docsearch.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
 
 <meta property="og:title" content="Function reference" />
-<meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="/logo.svg" />
 
 
 
@@ -68,7 +71,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-index">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -82,7 +85,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.8.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
       </span>
     </div>
 
@@ -90,7 +93,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -133,8 +136,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/Big-Life-Lab/cchsflow">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/Big-Life-Lab/cchsflow/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -175,6 +178,11 @@
           <p class="section-desc"><p>Model Specification Worksheets</p></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -195,12 +203,29 @@
           <p class="section-desc"><p>Functions for deriving custom CCHS variables</p></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
           <p><code><a href="bmi_fun.html">bmi_fun()</a></code> </p>
         </td>
         <td><p>Body Mass Index (BMI) derived variable</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="adjusted_bmi_fun.html">adjusted_bmi_fun()</a></code> </p>
+        </td>
+        <td><p>Adjusted Body Mass Index (BMI) derived variable</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="bmi_fun_cat.html">bmi_fun_cat()</a></code> </p>
+        </td>
+        <td><p>Categorical BMI (international standard)</p></td>
       </tr><tr>
         
         <td>
@@ -264,6 +289,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="RACDPAL_fun.html">RACDPAL_fun()</a></code> </p>
+        </td>
+        <td><p>Participation and Activity Limitation</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="adl_score_5_fun.html">adl_score_5_fun()</a></code> </p>
         </td>
         <td><p>The number of activities of daily living tasks that require help.</p></td>
@@ -288,6 +319,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="diet_score_fun_cat.html">diet_score_fun_cat()</a></code> </p>
+        </td>
+        <td><p>Categorized diet score</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="smoke_simple_fun.html">smoke_simple_fun()</a></code> </p>
         </td>
         <td><p>Simple smoking status</p></td>
@@ -297,6 +334,60 @@
           <p><code><a href="time_quit_smoking_fun.html">time_quit_smoking_fun()</a></code> </p>
         </td>
         <td><p>Time since quit smoking</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="low_drink_short_fun.html">low_drink_short_fun()</a></code> </p>
+        </td>
+        <td><p>Short term risks due to drinking</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="low_drink_long_fun.html">low_drink_long_fun()</a></code> </p>
+        </td>
+        <td><p>Long term risks due to drinking</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="low_drink_score_fun.html">low_drink_score_fun()</a></code> </p>
+        </td>
+        <td><p>Low drinking score (all cycles)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="low_drink_score_fun1.html">low_drink_score_fun1()</a></code> </p>
+        </td>
+        <td><p>Low drinking score (select cycles)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="immigration_fun.html">immigration_fun()</a></code> </p>
+        </td>
+        <td><p>Immigration by ethnicity and settlement</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pct_time_fun_cat.html">pct_time_fun_cat()</a></code> </p>
+        </td>
+        <td><p>Categorical percent time in Canada</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="energy_exp_fun.html">energy_exp_fun()</a></code> </p>
+        </td>
+        <td><p>Daily energy expenditure in leisure activity</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="SMKG040_fun.html">SMKG040_fun()</a></code> </p>
+        </td>
+        <td><p>Age started smoking daily - daily/former daily smokers</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pack_years_fun_cat.html">pack_years_fun_cat()</a></code> </p>
+        </td>
+        <td><p>Categorical smoking pack-years</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -305,6 +396,11 @@
           <p class="section-desc"><p>Derived variables in cchsflow that users may run into issues with</p></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -379,6 +475,11 @@
           <p class="section-desc"><p>Datasets for each CCHS cycle</p></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -439,6 +540,18 @@
           <p><code><a href="cchs2014_p.html">cchs2014_p</a></code> </p>
         </td>
         <td><p>2014 CCHS PUMF subset data (200 respondents)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="cchs2015_2016_p.html">cchs2015_2016_p</a></code> </p>
+        </td>
+        <td><p>2015-2016 CCHS PUMF subset data (200 respondents)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="cchs2017_2018_p.html">cchs2017_2018_p</a></code> </p>
+        </td>
+        <td><p>2017-2018 CCHS PUMF subset data (200 respondents)</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -447,6 +560,11 @@
           <p class="section-desc"><p>Functions used to manipulate CCHS datasets</p></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -473,6 +591,11 @@
           <p class="section-desc"><p>Utility functions that are used in other cchsflow functions</p></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -484,27 +607,21 @@
     </table>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-worksheets">Worksheets</a></li>
-      <li><a href="#section-derived-variable-functions">Derived variable functions</a></li>
-      <li><a href="#section-potentially-problematic-variables">Potentially problematic variables</a></li>
-      <li><a href="#section-cchs-datasets">CCHS datasets</a></li>
-      <li><a href="#section-processing-functions">Processing functions</a></li>
-      <li><a href="#section-utility-functions">Utility functions</a></li>
-    </ul>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Carol Bennett.</p>
+  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Kitty Chen, Carol Bennett.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

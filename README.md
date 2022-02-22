@@ -11,7 +11,7 @@ development](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://l
 
 *cchsflow* supports the use of the Canadian Community Health Survey (CCHS) by 
 transforming variables from each cycle into harmonized, consistent versions that 
-span survey cycles (currently, 2001 to 2014). 
+span survey cycles (currently, 2001 to 2018). 
 
 The CCHS is a population-based cross-sectional survey of Canadians that has been 
 administered every two years since 2001. There are approximately 130,000 
@@ -33,7 +33,7 @@ combine them together to increase sample size; however, you soon realize a
 challenge... 
 
 Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 
-to 2014. BMI _seems_ like a straightforward measure that is routinely-collected 
+to 2018. BMI _seems_ like a straightforward measure that is routinely-collected 
 worldwide. Indeed, BMI is included in all CCHS cycles. You examine the 
 documentation and find the variable `HWTAGBMI` in the CCHS 2001 corresponds to 
 body mass index, but that in other cycles, the variable name changes to 
@@ -122,15 +122,15 @@ variables that are listed in `variables.csv`. Transformations are performed
 using `rec_with_table()`. `variables.csv` and `variable_details.csv` can be 
 used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
 4. Demonstration CCHS data -  `cchsflow` includes a random sample of 200 
-respondents from each CCHS PUMF file from 2001 to 2014. These data are used for 
+respondents from each CCHS PUMF file from 2001 to 2018. These data are used for 
 the vignettes. 
 The CCHS test data is stored in /data as .RData files. They can be read as a 
 package database.
 
 ```
-# read the CCHS 2014 PUMF test data
+# read the CCHS 2017-2018 PUMF test data
 
-test_data <- cchs2014_p
+test_data <- cchs2017_2018_p
 ```
 
 This repository does not include the full CCHS data. Information on how to 

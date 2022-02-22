@@ -437,8 +437,8 @@ recode_columns <-
         pkg.globals$argument.CatValue]]), ]
     
     func_variables_to_process <-
-      variables_to_process[grepl("Func::", variables_to_process[[
-        pkg.globals$argument.CatValue]]), ]
+      variables_to_process[grepl("DerivedVar::", variables_to_process[[
+        pkg.globals$argument.VariableStart]]), ]
     
     rec_variables_to_process <-
       variables_to_process[(!grepl("Func::|map::", variables_to_process[[
@@ -565,7 +565,9 @@ recode_columns <-
             from_values <- list()
             interval <- ""
             if (grepl("\\[*\\]", as.character(row_being_checked[[
-              pkg.globals$argument.From]]))) {
+              pkg.globals$argument.From]])) ||
+              grepl("\\(*\\)", as.character(row_being_checked[[
+                pkg.globals$argument.From]]))) {
               from_values <-
                 strsplit(as.character(row_being_checked[[
                   pkg.globals$argument.From]]), ",")[[1]]
@@ -574,9 +576,20 @@ recode_columns <-
               interval_left <- substr(from_values[[1]], 1, 1)
               interval_right <- substr(from_values[[2]], nchar(from_values[[2]]), nchar(from_values[[2]]))
               interval <- paste0(interval_left,",",interval_right)
-              from_values[[1]] <- gsub("\\[|\\]", "", from_values[[1]])
-              from_values[[2]] <- gsub("\\[|\\]", "", from_values[[2]])
-            } else {
+              if(grepl("\\[", from_values[[1]])){
+                from_values[[1]] <- gsub("\\[", "", from_values[[1]])
+              }
+              else{
+                from_values[[1]] <- gsub("\\(", "", from_values[[1]])
+              }
+              if(grepl("\\]", from_values[[2]])){
+                from_values[[2]] <- gsub("|]", "", from_values[[2]])
+              }
+              else{
+                from_values[[2]] <- gsub("|)", "", from_values[[2]])
+              }
+            } 
+            else {
               temp_from <-
                 as.character(row_being_checked[[pkg.globals$argument.From]])
               from_values[[1]] <- temp_from
@@ -719,7 +732,16 @@ compare_value_based_on_interval <-
               as.numeric(left_boundary) < data[[compare_columns]] &
                 data[[compare_columns]] <= as.numeric(right_boundary)
             )]
-      } else {
+      } 
+      else if (interval == "(,)") {
+        return_boolean <-
+          data[[compare_columns]] %in% data[[
+            compare_columns]][which(
+              as.numeric(left_boundary) < data[[compare_columns]] &
+                data[[compare_columns]] < as.numeric(right_boundary)
+            )]
+      }
+      else {
         stop("Invalid Argument was passed")
       }
     }
@@ -815,10 +837,13 @@ recode_derived_variables <-
     variable_rows <-
       variables_to_process[variables_to_process[[
         pkg.globals$argument.Variables]] == variable_being_processed, ]
+    fun_variable_rows <-
+      variable_rows[grepl("Func::", variable_rows[[
+        pkg.globals$argument.CatValue]]), ]
     variables_to_process <-
       variables_to_process[variables_to_process[[
         pkg.globals$argument.Variables]] != variable_being_processed, ]
-    for (row_num in seq_len(nrow(variable_rows))) {
+    for (row_num in seq_len(nrow(fun_variable_rows))) {
       # Check for presence of feeder variables in data and in the
       # variable being processed stack
       feeder_vars <-
@@ -896,8 +921,6 @@ recode_derived_variables <-
       }
       
       # Obtain the function for each row
-      append(label_list, create_label_list_element(variable_rows))
-      
       row_being_checked <- variable_rows[row_num, ]
       func_cell <-
         as.character(row_being_checked[[pkg.globals$argument.CatValue]])
@@ -928,6 +951,9 @@ recode_derived_variables <-
       var_stack <-
         var_stack[!(var_stack == variable_being_processed)]
     }
+    
+    label_list[[as.character(variable_being_processed)]] <-
+      assign(variable_being_processed, create_label_list_element(variable_rows))
     
     return(
       list(
