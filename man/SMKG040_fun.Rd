@@ -15,7 +15,7 @@ daily smokers.}
 }
 \value{
 value for age started smoking daily for daily/former daily smokers in
-the SMKG040_cont
+the SMKG040_cont variable
 }
 \description{
 This function creates a continuous derived variable 
