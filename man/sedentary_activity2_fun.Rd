@@ -27,3 +27,38 @@ This function creates a derived variable (sedentary_activity2)
  time spent at school or work is excluded. Time spent in reading is not 
  included. This is limited to ages 20+.
 }
+\examples{
+# Using sedentary_activity2_fun() to create values for total hours per week 
+# spent doing sedentary activities (excluding reading) across CCHS cycles.
+# sedentary_activity2_fun() is specified in variable_details.csv along with 
+# the CCHS variables and cycles included.
+
+# To transform sedentary_activity2 across cycles, use rec_with_table() for each
+# CCHS cycle and specify sedentary_activity2, along with the required base 
+# variables.Then by using merge_rec_data(), you can combine 
+# sedentary_activity2 across cycles.
+
+library(cchsflow)
+
+sed_act2_2009_2010 <- rec_with_table(
+  cchs2009_2010_p, c(
+    "SAC_1", "SAC_2","SAC_3","SAC_4","DHHGAGE_cont","sedentary_activity2"
+  )
+)
+
+head(sed_act2_2009_2010)
+
+sed_act2_2015_2016 <- rec_with_table(
+  cchs2015_2016_p, c(
+    "SAC_1", "SAC_2D_A","SAC_2D_B","SAC_2D","DHHGAGE_cont","SAC_2_A",
+    "SAC_3","SAC_4","sedentary_activity2"
+  )
+)
+tail(sed_act2_2015_2016)
+
+combined_sed_act2 <- suppressWarnings(merge_rec_data(sed_act2_2009_2010,
+ sed_act2_2015_2016))
+
+head(combined_sed_act2)
+tail(combined_sed_act2)
+}

@@ -53,6 +53,15 @@ weekly_screen_time_fun <-
 #' @return value for screen time (hours/week) outside of school and work day
 #' 
 #' @examples 
+#' # Using weekly_screen_time_fun() to create values for weekly screen time 
+#' # across CCHS cycles.
+#' # weekly_screen_time_fun() is specified in variable_details.csv along with 
+#' # the CCHS variables and cycles included.
+#'
+#' # To transform weekly_screen across cycles, use rec_with_table() for each
+#' # CCHS cycle and specify weekly_screen, along with the daily screen time
+#' # variable.Then by using merge_rec_data(), you can combine 
+#' # weekly_screen across cycles.
 #' # Using weekly_screen_time_age1_fun() to create values for weekly screen time 
 #' # across CCHS cycles.
 #' # weekly_screen_time_age1_fun() is specified in variable_details.csv along with 
@@ -67,7 +76,7 @@ weekly_screen_time_fun <-
 #' 
 #' weekly_st_A_2017_2018 <- rec_with_table(
 #'   cchs2017_2018_p, c(
-#'     "DHHGAGE_cont",SBE_010", "weekly_screen_A"
+#'     "DHHGAGE_cont", "SBE_010", "weekly_screen_A"
 #'   )
 #' )
 #'
@@ -78,8 +87,9 @@ weekly_screen_time_fun <-
 weekly_screen_time_age1_fun <-
   function(DHHGAGE_cont, SBE_010) {
     if_else2(!is.na(SBE_010) & DHHGAGE_cont >=20, SBE_010*7, 
-             if_else2(SBE_010 == "NA(a)", 
-                      tagged_na("a"), tagged_na("b")))
+             if_else2(!is.na(SBE_010) & DHHGAGE_cont <20, tagged_na("a"),
+                       if_else2(SBE_010 == "NA(a)", 
+                                tagged_na("a"), tagged_na("b"))))
   }
 
 #' @title Weekly leisure screen time (age <20)
@@ -110,7 +120,7 @@ weekly_screen_time_age1_fun <-
 #' 
 #' weekly_st_B_2017_2018 <- rec_with_table(
 #'   cchs2017_2018_p, c(
-#'     "DHHGAGE_cont",SBE_010", "weekly_screen_B"
+#'     "DHHGAGE_cont","SBE_010", "weekly_screen_B"
 #'   )
 #' )
 #'
@@ -121,8 +131,9 @@ weekly_screen_time_age1_fun <-
 weekly_screen_time_age2_fun <-
   function(DHHGAGE_cont, SBE_010) {
     if_else2(!is.na(SBE_010) & DHHGAGE_cont <20, SBE_010*7, 
-             if_else2(SBE_010 == "NA(a)", 
-                      tagged_na("a"), tagged_na("b")))
+             if_else2(!is.na(SBE_010) & DHHGAGE_cont >=20, tagged_na("a"),
+                       if_else2(SBE_010 == "NA(a)", 
+                                tagged_na("a"), tagged_na("b"))))
   }
 
 #' @title Video games (physical and non-physical activity)
@@ -222,8 +233,10 @@ video_game_fun <-
 #' @export
 
 video_game_age1_fun <- function(DHHGAGE_cont, SAC_2D){
-  if_else2(DHHGAGE_cont >=20, SAC_2D, if_else2(SAC_2D == "NA(a)",
-                                               tagged_na("a"), tagged_na("b")))
+  if_else2(DHHGAGE_cont >=20, SAC_2D,
+           if_else2(DHHGAGE_cont <20, tagged_na("a"),
+                    if_else2(SAC_2D == "NA(a)",
+                             tagged_na("a"), tagged_na("b"))))
 }
 
 #' @title Time spent playing video games (age <20)
@@ -278,8 +291,10 @@ video_game_age1_fun <- function(DHHGAGE_cont, SAC_2D){
 #' @export
 
 video_game_age2_fun <- function(DHHGAGE_cont, SAC_2D){
-  if_else2(DHHGAGE_cont <20, SAC_2D, if_else2(SAC_2D == "NA(a)",
-                                              tagged_na("a"), tagged_na("b")))
+  if_else2(DHHGAGE_cont <20, SAC_2D, 
+           if_else2(DHHGAGE_cont >=20, tagged_na("a"),
+                    if_else2(SAC_2D == "NA(a)",
+                             tagged_na("a"), tagged_na("b"))))
 }
 
 #' @title Total hours/week - sedentary activity (age 20+)
@@ -345,9 +360,11 @@ sedentary_activity_fun <-
     if_else2(!is.na(SAC_1) & !is.na(SAC_2_A) & !is.na(SAC_3) & 
              !is.na(SAC_4) & DHHGAGE_cont >=20,
              SAC_1 + SAC_2_A + SAC_3 + SAC_4,
-             if_else2(SAC_1 == "NA(a)"| SAC_2_A == "NA(a)"| 
-                      SAC_3 == "NA(a)"| SAC_4== "NA(a)",
-                      tagged_na("a"), tagged_na("b")))
+             if_else2(!is.na(SAC_1) & !is.na(SAC_2_A) & !is.na(SAC_3) & 
+                      !is.na(SAC_4) & DHHGAGE_cont <20, tagged_na("a"),
+                       if_else2(SAC_1 == "NA(a)"| SAC_2_A == "NA(a)"| 
+                                SAC_3 == "NA(a)"| SAC_4== "NA(a)",
+                                tagged_na("a"), tagged_na("b"))))
   }
 
 
@@ -386,7 +403,7 @@ sedentary_activity_fun <-
 #' 
 #' sed_act2_2009_2010 <- rec_with_table(
 #'   cchs2009_2010_p, c(
-#'     "SAC_1", "SAC_2","SAC_3","SAC_4","DHHGAGE_cont,"sedentary_activity2"
+#'     "SAC_1", "SAC_2","SAC_3","SAC_4","DHHGAGE_cont","sedentary_activity2"
 #'   )
 #' )
 #'
@@ -411,6 +428,9 @@ sedentary_activity2_fun <-
   function(DHHGAGE_cont, SAC_1, SAC_2_A, SAC_3){
     if_else2(!is.na(SAC_1) & !is.na(SAC_2_A) & !is.na(SAC_3) & DHHGAGE_cont >=20,
              SAC_1 + SAC_2_A + SAC_3,
-              if_else2(SAC_1 == "NA(a)"| SAC_2_A == "NA(a)"| SAC_3 == "NA(a)",
-                       tagged_na("a"), tagged_na("b")))
+             if_else2(!is.na(SAC_1) & !is.na(SAC_2_A) & !is.na(SAC_3) & 
+                      DHHGAGE_cont <20, tagged_na("a"),
+                      if_else2(SAC_1 == "NA(a)"| SAC_2_A == "NA(a)"| 
+                               SAC_3 == "NA(a)",
+                               tagged_na("a"), tagged_na("b"))))
   }

@@ -20,3 +20,25 @@ This function creates a derived variable (weekly_screen_B)
  that calculates the total hours in a week spent using a screen outside of 
  school and/or work. This is limited to age less than 20.
 }
+\examples{
+# Using weekly_screen_time_age2_fun() to create values for weekly screen time 
+# across CCHS cycles.
+# weekly_screen_time_age2_fun() is specified in variable_details.csv along with 
+# the CCHS variables and cycles included.
+
+# To transform weekly_screen_B, use rec_with_table() for each
+# CCHS cycle and specify weekly_screen_B, along with the daily screen time
+# and continuous age variable.Then by using merge_rec_data(), you can combine 
+# weekly_screen_B across cycles.
+
+library(cchsflow)
+
+weekly_st_B_2017_2018 <- rec_with_table(
+  cchs2017_2018_p, c(
+    "DHHGAGE_cont","SBE_010", "weekly_screen_B"
+  )
+)
+
+head(weekly_st_B_2017_2018)
+tail(weekly_st_B_2017_2018)
+}
