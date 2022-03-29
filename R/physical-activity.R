@@ -1,12 +1,12 @@
 #' @title Daily energy expenditure in leisure activity 
 #' 
-#' @description This function creates a derived variable for 
-#' A MET is a conceptual value that represents energy expended during physical activity. 
-#' The volume of activity is calculated by multiplying the amount of minutes of 
-#' activity (by level of intensity) by the MET value associated with that 
-#' intensity. A MET (metabolic equivalent) is the energy cost of activity 
-#' expressed as kilocalories expended per kilogram of body 
-#' weight per hour of activity.
+#' @description This function creates a derived variable for daily leisure 
+#' energy expenditure.A MET is a conceptual value that represents energy 
+#' expended during physical activity. The volume of activity is calculated by 
+#' multiplying the amount of minutes of activity (by level of intensity) by the 
+#' MET value associated with that intensity. A MET (metabolic equivalent) is 
+#' the energy cost of activity expressed as kilocalories expended per kilogram 
+#' of body weight per hour of activity.
 #'
 #' In CCHS 2001-2014, PACDEE is the variable used to determine the daily 
 #' expenditure of leisure activity for all ages. In CCHS 2015-2018, ages 12-17 
@@ -121,13 +121,13 @@ energy_exp_fun <-
     physical_activity <-
       if_else2(!is.na(PAYDVVIG) & !is.na(leisure_youth) & !is.na(PAYDVDYS),
                (((leisure_youth) - (PAYDVVIG))*3 + (PAYDVVIG)*6)/7*PAYDVDYS/60,
-      if_else2(!is.na(PAADVDYS) & !is.na(PAADVVIG) & 
-               !is.na(leisure_adult) & !is.na(PAADVVIG),
+      if_else2(!is.na(PAADVDYS) & !is.na(PAADVVIG) & !is.na(leisure_adult),
                ((((leisure_adult) - (PAADVVIG))*3 + (PAADVVIG)*6)/7*(PAADVDYS)/60), 
                     if_else2(leisure_youth == "NA(a)"|
-                             PAYDVDYS == "NA(a)"|PAADVVIG == "NA(a)"|
-                             leisure_adult == "NA(a)"|PAADVDYS == "NA(a)", 
-                                 tagged_na("a"), tagged_na("b"))))
+                             PAYDVDYS == "NA(a)"|PAYDVVIG == "NA(a)"|
+                             leisure_adult == "NA(a)"|PAADVDYS == "NA(a)"|
+                             PAADVVIG == "NA(a)", 
+                             tagged_na("a"), tagged_na("b"))))
     return(physical_activity)
   }
 
