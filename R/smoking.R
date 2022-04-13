@@ -341,7 +341,7 @@ pack_years_fun <-
 #'  daily smokers.
 #'  
 #' @return value for age started smoking daily for daily/former daily smokers in
-#' the SMKG040_cont
+#' the SMKG040_cont variable
 #'  
 #' @examples  
 #' # Using SMKG040_fun() to create age values across CCHS cycles
@@ -464,4 +464,271 @@ pack_years_fun_cat <- function(pack_years_der){
     if_else2(pack_years_der == tagged_na("a"), "NA(a)", "NA(b)")))))))))
   
   return(pack_years_cat)
+}
+
+#' @title Type of smokers
+#' 
+#' @description This function creates a derived variable (SMKDSTY_A) for 
+#' smoker type with 5 categories:
+#' 
+#' \itemize{
+#'   \item daily smoker
+#'   \item current occasional smoker (former daily) 
+#'   \item current occasional smoker (never daily) 
+#'   \item current nonsmoker (former daily)
+#'   \item current nonsmoker (never daily)
+#'   \item nonsmoker
+#'  }
+#' 
+#' @details For CCHS 2001-2014, smoker type is derived from smoking more than 
+#' 100 cigarettes in lifetime, type of smoker at present time, and ever smoked 
+#' daily. For CCHS 2015-2018, smoker type was derived differently with different 
+#' variables and categories. A function was created for a consistent smoker 
+#' status across all cycles.
+#' 
+#' @param SMK_005 type of smoker presently
+#' 
+#' @param SMK_030 smoked daily - lifetime (occasional/former smoker)
+#' 
+#' @param SMK_01A smoked 100 or more cigarettes in lifetime
+#' 
+#' @return value for smoker type in the SMKDSTY_A variable
+#' 
+#' @examples  
+#' # Using SMKDSTY_fun() to derive smoke type values across CCHS cycles
+#' # SMKDSTY_fun() is specified in variable_details.csv along with the 
+#' # CCHS variables and cycles included.
+#'
+#' # To transform SMKDSTY_A across cycles, use rec_with_table() for each
+#' # CCHS cycle and specify SMKDSTY_A.
+#' # For CCHS 2001-2014, only specify SMKDSTY_A for smoker type.
+#' # For CCHS 2015-2018, specify the parameters and SMKDSTY_A for smoker type.
+#' 
+#' library(cchsflow)
+#'
+#' smoker_type_2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, "SMKDSTY_A")
+#'
+#' head(smoker_type_2009_2010)
+#'
+#' smoker_type_2017_2018 <- rec_with_table(
+#'   cchs2017_2018_p,c(
+#'     "SMK_01A", "SMK_005","SMK_030","SMKDSTY_A"
+#'   )
+#' )
+#'
+#' tail(smoker_type_2017_2018)
+#'
+#' combined_smoker_type <- suppressWarnings(merge_rec_data
+#' (smoker_type_2009_2010,smoker_type_2017_2018))
+#'
+#' head(combined_smoker_type)
+#' tail(combined_smoker_type)
+#' 
+#' @export
+
+SMKDSTY_fun<-function(SMK_005, SMK_030, SMK_01A){
+  if_else2(SMK_005 == 1, 1, # Daily smoker
+  if_else2(SMK_005 == 2 & SMK_030 == 1, 2, # Occasional smoker (former daily)
+  if_else2(SMK_005 == 2 & (SMK_030 == 2|SMK_030 == "NA(a)"|SMK_030 == "NA(b)"), 
+           3, # Occasional Smoker (never daily)
+  if_else2(SMK_005 == 3 & SMK_030 == 1 , 4, # Former daily
+  if_else2(SMK_005 == 3 & SMK_030 == 2 & SMK_01A == 1, 5, # Former occasional
+  if_else2(SMK_005 == 3 & SMK_01A == 2, 6, # Never smoked
+  if_else2(SMK_005 == "NA(a)", tagged_na("a"), tagged_na("b"))))))))
+}
+
+#' @title Age started to smoke daily - daily smoker
+#' 
+#' @description This function creates a continuous derived variable
+#' (SMKG203_cont) for age started to smoke daily for daily smokers.
+#' 
+#' @details For CCHS 2015-2018, age started to smoke daily was combined for daily 
+#' and former daily smokers.Previous cycles had separate variables for age 
+#' started to smoke daily. Type of smoker presently is used to define daily 
+#' smoker.
+#' 
+#' @param SMK_005 type of smoker presently
+#' 
+#' @param SMKG040 age started to smoke daily - daily/former daily smoker
+#' 
+#' @return value for continuous age started to smoke daily for daily smokers 
+#' in the SMKG203_cont variable
+#' 
+#' @examples  
+#' # Using SMKG203_fun() to derive age started to smoke daily values across 
+#' # CCHS cycles.
+#' # SMKG203_fun() is specified in variable_details.csv along with the 
+#' # CCHS variables and cycles included.
+#'
+#' # To transform SMKG203_A across cycles, use rec_with_table() for each
+#' # CCHS cycle and specify SMKG203_A.
+#' # For CCHS 2001-2014, only specify SMKG203_A.
+#' # For CCHS 2015-2018, specify the parameters and SMKG203_A for daily smoker 
+#' # age.
+#' 
+#' library(cchsflow)
+#'
+#' agecigd_2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, "SMKG203_A")
+#'
+#' head(agecigd_2009_2010)
+#'
+#' agecigd_2017_2018 <- rec_with_table(
+#'   cchs2017_2018_p,c(
+#'     "SMK_005","SMKG040","SMKG203_A"
+#'   )
+#' )
+#'
+#' tail(agecigd_2017_2018)
+#'
+#' combined_agecigd <- suppressWarnings(merge_rec_data
+#' (agecigd_2009_2010,agecigd_2017_2018))
+#'
+#' head(combined_agecigd)
+#' tail(combined_agecigd)
+#' 
+#' @export
+
+SMKG203_fun <- function(SMK_005, SMKG040){
+  SMKG203 <- if_else2(
+    SMK_005 == 1, SMKG040,
+      if_else2(
+        SMK_005 == "NA(a)"|SMKG040 == "NA(a)", tagged_na("a"), tagged_na("b")))
+  SMKG203_cont <- if_else2(
+    SMKG203 == 1, 8,
+    if_else2(
+      SMKG203 == 2, 13,
+      if_else2(
+        SMKG203 == 3, 16,
+        if_else2(
+          SMKG203 == 4, 18.5,
+          if_else2(
+            SMKG203 == 5, 22,
+            if_else2(
+              SMKG203 == 6, 27,
+              if_else2(
+                SMKG203 == 7, 32,
+                if_else2(
+                  SMKG203 == 8, 37,
+                  if_else2(
+                    SMKG203 == 9, 42,
+                    if_else2(
+                      SMKG203 == 10, 47,
+                      if_else2(
+                        SMKG203 == 11, 55,
+                        if_else2(SMKG203 == "NA(a)", 
+                                 tagged_na("a"), tagged_na("b")
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+  
+  return(SMKG203_cont)
+}
+
+#' @title Age started to smoke daily - former daily smoker
+#'
+#' @description This function creates a continuous derived variable
+#' (SMKG207_cont) for age started to smoke daily for former daily smokers.
+#' 
+#' @details For CCHS 2015-2018, age started to smoke daily was combined for daily 
+#' and former daily smokers.Previous cycles had separate variables for age 
+#' started to smoke daily. Smoked daily in lifetime is used to define former 
+#' daily smoker.
+#' 
+#' @param SMK_030 smoked daily - lifetime (occasional/former smoker)
+#' 
+#' @param SMKG040 age started to smoke daily - daily/former daily smoker
+#' 
+#' @return value for continuous age started to smoke daily for former daily 
+#' smokers in the SMKG207_cont variable
+#' 
+#' @examples  
+#' # Using SMKG207_fun() to derive age started to smoke daily values across 
+#' # CCHS cycles.
+#' # SMKG207_fun() is specified in variable_details.csv along with the 
+#' # CCHS variables and cycles included.
+#'
+#' # To transform SMKG207_A across cycles, use rec_with_table() for each
+#' # CCHS cycle and specify SMKG207_A.
+#' # For CCHS 2001-2014, only specify SMKG207_A.
+#' # For CCHS 2015-2018, specify the parameters and SMKG207_A for former daily 
+#' # smoker age.
+#' 
+#' library(cchsflow)
+#'
+#' agecigfd_2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, "SMKG207_A")
+#'
+#' head(agecigfd_2009_2010)
+#'
+#' agecigfd_2017_2018 <- rec_with_table(
+#'   cchs2017_2018_p,c(
+#'     "SMK_030","SMKG040","SMKG207_A"
+#'   )
+#' )
+#'
+#' tail(agecigfd_2017_2018)
+#'
+#' combined_agecigfd <- suppressWarnings(merge_rec_data
+#' (agecigfd_2009_2010,agecigfd_2017_2018))
+#'
+#' head(combined_agecigfd)
+#' tail(combined_agecigfd)
+#' 
+#' @export
+#' @export
+SMKG207_fun <- function(SMK_030, SMKG040){
+  SMKG207 <- if_else2(
+      SMK_030 == 1, SMKG040,
+       if_else2(
+         SMK_030 == "NA(a)"|SMKG040 == "NA(a)", tagged_na("a"), tagged_na("b")))
+  SMKG207_cont <- if_else2(
+    SMKG207 == 1, 8,
+      if_else2(
+        SMKG207 == 2, 13,
+          if_else2(
+            SMKG207 == 3, 16,
+              if_else2(
+                SMKG207 == 4, 18.5,
+                  if_else2(
+                    SMKG207 == 5, 22,
+                      if_else2(
+                        SMKG207 == 6, 27,
+                          if_else2(
+                            SMKG207 == 7, 32,
+                              if_else2(
+                                SMKG207 == 8, 37,
+                                if_else2(
+                                  SMKG207 == 9, 42,
+                                    if_else2(
+                                      SMKG207 == 10, 47,
+                                      if_else2(
+                                          SMKG207 == 11, 55,
+                                            if_else2(SMKG207 == "NA(a)", 
+                                                tagged_na("a"), tagged_na("b")
+                                                )
+                                          )
+                                      )
+                                  )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    )
+                    
+  return(SMKG207_cont)
+  
 }
