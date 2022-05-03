@@ -202,6 +202,6 @@ active_transport3_fun <-
              (PAYDVTTR + PAADVTRV)/7,
              if_else2(is.na(PAYDVTTR), PAADVTRV/7,
                       if_else2(is.na(PAADVTRV), PAYDVTTR/7,
-                               if_else2(PAYDVTTR == "NA(a)" & PAADVTRV == "NA(a)"),
-                               tagged_na("a"), tagged_na("b"))))
+                               if_else2(PAYDVTTR == "NA(a)" & PAADVTRV == "NA(a)",
+                               tagged_na("a"), tagged_na("b")))))
   }
