@@ -56,8 +56,7 @@ head(SPS5_2011_2012)
 
 SPS5_2017_2018 <- rec_with_table(
   cchs2017_2018_p,c(
-    "SPS_03", "SPS_03", "SPS_04", "SPS_04", "SPS_05", "SPS_05", 
-    "SPS_07", "SPS_07", "SPS_10", "SPS_10", "SPS5_der"
+    "SPS_03", "SPS_04", "SPS_05", "SPS_07", "SPS_10", "SPS5_der"
   )
 )
 

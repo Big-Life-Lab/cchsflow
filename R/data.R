@@ -427,3 +427,108 @@ NULL
 #' data(cchs2017_2018_p)
 #' str(cchs2017_2018_p)
 NULL
+
+#' 2009 CCHS synthetic subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2009 cycle of the Canadian
+#' Community Health Survey (CCHS) synthetic dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2009 synthetic
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
+#'
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed May 2022. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: synthetic-CCHS-E-2009-FullSampleFile_F1
+#'
+#' DDI: \url{https://osf.io/q8g7y/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2009_s
+#' @aliases cchs2009_s
+#' @docType data
+#' @return \item{cchs2009_s}{a data frame}
+#'
+#' @source
+#'  \url{https://www.statcan.gc.ca/en/statistical-programs/document/3226_D56_T9_V1}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2009_s)
+#' str(cchs2009_s)
+NULL
+
+#' 2010 CCHS synthetic subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2010 cycle of the Canadian
+#' Community Health Survey (CCHS) synthetic dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2010 synthetic
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
+#'
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed May 2022. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: synthetic-CCHS-E-2010-AnnualComponent_F1
+#'
+#' DDI: \url{https://osf.io/q8g7y/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2010_s
+#' @aliases cchs2010_s
+#' @docType data
+#' @return \item{cchs2010_s}{a data frame}
+#'
+#' @source
+#'  \url{https://www.statcan.gc.ca/en/statistical-programs/document/3226_D56_T9_V1}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2010_s)
+#' str(cchs2010_s)
+NULL
+
+#' 2012 CCHS synthetic subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2012 cycle of the Canadian
+#' Community Health Survey (CCHS) synthetic dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2012 synthetic
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
+#'
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed May 2022. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: synthetic-CCHS-E-2012-AnnualComponent_F1
+#'
+#' DDI: \url{https://osf.io/q8g7y/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2012_s
+#' @aliases cchs2012_s
+#' @docType data
+#' @return \item{cchs2012_s}{a data frame}
+#'
+#' @source
+#'  \url{https://www.statcan.gc.ca/en/statistical-programs/document/3226_D56_T9_V1}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2012_s)
+#' str(cchs2012_s)
+NULL
