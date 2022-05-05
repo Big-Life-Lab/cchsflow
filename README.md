@@ -7,6 +7,7 @@ development](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://l
 ![](https://img.shields.io/github/v/release/big-life-lab/cchsflow?color=green&label=GitHub)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![](https://img.shields.io/badge/doi-10.17605/OSF.IO/HKUY3-yellowgreen.svg)](https://OSF.IO/HKUY3)
+[![](https://cranlogs.r-pkg.org/badges/cchsflow)](https://cran.r-project.org/package=cchsflow)
 <!-- badges: end -->
 
 *cchsflow* supports the use of the Canadian Community Health Survey (CCHS) by 
