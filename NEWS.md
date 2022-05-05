@@ -1,4 +1,56 @@
 # cchsflow 2.0.1
+2022-05-05
+
+## Features
+- Support for CCHS synthetic data sets for 2009, 2010, and 2012. 
+
+## Variables
+#### Active transportation
+- <font color = green> **New**</font> **active_transport**: Daily active transportation.
+- <font color = green> **New**</font> **PAC_4A_cont**: Time walk work/school in week.
+- <font color = green> **New**</font> **PAC_4B_cont**: Time bike work/school in week.
+- <font color = green> **New**</font> **PAADVTRV**: Active transportation (18+ years old).
+- <font color = green> **New**</font> **PAYDVTTR**: Active transportation (12-17 years old).
+- <font color = green> **New**</font> **PAC_7B_cont**: Time walk work/school.
+- <font color = green> **New**</font> **PAC_8B_cont**: Time bike work/school.
+
+#### Social provision scale (SPS)
+- <font color = green> **New**</font> **SPS_01**: SPS-5 - people to depend on for help.
+- <font color = green> **New**</font> **SPS_02**: SPS-5 - people who enjoy same social activities.
+- <font color = green> **New**</font> **SPS_03**: SPS-5 - close relationships.
+- <font color = green> **New**</font> **SPS_04**: SPS-5 - important decision discussion.
+- <font color = green> **New**</font> **SPS_05**: SPS-5 - competence and skill are recognized.
+- <font color = green> **New**</font> **SPS_06**: SPS-5 - trustworthy person for advice.
+- <font color = green> **New**</font> **SPS_07**: SPS-5 - group with shared attitudes and beliefs.
+- <font color = green> **New**</font> **SPS_08**: SPS-5 - strong emotional bond with a least one person.
+- <font color = green> **New**</font> **SPS_09**: SPS-5 - admired talents and abilities.
+- <font color = green> **New**</font> **SPS_10**: SPS-5 - strong emotional bond.
+- <font color = green> **New**</font> **SPS5_der**: SPS-5 - overall.
+
+
+#### Medical outcome study (MOS)
+- <font color = green> **New**</font> **SSA_01**: MOS - # close friend and relatives.
+- <font color = green> **New**</font> **SSA_02**: MOS - has someone to give help if confined to bed.
+- <font color = green> **New**</font> **SSA_03**: MOS - has someone to listen.
+- <font color = green> **New**</font> **SSA_04**: MOS - has someone to provide/give advice about a crisis.
+- <font color = green> **New**</font> **SSA_05**: MOS - has someone to take to doctor.
+- <font color = green> **New**</font> **SSA_06**: MOS - has someone who shows love and affection.
+- <font color = green> **New**</font> **SSA_07**: MOS - has someone to have a good time with.
+- <font color = green> **New**</font> **SSA_08**: MOS - has someone to give info to help understand a situation.
+- <font color = green> **New**</font> **SSA_09**: MOS - has someone to confide in.
+- <font color = green> **New**</font> **SSA_10**: MOS - has someone who gives hugs.
+- <font color = green> **New**</font> **SSA_11**: MOS - has someone to get together with for relaxation.
+- <font color = green> **New**</font> **SSA_12**: MOS - has someone to prepare meals.
+- <font color = green> **New**</font> **SSA_13**: MOS - has someone to give advice.
+- <font color = green> **New**</font> **SSA_14**: MOS - has someone to do things to get mind off things.
+- <font color = green> **New**</font> **SSA_15**: MOS - has someone to help with daily chores if sick.
+- <font color = green> **New**</font> **SSA_16**: MOS - has someone to share most private worries and fears with.
+- <font color = green> **New**</font> **SSA_17**: MOS - has someone to turn to for suggestions for personal problems.
+- <font color = green> **New**</font> **SSA_18**: MOS - has someone to do something enjoyable with.
+- <font color = green> **New**</font> **SSA_19**: MOS - has someone who understands problems.
+- <font color = green> **New**</font> **SSA_20**: MOS - has someone who loves and makes feel wanted.
+
+# cchsflow 2.0.1
 2021-11-01
 
 ## Bug Fixes

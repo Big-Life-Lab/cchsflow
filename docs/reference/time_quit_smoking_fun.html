@@ -89,7 +89,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -198,76 +198,66 @@ former daily smokers who quit &gt;=3 years ago.</p></td>
     <p>value for time since quit smoking in time_quit_smoking_der.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'># Using time_quit_smoking_fun() to create pack-years values across CCHS </span></span>
-<span class='r-in'><span class='co'># cycles.</span></span>
-<span class='r-in'><span class='co'># time_quit_smoking_fun() is specified in variable_details.csv along with the</span></span>
-<span class='r-in'><span class='co'># CCHS variables and cycles included.</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'># To transform time_quit_smoking across cycles, use rec_with_table() for each</span></span>
-<span class='r-in'><span class='co'># CCHS cycle and specify time_quit_smoking, along with each smoking variable.</span></span>
-<span class='r-in'><span class='co'># Then by using merge_rec_data(), you can combine time_quit_smoking across</span></span>
-<span class='r-in'><span class='co'># cycles.</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>time_quit2009_2010</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span></span>
-<span class='r-in'>  <span class='va'>cchs2009_2010_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
-<span class='r-in'>    <span class='st'>"SMK_09A_B"</span>, <span class='st'>"SMKG09C"</span>, <span class='st'>"time_quit_smoking"</span></span>
-<span class='r-in'>  <span class='op'>)</span></span>
-<span class='r-in'><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG09C: Don't know (7) and refusal (8) not included in CCHS 2015-2016 and CCHS 2017-2018</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>time_quit2009_2010</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   SMK_09A_B SMKG09C time_quit_smoking</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4         4       2                 8</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5         4       3                12</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6         4       3                12</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>time_quit2011_2012</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span></span>
-<span class='r-in'>  <span class='va'>cchs2011_2012_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
-<span class='r-in'>    <span class='st'>"SMK_09A_B"</span>, <span class='st'>"SMKG09C"</span>, <span class='st'>"time_quit_smoking"</span></span>
-<span class='r-in'>  <span class='op'>)</span></span>
-<span class='r-in'><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG09C: Don't know (7) and refusal (8) not included in CCHS 2015-2016 and CCHS 2017-2018</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>time_quit2011_2012</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     SMK_09A_B SMKG09C time_quit_smoking</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 195         4       3                12</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 196     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 197     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 198         4       2                 8</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 199     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 200     NA(a)   NA(a)                NA</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>combined_time_quit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span><span class='op'>(</span><span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span><span class='op'>(</span><span class='va'>time_quit2009_2010</span>,</span>
-<span class='r-in'> <span class='va'>time_quit2011_2012</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>combined_time_quit</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   SMK_09A_B SMKG09C time_quit_smoking</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4         4       2                 8</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5         4       3                12</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6         4       3                12</span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>combined_time_quit</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     SMK_09A_B SMKG09C time_quit_smoking</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 395         4       3                12</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 396     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 397     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 398         4       2                 8</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 399     NA(a)   NA(a)                NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 400     NA(a)   NA(a)                NA</span>
-</pre>
+    <pre class="examples"><div class='input'><span class='co'># Using time_quit_smoking_fun() to create pack-years values across CCHS </span>
+<span class='co'># cycles.</span>
+<span class='co'># time_quit_smoking_fun() is specified in variable_details.csv along with the</span>
+<span class='co'># CCHS variables and cycles included.</span>
+
+<span class='co'># To transform time_quit_smoking across cycles, use rec_with_table() for each</span>
+<span class='co'># CCHS cycle and specify time_quit_smoking, along with each smoking variable.</span>
+<span class='co'># Then by using merge_rec_data(), you can combine time_quit_smoking across</span>
+<span class='co'># cycles.</span>
+
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span>
+
+<span class='va'>time_quit2009_2010</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span>
+  <span class='va'>cchs2009_2010_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+    <span class='st'>"SMK_09A_B"</span>, <span class='st'>"SMKG09C"</span>, <span class='st'>"time_quit_smoking"</span>
+  <span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG09C: Don't know (7) and refusal (8) not included in CCHS 2015-2016 and CCHS 2017-2018</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>time_quit2009_2010</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   SMK_09A_B SMKG09C time_quit_smoking
+#&gt; 1     NA(a)   NA(a)                NA
+#&gt; 2     NA(a)   NA(a)                NA
+#&gt; 3     NA(a)   NA(a)                NA
+#&gt; 4         4       2                 8
+#&gt; 5         4       3                12
+#&gt; 6         4       3                12</div><div class='input'>
+<span class='va'>time_quit2011_2012</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span>
+  <span class='va'>cchs2011_2012_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+    <span class='st'>"SMK_09A_B"</span>, <span class='st'>"SMKG09C"</span>, <span class='st'>"time_quit_smoking"</span>
+  <span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG09C: Don't know (7) and refusal (8) not included in CCHS 2015-2016 and CCHS 2017-2018</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>time_quit2011_2012</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;     SMK_09A_B SMKG09C time_quit_smoking
+#&gt; 195         4       3                12
+#&gt; 196     NA(a)   NA(a)                NA
+#&gt; 197     NA(a)   NA(a)                NA
+#&gt; 198         4       2                 8
+#&gt; 199     NA(a)   NA(a)                NA
+#&gt; 200     NA(a)   NA(a)                NA</div><div class='input'>
+<span class='va'>combined_time_quit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span><span class='op'>(</span><span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span><span class='op'>(</span><span class='va'>time_quit2009_2010</span>,
+ <span class='va'>time_quit2011_2012</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>combined_time_quit</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   SMK_09A_B SMKG09C time_quit_smoking
+#&gt; 1     NA(a)   NA(a)                NA
+#&gt; 2     NA(a)   NA(a)                NA
+#&gt; 3     NA(a)   NA(a)                NA
+#&gt; 4         4       2                 8
+#&gt; 5         4       3                12
+#&gt; 6         4       3                12</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>combined_time_quit</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;     SMK_09A_B SMKG09C time_quit_smoking
+#&gt; 395         4       3                12
+#&gt; 396     NA(a)   NA(a)                NA
+#&gt; 397     NA(a)   NA(a)                NA
+#&gt; 398         4       2                 8
+#&gt; 399     NA(a)   NA(a)                NA
+#&gt; 400     NA(a)   NA(a)                NA</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

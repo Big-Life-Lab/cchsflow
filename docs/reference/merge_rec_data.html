@@ -88,7 +88,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -200,43 +200,36 @@
  for more details on how NA's are treated in cchsflow.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'># Merging two CCHS cycles with variables missing in each cycle.</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'># INCGHH_A is a cchsflow variable available for the 2001 CCHS cycle, while</span></span>
-<span class='r-in'><span class='co'># INCGHH_B is a cchsflow variable available for the 2003 CCHS cycle. </span></span>
-<span class='r-in'><span class='co'># Using merge_rec_data(), datasets containing INCGHH_A &amp; INCGHH_B can be</span></span>
-<span class='r-in'><span class='co'># merged and tagged.</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>income2001</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span><span class='va'>cchs2001_p</span>, <span class='st'>"INCGHH_A"</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for INCGHH_A: CCHS 2001 classifies no income and less than $15,000 as separate categories</span>
-<span class='r-in'><span class='va'>income2003</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span><span class='va'>cchs2001_p</span>, <span class='st'>"INCGHH_B"</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>income_merged</span> <span class='op'>&lt;-</span> <span class='fu'>merge_rec_data</span><span class='op'>(</span><span class='va'>income2001</span>, <span class='va'>income2003</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>income_merged</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   INCGHH_A</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1        3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2        3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3        6</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4        3</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5        4</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6        4</span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>income_merged</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     INCGHH_A</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 395    NA(c)</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 396    NA(c)</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 397    NA(c)</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 398    NA(c)</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 399    NA(c)</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 400    NA(c)</span>
-<span class='r-in'></span>
-</pre>
+    <pre class="examples"><div class='input'><span class='co'># Merging two CCHS cycles with variables missing in each cycle.</span>
+
+<span class='co'># INCGHH_A is a cchsflow variable available for the 2001 CCHS cycle, while</span>
+<span class='co'># INCGHH_B is a cchsflow variable available for the 2003 CCHS cycle. </span>
+<span class='co'># Using merge_rec_data(), datasets containing INCGHH_A &amp; INCGHH_B can be</span>
+<span class='co'># merged and tagged.</span>
+
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span>
+<span class='va'>income2001</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span><span class='va'>cchs2001_p</span>, <span class='st'>"INCGHH_A"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for INCGHH_A: CCHS 2001 classifies no income and less than $15,000 as separate categories</span></div><div class='input'><span class='va'>income2003</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span><span class='va'>cchs2001_p</span>, <span class='st'>"INCGHH_B"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for INCGHH_B: CCHS 2001 classifies no income and less than $15,000 as separate categories</span></div><div class='input'>
+<span class='va'>income_merged</span> <span class='op'>&lt;-</span> <span class='fu'>merge_rec_data</span><span class='op'>(</span><span class='va'>income2001</span>, <span class='va'>income2003</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>income_merged</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   INCGHH_A INCGHH_B
+#&gt; 1        3    NA(c)
+#&gt; 2        3    NA(c)
+#&gt; 3        6    NA(c)
+#&gt; 4        3    NA(c)
+#&gt; 5        4    NA(c)
+#&gt; 6        4    NA(c)</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>income_merged</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;     INCGHH_A INCGHH_B
+#&gt; 395    NA(c)        3
+#&gt; 396    NA(c)        5
+#&gt; 397    NA(c)    NA(b)
+#&gt; 398    NA(c)        2
+#&gt; 399    NA(c)        1
+#&gt; 400    NA(c)        1</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

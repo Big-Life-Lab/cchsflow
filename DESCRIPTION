@@ -1,8 +1,8 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and Harmonizing CCHS Variables
-Version: 2.0.1
-Date: 2021-11-01
+Version: 2.1.0
+Date: 2022-05-05
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -11,7 +11,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-0912-0845")),
     person(given = "Warsame",
            family = "Yusuf",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "waryusuf@ohri.ca"),
     person(given = "Rostyslav", 
            family = "Vyuha",
@@ -19,7 +19,7 @@ Authors@R: c(
            email = "rostikvyuha@gmail.com"),
     person(given = "Kitty", 
            family = "Chen",
-           role = c("aut"),
+           role = c("aut","cre"),
            email = "kitchen@ohri.ca"),       
     person(given = "Carol", 
            family = "Bennett",
@@ -33,7 +33,7 @@ Authors@R: c(
           role = c("cph"),
           email = "dmanuel@ohri.ca"))
 Depends:
-  R (>= 3.2),
+  R (>= 3.5.0),
   haven (>= 1.1.2),
   dplyr (>= 0.8.2),
   sjlabelled (>= 1.0.17),
