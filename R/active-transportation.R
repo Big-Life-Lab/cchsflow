@@ -27,7 +27,7 @@
 #' library(cchsflow)
 #' active_transport2001 <- rec_with_table(
 #'   cchs2001_p, c(
-#'     "PAC_4A_cont", PAC_4B_cont", "active_transport"
+#'     "PAC_4A_cont", "PAC_4B_cont", "active_transport"
 #'   )
 #' )
 #' 
@@ -35,7 +35,7 @@
 #' 
 #' active_transport2005 <- rec_with_table(
 #'   cchs2005_p, c(
-#'     "PAC_4A_cont", PAC_4B_cont", "active_transport"
+#'     "PAC_4A_cont", "PAC_4B_cont", "active_transport"
 #'   )
 #' )
 #' 
@@ -54,8 +54,8 @@ active_transport1_fun <-
              (PAC_4A_cont + PAC_4B_cont)/7,
              if_else2(is.na(PAC_4A_cont), PAC_4B_cont/7,
                       if_else2(is.na(PAC_4B_cont), PAC_4A_cont/7,
-                               if_else2(PAC_4A_cont == "NA(a)" & PAC_4B_cont == "NA(a)"),
-                               tagged_na("a"), tagged_na("b"))))
+                               if_else2(PAC_4A_cont == "NA(a)" & PAC_4B_cont == "NA(a)",
+                               tagged_na("a"), tagged_na("b")))))
   }
 
 #' @title Daily active transportation (2007-2014)

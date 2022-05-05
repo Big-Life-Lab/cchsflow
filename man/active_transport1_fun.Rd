@@ -36,7 +36,7 @@ used for CCHS 2001-2005.
 library(cchsflow)
 active_transport2001 <- rec_with_table(
   cchs2001_p, c(
-    "PAC_4A_cont", PAC_4B_cont", "active_transport"
+    "PAC_4A_cont", "PAC_4B_cont", "active_transport"
   )
 )
 
@@ -44,7 +44,7 @@ head(active_transport2001)
 
 active_transport2005 <- rec_with_table(
   cchs2005_p, c(
-    "PAC_4A_cont", PAC_4B_cont", "active_transport"
+    "PAC_4A_cont", "PAC_4B_cont", "active_transport"
   )
 )
 
