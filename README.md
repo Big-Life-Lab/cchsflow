@@ -163,10 +163,10 @@ feel free to contribute to `cchsflow` by making a PR that creates versions of
 CCHS data used in this library is accessed and adapted in accordance to the 
 Statistics Canada Open Licence Agreement.
 
-Source from Statistics Canada, Canadian Community Health Survey 2001 to 2013 
-PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with the 
+Source from Statistics Canada, Canadian Community Health Survey 2001 to 2018 
+PUMF, accessed March 2022. Reproduced and distributed on an "as is" basis with the 
 permission of Statistics Canada.
 
-Adapted from Statistics Canada, Canadian Community Health Surveys 2013 to 2013 
-PUMF, accessed Jan 2020. This does not constitute an endorsement by Statistics 
+Adapted from Statistics Canada, Canadian Community Health Surveys 2001 to 2018 
+PUMF, accessed March 2022. This does not constitute an endorsement by Statistics 
 Canada of this product.

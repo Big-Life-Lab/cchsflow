@@ -63,7 +63,7 @@ kable(variable_details[variable_details$variable == "DHH_SEX", 1], col.names = '
 kable(variable_details[variable_details$variable == "DHH_SEX", c(1:2)])
 ```
 
-3. **toType:** the variable type of the final transformed variable. In this column, a transformed variable that is categorical will be specified as `cat`; while a transformed variable that is continuous will be specified as `cont`.
+3. **typeEnd:** the variable type of the final transformed variable. In this column, a transformed variable that is categorical will be specified as `cat`; while a transformed variable that is continuous will be specified as `cont`.
 
 ```{r, echo=FALSE, warning=FALSE}
 kable(variable_details[variable_details$variable == "DHH_SEX", c(1:3)])
@@ -85,13 +85,13 @@ kable(variable_details[variable_details$variable == "DHH_SEX", c(1:5)])
 
 + The categorical age variable in the CCHS surveys from 2007 to 2018 is `DHH_SEX`. Since it is the same as the final variable name, you would write in this column `[DHH_SEX]` **once**. The variable name that is denoted within the square brackets is the default variable name.
 
-6. **fromType:** the variable type as indicated in the CCHS surveys. As indicated in the **toType** column, categorical variables are denoted as `cat` and continuous variables are denoted as `cont`.
+6. **typeStart:** the variable type as indicated in the CCHS surveys. As indicated in the **toType** column, categorical variables are denoted as `cat` and continuous variables are denoted as `cont`.
 
 ```{r, echo=FALSE, warning=FALSE}
 kable(variable_details[variable_details$variable == "DHH_SEX", c(1:6)])
 ```
 
-7. **recTo:** the value you would like to recode each category value to. For continuous variables that are not transformed in type, you would write in this column `copy` so that the function copies the values without any transformations. For the not applicable category, write `NA::a`. For missing & else categories, write `NA::b` 
+7. **recEnd:** the value you would like to recode each category value to. For continuous variables that are not transformed in type, you would write in this column `copy` so that the function copies the values without any transformations. For the not applicable category, write `NA::a`. For missing & else categories, write `NA::b` 
 
 ```{r, echo=FALSE, warning=FALSE}
 kable(variable_details[variable_details$variable == "DHH_SEX", c(1:7)])
@@ -123,7 +123,7 @@ kable(variable_details[variable_details$variable == "DHH_SEX", c(1:10)])
 kable(variable_details[variable_details$variable == "DHH_SEX", c(1:11)])
 ```
 
-12. **recFrom:** the range of values for a particular category in a variable as indicated in the CCHS. See CCHS data documentation for each survey cycle and use the smallest and large values as your range to capture all values between the survey years. 
+12. **recStart:** the range of values for a particular category in a variable as indicated in the CCHS. See CCHS data documentation for each survey cycle and use the smallest and large values as your range to capture all values between the survey years. 
 
 The rules for each category of a new variable are a string in `recFrom` and value in `recTo`. These recode pairs are the same syntax as interval notation in which a closed range of values are specified using square brackets. See [here](https://en.wikipedia.org/wiki/Interval_(mathematics)#Notations_for_intervals) for more information on interval notation. Recode pairs are obtained from the RecFrom and RecTo columns
   *value range* is indicated by a comma, e.g. `recFrom= [1,4]; recTo = 1` (recodes all values from 1 to 4 into 1}
@@ -168,7 +168,7 @@ The same naming convention applies to derived variables with the exception of tw
 1. In **variableStart**, instead of database names being listed, **DerivedVar::** is written followed with the list of CCHS variables used inside square brackets. 
 + `DerivedVar::[var1, var2, var3]`
 
-2. In **recTo**, write **Func::** followed with the name of the custom function used to create the derived variable.
+2. In **recEnd**, write **Func::** followed with the name of the custom function used to create the derived variable.
 + `Func::derivedFunction`
 
 A derived variable looks like this in `variable_details.csv`

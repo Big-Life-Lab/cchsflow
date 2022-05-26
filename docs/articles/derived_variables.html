@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -227,7 +227,7 @@
 ## 2    NA::a          999.96            0
 ## 3    NA::b [999.97,999.99]           14</code></pre>
 <p>Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> as shown above. So for the derived BMI variable, you will have to also specify the height (<code>HWTGHTM</code>) and weight (<code>HWTGWTK</code>) variables.</p>
-<p>Using <code><a href="https://rdrr.io/pkg/dplyr/man/bind.html">bind_rows()</a></code>, you can then combine your transformed datasets.</p>
+<p>Using <code>bind_rows()</code>, you can then combine your transformed datasets.</p>
 <table class="table">
 <thead><tr>
 <th style="text-align:right;">

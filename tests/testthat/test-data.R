@@ -25,14 +25,14 @@ test_that(
   "variable_details included with cchsflow contains the needed columns for
   rec_with_table()", {
     expect_false(is.null(variable_details$variable))
-    expect_false(is.null(variable_details$toType))
+    expect_false(is.null(variable_details$typeEnd))
     expect_false(is.null(variable_details$databaseStart))
     expect_false(is.null(variable_details$variableStart))
-    expect_false(is.null(variable_details$fromType))
-    expect_false(is.null(variable_details$recTo))
+    expect_false(is.null(variable_details$typeStart))
+    expect_false(is.null(variable_details$recEnd))
     expect_false(is.null(variable_details$catLabel))
     expect_false(is.null(variable_details$catLabelLong))
-    expect_false(is.null(variable_details$recFrom))
+    expect_false(is.null(variable_details$recStart))
     expect_false(is.null(variable_details$units))
     expect_false(is.null(variable_details$catStartLabel))
     expect_false(is.null(variable_details$notes))
@@ -140,4 +140,34 @@ test_that("cchs2017_2018_p dataset included with cchsflow
 test_that("cchs2017_2018_p dataset included with cchsflow
           contains only the 200 sample rows", {
             expect_true(nrow(cchs2017_2018_p) == 200)
+          })
+
+# Testing cchs2009_s
+test_that("cchs2009_s dataset included with cchsflow
+          is saved in correct format", {
+            expect_s3_class(cchs2009_s, "data.frame", exact = TRUE)
+          })
+test_that("cchs2009_s dataset included with cchsflow
+          contains only the 200 sample rows", {
+            expect_true(nrow(cchs2009_s) == 200)
+          })
+
+# Testing cchs2010_s
+test_that("cchs2010_s dataset included with cchsflow
+          is saved in correct format", {
+            expect_s3_class(cchs2010_s, "data.frame", exact = TRUE)
+          })
+test_that("cchs2010_s dataset included with cchsflow
+          contains only the 200 sample rows", {
+            expect_true(nrow(cchs2010_s) == 200)
+          })
+
+# Testing cchs2012_s
+test_that("cchs2012_s dataset included with cchsflow
+          is saved in correct format", {
+            expect_s3_class(cchs2012_s, "data.frame", exact = TRUE)
+          })
+test_that("cchs2012_s dataset included with cchsflow
+          contains only the 200 sample rows", {
+            expect_true(nrow(cchs2012_s) == 200)
           })

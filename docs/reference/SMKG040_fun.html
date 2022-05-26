@@ -88,7 +88,7 @@ daily smoker began smoking daily." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -194,7 +194,7 @@ daily smokers.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>value for age started smoking daily for daily/former daily smokers in
-the SMKG040_cont</p>
+the SMKG040_cont variable</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>SMKG203 (daily smoker) and SMKG207 (former daily) are present in
@@ -211,81 +211,63 @@ a result, SMKG040 has a large number of missing respondents for CCHS 2015
 survey cycles and onward.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'> </span>
-<span class='r-in'><span class='co'># Using SMKG040_fun() to create age values across CCHS cycles</span></span>
-<span class='r-in'><span class='co'># SMKG040_fun() is specified in variable_details.csv under SMKG040_cont.</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'># To create a continuous harmonized variable for SMKG040, use rec_with_table() </span></span>
-<span class='r-in'><span class='co'># for each CCHS cycle and specify SMKG040_cont.</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>age_smoke_dfd_2009_2010</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span></span>
-<span class='r-in'>  <span class='va'>cchs2009_2010_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
-<span class='r-in'>    <span class='st'>"SMKG203_cont"</span>, <span class='st'>"SMKG207_cont"</span>,<span class='st'>"SMKG040_cont"</span></span>
-<span class='r-in'>  <span class='op'>)</span></span>
-<span class='r-in'><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>age_smoke_dfd_2009_2010</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   SMKG203_cont SMKG207_cont SMKG040_cont</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4           NA         18.5         18.5</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5           NA         16.0         16.0</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6           NA          8.0          8.0</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>age_smoke_dfd_2011_2012</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span></span>
-<span class='r-in'>  <span class='va'>cchs2011_2012_p</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
-<span class='r-in'>    <span class='st'>"SMKG203_cont"</span>, <span class='st'>"SMKG207_cont"</span>,<span class='st'>"SMKG040_cont"</span></span>
-<span class='r-in'>  <span class='op'>)</span></span>
-<span class='r-in'><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> No variable_details detected.</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>               Loading cchsflow variable_details</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Using the passed data variable name as database_name</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> NOTE for SMKG207_cont: Missing 2001 Data</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>age_smoke_dfd_2011_2012</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     SMKG203_cont SMKG207_cont SMKG040_cont</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 195           NA           16           16</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 196           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 197           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 198           NA           16           16</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 199           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 200           16           NA           16</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='va'>combined_age_smoke_dfd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span><span class='op'>(</span><span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span></span>
-<span class='r-in'><span class='op'>(</span><span class='va'>age_smoke_dfd_2009_2010</span>,<span class='va'>age_smoke_dfd_2011_2012</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>combined_age_smoke_dfd</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   SMKG203_cont SMKG207_cont SMKG040_cont</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 2           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 3           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 4           NA         18.5         18.5</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 5           NA         16.0         16.0</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 6           NA          8.0          8.0</span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>combined_age_smoke_dfd</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>     SMKG203_cont SMKG207_cont SMKG040_cont</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 395           NA           16           16</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 396           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 397           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 398           NA           16           16</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 399           NA           NA           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 400           16           NA           16</span>
-</pre>
+    <pre class="examples"><div class='input'> 
+<span class='co'># Using SMKG040_fun() to create age values across CCHS cycles</span>
+<span class='co'># SMKG040_fun() is specified in variable_details.csv under SMKG040_cont.</span>
+
+<span class='co'># To create a continuous harmonized variable for SMKG040, use rec_with_table() </span>
+<span class='co'># for each CCHS cycle and specify SMKG040_cont.</span>
+
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span>
+
+<span class='va'>age_smoke_dfd_2009_2010</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span>
+  <span class='va'>cchs2009_2010_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+    <span class='st'>"SMKG203_cont"</span>, <span class='st'>"SMKG207_cont"</span>,<span class='st'>"SMKG040_cont"</span>
+  <span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>age_smoke_dfd_2009_2010</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   SMKG203_cont SMKG207_cont SMKG040_cont
+#&gt; 1           NA           NA           NA
+#&gt; 2           NA           NA           NA
+#&gt; 3           NA           NA           NA
+#&gt; 4           NA         18.5         18.5
+#&gt; 5           NA         16.0         16.0
+#&gt; 6           NA          8.0          8.0</div><div class='input'>
+<span class='va'>age_smoke_dfd_2011_2012</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span>
+  <span class='va'>cchs2011_2012_p</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+    <span class='st'>"SMKG203_cont"</span>, <span class='st'>"SMKG207_cont"</span>,<span class='st'>"SMKG040_cont"</span>
+  <span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SMKG207_cont: Missing 2001 Data</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>age_smoke_dfd_2011_2012</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;     SMKG203_cont SMKG207_cont SMKG040_cont
+#&gt; 195           NA           16           16
+#&gt; 196           NA           NA           NA
+#&gt; 197           NA           NA           NA
+#&gt; 198           NA           16           16
+#&gt; 199           NA           NA           NA
+#&gt; 200           16           NA           16</div><div class='input'>
+<span class='va'>combined_age_smoke_dfd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span><span class='op'>(</span><span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span>
+<span class='op'>(</span><span class='va'>age_smoke_dfd_2009_2010</span>,<span class='va'>age_smoke_dfd_2011_2012</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>combined_age_smoke_dfd</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   SMKG203_cont SMKG207_cont SMKG040_cont
+#&gt; 1           NA           NA           NA
+#&gt; 2           NA           NA           NA
+#&gt; 3           NA           NA           NA
+#&gt; 4           NA         18.5         18.5
+#&gt; 5           NA         16.0         16.0
+#&gt; 6           NA          8.0          8.0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>combined_age_smoke_dfd</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;     SMKG203_cont SMKG207_cont SMKG040_cont
+#&gt; 395           NA           16           16
+#&gt; 396           NA           NA           NA
+#&gt; 397           NA           NA           NA
+#&gt; 398           NA           16           16
+#&gt; 399           NA           NA           NA
+#&gt; 400           16           NA           16</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -55,13 +55,13 @@ CCHS 2015-2018 for 12-17 years old.}
 Continuous variable for energy expenditure (energy_exp)
 }
 \description{
-This function creates a derived variable for 
-A MET is a conceptual value that represents energy expended during physical activity. 
-The volume of activity is calculated by multiplying the amount of minutes of 
-activity (by level of intensity) by the MET value associated with that 
-intensity. A MET (metabolic equivalent) is the energy cost of activity 
-expressed as kilocalories expended per kilogram of body 
-weight per hour of activity.
+This function creates a derived variable for daily leisure 
+energy expenditure.A MET is a conceptual value that represents energy 
+expended during physical activity. The volume of activity is calculated by 
+multiplying the amount of minutes of activity (by level of intensity) by the 
+MET value associated with that intensity. A MET (metabolic equivalent) is 
+the energy cost of activity expressed as kilocalories expended per kilogram 
+of body weight per hour of activity.
 
 In CCHS 2001-2014, PACDEE is the variable used to determine the daily 
 expenditure of leisure activity for all ages. In CCHS 2015-2018, ages 12-17 

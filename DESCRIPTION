@@ -1,8 +1,8 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and Harmonizing CCHS Variables
-Version: 2.0.1
-Date: 2022-04-13
+Version: 2.1.0
+Date: 2022-05-05
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -33,7 +33,7 @@ Authors@R: c(
           role = c("cph"),
           email = "dmanuel@ohri.ca"))
 Depends:
-  R (>= 3.2),
+  R (>= 3.5.0),
   haven (>= 1.1.2),
   dplyr (>= 0.8.2),
   sjlabelled (>= 1.0.17),
@@ -55,4 +55,5 @@ URL: https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
 RoxygenNote: 7.1.2
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
