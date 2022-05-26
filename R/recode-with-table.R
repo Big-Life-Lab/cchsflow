@@ -183,7 +183,7 @@ rec_with_table <-
     }
     # ---- Step 1: Detemine if the passed data is a list or single database
     append_non_db_columns <- FALSE
-    if (class(data) == "list" &&
+    if (is.list(data) &&
         length(database_name) == length(data)) {
       for (data_name in database_name) {
         # ---- Step 2A: Verify that the passed name exists in the passed data

@@ -64,8 +64,8 @@ LBFA_31A <- function(LBFA_31A){
 #'  Mining, Processing, Manufacturing, Utilities".  
 #'  
 #'  The "other" category in the 2001 CCHS survey cycle was assigned to missing
-#'  (NA(b)). This is consistent with 
-#'  \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6423929/}{other studies}
+#'  (NA(b)). This is consistent with other studies 
+#'  (\doi{10.4103/IJCIIS.IJCIIS_43_18})
 #'  that group the "other" category as "missing". \code{\link{LBFA_31A_b}}
 #'  is a 6 category variable that keeps the "other" category in the 2001 survey
 #'  cycle as "other".

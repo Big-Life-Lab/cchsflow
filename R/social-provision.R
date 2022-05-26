@@ -10,7 +10,8 @@
 #' decreases the respondent burden on surveys. SPS-5 is a valid measure of 
 #' social support while maintaining adequate measurement properties 
 #' (Orpana et al., 2019). Validation of SDS-5 using Canadian national survey 
-#' data can be found \href{https://doi.org/10.24095/hpcdp.39.12.02}{here}. 
+#' data can be found  
+#' \href{https://www.canada.ca/en/public-health/services/reports-publications/health-promotion-chronic-disease-prevention-canada-research-policy-practice/vol-39-no-12-2019/original-quantitative-research-social-provisions-scale.html}{here}. 
 #' 
 #' SPS-10 and their items were available in CCHS from 2011-2018. 
 #' 
