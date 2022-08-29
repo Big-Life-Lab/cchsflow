@@ -145,5 +145,5 @@ pct_time_fun_cat <-
     if_else2(pct_time_der > 70 & pct_time_der <= 80, 8,
     if_else2(pct_time_der > 80 & pct_time_der <= 90, 9,
     if_else2(pct_time_der > 90 & pct_time_der <= 100, 10,
-    if_else2(pct_time_der == tagged_na("a"), "NA(a)", "NA(b)")))))))))))
+    if_else2(haven::is_tagged_na(pct_time_der, "a"), "NA(a)", "NA(b)")))))))))))
   }
