@@ -1,0 +1,20 @@
+---
+title: "cchsflow: An open science approach to transform & combine population health datasets"
+author: "Warsame Yusuf and Kitty Chen"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+bibliography: ../../bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Abstract
+The Canadian Community Health Survey (CCHS) is one of the world's largest ongoing cross-sectional population health surveys with over 130,000 respondents every two years or over 1.5 million respondents since its inception in 2001. While the survey remains relatively consistent over the years, there are differences between cycles that pose a challenge when conducting longitudinal analyses. _cchsflow_ was developed to transform and harmonize CCHS variables to consistent formats across multiple survey cycles. An open science approach was used to maintain transparency, reproducibility and collaboration. The _cchsflow_ R package supports CCHS survey data between 2001 and 2018. Worksheets were created to guide variable transformation and dataset harmonization. A GitHub repository was created for the package [@cchsflow] to encourage collaboration with other researchers. Currently, _cchsflow_ package has been added to the Comprehensive R Archive Network (CRAN) and contains support for over 300 CCHS variables for 1.5 million respondents of the CCHS Public Use Microdata File (PUMF) from 2001 to 2018. _cchsflow_ also includes “share” version of CCHS that is used in Statistics Canada Regional Data Centres and other settings. _cchsflow_ has been published in the Canadian Journal of Public Health [@Yusuf2021] as an innovative tool to further advance Canadian health research. By implementing open science practices, _cchsflow_ aims to minimize the amount of time needed to clean and prepare data for the many CCHS users across Canada.
+
+## References
+
