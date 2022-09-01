@@ -41,7 +41,7 @@ NULL
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -58,7 +58,7 @@ NULL
 #' @return \item{cchs2001_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=3359}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=3359}
 #'
 #' @keywords datasets
 #' @examples
@@ -72,7 +72,7 @@ NULL
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -89,7 +89,7 @@ NULL
 #' @return \item{cchs2003_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=4995}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=4995}
 #'
 #' @keywords datasets
 #' @examples
@@ -103,7 +103,7 @@ NULL
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -120,7 +120,7 @@ NULL
 #' @return \item{cchs2005_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=22642}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=22642}
 #'
 #' @keywords datasets
 #' @examples
@@ -134,7 +134,7 @@ NULL
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -151,7 +151,7 @@ NULL
 #' @return \item{cchs2007_2008_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
 #'
 #' @keywords datasets
 #' @examples
@@ -165,7 +165,7 @@ NULL
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -182,7 +182,7 @@ NULL
 #' @return \item{cchs2009_2010_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=67251}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=67251}
 #'
 #' @keywords datasets
 #' @examples
@@ -200,7 +200,7 @@ NULL
 #' subset. Please see the "CCHS datasets that overlap each other" article to see
 #' how the two datasets contain overlap.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -217,7 +217,7 @@ NULL
 #' @return \item{cchs2010_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=81424}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=81424}
 #'
 #' @keywords datasets
 #' @examples
@@ -231,7 +231,7 @@ NULL
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -248,7 +248,7 @@ NULL
 #' @return \item{cchs2011_2012_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=114112}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=114112}
 #'
 #' @keywords datasets
 #' @examples
@@ -266,7 +266,7 @@ NULL
 #' subset. Please see the "CCHS datasets that overlap each other" article to see
 #' how the two datasets contain overlap.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -283,7 +283,7 @@ NULL
 #' @return \item{cchs2012_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=135927}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=135927}
 #'
 #' @keywords datasets
 #' @examples
@@ -297,7 +297,7 @@ NULL
 #' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 #' The CCHS survey is conducted by Statistics Canada.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -314,7 +314,7 @@ NULL
 #' @return \item{cchs2013_2014_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=144170}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=144170}
 #'
 #' @keywords datasets
 #' @examples
@@ -332,7 +332,7 @@ NULL
 #' subset. Please see the "CCHS datasets that overlap each other" article to see
 #' how the two datasets contain overlap.
 #'
-#' See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 #' license. Source from Statistics Canada, Canadian Community Health Survey 
 #' PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 #' the permission of Statistics Canada.
@@ -349,10 +349,186 @@ NULL
 #' @return \item{cchs2014_p}{a data frame}
 #'
 #' @source
-#'  \url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=164081}
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=164081}
 #'
 #' @keywords datasets
 #' @examples
 #' data(cchs2014_p)
 #' str(cchs2014_p)
+NULL
+
+#' 2015-2016 CCHS PUMF subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2015-2016 cycle of the Canadian
+#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2015-2016 PUMF
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
+#'
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Oct 2021. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: cchs-82M0013-E-2015-2016-Annual-component
+#'
+#' DDI: \url{https://osf.io/m948q/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2015_2016_p
+#' @aliases cchs2015_2016_p
+#' @docType data
+#' @return \item{cchs2015_2016_p}{a data frame}
+#'
+#' @source
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=238854}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2015_2016_p)
+#' str(cchs2015_2016_p)
+NULL
+
+
+#' 2017-2018 CCHS PUMF subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2017-2018 cycle of the Canadian
+#' Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2017-2018 PUMF
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
+#'
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed Oct 2021. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: cchs-82M0013-E-2017-2018-Annual-component
+#'
+#' DDI: \url{https://osf.io/q8g7y/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2017_2018_p
+#' @aliases cchs2017_2018_p
+#' @docType data
+#' @return \item{cchs2017_2018_p}{a data frame}
+#'
+#' @source
+#'  \url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=329241}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2017_2018_p)
+#' str(cchs2017_2018_p)
+NULL
+
+#' 2009 CCHS synthetic subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2009 cycle of the Canadian
+#' Community Health Survey (CCHS) synthetic dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2009 synthetic
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
+#'
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed May 2022. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: synthetic-CCHS-E-2009-FullSampleFile_F1
+#'
+#' DDI: \url{https://osf.io/q8g7y/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2009_s
+#' @aliases cchs2009_s
+#' @docType data
+#' @return \item{cchs2009_s}{a data frame}
+#'
+#' @source
+#'  \url{https://www.statcan.gc.ca/en/statistical-programs/document/3226_D56_T9_V1}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2009_s)
+#' str(cchs2009_s)
+NULL
+
+#' 2010 CCHS synthetic subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2010 cycle of the Canadian
+#' Community Health Survey (CCHS) synthetic dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2010 synthetic
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
+#'
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed May 2022. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: synthetic-CCHS-E-2010-AnnualComponent_F1
+#'
+#' DDI: \url{https://osf.io/q8g7y/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2010_s
+#' @aliases cchs2010_s
+#' @docType data
+#' @return \item{cchs2010_s}{a data frame}
+#'
+#' @source
+#'  \url{https://www.statcan.gc.ca/en/statistical-programs/document/3226_D56_T9_V1}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2010_s)
+#' str(cchs2010_s)
+NULL
+
+#' 2012 CCHS synthetic subset data (200 respondents)
+#'
+#' This is a subset of 200 observations from the 2012 cycle of the Canadian
+#' Community Health Survey (CCHS) synthetic dataset.
+#' The CCHS survey is conducted by Statistics Canada.
+#' 
+#' \strong{NOTE:} this subset of respondents may also be in the 2012 synthetic
+#' subset. Please see the "CCHS datasets that overlap each other" article to see
+#' how the two datasets contain overlap.
+#'
+#' See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
+#' license. Source from Statistics Canada, Canadian Community Health Survey 
+#' PUMF, accessed May 2022. Reproduced and distributed on an "as is" basis with 
+#' the permission of Statistics Canada.
+#'
+#' Long name: synthetic-CCHS-E-2012-AnnualComponent_F1
+#'
+#' DDI: \url{https://osf.io/q8g7y/}
+#'
+#' Additional documentation (PDFs): \url{https://osf.io/hkuy3/}
+#'
+#' @name cchs2012_s
+#' @aliases cchs2012_s
+#' @docType data
+#' @return \item{cchs2012_s}{a data frame}
+#'
+#' @source
+#'  \url{https://www.statcan.gc.ca/en/statistical-programs/document/3226_D56_T9_V1}
+#'
+#' @keywords datasets
+#' @examples
+#' data(cchs2012_s)
+#' str(cchs2012_s)
 NULL

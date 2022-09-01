@@ -17,7 +17,7 @@ get_data_variable_name(
 \item{data}{database being checked}
 
 \item{row_being_checked}{the row from variable details that contains
-information on this variables}
+information on this variable}
 
 \item{variable_being_checked}{the name of the recoded variable}
 }

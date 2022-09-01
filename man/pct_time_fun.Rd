@@ -17,7 +17,7 @@ datasets, this is a categorical variable with two categories (1 - 0-9 years;
 2 - 10+ years).}
 }
 \value{
-Numeric value that is a fraction between 0 and 1 that represents
+Numeric value between 0 and 100 that represents
  percentage of a respondent's time in Canada
 }
 \description{
@@ -39,8 +39,8 @@ Since SDCGRES is a categorical variable measuring length of time, we've
 # To transform pct_time_der across cycles, use rec_with_table() for each CCHS
 # cycle and specify pct_time_der, along with age (DHHGAGE_cont), whether or
 # not someone was born in Canada (SDCGCBG), how long someone has lived in
-# Canada (SDCGRES). Then by using bind_rows(), you can combine Pct_time_der
-# across cycles
+# Canada (SDCGRES). Then by using merge_rec_data(), you can combine
+# pct_time_der across cycles
 
 library(cchsflow)
 pct_time2009_2010 <- rec_with_table(
@@ -59,7 +59,7 @@ pct_time2011_2012 <- rec_with_table(
 )
 tail(pct_time2011_2012)
 
-combined_pct_time <- bind_rows(pct_time2009_2010, pct_time2011_2012)
+combined_pct_time <- merge_rec_data(pct_time2009_2010, pct_time2011_2012)
 head(combined_pct_time)
 tail(combined_pct_time)
 

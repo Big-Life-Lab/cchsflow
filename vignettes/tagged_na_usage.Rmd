@@ -2,7 +2,7 @@
 title: "missing data (tagged_na)"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{3 - variable_details.csv}     
+  %\VignetteIndexEntry{How to use tagged_na}     
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---
@@ -43,12 +43,12 @@ or coded in CCHS surveys, recoded to NA(a)
 **Summary of `tagged_na` values and their corresponding CCHS category values.**
 
 | cchsflow `tagged_na` | CCHS category value | Label |
-|----------------|--------------|
+|----------------|--------------|-----------------|
 | NA(a) | 6                  | not applicable     |
 | NA(b) | 7                  | don't know         |
 | NA(b) | 8                  | refusal            |
 | NA(b) | 9                  | not stated         |
-| NA(a) | question not asked in the survey cycle  |
+| NA(c) | | question not asked in the survey cycle  |
 
 ## Example `haven::tagged_na()`
 ```{r}
@@ -69,3 +69,33 @@ x
 ```{r}
 is.na(x)
 ```
+
+## Using tagged_na for creating derived variables
+
+See the [derived variables](derived_variables.html) and
+[how to add variables](how_to_add_variables.html) for details on derived
+variables and how to add them.
+
+When creating derived variables from CCHS variables, it is important to
+distinguish the different NA values. Certain derived variables include the use
+of variables that may not be applicable to respondents. For example,
+[smoking pack-years](https://big-life-lab.github.io/cchsflow/reference/pack_years_fun.html)
+involves the use of smoking variables that may not be applicable to all CCHS
+respondents (i.e. non-smokers who have never smoked). In this scenario,
+respondents who had values of `NA(a)` for the various base smoking variables
+would have a value of `NA(a)` for smoking pack-years. Respondents who had
+identified as having smoked at one point in their lives, but had values of
+`NA(b)` in the base smoking variables would have a value of `NA(b)` for smoking
+pack-years as pack-years cannot be calculated due to missing values.
+
+On the other hand, there are certain derived variables that use variables that
+are applicable to all respondents. For example, [BMI](https://big-life-lab.github.io/cchsflow/reference/bmi_fun.html) uses CCHS
+height and weight variables which are asked to all CCHS respondents. In this
+scenario, all NA variables would be tagged as `NA(b)` as these variables are
+applicable to everyone, and respondents with NA values would be classified as
+missing. 
+
+When creating deriving variables, it is important to examine the base CCHS
+variables to check for the presence of `NA(a)` and `NA(b)`. This can be done
+by reviewing the [CCHS documentation](https://osf.io/g6d84/).
+

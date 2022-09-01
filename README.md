@@ -2,16 +2,17 @@
 
 <!-- badges: start -->
 [![Lifecycle:
-development](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+development](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable-1)
 [![](https://img.shields.io/cran/v/cchsflow?color=green)](https://CRAN.R-project.org/package=cchsflow)
 ![](https://img.shields.io/github/v/release/big-life-lab/cchsflow?color=green&label=GitHub)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![](https://img.shields.io/badge/doi-10.17605/OSF.IO/HKUY3-yellowgreen.svg)](https://OSF.IO/HKUY3)
+[![](https://cranlogs.r-pkg.org/badges/cchsflow)](https://cran.r-project.org/package=cchsflow)
 <!-- badges: end -->
 
 *cchsflow* supports the use of the Canadian Community Health Survey (CCHS) by 
 transforming variables from each cycle into harmonized, consistent versions that 
-span survey cycles (currently, 2001 to 2014). 
+span survey cycles (currently, 2001 to 2018). 
 
 The CCHS is a population-based cross-sectional survey of Canadians that has been 
 administered every two years since 2001. There are approximately 130,000 
@@ -21,7 +22,7 @@ in a single cycle.
 
 The CCHS is one of the largest and most robust ongoing population health surveys 
 worldwide. The CCHS, administered by Statistics Canada, is Canada's main general 
-population health survey. Information about the survey is found [here](http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
+population health survey. Information about the survey is found [here](https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226). 
 The CCHS has a [Statistic Canada Open Licence](https://www.statcan.gc.ca/eng/reference/licence).
 
 ## Concept
@@ -33,7 +34,7 @@ combine them together to increase sample size; however, you soon realize a
 challenge... 
 
 Imagine you want to use BMI (body mass index) for a study that spans CCHS 2001 
-to 2014. BMI _seems_ like a straightforward measure that is routinely-collected 
+to 2018. BMI _seems_ like a straightforward measure that is routinely-collected 
 worldwide. Indeed, BMI is included in all CCHS cycles. You examine the 
 documentation and find the variable `HWTAGBMI` in the CCHS 2001 corresponds to 
 body mass index, but that in other cycles, the variable name changes to 
@@ -83,7 +84,7 @@ in 2001 CCHS"
 other forms of bias that affects studies in different ways.* The transformations 
 that are described in this repository have been used in several research 
 projects, but there are no guarantees regarding the accuracy or appropriate 
-uses.
+uses. [Thomas and Wannell](https://www150.statcan.gc.ca/n1/en/pub/82-003-x/82-003-x2009001-eng.pdf?st=_n9lb9N4) describe methodolgy issues when combining CCHS cycles.
 
 Care must be taken to understand how specific variable transformation and 
 harmonization with `cchsflow` affect your study or use of CCHS data. Across 
@@ -102,7 +103,7 @@ affect responses.
     devtools::install_github("Big-Life-Lab/cchsflow")
 ```
 
-Do you just want new variables not yet added to the CRAN version?
+#### New variables not yet added to the CRAN version
 
 You can download and use the latest version of 
 [`variables.csv`](https://github.com/Big-Life-Lab/cchsflow/blob/master/inst/extdata/variables.csv)
@@ -122,15 +123,15 @@ variables that are listed in `variables.csv`. Transformations are performed
 using `rec_with_table()`. `variables.csv` and `variable_details.csv` can be 
 used with other statistics programs (see [issue](https://github.com/Big-Life-Lab/cchsflow/issues)).
 4. Demonstration CCHS data -  `cchsflow` includes a random sample of 200 
-respondents from each CCHS PUMF file from 2001 to 2014. These data are used for 
+respondents from each CCHS PUMF file from 2001 to 2018. These data are used for 
 the vignettes. 
 The CCHS test data is stored in /data as .RData files. They can be read as a 
 package database.
 
 ```
-# read the CCHS 2014 PUMF test data
+# read the CCHS 2017-2018 PUMF test data
 
-test_data <- cchs2014_p
+test_data <- cchs2017_2018_p
 ```
 
 This repository does not include the full CCHS data. Information on how to 
@@ -162,10 +163,10 @@ feel free to contribute to `cchsflow` by making a PR that creates versions of
 CCHS data used in this library is accessed and adapted in accordance to the 
 Statistics Canada Open Licence Agreement.
 
-Source from Statistics Canada, Canadian Community Health Survey 2001 to 2013 
-PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with the 
+Source from Statistics Canada, Canadian Community Health Survey 2001 to 2018 
+PUMF, accessed March 2022. Reproduced and distributed on an "as is" basis with the 
 permission of Statistics Canada.
 
-Adapted from Statistics Canada, Canadian Community Health Surveys 2013 to 2013 
-PUMF, accessed Jan 2020. This does not constitute an endorsement by Statistics 
+Adapted from Statistics Canada, Canadian Community Health Surveys 2001 to 2018 
+PUMF, accessed March 2022. This does not constitute an endorsement by Statistics 
 Canada of this product.

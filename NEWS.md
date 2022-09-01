@@ -1,4 +1,244 @@
-# cchsflow 1.6.0 (Latest build)
+# cchsflow 2.0.1
+2022-05-05
+
+## Features
+- Support for CCHS synthetic data sets for 2009, 2010, and 2012. 
+
+## Variables
+#### Active transportation
+- <font color = green> **New**</font> **active_transport**: Daily active transportation.
+- <font color = green> **New**</font> **PAC_4A_cont**: Time walk work/school in week.
+- <font color = green> **New**</font> **PAC_4B_cont**: Time bike work/school in week.
+- <font color = green> **New**</font> **PAADVTRV**: Active transportation (18+ years old).
+- <font color = green> **New**</font> **PAYDVTTR**: Active transportation (12-17 years old).
+- <font color = green> **New**</font> **PAC_7B_cont**: Time walk work/school.
+- <font color = green> **New**</font> **PAC_8B_cont**: Time bike work/school.
+
+#### Social provision scale (SPS)
+- <font color = green> **New**</font> **SPS_01**: SPS-5 - people to depend on for help.
+- <font color = green> **New**</font> **SPS_02**: SPS-5 - people who enjoy same social activities.
+- <font color = green> **New**</font> **SPS_03**: SPS-5 - close relationships.
+- <font color = green> **New**</font> **SPS_04**: SPS-5 - important decision discussion.
+- <font color = green> **New**</font> **SPS_05**: SPS-5 - competence and skill are recognized.
+- <font color = green> **New**</font> **SPS_06**: SPS-5 - trustworthy person for advice.
+- <font color = green> **New**</font> **SPS_07**: SPS-5 - group with shared attitudes and beliefs.
+- <font color = green> **New**</font> **SPS_08**: SPS-5 - strong emotional bond with a least one person.
+- <font color = green> **New**</font> **SPS_09**: SPS-5 - admired talents and abilities.
+- <font color = green> **New**</font> **SPS_10**: SPS-5 - strong emotional bond.
+- <font color = green> **New**</font> **SPS5_der**: SPS-5 - overall.
+
+
+#### Medical outcome study (MOS)
+- <font color = green> **New**</font> **SSA_01**: MOS - # close friend and relatives.
+- <font color = green> **New**</font> **SSA_02**: MOS - has someone to give help if confined to bed.
+- <font color = green> **New**</font> **SSA_03**: MOS - has someone to listen.
+- <font color = green> **New**</font> **SSA_04**: MOS - has someone to provide/give advice about a crisis.
+- <font color = green> **New**</font> **SSA_05**: MOS - has someone to take to doctor.
+- <font color = green> **New**</font> **SSA_06**: MOS - has someone who shows love and affection.
+- <font color = green> **New**</font> **SSA_07**: MOS - has someone to have a good time with.
+- <font color = green> **New**</font> **SSA_08**: MOS - has someone to give info to help understand a situation.
+- <font color = green> **New**</font> **SSA_09**: MOS - has someone to confide in.
+- <font color = green> **New**</font> **SSA_10**: MOS - has someone who gives hugs.
+- <font color = green> **New**</font> **SSA_11**: MOS - has someone to get together with for relaxation.
+- <font color = green> **New**</font> **SSA_12**: MOS - has someone to prepare meals.
+- <font color = green> **New**</font> **SSA_13**: MOS - has someone to give advice.
+- <font color = green> **New**</font> **SSA_14**: MOS - has someone to do things to get mind off things.
+- <font color = green> **New**</font> **SSA_15**: MOS - has someone to help with daily chores if sick.
+- <font color = green> **New**</font> **SSA_16**: MOS - has someone to share most private worries and fears with.
+- <font color = green> **New**</font> **SSA_17**: MOS - has someone to turn to for suggestions for personal problems.
+- <font color = green> **New**</font> **SSA_18**: MOS - has someone to do something enjoyable with.
+- <font color = green> **New**</font> **SSA_19**: MOS - has someone who understands problems.
+- <font color = green> **New**</font> **SSA_20**: MOS - has someone who loves and makes feel wanted.
+
+# cchsflow 2.0.1
+2021-11-01
+
+## Bug Fixes
+- Bug fixes to labelling in `rec_with_table()`.
+- Corrections to specifications on `variables.csv` and `variable_details.csv`.
+
+# cchsflow 2.0.0
+2021-10-25
+
+## Features
+- Support for CCHS cycles up to 2018.
+
+## Bug Fixes
+- Fixes to `rec_with_table()` to support round bracket interval notation.
+
+## Variables
+
+- <font color = green> **New**</font> **ADL_01_A**: Help preparing meals. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_02_A**: Help appointments/errands. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_03_A**: Help housework. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_04_A**: Help personal care. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_05_A**: Help move inside house. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ADL_06_A**: Help personal finances. Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **ALC_005**: In lifetime, ever drank alcohol? Used for CCHS 2001-2008 and 2015-2018.
+- <font color = green> **New**</font> **ALWDVSTR_der**: Derived variable for short term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **ALWDVLTR_der**: Derived variable for long term risks due to drinking. Used for all CCHS cycles.
+- <font color = green> **New**</font> **DEPDVSEV**: Depression scale - severity of depression. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **diet_score_cat3**: Derived variable for categorical diet score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **EDUDR03**: Derived variable for highest level/education - 3 categories. Used for all cycles.
+- <font color = green> **New**</font> **energy_exp**: Daily energy expenditure. Used for all cycles.
+- <font color = green> **New**</font> **HUIDHSI_cat10**: Categorical Health Utility Index into 10 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HUIDHSI_cat20**: Categorical Health Utility Index into 20 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HUIDHSI_cat50**: Categorical Health Utility Index into 50 categories. Used for CCHS 2001-2016.
+- <font color = green> **New**</font> **HWTGBMI_der_cat4**: Derived variable for categorical body mass index into 4 categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **HWTGCOR**: Adjusted BMI. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **HWTGCOR_der**: Derived variable for adjusted BMI. Used for all CCHS cycles.
+- <font color = green> **New**</font> **immigration_der**: Derived variable for immigration categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **low_drink_score**: Derived variable for low risk drinking score. Used for all CCHS cycles.
+- <font color = green> **New**</font> **low_drink_score1**: Derived variable for low risk drinking score that includes never drank and former drinker categories. Used for CCHS 2001-2008 and 2015-2018.
+- <font color = green> **New**</font> **PAA_045**: Sweat/breathe harder exercises - hours - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAA_050**: Sweat/breathe harder exercises - minutes - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAA_075**: Other physical activities - hours - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAA_080**: Other physical activities - minutes - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAADVDYS**: Active days - 7d (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAADVVIG**: Vigorous activity over a week (18+ years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAYDVADL**: Leisure activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAYDVDYS**: Active days - 7d (12-17 years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAYDVTOA**: Other physical activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **PAYDVVIG**: Vigorous activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.
+- <font color = green> **New**</font> **pct_time_der_cat10**: Categorical percentage of time in Canada. Used for all CCHS cycles.
+- <font color = green> **New**</font> **SMKDSTY_B**: Smoker status into 5 categories. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **SMKDSTY_cat5**: Smoker status into 5 categories. Used for all CCHS cycles.
+- <font color = green> **New**</font> **SMKG040**: Age started to smoke daily - daily/former daily smoker. Used for CCHS 2015-2018.
+- <font color = green> **New**</font> **SMKG040_cont**: Derived variable for age started to smoke daily - daily/former daily smoker. Used for all CCHS cycles.
+- <font color = green> **New**</font> **CCC_075**: Do you have high blood cholesterol or lipids? Used for CCHS 2015-2018.
+
+# cchsflow 1.8.3
+2021-08-20
+
+## Bug Fixes
+- Documentation corrections to `pct_time_fun()` and [variable_details](https://big-life-lab.github.io/cchsflow/articles/variable_details.html).
+
+# cchsflow 1.8.2
+2021-06-23
+
+## Bug Fixes
+- Fixes to `age_cat_fun()` to support decimal values from `DHHGAGE_cont`.
+- Documentation corrections to `pack_years_fun()` and `time_quit_smoking_fun()`.
+
+## New variable
+- **SMKDSTY_cat3**: 3 category smoking status derived variable.
+
+# cchsflow 1.8.1
+2021-01-25
+
+## Bug Fixes
+- Correct breaking specification errors for [diet_score](https://big-life-lab.github.io/cchsflow/reference/diet_score_fun.html).
+
+# cchsflow 1.8.0
+2021-01-22
+
+## Features
+- New function `merge_rec_data()` that merges and labels transformed CCHS
+datasets.
+
+## Minor improvements
+- Improved support for `tagged_na` in derived variables. Additional
+documentation added for creating derived variables in the [tagged_na](https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html)
+article.
+- Updates to labels and variable classification on `variables.csv` and
+`variable_details.csv`.
+
+## New variables
+- [**COPD_Emph_der:**](https://big-life-lab.github.io/cchsflow/reference/COPD_Emph_der_fun1.html)
+derived variable that determines if a respondent has either COPD or Emphysema.
+- [**ADL_score_5:**](https://big-life-lab.github.io/cchsflow/reference/adl_score_5_fun.html)
+derived variable that scores the number of daily tasks that a respondent needs
+help with.
+- [**diet_score:**](https://big-life-lab.github.io/cchsflow/reference/diet_score_fun.html)
+derived variable that scores respondents based on daily consumption of fruit,
+vegetables, and fruit juice.
+- [**smoke_simple:**](https://big-life-lab.github.io/cchsflow/reference/smoke_simple_fun.html)
+derived variable that identifies respondents smoking status.
+- [**time_quit_smoking:**](https://big-life-lab.github.io/cchsflow/reference/time_quit_smoking_fun.html)
+derived variable that estimates approximate time since respondent has quit
+smoking if they are a former smoker.
+- [**LBFA_31A/LBFA_31A_a/LBFA_31A_b:**](https://big-life-lab.github.io/cchsflow/reference/LBFA_31A.html)
+Occupation group. 3 different variables with differing categories were created
+to harmonize between CCHS cycles.
+- **CCC_041:** Fibromyalgia.
+- **CCC_061:** Back problems.
+- **CCC_081:** Migraine headaches.
+- **CCC_290:** Anxiety disorder.
+
+# cchsflow 1.7.1
+2020-09-16
+
+## Minor improvements
+- Corrections to typos in [tagged_na](https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html)
+article.
+- Refactor `recTo` values for GEOGPRV to values specified in CCHS.
+
+## New variables
+- GEODPMF: Health region. Specified for the 2013-14 & 2014 CCHS cycles.
+- id_year: ID variable that appends data_name to ADM_RNO, creating a unique
+identifier for all respondents.
+
+# cchsflow 1.7.0 
+2020-09-11
+
+## Breaking changes
+- Notation in **recFrom** column of `variable_details.csv` is now changed to
+interval notation (e.g. 7:9 is now denoted as [7,9]).
+
+## Features
+- New `description` column added to `variables.csv` to allow a description of
+variables.
+- New `role` column added to `variables.csv` to allow users to set roles for
+variable manipulation.
+
+## New variables
+Age:
+1. DHHGAGE_5: age variable categorized into 5 20-year age groups. Used in all
+CCHS cycles.
+2. DHHGAGE_D: age variable categorized into 8 10-year age groups. Used in all
+CCHS cycles.
+
+Depression:
+1. DPSDPP: Depression Scale - Predicted Probability. Used in all CCHS cycles.
+2. DPSDSF: Depression Scale - Short Form Score. Used in all CCHS cycles
+3. DIS_10G: Frequency - distress: felt sad / depressed - past month. Used in
+CCHS cycles 2005-2014.
+4. DIS_10H: Frequency - distress: depressed/nothing cheers - past month. Used in
+CCHS cycles 2005-2014.
+5. DPSDMT: Specific month when felt depressed. Used in all CCHS cycles.
+6. DPSDWK: Number of weeks felt depressed - (D). Used in all CCHS cycles.
+7. DPS_02: Felt sad/blue/depressed - 2 weeks or more - 12 mo. Used in CCHS
+cycles 2007-2012.
+8. DPS_03: Sad/depressed - length feelings lasted - 2 wk. Used in CCHS cycles
+2007-2012.
+9. DPS_04: Sad/depressed - frequency - 2 wk. Used in CCHS cycles 2007-2012.
+10. DPS_05: Sad/depressed - lose interest in things - 2 wk. Used in CCHS cycles
+2007-2012.
+11. DPS_06: Sad/depressed - felt tired out / low on energy - 2 wk. Used in CCHS
+cycles 2007-2012.
+12. DPS_07: Sad/depressed - weight change - 2 wk. Used in CCHS cycles 2007-2012.
+13. DPS_08A: Sad/depressed - weight change (amount) - 2 wk. Used in CCHS cycles
+2007-2012.
+14. DPS_08B: Sad/depressed - weight change (lb/kg) - 2 wk. Used in CCHS cycles
+2007-2012.
+15. DPS_09: Sad/depressed - trouble falling asleep - 2 wk. Used in CCHS cycles
+2007-2012.
+16. DPS_10: Sad/depressed trouble falling asleep - frequency - 2 wk. Used in
+CCHS cycles 2007-2012.
+17. DPS_11: Sad/depressed - trouble concentrating - 2 wk. Used in CCHS cycles
+2007-2012.
+18. DPS_12: Sad/depressed - felt down on self - 2 wk. Used in CCHS cycles
+2007-2012.
+19. DPS_13: Sad/depressed - thought a lot about death - 2 wk. Used in CCHS
+cycles 2007-2012.
+20. DPS_14: Sad/depressed - number of weeks - 12 mo. Used in CCHS cycles
+2007-2012.
+
+Influenza:
+1. FLU_160: Ever had a flu shot. Used in all CCHS cycles.
+2. FLU_162: Last time had flu shot. Used in all CCHS cycles.
+
+# cchsflow 1.6.0 
 2020-03-30
 
 ## Breaking changes
@@ -62,7 +302,7 @@ variable
 - Added example in [get started](https://big-life-lab.github.io/cchsflow/articles/get_started.html)
 that uses new attach_data_name argument in `rec_with_table()`
 
-# cchsflow 1.4.4 (Latest build)
+# cchsflow 1.4.4
 2020-03-03
 
 ## Features

@@ -1,8 +1,8 @@
 Package: cchsflow
 Type: Package
 Title: Transforming and Harmonizing CCHS Variables
-Version: 1.6.0
-Date: 2020-03-30
+Version: 2.1.0
+Date: 2022-05-05
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -11,12 +11,16 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-0912-0845")),
     person(given = "Warsame",
            family = "Yusuf",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "waryusuf@ohri.ca"),
     person(given = "Rostyslav", 
            family = "Vyuha",
            role = c("aut"),
            email = "rostikvyuha@gmail.com"),
+    person(given = "Kitty", 
+           family = "Chen",
+           role = c("aut","cre"),
+           email = "kitchen@ohri.ca"),       
     person(given = "Carol", 
            family = "Bennett",
            role = c("aut"),
@@ -29,7 +33,7 @@ Authors@R: c(
           role = c("cph"),
           email = "dmanuel@ohri.ca"))
 Depends:
-  R (>= 3.2),
+  R (>= 3.5.0),
   haven (>= 1.1.2),
   dplyr (>= 0.8.2),
   sjlabelled (>= 1.0.17),
@@ -38,7 +42,7 @@ Depends:
 Description: Supporting the use of the Canadian Community Health Survey 
              (CCHS) by transforming variables from each cycle into harmonized, 
              consistent versions that span survey cycles (currently, 2001 to 
-             2014). CCHS data used in this library is accessed and adapted in 
+             2018). CCHS data used in this library is accessed and adapted in 
              accordance to the Statistics Canada Open Licence Agreement. This 
              package uses rec_with_table(), which was developed from 'sjmisc' 
              rec(). Lüdecke D (2018). "sjmisc: Data and Variable Transformation 
@@ -49,6 +53,7 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.2
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

@@ -156,3 +156,41 @@ test_that("resp_condition_fun3 has expected output when
           age is less than 35 and condition positive", {
             expect_equal(resp_condition_fun3(34, 1, 2, 1), 2)
           })
+
+# COPD_Emph_der_fun1--------------------------------
+test_that("COPD_Emph_der_fun1 has expected output when
+          age is out of range", {
+            expect_equal(COPD_Emph_der_fun1(-1, 1, 1), "NA(b)")
+          })
+
+test_that("COPD_Emph_der_fun1 has expected output when
+          CCC_91E is out of range", {
+            expect_warning(out <- COPD_Emph_der_fun1(20, -1, 1))
+            expect_equal(out, 2)
+          })
+
+test_that("COPD_Emph_der_fun1 has expected output when
+          CCC_91F is out of range", {
+            expect_warning(out <- COPD_Emph_der_fun1(20, 1, -1))
+            expect_equal(out, 2)
+          })
+
+test_that("COPD_Emph_der_fun1 has expected output when
+          all parameters are in range", {
+            expect_equal(COPD_Emph_der_fun1(20, 1, 1), 2)
+          })
+
+# COPD_Emph_der_fun2--------------------------------
+test_that("COPD_Emph_der_fun2 has expected output when
+          age is out of range", {
+            expect_equal(COPD_Emph_der_fun2(-1, 1), "NA(b)")
+          })
+
+test_that("COPD_Emph_der_fun2 has expected output when
+          CCC_91E is out of range", {
+            expect_equal(COPD_Emph_der_fun2(20, -1), "NA(b)")
+          })
+test_that("COPD_Emph_der_fun2 has expected output when
+          all parameters are in range", {
+            expect_equal(COPD_Emph_der_fun2(20, 1), 2)
+          })

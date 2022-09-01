@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,15 +46,14 @@
 
 <!-- docsearch -->
 <script src="../docsearch.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
 
 <meta property="og:title" content="Changelog" />
-<meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="/logo.svg" />
 
 
 
@@ -68,7 +71,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -82,7 +85,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
       </span>
     </div>
 
@@ -90,7 +93,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -133,8 +136,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/Big-Life-Lab/cchsflow">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/Big-Life-Lab/cchsflow/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -157,34 +160,325 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
+      <h1 data-toc-skip>Changelog <small></small></h1>
       <small>Source: <a href='https://github.com/Big-Life-Lab/cchsflow/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="cchsflow-160-latest-build" class="section level1">
-<h1 class="page-header">
-<a href="#cchsflow-160-latest-build" class="anchor"></a>cchsflow 1.6.0 (Latest build)<small> Unreleased </small>
+    <div id="cchsflow-201" class="section level1">
+<h1 class="page-header" data-toc-text="2.0.1">
+<a href="#cchsflow-201" class="anchor"></a>cchsflow 2.0.1<small> Unreleased </small>
 </h1>
-<p>2020-03-30</p>
+<p>2021-11-01</p>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug Fixes</h2>
+<ul>
+<li>Bug fixes to labelling in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code>.</li>
+<li>Corrections to specifications on <code>variables.csv</code> and <code>variable_details.csv</code>.</li>
+</ul>
+</div>
+</div>
+    <div id="cchsflow-200" class="section level1">
+<h1 class="page-header" data-toc-text="2.0.0">
+<a href="#cchsflow-200" class="anchor"></a>cchsflow 2.0.0<small> 2021-10-25 </small>
+</h1>
+<p>2021-10-25</p>
+<div id="features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h2>
+<ul>
+<li>Support for CCHS cycles up to 2018.</li>
+</ul>
+</div>
+<div id="bug-fixes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-1" class="anchor"></a>Bug Fixes</h2>
+<ul>
+<li>Fixes to <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> to support round bracket interval notation.</li>
+</ul>
+</div>
+<div id="variables" class="section level2">
+<h2 class="hasAnchor">
+<a href="#variables" class="anchor"></a>Variables</h2>
+<ul>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ADL_01_A</strong>: Help preparing meals. Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ADL_02_A</strong>: Help appointments/errands. Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ADL_03_A</strong>: Help housework. Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ADL_04_A</strong>: Help personal care. Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ADL_05_A</strong>: Help move inside house. Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ADL_06_A</strong>: Help personal finances. Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ALC_005</strong>: In lifetime, ever drank alcohol? Used for CCHS 2001-2008 and 2015-2018.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ALWDVSTR_der</strong>: Derived variable for short term risks due to drinking. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>ALWDVLTR_der</strong>: Derived variable for long term risks due to drinking. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>DEPDVSEV</strong>: Depression scale - severity of depression. Used for CCHS 2015-2018.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>diet_score_cat3</strong>: Derived variable for categorical diet score. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>EDUDR03</strong>: Derived variable for highest level/education - 3 categories. Used for all cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>energy_exp</strong>: Daily energy expenditure. Used for all cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>HUIDHSI_cat10</strong>: Categorical Health Utility Index into 10 categories. Used for CCHS 2001-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>HUIDHSI_cat20</strong>: Categorical Health Utility Index into 20 categories. Used for CCHS 2001-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>HUIDHSI_cat50</strong>: Categorical Health Utility Index into 50 categories. Used for CCHS 2001-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>HWTGBMI_der_cat4</strong>: Derived variable for categorical body mass index into 4 categories. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>HWTGCOR</strong>: Adjusted BMI. Used for CCHS 2015-2018.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>HWTGCOR_der</strong>: Derived variable for adjusted BMI. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>immigration_der</strong>: Derived variable for immigration categories. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>low_drink_score</strong>: Derived variable for low risk drinking score. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>low_drink_score1</strong>: Derived variable for low risk drinking score that includes never drank and former drinker categories. Used for CCHS 2001-2008 and 2015-2018.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAA_045</strong>: Sweat/breathe harder exercises - hours - 7d (18+ years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAA_050</strong>: Sweat/breathe harder exercises - minutes - 7d (18+ years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAA_075</strong>: Other physical activities - hours - 7d (18+ years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAA_080</strong>: Other physical activities - minutes - 7d (18+ years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAADVDYS</strong>: Active days - 7d (18+ years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAADVVIG</strong>: Vigorous activity over a week (18+ years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAYDVADL</strong>: Leisure activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAYDVDYS</strong>: Active days - 7d (12-17 years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAYDVTOA</strong>: Other physical activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>PAYDVVIG</strong>: Vigorous activities - minutes - 7d (12-17 years old). Used for CCHS 2015-2016.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>pct_time_der_cat10</strong>: Categorical percentage of time in Canada. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>SMKDSTY_B</strong>: Smoker status into 5 categories. Used for CCHS 2015-2018.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>SMKDSTY_cat5</strong>: Smoker status into 5 categories. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>SMKG040</strong>: Age started to smoke daily - daily/former daily smoker. Used for CCHS 2015-2018.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>SMKG040_cont</strong>: Derived variable for age started to smoke daily - daily/former daily smoker. Used for all CCHS cycles.</li>
+<li>
+<font color="green"> <strong>New</strong></font> <strong>CCC_075</strong>: Do you have high blood cholesterol or lipids? Used for CCHS 2015-2018.</li>
+</ul>
+</div>
+</div>
+    <div id="cchsflow-183" class="section level1">
+<h1 class="page-header" data-toc-text="1.8.3">
+<a href="#cchsflow-183" class="anchor"></a>cchsflow 1.8.3<small> Unreleased </small>
+</h1>
+<p>2021-08-20</p>
+<div id="bug-fixes-2" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-2" class="anchor"></a>Bug Fixes</h2>
+<ul>
+<li>Documentation corrections to <code><a href="../reference/pct_time_fun.html">pct_time_fun()</a></code> and <a href="https://big-life-lab.github.io/cchsflow/articles/variable_details.html">variable_details</a>.</li>
+</ul>
+</div>
+</div>
+    <div id="cchsflow-182" class="section level1">
+<h1 class="page-header" data-toc-text="1.8.2">
+<a href="#cchsflow-182" class="anchor"></a>cchsflow 1.8.2<small> 2021-06-23 </small>
+</h1>
+<p>2021-06-23</p>
+<div id="bug-fixes-3" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-3" class="anchor"></a>Bug Fixes</h2>
+<ul>
+<li>Fixes to <code><a href="../reference/age_cat_fun.html">age_cat_fun()</a></code> to support decimal values from <code>DHHGAGE_cont</code>.</li>
+<li>Documentation corrections to <code><a href="../reference/pack_years_fun.html">pack_years_fun()</a></code> and <code><a href="../reference/time_quit_smoking_fun.html">time_quit_smoking_fun()</a></code>.</li>
+</ul>
+</div>
+<div id="new-variable" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-variable" class="anchor"></a>New variable</h2>
+<ul>
+<li>
+<strong>SMKDSTY_cat3</strong>: 3 category smoking status derived variable.</li>
+</ul>
+</div>
+</div>
+    <div id="cchsflow-181" class="section level1">
+<h1 class="page-header" data-toc-text="1.8.1">
+<a href="#cchsflow-181" class="anchor"></a>cchsflow 1.8.1<small> Unreleased </small>
+</h1>
+<p>2021-01-25</p>
+<div id="bug-fixes-4" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-4" class="anchor"></a>Bug Fixes</h2>
+<ul>
+<li>Correct breaking specification errors for <a href="https://big-life-lab.github.io/cchsflow/reference/diet_score_fun.html">diet_score</a>.</li>
+</ul>
+</div>
+</div>
+    <div id="cchsflow-180" class="section level1">
+<h1 class="page-header" data-toc-text="1.8.0">
+<a href="#cchsflow-180" class="anchor"></a>cchsflow 1.8.0<small> 2021-01-24 </small>
+</h1>
+<p>2021-01-22</p>
+<div id="features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features-1" class="anchor"></a>Features</h2>
+<ul>
+<li>New function <code><a href="../reference/merge_rec_data.html">merge_rec_data()</a></code> that merges and labels transformed CCHS datasets.</li>
+</ul>
+</div>
+<div id="minor-improvements" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements" class="anchor"></a>Minor improvements</h2>
+<ul>
+<li>Improved support for <code>tagged_na</code> in derived variables. Additional documentation added for creating derived variables in the <a href="https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html">tagged_na</a> article.</li>
+<li>Updates to labels and variable classification on <code>variables.csv</code> and <code>variable_details.csv</code>.</li>
+</ul>
+</div>
+<div id="new-variables" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-variables" class="anchor"></a>New variables</h2>
+<ul>
+<li>
+<a href="https://big-life-lab.github.io/cchsflow/reference/COPD_Emph_der_fun1.html"><strong>COPD_Emph_der:</strong></a> derived variable that determines if a respondent has either COPD or Emphysema.</li>
+<li>
+<a href="https://big-life-lab.github.io/cchsflow/reference/adl_score_5_fun.html"><strong>ADL_score_5:</strong></a> derived variable that scores the number of daily tasks that a respondent needs help with.</li>
+<li>
+<a href="https://big-life-lab.github.io/cchsflow/reference/diet_score_fun.html"><strong>diet_score:</strong></a> derived variable that scores respondents based on daily consumption of fruit, vegetables, and fruit juice.</li>
+<li>
+<a href="https://big-life-lab.github.io/cchsflow/reference/smoke_simple_fun.html"><strong>smoke_simple:</strong></a> derived variable that identifies respondents smoking status.</li>
+<li>
+<a href="https://big-life-lab.github.io/cchsflow/reference/time_quit_smoking_fun.html"><strong>time_quit_smoking:</strong></a> derived variable that estimates approximate time since respondent has quit smoking if they are a former smoker.</li>
+<li>
+<a href="https://big-life-lab.github.io/cchsflow/reference/LBFA_31A.html"><strong>LBFA_31A/LBFA_31A_a/LBFA_31A_b:</strong></a> Occupation group. 3 different variables with differing categories were created to harmonize between CCHS cycles.</li>
+<li>
+<strong>CCC_041:</strong> Fibromyalgia.</li>
+<li>
+<strong>CCC_061:</strong> Back problems.</li>
+<li>
+<strong>CCC_081:</strong> Migraine headaches.</li>
+<li>
+<strong>CCC_290:</strong> Anxiety disorder.</li>
+</ul>
+</div>
+</div>
+    <div id="cchsflow-171" class="section level1">
+<h1 class="page-header" data-toc-text="1.7.1">
+<a href="#cchsflow-171" class="anchor"></a>cchsflow 1.7.1<small> Unreleased </small>
+</h1>
+<p>2020-09-16</p>
+<div id="minor-improvements-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-1" class="anchor"></a>Minor improvements</h2>
+<ul>
+<li>Corrections to typos in <a href="https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html">tagged_na</a> article.</li>
+<li>Refactor <code>recTo</code> values for GEOGPRV to values specified in CCHS.</li>
+</ul>
+</div>
+<div id="new-variables-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-variables-1" class="anchor"></a>New variables</h2>
+<ul>
+<li>GEODPMF: Health region. Specified for the 2013-14 &amp; 2014 CCHS cycles.</li>
+<li>id_year: ID variable that appends data_name to ADM_RNO, creating a unique identifier for all respondents.</li>
+</ul>
+</div>
+</div>
+    <div id="cchsflow-170" class="section level1">
+<h1 class="page-header" data-toc-text="1.7.0">
+<a href="#cchsflow-170" class="anchor"></a>cchsflow 1.7.0<small> Unreleased </small>
+</h1>
+<p>2020-09-11</p>
 <div id="breaking-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
+<ul>
+<li>Notation in <strong>recFrom</strong> column of <code>variable_details.csv</code> is now changed to interval notation (e.g. 7:9 is now denoted as [7,9]).</li>
+</ul>
+</div>
+<div id="features-2" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features-2" class="anchor"></a>Features</h2>
+<ul>
+<li>New <code>description</code> column added to <code>variables.csv</code> to allow a description of variables.</li>
+<li>New <code>role</code> column added to <code>variables.csv</code> to allow users to set roles for variable manipulation.</li>
+</ul>
+</div>
+<div id="new-variables-2" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-variables-2" class="anchor"></a>New variables</h2>
+<p>Age:</p>
+<ol>
+<li>DHHGAGE_5: age variable categorized into 5 20-year age groups. Used in all CCHS cycles.</li>
+<li>DHHGAGE_D: age variable categorized into 8 10-year age groups. Used in all CCHS cycles.</li>
+</ol>
+<p>Depression:</p>
+<ol>
+<li>DPSDPP: Depression Scale - Predicted Probability. Used in all CCHS cycles.</li>
+<li>DPSDSF: Depression Scale - Short Form Score. Used in all CCHS cycles</li>
+<li>DIS_10G: Frequency - distress: felt sad / depressed - past month. Used in CCHS cycles 2005-2014.</li>
+<li>DIS_10H: Frequency - distress: depressed/nothing cheers - past month. Used in CCHS cycles 2005-2014.</li>
+<li>DPSDMT: Specific month when felt depressed. Used in all CCHS cycles.</li>
+<li>DPSDWK: Number of weeks felt depressed - (D). Used in all CCHS cycles.</li>
+<li>DPS_02: Felt sad/blue/depressed - 2 weeks or more - 12 mo. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_03: Sad/depressed - length feelings lasted - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_04: Sad/depressed - frequency - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_05: Sad/depressed - lose interest in things - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_06: Sad/depressed - felt tired out / low on energy - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_07: Sad/depressed - weight change - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_08A: Sad/depressed - weight change (amount) - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_08B: Sad/depressed - weight change (lb/kg) - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_09: Sad/depressed - trouble falling asleep - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_10: Sad/depressed trouble falling asleep - frequency - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_11: Sad/depressed - trouble concentrating - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_12: Sad/depressed - felt down on self - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_13: Sad/depressed - thought a lot about death - 2 wk. Used in CCHS cycles 2007-2012.</li>
+<li>DPS_14: Sad/depressed - number of weeks - 12 mo. Used in CCHS cycles 2007-2012.</li>
+</ol>
+<p>Influenza:</p>
+<ol>
+<li>FLU_160: Ever had a flu shot. Used in all CCHS cycles.</li>
+<li>FLU_162: Last time had flu shot. Used in all CCHS cycles.</li>
+</ol>
+</div>
+</div>
+    <div id="cchsflow-160" class="section level1">
+<h1 class="page-header" data-toc-text="1.6.0">
+<a href="#cchsflow-160" class="anchor"></a>cchsflow 1.6.0<small> 2020-03-30 </small>
+</h1>
+<p>2020-03-30</p>
+<div id="breaking-changes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#breaking-changes-1" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li>Refactored derived variable functions to handle tagged_na</li>
 <li>Added new parameter ALW_1 to <code><a href="../reference/binge_drinker_fun.html">binge_drinker_fun()</a></code>
 </li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug Fixes</h2>
+<a href="#bug-fixes-5" class="anchor"></a>Bug Fixes</h2>
 <ul>
 <li>Bug fix to <code><a href="../reference/resp_condition_fun1.html">resp_condition_fun1()</a></code> that was not correctly handling respondents under 35 with respiratory conditions</li>
 </ul>
 </div>
-<div id="variables" class="section level2">
+<div id="variables-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables" class="anchor"></a>Variables</h2>
+<a href="#variables-1" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> SDC_5A_1 - Knowledge of official languages. Used in CCHS cycles 2011-2014</li>
@@ -198,13 +492,13 @@
 </div>
 </div>
     <div id="cchsflow-152" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.5.2">
 <a href="#cchsflow-152" class="anchor"></a>cchsflow 1.5.2<small> Unreleased </small>
 </h1>
 <p>2020-03-24</p>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>Bug Fixes</h2>
+<a href="#bug-fixes-6" class="anchor"></a>Bug Fixes</h2>
 <ul>
 <li>Fixes to typos in <code>variables.csv</code> &amp; <code>variable_details.csv</code>
 </li>
@@ -212,34 +506,34 @@
 </div>
 </div>
     <div id="cchsflow-151" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.5.1">
 <a href="#cchsflow-151" class="anchor"></a>cchsflow 1.5.1<small> 2020-03-20 </small>
 </h1>
 <p>2020-03-20</p>
-<div id="minor-improvements" class="section level2">
+<div id="minor-improvements-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-2" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Minor hotfix in description of package</li>
 </ul>
 </div>
 </div>
     <div id="cchsflow-150" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.5.0">
 <a href="#cchsflow-150" class="anchor"></a>cchsflow 1.5.0<small> Unreleased </small>
 </h1>
 <p>2020-03-20</p>
-<div id="breaking-changes-1" class="section level2">
+<div id="breaking-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes-1" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-2" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li>Modified internal list index access to be compliant with R 4.0.</li>
 <li>Added <code>attach_data_name</code>: new argument for adding data_name to <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> return</li>
 </ul>
 </div>
-<div id="variables-1" class="section level2">
+<div id="variables-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables-1" class="anchor"></a>Variables</h2>
+<a href="#variables-2" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/adl_fun.html">ADL_der</a> - derived “needs help with task” variable.</li>
@@ -255,9 +549,9 @@
 <font color="green"><strong>New</strong></font> INCGPER_cont - continuous personal income variable harmonized across all CCHS cycles</li>
 </ul>
 </div>
-<div id="minor-improvements-1" class="section level2">
+<div id="minor-improvements-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-1" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-3" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>New <a href="https://big-life-lab.github.io/cchsflow/articles/duplicate_datasets.html">article</a> that describes overlaps in certain CCHS datasets</li>
 <li>Documentation on <a href="https://big-life-lab.github.io/cchsflow/reference/GEN_02A2.html">GEN_02A2</a> variable</li>
@@ -267,31 +561,31 @@
 </ul>
 </div>
 </div>
-    <div id="cchsflow-144-latest-build" class="section level1">
-<h1 class="page-header">
-<a href="#cchsflow-144-latest-build" class="anchor"></a>cchsflow 1.4.4 (Latest build)<small> Unreleased </small>
+    <div id="cchsflow-144" class="section level1">
+<h1 class="page-header" data-toc-text="1.4.4">
+<a href="#cchsflow-144" class="anchor"></a>cchsflow 1.4.4<small> Unreleased </small>
 </h1>
 <p>2020-03-03</p>
-<div id="features" class="section level2">
+<div id="features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<a href="#features-3" class="anchor"></a>Features</h2>
 <ul>
 <li>Docsearch added to website</li>
 <li>New article on getting started with <em>cchsflow</em>
 </li>
 </ul>
 </div>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-7" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Refactor to <code>pct_time_fun</code> function to output value from 0-100% as opposed to 0-1</li>
 <li>Refactor to respiratory functions to better capture respondents under 35 with respiratory conditions</li>
 </ul>
 </div>
-<div id="minor-improvements-2" class="section level2">
+<div id="minor-improvements-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-2" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-4" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Improvements to warning outputs in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code>
 </li>
@@ -301,20 +595,20 @@
 </div>
 </div>
     <div id="cchsflow-143" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.3">
 <a href="#cchsflow-143" class="anchor"></a>cchsflow 1.4.3<small> Unreleased </small>
 </h1>
 <p>2020-02-21</p>
-<div id="minor-improvements-3" class="section level2">
+<div id="minor-improvements-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-3" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-5" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Minor documentation improvements in vignettes and home page</li>
 </ul>
 </div>
 </div>
     <div id="cchsflow-142" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.2">
 <a href="#cchsflow-142" class="anchor"></a>cchsflow 1.4.2<small> Unreleased </small>
 </h1>
 <p>2020-02-19</p>
@@ -329,13 +623,13 @@
 </div>
 </div>
     <div id="cchsflow-141" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.1">
 <a href="#cchsflow-141" class="anchor"></a>cchsflow 1.4.1<small> Unreleased </small>
 </h1>
 <p>2020-02-11</p>
-<div id="minor-improvements-4" class="section level2">
+<div id="minor-improvements-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-4" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-6" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Suppressed warning messages in function examples</li>
 <li>Minor edits &amp; corrections to <a href="https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html">tagged_na</a>, <a href="https://big-life-lab.github.io/cchsflow/articles/variable_details.html">variable_details</a>, and <a href="https://big-life-lab.github.io/cchsflow/articles/how_to_add_variables.html">how to add variables</a> articles.</li>
@@ -346,75 +640,75 @@
 </div>
 </div>
     <div id="cchsflow-140" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.0">
 <a href="#cchsflow-140" class="anchor"></a>cchsflow 1.4.0<small> Unreleased </small>
 </h1>
 <p>2020-02-10</p>
-<div id="breaking-changes-2" class="section level2">
+<div id="breaking-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes-2" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-3" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li>Added to _p suffix to the names of datasets &amp; databaseStarts to denote CCHS PUMF data</li>
 </ul>
 </div>
-<div id="features-1" class="section level2">
+<div id="features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-1" class="anchor"></a>Features</h2>
+<a href="#features-4" class="anchor"></a>Features</h2>
 <ul>
 <li>Badges added to <code>README.md</code> with <code>usethis</code>.</li>
 </ul>
 </div>
-<div id="variables-2" class="section level2">
+<div id="variables-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables-2" class="anchor"></a>Variables</h2>
+<a href="#variables-3" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/multiple_conditions_fun1.html">multiple conditions</a> - derived multiple chronic conditions variable</li>
 <li>Modifications to derived respiratory condition variable to include respondents with asthma.</li>
 </ul>
 </div>
-<div id="minor-improvements-5" class="section level2">
+<div id="minor-improvements-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-5" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-7" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Expansion to <a href="https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html">tagged_na</a> article</li>
 </ul>
 </div>
 </div>
     <div id="cchsflow-132" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.3.2">
 <a href="#cchsflow-132" class="anchor"></a>cchsflow 1.3.2<small> 2020-02-16 </small>
 </h1>
 <p>2020-02-04</p>
-<div id="variables-3" class="section level2">
+<div id="variables-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables-3" class="anchor"></a>Variables</h2>
+<a href="#variables-4" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/binge_drinker_fun.html">binge_drinker</a> - derived binge drinking variable</li>
 </ul>
 </div>
-<div id="minor-improvements-6" class="section level2">
+<div id="minor-improvements-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-6" class="anchor"></a>Minor improvements</h2>
+<a href="#minor-improvements-8" class="anchor"></a>Minor improvements</h2>
 <ul>
 <li>Issue and variable request templates added on Github</li>
 <li>Minor edits to the labels and sections in <code>variables.csv</code>
 </li>
 <li>Minor correction to <code>DESCRIPTION</code>
 </li>
-<li>Minor corrections to the documentation of <a href="https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun1.html"><code><a href="../reference/resp_condition_fun1.html">resp_condition_fun1()</a></code></a>, <a href="https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun2.html"><code><a href="../reference/resp_condition_fun2.html">resp_condition_fun2()</a></code></a>, <a href="https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun3.html"><code><a href="../reference/resp_condition_fun3.html">resp_condition_fun3()</a></code></a>,</li>
+<li>Minor corrections to the documentation of <a href="https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun1.html"><code>resp_condition_fun1()</code></a>, <a href="https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun2.html"><code>resp_condition_fun2()</code></a>, <a href="https://big-life-lab.github.io/cchsflow/reference/resp_condition_fun3.html"><code>resp_condition_fun3()</code></a>,</li>
 </ul>
 </div>
 </div>
     <div id="cchsflow-131" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.3.1">
 <a href="#cchsflow-131" class="anchor"></a>cchsflow 1.3.1<small> Unreleased </small>
 </h1>
 <p>2020-01-28</p>
-<div id="variables-4" class="section level2">
+<div id="variables-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables-4" class="anchor"></a>Variables</h2>
+<a href="#variables-5" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> CCC_31A. Ever diagnosed with cancer</li>
@@ -428,20 +722,20 @@
 </div>
 </div>
     <div id="cchsflow-130" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.3.0">
 <a href="#cchsflow-130" class="anchor"></a>cchsflow 1.3.0<small> Unreleased </small>
 </h1>
 <p>2020-01-23</p>
-<div id="breaking-changes-3" class="section level2">
+<div id="breaking-changes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes-3" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-4" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li>Changed <code>print_note()</code> parameter in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> to <code>notes</code>.</li>
 </ul>
 </div>
-<div id="variables-5" class="section level2">
+<div id="variables-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#variables-5" class="anchor"></a>Variables</h2>
+<a href="#variables-6" class="anchor"></a>Variables</h2>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> food_insecurity_der. Derived food insecurity variable.</li>
@@ -465,13 +759,13 @@
 </div>
 </div>
     <div id="cchsflow-120" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.2.0">
 <a href="#cchsflow-120" class="anchor"></a>cchsflow 1.2.0<small> Unreleased </small>
 </h1>
 <p>2020-01-13</p>
-<div id="breaking-changes-4" class="section level2">
+<div id="breaking-changes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes-4" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-5" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li>Changed dataset_name to database_name</li>
 <li>Added a simple <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> function call that uses <code>data</code> variable name as <code>database_name</code> as well as default <code>variables</code> and <code>variable_details</code> that come with the package.</li>
@@ -491,13 +785,13 @@
 </div>
 </div>
     <div id="cchsflow-110" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.1.0">
 <a href="#cchsflow-110" class="anchor"></a>cchsflow 1.1.0<small> Unreleased </small>
 </h1>
 <p>2020-01-08</p>
-<div id="breaking-changes-5" class="section level2">
+<div id="breaking-changes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#breaking-changes-5" class="anchor"></a>Breaking changes</h2>
+<a href="#breaking-changes-6" class="anchor"></a>Breaking changes</h2>
 <ul>
 <li><p>Changed <code>data_source</code> parameter in <code><a href="../reference/rec_with_table.html">rec_with_table()</a></code> to <code>data</code>.</p></li>
 <li><p>Changed order of parameters to have <code>variables</code> after <code>dataset_name</code>.</p></li>
@@ -526,13 +820,13 @@
 </div>
 </div>
     <div id="cchsflow-101" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.0.1">
 <a href="#cchsflow-101" class="anchor"></a>cchsflow 1.0.1<small> Unreleased </small>
 </h1>
 <p>2019-12-19</p>
-<div id="features-2" class="section level2">
+<div id="features-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-2" class="anchor"></a>Features</h2>
+<a href="#features-5" class="anchor"></a>Features</h2>
 <ul>
 <li>Updated <code>LICENSE</code>
 </li>
@@ -541,7 +835,7 @@
 </div>
 </div>
     <div id="cchsflow-100" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.0.0">
 <a href="#cchsflow-100" class="anchor"></a>cchsflow 1.0.0<small> Unreleased </small>
 </h1>
 <p>2019-12-18</p>
@@ -552,9 +846,9 @@
 <li>Submitted package to CRAN</li>
 </ul>
 </div>
-<div id="features-3" class="section level2">
+<div id="features-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-3" class="anchor"></a>Features</h2>
+<a href="#features-6" class="anchor"></a>Features</h2>
 <ul>
 <li>Switched formatting to snake_case</li>
 <li>Corrections to “using cchsflow” article</li>
@@ -575,21 +869,21 @@
 </div>
 </div>
     <div id="cchsflow-023" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.2.3">
 <a href="#cchsflow-023" class="anchor"></a>cchsflow 0.2.3<small> Unreleased </small>
 </h1>
 <p>2019-11-29</p>
-<div id="features-4" class="section level2">
+<div id="features-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-4" class="anchor"></a>Features</h2>
+<a href="#features-7" class="anchor"></a>Features</h2>
 <ul>
 <li>Updated example in the <a href="https://big-life-lab.github.io/cchsflow/index.html">introduction</a> to reflect data that is now included in the cchsflow package.</li>
 <li>Updates to vignettes to reflect latest version of package</li>
 <li>Updates to variables.csv &amp; variableDetails.csv</li>
 </ul>
-<div id="variables-6" class="section level3">
+<div id="variables-7" class="section level3">
 <h3 class="hasAnchor">
-<a href="#variables-6" class="anchor"></a>Variables</h3>
+<a href="#variables-7" class="anchor"></a>Variables</h3>
 <ul>
 <li>
 <font color="green"><strong>New</strong></font> <a href="https://big-life-lab.github.io/cchsflow/reference/age_cat_fun.html">DHHGAGE_C</a> - categorical age variable that groups various age categories across all CCHS cycles. Based on the continuous age variable (<code>DHHGAGE_cont</code>) that is also harmonious across all CCHS cycles.</li>
@@ -604,13 +898,13 @@
 </div>
 </div>
     <div id="cchsflow-022" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.2.2">
 <a href="#cchsflow-022" class="anchor"></a>cchsflow 0.2.2<small> Unreleased </small>
 </h1>
 <p>2019-11-26</p>
-<div id="features-5" class="section level2">
+<div id="features-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-5" class="anchor"></a>Features</h2>
+<a href="#features-8" class="anchor"></a>Features</h2>
 <ul>
 <li>Updated ref branch of bllflow to match latest version of <code>RecWTable()</code>
 </li>
@@ -620,13 +914,13 @@
 </div>
 </div>
     <div id="cchsflow-021" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.2.1">
 <a href="#cchsflow-021" class="anchor"></a>cchsflow 0.2.1<small> Unreleased </small>
 </h1>
 <p>2019-11-19</p>
-<div id="features-6" class="section level2">
+<div id="features-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-6" class="anchor"></a>Features</h2>
+<a href="#features-9" class="anchor"></a>Features</h2>
 <ul>
 <li>Documentation for derived variable functions now available</li>
 <li>Documentation for derived alcohol variables now available</li>
@@ -634,12 +928,12 @@
 </div>
 </div>
     <div id="cchsflow-020" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.2.0">
 <a href="#cchsflow-020" class="anchor"></a>cchsflow 0.2.0<small> Unreleased </small>
 </h1>
-<div id="features-7" class="section level2">
+<div id="features-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-7" class="anchor"></a>Features</h2>
+<a href="#features-10" class="anchor"></a>Features</h2>
 <ul>
 <li>Added Support for derived variables alongside vignettes explaining how to add new variables</li>
 <li>Added R file with custom functions for derived variables</li>
@@ -649,12 +943,12 @@
 </div>
 </div>
     <div id="cchsflow-010-first-version" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.1.0">
 <a href="#cchsflow-010-first-version" class="anchor"></a>cchsflow 0.1.0 (First Version)<small> Unreleased </small>
 </h1>
-<div id="features-8" class="section level2">
+<div id="features-11" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-8" class="anchor"></a>Features</h2>
+<a href="#features-11" class="anchor"></a>Features</h2>
 <ul>
 <li>Added variables.csv that contains list of CCHS variables in cchsflow.</li>
 <li>Added variableDetails.csv that maps variables across CCHS cycles from 2001-2014</li>
@@ -664,33 +958,10 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#cchsflow-160-latest-build">1.6.0</a></li>
-        <li><a href="#cchsflow-152">1.5.2</a></li>
-        <li><a href="#cchsflow-151">1.5.1</a></li>
-        <li><a href="#cchsflow-150">1.5.0</a></li>
-        <li><a href="#cchsflow-144-latest-build">1.4.4</a></li>
-        <li><a href="#cchsflow-143">1.4.3</a></li>
-        <li><a href="#cchsflow-142">1.4.2</a></li>
-        <li><a href="#cchsflow-141">1.4.1</a></li>
-        <li><a href="#cchsflow-140">1.4.0</a></li>
-        <li><a href="#cchsflow-132">1.3.2</a></li>
-        <li><a href="#cchsflow-131">1.3.1</a></li>
-        <li><a href="#cchsflow-130">1.3.0</a></li>
-        <li><a href="#cchsflow-120">1.2.0</a></li>
-        <li><a href="#cchsflow-110">1.1.0</a></li>
-        <li><a href="#cchsflow-101">1.0.1</a></li>
-        <li><a href="#cchsflow-100">1.0.0</a></li>
-        <li><a href="#cchsflow-023">0.2.3</a></li>
-        <li><a href="#cchsflow-022">0.2.2</a></li>
-        <li><a href="#cchsflow-021">0.2.1</a></li>
-        <li><a href="#cchsflow-020">0.2.0</a></li>
-        <li><a href="#cchsflow-010-first-version">0.1.0</a></li>
-      </ul>
-    </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -698,11 +969,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Carol Bennett.</p>
+  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Kitty Chen, Carol Bennett.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

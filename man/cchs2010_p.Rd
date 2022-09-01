@@ -5,7 +5,7 @@
 \alias{cchs2010_p}
 \title{2010 CCHS PUMF subset data (200 respondents)}
 \source{
-\url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=81424}
+\url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=81424}
 }
 \value{
 \item{cchs2010_p}{a data frame}
@@ -20,7 +20,7 @@ The CCHS survey is conducted by Statistics Canada.
 subset. Please see the "CCHS datasets that overlap each other" article to see
 how the two datasets contain overlap.
 
-See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 license. Source from Statistics Canada, Canadian Community Health Survey 
 PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 the permission of Statistics Canada.

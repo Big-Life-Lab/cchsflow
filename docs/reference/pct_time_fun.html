@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,7 +46,7 @@
 
 <!-- docsearch -->
 <script src="../docsearch.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
@@ -52,8 +56,7 @@
 <meta property="og:description" content="This function creates a derived variable (pct_time_der) that
  provides an estimated percentage of the time a person's life was spent in
  Canada." />
-<meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="/logo.svg" />
 
 
 
@@ -71,7 +74,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -85,7 +88,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -93,7 +96,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -136,8 +139,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/Big-Life-Lab/cchsflow">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/Big-Life-Lab/cchsflow/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -171,7 +174,7 @@
  Canada.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pct_time_fun</span>(<span class='no'>DHHGAGE_cont</span>, <span class='no'>SDCGCBG</span>, <span class='no'>SDCGRES</span>)</pre>
+    <pre class="usage"><span class='fu'>pct_time_fun</span><span class='op'>(</span><span class='va'>DHHGAGE_cont</span>, <span class='va'>SDCGCBG</span>, <span class='va'>SDCGRES</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -195,7 +198,7 @@ datasets, this is a categorical variable with two categories (1 - 0-9 years;
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Numeric value that is a fraction between 0 and 1 that represents
+    <p>Numeric value between 0 and 100 that represents
  percentage of a respondent's time in Canada</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
@@ -212,42 +215,50 @@ datasets, this is a categorical variable with two categories (1 - 0-9 years;
 <span class='co'># To transform pct_time_der across cycles, use rec_with_table() for each CCHS</span>
 <span class='co'># cycle and specify pct_time_der, along with age (DHHGAGE_cont), whether or</span>
 <span class='co'># not someone was born in Canada (SDCGCBG), how long someone has lived in</span>
-<span class='co'># Canada (SDCGRES). Then by using bind_rows(), you can combine Pct_time_der</span>
-<span class='co'># across cycles</span>
+<span class='co'># Canada (SDCGRES). Then by using merge_rec_data(), you can combine</span>
+<span class='co'># pct_time_der across cycles</span>
 
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>cchsflow</span>)
-<span class='no'>pct_time2009_2010</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='no'>cchs2009_2010_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Big-Life-Lab/cchsflow'>cchsflow</a></span><span class='op'>)</span>
+<span class='va'>pct_time2009_2010</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span>
+  <span class='va'>cchs2009_2010_p</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
     <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"SDCGCBG"</span>,
     <span class='st'>"SDCGRES"</span>, <span class='st'>"pct_time_der"</span>
-  )
-)</div><div class='output co'>#&gt; <span class='message'>Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SDCGCBG: CCHS 2001 does not have don't know (7) or refusal (8)</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SDCGRES: CCHS 2001 missing don't know (7), refusal (8)</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>pct_time2009_2010</span>)</div><div class='output co'>#&gt;   DHHGAGE_cont SDCGCBG SDCGRES pct_time_der
+  <span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SDCGCBG: CCHS 2001 does not have don't know (7) or refusal (8)</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SDCGRES: CCHS 2001 missing don't know (7), refusal (8)</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>pct_time2009_2010</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   DHHGAGE_cont SDCGCBG SDCGRES pct_time_der
 #&gt; 1           13       1   NA(a)    100.00000
 #&gt; 2           27       2       2     55.55556
 #&gt; 3           62       1   NA(a)    100.00000
 #&gt; 4           52       1   NA(a)    100.00000
 #&gt; 5           67       1   NA(a)    100.00000
 #&gt; 6           62       1   NA(a)    100.00000</div><div class='input'>
-<span class='no'>pct_time2011_2012</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span>(
-  <span class='no'>cchs2011_2012_p</span>,  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+<span class='va'>pct_time2011_2012</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rec_with_table.html'>rec_with_table</a></span><span class='op'>(</span>
+  <span class='va'>cchs2011_2012_p</span>,  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
     <span class='st'>"DHHGAGE_cont"</span>, <span class='st'>"SDCGCBG"</span>,
     <span class='st'>"SDCGRES"</span>, <span class='st'>"pct_time_der"</span>
-  )
-)</div><div class='output co'>#&gt; <span class='message'>Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SDCGCBG: CCHS 2001 does not have don't know (7) or refusal (8)</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SDCGRES: CCHS 2001 missing don't know (7), refusal (8)</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>pct_time2011_2012</span>)</div><div class='output co'>#&gt;     DHHGAGE_cont SDCGCBG SDCGRES pct_time_der
+  <span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>No variable_details detected.</span>
+#&gt; <span class='message'>              Loading cchsflow variable_details</span></div><div class='output co'>#&gt; <span class='message'>Using the passed data variable name as database_name</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SDCGCBG: CCHS 2001 does not have don't know (7) or refusal (8)</span></div><div class='output co'>#&gt; <span class='message'>NOTE for SDCGRES: CCHS 2001 missing don't know (7), refusal (8)</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>pct_time2011_2012</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;     DHHGAGE_cont SDCGCBG SDCGRES pct_time_der
 #&gt; 195         72.0       2       2     20.83333
 #&gt; 196         22.0       1   NA(a)    100.00000
 #&gt; 197         18.5       1   NA(a)    100.00000
 #&gt; 198         42.0       2       2     35.71429
 #&gt; 199         62.0       1   NA(a)    100.00000
 #&gt; 200         52.0       1   NA(a)    100.00000</div><div class='input'>
-<span class='no'>combined_pct_time</span> <span class='kw'>&lt;-</span> <span class='fu'>bind_rows</span>(<span class='no'>pct_time2009_2010</span>, <span class='no'>pct_time2011_2012</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>combined_pct_time</span>)</div><div class='output co'>#&gt;   DHHGAGE_cont SDCGCBG SDCGRES pct_time_der
+<span class='va'>combined_pct_time</span> <span class='op'>&lt;-</span> <span class='fu'><a href='merge_rec_data.html'>merge_rec_data</a></span><span class='op'>(</span><span class='va'>pct_time2009_2010</span>, <span class='va'>pct_time2011_2012</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>combined_pct_time</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   DHHGAGE_cont SDCGCBG SDCGRES pct_time_der
 #&gt; 1           13       1   NA(a)    100.00000
 #&gt; 2           27       2       2     55.55556
 #&gt; 3           62       1   NA(a)    100.00000
 #&gt; 4           52       1   NA(a)    100.00000
 #&gt; 5           67       1   NA(a)    100.00000
-#&gt; 6           62       1   NA(a)    100.00000</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span>(<span class='no'>combined_pct_time</span>)</div><div class='output co'>#&gt;     DHHGAGE_cont SDCGCBG SDCGRES pct_time_der
+#&gt; 6           62       1   NA(a)    100.00000</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>combined_pct_time</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;     DHHGAGE_cont SDCGCBG SDCGRES pct_time_der
 #&gt; 395         72.0       2       2     20.83333
 #&gt; 396         22.0       1   NA(a)    100.00000
 #&gt; 397         18.5       1   NA(a)    100.00000
@@ -259,30 +270,26 @@ datasets, this is a categorical variable with two categories (1 - 0-9 years;
 <span class='co'># outside of Canada and have been living in Canada for less than 10 years.</span>
 <span class='co'># Your estimated percent time spent in Canada can be calculated as follows:</span>
 
-<span class='no'>pct_time</span> <span class='kw'>&lt;-</span> <span class='fu'>pct_time_fun</span>(<span class='kw'>DHHGAGE_cont</span> <span class='kw'>=</span> <span class='fl'>27</span>, <span class='kw'>SDCGCBG</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>SDCGRES</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='va'>pct_time</span> <span class='op'>&lt;-</span> <span class='fu'>pct_time_fun</span><span class='op'>(</span>DHHGAGE_cont <span class='op'>=</span> <span class='fl'>27</span>, SDCGCBG <span class='op'>=</span> <span class='fl'>2</span>, SDCGRES <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>pct_time</span>)</div><div class='output co'>#&gt; [1] 16.66667</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>pct_time</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 16.66667</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#note">Note</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Carol Bennett.</p>
+  <p>Developed by Doug Manuel, Warsame Yusuf, Rostyslav Vyuha, Kitty Chen, Carol Bennett.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

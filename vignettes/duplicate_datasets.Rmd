@@ -2,7 +2,7 @@
 title: "CCHS datasets that overlap each other"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{6 - Duplicate datasets}     
+  %\VignetteIndexEntry{CCHS datasets that overlap each other}     
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---
@@ -25,6 +25,8 @@ The following datasets are currently supported by cchsflow:
 * CCHS PUMF 2012
 * CCHS PUMF 2013-2014
 * CCHS PUMF 2014
+* CCHS PUMF 2015-2016
+* CCHS PUMF 2017-2018
 
 ## Datasets in cchsflow with overlap
 

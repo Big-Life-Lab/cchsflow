@@ -54,7 +54,12 @@ reference:
   - title: "Derived variable functions"
     desc: Functions for deriving custom CCHS variables
     contents:
+    - active_transport1_fun
+    - active_transport2_fun
+    - active_transport3_fun
     - bmi_fun
+    - adjusted_bmi_fun
+    - bmi_fun_cat
     - pack_years_fun
     - pct_time_fun
     - resp_condition_fun1
@@ -65,15 +70,49 @@ reference:
     - multiple_conditions_fun1
     - multiple_conditions_fun2
     - adl_fun
+    - RACDPAL_fun
+    - adl_score_5_fun
+    - COPD_Emph_der_fun1
+    - COPD_Emph_der_fun2
+    - diet_score_fun
+    - diet_score_fun_cat
+    - smoke_simple_fun
+    - time_quit_smoking_fun
+    - low_drink_short_fun
+    - low_drink_long_fun
+    - low_drink_score_fun
+    - low_drink_score_fun1
+    - immigration_fun
+    - pct_time_fun_cat
+    - energy_exp_fun
+    - SMKDSTY_fun
+    - SMKG040_fun
+    - SMKG203_fun
+    - SMKG207_fun
+    - SPS_5_fun 
+    - pack_years_fun_cat
   - title: "Potentially problematic variables"
     desc: Derived variables in cchsflow that users may run into issues with
     contents:
+    - ALW_1
+    - ALW_2A1
+    - ALW_2A2
+    - ALW_2A3
+    - ALW_2A4
+    - ALW_2A5
+    - ALW_2A6
+    - ALW_2A7
     - ALWDWKY
     - ALWDDLY
     - ALCDTYP
     - ALCDTTM
+    - DPSDSF
+    - DPSDPP
     - food_insecurity_der
     - GEN_02A2
+    - LBFA_31A
+    - LBFA_31A_a
+    - LBFA_31A_b
   - title: "CCHS datasets"
     desc: Datasets for each CCHS cycle
     contents:
@@ -87,11 +126,17 @@ reference:
     - cchs2012_p 
     - cchs2013_2014_p
     - cchs2014_p 
+    - cchs2015_2016_p
+    - cchs2017_2018_p
+    - cchs2009_s
+    - cchs2010_s
+    - cchs2012_s
   - title: "Processing functions"
     desc: Functions used to manipulate CCHS datasets
     contents:
     - rec_with_table
     - set_data_labels
+    - merge_rec_data
   - title: "Utility functions"
     desc: Utility functions that are used in other cchsflow functions
     contents:

@@ -5,10 +5,9 @@
 \title{Smoking pack-years}
 \usage{
 pack_years_fun(
-  SMKDSTY,
+  SMKDSTY_A,
   DHHGAGE_cont,
-  SMK_09A_B,
-  SMKG09C,
+  time_quit_smoking,
   SMKG203_cont,
   SMKG207_cont,
   SMK_204,
@@ -20,16 +19,15 @@ pack_years_fun(
 )
 }
 \arguments{
-\item{SMKDSTY}{derived variable that classifies an individual's smoking
-status.}
+\item{SMKDSTY_A}{variable used in CCHS cycles 2001-2014 that classifies an 
+individual's smoking status.}
 
 \item{DHHGAGE_cont}{continuous age variable.}
 
-\item{SMK_09A_B}{number of years since quitting smoking. Variable asked to
-former daily smokers who quit <3 years ago.}
-
-\item{SMKG09C}{number of years since quitting smoking. Variable asked to
-former daily smokers who quit >=3 years ago.}
+\item{time_quit_smoking}{derived variable that calculates the approximate
+time a former smoker has quit smoking. 
+See \code{\link{time_quit_smoking_fun}} for documentation on how variable
+was derived}
 
 \item{SMKG203_cont}{age started smoking daily. Variable asked to daily
 smokers.}
@@ -53,7 +51,7 @@ daily smokers}
 \item{SMK_01A}{smoked 100 cigarettes in lifetime (y/n)}
 }
 \value{
-value for smoking pack-years in the Pack_years_der variable
+value for smoking pack-years in the pack_years_der variable
 }
 \description{
 This function creates a derived variable (pack_years_der) that
@@ -77,13 +75,16 @@ pack-years is calculated by multiplying the number of cigarette
 
 # To transform pack_years_der across cycles, use rec_with_table() for each
 # CCHS cycle and specify pack_years_der, along with each smoking variable.
-# Then by using bind_rows(), you can combine pack_years_der across cycles
+# Since time_quit_smoking_der is also a derived 
+# variable, you will have to specify the variables that are derived from it.
+# Then by using merge_rec_data(), you can combine pack_years_der across
+# cycles
 
 library(cchsflow)
 
 pack_years2009_2010 <- rec_with_table(
   cchs2009_2010_p, c(
-    "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
+    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
   )
@@ -93,7 +94,7 @@ head(pack_years2009_2010)
 
 pack_years2011_2012 <- rec_with_table(
   cchs2011_2012_p,c(
-    "SMKDSTY", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C",
+    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
   )
@@ -101,7 +102,7 @@ pack_years2011_2012 <- rec_with_table(
 
 tail(pack_years2011_2012)
 
-combined_pack_years <- suppressWarnings(bind_rows(pack_years2009_2010,
+combined_pack_years <- suppressWarnings(merge_rec_data(pack_years2009_2010,
  pack_years2011_2012))
 
 head(combined_pack_years)

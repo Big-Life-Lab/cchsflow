@@ -38,8 +38,8 @@ This is one of 3 functions used to create a derived variable
 
 # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
 # and specify resp_condition_der, along with the various respiratory
-# variables. Then by using bind_rows() you can combine resp_condition_der
-# across cycles.
+# variables. Then by using merge_rec_data() you can combine
+# resp_condition_der across cycles.
 
 library(cchsflow)
 
@@ -61,7 +61,8 @@ resp2011_2012 <- suppressWarnings(rec_with_table(
 
 tail(resp2011_2012)
 
-combined_resp <- suppressWarnings(bind_rows(resp2009_2010, resp2011_2012))
+combined_resp <-
+ suppressWarnings(merge_rec_data(resp2009_2010, resp2011_2012))
 
 head(combined_resp)
 tail(combined_resp)

@@ -5,7 +5,7 @@
 \alias{cchs2007_2008_p}
 \title{2007-2008 CCHS PUMF subset data (200 respondents)}
 \source{
-\url{http://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
+\url{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=29539}
 }
 \value{
 \item{cchs2007_2008_p}{a data frame}
@@ -16,7 +16,7 @@ Community Health Survey (CCHS) Public Use Microdata file (PUMF) dataset.
 The CCHS survey is conducted by Statistics Canada.
 }
 \details{
-See \href{https://www.statcan.gc.ca/eng/reference/licence}{here} for the open
+See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
 license. Source from Statistics Canada, Canadian Community Health Survey 
 PUMF, accessed Jan 2020. Reproduced and distributed on an "as is" basis with 
 the permission of Statistics Canada.
