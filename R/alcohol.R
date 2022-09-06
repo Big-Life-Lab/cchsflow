@@ -952,7 +952,7 @@ low_drink_score_fun1 <-
       # Medium risk
       if_else2(step1 %in% (3:4), 4,
       # High risk
-      if_else2(step1 %in% (5:9), 5, tagged_na("b"))))))
+      if_else2(step1 %in% (5:9), 5, "NA(b)")))))
     
     return(low_drink_score1)
   }

@@ -203,5 +203,5 @@ diet_score_fun_cat <-
     # Adequate diet 
     if_else2(diet_score >=8 & diet_score <= 10, 3,
     # No response
-    if_else2(diet_score == tagged_na("a"), "NA(a)", "NA(b)"))))
+    if_else2(haven::is_tagged_na(diet_score, "a"), "NA(a)", "NA(b)"))))
   }
