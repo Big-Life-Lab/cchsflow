@@ -76,6 +76,6 @@ SPS_5_fun <-
     SPS_5 <- if_else2(SPS5_raw_scale <0, 0,
                            if_else2(SPS5_raw_scale >20, 20,
                                     if_else2(!is.na(SPS5_raw_scale), SPS5_raw_scale,
-                                             tagged_na("b"))))
+                                             "NA(b)")))
     return(SPS_5)
   }

@@ -461,7 +461,7 @@ pack_years_fun_cat <- function(pack_years_der){
     if_else2(pack_years_der > 16.2 & pack_years_der <= 25.7, 6,
     if_else2(pack_years_der > 25.7 & pack_years_der <= 40.0, 7,
     if_else2(pack_years_der > 40.0, 8,
-    if_else2(pack_years_der == tagged_na("a"), "NA(a)", "NA(b)")))))))))
+    if_else2(haven::is_tagged_na(pack_years_der, "a"), "NA(a)", "NA(b)")))))))))
   
   return(pack_years_cat)
 }

@@ -77,6 +77,19 @@
 #' @export
 diet_score_fun <-
   function(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI, DHH_SEX) {
+    all_diet_score_parameters <- c(
+      FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI
+    )
+    if(sum(haven::is_tagged_na(all_diet_score_parameters, "a")) > 0) {
+      return(haven::tagged_na("a"))
+    }
+    if(sum(haven::is_tagged_na(all_diet_score_parameters, "b")) > 0) {
+      return(haven::tagged_na("b"))
+    }
+    
+    if("NA(b)" %in% c(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI)) {
+      return("NA(b)")
+    }
     
     # Total fruit and vegetables, excluding fruit juice
       total_fruitveg <- 
@@ -190,5 +203,5 @@ diet_score_fun_cat <-
     # Adequate diet 
     if_else2(diet_score >=8 & diet_score <= 10, 3,
     # No response
-    if_else2(diet_score == tagged_na("a"), "NA(a)", "NA(b)"))))
+    if_else2(haven::is_tagged_na(diet_score, "a"), "NA(a)", "NA(b)"))))
   }
