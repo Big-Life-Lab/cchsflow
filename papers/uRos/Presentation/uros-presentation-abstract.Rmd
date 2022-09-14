@@ -1,0 +1,20 @@
+---
+title: "cchsflow: An open science approach to transform & combine population health datasets"
+author: "Warsame Yusuf and Kitty Chen"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+bibliography: ../../bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Abstract
+
+The Canadian Community Health Survey (CCHS) is one of the world's robust ongoing cross-sectional population health surveys, with over 130,000 respondents every two years (currently over 1.5 million respondents since its inception in 2001). While the survey remains relatively consistent over the years, differences between cycles, including a major redesign in 2015, present a challenge when conducting longitudinal analyses. *cchsflow* is an R package that transforms and harmonizes variables into consistent formats across multiple CCHS cycles (currently, 2001 to 2018). By implementing open science practices, *cchsflow* aims to minimize the amount of time spent data cleaning for the wide number of CCHS users. Worksheets were used to guide the variable transformation process and to generate harmonized metadata. A GitHub repository was created for the package [@cchsflow] where the broader community of CCHS users collaborate to improve the consistent use of the surveys. Currently, *cchsflow* package is available for installation through the Comprehensive R Archive Network (CRAN) and contains support for over 300 CCHS variables for 1.5 million respondents of the CCHS Public Use Microdata File (PUMF) from 2001 to 2018. There are over 400 package downloads per month. The functions and approach from *cchsflow* now forms the basis of a new package, *recodeflow*, which is used to transform and harmonize an increasing number of databases. The worksheets of *cchsflow* and *recodeflow* are comma separated values (CSV) tables can be used in any software systems.
+
+## References
