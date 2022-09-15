@@ -1,6 +1,5 @@
 ---
 title: "cchsflow: An open science approach to transform & combine population health datasets"
-author: "Warsame Yusuf and Kitty Chen"
 output:
   word_document: default
   pdf_document: default
@@ -12,6 +11,18 @@ bibliography: ../../bibliography.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+## Authors
+
+Kitty Chen (University of Ottawa, Ottawa Hospital Research Institute)
+
+Warsame Yusuf (Public Health Agency of Canada)
+
+Carol Bennett (Ottawa Hospital Research Institute, ICES)
+
+Yulric Sequeira (Ottawa Hospital Research Institute)
+
+Douglas G. Manuel (Ottawa Hospital Research Institute, University of Ottawa)
 
 ## Abstract
 
