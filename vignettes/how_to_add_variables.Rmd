@@ -16,7 +16,9 @@ knitr::opts_chunk$set(
 
 ## Introduction 
 
-This vignette explains how you can add variables to the _cchsflow_ package. There are two types of variables that can be added:
+This vignette explains how you can select and add variables to the _cchsflow_ package. When selecting CCHS variables, relevant and homogeneous variables should be identified across cycles. To see how survey questions and responses have changed over time, it's best to look through the CCHS data dictionaries and derived variable guides which can be found [here](https://osf.io/hkuy3/). [613apps](https://613apps.ca/data-dictionary-builder/) is another good resource to map out the variable name and survey question changes over time for different surveys. You can also browse our existing harmonized variables in `variables.csv` in _cchsflow_. If the variable is not available in the existing repository, you can add the variables to _cchsflow_.
+
+There are two types of variables that can be added:
 
 1. Existing CCHS variables to be harmonized across cycles.
 2. Derived variables based on harmonized CCHS cycles.
