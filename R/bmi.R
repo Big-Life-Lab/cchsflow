@@ -267,5 +267,5 @@ bmi_fun_cat <-
     # Obese
     if_else2(HWTGBMI_der >= 30, 4,
     # No response
-    if_else2(HWTGBMI_der == tagged_na("a"), "NA(a)", "NA(b)")))))
+    if_else2(haven::is_tagged_na(HWTGBMI_der,"a"), "NA(a)", "NA(b)")))))
   }

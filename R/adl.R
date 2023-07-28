@@ -201,8 +201,8 @@ adl_score_5_fun <-
     count_missing_adl <- sum(all_adl_vector == "NA(b)")
     # Count the number of not applicable values in vector
     count_not_applicable_adl <- sum(all_adl_vector == "NA(a)")
-    # Count the number of ADLs that require help (value of 2)
-    count_adl <- sum(all_adl_vector == 2)
+    # Count the number of ADLs that require help (value of 1)
+    count_adl <- sum(all_adl_vector == 1)
     
     
     # If the individual had missing data for any of the variables then set
