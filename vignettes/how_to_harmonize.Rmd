@@ -1,0 +1,117 @@
+---
+title: "How to harmonize across survey cycles"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  eval = F,
+  echo = T,
+  results = "hide",
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction 
+
+This vignette explains how you can transform variables across multiple CCHS datasets using the full datasets to the _cchsflow_ package. The full PUMF datasets can be found [here](https://odesi.ca/). A full harmonized dataset of all cchsflow variables
+can be found [here](https://osf.io/j5wgu). With the original PUMF datasets, data should be renamed such that it specifies the survey and cycle year, which follows the format of the _p sample data (ex. cchs2001, cchs2013_2014).
+
+Note: Harmonizing cycles before 2014 with cycles from 2015 onward is not advised as Statistics Canada has made major survey design changes.
+
+## How to combine a single variable across multiple cycles
+
+In this example, the sex variable from 2001 to 2018 CCHS datasets will be transformed and labeled using  `rec_with_table()`, which is then combined into one dataset and labeled using  `merge_rec_data()`.
+
+```{r}
+# Harmonize individual datasets
+sex2001 <- rec_with_table(cchs2001, "DHH_SEX")
+sex2003 <- rec_with_table(cchs2003, "DHH_SEX")
+sex2005 <- rec_with_table(cchs2005, "DHH_SEX")
+sex2007_2008 <- rec_with_table(cchs2007_2008, "DHH_SEX")
+sex2009_2010 <- rec_with_table(cchs2009_2010, "DHH_SEX")
+sex2011 <- rec_with_table(cchs2011, "DHH_SEX")
+sex2012 <- rec_with_table(cchs2012, "DHH_SEX")
+sex2013_2014 <- rec_with_table(cchs2013_2014, "DHH_SEX")
+sex2015_2016 <- rec_with_table(cchs2015_2016, "DHH_SEX")
+sex2017_2018 <- rec_with_table(cchs2017_2018, "DHH_SEX")
+
+# Merge harmonized data
+combined_sex <- merge_rec_data(sex2001, sex2003, sex2005, sex2007_2008, sex2009_2010, sex2011, sex2012, sex2013_2014, sex2015_2016, sex2017_2018)
+
+```
+
+
+## How to combine multiple variables across multiple cycles
+
+In this example, the continuous age and sex variable from 2001 to 2018 CCHS datasets will be transformed and labeled using  `rec_with_table()`, which is then combined into one dataset and labeled using  `merge_rec_data()`.
+
+```{r}
+# Harmonize individual datasets
+age_sex2001 <- rec_with_table(cchs2001, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2003 <- rec_with_table(cchs2003, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2005 <- rec_with_table(cchs2005, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2007_2008 <- rec_with_table(cchs2007_2008, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2009_2010 <- rec_with_table(cchs2009_2010, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2011 <- rec_with_table(cchs2011, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2012 <- rec_with_table(cchs2012, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2013_2014 <- rec_with_table(cchs2013_2014, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2015_2016 <- rec_with_table(cchs2015_2016, c("DHHGAGE_cont", "DHH_SEX"))
+age_sex2017_2018 <- rec_with_table(cchs2017_2018, c("DHHGAGE_cont", "DHH_SEX"))
+
+# Merge harmonized data
+combined_age_sex <- merge_rec_data(age_sex2001, age_sex2003, age_sex2005, age_sex2007_2008, age_sex2009_2010, age_sex2011, age_sex2012, age_sex2013_2014, age_sex2015_2016, age_sex2017_2018)
+
+```
+
+## How to combine all variables in the variable_details sheet across multiple cycles
+
+To combine a large number of variables, it is best to use `variables.csv` and `variable_details.csv`. There are vignettes that further describe variables and variable_details, including how to add or customize transformed variables.
+
+### Option 1: Using _cchsflow_ variable_details sheet
+
+When the variable argument in `rec_with_table()` is not specified, all variables listed in `variables.csv` and `variable_details.csv` will be transformed. In this example, all variables from the _cchsflow_ `variables.csv` and `variable_details.csv` sheets from 2001 to 2018 CCHS datasets will be transformed and labeled using  `rec_with_table()`, which is then combined into one dataset and labeled using  `merge_rec_data()`.
+
+```{r}
+# Harmonize individual datasets
+harmonized_2001 <- rec_with_table(cchs2001)
+harmonized_2003 <- rec_with_table(cchs2003)
+harmonized_2005 <- rec_with_table(cchs2005)
+harmonized_2007_2008 <- rec_with_table(cchs2007_2008)
+harmonized_2009_2010 <- rec_with_table(cchs2009_2010)
+harmonized_2011 <- rec_with_table(cchs2011)
+harmonized_2012 <- rec_with_table(cchs2012)
+harmonized_2013_2014 <- rec_with_table(cchs2013_2014)
+harmonized_2015_2016 <- rec_with_table(cchs2015_2016)
+harmonized_2017_2018 <- rec_with_table(cchs2017_2018)
+
+# Merge harmonized data
+combined_all_cycles <- merge_rec_data(harmonized_2001, harmonized_2003, harmonized_2005, harmonized_2007_2008, harmonized_2009_2010, harmonized_2011, harmonized_2012, harmonized_2013_2014, harmonized_2015_2016, harmonized_2017_2018)
+```
+
+### Option 2: Using your own variable_details sheet
+
+In this example, all variables from personalized `variables.csv` and `variable_details.csv` sheets from 2001 to 2018 CCHS datasets will be transformed and labeled using  `rec_with_table()`, which is then combined into one dataset and labeled using  `merge_rec_data()`.
+
+```{r message=FALSE, warning=FALSE}
+# Harmonize individual datasets
+harmonized_2001 <- rec_with_table(cchs2001, variables = sample_variables, variable_details = sample_variable_details)
+harmonized_2003 <- rec_with_table(cchs2003, variables = sample_variables, variable_details = sample_variable_details)
+harmonized_2005 <- rec_with_table(cchs2005, variables = sample_variables, variable_details = sample_variable_details)
+harmonized_2007_2008 <- rec_with_table(cchs2007_2008, variables = sample_variables, variable_details = variable_details)
+harmonized_2009_2010 <- rec_with_table(cchs2009_2010, variables = sample_variables, variable_details = sample_variable_details)
+harmonized_2011 <- rec_with_table(cchs2011, variables = sample_variables, variable_details = sample_variable_details)
+harmonized_2012 <- rec_with_table(cchs2012, variables = sample_variables, variable_details = sample_variable_details)
+harmonized_2013_2014 <- rec_with_table(cchs2013_2014, variables = sample_variables, variable_details = sample_variable_details)
+harmonized_2015_2016 <- rec_with_table(cchs2015_2016, variables = sample_variables, variable_details = sample_variable_details)
+harmonized_2017_2018 <- rec_with_table(cchs2017_2018, variables = sample_variables, variable_details = sample_variable_details)
+
+# Merge harmonized data
+combined_all_cycles <- merge_rec_data(harmonized_2001, harmonized_2003, harmonized_2005, harmonized_2007_2008, harmonized_2009_2010, harmonized_2011, harmonized_2012, harmonized_2013_2014, harmonized_2015_2016, harmonized_2017_2018)
+```
+
