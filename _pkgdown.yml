@@ -38,6 +38,8 @@ navbar:
         href: articles/tagged_na_usage.html
       - text: CCHS datasets that overlap each other
         href: articles/duplicate_datasets.html
+      - text: Harmozning variabels using the full dataset
+        href: articles/how_to_harmonize.Rmd
     reference:
       text: Reference
       href: reference/index.html
