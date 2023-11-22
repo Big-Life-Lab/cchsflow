@@ -143,3 +143,5 @@ reference:
     desc: Utility functions that are used in other cchsflow functions
     contents:
     - if_else2
+    - is_equal
+    - label_data
