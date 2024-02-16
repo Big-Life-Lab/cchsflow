@@ -51,7 +51,7 @@ Description: Supporting the use of the Canadian Community Health Survey
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/Big-Life-Lab/cchsflow
+URL: https://big-life-lab.github.io/cchsflow/, https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
 RoxygenNote: 7.1.2
 Suggests: 
