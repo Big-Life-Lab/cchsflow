@@ -1,4 +1,5 @@
 destination: docs
+url: https://big-life-lab.github.io/cchsflow
 
 template:
   params:
@@ -6,6 +7,7 @@ template:
     docsearch:
       api_key: a674c1edc7b44c4ee995ef4227708c57
       index_name: cchsflow
+
 
 development:
   mode: auto
@@ -141,3 +143,9 @@ reference:
     desc: Utility functions that are used in other cchsflow functions
     contents:
     - if_else2
+    - compare_value_based_on_interval
+    - get_data_variable_name
+    - is_equal
+    - label_data
+    - recode_columns
+    - recode_variable_NA_formating
