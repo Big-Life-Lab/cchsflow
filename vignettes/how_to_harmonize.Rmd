@@ -17,10 +17,12 @@ knitr::opts_chunk$set(
 
 ## Introduction 
 
-This vignette explains how you can transform variables across multiple CCHS datasets using the full datasets to the _cchsflow_ package. The full PUMF datasets can be found [here](https://odesi.ca/). A full harmonized dataset of all _cchsflow_ variables
+This vignette explains how you can transform variables across multiple Canadian Community Health Survey (CCHS) cycles using complete datasets with the _cchsflow_ package. The Public Use Microdata Files (PUMF) containing the complete data can be found [here](https://odesi.ca/). A full harmonized dataset of all _cchsflow_ variables
+
 can be found [here](https://osf.io/j5wgu). With the original PUMF datasets, data file should be renamed such that it specifies the survey and cycle year, which follows the format of the _p sample data (ex. cchs2001_p, cchs2013_2014_p).
 
-To harmonize the data files, the `rec_with_table()` function is used to transform the indicated variables. 
+To harmonize the data files, the `cchsflow::rec_with_table()` function is used to transform the indicated variables. 
+
 
 Note: Harmonizing cycles before 2014 with cycles from 2015 onward is not advised as Statistics Canada has made major survey design changes.
 
