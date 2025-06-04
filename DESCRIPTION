@@ -55,5 +55,10 @@ URL: https://big-life-lab.github.io/cchsflow/, https://github.com/Big-Life-Lab/c
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
 RoxygenNote: 7.1.2
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    kableExtra,
+    DT,
+    rmarkdown,
+    knitr,
+    pkgdown
 Config/testthat/edition: 3
