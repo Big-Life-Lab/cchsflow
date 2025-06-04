@@ -38,6 +38,8 @@ navbar:
         href: articles/tagged_na_usage.html
       - text: CCHS datasets that overlap each other
         href: articles/duplicate_datasets.html
+      - text: Harmonizing variables using the full dataset
+        href: articles/how_to_harmonize.html
     reference:
       text: Reference
       href: reference/index.html
@@ -141,3 +143,9 @@ reference:
     desc: Utility functions that are used in other cchsflow functions
     contents:
     - if_else2
+    - compare_value_based_on_interval
+    - get_data_variable_name
+    - is_equal
+    - label_data
+    - recode_columns
+    - recode_variable_NA_formating
