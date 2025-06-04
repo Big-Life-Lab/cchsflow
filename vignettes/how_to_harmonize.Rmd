@@ -21,7 +21,8 @@ This vignette explains how you can transform variables across multiple Canadian 
 
 can be found [here](https://osf.io/j5wgu). With the original PUMF datasets, data file should be renamed such that it specifies the survey and cycle year, which follows the format of the _p sample data (ex. cchs2001_p, cchs2013_2014_p).
 
-To harmonize the data files, the `rec_with_table()` function is used to transform the indicated variables. 
+To harmonize the data files, the `cchsflow::rec_with_table()` function is used to transform the indicated variables. 
+
 
 Note: Harmonizing cycles before 2014 with cycles from 2015 onward is not advised as Statistics Canada has made major survey design changes.
 
