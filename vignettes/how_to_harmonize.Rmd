@@ -104,17 +104,30 @@ combined_all_cycles <- merge_rec_data(harmonized_2001, harmonized_2003, harmoniz
 
 In this example, all variables from personalized `variables.csv` and `variable_details.csv` sheets from 2001 to 2018 CCHS datasets will be transformed and labeled using  `rec_with_table()`, which is then combined into one dataset and labeled using  `merge_rec_data()`.
 
+First, you need to load your personalized variable sheets into R. You can create these CSV files based on the format of the sample files included with cchsflow, or modify the existing sample files to suit your needs.
+
 ```{r , eval=F, results = "hide"}
-# Harmonize individual datasets
-harmonized_2001 <- rec_with_table(cchs2001_p, variables = sample_variables, variable_details = sample_variable_details)
-harmonized_2003 <- rec_with_table(cchs2003_p, variables = sample_variables, variable_details = sample_variable_details)
-harmonized_2005 <- rec_with_table(cchs2005_p, variables = sample_variables, variable_details = sample_variable_details)
-harmonized_2007_2008 <- rec_with_table(cchs2007_2008_p, variables = sample_variables, variable_details = variable_details)
-harmonized_2009_2010 <- rec_with_table(cchs2009_2010_p, variables = sample_variables, variable_details = sample_variable_details)
-harmonized_2011_2012 <- rec_with_table(cchs2011_2012_p, variables = sample_variables, variable_details = sample_variable_details)
-harmonized_2013_2014 <- rec_with_table(cchs2013_2014_p, variables = sample_variables, variable_details = sample_variable_details)
-harmonized_2015_2016 <- rec_with_table(cchs2015_2016_p, variables = sample_variables, variable_details = sample_variable_details)
-harmonized_2017_2018 <- rec_with_table(cchs2017_2018_p, variables = sample_variables, variable_details = sample_variable_details)
+# Load your personalized variable sheets from CSV files
+# You can create these files based on the sample files included with cchsflow
+my_variables <- readr::read_csv('path/to/your/variables.csv')
+my_variable_details <- readr::read_csv('path/to/your/variable_details.csv')
+
+# Alternatively, you can start with the sample files and modify them
+data("sample_variables")
+data("sample_variable_details")
+my_variables <- sample_variables
+my_variable_details <- sample_variable_details
+
+# Harmonize individual datasets using your personalized sheets
+harmonized_2001 <- rec_with_table(cchs2001_p, variables = my_variables, variable_details = my_variable_details)
+harmonized_2003 <- rec_with_table(cchs2003_p, variables = my_variables, variable_details = my_variable_details)
+harmonized_2005 <- rec_with_table(cchs2005_p, variables = my_variables, variable_details = my_variable_details)
+harmonized_2007_2008 <- rec_with_table(cchs2007_2008_p, variables = my_variables, variable_details = my_variable_details)
+harmonized_2009_2010 <- rec_with_table(cchs2009_2010_p, variables = my_variables, variable_details = my_variable_details)
+harmonized_2011_2012 <- rec_with_table(cchs2011_2012_p, variables = my_variables, variable_details = my_variable_details)
+harmonized_2013_2014 <- rec_with_table(cchs2013_2014_p, variables = my_variables, variable_details = my_variable_details)
+harmonized_2015_2016 <- rec_with_table(cchs2015_2016_p, variables = my_variables, variable_details = my_variable_details)
+harmonized_2017_2018 <- rec_with_table(cchs2017_2018_p, variables = my_variables, variable_details = my_variable_details)
 
 # Merge harmonized data
 combined_all_cycles <- merge_rec_data(harmonized_2001, harmonized_2003, harmonized_2005, harmonized_2007_2008, harmonized_2009_2010, harmonized_2011_2012, harmonized_2013_2014, harmonized_2015_2016, harmonized_2017_2018)
