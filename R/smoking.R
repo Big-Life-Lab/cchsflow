@@ -283,7 +283,7 @@ pack_years_fun <-
         if_else2(
           SMKDSTY_A == 2, pmax(((DHHGAGE_cont - SMKG207_cont -
                                  time_quit_smoking) * (SMK_208 / 20)), 0.0137) +
-            (pmax((SMK_05B * SMK_05C / 30), 1) *time_quit_smoking),
+            ((pmax((SMK_05B * SMK_05C / 30), 1) / 20) * time_quit_smoking),
           # PackYears for Occasional Smoker (never daily)
           if_else2(
             SMKDSTY_A == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) *

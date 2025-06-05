@@ -42,6 +42,14 @@ test_that("pack_years_fun() has expected outputs when
                          12)
           })
 
+test_that("pack_years_fun", {
+  test_derived_function(
+    test_data <- read.csv("../testdata/pack_years.csv"),
+    pack_years_fun
+  )
+})
+
+
 test_that("pack_years_fun_cat() has expected outputs when
           pack_years_der is out of range", {
             expect_equal(pack_years_fun_cat(-1),
