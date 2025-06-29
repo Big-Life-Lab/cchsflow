@@ -1,9 +1,8 @@
-#' @title Activities of Daily Living (ADL) help indicator
+#' @title Derived needs help with tasks
 #' 
-#' @description Creates a binary indicator variable for whether a person needs
-#'   help with any activities of daily living. This harmonized variable is based
-#'   on the CCHS derived variable ADLF6R but uses ADL variables that are
-#'   consistent across all CCHS survey cycles.
+#' @description This derived variable (ADL_der) is based on the CCHS derived
+#'  variable ADLF6R which flags respondents who need help with tasks based on
+#'  their response to the various activities of daily living (ADL) variables.
 #' 
 #' @details The CCHS derived variable ADLF6R uses different ADL variables across
 #'  the various CCHS survey cycles. This newly derived variable (ADL_der) uses
@@ -43,157 +42,6 @@
 #'   \item ADL_06 - Needs help doing finances
 #'  }
 #'  
-#'  This newly derived variable (ADL_der) uses ADL_01 to ADL_05 which are
-#'  consistent across all survey cycles. For any single CCHS survey year,
-#'  it is appropriate to use ADLF6R. ADL_der is recommended when using multiple
-#'  survey cycles.     
-#' 
-#' @param ADL_01 A numeric value indicating if help is needed preparing meals.
-#'   Valid values: 1 = needs help, 2 = does not need help.
-#' @param ADL_02 A numeric value indicating if help is needed getting to
-#'   appointments/errands. Valid values: 1 = needs help, 2 = does not need help.
-#' @param ADL_03 A numeric value indicating if help is needed doing housework.
-#'   Valid values: 1 = needs help, 2 = does not need help.
-#' @param ADL_04 A numeric value indicating if help is needed doing personal care.
-#'   Valid values: 1 = needs help, 2 = does not need help.
-#' @param ADL_05 A numeric value indicating if help is needed moving inside house.
-#'   Valid values: 1 = needs help, 2 = does not need help.
-#' 
-#' @return A numeric value with the following categories:
-#'   \itemize{
-#'     \item \code{1}: Needs help with at least one task
-#'     \item \code{2}: Does not need help with any task
-#'     \item \code{"NA(b)"}: Missing or invalid input values
-#'   }
-#' 
-#' @examples
-#' # Person who needs help with at least one task
-#' adl_fun(ADL_01 = 1, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 1 (needs help with preparing meals)
-#' 
-#' # Person who needs no help with any task
-#' adl_fun(ADL_01 = 2, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 2 (does not need help)
-#' 
-#' # Person who needs help with multiple tasks
-#' adl_fun(ADL_01 = 1, ADL_02 = 1, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 1 (needs help with meals and appointments)
-#' 
-#' # Invalid input
-#' adl_fun(ADL_01 = 0, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: "NA(b)" (invalid input value)
-#'
-#' @seealso \code{\link{adl_score_5_fun}} for counting the number of ADL tasks
-#'   requiring help.
-#' 
-#' @export
-adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-  # Check to see if all values are in range
-  if_else2((ADL_01 %in% 1:2) & (ADL_02 %in% 1:2) & (ADL_03 %in% 1:2) &
-             (ADL_04 %in% 1:2) & (ADL_05 %in% 1:2),
-           # Examining if respondents needed help with any task
-           if_else2(ADL_01 == 1 | ADL_02 == 1 | ADL_03 == 1 | ADL_04 == 1 |
-                      ADL_05 == 1, 1,
-                    # Examining if respondents do not need help with any task
-                    if_else2(ADL_01 == 2 & ADL_02 == 2 & ADL_03 == 2 &
-                               ADL_04 == 2 & ADL_05 == 2, 2, "NA(b)")),
-           # Return NA if any ADL variable is out of range
-           "NA(b)"
-           )
-
-}
-
-#' @title ADL help score (count of tasks requiring help)
-#'
-#' @description Counts the number of activities of daily living (ADL) tasks
-#'   that require help, creating a 6-category variable (0-5). This provides
-#'   a more granular measure of functional limitation compared to the binary
-#'   ADL indicator. Uses ADL variables that are consistent across all CCHS
-#'   cycles from 2001 to 2014.
-#'
-#' @param ADL_01 A numeric value indicating if help is needed preparing meals.
-#'   Valid values: 1 = needs help, 2 = does not need help, "NA(a)" = not applicable,
-#'   "NA(b)" = missing.
-#' @param ADL_02 A numeric value indicating if help is needed getting to
-#'   appointments/errands. Valid values: 1 = needs help, 2 = does not need help,
-#'   "NA(a)" = not applicable, "NA(b)" = missing.
-#' @param ADL_03 A numeric value indicating if help is needed doing housework.
-#'   Valid values: 1 = needs help, 2 = does not need help, "NA(a)" = not applicable,
-#'   "NA(b)" = missing.
-#' @param ADL_04 A numeric value indicating if help is needed doing personal care.
-#'   Valid values: 1 = needs help, 2 = does not need help, "NA(a)" = not applicable,
-#'   "NA(b)" = missing.
-#' @param ADL_05 A numeric value indicating if help is needed moving inside house.
-#'   Valid values: 1 = needs help, 2 = does not need help, "NA(a)" = not applicable,
-#'   "NA(b)" = missing.
-#'
-#' @return A numeric value representing the count of ADL tasks requiring help:
-#'   \itemize{
-#'     \item \code{0}: No tasks require help
-#'     \item \code{1}: One task requires help
-#'     \item \code{2}: Two tasks require help
-#'     \item \code{3}: Three tasks require help
-#'     \item \code{4}: Four tasks require help
-#'     \item \code{5}: All five tasks require help
-#'     \item \code{"NA(a)"}: Not applicable (if any input is "NA(a)")
-#'     \item \code{"NA(b)"}: Missing (if any input is "NA(b)")
-#'   }
-#'
-#'
-#' @examples
-#' # Person needing no help with any tasks
-#' adl_score_5_fun(ADL_01 = 2, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 0
-#' 
-#' # Person needing help with two tasks
-#' adl_score_5_fun(ADL_01 = 1, ADL_02 = 2, ADL_03 = 1, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 2 (help needed with meals and housework)
-#' 
-#' # Person needing help with all tasks
-#' adl_score_5_fun(ADL_01 = 1, ADL_02 = 1, ADL_03 = 1, ADL_04 = 1, ADL_05 = 1)
-#' # Returns: 5
-#' 
-#' # Missing data example
-#' adl_score_5_fun(ADL_01 = "NA(b)", ADL_02 = 1, ADL_03 = 1, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: "NA(b)" (any missing value results in missing score)
-#'
-#' @seealso \code{\link{adl_fun}} for a binary ADL help indicator.
-#'
-#' @export
-adl_score_5_fun <-
-  function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-    
-    # Create vector of ADL input variables
-    all_adl_vector <- c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
-    # Count the number of missing values in vector
-    count_missing_adl <- sum(all_adl_vector == "NA(b)")
-    # Count the number of not applicable values in vector
-    count_not_applicable_adl <- sum(all_adl_vector == "NA(a)")
-    # Count the number of ADLs that require help (value of 1)
-    count_adl <- sum(all_adl_vector == 1)
-    
-    
-    # If the individual had missing data for any of the variables then set
-    # the score to missing
-    # If the individual has "not applicable" for any of the variables, then
-    # set the score to "not applicable"
-    # Otherwise set the score for each individual to the count of the number
-    # of tasks they needed help with
-    total_num_adls <- 5
-    ADL_score_5 <-
-      ifelse(
-        count_not_applicable_adl >= 1,
-        "NA(a)",
-        ifelse(
-          count_missing_adl >= 1,
-          "NA(b)",
-          count_adl
-        )
-      )
-    
-    return(ADL_score_5)
-  }
-#'
 #'  This newly derived variable (ADL_der_B) uses ADL_01 to ADL_06 which are
 #'  consistent across survey cycles from 2003-2014. ADL_der_B is recommended when using multiple
 #'  survey cycles.     
@@ -210,7 +58,45 @@ adl_score_5_fun <-
 #' 
 #' @param ADL_06 Needs help doing finances
 #' 
-#' #' # Using adl_fun_C() to generate to ADL_der_C based on user inputted values.
+#' @return A derived variable (ADL_der_B) with 2 categories:
+#'  \enumerate{
+#'   \item - Needs help with tasks
+#'   \item - Does not need help with tasks
+#'  }
+#' 
+#' @examples 
+#' # Using adl_fun_B() to create ADL_der_B values across CCHS cycles
+#' # adl_fun_B() is specified in variable_details.csv along with the
+#' # CCHS variables and cycles included.
+#' 
+#' # To transform ADL_der_B, use rec_with_table() for each CCHS cycle
+#' # and specify ADL_der_B, along with the various ADL variables.
+#' # Then by using merge_rec_data() you can combine ADL_der_B across cycles.
+#' 
+#' library(cchsflow)
+#' adl2001 <- rec_with_table(
+#'   cchs2001_p, c(
+#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der_B"
+#'   )
+#' )
+#' 
+#' head(adl2001)
+#' 
+#' adl2009_2010 <- rec_with_table(
+#'   cchs2009_2010_p, c(
+#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06", ADL_der_B"
+#'   )
+#' )
+#' 
+#' tail(adl2009_2010)
+#' 
+#' combined_adl <- merge_rec_data(adl2001, adl2009_2010)
+#' 
+#' head(combined_adl)
+#' 
+#' tail(combined_adl)
+#' 
+#' # Using adl_fun_B() to generate to ADL_der_B based on user inputted values.
 #' # 
 #' # Let's say you do not need help preparing meals, you need help getting to
 #' # appointments or errands, you need help doing housework, do not need help
@@ -218,9 +104,9 @@ adl_score_5_fun <-
 #' # need help doing fiances. Using adl_fun_B() we can check if you need help 
 #' # doing tasks
 #' 
-#' ADL_der_C <- adl_fun_B(2, 1, 1, 2, 2, 2)
+#' ADL_der_B <- adl_fun_B(2, 1, 1, 2, 2, 2)
 #' 
-#' print(ADL_der_C)
+#' print(ADL_der_B)
 #' 
 #' @export
 adl_fun_B <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
@@ -235,9 +121,10 @@ adl_fun_B <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
                                ADL_04 == 2 & ADL_05 == 2 & ADL_06 == 2, 2, "NA(b)")),
            # Return NA if any ADL variable is out of range
            "NA(b)"
-  )
-  
+           )
+
 }
+
 #' @title The number of activities of daily living tasks that require help.
 #'
 #' @description A 7 category variable (ADL_score_6) representing the number of

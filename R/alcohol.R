@@ -447,8 +447,30 @@ ALW_2A7 <- function(ALW_2A7) {
 #'                           ALW_2A6 = 8, ALW_2A7 = 2)
 #' 
 #' print(binge)
+#' 
+#' library(cchsflow)
+#' DHH_SEX <- c(1, 2) 
+#' ALW_1 <- c(1, 1)
+#' ALW_2A1 <- c(3, 1)
+#' ALW_2A2 <- c(1, 5)
+#' ALW_2A3 <- c(6, 2)
+#' ALW_2A4 <- c(0, 4)
+#' ALW_2A5 <- c(3, 0)
+#' ALW_2A6 <- c(8, 1)
+#' ALW_2A7 <- c(2, 2)
+#'
+#' binge_drink_data <- data.frame(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4,
+#'                                ALW_2A5, ALW_2A6, ALW_2A7)
+#' binge_drink_data[,"Binge_Drinker"] <- NA
+#'print(binge_drink_data)
+#'
+#' binge_drink_data$Binge_Drinker<-binge_drinker_fun(binge_drink_data[[1]], binge_drink_data[[2]], 
+#'                                                  binge_drink_data[[3]], binge_drink_data[[4]], 
+#'                                                  binge_drink_data[[5]], binge_drink_data[[6]],
+#'                                                  binge_drink_data[[7]], binge_drink_data[[8]], 
+#'                                                  binge_drink_data[[9]])
+#'print(binge_drink_data)
 #' @export
-
 binge_drinker_fun <-
   function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6,
            ALW_2A7) {
@@ -577,6 +599,32 @@ binge_drinker_fun <-
 #'  ALW_2A6 = 8, ALW_2A7 = 2)
 #'
 #' print(short_term_drink)
+#' 
+#' library(cchsflow)
+#' DHH_SEX <- c(1, 2) 
+#' ALWDWKY <- c(30, 15)
+#' ALC_1 <- c(1, 1)
+#' ALW_1 <- c(1, 1)
+#' ALW_2A1 <- c(3, 1)
+#' ALW_2A2 <- c(1, 5)
+#' ALW_2A3 <- c(6, 2)
+#' ALW_2A4 <- c(0, 4)
+#' ALW_2A5 <- c(3, 0)
+#' ALW_2A6 <- c(8, 1)
+#' ALW_2A7 <- c(2, 2)
+#'
+#' short_term_risk_data <- data.frame(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, 
+#'                                ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
+#' short_term_risk_data[,"Short_Term_Risk"] <- NA
+#' print(short_term_risk_data)
+#'
+#' short_term_risk_data$Short_Term_Risk<-low_drink_short_fun(short_term_risk_data[[1]], short_term_risk_data[[2]], 
+#'                                                  short_term_risk_data[[3]], short_term_risk_data[[4]], 
+#'                                                  short_term_risk_data[[5]], short_term_risk_data[[6]],
+#'                                                  short_term_risk_data[7]], short_term_risk_data[[8]], 
+#'                                                  short_term_risk_data[[9]], short_term_risk_data[[10]],
+#'                                                  short_term_risk_data[[11]])
+#'print(short_term_risk_data)
 #' @export
 #' 
 low_drink_short_fun <-
@@ -714,6 +762,37 @@ low_drink_short_fun <-
 #'  ALW_2A6 = 8, ALW_2A7 = 2)
 #'
 #' print(long_term_drink)
+#' 
+#' library(cchsflow)
+#' DHH_SEX <- c(1, 2) 
+#' ALWDWKY <- c(30, 15)
+#' ALC_1 <- c(1, 1)
+#' ALW_1 <- c(1, 1)
+#' ALW_2A1 <- c(3, 1)
+#' ALW_2A2 <- c(1, 5)
+#' ALW_2A3 <- c(6, 2)
+#' ALW_2A4 <- c(0, 4)
+#' ALW_2A5 <- c(3, 0)
+#' ALW_2A6 <- c(8, 1)
+#' ALW_2A7 <- c(2, 2)
+#'
+#' long_term_risk_data <- data.frame(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, 
+#'                                ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
+#' long_term_risk_data[,"Long_Term_Risk"] <- NA
+#' print(long_term_risk_data)
+#'
+#' long_term_risk_data$Long_Term_Risk<-low_drink_long_fun(long_term_risk_data[[1]], 
+#'                                                        long_term_risk_data[[2]], 
+#'                                                        long_term_risk_data[[3]], 
+#'                                                        long_term_risk_data[[4]], 
+#'                                                        long_term_risk_data[[5]], 
+#'                                                        long_term_risk_data[[6]],
+#'                                                        long_term_risk_data[7]], 
+#'                                                        long_term_risk_data[[8]], 
+#'                                                        long_term_risk_data[[9]],
+#'                                                        long_term_risk_data[[10]],
+#'                                                        long_term_risk_data[[11]])
+#'print(long_term_risk_data)
 #' @export
 #' 
 low_drink_long_fun <-
@@ -817,6 +896,17 @@ low_drink_long_fun <-
 #' 
 #' tail(combined_low_drink)
 #' 
+#' library(cchsflow)
+#' DHH_SEX <- c(1, 2) 
+#' ALWDWKY <- c(30, 15)
+#' 
+#' low_drink_score_data <- data.frame(DHH_SEX, ALWDWKY)
+#' low_drink_score_data[,"Low_Drink_Score"] <- NA
+#' print(low_drink_score_data)
+#'
+#' low_drink_score_data$Low_Drink_Score <-low_drink_score_fun(low_drink_score_data[[1]], 
+#'                                                        low_drink_score_data[[2]])
+#'print(low_drink_score_data)
 #' @export
 #' 
 low_drink_score_fun <-
@@ -924,6 +1014,21 @@ low_drink_score_fun <-
 #' 
 #' tail(combined_low_drink1)
 #' 
+#' library(cchsflow)
+#' DHH_SEX <- c(1, 2) 
+#' ALWDWKY <- c(30, 15)
+#' ALC_005 <- c(1, 1)
+#' ALC_1 <- c(1, 1)
+#' 
+#' low_drink_score1_data <- data.frame(DHH_SEX, ALWDWKY, ALC_005, ALC_1)
+#' low_drink_score1_data[,"Low_Drink_Score"] <- NA
+#' print(low_drink_score1_data)
+#'
+#' low_drink_score1_data$Low_Drink_Score <-low_drink_score1_fun(low_drink_score_data[[1]], 
+#'                                                        low_drink_score_data[[2]],
+#'                                                        low_drink_score_data[[3]],
+#'                                                        low_drink_score_data[[4]])
+#'print(low_drink_score1_data)
 #' @export
 #' 
 low_drink_score_fun1 <-
@@ -957,3 +1062,89 @@ low_drink_score_fun1 <-
     return(low_drink_score1)
   }
 
+#' @title ICES Type of drinker
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a categorical variable derived from ALCDTYP and ALCDTTM that uses
+#'  various intermediate alcohol variables to categorize individuals into 2
+#'  distinct groups:
+#'
+#'  \enumerate{
+#'   \item Former Drinker
+#'   \item Other Drinker
+#'  }
+#'
+#'  For CCHS cycles from 2001 to 2007, categories regular drinker, 
+#'  occasional drinker and never drinker are combined into an 
+#'  "Other Drinker" category. Starting in 2007, Statistics Canada created 
+#'  a derived variable that looked at drinking type in the last 12 months. 
+#'  This new derived variable did not distinguish between former and never 
+#'  drinkers. Therefore, for ICES CCHS cycles from 2007 onward regular drinker
+#'  and occasional drinker are combined into the "Other Drinker" category
+#'  and "Did not drink in the last 12 months" was categorized as "Former 
+#'  Drinker". If your research requires you to differentiate between former 
+#'  and never drinkers, we recommend using earlier cycles of the CCHS.
+#'
+#' @param ALCDTYP_A cchsflow variable name for type of drinker
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALCDTYP_A
+#'
+#' @export
+ALCDTYP_A <- function(ALCDTYP_A) {
+  # this is for documentation purposes only
+}
+
+#' @title Type of drinker (12 months)
+#'
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a categorical variable derived by Statistics Canada that uses
+#'  various intermediate alcohol variables to categorize individuals into 3
+#'  distinct groups:
+#'
+#'  \enumerate{
+#'   \item Regular Drinker
+#'   \item Occasional Drinker
+#'   \item No drink in the last 12 months.
+#'   }
+#'
+#' @details This variable was introduced in the 2007-2008 cycle of the CCHS, and
+#'  became the sole derived variable that categorized people into various
+#'  drinker types from 2009 onwards. Unlike ALCDTYP, this variable does not
+#'  distinguish between former and never drinkers. Please note that ALCDTMM for
+#'  cycles from 2001 to 2005 utilize ALCDTYP where 'former' and 'never' drinkers
+#'  are re-coded into 'no drink in the last 12 months' category. 
+#'
+#' @param ALCDTTM cchsflow variable name for type of drinker (12 months)
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALCDTTM
+#'
+#' @export
+ALCDTTM <- function(ALCDTTM) {
+  # this is for documentation purposes only
+}
+
+#' @title Number of drinks - Weekly
+#' 
+#' @description \strong{NOTE:} this is not a function.
+#'
+#'  This is a continuous variable derived by Statistics Canada that quantifies 
+#'  the number of alcoholic drinks consumed weekly.
+#' 
+#' @details This variable is present in every CCHS cycle used in cchsflow.
+#'
+#' @param ALWDWKY cchsflow variable name for number of drinks per week
+#'
+#' @examples
+#' library(cchsflow)
+#'  ?ALWDWKY
+#'
+#' @export
+ALWDWKY <- function(ALWDWKY) {
+  # this is for documentation purposes only
+}
