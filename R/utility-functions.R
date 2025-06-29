@@ -1,6 +1,9 @@
-#' @title if_else2
+#' @title if_else2 (DEPRECATED)
 #'
-#' @description Custom ifelse function that evaluates missing (NA) values. If
+#' @description **DEPRECATED**: This function is deprecated and will be removed 
+#'  in a future version. Please use \code{dplyr::if_else()} instead.
+#'  
+#'  Custom ifelse function that evaluates missing (NA) values. If
 #'  the logical argument (x) compares to a value that is `NA`, it is set to
 #'  `FALSE`
 #'
@@ -28,6 +31,22 @@
 #' print(status)
 #' @export
 if_else2 <- function(x, a, b) {
+  # Deprecation warning - show only every 6 hours to avoid spam
+  if (!exists(".if_else2_last_warning", envir = .GlobalEnv)) {
+    assign(".if_else2_last_warning", Sys.time(), envir = .GlobalEnv)
+    warning("if_else2() is deprecated and will be removed in a future version. ", 
+            "Please use dplyr::if_else() instead for better type safety and NA handling.",
+            call. = FALSE)
+  } else {
+    last_warning <- get(".if_else2_last_warning", envir = .GlobalEnv)
+    if (difftime(Sys.time(), last_warning, units = "hours") >= 6) {
+      assign(".if_else2_last_warning", Sys.time(), envir = .GlobalEnv)
+      warning("if_else2() is deprecated and will be removed in a future version. ", 
+              "Please use dplyr::if_else() instead for better type safety and NA handling.",
+              call. = FALSE)
+    }
+  }
+  
   falseifNA <- function(x) {
     ifelse(is.na(x), FALSE, x)
   }

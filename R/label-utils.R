@@ -76,7 +76,7 @@ set_data_labels <-
         create_label_list_element(rows_to_process)
     }
     data_to_label <- label_data(label_list, data_to_label)
-
+    
     return(data_to_label)
   }
 

@@ -181,7 +181,7 @@ rec_with_table <-
       message("Using the passed data variable name as database_name")
       database_name <- deparse(substitute(data))
     }
-    # ---- Step 1: Detemine if the passed data is a list or single database
+    # ---- Step 1: Determine if the passed data is a list or single database
     append_non_db_columns <- FALSE
     if (is.list(data) &&
         length(database_name) == length(data)) {
@@ -680,6 +680,12 @@ recode_columns <-
         derived_return$variables_to_process
     }
     # Populate data Labels
+    if (is.list(label_list) && is.data.frame(recoded_data)) {
+      # Proceed with labeling the data
+      labeled_data <- label_data(label_list = label_list, data_to_label = recoded_data)
+    } else {
+      stop("label_list must be a list and recoded_data must be a data frame.")
+    }
     recoded_data <-
       label_data(label_list = label_list, data_to_label = recoded_data)
     
@@ -930,7 +936,7 @@ recode_derived_variables <-
       column_value <-
         recoded_data %>%
         rowwise() %>%
-        select(used_feeder_vars) %>%
+        select(all_of(used_feeder_vars)) %>%
         do(
           column_being_added = calculate_custom_function_row_value(
             .,
