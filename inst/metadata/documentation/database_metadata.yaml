@@ -1,0 +1,266 @@
+schema_version: "1.0.0"
+schema_date: "2025-06-22"
+description: "Database metadata schema for recodeflow - defines Dublin Core compliant dataset-level metadata for databases and data collections."
+registry_file: "metadata_registry.yaml"
+
+# Note: YAML format specifications are defined in metadata_registry.yaml to maintain DRY principles
+
+database_metadata_schema:
+  title: "Database metadata configuration"
+  description: "Defines dataset-level metadata following Dublin Core standards for database documentation and cataloging."
+  
+  standard: "Dublin Core with DCAT extensions"
+  target_format: "YAML metadata files"
+  
+  # Field definitions following Dublin Core standard
+  fields:
+    # ============================================================================
+    # CORE DUBLIN CORE FIELDS - Essential dataset documentation
+    # ============================================================================
+    
+    - name: "title"
+      title: "Dataset title"
+      description: "Name of the dataset."
+      type: "string"
+      tier: "core"
+      dublin_core_element: "dc:title"
+      constraints:
+        required: true
+      notes: |
+        Provide a clear, concise name for the dataset.
+        Examples: "Health Survey 2024", "Primary Biliary Cirrhosis (PBC) Data Set"
+        
+    - name: "description"
+      title: "Dataset description"
+      description: "Detailed explanation of the dataset."
+      type: "string"
+      tier: "core"
+      dublin_core_element: "dc:description"
+      constraints:
+        required: true
+      notes: |
+        Comprehensive description of the dataset including purpose, scope, and methodology.
+        Should be sufficient for users to understand if the dataset meets their needs.
+        
+    - name: "creator"
+      title: "Dataset creator"
+      description: "Person or organization responsible for creating the data."
+      type: "array"
+      tier: "core"
+      dublin_core_element: "dc:creator"
+      constraints:
+        required: true
+      item_structure:
+        name: "Creator name"
+        affiliation: "Creator affiliation (optional)"
+        orcid: "ORCID identifier (optional)"
+      notes: |
+        Attribution of data origin and responsibility.
+        Examples: "Mayo Clinic", "RecodeFlow Team", "Statistics Canada"
+        
+    - name: "publisher"
+      title: "Dataset publisher"
+      description: "Organization publishing the data."
+      type: "string"
+      tier: "core"
+      dublin_core_element: "dc:publisher"
+      constraints:
+        required: true
+      notes: |
+        Identifies the official data publisher or distributing organization.
+        Examples: "Public Health Agency", "Mayo Clinic", "CRAN"
+        
+    - name: "subject"
+      title: "Dataset subject"
+      description: "Topics covered by the dataset."
+      type: "array"
+      tier: "core"
+      dublin_core_element: "dc:subject"
+      constraints:
+        required: true
+      notes: |
+        Categorize dataset's thematic content using relevant keywords or controlled vocabularies.
+        Examples: ["primary biliary cirrhosis", "clinical study", "medical research"]
+        
+    - name: "date_created"
+      title: "Creation date"
+      description: "Dataset creation date."
+      type: "string"
+      tier: "core"
+      dublin_core_element: "dc:date"
+      format: "date"
+      constraints:
+        required: true
+        pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      notes: |
+        Use ISO date format: YYYY-MM-DD
+        Track dataset's initial creation date.
+        
+    - name: "date_modified"
+      title: "Last modification date"
+      description: "Date when dataset was last modified."
+      type: "string"
+      tier: "optional"
+      dublin_core_element: "dcterms:modified"
+      format: "date"
+      constraints:
+        pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      notes: |
+        Use ISO date format: YYYY-MM-DD
+        Track most recent updates to the dataset.
+        
+    - name: "version"
+      title: "Dataset version"
+      description: "Version number of the dataset."
+      type: "string"
+      tier: "optional"
+      dublin_core_element: "dcterms:hasVersion"
+      constraints:
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      notes: |
+        Track dataset iterations using semantic versioning (e.g., 1.0.0).
+        Increment for changes: major.minor.patch
+        
+    - name: "license"
+      title: "Licensing information"
+      description: "Licensing and usage rights information."
+      type: "string"
+      tier: "core"
+      dublin_core_element: "dc:rights"
+      constraints:
+        required: true
+      notes: |
+        Specify usage and distribution rights clearly.
+        Examples: "CC-BY 4.0", "Open Source", "Restricted - Contact Publisher"
+        
+    - name: "contact_point"
+      title: "Dataset contact"
+      description: "Contact information for dataset inquiries."
+      type: "string"
+      tier: "core"
+      dublin_core_element: "dcat:contactPoint"
+      constraints:
+        required: true
+      notes: |
+        Provide communication channel for questions about the dataset.
+        Examples: "support@example.org", "researcher@institution.edu"
+
+    # ============================================================================
+    # EXTENDED DUBLIN CORE / DCAT FIELDS - Enhanced metadata
+    # ============================================================================
+    
+    - name: "type"
+      title: "Dataset type"
+      description: "Type or nature of the dataset."
+      type: "string"
+      tier: "optional"
+      dublin_core_element: "dc:type"
+      constraints:
+        enum: ["Dataset", "Survey", "Clinical Trial", "Administrative Data", "Registry"]
+      notes: |
+        Classify the nature of the data collection.
+        
+    - name: "format"
+      title: "Dataset format"
+      description: "Physical or digital manifestation of the dataset."
+      type: "string"
+      tier: "optional"
+      dublin_core_element: "dc:format"
+      notes: |
+        Describe the format and structure of the data.
+        Examples: "Tabular data", "CSV files", "R data frames"
+        
+    - name: "identifier"
+      title: "Dataset identifier"
+      description: "Unique identifier for the dataset."
+      type: "array"
+      tier: "optional"
+      dublin_core_element: "dc:identifier"
+      item_structure:
+        type: "Identifier type"
+        value: "Identifier value"
+      notes: |
+        Provide unique identifiers for referencing the dataset.
+        Examples: DOI, package name, institutional ID
+        
+    - name: "source"
+      title: "Dataset source"
+      description: "Source or origin of the dataset."
+      type: "string"
+      tier: "optional"
+      dublin_core_element: "dc:source"
+      notes: |
+        Reference to the original source or related datasets.
+        Examples: URLs, publications, parent datasets
+        
+    - name: "language"
+      title: "Dataset language"
+      description: "Language(s) used in the dataset."
+      type: "string"
+      tier: "optional"
+      dublin_core_element: "dc:language"
+      constraints:
+        pattern: "^[a-z]{2}(-[A-Z]{2})?$"
+      notes: |
+        Use ISO 639-1 language codes (e.g., "en", "fr", "en-CA").
+        
+    - name: "relation"
+      title: "Related resources"
+      description: "Relationships to other datasets or resources."
+      type: "array"
+      tier: "optional"
+      dublin_core_element: "dc:relation"
+      item_structure:
+        type: "Relationship type"
+        identifier: "Related resource identifier"
+        description: "Description of relationship"
+      notes: |
+        Document connections to related datasets, publications, or projects.
+        
+    - name: "coverage"
+      title: "Dataset coverage"
+      description: "Spatial or temporal coverage of the dataset."
+      type: "object"
+      tier: "optional"
+      dublin_core_element: "dc:coverage"
+      structure:
+        spatial: "Geographic coverage"
+        temporal: "Time period coverage"
+      notes: |
+        Specify the scope of data collection in space and time.
+
+    # ============================================================================
+    # RECODEFLOW-SPECIFIC EXTENSIONS - Integration metadata
+    # ============================================================================
+    
+    - name: "recodeflow_integration"
+      title: "Recodeflow integration metadata"
+      description: "Metadata specific to recodeflow usage and integration."
+      type: "object"
+      tier: "extension"
+      structure:
+        variables_file: "Associated variables.csv file"
+        variable_details_file: "Associated variable_details.csv file"
+        harmonization_notes: "Notes about harmonization approach"
+        rec_with_table_compatible: "Boolean indicating compatibility"
+      notes: |
+        Integration metadata for recodeflow workflow compatibility.
+        Links database metadata to associated variable definition files.
+  
+  # Usage patterns
+  usage_patterns:
+    metadata_files:
+      description: "YAML files alongside data files for metadata documentation."
+      naming_convention: "{dataset_name}_metadata.yaml"
+      examples: ["pbc_metadata.yaml", "cchs2017_metadata.yaml"]
+
+  # Validation and quality
+  validation_notes: |
+    - All required Dublin Core fields must be present
+    - Date fields must follow ISO 8601 format (YYYY-MM-DD)
+    - Language codes must follow ISO 639-1 standard
+    - Contact points should be valid email addresses or URLs
+    - Version numbers should follow semantic versioning when provided
+    
+  # Note: Missing data handling, validation modes, and shared specifications
+  # are defined in metadata_registry.yaml

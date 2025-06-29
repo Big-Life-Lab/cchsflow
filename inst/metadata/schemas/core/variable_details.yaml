@@ -1,0 +1,317 @@
+schema_version: "1.0.0"
+schema_date: "2025-06-22"
+description: "Variable details schema for recodeflow - defines transformation rules and recoding specifications for harmonizing data across multiple sources."
+registry_file: "metadata_registry.yaml"
+
+# Note: Shared specifications (CSV format, tier system, validation patterns, etc.)
+# are defined in metadata_registry.yaml to maintain DRY principles
+
+variable_details_schema:
+  title: "Variable details configuration"
+  description: "Defines value-level transformations, recoding logic, and categorical mappings for data harmonization projects."
+  
+  id_column_name: "dummyVariable"
+  
+  # Column order based on cchsflow production + recodeflow extensions
+  expected_column_order:
+    # Core fields (positions 1-16) - cchsflow production compatibility
+    - "variable"
+    - "dummyVariable"
+    - "typeEnd"
+    - "databaseStart"
+    - "variableStart"
+    - "typeStart"
+    - "recEnd"
+    - "numValidCat"
+    - "catLabel"
+    - "catLabelLong"
+    - "units"
+    - "recStart"
+    - "catStartLabel"
+    - "variableStartShortLabel"
+    - "variableStartLabel"
+    - "notes"
+    # Extension fields (positions 17+)
+    - "templateVariable"
+    # Versioning fields (far right)
+    - "version"
+    - "lastUpdated"
+    - "harmonizationStatus"
+    - "reviewNotes"
+
+  # Field definitions organized by tier
+  fields:
+    # ============================================================================
+    # CORE FIELDS - Essential for any recodeflow project
+    # ============================================================================
+    
+    - name: "variable"
+      title: "Variable name"
+      description: "Name of the harmonized variable being created."
+      type: "string"
+      tier: "core"
+      constraints:
+        pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        foreign_key: "variables.csv:variable"
+      notes: |
+        This should match a variable name defined in your variables.csv file.
+        Use descriptive names that clearly indicate what the variable represents.
+        
+    - name: "dummyVariable"
+      title: "Row identifier"
+      description: "Unique identifier for each transformation rule."
+      type: "string"
+      tier: "core"
+      constraints:
+        unique: true
+        pattern_reference: "See metadata_registry.yaml dummy_variable_patterns for naming guidelines"
+      notes: |
+        Primary identifier for variable detail rows. Provides stable ordering for CSV files and git diffs.
+        
+        Recommended pattern: {variable}_{cat|cont}{number}_{category}
+        Examples:
+        - Categorical: age_cat4_1, age_cat4_2, smoking_cat3_1
+        - Continuous: bmi_cont1, height_cont1, weight_cont1
+        
+        Benefits: Natural grouping, stable CSV ordering, meaningful git diffs.
+        For complete patterns and examples, see metadata_registry.yaml dummy_variable_patterns.
+        
+    - name: "typeEnd"
+      title: "Target data type"
+      description: "Type of the variable after harmonization."
+      type: "string"
+      tier: "core"
+      constraints:
+        enum: ["cat", "cont"]
+      notes: |
+        - "cat" for categorical variables (factors with discrete levels)
+        - "cont" for continuous variables (numeric measurements)
+        
+    - name: "databaseStart"
+      title: "Source database"
+      description: "Name of the original database or data source."
+      type: "string"
+      tier: "core"
+      notes: |
+        Identifies which database this transformation rule applies to.
+        Examples: "cchs2017_p", "rai_hc_2019", "custom_survey_2024"
+        
+    - name: "variableStart"
+      title: "Source variable name"
+      description: "Name of the original variable being transformed."
+      type: "string"
+      tier: "core"
+      constraints:
+        pattern_reference: "See metadata_registry.yaml transformation_patterns for validation rules"
+      notes: |
+        Specifies how to find the source data for transformation.
+        Uses same transformation patterns as variables.yaml variableStart field.
+        
+        Supports multiple patterns (case-insensitive):
+        - Simple reference: [HEIGHT] or [height]
+        - Database-specific: cchs2017_p::HWT_2 or cchs2017_p::hwt_2
+        - Derived variables: DerivedVar::[HEIGHT_CM, WEIGHT_KG]
+        - Multiple sources: cchs2017_p::VAR1, cchs2019_p::VAR2
+        - Complex mixed: cchs2001_p::RACA_6A, cchs2003_p::RACC_6A, [ADL_01]
+        
+        For complete validation patterns, see metadata_registry.yaml transformation_patterns.
+        
+    - name: "typeStart"
+      title: "Source data type"
+      description: "Type of the variable in its original form."
+      type: "string"
+      tier: "core"
+      constraints:
+        enum: ["cat", "cont", "N/A"]
+      notes: |
+        Helps understand the transformation being performed.
+        Use "N/A" for derived variables or when type doesn't apply.
+        
+    - name: "recEnd"
+      title: "Target value"
+      description: "The harmonized value after transformation."
+      type: "string"
+      tier: "core"
+      notes: |
+        Defines what value this rule produces in the harmonized dataset.
+        Common patterns:
+        - Categorical codes: "1", "2", "3"
+        - Missing data: "NA::a", "NA::b"
+        - Functions: "Func::bmi_calculation"
+        - Copy original: "copy"
+        
+    - name: "numValidCat"
+      title: "Number of valid categories"
+      description: "Total count of valid (non-missing) categories for categorical variables."
+      type: "string"
+      tier: "core"
+      constraints:
+        pattern: "^([0-9]+|N/A)$"
+      notes: |
+        For categorical variables, specify the total number of meaningful categories.
+        Use "N/A" for continuous variables or when not applicable.
+        
+    - name: "catLabel"
+      title: "Category label"
+      description: "Short, display-friendly label for this category."
+      type: "string"
+      tier: "core"
+      notes: |
+        Brief labels suitable for charts, tables, and user interfaces.
+        Examples: "Male", "High", "18-24 years"
+        
+    - name: "catLabelLong"
+      title: "Detailed category label"
+      description: "Comprehensive description for documentation and codebooks."
+      type: "string"
+      tier: "core"
+      notes: |
+        Full descriptive labels for complete documentation.
+        Examples: "Body mass index 25.0-29.9 (overweight)", "Valid skip due to survey logic"
+        
+    - name: "units"
+      title: "Measurement units"
+      description: "Units of measurement for the variable."
+      type: "string"
+      tier: "core"
+      notes: |
+        Specify units for continuous variables to ensure proper interpretation.
+        Examples: "kg", "years", "cm", "minutes/day", "score (0-100)"
+        Leave blank for categorical variables.
+        
+    - name: "recStart"
+      title: "Source value or range"
+      description: "Original value or condition that triggers this transformation."
+      type: "string"
+      tier: "core"
+      constraints:
+        pattern_reference: "See metadata_registry.yaml interval_notation for validation rules"
+      notes: |
+        Defines what source data matches this transformation rule.
+        Enhanced interval notation based on real-world validation with 3,577 records.
+        
+        Supports comprehensive patterns:
+        - Single values: "1", "male", "english"
+        - Closed intervals: "[18.5,24.9]" (includes endpoints)
+        - Open intervals: "(0,18.5)" (excludes endpoints)
+        - Half-open: "[25,30)", "(18.5,25]"
+        - Complex decimals: "[-0.359,1]", "[0.0487,0.1846)"
+        - Missing data: "NA::a", "NA::b"
+        - Default case: "else"
+        
+        For complete interval notation patterns, see metadata_registry.yaml interval_notation.
+        
+    - name: "catStartLabel"
+      title: "Source category label"
+      description: "Label describing the original category being transformed."
+      type: "string"
+      tier: "core"
+      notes: |
+        Documents what the source category represents in the original data.
+        Helpful for understanding transformations and maintaining documentation.
+        
+    - name: "variableStartShortLabel"
+      title: "Source variable short label"
+      description: "Brief label for the source variable."
+      type: "string"
+      tier: "core"
+      notes: |
+        Abbreviated description of the source variable for compact displays.
+        
+    - name: "variableStartLabel"
+      title: "Source variable label"
+      description: "Full descriptive label of the source variable."
+      type: "string"
+      tier: "core"
+      notes: |
+        Complete description of what the source variable measures or represents.
+        Should match the official documentation from the source database.
+        
+    - name: "notes"
+      title: "Transformation notes"
+      description: "Additional comments or documentation for this transformation rule."
+      type: "string"
+      tier: "core"
+      notes: |
+        Use for any special considerations, assumptions, or explanations needed
+        to understand or maintain this transformation rule.
+
+    # ============================================================================
+    # EXTENSION FIELDS - Enhanced functionality
+    # ============================================================================
+    
+    - name: "templateVariable"
+      title: "Template system indicator"
+      description: "Enables reusable transformation patterns to avoid duplication."
+      type: "string"
+      tier: "extension"
+      constraints:
+        enum: ["Yes", "No", null, ""]
+        usage_reference: "See metadata_registry.yaml extension_registry for implementation details"
+      default_value: "No"
+      notes: |
+        Reduces duplication for intended purposes:
+        - 8 variables × 132 categories = 1,056 rows reduced to 138 rows (87% reduction)
+        
+        Values:
+        - "Yes": This row defines a reusable template
+        - "No": Normal variable (not using templates)
+        - Template name: This variable extends the named template
+        
+        For complete usage guidance and examples, see metadata_registry.yaml extension_registry.
+
+    # ============================================================================
+    # VERSIONING FIELDS - Professional project management
+    # ============================================================================
+    
+    - name: "version"
+      title: "Version number"
+      description: "Semantic version of this variable detail definition."
+      type: "string"
+      tier: "versioning"
+      constraints:
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      notes: |
+        Track changes to transformation rules using semantic versioning (e.g., 1.0.0).
+        Increment for changes: major.minor.patch
+        
+    - name: "lastUpdated"
+      title: "Last updated"
+      description: "Date when this transformation rule was last modified."
+      type: "string"
+      tier: "versioning"
+      format: "date"
+      constraints:
+        pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      notes: |
+        Use ISO date format: YYYY-MM-DD
+        Helps track when changes were made for collaboration and maintenance.
+        
+    - name: "harmonizationStatus"
+      title: "Harmonization status"
+      description: "Current status of this transformation in your workflow."
+      type: "string"
+      tier: "versioning"
+      constraints:
+        enum: ["development", "active", "not_harmonizable", "pending_review"]
+      notes: |
+        Track the progress of harmonization work:
+        - "development": Still being developed or tested
+        - "active": Ready for production use
+        - "not_harmonizable": Cannot be harmonized (document why in reviewNotes)
+        - "pending_review": Needs review before finalization
+        
+    - name: "reviewNotes"
+      title: "Review notes"
+      description: "Notes about harmonization decisions and review outcomes."
+      type: "string"
+      tier: "versioning"
+      notes: |
+        Document decisions, rationale, and any issues discovered during review.
+        Useful for team collaboration and future reference.
+
+  # Configuration options (schema-specific)
+  allow_additional_columns: true
+  extension_schema: null
+  
+  # Note: Missing data handling, validation modes, and extensions are defined in metadata_registry.yaml
