@@ -1,0 +1,373 @@
+schema_version: "1.0.0"
+schema_date: "2025-01-20"
+description: "CCHS-specific missing data patterns and transformation rules"
+
+# ============================================================================
+# CCHS ORIGINAL MISSING DATA CODES AND TRANSFORMATIONS
+# ============================================================================
+cchs_missing_data_specification:
+  title: "Canadian Community Health Survey Missing Data Code Patterns"
+  description: "Comprehensive specification of original CCHS missing data codes, their semantic meanings, and transformation rules to standardized NA categories"
+  version: "1.0.0"
+  
+  # Official CCHS missing data code definitions
+  original_cchs_codes:
+    standard_response_variables:
+      description: "Standard response variables (SMK_005, SMK_030, SMK_01A, etc.)"
+      valid_response_range: [1, 5]  # Most CCHS variables use 1-5 for valid responses
+      missing_data_codes:
+        6:
+          semantic_meaning: "Not applicable"
+          description: "Question does not apply to respondent (age restrictions, skip patterns)"
+          cchs_definition: "Valid skip - respondent legitimately excluded from question"
+          transformation_target: "NA::a"
+          examples:
+            - "SMK_005 = 6 for respondents under 12 years old"
+            - "SMK_030 = 6 for respondents who never smoked"
+        7:
+          semantic_meaning: "Don't know"
+          description: "Respondent doesn't know the answer"
+          cchs_definition: "Respondent stated they don't know"
+          transformation_target: "NA::b"
+          examples:
+            - "SMK_005 = 7 when respondent unsure of smoking status"
+        8:
+          semantic_meaning: "Refusal"
+          description: "Respondent refused to answer"
+          cchs_definition: "Respondent explicitly refused to provide answer"
+          transformation_target: "NA::b"
+          examples:
+            - "SMK_005 = 8 when respondent declined to answer smoking question"
+        9:
+          semantic_meaning: "Not stated"
+          description: "No response provided"
+          cchs_definition: "Question was asked but no response was recorded"
+          transformation_target: "NA::b"
+          examples:
+            - "SMK_005 = 9 when no response recorded for smoking status"
+    
+    categorical_age_variables:
+      description: "Categorical age variables (SMKG203, SMKG207, etc.)"
+      valid_response_range: [1, 11]  # Age categories 1-11
+      missing_data_codes:
+        96:
+          semantic_meaning: "Not applicable"
+          description: "Age question does not apply to respondent"
+          cchs_definition: "Valid skip - age information not applicable"
+          transformation_target: "NA::a"
+          examples:
+            - "SMKG203 = 96 for non-smokers (age started smoking not applicable)"
+        97:
+          semantic_meaning: "Don't know"
+          description: "Respondent doesn't know their age when event occurred"
+          cchs_definition: "Respondent stated they don't know the age"
+          transformation_target: "NA::b"
+          examples:
+            - "SMKG203 = 97 when respondent doesn't remember age started smoking"
+        98:
+          semantic_meaning: "Refusal"
+          description: "Respondent refused to provide age information"
+          cchs_definition: "Respondent explicitly refused to provide age"
+          transformation_target: "NA::b"
+          examples:
+            - "SMKG203 = 98 when respondent declined to answer age question"
+        99:
+          semantic_meaning: "Not stated"
+          description: "No age response provided"
+          cchs_definition: "Age question was asked but no response recorded"
+          transformation_target: "NA::b"
+          examples:
+            - "SMKG203 = 99 when no response recorded for age started smoking"
+    
+    continuous_variables_standard:
+      description: "Continuous variables with extended missing codes (SMK_204, HWTDGWTK, etc.)"
+      valid_response_range: "variable_specific"  # Depends on measurement (e.g., 0-150 for cigarettes, 20-300 for weight)
+      missing_data_codes:
+        996:
+          semantic_meaning: "Not applicable"
+          description: "Measurement does not apply to respondent"
+          cchs_definition: "Valid skip - measurement not applicable to respondent's situation"
+          transformation_target: "NA::a"
+          examples:
+            - "SMK_204 = 996 for non-daily smokers (cigarettes per day not applicable)"
+            - "HWTDGWTK = 996 for proxy respondents (weight measurement not obtained)"
+        997:
+          semantic_meaning: "Don't know"
+          description: "Respondent doesn't know the measurement value"
+          cchs_definition: "Respondent stated they don't know the value"
+          transformation_target: "NA::b"
+          examples:
+            - "SMK_204 = 997 when smoker doesn't know cigarettes per day"
+            - "HWTDGWTK = 997 when respondent doesn't know their weight"
+        998:
+          semantic_meaning: "Refusal"
+          description: "Respondent refused to provide measurement"
+          cchs_definition: "Respondent explicitly refused to provide measurement"
+          transformation_target: "NA::b"
+          examples:
+            - "HWTDGWTK = 998 when respondent declined to provide weight"
+        999:
+          semantic_meaning: "Not stated"
+          description: "No measurement response provided"
+          cchs_definition: "Measurement was requested but no response recorded"
+          transformation_target: "NA::b"
+          examples:
+            - "SMK_204 = 999 when no response recorded for cigarettes per day"
+
+# ============================================================================
+# VARIABLE-SPECIFIC MISSING DATA PATTERNS
+# ============================================================================
+variable_specific_patterns:
+  # Smoking variables
+  SMK_005:
+    variable_name: "Type of smoker presently"
+    pattern_type: "standard_response_variables"
+    valid_range: [1, 3]  # 1=daily, 2=occasionally, 3=not at all
+    missing_codes: [6, 7, 8, 9]
+    special_notes:
+      - "Code 6 typically assigned to respondents under 12 years old"
+      - "Skip pattern: if under minimum smoking age, assign code 6"
+    usage_context: "Core smoking status classification for all CCHS cycles"
+    
+  SMK_030:
+    variable_name: "Ever smoked daily"
+    pattern_type: "standard_response_variables"
+    valid_range: [1, 2]  # 1=yes, 2=no
+    missing_codes: [6, 7, 8, 9]
+    special_notes:
+      - "Code 6 assigned to never smokers (SMK_005 = 3)"
+      - "Skip pattern: if never smoked, assign code 6"
+    usage_context: "Asked to current occasional smokers and former smokers"
+    
+  SMK_01A:
+    variable_name: "Smoked 100+ cigarettes in lifetime"
+    pattern_type: "standard_response_variables"
+    valid_range: [1, 2]  # 1=yes, 2=no
+    missing_codes: [6, 7, 8, 9]
+    special_notes:
+      - "Code 6 assigned based on smoking status skip patterns"
+      - "Critical for determining smoking classification"
+    usage_context: "Core smoking history question for classification"
+    
+  SMKG203:
+    variable_name: "Age started smoking daily (daily smokers)"
+    pattern_type: "categorical_age_variables"
+    valid_range: [1, 11]  # Age categories 1=<15 years to 11=50+ years
+    missing_codes: [96, 97, 98, 99]
+    special_notes:
+      - "Code 96 assigned to non-daily smokers"
+      - "Age categories vary by CCHS cycle - see cycle-specific documentation"
+    usage_context: "Asked only to current daily smokers"
+    
+  SMKG207:
+    variable_name: "Age started smoking daily (former daily smokers)"
+    pattern_type: "categorical_age_variables"
+    valid_range: [1, 11]  # Same age categories as SMKG203
+    missing_codes: [96, 97, 98, 99]
+    special_notes:
+      - "Code 96 assigned to never-daily smokers"
+      - "Parallel structure to SMKG203 for former smokers"
+    usage_context: "Asked only to former daily smokers"
+    
+  SMK_204:
+    variable_name: "Number of cigarettes smoked per day (daily smokers)"
+    pattern_type: "continuous_variables_standard"
+    valid_range: [0, 150]  # Cigarettes per day
+    missing_codes: [996, 997, 998, 999]
+    special_notes:
+      - "Code 996 assigned to non-daily smokers"
+      - "Values over 100 are rare but possible"
+    usage_context: "Asked only to current daily smokers"
+    
+  SMK_208:
+    variable_name: "Number of cigarettes smoked per day (former daily smokers)"
+    pattern_type: "continuous_variables_standard"
+    valid_range: [0, 150]  # Cigarettes per day when they smoked
+    missing_codes: [996, 997, 998, 999]
+    special_notes:
+      - "Code 996 assigned to never-daily smokers"
+      - "Retrospective question about past smoking"
+    usage_context: "Asked only to former daily smokers"
+    
+  # Anthropometric variables (for BMI future enhancement)
+  HWTDGHTM:
+    variable_name: "Height in meters"
+    pattern_type: "continuous_variables_standard"
+    valid_range: [0.5, 2.5]  # Height in meters
+    missing_codes: [996, 997, 998, 999]
+    special_notes:
+      - "Code 996 commonly assigned for proxy respondents"
+      - "Measurement not obtained for various reasons"
+    usage_context: "Direct measurement or self-report across all CCHS cycles"
+    
+  HWTDGWTK:
+    variable_name: "Weight in kilograms"
+    pattern_type: "continuous_variables_standard"
+    valid_range: [20, 300]  # Weight in kilograms
+    missing_codes: [996, 997, 998, 999]
+    special_notes:
+      - "Code 996 commonly assigned for proxy respondents"
+      - "More sensitive than height - higher refusal rates"
+    usage_context: "Direct measurement or self-report across all CCHS cycles"
+
+# ============================================================================
+# TRANSFORMATION RULES AND IMPLEMENTATION
+# ============================================================================
+transformation_rules:
+  title: "CCHS Missing Data Transformation Implementation"
+  description: "Rules for converting original CCHS codes to standardized NA categories"
+  
+  na_category_definitions:
+    "NA::a":
+      semantic_meaning: "Not applicable"
+      original_codes: [6, 96, 996]
+      usage_principles:
+        - "Question legitimately does not apply to respondent"
+        - "Skip patterns based on age, previous responses, or questionnaire logic"
+        - "Valid exclusion from question scope"
+      statistical_treatment: "Exclude from denominators and percentage calculations"
+      examples:
+        - "Smoking questions for children under minimum age"
+        - "Cigarettes per day for non-smokers"
+        - "Age started smoking for never smokers"
+        
+    "NA::b":
+      semantic_meaning: "Missing data"
+      original_codes: [7, 8, 9, 97, 98, 99, 997, 998, 999]
+      usage_principles:
+        - "Question applies but no valid response obtained"
+        - "Don't know, refusal, or not stated responses"
+        - "Data collection failure or non-response"
+      statistical_treatment: "Include in denominators, exclude from numerators"
+      examples:
+        - "Respondent doesn't know their smoking status"
+        - "Refused to answer weight question"
+        - "No response recorded for age started smoking"
+  
+  implementation_patterns:
+    preprocessing_function: "preprocess_cchs_missing_codes"
+    pattern_detection:
+      standard_response: "detect_codes([6, 7, 8, 9])"
+      categorical_age: "detect_codes([96, 97, 98, 99])"
+      continuous_standard: "detect_codes([996, 997, 998, 999])"
+    
+    transformation_logic:
+      step_1: "Identify variable pattern type"
+      step_2: "Apply pattern-specific code mapping"
+      step_3: "Convert original codes to haven::tagged_na()"
+      step_4: "Preserve existing string and haven NA values"
+      step_5: "Return type-consistent results"
+
+# ============================================================================
+# QUALITY ASSURANCE AND VALIDATION
+# ============================================================================
+quality_assurance:
+  validation_requirements:
+    completeness:
+      - "All CCHS variables must have documented missing data patterns"
+      - "All original missing codes must map to appropriate NA categories"
+      - "No orphaned missing codes without semantic definitions"
+    
+    consistency:
+      - "Similar variables use consistent missing code patterns"
+      - "Cross-cycle consistency maintained where possible"
+      - "Skip pattern logic clearly documented"
+      
+    accuracy:
+      - "Missing code definitions verified against CCHS documentation"
+      - "Transformation rules tested against real CCHS data"
+      - "Statistical treatment guidelines validated"
+  
+  testing_requirements:
+    unit_tests:
+      - "Test all original missing codes for each pattern type"
+      - "Verify transformation accuracy for all mappings"
+      - "Validate type safety in conversion process"
+    
+    integration_tests:
+      - "Test with real CCHS data from multiple cycles"
+      - "Verify rec_with_table() workflow compatibility"
+      - "Validate statistical analysis consistency"
+    
+    regression_tests:
+      - "Ensure backward compatibility with existing workflows"
+      - "Performance validation for large datasets"
+      - "Cross-module consistency verification"
+
+# ============================================================================
+# CCHS CYCLE-SPECIFIC VARIATIONS
+# ============================================================================
+cycle_variations:
+  title: "CCHS Cycle-Specific Missing Data Considerations"
+  description: "Documentation of variations in missing data patterns across CCHS cycles"
+  
+  general_patterns:
+    stable_across_cycles:
+      - "Core missing codes (6,7,8,9) consistent since CCHS 2001"
+      - "Extended codes (96-99, 996-999) standard for continuous variables"
+      - "Semantic meanings stable across cycles"
+    
+    potential_variations:
+      - "Valid response ranges may vary by cycle"
+      - "Skip pattern logic may evolve"
+      - "New variables may introduce new patterns"
+  
+  specific_cycle_notes:
+    cchs2001_2014:
+      missing_data_approach: "Established core patterns"
+      special_considerations: "Earlier cycles may have slightly different skip patterns"
+      
+    cchs2015_current:
+      missing_data_approach: "Standardized patterns consistent"
+      special_considerations: "More complex questionnaire logic in recent cycles"
+      
+    future_cycles:
+      evolution_potential: "Core patterns expected to remain stable"
+      monitoring_required: "New variables and questionnaire changes"
+
+# ============================================================================
+# INTEGRATION WITH CCHSFLOW ECOSYSTEM
+# ============================================================================
+cchsflow_integration:
+  helper_functions:
+    primary_function: "preprocess_cchs_missing_codes"
+    pattern_functions:
+      - "preprocess_standard_response"
+      - "preprocess_categorical_age"
+      - "preprocess_continuous_standard"
+    
+  documentation_standards:
+    roxygen_templates: "Auto-generate from this YAML specification"
+    function_documentation: "Include missing data workflow in all derived functions"
+    vignette_integration: "Reference this schema as authoritative source"
+    
+  testing_integration:
+    test_generation: "Auto-generate test cases from variable patterns"
+    validation_helpers: "Type-safe expectation testing for haven::tagged_na"
+    integration_testing: "rec_with_table() workflow validation"
+    
+  future_enhancements:
+    variable_details_integration: "Enhanced metadata in variable_details.csv"
+    automated_documentation: "Generate roxygen2 from YAML patterns"
+    schema_validation: "Ensure implementation matches specification"
+
+# ============================================================================
+# METADATA AND VERSIONING
+# ============================================================================
+metadata:
+  schema_authority: "CCHS Missing Data Working Group"
+  last_reviewed: "2025-01-20"
+  next_review_due: "2025-07-20"
+  version_history:
+    "1.0.0": "Initial comprehensive specification based on smoking function analysis"
+  
+  related_documents:
+    - "CCHS User Guide (Statistics Canada)"
+    - "variable_details.csv specification"
+    - "tidyverse_derived_variables.md best practices"
+    - "cchsflow vignettes and documentation"
+  
+  contact_information:
+    maintainer: "cchsflow development team"
+    issues: "https://github.com/Big-Life-Lab/cchsflow/issues"
+    documentation: "https://big-life-lab.github.io/cchsflow/"

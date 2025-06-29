@@ -1,0 +1,224 @@
+schema_version: "1.0.0"
+schema_date: "2025-06-22"
+description: "Variables schema for recodeflow - defines structure and metadata for variables.csv files used in data harmonization projects."
+registry_file: "metadata_registry.yaml"
+
+# Note: Shared specifications (CSV format, tier system, validation patterns, etc.)
+# are defined in metadata_registry.yaml to maintain DRY principles
+
+variables_schema:
+  title: "Variables configuration"
+  description: "Defines master variable attributes, types, labels, and specifications for harmonization projects."
+  
+  id_column_name: "variable"
+  
+  # Column order - core fields first, then optional, then versioning
+  expected_column_order:
+    # Core fields - essential for any project
+    - "variable"
+    - "label"
+    - "labelLong"
+    - "variableType"
+    - "databaseStart"
+    - "variableStart"
+    # Optional fields - enhanced documentation
+    - "subject"
+    - "section"
+    - "units"
+    - "notes"
+    - "description"
+    # Extension fields - enhanced functionality
+      # Currently no extension fields for variables
+    # Versioning fields - professional workflows
+    - "version"
+    - "lastUpdated"
+    - "harmonizationStatus"
+    - "reviewNotes"
+
+  # Field definitions organized by tier
+  fields:
+    # ============================================================================
+    # CORE FIELDS - Essential for any recodeflow project
+    # ============================================================================
+    
+    - name: "variable"
+      title: "Variable name"
+      description: "Unique name of the harmonized variable you are creating."
+      type: "string"
+      tier: "core"
+      constraints:
+        unique: true
+        pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+      notes: |
+        Choose descriptive names that clearly indicate what the variable represents.
+        Follow R naming conventions: start with letter/underscore, use letters/numbers/underscores only.
+        Examples: age_group, bmi_category, smoking_status
+        
+    - name: "label"
+      title: "Short label"
+      description: "Brief, human-readable label for displays and charts."
+      type: "string"
+      tier: "core"
+      notes: |
+        Keep concise (under 20 characters) for use in charts, tables, and compact displays.
+        Examples: "Age group", "BMI category", "Income level"
+        
+    - name: "labelLong"
+      title: "Long label"
+      description: "Detailed description for documentation and codebooks."
+      type: "string"
+      tier: "core"
+      notes: |
+        Comprehensive description used in data dictionaries and documentation.
+        Include operational definitions and important context.
+        Examples: "Body mass index categories based on WHO classification", 
+                  "Age at time of interview, grouped into 10-year intervals"
+        
+    - name: "variableType"
+      title: "Variable type"
+      description: "Whether the variable represents categories or continuous measurements."
+      type: "string"
+      tier: "core"
+      constraints:
+        enum: ["Categorical", "Continuous"]
+      notes: |
+        Determines how rec_with_table() processes the variable:
+        - "Categorical": Discrete categories or groups (factors with levels)
+        - "Continuous": Numeric measurements or counts
+        
+    - name: "databaseStart"
+      title: "Source database(s)"
+      description: "Name(s) of the original database(s) containing this variable's source data."
+      type: "string"
+      tier: "core"
+      notes: |
+        Identifies which databases contain the source data for this harmonized variable.
+        Examples: 
+        - Single database: "cchs2017_p", "rai_hc_2019"
+        - Multiple databases: "cchs2017_p, cchs2019_p, cchs2021_p"
+        
+    - name: "variableStart"
+      title: "Source variable specification"
+      description: "How to find and combine source data to create this harmonized variable."
+      type: "string"
+      tier: "core"
+      constraints:
+        pattern_reference: "See metadata_registry.yaml transformation_patterns for validation rules"
+      notes: |
+        Specifies the transformation pattern for creating this variable.
+        Critical for data harmonization workflows - tells rec_with_table() how to find and transform source data.
+        
+        Supports multiple patterns (case-insensitive):
+        - Simple reference: [HEIGHT] or [height]
+        - Database-specific: cchs2017_p::HWT_2 or cchs2017_p::hwt_2
+        - Derived variables: DerivedVar::[HEIGHT_CM, WEIGHT_KG]
+        - Multiple sources: cchs2017_p::VAR1, cchs2019_p::VAR2
+        - Complex mixed: cchs2001_p::RACA_6A, cchs2003_p::RACC_6A, [ADL_01]
+        
+        For complete validation patterns and examples, see metadata_registry.yaml transformation_patterns.
+
+    # ============================================================================
+    # OPTIONAL FIELDS - Enhanced documentation and organization
+    # ============================================================================
+    
+    - name: "subject"
+      title: "Subject area"
+      description: "Thematic area or domain this variable belongs to."
+      type: "string"
+      tier: "optional"
+      notes: |
+        Groups variables by topic for better organization.
+        Examples: "Demographics", "Health behaviors", "Social determinants", "Physical measures"
+        
+    - name: "section"
+      title: "Survey section"
+      description: "Specific section or module where this variable originates."
+      type: "string"
+      tier: "optional"
+      notes: |
+        Identifies the source questionnaire section or data collection module.
+        Examples: "Core demographics", "Health status", "Physical activity module"
+        
+    - name: "units"
+      title: "Measurement units"
+      description: "Units of measurement for continuous variables."
+      type: "string"
+      tier: "optional"
+      notes: |
+        Essential for continuous variables to ensure proper interpretation.
+        Examples: "kg", "years", "cm", "minutes/day", "score (0-100)"
+        Leave blank for categorical variables.
+        
+    - name: "notes"
+      title: "General notes"
+      description: "Additional comments or important information about this variable."
+      type: "string"
+      tier: "optional"
+      notes: |
+        Use for any special considerations, limitations, or usage notes.
+        Examples: methodology notes, data quality issues, interpretation guidance.
+        
+    - name: "description"
+      title: "Detailed description"
+      description: "Comprehensive definition including methodology and operational details."
+      type: "string"
+      tier: "optional"
+      notes: |
+        Full technical description including how the variable is constructed,
+        any assumptions made, and methodological considerations.
+
+    # ============================================================================
+    # VERSIONING FIELDS - Best-practice project management
+    # ============================================================================
+    
+    - name: "version"
+      title: "Version number"
+      description: "Semantic version of this variable definition."
+      type: "string"
+      tier: "versioning"
+      constraints:
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      notes: |
+        Track changes using semantic versioning (e.g., 1.0.0).
+        Increment for changes: major.minor.patch
+        
+    - name: "lastUpdated"
+      title: "Last updated"
+      description: "Date when this variable definition was last modified."
+      type: "string"
+      tier: "versioning"
+      format: "date"
+      constraints:
+        pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      notes: |
+        Use ISO date format: YYYY-MM-DD
+        Helps track when changes were made for collaboration and maintenance.
+        
+    - name: "harmonizationStatus"
+      title: "Harmonization status"
+      description: "Current status of this variable in your harmonization workflow."
+      type: "string"
+      tier: "versioning"
+      constraints:
+        enum: ["development", "active", "not_harmonizable", "pending_review"]
+      notes: |
+        Track progress of harmonization work:
+        - "development": Still being developed or tested
+        - "active": Ready for production use
+        - "not_harmonizable": Cannot be harmonized across sources
+        - "pending_review": Needs review before finalization
+        
+    - name: "reviewNotes"
+      title: "Review notes"
+      description: "Notes about harmonization decisions and review outcomes."
+      type: "string"
+      tier: "versioning"
+      notes: |
+        Document decisions, rationale, and any issues discovered during review.
+        Useful for team collaboration and future reference.
+
+  # Configuration options (schema-specific)
+  allow_additional_columns: true
+  extension_schema: null
+  
+  # Note: Missing data handling, validation modes, and extensions are defined in metadata_registry.yaml

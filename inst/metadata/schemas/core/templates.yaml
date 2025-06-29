@@ -1,0 +1,81 @@
+schema_version: "0.1"
+schema_date: "2025-01-01"
+description: "Template variable system documentation and validation rules"
+
+template_system_schema:
+  title: "Template Variable System"
+  description: "Schema for template variable inheritance and validation in recodeflow development"
+  version: "0.1"
+  
+  # How to identify template definitions
+  template_definitions:
+    marker_field: "templateVariable"
+    marker_values: ["Yes"]
+    required_fields:
+      - "variable"        # Template must have a name (serves as template identifier)
+      - "typeEnd"         # Template must define output type
+      - "recStart"        # Template must define source values  
+      - "recEnd"          # Template must define target values
+    
+  # How template inheritance works
+  template_inheritance:
+    reference_field: "templateVariable"
+    reference_pattern: "template_name"  # References existing template by variable name
+    required_fields:
+      - "variable"        # Using variable must have unique name
+      - "variableStart"   # Using variable must define source mapping
+    inheritance_rules:
+      - "Template recoding rules (recStart/recEnd) are inherited"
+      - "Using variable defines its own source mapping (variableStart)"
+      - "Type information (typeEnd/typeStart) can be inherited or overridden"
+  
+  # Validation rules for template system
+  validation_rules:
+    template_existence:
+      description: "Referenced templates must exist in the same variable_details file"
+      rule: "If templateVariable != 'Yes' and templateVariable != 'No', then variable with that name and templateVariable = 'Yes' must exist"
+    
+    circular_references:
+      description: "Templates cannot reference other templates"
+      rule: "If templateVariable = 'Yes', then variable cannot reference another template"
+    
+    consistent_typing:
+      description: "Template usage should maintain type consistency"
+      rule: "Variables using templates should have compatible typeEnd values"
+
+  # Examples for documentation
+  examples:
+    simple_template:
+      description: "Basic language template example"
+      template_definition:
+        variable: "lang"
+        templateVariable: "Yes"
+        typeEnd: "cat"
+        recStart: ["english", "french"]
+        recEnd: ["1", "2"]
+      
+      template_usage:
+        variable: "primary_lang"
+        templateVariable: "lang"
+        variableStart: "[PL]"
+        # Inherits: typeEnd="cat", recStart/recEnd mappings
+
+# Schema evolution roadmap
+migration_notes: |
+  Version 0.1: Initial schema focused on git diff improvements and recodeflow coordination
+  - Establishes metadata architecture mirroring final recodeflow structure
+  - Uses established camelCase naming convention throughout
+  - Documents templateVariable system for active development coordination
+  - Permissive validation to support ongoing development
+  - Foundation for seamless migration to recodeflow v1.0
+  
+  Planned v0.2: Enhanced validation and template system
+  - Tighter validation constraints based on team feedback
+  - Enhanced template system validation and documentation
+  - Better coordination with recodeflow development progress
+  
+  Planned v1.0: Full recodeflow integration
+  - Migration to recodeflow/inst/metadata/ structure
+  - Comprehensive validation and constraint enforcement
+  - Multi-project schema inheritance system
+  - Template system fully integrated with recodeflow v1.0
