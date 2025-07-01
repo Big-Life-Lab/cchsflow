@@ -15,3 +15,4 @@ Categorized time with standard CCHS categories
 \description{
 Time since quit categorization for former smokers
 }
+\keyword{internal}

@@ -9,3 +9,4 @@ validate_column_order(data, schema_def)
 \description{
 Validate Column Order
 }
+\keyword{internal}

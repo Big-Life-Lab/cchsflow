@@ -15,3 +15,4 @@ Tests metadata registry and supporting documentation schemas that provide
 shared specifications and database configurations (metadata_registry.yaml 
 and database_metadata.yaml). Validates central transformation patterns and Dublin Core metadata.
 }
+\keyword{internal}

@@ -12,3 +12,4 @@ List of validation results
 \description{
 Validate CCHS-specific extension schemas (optional)
 }
+\keyword{internal}

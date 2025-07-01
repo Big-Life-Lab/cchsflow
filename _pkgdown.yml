@@ -59,40 +59,80 @@ reference:
     - active_transport1_fun
     - active_transport2_fun
     - active_transport3_fun
-    - bmi_fun
-    - adjusted_bmi_fun
-    - bmi_fun_cat
+    - calculate_bmi
+    - adjust_bmi
+    - categorize_bmi
     - pack_years_fun
     - pct_time_fun
     - resp_condition_fun1
     - resp_condition_fun2
     - resp_condition_fun3
     - age_cat_fun
-    - binge_drinker_fun
+    - assess_binge_drinking
     - multiple_conditions_fun1
     - multiple_conditions_fun2
-    - adl_fun
+    - assess_adl
     - RACDPAL_fun
-    - adl_score_5_fun
+    - score_adl
+    - score_adl_6
     - COPD_Emph_der_fun1
     - COPD_Emph_der_fun2
     - diet_score_fun
     - diet_score_fun_cat
     - smoke_simple_fun
     - time_quit_smoking_fun
-    - low_drink_short_fun
-    - low_drink_long_fun
+    - assess_drinking_risk_short
+    - assess_drinking_risk_long
     - low_drink_score_fun
     - low_drink_score_fun1
     - immigration_fun
     - pct_time_fun_cat
-    - energy_exp_fun
+    - calculate_energy_expenditure
     - SMKDSTY_fun
     - SMKG040_fun
     - SMKG203_fun
     - SMKG207_fun
     - SPS_5_fun 
     - pack_years_fun_cat
+  - title: "Deprecated function aliases"
+    desc: Backward compatibility aliases for modernized functions (deprecated in v3.0.0)
+    contents:
+    - bmi_fun
+    - adjusted_bmi_fun
+    - bmi_fun_cat
+    - adl_fun
+    - adl_score_5_fun
+    - adl_score_6_fun
+    - binge_drinker_fun
+    - low_drink_short_fun
+    - low_drink_long_fun
+    - energy_exp_fun
+  - title: "Internal and derived helper functions"
+    desc: Internal functions and derived variable helpers
+    contents:
+    - ALCDTYP_A
+    - SMK09AB_fun
+    - SMK09AI_fun
+    - SMK09C_fun
+    - SMKG040_fun_A
+    - SMKG203I_fun
+    - SMKG207I_fun
+    - SPU25_fun
+    - adjusted_bmi_fun_D
+    - adl_fun_B
+    - bmi_fun_D
+    - bmi_fun_cat_D
+    - pack_years_fun_A
+    - smoke_simple_fun_A
+    - time_quit_smoking_fun_A
+    - has_cchs_missing_codes
+    - preprocess_categorical_age
+    - preprocess_cchs_missing_codes
+    - preprocess_continuous_standard
+    - preprocess_smoking_variable
+    - preprocess_standard_response
+    - standardise_csv
+    - validate_missing_code_preprocessing
   - title: "Potentially problematic variables"
     desc: Derived variables in cchsflow that users may run into issues with
     contents:

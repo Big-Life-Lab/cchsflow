@@ -15,3 +15,4 @@ Binary ever smoker indicator (1 = ever smoked, 0 = never)
 \description{
 Ever smoker classification
 }
+\keyword{internal}

@@ -15,3 +15,4 @@ Validated age with smoking-specific bounds
 \description{
 Apply smoking initiation age bounds
 }
+\keyword{internal}

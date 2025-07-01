@@ -15,3 +15,4 @@ Character classification of smoking status
 \description{
 Smoking status classification helper
 }
+\keyword{internal}

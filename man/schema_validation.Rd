@@ -6,3 +6,4 @@
 \description{
 Functions for schema validation.
 }
+\keyword{internal}

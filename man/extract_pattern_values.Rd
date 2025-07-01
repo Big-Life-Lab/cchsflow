@@ -15,3 +15,4 @@ Character vector of patterns
 \description{
 Extract Pattern Values from Registry Structure
 }
+\keyword{internal}

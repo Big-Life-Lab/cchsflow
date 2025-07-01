@@ -15,3 +15,4 @@ Character vector of patterns
 \description{
 General Pattern Extraction (Fallback)
 }
+\keyword{internal}

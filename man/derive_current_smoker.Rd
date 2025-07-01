@@ -15,3 +15,4 @@ Binary current smoker indicator (1 = current, 0 = not current)
 \description{
 Current vs former smoker classification
 }
+\keyword{internal}

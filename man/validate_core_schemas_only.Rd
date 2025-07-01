@@ -12,3 +12,4 @@ Results from core schema validation
 \description{
 Validate only the essential schemas (variables.yaml and variable_details.yaml)
 }
+\keyword{internal}

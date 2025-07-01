@@ -9,3 +9,4 @@ validate_patterns(data, schema_def)
 \description{
 Validate Pattern Fields
 }
+\keyword{internal}

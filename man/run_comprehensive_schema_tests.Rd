@@ -9,3 +9,4 @@ run_comprehensive_schema_tests()
 \description{
 Tests both schemas against real data and generates detailed reports
 }
+\keyword{internal}

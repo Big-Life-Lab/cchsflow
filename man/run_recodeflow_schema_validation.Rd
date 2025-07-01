@@ -20,3 +20,4 @@ Combined results from all validation phases
 \description{
 Run comprehensive validation of all recodeflow YAML schemas
 }
+\keyword{internal}
