@@ -62,9 +62,9 @@
 #' @return Continuous variable for energy expenditure (energy_exp)
 #' 
 #' @examples
-#' # Using energy_exp_fun() to create energy expenditure values across CCHS 
+#' # Using calculate_energy_expenditure() to create energy expenditure values across CCHS 
 #' # cycles
-#' # energy_exp_fun() is specified in variable_details.csv along with the CCHS
+#' # calculate_energy_expenditure() is specified in variable_details.csv along with the CCHS
 #' # variables and cycles included.
 #'
 #' # To transform energy_exp across cycles, use rec_with_table() for each
@@ -98,7 +98,7 @@
 #' tail(combined_energy_exp)
 #' @export
 
-energy_exp_fun <-
+calculate_energy_expenditure <-
   function(DHHGAGE_cont, PAA_045, PAA_050, PAA_075, PAA_080, PAADVDYS, 
            PAADVVIG, PAYDVTOA, PAYDVADL, PAYDVVIG, PAYDVDYS){
     # Leisure activity for adults

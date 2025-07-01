@@ -43,21 +43,76 @@ This guide focuses on **calculated derived variables** that require custom R fun
 
 ## Modern design principles
 
-Our current approach follows these key principles established through the v3.0.0 smoking function modernization:
+Our current approach follows these key principles established through the v3.0.0 modernization:
 
 - **Tidyverse-first**: Use `dplyr::case_when()`, `haven::tagged_na()`, and type-safe operations
 - **Universal robustness**: Functions work across all database types (PUMF, shared, master)
 - **Copy-paste philosophy**: Functions work seamlessly on scalars, vectors, and in `rec_with_table()` workflows
 - **Dual input handling**: Functions accept both raw CCHS data (6,7,8,9 codes) AND preprocessed `haven::tagged_na()` 
 - **Comprehensive missing data handling**: Standardized preprocessing with automatic detection
-- **Zero breaking changes**: Full backward compatibility while adding functionality
+- **Conventional R naming**: Functions follow tidyverse verb-first naming conventions
+
+## Function naming standards
+
+All derived variable functions must follow R community naming conventions for consistency and discoverability.
+
+### Standard verb patterns
+
+```r
+# Primary verbs for derived variables
+calculate_*()   # Mathematical computations (BMI, energy expenditure, pack-years)
+assess_*()      # Health risk evaluations (drinking risk, ADL needs, smoking status)
+categorize_*()  # Classification into groups (BMI categories, risk levels)
+score_*()       # Scoring systems (ADL scores, composite indices)
+classify_*()    # Alternative to categorize for complex classification rules
+```
+
+### Naming convention rules
+
+Follow this pattern: `{verb}_{health_domain}_{modifier}`
+
+```r
+# Examples of proper naming
+calculate_bmi()                    # Simple calculation
+assess_drinking_risk_short()       # Assessment with modifier
+categorize_bmi()                   # Classification
+score_adl()                        # Default scoring (5-item)
+score_adl_6()                      # Modified scoring (6-item)
+adjust_bmi()                       # Data adjustment/correction
+```
+
+### Function name migration (v3.0.0)
+
+The following functions have been renamed to follow R conventions:
+
+```r
+# BMI Functions
+bmi_fun()           → calculate_bmi()
+adjusted_bmi_fun()  → adjust_bmi()
+bmi_fun_cat()       → categorize_bmi()
+
+# ADL Functions  
+adl_fun()           → assess_adl()
+adl_score_5_fun()   → score_adl()            # Default 5-item
+adl_score_6_fun()   → score_adl_6()
+
+# Alcohol Functions
+binge_drinker_fun()     → assess_binge_drinking()
+low_drink_short_fun()   → assess_drinking_risk_short()
+low_drink_long_fun()    → assess_drinking_risk_long()
+
+# Physical Activity
+energy_exp_fun()    → calculate_energy_expenditure()
+```
+
+**Migration support**: Deprecated aliases are provided for backward compatibility during the transition period.
 
 ### Copy-paste functionality requirements
 
 All derived variable functions must work correctly in three contexts:
 
-1. **Scalar operations**: `bmi_fun(1.75, 70)` - Single value calculations
-2. **Vector operations**: `bmi_fun(c(1.75, 1.80), c(70, 75))` - Multiple observations  
+1. **Scalar operations**: `calculate_bmi(1.75, 70)` - Single value calculations
+2. **Vector operations**: `calculate_bmi(c(1.75, 1.80), c(70, 75))` - Multiple observations  
 3. **Data frame integration**: `rec_with_table(data, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))`
 
 This requires functions to handle both:
@@ -211,10 +266,10 @@ Essential validations for robust derived variable functions:
 Functions automatically detect validation requirements and database contexts:
 
 ```{r eval=FALSE}
-bmi_fun <- function(HWTGHTM, HWTGWTK, 
-                    min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
-                    min_HWTGWTK = 22.7, max_HWTGWTK = 209.1,
-                    BMI_min = 10, BMI_max = 100) {
+calculate_bmi <- function(HWTGHTM, HWTGWTK, 
+                         min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
+                         min_HWTGWTK = 22.7, max_HWTGWTK = 209.1,
+                         BMI_min = 10, BMI_max = 100) {
   
   # Auto-detect validation mode based on parameters
   validate_params <- !all(is.null(c(min_HWTGHTM, max_HWTGHTM, 
@@ -1126,7 +1181,7 @@ All cchsflow derived variable functions must follow R community documentation st
 #' result <- rec_with_table(cchs2013_2014_p, c("HWTGHTM", "HWTGWTK", "BMI_der"))
 #' 
 #' # Direct usage
-#' bmi_fun(1.75, 70)
+#' calculate_bmi(1.75, 70)
 ```
 
 ### Examples section requirements
@@ -1149,13 +1204,13 @@ The `@examples` section must prioritize cchsflow workflows:
 #' head(bmi_data)
 #' 
 #' # Basic usage
-#' bmi_fun(1.75, 70)
+#' calculate_bmi(1.75, 70)
 #' 
 #' # Vector processing with missing data
-#' bmi_fun(c(1.75, 1.80, 6), c(70, 75, 7))
+#' calculate_bmi(c(1.75, 1.80, 6), c(70, 75, 7))
 #' 
 #' # Research mode with custom validation
-#' bmi_fun(1.75, 70, min_HWTGHTM = 1.0, max_HWTGHTM = 2.0)
+#' calculate_bmi(1.75, 70, min_HWTGHTM = 1.0, max_HWTGHTM = 2.0)
 ```
 
 ### Parameter documentation standards
@@ -1238,9 +1293,9 @@ legacy_bmi_fun <- function(height, weight) {
 ### Modern pattern (v3.0.0):
 ```{r eval=FALSE}
 # Modern case_when approach with preprocessing
-bmi_fun <- function(HWTGHTM, HWTGWTK, 
-                    min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
-                    min_HWTGWTK = 22.7, max_HWTGWTK = 209.1) {
+calculate_bmi <- function(HWTGHTM, HWTGWTK, 
+                         min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
+                         min_HWTGWTK = 22.7, max_HWTGWTK = 209.1) {
   
   # Preprocess missing data
   HWTGHTM <- preprocess_continuous_standard(HWTGHTM)

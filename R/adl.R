@@ -179,13 +179,13 @@ calculate_adl_binary <- function(adl_list) {
 #'
 #' @examples
 #' # Basic usage - needs help with one task
-#' adl_enhanced(1, 2, 2, 2, 2)  # Returns: 1
+#' assess_adl(1, 2, 2, 2, 2)  # Returns: 1
 #'
 #' # No help needed with any task
-#' adl_enhanced(2, 2, 2, 2, 2)  # Returns: 2
+#' assess_adl(2, 2, 2, 2, 2)  # Returns: 2
 #'
 #' # Vector processing with missing data
-#' adl_enhanced(c(1, 2, 6), c(2, 2, 7), c(2, 2, 2), c(2, 2, 2), c(2, 2, 2))
+#' assess_adl(c(1, 2, 6), c(2, 2, 7), c(2, 2, 2), c(2, 2, 2), c(2, 2, 2))
 #'
 #' # Integration with rec_with_table()
 #' \dontrun{
@@ -194,8 +194,8 @@ calculate_adl_binary <- function(adl_list) {
 #' }
 #'
 #' @seealso
-#' \code{\link{adl_score_enhanced}} for count-based ADL scoring
-#' \code{\link{adl_score_6_enhanced}} for 6-item ADL scoring
+#' \code{\link{score_adl}} for count-based ADL scoring
+#' \code{\link{score_adl_6}} for 6-item ADL scoring
 #'
 #' @references
 #' Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL. 
@@ -203,7 +203,7 @@ calculate_adl_binary <- function(adl_list) {
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
 #' @export
-adl_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
+assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
   
   # 1. Enhanced input validation
   validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
@@ -243,7 +243,7 @@ adl_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #' **Method**: Sums "needs help" responses across 5 consistent ADL items
 #' **Clinical Context**: Graduated disability measure for research and clinical assessment
 #'
-#' @param ADL_01,ADL_02,ADL_03,ADL_04,ADL_05 ADL variables as in adl_enhanced()
+#' @param ADL_01,ADL_02,ADL_03,ADL_04,ADL_05 ADL variables as in assess_adl()
 #'
 #' @return 
 #' **Data Type**: Numeric count (0-5)
@@ -265,17 +265,17 @@ adl_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #'
 #' @examples
 #' # No help needed (score = 0)
-#' adl_score_enhanced(2, 2, 2, 2, 2)
+#' score_adl(2, 2, 2, 2, 2)
 #'
 #' # Help needed with 2 tasks (score = 2)
-#' adl_score_enhanced(1, 2, 1, 2, 2)
+#' score_adl(1, 2, 1, 2, 2)
 #'
 #' # Complete dependence (score = 5)
-#' adl_score_enhanced(1, 1, 1, 1, 1)
+#' score_adl(1, 1, 1, 1, 1)
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced scoring with comprehensive missing data validation
 #' @export
-adl_score_5_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
+score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
   
   # 1. Input validation (reuse from binary function)
   validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
@@ -334,14 +334,14 @@ adl_score_5_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #'
 #' @examples
 #' # Independent across all 6 tasks
-#' adl_score_6_enhanced(2, 2, 2, 2, 2, 2)
+#' score_adl_6(2, 2, 2, 2, 2, 2)
 #'
 #' # Help needed with 3 tasks including finances
-#' adl_score_6_enhanced(1, 2, 1, 2, 2, 1)
+#' score_adl_6(1, 2, 1, 2, 2, 1)
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced 6-item scoring for comprehensive functional assessment
 #' @export
-adl_score_6_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
+score_adl_6 <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
   
   # 1. Enhanced input validation
   validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
