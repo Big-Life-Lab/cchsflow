@@ -1,0 +1,1105 @@
+---
+title: "Derived Variable Development Guide"
+subtitle: "Modern tidyverse approach for developing and testing derived variables in cchsflow"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    number-sections: true
+vignette: >
+  %\VignetteIndexEntry{Derived Variable Development Guide}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(haven)
+library(cchsflow)
+
+opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This guide provides comprehensive instructions for developing, testing, and implementing derived variables in cchsflow using modern tidyverse patterns. The approach emphasizes type safety, readable code, robust missing data handling, and comprehensive validation.
+
+## Types of derived variables
+
+cchsflow supports two primary types of derived variables:
+
+1. **Variable mapping** - harmonizing existing CCHS variables across cycles
+2. **Calculated variables** - creating new variables from mathematical functions or complex logic
+
+This guide focuses on **calculated derived variables** that require custom R functions.
+
+## Modern design principles
+
+Our current approach follows these key principles established through the v3.0.0 smoking function modernization:
+
+- **Tidyverse-first**: Use `dplyr::case_when()`, `haven::tagged_na()`, and type-safe operations
+- **Universal robustness**: Functions work across all database types (PUMF, shared, master)
+- **Copy-paste philosophy**: Functions work seamlessly on scalars, vectors, and in `rec_with_table()` workflows
+- **Dual input handling**: Functions accept both raw CCHS data (6,7,8,9 codes) AND preprocessed `haven::tagged_na()` 
+- **Comprehensive missing data handling**: Standardized preprocessing with automatic detection
+- **Zero breaking changes**: Full backward compatibility while adding functionality
+
+### Copy-paste functionality requirements
+
+All derived variable functions must work correctly in three contexts:
+
+1. **Scalar operations**: `bmi_fun(1.75, 70)` - Single value calculations
+2. **Vector operations**: `bmi_fun(c(1.75, 1.80), c(70, 75))` - Multiple observations  
+3. **Data frame integration**: `rec_with_table(data, variables = c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))`
+
+This requires functions to handle both:
+- **Raw CCHS codes**: `c(1, 2, 6, 7, 8, 9)` - Original survey responses
+- **Preprocessed data**: `c(1, 2, haven::tagged_na("a"), haven::tagged_na("b"))` - Already processed inputs
+
+# Architecture and design patterns
+
+## Function architecture (four-tier design)
+
+Based on the smoking function modernization, derived variable functions follow a standardized four-tier architecture:
+
+### Tier 1: Constants and configuration
+```{r eval=FALSE}
+# Age bounds and validation constants
+MIN_SMOKING_INITIATION_AGE <- 8
+MAX_SMOKING_INITIATION_AGE <- 95
+
+# Variable-specific bounds (future: migrate to variable_details.csv)
+SMOKING_AGE_BOUNDS <- list(
+  SMKG203_cont = list(min = 8, max = 84),
+  SMKG207_cont = list(min = 8, max = 95)
+)
+```
+
+### Tier 2: Core utilities
+```{r eval=FALSE}
+# Missing data preprocessing (universal across variables)
+source("R/missing-data-helpers.R")
+
+# Variable-specific preprocessing helpers
+validate_smoking_initiation_age <- function(age_var, min_age = 8, max_age = 95) {
+  dplyr::case_when(
+    age_var < min_age | age_var > max_age ~ haven::tagged_na("b"),
+    .default = age_var
+  )
+}
+```
+
+### Tier 3: Specialized helpers
+```{r eval=FALSE}
+# Context-specific transformation functions
+classify_smoking_status <- function(smkdsty_value) {
+  dplyr::case_when(
+    smkdsty_value == 1 ~ "daily_smoker",
+    smkdsty_value == 2 ~ "occasional_smoker", 
+    smkdsty_value == 3 ~ "never_smoker",
+    smkdsty_value == 4 ~ "former_smoker",
+    .default = NA_character_
+  )
+}
+```
+
+### Tier 4: Public API functions
+```{r eval=FALSE}
+#' @note v3.0.0, last updated: 2025-06-30, status: active
+#' @export
+derived_variable_fun <- function(input_vars...) {
+  # Implementation using tiers 1-3
+}
+```
+
+## Missing data handling framework
+
+### Three-stage transformation pipeline
+
+All derived variables follow this standardized missing data preprocessing:
+
+1. **Original CCHS codes** (6,7,8,9) → **Harmonized categories** (NA::a, NA::b)
+2. **String-based NAs** ("Not applicable", "Missing") → **Haven tagged NAs**
+3. **Type validation** → **Final haven::tagged_na() output**
+
+### Universal preprocessing functions
+
+```{r eval=FALSE}
+# Standard response variables (SMK_005, SMK_030, etc.)
+input_var <- preprocess_standard_response(input_var)
+
+# Categorical age variables (SMKG203, SMKG207, etc.)  
+input_var <- preprocess_categorical_age(input_var)
+
+# Continuous variables with 996,997,998,999 codes
+input_var <- preprocess_continuous_standard(input_var)
+
+# Smoking-specific variables (auto-detection)
+input_var <- preprocess_smoking_variable(input_var, variable_name = "SMK_005")
+```
+
+### Tagged NA semantic meaning
+
+- `haven::tagged_na("a")` - **Not applicable** (valid skip, age restrictions)
+- `haven::tagged_na("b")` - **Missing data** (don't know, refusal, not stated)
+
+## Input validation and data checks
+
+### Essential validation at function start
+
+All derived variable functions must include comprehensive input validation to ensure robust operation across different data contexts:
+
+```{r eval=FALSE}
+derived_var_fun <- function(input_var1, input_var2, ...) {
+  
+  # 1. Basic input validation
+  if (missing(input_var1) || missing(input_var2)) {
+    stop("Required parameters input_var1 and input_var2 must be provided", call. = FALSE)
+  }
+  
+  # 2. Length compatibility check  
+  if (length(input_var1) != length(input_var2) && 
+      !any(c(length(input_var1), length(input_var2)) == 1)) {
+    stop("Input vectors must have compatible lengths", call. = FALSE)
+  }
+  
+  # 3. Type validation with helpful messages
+  if (!is.numeric(input_var1) && !all(input_var1 %in% c(1:9, NA)) &&
+      !all(haven::is_tagged_na(input_var1))) {
+    warning("input_var1 contains unexpected values. Expected: numeric, CCHS codes (1-9), or haven::tagged_na()", 
+            call. = FALSE)
+  }
+  
+  # 4. Auto-detect input data type for appropriate preprocessing
+  input1_needs_preprocessing <- any(input_var1 %in% c(6, 7, 8, 9, 96:99, 996:999), na.rm = TRUE) ||
+                               any(is.character(input_var1) & input_var1 %in% 
+                                   c("Not applicable", "Missing", "Don't know"), na.rm = TRUE)
+  
+  # 5. Handle edge cases gracefully
+  if (all(is.na(input_var1)) || all(is.na(input_var2))) {
+    warning("All input values are missing. Results will be entirely NA.", call. = FALSE)
+  }
+  
+  # Continue with preprocessing...
+}
+```
+
+### Validation checklist
+
+Essential validations for robust derived variable functions:
+
+- [ ] **Parameter presence**: Check required parameters are provided
+- [ ] **Length compatibility**: Ensure vector inputs can be processed together  
+- [ ] **Type expectations**: Validate input types with informative messages
+- [ ] **Range validation**: Check for plausible value ranges when applicable
+- [ ] **Missing data detection**: Identify if preprocessing is needed
+- [ ] **Edge case handling**: Graceful behavior when all inputs are missing
+- [ ] **Performance considerations**: Avoid expensive validation on large vectors
+
+## Function design patterns
+
+### Pattern 1: Auto-detection and validation modes
+
+Functions automatically detect validation requirements and database contexts:
+
+```{r eval=FALSE}
+bmi_fun <- function(HWTGHTM, HWTGWTK, 
+                    min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
+                    min_HWTGWTK = 22.7, max_HWTGWTK = 209.1,
+                    BMI_min = 10, BMI_max = 100) {
+  
+  # Auto-detect validation mode based on parameters
+  validate_params <- !all(is.null(c(min_HWTGHTM, max_HWTGHTM, 
+                                   min_HWTGWTK, max_HWTGWTK)))
+  
+  # Apply preprocessing
+  HWTGHTM <- preprocess_continuous_standard(HWTGHTM)
+  HWTGWTK <- preprocess_continuous_standard(HWTGWTK)
+  
+  # Main calculation with validation
+  bmi_calculated <- dplyr::case_when(
+    is.na(HWTGHTM) | is.na(HWTGWTK) ~ haven::tagged_na("b"),
+    validate_params & (HWTGHTM < min_HWTGHTM | HWTGHTM > max_HWTGHTM) ~ haven::tagged_na("b"),
+    validate_params & (HWTGWTK < min_HWTGWTK | HWTGWTK > max_HWTGWTK) ~ haven::tagged_na("b"),
+    .default = HWTGWTK / (HWTGHTM^2)
+  )
+  
+  # Final BMI validation
+  dplyr::case_when(
+    validate_params & (bmi_calculated < BMI_min | bmi_calculated > BMI_max) ~ haven::tagged_na("b"),
+    .default = bmi_calculated
+  )
+}
+```
+
+### Pattern 2: Unified categorical/continuous handling
+
+Functions handle both categorical CCHS codes and continuous research values:
+
+```{r eval=FALSE}
+time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C, 
+                                  min_SMKG09C = NULL, max_SMKG09C = NULL) {
+  
+  # Preprocess both inputs
+  SMK_09A_B <- preprocess_smoking_variable(SMK_09A_B)
+  
+  # Auto-detect categorical vs continuous SMKG09C
+  if (any(SMKG09C %in% c(96, 97, 98, 99), na.rm = TRUE)) {
+    SMKG09C <- preprocess_categorical_age(SMKG09C)
+  } else {
+    SMKG09C <- preprocess_smoking_variable(SMKG09C)
+  }
+  
+  # Convert categorical to continuous
+  SMKG09C_cont <- dplyr::case_when(
+    is.numeric(SMKG09C) ~ as.numeric(SMKG09C),  # Already continuous
+    SMKG09C == 1 ~ 4,   # 3-5 years category
+    SMKG09C == 2 ~ 8,   # 6-10 years category  
+    SMKG09C == 3 ~ 12,  # 11+ years category
+    haven::is_tagged_na(SMKG09C, "a") ~ haven::tagged_na("a"),
+    .default = haven::tagged_na("b")
+  )
+  
+  # Main calculation
+  dplyr::case_when(
+    SMK_09A_B == 4 ~ SMKG09C_cont,
+    SMK_09A_B == 1 ~ 0.5,
+    SMK_09A_B == 2 ~ 1.5, 
+    SMK_09A_B == 3 ~ 2.5,
+    haven::is_tagged_na(SMK_09A_B, "a") ~ haven::tagged_na("a"),
+    .default = haven::tagged_na("b")
+  )
+}
+```
+
+## Complex case_when patterns with missing data
+
+### Handling mixed data types and missing codes
+
+When working with `case_when()` and missing data, special attention is required to handle the combination of raw CCHS codes, haven tagged NAs, and calculated values:
+
+```{r eval=FALSE}
+# Complex example: BMI categorization with comprehensive missing data handling
+bmi_categorization_fun <- function(HWTGHTM, HWTGWTK) {
+  
+  # Input validation and preprocessing
+  HWTGHTM <- preprocess_continuous_standard(HWTGHTM)
+  HWTGWTK <- preprocess_continuous_standard(HWTGWTK)
+  
+  # Calculate BMI first, handling missing data
+  bmi_value <- dplyr::case_when(
+    # Handle tagged NAs first (most specific)
+    haven::is_tagged_na(HWTGHTM, "a") | haven::is_tagged_na(HWTGWTK, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(HWTGHTM, "b") | haven::is_tagged_na(HWTGWTK, "b") ~ haven::tagged_na("b"),
+    
+    # Handle regular NAs  
+    is.na(HWTGHTM) | is.na(HWTGWTK) ~ haven::tagged_na("b"),
+    
+    # Validation bounds
+    HWTGHTM < 0.82 | HWTGHTM > 2.50 ~ haven::tagged_na("b"),
+    HWTGWTK < 22.7 | HWTGWTK > 209.1 ~ haven::tagged_na("b"),
+    
+    # Valid calculation
+    .default = HWTGWTK / (HWTGHTM^2)
+  )
+  
+  # Now categorize BMI, preserving tagged NAs
+  dplyr::case_when(
+    # Preserve tagged NAs with explicit checks
+    haven::is_tagged_na(bmi_value, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(bmi_value, "b") ~ haven::tagged_na("b"),
+    
+    # Handle regular NAs
+    is.na(bmi_value) ~ haven::tagged_na("b"),
+    
+    # BMI categories (WHO classification)
+    bmi_value < 18.5 ~ "Underweight",
+    bmi_value >= 18.5 & bmi_value < 25.0 ~ "Normal weight", 
+    bmi_value >= 25.0 & bmi_value < 30.0 ~ "Overweight",
+    bmi_value >= 30.0 ~ "Obese",
+    
+    # Catch-all for any remaining edge cases
+    .default = haven::tagged_na("b")
+  )
+}
+```
+
+### Critical case_when patterns for missing data
+
+#### Pattern 1: Preserve tagged NA types
+```{r eval=FALSE}
+# CORRECT: Check specific tagged NA types first
+dplyr::case_when(
+  haven::is_tagged_na(var, "a") ~ haven::tagged_na("a"),  # Not applicable
+  haven::is_tagged_na(var, "b") ~ haven::tagged_na("b"),  # Missing
+  is.na(var) ~ haven::tagged_na("b"),                     # Regular NA
+  var < threshold ~ "Below",
+  var >= threshold ~ "Above",
+  .default = haven::tagged_na("b")
+)
+
+# INCORRECT: General is.na() will catch tagged NAs incorrectly
+dplyr::case_when(
+  is.na(var) ~ haven::tagged_na("b"),                     # Wrong - catches all NAs
+  haven::is_tagged_na(var, "a") ~ haven::tagged_na("a"),  # Never reached
+  var < threshold ~ "Below",
+  .default = "Above"
+)
+```
+
+#### Pattern 2: Multi-variable missing data propagation
+```{r eval=FALSE}
+# Handle missing data from multiple input variables
+dplyr::case_when(
+  # If ANY input is not applicable, result is not applicable
+  haven::is_tagged_na(var1, "a") | haven::is_tagged_na(var2, "a") ~ haven::tagged_na("a"),
+  
+  # If ANY input is missing, result is missing  
+  haven::is_tagged_na(var1, "b") | haven::is_tagged_na(var2, "b") ~ haven::tagged_na("b"),
+  is.na(var1) | is.na(var2) ~ haven::tagged_na("b"),
+  
+  # Complex logical conditions with valid data
+  var1 == 1 & var2 %in% c(1, 2) ~ "Category A",
+  var1 == 2 & var2 == 3 ~ "Category B", 
+  var1 %in% c(3, 4) ~ "Category C",
+  
+  .default = haven::tagged_na("b")
+)
+```
+
+#### Pattern 3: Conditional missing data based on logic
+```{r eval=FALSE}
+# Example: Pack-years calculation with age-dependent logic
+dplyr::case_when(
+  # Preserve input missing data first
+  haven::is_tagged_na(current_age, "a") ~ haven::tagged_na("a"),
+  haven::is_tagged_na(age_started, "b") ~ haven::tagged_na("b"),
+  
+  # Age validation - implausible values become missing
+  age_started < 8 | age_started > current_age ~ haven::tagged_na("b"),
+  
+  # Logic-based not applicable 
+  smoking_status == "never_smoker" ~ haven::tagged_na("a"),
+  
+  # Valid calculations
+  smoking_status == "current_smoker" ~ (current_age - age_started) * packs_per_day,
+  smoking_status == "former_smoker" ~ (age_quit - age_started) * packs_per_day,
+  
+  .default = haven::tagged_na("b")
+)
+```
+
+### Testing complex case_when logic
+
+When testing complex missing data patterns:
+
+```{r eval=FALSE}
+test_that("complex case_when preserves tagged NA semantics", {
+  # Test tagged NA preservation
+  result_na_a <- bmi_categorization_fun(haven::tagged_na("a"), 70)
+  expect_true(haven::is_tagged_na(result_na_a, "a"))
+  
+  result_na_b <- bmi_categorization_fun(1.75, haven::tagged_na("b"))
+  expect_true(haven::is_tagged_na(result_na_b, "b"))
+  
+  # Test mixed missing data scenarios
+  mixed_result <- bmi_categorization_fun(c(1.75, haven::tagged_na("a"), 6), 
+                                        c(70, 65, haven::tagged_na("b")))
+  
+  expect_equal(length(mixed_result), 3)
+  expect_false(haven::is_tagged_na(mixed_result[1]))  # Valid calculation
+  expect_true(haven::is_tagged_na(mixed_result[2], "a"))  # Not applicable
+  expect_true(haven::is_tagged_na(mixed_result[3], "b"))  # Missing
+})
+```
+
+# Development workflow
+
+## Step 1: Variable planning and design
+
+### Documentation requirements
+
+Before coding, document your derived variable in:
+
+1. **`inst/extdata/variables.csv`** - Add the new variable entry
+2. **`inst/extdata/variable_details.csv`** - Map across cycles with `Func::function_name`
+3. **Function specification** - Document inputs, outputs, validation rules
+
+### Design checklist
+
+- [ ] Identify all input CCHS variables required
+- [ ] Determine validation bounds and edge cases  
+- [ ] Plan missing data handling strategy
+- [ ] Consider backward compatibility requirements
+- [ ] Document expected output format and categories
+
+## Step 2: Function implementation
+
+### Function template
+
+Use this template for all new derived variable functions:
+
+```{r eval=FALSE}
+#' Derived Variable Function Title
+#'
+#' @description Brief description of what the function calculates and its purpose
+#'   in CCHS harmonization. Reference any relevant health measurement standards.
+#'
+#' @param input_var1 Primary CCHS variable description
+#' @param input_var2 Secondary CCHS variable description  
+#' @param min_param Optional minimum validation bound (default NULL)
+#' @param max_param Optional maximum validation bound (default NULL)
+#' @param validate_params Auto-detect validation mode (default NULL)
+#'
+#' @return Numeric or categorical derived variable. Returns haven::tagged_na("a") 
+#'   for not applicable cases, haven::tagged_na("b") for missing/invalid data.
+#'
+#' @details
+#' **Calculation Method:**
+#' Brief mathematical or logical description
+#' 
+#' **Missing Data Handling:**
+#' - Original CCHS codes (6,7,8,9) preprocessed to haven::tagged_na()
+#' - Invalid measurements tagged as haven::tagged_na("b")
+#' - Not applicable cases tagged as haven::tagged_na("a")
+#' 
+#' **Validation (when enabled):**
+#' - Input bounds: param1 [min, max], param2 [min, max]
+#' - Output bounds: result [min, max]
+#'
+#' @examples
+#' # Basic CCHS processing
+#' derived_var_fun(var1 = c(1, 2, 3), var2 = c(10, 20, 30))
+#'
+#' # Research mode with validation
+#' derived_var_fun(var1 = c(1.5, 2.1), var2 = c(15.2, 25.8),
+#'                min_param1 = 1, max_param1 = 5)
+#'
+#' @references
+#' Include relevant academic or methodological references
+#'
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Brief change description
+#' @export
+derived_var_fun <- function(input_var1, input_var2, 
+                           min_param1 = NULL, max_param1 = NULL,
+                           validate_params = NULL) {
+  
+  # 1. Preprocess original CCHS missing codes
+  input_var1 <- preprocess_appropriate_pattern(input_var1)
+  input_var2 <- preprocess_appropriate_pattern(input_var2)
+  
+  # 2. Auto-detect validation mode
+  if (is.null(validate_params)) {
+    validate_params <- !is.null(min_param1) || !is.null(max_param1)
+  }
+  
+  # 3. Apply parameter validation
+  if (validate_params) {
+    if (!is.null(min_param1)) {
+      input_var1 <- dplyr::case_when(
+        input_var1 < min_param1 | input_var1 > max_param1 ~ haven::tagged_na("b"),
+        .default = input_var1
+      )
+    }
+  }
+  
+  # 4. Main calculation using case_when
+  result <- dplyr::case_when(
+    # Define calculation logic
+    is.na(input_var1) | is.na(input_var2) ~ haven::tagged_na("b"),
+    # ... specific calculation cases
+    .default = calculated_value
+  )
+  
+  # 5. Final validation (if enabled)
+  if (validate_params) {
+    result <- dplyr::case_when(
+      result < output_min | result > output_max ~ haven::tagged_na("b"),
+      .default = result
+    )
+  }
+  
+  return(result)
+}
+```
+
+### Implementation guidelines
+
+1. **Use explicit package references**: `dplyr::case_when()`, `haven::tagged_na()`
+2. **Avoid nested ifelse**: Replace with readable case_when patterns
+3. **Consistent missing data handling**: Use preprocessing helpers
+4. **Comprehensive documentation**: Include examples for both basic and research use
+5. **Semantic versioning**: Update @note metadata with version and changes
+
+## Step 3: Testing framework
+
+### Comprehensive test structure
+
+Create tests following this template in `tests/testthat/test-{variable-name}.R`:
+
+```{r eval=FALSE}
+# Test Structure for Derived Variables
+test_that("derived_var_fun() handles basic CCHS inputs correctly", {
+  # Test valid inputs
+  expect_equal(derived_var_fun(1.5, 70), expected_output)
+  
+  # Test boundary conditions
+  expect_equal(derived_var_fun(0.8, 20), expected_boundary_output)
+  
+  # Test type consistency
+  expect_type(derived_var_fun(1.5, 70), "double")
+})
+
+test_that("derived_var_fun() handles missing data correctly", {
+  # Test original CCHS missing codes
+  expect_true(haven::is_tagged_na(derived_var_fun(6, 70), "a"))  # Not applicable
+  expect_true(haven::is_tagged_na(derived_var_fun(7, 70), "b"))  # Don't know
+  expect_true(haven::is_tagged_na(derived_var_fun(8, 70), "b"))  # Refusal
+  expect_true(haven::is_tagged_na(derived_var_fun(9, 70), "b"))  # Not stated
+  
+  # Test string NA inputs
+  expect_true(haven::is_tagged_na(derived_var_fun("Not applicable", 70), "a"))
+  expect_true(haven::is_tagged_na(derived_var_fun("Missing", 70), "b"))
+  
+  # Test haven::tagged_na inputs (passthrough)
+  expect_true(haven::is_tagged_na(derived_var_fun(haven::tagged_na("a"), 70), "a"))
+})
+
+test_that("derived_var_fun() validation mode works correctly", {
+  # Test validation enabled
+  result_validated <- derived_var_fun(1.5, 70, min_param1 = 1.0, max_param1 = 2.0)
+  expect_false(is.na(result_validated))
+  
+  # Test out-of-bounds inputs
+  result_invalid <- derived_var_fun(0.5, 70, min_param1 = 1.0, max_param1 = 2.0)
+  expect_true(haven::is_tagged_na(result_invalid, "b"))
+})
+
+test_that("derived_var_fun() backward compatibility", {
+  # Test against legacy implementation (if exists)
+  legacy_result <- legacy_derived_var_fun(1.5, 70)
+  modern_result <- derived_var_fun(1.5, 70)
+  
+  # Should produce identical results for valid inputs
+  expect_equal(legacy_result, modern_result, ignore_attr = TRUE)
+})
+
+test_that("derived_var_fun() integration with rec_with_table()", {
+  # Test with actual CCHS data
+  test_data <- cchs2010_p
+  
+  # Test transformation works
+  result <- rec_with_table(test_data, 
+                          variables = c("input_var1", "input_var2", "derived_var"),
+                          log = FALSE)
+  
+  expect_true("derived_var" %in% names(result))
+  expect_type(result$derived_var, "double")
+})
+```
+
+### Test execution and validation
+
+```{r eval=FALSE}
+# Run comprehensive tests
+devtools::test_file("tests/testthat/test-your-variable.R")
+
+# Check test coverage
+covr::function_coverage(derived_var_fun, 
+                       test_file("tests/testthat/test-your-variable.R"))
+
+# Integration testing
+devtools::test()  # Full package test suite
+```
+
+## Step 4: Documentation and integration
+
+### Update variable tracking files
+
+1. **Add to variables.csv**:
+```csv
+variable,variableStart,typeStart,typeEnd,databaseStart,variableStartLabel,variableStartShortLabel,units,recStart,recEnd,notes
+derived_var,DerivedVar::[INPUT_VAR1, INPUT_VAR2],cont,cont,all_cycles,Long description,Short desc,unit,func_name,Func::derived_var_fun,Description of purpose
+```
+
+2. **Add detailed mappings to variable_details.csv**:
+```csv
+variable,dummyVariable,typeEnd,databaseStart,variableStart,recEnd,numValidCat,catLabel,catLabelLong,units,notes,version,last_modified,change_type
+derived_var,N/A,cont,cchs2001_p,DerivedVar::[INPUT_VAR1, INPUT_VAR2],Func::derived_var_fun,N/A,N/A,N/A,unit,Description,3.0.0,2025-06-30,new
+```
+
+### Generate documentation
+
+```{r eval=FALSE}
+# Update roxygen documentation
+devtools::document()
+
+# Build package site
+pkgdown::build_site()
+
+# Check documentation completeness
+devtools::check()
+```
+
+## Documentation standards and transformation warnings
+
+### Comprehensive roxygen2 documentation requirements
+
+Every derived variable function must include complete documentation following this template:
+
+```{r eval=FALSE}
+#' Function title (should match variable name in variable_details.csv)
+#'
+#' @description 
+#' **Purpose**: Detailed description of what the function calculates and why
+#' **Method**: Brief explanation of calculation approach or algorithm
+#' **Clinical/Research Context**: Why this derived variable is useful
+#'
+#' @param input_var1 CCHS variable description with cycles where available
+#' @param input_var2 CCHS variable description with cycles where available
+#' @param min_param1 Validation parameter description and default rationale
+#' @param max_param1 Validation parameter description and default rationale
+#' @param validate_params Auto-detection toggle (typically leave NULL)
+#'
+#' @return 
+#' **Data Type**: Numeric/character/factor as appropriate
+#' **Missing Data Handling**: 
+#' - Returns `haven::tagged_na("a")` for not applicable cases
+#' - Returns `haven::tagged_na("b")` for missing/invalid data
+#' **Value Range**: Expected output range for valid calculations
+#'
+#' @details
+#' **Transformation Warnings** (include when applicable):
+#' ⚠️ **CAUTION - Temporal Changes**: [Cycle ranges] had different question wording that may affect comparability
+#' ⚠️ **CAUTION - Population Restrictions**: This variable applies only to [age groups/conditions]  
+#' ⚠️ **CAUTION - Methodological Changes**: Calculation method differs from original CCHS derived variable
+#' ⚠️ **CAUTION - Validation Differences**: Research bounds differ from standard CCHS processing
+#'
+#' **Calculation Details**:
+#' - Formula: [Mathematical expression if applicable]
+#' - Missing Data: Original CCHS codes (6,7,8,9) automatically converted to haven::tagged_na()
+#' - Validation: [Describe validation rules and their rationale]
+#' - Edge Cases: [Document handling of boundary conditions]
+#'
+#' @examples
+#' # Basic CCHS processing (most common use case)
+#' derived_var_fun(input1, input2)
+#'
+#' # Vector processing 
+#' derived_var_fun(c(1, 2, 6), c(10, 20, 7))  # Shows missing data handling
+#'
+#' # Research mode with validation
+#' derived_var_fun(input1, input2, min_param1 = X, max_param1 = Y)
+#'
+#' # Integration with rec_with_table()
+#' \dontrun{
+#' result <- rec_with_table(cchs2010_p, 
+#'                         variables = c("INPUT_VAR1", "INPUT_VAR2", "DERIVED_VAR"))
+#' }
+#'
+#' @seealso
+#' \code{\link{related_function}} for related calculations
+#' Link to variable_details documentation if helpful
+#'
+#' @references
+#' Include academic references for calculation methods
+#' Statistics Canada methodology documents where applicable
+#'
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Brief change description
+#' @export
+```
+
+### When to include transformation warnings
+
+Include transformation cautions in documentation when:
+
+#### ⚠️ **Temporal Changes** (Question Wording)
+```
+⚠️ **CAUTION - Temporal Changes**: CCHS 2001-2005 asked "Do you currently smoke?" 
+while 2007+ asked "Have you smoked in the past 30 days?". This may affect 
+trend analyses comparing early vs. later cycles.
+```
+
+#### ⚠️ **Population Restrictions** 
+```
+⚠️ **CAUTION - Population Restrictions**: This variable applies only to 
+respondents aged 12+ in CCHS 2001-2014 and 18+ in CCHS 2015+. Results for 
+age-restricted samples are marked as haven::tagged_na("a").
+```
+
+#### ⚠️ **Methodological Differences**
+```
+⚠️ **CAUTION - Methodological Changes**: cchsflow BMI calculation uses harmonized 
+height/weight variables and may produce different results than original CCHS 
+derived BMI variables which had cycle-specific validation rules.
+```
+
+#### ⚠️ **Validation Differences**
+```
+⚠️ **CAUTION - Validation Differences**: Research mode validation bounds differ 
+from standard CCHS processing. Enable validation only when analysis requires 
+stricter data quality controls.
+```
+
+### Documentation validation checklist
+
+- [ ] **Function title** matches variable name in CSV files
+- [ ] **All parameters documented** with clear descriptions
+- [ ] **Return value specified** including missing data semantics  
+- [ ] **Transformation warnings** included where applicable
+- [ ] **Examples show** basic, vector, and rec_with_table() usage
+- [ ] **@note metadata** includes version, date, status, change description
+- [ ] **References included** for calculation methods
+- [ ] **@seealso links** to related functions
+
+## Function versioning and validation
+
+### Structured @note metadata requirements
+
+All derived variable functions must include standardized version tracking:
+
+```{r eval=FALSE}
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Brief change description
+```
+
+#### Version components:
+- **v3.0.0**: Semantic version (MAJOR.MINOR.PATCH)
+- **last updated**: Date of most recent changes (YYYY-MM-DD format)
+- **status**: `active` | `deprecated` | `experimental` | `legacy`
+- **Note**: Brief description of changes in this version
+
+#### Version update rules:
+- **MAJOR**: Breaking changes (parameter changes, calculation method changes)
+- **MINOR**: New features, additional validation, enhanced functionality  
+- **PATCH**: Bug fixes, documentation updates, minor improvements
+
+### Versioning workflow
+
+#### When creating new functions:
+```{r eval=FALSE}
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Initial implementation with modern tidyverse patterns
+```
+
+#### When updating existing functions:
+```{r eval=FALSE}
+# Before: v2.1.3, last updated: 2024-12-15, status: active, Note: Enhanced validation
+# After:  v2.2.0, last updated: 2025-06-30, status: active, Note: Added support for continuous variables
+```
+
+### Validation of versioning
+
+#### Check version consistency across files:
+```{r eval=FALSE}
+# Validation script to check version consistency
+check_function_versioning <- function() {
+  
+  # Extract @note metadata from R files
+  r_files <- list.files("R/", pattern = "\\.R$", full.names = TRUE)
+  
+  version_data <- map_dfr(r_files, ~{
+    content <- readLines(.x)
+    note_lines <- content[grep("@note", content)]
+    
+    if (length(note_lines) > 0) {
+      # Parse version information
+      tibble(
+        file = basename(.x),
+        note_line = note_lines,
+        version = str_extract(note_lines, "v\\d+\\.\\d+\\.\\d+"),
+        date = str_extract(note_lines, "\\d{4}-\\d{2}-\\d{2}"),
+        status = str_extract(note_lines, "status: \\w+")
+      )
+    }
+  })
+  
+  # Check for consistency issues
+  version_issues <- version_data %>%
+    group_by(file) %>%
+    summarise(
+      unique_versions = n_distinct(version),
+      latest_date = max(date),
+      .groups = "drop"
+    ) %>%
+    filter(unique_versions > 1)
+  
+  if (nrow(version_issues) > 0) {
+    warning("Inconsistent versioning found in: ", paste(version_issues$file, collapse = ", "))
+  }
+  
+  return(version_data)
+}
+
+# Run version validation
+version_check <- check_function_versioning()
+```
+
+#### Test versioning in automated tests:
+```{r eval=FALSE}
+test_that("function versioning is consistent and current", {
+  # Test that @note metadata exists
+  function_content <- readLines("R/derived-variable.R")
+  note_lines <- function_content[grep("@note", function_content)]
+  
+  expect_gt(length(note_lines), 0, "Function must include @note metadata")
+  
+  # Test version format
+  version_pattern <- "v\\d+\\.\\d+\\.\\d+"
+  expect_true(any(grepl(version_pattern, note_lines)), 
+              "Version must follow semantic versioning (vX.Y.Z)")
+  
+  # Test date format
+  date_pattern <- "\\d{4}-\\d{2}-\\d{2}"
+  expect_true(any(grepl(date_pattern, note_lines)),
+              "Date must be in YYYY-MM-DD format")
+  
+  # Test status is valid
+  status_pattern <- "status: (active|deprecated|experimental|legacy)"
+  expect_true(any(grepl(status_pattern, note_lines)),
+              "Status must be active, deprecated, experimental, or legacy")
+})
+```
+
+### Integration with variable tracking
+
+Ensure version consistency between function @note and CSV tracking:
+
+```{r eval=FALSE}
+# Update variable_details.csv when function versions change
+update_variable_version <- function(variable_name, new_version, change_type = "enhanced") {
+  
+  variable_details <- read.csv("inst/extdata/variable_details.csv")
+  
+  # Update version information
+  variable_details <- variable_details %>%
+    mutate(
+      version = if_else(variable == variable_name, new_version, version),
+      last_modified = if_else(variable == variable_name, Sys.Date(), last_modified),
+      change_type = if_else(variable == variable_name, change_type, change_type)
+    )
+  
+  # Write back to CSV
+  write.csv(variable_details, "inst/extdata/variable_details.csv", row.names = FALSE)
+  
+  message("Updated ", variable_name, " to version ", new_version)
+}
+
+# Usage
+update_variable_version("HWTGBMI_der", "v3.0.0", "modernized")
+```
+
+# Testing best practices
+
+## Comprehensive validation approach
+
+### 1. Unit testing strategy
+
+- **Input validation**: Test all parameter combinations
+- **Edge cases**: Boundary values, extreme inputs
+- **Missing data**: All CCHS missing code patterns  
+- **Type safety**: Ensure consistent output types
+- **Performance**: Validate execution time for large datasets
+
+### 2. Integration testing
+
+- **Cross-cycle compatibility**: Test with multiple CCHS cycles
+- **rec_with_table() integration**: Ensure transformation workflows work
+- **Backward compatibility**: Compare against legacy implementations
+- **Real-world validation**: Test with actual CCHS datasets
+
+### 3. Regression testing
+
+```{r eval=FALSE}
+# Automated regression testing framework
+test_that("derived_var_fun() regression testing", {
+  # Load reference results from previous versions
+  reference_data <- readRDS("tests/testdata/derived_var_reference.rds")
+  
+  # Test current implementation against reference
+  current_results <- derived_var_fun(reference_data$input1, reference_data$input2)
+  
+  # Allow for minor floating-point differences
+  expect_equal(current_results, reference_data$expected_output, tolerance = 1e-10)
+})
+```
+
+## Performance considerations
+
+### Efficiency guidelines
+
+1. **Vectorized operations**: Use dplyr operations that work on entire vectors
+2. **Minimal memory allocation**: Avoid creating unnecessary intermediate variables
+3. **Lazy evaluation**: Let case_when() short-circuit for performance
+4. **Efficient missing data handling**: Preprocessing once vs. repeated checks
+
+### Performance testing
+
+```{r eval=FALSE}
+# Benchmark against large datasets
+library(microbenchmark)
+
+large_dataset <- data.frame(
+  var1 = rnorm(100000, 1.7, 0.1),
+  var2 = rnorm(100000, 70, 15)
+)
+
+microbenchmark(
+  derived_var_fun(large_dataset$var1, large_dataset$var2),
+  times = 100
+)
+```
+
+# Migration from legacy functions
+
+## Modernization checklist
+
+When updating existing derived variables to v3.0.0 standards:
+
+- [ ] Replace nested `ifelse()` with `dplyr::case_when()`
+- [ ] Add missing data preprocessing helpers
+- [ ] Implement auto-detection for validation modes
+- [ ] Add comprehensive parameter validation
+- [ ] Update documentation with modern examples
+- [ ] Maintain backward compatibility
+- [ ] Add comprehensive test coverage
+- [ ] Update @note metadata with v3.0.0
+
+## Example migration
+
+### Legacy pattern (deprecated):
+```{r eval=FALSE}
+# Old nested ifelse approach
+legacy_bmi_fun <- function(height, weight) {
+  ifelse(is.na(height) | is.na(weight), NA,
+    ifelse(height < 0.8 | height > 2.5, NA,
+      ifelse(weight < 20 | weight > 200, NA,
+        weight / (height^2)
+      )
+    )
+  )
+}
+```
+
+### Modern pattern (v3.0.0):
+```{r eval=FALSE}
+# Modern case_when approach with preprocessing
+bmi_fun <- function(HWTGHTM, HWTGWTK, 
+                    min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
+                    min_HWTGWTK = 22.7, max_HWTGWTK = 209.1) {
+  
+  # Preprocess missing data
+  HWTGHTM <- preprocess_continuous_standard(HWTGHTM)
+  HWTGWTK <- preprocess_continuous_standard(HWTGWTK)
+  
+  # Calculate with validation
+  dplyr::case_when(
+    is.na(HWTGHTM) | is.na(HWTGWTK) ~ haven::tagged_na("b"),
+    HWTGHTM < min_HWTGHTM | HWTGHTM > max_HWTGHTM ~ haven::tagged_na("b"),
+    HWTGWTK < min_HWTGWTK | HWTGWTK > max_HWTGWTK ~ haven::tagged_na("b"),
+    .default = HWTGWTK / (HWTGHTM^2)
+  )
+}
+```
+
+# Advanced topics
+
+## Custom missing data patterns
+
+For variables with unique missing data patterns, create custom preprocessing:
+
+```{r eval=FALSE}
+preprocess_custom_variable <- function(input_var, custom_codes = NULL) {
+  if (is.null(custom_codes)) {
+    custom_codes <- list(
+      not_applicable = c(96, 97),
+      missing = c(98, 99, 999)
+    )
+  }
+  
+  dplyr::case_when(
+    input_var %in% custom_codes$not_applicable ~ haven::tagged_na("a"),
+    input_var %in% custom_codes$missing ~ haven::tagged_na("b"),
+    .default = input_var
+  )
+}
+```
+
+## Multi-variable derived functions
+
+For complex derived variables requiring multiple inputs:
+
+```{r eval=FALSE}
+complex_derived_fun <- function(var1, var2, var3, var4, ...) {
+  # Preprocess all inputs
+  processed_vars <- map(list(var1, var2, var3, var4), 
+                       ~preprocess_appropriate_pattern(.x))
+  
+  # Unpack processed variables
+  list2env(setNames(processed_vars, c("var1", "var2", "var3", "var4")), 
+           environment())
+  
+  # Complex calculation logic
+  dplyr::case_when(
+    # Multi-condition logic here
+    .default = final_calculation
+  )
+}
+```
+
+## Integration with external validation
+
+For research applications requiring external validation datasets:
+
+```{r eval=FALSE}
+validated_derived_fun <- function(inputs, external_validation = NULL) {
+  if (!is.null(external_validation)) {
+    # Apply external validation rules
+    validation_result <- validate_against_external(inputs, external_validation)
+    inputs <- validation_result$validated_inputs
+  }
+  
+  # Standard calculation
+  derived_var_fun(inputs)
+}
+```
+
+# Conclusion
+
+This development guide provides the framework for creating robust, maintainable derived variables that follow cchsflow v3.0.0 standards. The approach emphasizes:
+
+- **Type safety** through haven::tagged_na() and consistent preprocessing
+- **Copy-paste functionality** across scalar, vector, and rec_with_table() contexts
+- **Dual input handling** for both raw CCHS codes and preprocessed data
+- **Comprehensive missing data management** with complex case_when patterns
+- **Readability** through case_when() patterns and clear documentation  
+- **Robustness** through comprehensive validation and testing
+- **Proper versioning** with structured @note metadata and validation
+- **Transformation warnings** for methodological and temporal considerations
+
+By following these patterns, derived variables will integrate seamlessly with the cchsflow ecosystem while providing reliable, well-documented functionality for both basic CCHS processing and advanced research applications.
+
+## Future documentation topics
+
+Additional topics that may warrant separate documentation guides:
+
+- **Dependency management**: Checking for package dependencies, version compatibility, and CRAN compliance
+- **Performance optimization**: Advanced techniques for large-scale data processing
+- **Cross-cycle validation**: Systematic approaches for validating harmonization across CCHS cycles
+- **External validation**: Integration with external datasets and validation studies
+- **Advanced testing patterns**: Property-based testing, fuzzing, and stress testing approaches
+
+## Reference implementations
+
+For questions or issues with derived variable development, consult these reference implementations:
+
+- **Modern patterns**: `R/smoking.R` - Complete v3.0.0 implementation with all patterns
+- **Missing data handling**: `R/missing-data-helpers.R` - Universal preprocessing utilities
+- **Complex case_when**: Look for functions like `time_quit_smoking_fun()` and `pack_years_fun()`
+- **Testing examples**: `tests/testthat/test-smoking.R` - Comprehensive test coverage patterns
