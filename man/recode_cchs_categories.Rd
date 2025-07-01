@@ -17,3 +17,4 @@ Recoded variable with proper NA handling
 \description{
 CCHS variable recoding helper
 }
+\keyword{internal}

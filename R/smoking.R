@@ -78,6 +78,7 @@ PACK_YEARS_CONSTANTS <- list(
 #' @param max_age Maximum valid age (default 95)
 #' @param na_handling Character tag for NA handling ("a" or "b")
 #' @return Validated age or haven::tagged_na
+#' @keywords internal
 validate_age_bounds <- function(age, min_age = 8, max_age = 95, na_handling = "b") {
   dplyr::case_when(
     is.na(age) ~ haven::tagged_na(na_handling),
@@ -91,6 +92,7 @@ validate_age_bounds <- function(age, min_age = 8, max_age = 95, na_handling = "b
 #' @param age Numeric age value to validate
 #' @param variable_name Name of CCHS variable for bounds lookup
 #' @return Validated age or haven::tagged_na with appropriate bounds
+#' @keywords internal
 validate_age_variable <- function(age, variable_name) {
   bounds <- SMOKING_AGE_BOUNDS[[variable_name]]
   if (is.null(bounds)) {
@@ -111,6 +113,7 @@ validate_age_variable <- function(age, variable_name) {
 #' 
 #' @param age Age when smoking initiation occurred
 #' @return Validated age with smoking-specific bounds
+#' @keywords internal
 validate_smoking_initiation_age <- function(age) {
   dplyr::case_when(
     is.na(age) ~ haven::tagged_na("b"),
@@ -127,6 +130,7 @@ validate_smoking_initiation_age <- function(age) {
 #' @param breaks Numeric vector of break points
 #' @param labels Character vector of labels for categories
 #' @return Categorized time value
+#' @keywords internal
 categorize_time_ranges <- function(time_value, breaks, labels) {
   dplyr::case_when(
     is.na(time_value) ~ haven::tagged_na("b"),
@@ -142,6 +146,7 @@ categorize_time_ranges <- function(time_value, breaks, labels) {
 #' @param years_smoked Number of years smoking
 #' @param min_pack_years Minimum pack-years value (default 0.0137)
 #' @return Pack-years calculation with minimum threshold
+#' @keywords internal
 calculate_pack_years <- function(cigarettes_per_day, years_smoked, min_pack_years = 0.0137) {
   pack_years <- (cigarettes_per_day / 20) * years_smoked
   pmax(pack_years, min_pack_years, na.rm = TRUE)
@@ -152,6 +157,7 @@ calculate_pack_years <- function(cigarettes_per_day, years_smoked, min_pack_year
 #' @param variable Variable to recode
 #' @param recode_map Named vector mapping old values to new values
 #' @return Recoded variable with proper NA handling
+#' @keywords internal
 recode_cchs_categories <- function(variable, recode_map) {
   dplyr::case_when(
     variable == "NA(a)" ~ haven::tagged_na("a"),
@@ -169,6 +175,7 @@ recode_cchs_categories <- function(variable, recode_map) {
 #' 
 #' @param smkdsty_cat5 5-category smoking status variable
 #' @return Binary current smoker indicator (1 = current, 0 = not current)
+#' @keywords internal
 derive_current_smoker <- function(smkdsty_cat5) {
   dplyr::case_when(
     smkdsty_cat5 %in% c(1, 2) ~ 1L,  # Current smoker (daily + occasional)
@@ -183,6 +190,7 @@ derive_current_smoker <- function(smkdsty_cat5) {
 #' 
 #' @param smkdsty_cat5 5-category smoking status variable
 #' @return Binary ever smoker indicator (1 = ever smoked, 0 = never)
+#' @keywords internal
 derive_ever_smoker <- function(smkdsty_cat5) {
   dplyr::case_when(
     smkdsty_cat5 %in% c(1, 2, 3, 4) ~ 1L,  # Ever smoked (current + former)
@@ -197,6 +205,7 @@ derive_ever_smoker <- function(smkdsty_cat5) {
 #' 
 #' @param time_value Continuous time since quitting value
 #' @return Categorized time with standard CCHS categories
+#' @keywords internal
 categorize_quit_time <- function(time_value) {
   dplyr::case_when(
     is.na(time_value) ~ haven::tagged_na("b"),
@@ -212,6 +221,7 @@ categorize_quit_time <- function(time_value) {
 #' 
 #' @param smkdsty_value SMKDSTY smoking status value
 #' @return Character classification of smoking status
+#' @keywords internal
 classify_smoking_status <- function(smkdsty_value) {
   dplyr::case_when(
     smkdsty_value %in% c(1, 2) ~ "current",

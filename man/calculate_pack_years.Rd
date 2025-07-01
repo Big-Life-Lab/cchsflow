@@ -19,3 +19,4 @@ Pack-years calculation with minimum threshold
 \description{
 Pack-years calculation helper
 }
+\keyword{internal}

@@ -15,3 +15,4 @@ Character vector of patterns
 \description{
 Extract Patterns from Schema Field Definitions
 }
+\keyword{internal}

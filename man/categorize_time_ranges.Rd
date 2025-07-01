@@ -19,3 +19,4 @@ Categorized time value
 \description{
 Time categorization helper for smoking cessation
 }
+\keyword{internal}

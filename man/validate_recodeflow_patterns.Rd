@@ -17,3 +17,4 @@ List with pattern validation results
 \description{
 Tests regex patterns from recodeflow schemas including metadata_registry patterns
 }
+\keyword{internal}

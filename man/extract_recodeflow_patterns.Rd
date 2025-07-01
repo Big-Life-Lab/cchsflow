@@ -15,3 +15,4 @@ Character vector of regex patterns found
 \description{
 Specialized extraction for recodeflow YAML schemas including metadata_registry patterns
 }
+\keyword{internal}

@@ -15,3 +15,4 @@ Parsed schema object
 \description{
 Load and Parse YAML Schema
 }
+\keyword{internal}

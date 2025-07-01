@@ -1,6 +1,7 @@
 #' Schema Validation Functions
 #' @name schema_validation
 #' @description Functions for schema validation.
+#' @keywords internal
 
 library(yaml)
 library(stringr)  # For cross-platform regex consistency (ICU engine)
@@ -9,6 +10,7 @@ library(stringr)  # For cross-platform regex consistency (ICU engine)
 #'
 #' @param schema_path Path to YAML schema file
 #' @return Parsed schema object
+#' @keywords internal
 load_schema <- function(schema_path) {
   if (!file.exists(schema_path)) {
     stop("Schema file not found: ", schema_path)
@@ -27,6 +29,7 @@ load_schema <- function(schema_path) {
 #' @param schema_path Path to YAML schema file
 #' @param mode Validation mode: "basic" or "pipeline"
 #' @return Validation result object
+#' @keywords internal
 validate_csv_against_schema <- function(csv_path, schema_path, mode = "basic") {
   # Load schema and data
   schema <- load_schema(schema_path)
@@ -138,6 +141,7 @@ validate_csv_against_schema <- function(csv_path, schema_path, mode = "basic") {
 }
 
 #' Validate Column Order
+#' @keywords internal
 validate_column_order <- function(data, schema_def) {
   result <- list(errors = character(0), warnings = character(0), info = character(0))
   
@@ -180,6 +184,7 @@ validate_column_order <- function(data, schema_def) {
 }
 
 #' Validate Individual Fields
+#' @keywords internal
 validate_fields <- function(data, schema_def, mode_config) {
   result <- list(errors = character(0), warnings = character(0), info = character(0))
   
@@ -235,6 +240,7 @@ validate_fields <- function(data, schema_def, mode_config) {
 }
 
 #' Validate Pattern Fields
+#' @keywords internal
 validate_patterns <- function(data, schema_def) {
   result <- list(errors = character(0), warnings = character(0), info = character(0))
   
@@ -271,6 +277,7 @@ validate_patterns <- function(data, schema_def) {
 }
 
 #' Validate Enum Fields
+#' @keywords internal
 validate_enums <- function(data, schema_def, full_schema) {
   result <- list(errors = character(0), warnings = character(0), info = character(0))
   
@@ -321,6 +328,7 @@ validate_enums <- function(data, schema_def, full_schema) {
 }
 
 #' Validate Cross-Field Rules
+#' @keywords internal
 validate_cross_field_rules <- function(data, schema_def) {
   result <- list(errors = character(0), warnings = character(0), info = character(0))
   
@@ -382,6 +390,7 @@ validate_cross_field_rules <- function(data, schema_def) {
 #'
 #' @param x schema_validation_result object
 #' @param ... Additional arguments (unused)
+#' @keywords internal
 print.schema_validation_result <- function(x, ...) {
   cat("Schema Validation Report\n")
   cat("========================\n")
@@ -430,6 +439,7 @@ print.schema_validation_result <- function(x, ...) {
 #' Comprehensive Schema Testing Suite
 #'
 #' Tests both schemas against real data and generates detailed reports
+#' @keywords internal
 run_comprehensive_schema_tests <- function() {
   cat("=== Comprehensive Schema Validation Suite ===\n\n")
   
@@ -558,6 +568,7 @@ run_comprehensive_schema_tests <- function() {
 #'   cat("Errors found:", paste(result$errors, collapse = "; "))
 #' }
 #' }
+#' @keywords internal
 validate_yaml_schema <- function(yaml_path) {
   result <- list(
     file = basename(yaml_path),
@@ -614,6 +625,7 @@ validate_yaml_schema <- function(yaml_path) {
 #' @param schema Parsed YAML object  
 #' @param yaml_path Path for error reporting
 #' @return List with pattern validation results
+#' @keywords internal
 validate_recodeflow_patterns <- function(schema, yaml_path) {
   result <- list(
     patterns_tested = 0,
@@ -650,6 +662,7 @@ validate_recodeflow_patterns <- function(schema, yaml_path) {
 #' Specialized extraction for recodeflow YAML schemas including metadata_registry patterns
 #' @param schema Parsed YAML object from recodeflow schema
 #' @return Character vector of regex patterns found
+#' @keywords internal
 extract_recodeflow_patterns <- function(schema) {
   patterns <- character()
   
@@ -681,6 +694,7 @@ extract_recodeflow_patterns <- function(schema) {
 #' Extract Pattern Values from Registry Structure
 #' @param patterns_section Pattern section from metadata_registry
 #' @return Character vector of patterns
+#' @keywords internal
 extract_pattern_values <- function(patterns_section) {
   patterns <- character()
   
@@ -704,6 +718,7 @@ extract_pattern_values <- function(patterns_section) {
 #' Extract Patterns from Schema Field Definitions
 #' @param schema_section Schema section containing fields
 #' @return Character vector of patterns
+#' @keywords internal
 extract_field_patterns <- function(schema_section) {
   patterns <- character()
   
@@ -724,6 +739,7 @@ extract_field_patterns <- function(schema_section) {
 #' General Pattern Extraction (Fallback)
 #' @param obj YAML object
 #' @return Character vector of patterns
+#' @keywords internal
 extract_general_patterns <- function(obj) {
   patterns <- character()
   
@@ -749,6 +765,7 @@ extract_general_patterns <- function(obj) {
 #' full_path specifications with fallback to default locations.
 #' @return List with organized schema paths (core_schemas, registry_schemas) 
 #'   enabling dynamic file location management across the package
+#' @keywords internal
 get_schema_paths <- function() {
   registry_path <- "inst/metadata/documentation/metadata_registry.yaml"
   
@@ -813,6 +830,7 @@ get_schema_paths <- function() {
 #' Validates master variable definitions and detailed transformation rules.
 #' @return Named list containing validation results for both core schemas with 
 #'   summary statistics and console output for immediate feedback
+#' @keywords internal
 validate_core_schemas <- function() {
   cat("=== Core Schema Validation ===\n")
   cat("Testing essential recodeflow schemas with stringr (ICU) for cross-platform consistency\n\n")
@@ -865,6 +883,7 @@ validate_core_schemas <- function() {
 #' and database_metadata.yaml). Validates central transformation patterns and Dublin Core metadata.
 #' @return Named list with validation results for registry schemas plus summary 
 #'   statistics for monitoring supporting infrastructure health
+#' @keywords internal
 validate_registry_schemas <- function() {
   cat("\n=== Registry & Supporting Schema Validation ===\n")
   cat("Testing metadata registry and supporting schema files\n\n")
@@ -918,7 +937,8 @@ validate_registry_schemas <- function() {
 #' CCHS Extension Schema Validation
 #'
 #' Validate CCHS-specific extension schemas (optional)
-#' @return List of validation results  
+#' @return List of validation results
+#' @keywords internal  
 validate_cchs_extension_schemas <- function() {
   cat("\n=== CCHS Extension Schema Validation ===\n")
   cat("Testing CCHS-specific extension schemas\n\n")
@@ -975,6 +995,7 @@ validate_cchs_extension_schemas <- function() {
 #' @param include_registry Include metadata registry validation (default: TRUE)
 #' @param include_cchs_extensions Include CCHS extension validation (default: FALSE)
 #' @return Combined results from all validation phases
+#' @keywords internal
 run_recodeflow_schema_validation <- function(include_registry = TRUE, include_cchs_extensions = FALSE) {
   cat("Starting Recodeflow Schema Validation with stringr for regex consistency...\n\n")
   
@@ -1045,6 +1066,7 @@ run_recodeflow_schema_validation <- function(include_registry = TRUE, include_cc
 #'
 #' Validate only the essential schemas (variables.yaml and variable_details.yaml)
 #' @return Results from core schema validation
+#' @keywords internal
 validate_core_schemas_only <- function() {
   cat("Quick validation of core recodeflow schemas...\n\n")
   

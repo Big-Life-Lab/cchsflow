@@ -15,3 +15,4 @@ Reads schema file locations from metadata_registry.yaml configuration to enable
 flexible file organization and centralized path management. Uses registry 
 full_path specifications with fallback to default locations.
 }
+\keyword{internal}
