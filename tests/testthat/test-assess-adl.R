@@ -5,8 +5,7 @@ library(testthat)
 library(haven)
 library(dplyr)
 
-# Load the ADL functions
-source("R/adl.R")
+# ADL functions loaded via devtools::load_all()
 
 # ==============================================================================
 # 1. BASIC FUNCTIONALITY TESTS
