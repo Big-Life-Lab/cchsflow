@@ -1,7 +1,6 @@
-#' Schema Validation
+#' Schema Validation Functions
 #' @name schema_validation
-#' 
-#' Functions for schema validation.
+#' @description Functions for schema validation.
 
 library(yaml)
 library(stringr)  # For cross-platform regex consistency (ICU engine)

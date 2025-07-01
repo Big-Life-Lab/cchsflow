@@ -62,40 +62,59 @@
 #' @return Continuous variable for energy expenditure (energy_exp)
 #' 
 #' @examples
-#' # Using calculate_energy_expenditure() to create energy expenditure values across CCHS 
-#' # cycles
-#' # calculate_energy_expenditure() is specified in variable_details.csv along with the CCHS
-#' # variables and cycles included.
+#' # Scalar usage - Adult with moderate activity levels
+#' calculate_energy_expenditure(
+#'   DHHGAGE_cont = 35, PAA_045 = 1, PAA_050 = 30, PAA_075 = 2, PAA_080 = 20,
+#'   PAADVDYS = 5, PAADVVIG = 150, PAYDVTOA = 0, PAYDVADL = 0, 
+#'   PAYDVVIG = 0, PAYDVDYS = 0
+#' )
 #'
-#' # To transform energy_exp across cycles, use rec_with_table() for each
-#' # CCHS cycle and specify energy_exp, along with each activity variable.
-#' # Then by using merge_rec_data(), you can combine energy_exp across
-#' # cycles
+#' # Scalar usage - Youth with high activity levels  
+#' calculate_energy_expenditure(
+#'   DHHGAGE_cont = 16, PAA_045 = 0, PAA_050 = 0, PAA_075 = 0, PAA_080 = 0,
+#'   PAADVDYS = 0, PAADVVIG = 0, PAYDVTOA = 200, PAYDVADL = 100, 
+#'   PAYDVVIG = 150, PAYDVDYS = 6
+#' )
+#'
+#' # Vector processing with missing data and different age groups
+#' ages <- c(25, 45, 16, 65, NA)                    # Mixed adults and youth
+#' paa_045 <- c(2, 1, 0, 0, 1)                     # Hours vigorous (adults)
+#' paa_050 <- c(30, 15, 0, 0, 20)                  # Minutes vigorous (adults)
+#' paa_075 <- c(1, 2, 0, 1, "NA(a)")              # Hours moderate with missing
+#' paa_080 <- c(20, 40, 0, 30, 25)                 # Minutes moderate
+#' paadvdys <- c(5, 3, 0, 2, 4)                    # Active days
+#' paadvvig <- c(150, 75, 0, 30, 120)              # Vigorous minutes
+#' paydvtoa <- c(0, 0, 180, 0, 0)                  # Youth other activities
+#' paydvadl <- c(0, 0, 90, 0, 0)                   # Youth ADL activities
+#' paydvvig <- c(0, 0, 120, 0, 0)                  # Youth vigorous
+#' paydvdys <- c(0, 0, 5, 0, 0)                    # Youth active days
 #' 
+#' calculate_energy_expenditure(ages, paa_045, paa_050, paa_075, paa_080,
+#'                             paadvdys, paadvvig, paydvtoa, paydvadl, 
+#'                             paydvvig, paydvdys)
+#'
+#' # rec_with_table() integration for production use across CCHS cycles
+#' \dontrun{
 #' library(cchsflow)
+#' 
+#' # CCHS 2015-2016 energy expenditure
 #' energy_exp2015_2016 <- rec_with_table(
-#'   cchs2015_2016_p, c(
-#'     "DHHGAGE_cont", "PAA_045", "PAA_050", "PAA_075", "PAA_080", "PAADVDYS", 
-#'     "PAADVVIG", "PAYDVTOA", "PAYDVADL", "PAYDVVIG", "PAYDVDYS", "energy_exp"
-#'   )
+#'   data = cchs2015_2016_p,
+#'   variables = "energy_exp",
+#'   database_name = "cchs2015_2016_p"
 #' )
 #' 
-#' head(energy_exp2015_2016)
-#' 
+#' # CCHS 2017-2018 energy expenditure
 #' energy_exp2017_2018 <- rec_with_table(
-#'   cchs2017_2018_p, c(
-#'     "DHHGAGE_cont", "PAA_045", "PAA_050", "PAA_075", "PAA_080", "PAADVDYS", 
-#'     "PAADVVIG", "PAYDVTOA", "PAYDVADL", "PAYDVVIG", "PAYDVDYS", "energy_exp"
-#'   )
+#'   data = cchs2017_2018_p,
+#'   variables = "energy_exp", 
+#'   database_name = "cchs2017_2018_p"
 #' )
 #' 
-#' tail(energy_exp2015_2016)
-#' 
-#' combined_energy_exp <- suppressWarnings(merge_rec_data(energy_exp2015_2016,
-#'  energy_exp2017_2018))
-#'
-#' head(combined_energy_exp)
-#' tail(combined_energy_exp)
+#' # Combine across cycles using merge_rec_data()
+#' combined_energy_exp <- merge_rec_data(energy_exp2015_2016, energy_exp2017_2018)
+#' summary(combined_energy_exp$energy_exp)
+#' }
 #' @note v3.0.0, last updated: 2025-01-01, status: active, Note: Function renamed from energy_exp_fun to calculate_energy_expenditure following R conventions
 #' 
 #' @export

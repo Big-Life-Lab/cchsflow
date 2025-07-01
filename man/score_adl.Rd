@@ -39,13 +39,32 @@ granular assessment than binary indicator but requires complete data for valid i
 v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced scoring with comprehensive missing data validation
 }
 \examples{
-# No help needed (score = 0)
+# Scalar usage - No help needed (score = 0)
 score_adl(2, 2, 2, 2, 2)
 
-# Help needed with 2 tasks (score = 2)
+# Scalar usage - Help needed with 2 tasks (score = 2)
 score_adl(1, 2, 1, 2, 2)
 
-# Complete dependence (score = 5)
+# Scalar usage - Complete dependence (score = 5)
 score_adl(1, 1, 1, 1, 1)
+
+# Vector processing with missing data and outliers
+adl_01 <- c(1, 2, 2, 6, "NA(a)")  # Includes not applicable and missing
+adl_02 <- c(2, 2, 1, 2, 7)        # Includes don't know
+adl_03 <- c(2, 2, 2, 2, 2)
+adl_04 <- c(2, 2, 2, 2, 2)
+adl_05 <- c(2, 2, 2, 2, 2)
+score_adl(adl_01, adl_02, adl_03, adl_04, adl_05)
+
+# rec_with_table() integration for production use
+\dontrun{
+library(cchsflow)
+result <- rec_with_table(
+  data = cchs2015_2016_p,
+  variables = "ADL_score_5",
+  database_name = "cchs2015_2016_p"
+)
+head(result$ADL_score_5)
+}
 
 }

@@ -1,0 +1,54 @@
+* using log directory ‘/Users/dmanuel/github/cchsflow/..Rcheck’
+* using R version 4.4.3 (2025-02-28)
+* using platform: aarch64-apple-darwin20
+* R was compiled by
+    Apple clang version 14.0.0 (clang-1400.0.29.202)
+    GNU Fortran (GCC) 12.2.0
+* running under: macOS Sequoia 15.5
+* using session charset: UTF-8
+* using options ‘--no-manual --no-vignettes’
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘cchsflow’ version ‘2.2.0’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... NOTE
+Depends: includes the non-default packages:
+  'haven', 'dplyr', 'sjlabelled', 'stringr', 'magrittr', 'yaml',
+  'readr'
+Adding so many packages to the search path is excessive and importing
+selectively is preferable.
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .DS_Store
+  .github/.gitignore
+  .gitignore
+  inst/.DS_Store
+  ..Rcheck
+  .git
+  .github
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... NOTE
+Found the following non-portable file paths:
+  cchsflow/vignettes/derived_variables_development_files/libs/bootstrap/bootstrap-81267100e462c21b3d6c0d5bf76a3417.min.css
+  cchsflow/vignettes/derived_variables_development_files/libs/quarto-html/quarto-syntax-highlighting-0815c480559380816a4d1ea211a47e91.css
+
+Tarballs are only required to store paths of up to 100 bytes and cannot
+store those of more than 256 bytes, with restrictions including to 100
+bytes for the final component.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘cchsflow’ can be installed ... ERROR
+Installation failed.
+See ‘/Users/dmanuel/github/cchsflow/..Rcheck/00install.out’ for details.
+* DONE
+
+Status: 1 ERROR, 3 NOTEs
+See
+  ‘/Users/dmanuel/github/cchsflow/..Rcheck/00check.log’
+for details.
+

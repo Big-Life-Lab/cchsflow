@@ -42,10 +42,30 @@ have different age restrictions or applicability rules across cycles.
 v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced 6-item scoring for comprehensive functional assessment
 }
 \examples{
-# Independent across all 6 tasks
+# Scalar usage - Independent across all 6 tasks
 score_adl_6(2, 2, 2, 2, 2, 2)
 
-# Help needed with 3 tasks including finances
+# Scalar usage - Help needed with 3 tasks including finances
 score_adl_6(1, 2, 1, 2, 2, 1)
+
+# Vector processing with missing data
+adl_01 <- c(1, 2, 2, "NA(a)")  # Mixed responses with not applicable
+adl_02 <- c(2, 2, 1, 7)        # Includes don't know
+adl_03 <- c(2, 2, 2, 2)
+adl_04 <- c(2, 2, 2, 2)
+adl_05 <- c(2, 2, 2, 2)
+adl_06 <- c(1, 2, 1, 8)        # Finances task with refusal
+score_adl_6(adl_01, adl_02, adl_03, adl_04, adl_05, adl_06)
+
+# rec_with_table() integration for DemPoRT analysis
+\dontrun{
+library(cchsflow)
+result <- rec_with_table(
+  data = cchs2015_2016_p,
+  variables = "ADL_score_6",
+  database_name = "cchs2015_2016_p"
+)
+summary(result$ADL_score_6)
+}
 
 }
