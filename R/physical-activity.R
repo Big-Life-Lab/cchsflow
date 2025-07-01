@@ -96,6 +96,8 @@
 #'
 #' head(combined_energy_exp)
 #' tail(combined_energy_exp)
+#' @note v3.0.0, last updated: 2025-01-01, status: active, Note: Function renamed from energy_exp_fun to calculate_energy_expenditure following R conventions
+#' 
 #' @export
 
 calculate_energy_expenditure <-
