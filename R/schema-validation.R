@@ -1,7 +1,7 @@
-#' Recodeflow Schema Validation System
-#' @name recodeflow_schema_validation
+#' Schema Validation
+#' @name schema_validation
 #' 
-#' Comprehensive validation for Recodeflow YAML schemas.
+#' Functions for schema validation.
 
 library(yaml)
 library(stringr)  # For cross-platform regex consistency (ICU engine)
