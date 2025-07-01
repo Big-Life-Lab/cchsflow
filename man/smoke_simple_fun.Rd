@@ -32,5 +32,5 @@ This function creates a derived smoking variable (smoke_simple)
  or former occasional smoker, former daily smoker quit >5 years
 }
 \note{
-v2.2.0, last updated: 2025-06-30, status: active, Note: Simplified logic with enhanced validation and documentation
+v3.0.0, last updated: 2025-06-30, status: active, Note: Simplified logic with enhanced validation and documentation
 }
