@@ -108,14 +108,14 @@ energy_exp_fun <-
                 ((PAA_045)*60 +(PAA_050) +(PAA_075)*60 +(PAA_080)), 
                if_else2(PAA_045 == "NA(a)"|PAA_050 == "NA(a)"|
                         PAA_075 == "NA(a)"|PAA_080 == "NA(a)", 
-                        tagged_na("a"), tagged_na("b")))
+                        haven::tagged_na("a"), haven::tagged_na("b")))
     
     # Leisure activity for youth
     leisure_youth <- 
       if_else2(DHHGAGE_cont < 18 & !is.na(PAYDVTOA) & !is.na(PAYDVADL), 
                ((PAYDVTOA) + (PAYDVADL)),
                if_else2(PAYDVTOA == "NA(a)"|PAYDVADL == "NA(a)", 
-                        tagged_na("a"), tagged_na("b")))
+                        haven::tagged_na("a"), haven::tagged_na("b")))
     
     # Energy expenditure calculation
     physical_activity <-
@@ -127,7 +127,7 @@ energy_exp_fun <-
                              PAYDVDYS == "NA(a)"|PAYDVVIG == "NA(a)"|
                              leisure_adult == "NA(a)"|PAADVDYS == "NA(a)"|
                              PAADVVIG == "NA(a)", 
-                             tagged_na("a"), tagged_na("b"))))
+                             haven::tagged_na("a"), haven::tagged_na("b"))))
     return(physical_activity)
   }
 
