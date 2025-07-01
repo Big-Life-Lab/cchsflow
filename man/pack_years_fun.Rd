@@ -108,7 +108,7 @@ This function creates a derived variable (pack_years_der) that
  lifetime exposure to cigarette use.
 }
 \note{
-v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced calculation logic with better edge case handling
+v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced calculation logic with better edge case handling
 }
 \examples{
 # Standard CCHS processing (no validation)

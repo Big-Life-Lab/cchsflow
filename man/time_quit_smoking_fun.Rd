@@ -35,7 +35,7 @@ This function creates a derived variable (time_quit_smoking_der)
  CCHS surveys 2003-2014.
 }
 \note{
-v2.2.0, last updated: 2025-06-30, status: active, Note: Modernized with improved time calculation and validation
+v3.0.0, last updated: 2025-06-30, status: active, Note: Modernized with improved time calculation and validation
 }
 \examples{
 # Standard CCHS processing (basic mode)
