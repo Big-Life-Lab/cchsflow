@@ -335,3 +335,31 @@ test_that("assess_adl() has proper version metadata", {
   expected_6_params <- c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06")
   expect_true(all(expected_6_params %in% score_6_formals))
 })
+
+test_that("assess_adl() functions have proper @note version metadata", {
+  # Test that @note metadata exists in function documentation
+  function_content <- readLines("R/adl.R")
+  note_lines <- function_content[grep("@note", function_content)]
+  
+  expect_gt(length(note_lines), 0, "Functions must include @note metadata")
+  
+  # Test version format (semantic versioning vX.Y.Z)
+  version_pattern <- "v\\d+\\.\\d+\\.\\d+"
+  expect_true(any(grepl(version_pattern, note_lines)), 
+              "Version must follow semantic versioning (vX.Y.Z)")
+  
+  # Test date format (YYYY-MM-DD)
+  date_pattern <- "\\d{4}-\\d{2}-\\d{2}"
+  expect_true(any(grepl(date_pattern, note_lines)),
+              "Date must be in YYYY-MM-DD format")
+  
+  # Test status is valid
+  status_pattern <- "status: (active|deprecated|experimental|legacy)"
+  expect_true(any(grepl(status_pattern, note_lines)),
+              "Status must be active, deprecated, experimental, or legacy")
+  
+  # Test v3.0.0 version for modernized functions
+  v3_pattern <- "v3\\.0\\.0"
+  expect_true(any(grepl(v3_pattern, note_lines)),
+              "Modernized functions should be marked as v3.0.0")
+})
