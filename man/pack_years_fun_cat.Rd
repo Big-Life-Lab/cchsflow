@@ -7,9 +7,7 @@
 pack_years_fun_cat(pack_years_der)
 }
 \arguments{
-\item{pack_years_der}{derived variable that calculates smoking pack-years
-See \code{\link{pack_years_fun}} for documentation on how variable
-was derived.}
+\item{pack_years_der}{derived variable that calculates smoking pack-years}
 }
 \value{
 value for pack year categories in the pack_years_cat variable.
@@ -17,58 +15,4 @@ value for pack year categories in the pack_years_cat variable.
 \description{
 This function creates a categorical derived variable
 (pack_years_cat) that categorizes smoking pack-years (pack_years_der).
-}
-\details{
-pack-years is calculated by multiplying the number of cigarette 
-packs per day (20 cigarettes per pack) by the number of years.The categories 
-were based on the Cardiovascular Disease Population Risk Tool 
-(Douglas Manuel et al. 2018). 
-
-pack_years_cat uses the derived variable pack_years_der. Pack_years_der uses
-age and various smoking variables that have been transformed by cchsflow (see
-documentation on pack_year_der). In order to categorize pack years across CCHS
-cycles, age and smoking variables must be transformed and harmonized.
-}
-\examples{
- 
-# Using pack_years_fun_cat() to categorize pack year values across CCHS cycles
-# pack_years_fun_cat() is specified in variable_details.csv along with the 
-# CCHS variables and cycles included.
-
-# To transform pack_years_cat across cycles, use rec_with_table() for each
-# CCHS cycle and specify pack_years_cat.
-# Since pack_year_der is also also derived variable, you will have to specify 
-# the variables that are derived from it.
-# Since time_quit_smoking_der is also a derived variable in pack_year_der, 
-# you will have to specify the variables that are derived from it.
-# Then by using merge_rec_data(), you can combine pack_years_cat across
-# cycles.
-
-library(cchsflow)
-
-pack_years_cat_2009_2010 <- rec_with_table(
-  cchs2009_2010_p, c(
-    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
-    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
-    "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der", "pack_years_cat"
-  )
-)
-
-head(pack_years_cat_2009_2010)
-
-pack_years_cat_2011_2012 <- rec_with_table(
-  cchs2011_2012_p,c(
-    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
-    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
-    "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der", "pack_years_cat"
-  )
-)
-
-tail(pack_years_cat_2011_2012)
-
-combined_pack_years_cat <- suppressWarnings(merge_rec_data
-(pack_years_cat_2009_2010,pack_years_cat_2011_2012))
-
-head(combined_pack_years_cat)
-tail(combined_pack_years_cat)
 }

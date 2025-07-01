@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking.R
 \name{pack_years_fun}
 \alias{pack_years_fun}
-\title{Smoking pack-years}
+\title{Smoking pack-years (unified approach)}
 \usage{
 pack_years_fun(
   SMKDSTY_A,
@@ -15,40 +15,88 @@ pack_years_fun(
   SMK_208,
   SMK_05C,
   SMKG01C_cont,
-  SMK_01A
+  SMK_01A,
+  validate_params = FALSE,
+  min_DHHGAGE_cont = 12,
+  max_DHHGAGE_cont = 102,
+  min_time_quit_smoking = 0.5,
+  max_time_quit_smoking = 82,
+  min_SMKG203_cont = 8,
+  max_SMKG203_cont = 84,
+  min_SMKG207_cont = 8,
+  max_SMKG207_cont = 84,
+  min_SMK_204 = 1,
+  max_SMK_204 = 99,
+  min_SMK_05B = 1,
+  max_SMK_05B = 99,
+  min_SMK_208 = 1,
+  max_SMK_208 = 99,
+  min_SMK_05C = 0,
+  max_SMK_05C = 31,
+  min_SMKG01C_cont = 8,
+  max_SMKG01C_cont = 84
 )
 }
 \arguments{
-\item{SMKDSTY_A}{variable used in CCHS cycles 2001-2014 that classifies an 
-individual's smoking status.}
+\item{SMKDSTY_A}{variable used in CCHS cycles 2001-2014 that classifies smoking status}
 
-\item{DHHGAGE_cont}{continuous age variable.}
+\item{DHHGAGE_cont}{continuous age variable}
 
-\item{time_quit_smoking}{derived variable that calculates the approximate
-time a former smoker has quit smoking. 
-See \code{\link{time_quit_smoking_fun}} for documentation on how variable
-was derived}
+\item{time_quit_smoking}{derived variable for time since quitting smoking}
 
-\item{SMKG203_cont}{age started smoking daily. Variable asked to daily
-smokers.}
+\item{SMKG203_cont}{age started smoking daily (daily smokers)}
 
-\item{SMKG207_cont}{age started smoking daily. Variable asked to former
-daily smokers.}
+\item{SMKG207_cont}{age started smoking daily (former daily smokers)}
 
-\item{SMK_204}{number of cigarettes smoked per day. Variable asked to
-daily smokers.}
+\item{SMK_204}{number of cigarettes smoked per day (daily smokers)}
 
-\item{SMK_05B}{number of cigarettes smoked per day. Variable asked to
-occasional smokers}
+\item{SMK_05B}{number of cigarettes smoked per day (occasional smokers)}
 
-\item{SMK_208}{number of cigarettes smoked per day. Variable asked to former
-daily smokers}
+\item{SMK_208}{number of cigarettes smoked per day (former daily smokers)}
 
 \item{SMK_05C}{number of days smoked at least one cigarette}
 
 \item{SMKG01C_cont}{age smoked first cigarette}
 
 \item{SMK_01A}{smoked 100 cigarettes in lifetime (y/n)}
+
+\item{validate_params}{logical, enable parameter validation (default FALSE)}
+
+\item{min_DHHGAGE_cont}{minimum valid age (default 12)}
+
+\item{max_DHHGAGE_cont}{maximum valid age (default 102)}
+
+\item{min_time_quit_smoking}{minimum valid time since quitting (default 0.5)}
+
+\item{max_time_quit_smoking}{maximum valid time since quitting (default 82)}
+
+\item{min_SMKG203_cont}{minimum valid age started daily (default 5)}
+
+\item{max_SMKG203_cont}{maximum valid age started daily (default 84)}
+
+\item{min_SMKG207_cont}{minimum valid age started daily former (default 5)}
+
+\item{max_SMKG207_cont}{maximum valid age started daily former (default 80)}
+
+\item{min_SMK_204}{minimum cigarettes per day daily (default 1)}
+
+\item{max_SMK_204}{maximum cigarettes per day daily (default 99)}
+
+\item{min_SMK_05B}{minimum cigarettes per day occasional (default 1)}
+
+\item{max_SMK_05B}{maximum cigarettes per day occasional (default 99)}
+
+\item{min_SMK_208}{minimum cigarettes per day former (default 1)}
+
+\item{max_SMK_208}{maximum cigarettes per day former (default 99)}
+
+\item{min_SMK_05C}{minimum days smoked (default 0)}
+
+\item{max_SMK_05C}{maximum days smoked (default 31)}
+
+\item{min_SMKG01C_cont}{minimum age first cigarette (default 8)}
+
+\item{max_SMKG01C_cont}{maximum age first cigarette (default 84)}
 }
 \value{
 value for smoking pack-years in the pack_years_der variable
@@ -59,52 +107,20 @@ This function creates a derived variable (pack_years_der) that
  variables. This is a popular variable used by researchers to quantify
  lifetime exposure to cigarette use.
 }
-\details{
-pack-years is calculated by multiplying the number of cigarette
- packs per day (20 cigarettes per pack) by the number of years. Example 1:
- a respondent who is a current smoker who smokes 1 package of cigarettes for
- the last 10 years has smoked 10 pack-years. Pack-years is also calculated
- for former smokers. Example 2: a respondent who started smoking at age
- 20 years and smoked half a pack of cigarettes until age 40 years smoked for
- 10 pack-years.
-}
 \examples{
-# Using pack_years_fun() to create pack-years values across CCHS cycles
-# pack_years_fun() is specified in variable_details.csv along with the CCHS
-# variables and cycles included.
+# Standard CCHS processing (no validation)
+pack_years_fun(1, 45, NA, 18, NA, 20, NA, NA, NA, NA, 1)
 
-# To transform pack_years_der across cycles, use rec_with_table() for each
-# CCHS cycle and specify pack_years_der, along with each smoking variable.
-# Since time_quit_smoking_der is also a derived 
-# variable, you will have to specify the variables that are derived from it.
-# Then by using merge_rec_data(), you can combine pack_years_der across
-# cycles
+# RDC with validation for data quality
+pack_years_fun(1, 45, NA, 18, NA, 20, NA, NA, NA, NA, 1,
+               validate_params = TRUE, min_DHHGAGE_cont = 12, max_DHHGAGE_cont = 102)
 
-library(cchsflow)
+}
+\references{
+Holford, T.R., et al. (2014). Patterns of Birth Cohort–Specific Smoking Histories, 1965–2009. 
+\emph{Am J Prev Med}, 46(2), e31-7. \doi{10.1016/j.amepre.2013.10.022}
 
-pack_years2009_2010 <- rec_with_table(
-  cchs2009_2010_p, c(
-    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
-    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
-    "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
-  )
-)
-
-head(pack_years2009_2010)
-
-pack_years2011_2012 <- rec_with_table(
-  cchs2011_2012_p,c(
-    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
-    "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
-    "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der"
-  )
-)
-
-tail(pack_years2011_2012)
-
-combined_pack_years <- suppressWarnings(merge_rec_data(pack_years2009_2010,
- pack_years2011_2012))
-
-head(combined_pack_years)
-tail(combined_pack_years)
+Manuel, D.G., et al. (2020). Smoking Patterns Based on Birth-Cohort-Specific Histories from 1965 to 2013, with Projections to 2041. 
+\emph{Health Reports}, 31(11), 16-31. 
+\url{https://www150.statcan.gc.ca/n1/pub/82-003-x/2020011/article/00002-eng.htm}
 }

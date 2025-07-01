@@ -2,16 +2,28 @@
 % Please edit documentation in R/smoking.R
 \name{time_quit_smoking_fun}
 \alias{time_quit_smoking_fun}
-\title{Time since quit smoking}
+\title{Time since quit smoking (unified approach)}
 \usage{
-time_quit_smoking_fun(SMK_09A_B, SMKG09C)
+time_quit_smoking_fun(
+  SMK_09A_B,
+  SMKG09C,
+  min_SMKG09C = NULL,
+  max_SMKG09C = NULL,
+  validate_params = NULL
+)
 }
 \arguments{
 \item{SMK_09A_B}{number of years since quitting smoking. Variable asked to
 former daily smokers who quit <3 years ago.}
 
 \item{SMKG09C}{number of years since quitting smoking. Variable asked to
-former daily smokers who quit >=3 years ago.}
+former daily smokers who quit >=3 years ago. Can be categorical (1,2,3) or continuous.}
+
+\item{min_SMKG09C}{minimum valid value for SMKG09C (NULL for no validation)}
+
+\item{max_SMKG09C}{maximum valid value for SMKG09C (NULL for no validation)}
+
+\item{validate_params}{logical, enable parameter validation (auto-detected if NULL)}
 }
 \value{
 value for time since quit smoking in time_quit_smoking_der.
@@ -23,37 +35,19 @@ This function creates a derived variable (time_quit_smoking_der)
  CCHS surveys 2003-2014.
 }
 \examples{
-# Using time_quit_smoking_fun() to create pack-years values across CCHS 
-# cycles.
-# time_quit_smoking_fun() is specified in variable_details.csv along with the
-# CCHS variables and cycles included.
+# Standard CCHS processing (basic mode)
+time_quit_smoking_fun(SMK_09A_B = 4, SMKG09C = 2)  # Returns 8 years
 
-# To transform time_quit_smoking across cycles, use rec_with_table() for each
-# CCHS cycle and specify time_quit_smoking, along with each smoking variable.
-# Then by using merge_rec_data(), you can combine time_quit_smoking across
-# cycles.
+# Research with validation (enhanced mode)
+time_quit_smoking_fun(SMK_09A_B = 4, SMKG09C_cont = 15,
+                      min_SMKG09C = 3, max_SMKG09C = 82)  # Returns 15 years
 
-library(cchsflow)
+}
+\references{
+Holford, T.R., et al. (2014). Patterns of Birth Cohort–Specific Smoking Histories, 1965–2009. 
+\emph{Am J Prev Med}, 46(2), e31-7. \doi{10.1016/j.amepre.2013.10.022}
 
-time_quit2009_2010 <- rec_with_table(
-  cchs2009_2010_p, c(
-    "SMK_09A_B", "SMKG09C", "time_quit_smoking"
-  )
-)
-
-head(time_quit2009_2010)
-
-time_quit2011_2012 <- rec_with_table(
-  cchs2011_2012_p, c(
-    "SMK_09A_B", "SMKG09C", "time_quit_smoking"
-  )
-)
-
-tail(time_quit2011_2012)
-
-combined_time_quit <- suppressWarnings(merge_rec_data(time_quit2009_2010,
- time_quit2011_2012))
-
-head(combined_time_quit)
-tail(combined_time_quit)
+Manuel, D.G., et al. (2020). Smoking Patterns Based on Birth-Cohort-Specific Histories from 1965 to 2013, with Projections to 2041. 
+\emph{Health Reports}, 31(11), 16-31. 
+\url{https://www150.statcan.gc.ca/n1/pub/82-003-x/2020011/article/00002-eng.htm}
 }

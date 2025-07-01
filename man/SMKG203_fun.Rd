@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking.R
 \name{SMKG203_fun}
 \alias{SMKG203_fun}
-\title{Age started to smoke daily - daily smoker}
+\title{Age started to smoke daily - daily smoker (from combined variable)}
 \usage{
 SMKG203_fun(SMK_005, SMKG040)
 }
@@ -12,51 +12,9 @@ SMKG203_fun(SMK_005, SMKG040)
 \item{SMKG040}{age started to smoke daily - daily/former daily smoker}
 }
 \value{
-value for continuous age started to smoke daily for daily smokers 
-in the SMKG203_cont variable
+value for continuous age started to smoke daily for daily smokers
 }
 \description{
 This function creates a continuous derived variable
 (SMKG203_cont) for age started to smoke daily for daily smokers.
-}
-\details{
-For CCHS 2015-2018, age started to smoke daily was combined for daily 
-and former daily smokers.Previous cycles had separate variables for age 
-started to smoke daily. Type of smoker presently is used to define daily 
-smoker.
-}
-\examples{
- 
-# Using SMKG203_fun() to derive age started to smoke daily values across 
-# CCHS cycles.
-# SMKG203_fun() is specified in variable_details.csv along with the 
-# CCHS variables and cycles included.
-
-# To transform SMKG203_A across cycles, use rec_with_table() for each
-# CCHS cycle and specify SMKG203_A.
-# For CCHS 2001-2014, only specify SMKG203_A.
-# For CCHS 2015-2018, specify the parameters and SMKG203_A for daily smoker 
-# age.
-
-library(cchsflow)
-
-agecigd_2009_2010 <- rec_with_table(
-  cchs2009_2010_p, "SMKG203_A")
-
-head(agecigd_2009_2010)
-
-agecigd_2017_2018 <- rec_with_table(
-  cchs2017_2018_p,c(
-    "SMK_005","SMKG040","SMKG203_A"
-  )
-)
-
-tail(agecigd_2017_2018)
-
-combined_agecigd <- suppressWarnings(merge_rec_data
-(agecigd_2009_2010,agecigd_2017_2018))
-
-head(combined_agecigd)
-tail(combined_agecigd)
-
 }

@@ -105,4 +105,27 @@ binge <- binge_drinker_fun(DHH_SEX = 1, ALW_1 = 1, ALW_2A1 = 3, ALW_2A2 = 1,
                           ALW_2A6 = 8, ALW_2A7 = 2)
 
 print(binge)
+
+library(cchsflow)
+DHH_SEX <- c(1, 2) 
+ALW_1 <- c(1, 1)
+ALW_2A1 <- c(3, 1)
+ALW_2A2 <- c(1, 5)
+ALW_2A3 <- c(6, 2)
+ALW_2A4 <- c(0, 4)
+ALW_2A5 <- c(3, 0)
+ALW_2A6 <- c(8, 1)
+ALW_2A7 <- c(2, 2)
+
+binge_drink_data <- data.frame(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4,
+                               ALW_2A5, ALW_2A6, ALW_2A7)
+binge_drink_data[,"Binge_Drinker"] <- NA
+print(binge_drink_data)
+
+binge_drink_data$Binge_Drinker<-binge_drinker_fun(binge_drink_data[[1]], binge_drink_data[[2]], 
+                                                 binge_drink_data[[3]], binge_drink_data[[4]], 
+                                                 binge_drink_data[[5]], binge_drink_data[[6]],
+                                                 binge_drink_data[[7]], binge_drink_data[[8]], 
+                                                 binge_drink_data[[9]])
+print(binge_drink_data)
 }
