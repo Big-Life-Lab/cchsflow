@@ -1,7 +1,7 @@
 #' @title Daily energy expenditure in leisure activity 
 #' 
 #' @description This function creates a derived variable for daily leisure 
-#' energy expenditure.A MET is a conceptual value that represents energy 
+#' energy expenditure. A MET is a conceptual value that represents energy 
 #' expended during physical activity. The volume of activity is calculated by 
 #' multiplying the amount of minutes of activity (by level of intensity) by the 
 #' MET value associated with that intensity. A MET (metabolic equivalent) is 
