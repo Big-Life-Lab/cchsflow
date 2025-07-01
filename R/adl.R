@@ -1,348 +1,372 @@
-#' @title Activities of Daily Living (ADL) help indicator
-#' 
-#' @description Creates a binary indicator variable for whether a person needs
-#'   help with any activities of daily living. This harmonized variable is based
-#'   on the CCHS derived variable ADLF6R but uses ADL variables that are
-#'   consistent across all CCHS survey cycles.
-#' 
-#' @details The CCHS derived variable ADLF6R uses different ADL variables across
-#'  the various CCHS survey cycles. This newly derived variable (ADL_der) uses
-#'  ADL variables that are consistent across CCHS cycles.
-#'  
-#'  In the 2001 CCHS survey cycle, the ADLF6R variable examines the following
-#'  ADL variables:
-#'  \enumerate{
-#'   \item ADL_01 - Needs help preparing meals
-#'   \item ADL_02 - Needs help getting to appointments/errands
-#'   \item ADL_03 - Needs help doing housework
-#'   \item ADL_04 - Needs help doing personal care
-#'   \item ADL_05 - Needs help moving inside house
-#'   \item ADL_07 - Needs help doing heavy household chores
-#'  }  
-#' 
-#'  In the 2003-2005 CCHS survey cycles, the ADLF6R variable examines the
-#'  following ADL variables:
-#'  \enumerate{
-#'   \item ADL_01 - Needs help preparing meals
-#'   \item ADL_02 - Needs help getting to appointments/errands
-#'   \item ADL_03 - Needs help doing housework
-#'   \item ADL_04 - Needs help doing personal care
-#'   \item ADL_05 - Needs help moving inside house
-#'   \item ADL_06 - Needs help doing finances
-#'   \item ADL_07 - Needs help doing heavy household chores
-#'  }
-#'  
-#'  In the 2007-2014 CCHS survey cycles, the ADLF6R variable examines the
-#'  following ADL variables:
-#'  \enumerate{
-#'   \item ADL_01 - Needs help preparing meals
-#'   \item ADL_02 - Needs help getting to appointments/errands
-#'   \item ADL_03 - Needs help doing housework
-#'   \item ADL_04 - Needs help doing personal care
-#'   \item ADL_05 - Needs help moving inside house
-#'   \item ADL_06 - Needs help doing finances
-#'  }
-#'  
-#'  This newly derived variable (ADL_der) uses ADL_01 to ADL_05 which are
-#'  consistent across all survey cycles. For any single CCHS survey year,
-#'  it is appropriate to use ADLF6R. ADL_der is recommended when using multiple
-#'  survey cycles.     
-#' 
-#' @param ADL_01 A numeric value indicating if help is needed preparing meals.
-#'   Valid values: 1 = needs help, 2 = does not need help.
-#' @param ADL_02 A numeric value indicating if help is needed getting to
-#'   appointments/errands. Valid values: 1 = needs help, 2 = does not need help.
-#' @param ADL_03 A numeric value indicating if help is needed doing housework.
-#'   Valid values: 1 = needs help, 2 = does not need help.
-#' @param ADL_04 A numeric value indicating if help is needed doing personal care.
-#'   Valid values: 1 = needs help, 2 = does not need help.
-#' @param ADL_05 A numeric value indicating if help is needed moving inside house.
-#'   Valid values: 1 = needs help, 2 = does not need help.
-#' 
-#' @return A numeric value with the following categories:
-#'   \itemize{
-#'     \item \code{1}: Needs help with at least one task
-#'     \item \code{2}: Does not need help with any task
-#'     \item \code{"NA(b)"}: Missing or invalid input values
-#'   }
-#' 
-#' @examples
-#' # Person who needs help with at least one task
-#' adl_fun(ADL_01 = 1, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 1 (needs help with preparing meals)
-#' 
-#' # Person who needs no help with any task
-#' adl_fun(ADL_01 = 2, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 2 (does not need help)
-#' 
-#' # Person who needs help with multiple tasks
-#' adl_fun(ADL_01 = 1, ADL_02 = 1, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 1 (needs help with meals and appointments)
-#' 
-#' # Invalid input
-#' adl_fun(ADL_01 = 0, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: "NA(b)" (invalid input value)
-#'
-#' @seealso \code{\link{adl_score_5_fun}} for counting the number of ADL tasks
-#'   requiring help.
-#' 
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced for new ADL_score_6 variable support
-#' @export
-adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-  # Check to see if all values are in range
-  if_else2((ADL_01 %in% 1:2) & (ADL_02 %in% 1:2) & (ADL_03 %in% 1:2) &
-             (ADL_04 %in% 1:2) & (ADL_05 %in% 1:2),
-           # Examining if respondents needed help with any task
-           if_else2(ADL_01 == 1 | ADL_02 == 1 | ADL_03 == 1 | ADL_04 == 1 |
-                      ADL_05 == 1, 1,
-                    # Examining if respondents do not need help with any task
-                    if_else2(ADL_01 == 2 & ADL_02 == 2 & ADL_03 == 2 &
-                               ADL_04 == 2 & ADL_05 == 2, 2, "NA(b)")),
-           # Return NA if any ADL variable is out of range
-           "NA(b)"
-           )
+# ==============================================================================
+# Enhanced ADL Functions - Following v3.0.0 Development Guide
+# ==============================================================================
 
-}
+# REQUIRED DEPENDENCIES:
+#   library(haven)   # for haven::tagged_na() and haven::is_tagged_na()
+#   library(dplyr)   # for dplyr::case_when() and dplyr::if_else()
+#   source("R/missing-data-helpers.R")  # for preprocessing functions
 
-#' @title ADL help score (count of tasks requiring help)
-#'
-#' @description Counts the number of activities of daily living (ADL) tasks
-#'   that require help, creating a 6-category variable (0-5). This provides
-#'   a more granular measure of functional limitation compared to the binary
-#'   ADL indicator. Uses ADL variables that are consistent across all CCHS
-#'   cycles from 2001 to 2014.
-#'
-#' @param ADL_01 A numeric value indicating if help is needed preparing meals.
-#'   Valid values: 1 = needs help, 2 = does not need help, "NA(a)" = not applicable,
-#'   "NA(b)" = missing.
-#' @param ADL_02 A numeric value indicating if help is needed getting to
-#'   appointments/errands. Valid values: 1 = needs help, 2 = does not need help,
-#'   "NA(a)" = not applicable, "NA(b)" = missing.
-#' @param ADL_03 A numeric value indicating if help is needed doing housework.
-#'   Valid values: 1 = needs help, 2 = does not need help, "NA(a)" = not applicable,
-#'   "NA(b)" = missing.
-#' @param ADL_04 A numeric value indicating if help is needed doing personal care.
-#'   Valid values: 1 = needs help, 2 = does not need help, "NA(a)" = not applicable,
-#'   "NA(b)" = missing.
-#' @param ADL_05 A numeric value indicating if help is needed moving inside house.
-#'   Valid values: 1 = needs help, 2 = does not need help, "NA(a)" = not applicable,
-#'   "NA(b)" = missing.
-#'
-#' @return A numeric value representing the count of ADL tasks requiring help:
-#'   \itemize{
-#'     \item \code{0}: No tasks require help
-#'     \item \code{1}: One task requires help
-#'     \item \code{2}: Two tasks require help
-#'     \item \code{3}: Three tasks require help
-#'     \item \code{4}: Four tasks require help
-#'     \item \code{5}: All five tasks require help
-#'     \item \code{"NA(a)"}: Not applicable (if any input is "NA(a)")
-#'     \item \code{"NA(b)"}: Missing (if any input is "NA(b)")
-#'   }
-#'
-#'
-#' @examples
-#' # Person needing no help with any tasks
-#' adl_score_5_fun(ADL_01 = 2, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 0
-#' 
-#' # Person needing help with two tasks
-#' adl_score_5_fun(ADL_01 = 1, ADL_02 = 2, ADL_03 = 1, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: 2 (help needed with meals and housework)
-#' 
-#' # Person needing help with all tasks
-#' adl_score_5_fun(ADL_01 = 1, ADL_02 = 1, ADL_03 = 1, ADL_04 = 1, ADL_05 = 1)
-#' # Returns: 5
-#' 
-#' # Missing data example
-#' adl_score_5_fun(ADL_01 = "NA(b)", ADL_02 = 1, ADL_03 = 1, ADL_04 = 2, ADL_05 = 2)
-#' # Returns: "NA(b)" (any missing value results in missing score)
-#'
-#' @seealso \code{\link{adl_fun}} for a binary ADL help indicator.
-#'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and calculation improvements
-#' @export
-adl_score_5_fun <-
-  function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-    
-    # Create vector of ADL input variables
-    all_adl_vector <- c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
-    # Count the number of missing values in vector
-    count_missing_adl <- sum(all_adl_vector == "NA(b)")
-    # Count the number of not applicable values in vector
-    count_not_applicable_adl <- sum(all_adl_vector == "NA(a)")
-    # Count the number of ADLs that require help (value of 1)
-    count_adl <- sum(all_adl_vector == 1)
-    
-    
-    # If the individual had missing data for any of the variables then set
-    # the score to missing
-    # If the individual has "not applicable" for any of the variables, then
-    # set the score to "not applicable"
-    # Otherwise set the score for each individual to the count of the number
-    # of tasks they needed help with
-    total_num_adls <- 5
-    ADL_score_5 <-
-      ifelse(
-        count_not_applicable_adl >= 1,
-        "NA(a)",
-        ifelse(
-          count_missing_adl >= 1,
-          "NA(b)",
-          count_adl
-        )
-      )
-    
-    return(ADL_score_5)
+# ==============================================================================
+# 1. CONSTANTS AND CONFIGURATION
+# ==============================================================================
+
+# ADL validation constants
+ADL_VALID_RESPONSES <- c(1, 2)  # 1 = needs help, 2 = does not need help
+ADL_ITEM_NAMES <- list(
+  five_item = c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05"),
+  six_item = c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06")
+)
+
+# ==============================================================================
+# 2. CORE UTILITY FUNCTIONS
+# ==============================================================================
+
+#' Enhanced ADL input validation
+#' @param param_name Parameter name for error messages
+#' @param param_value Parameter value to validate
+#' @param required Logical indicating if parameter is required
+#' @return Validated parameter or error
+#' @noRd
+validate_adl_parameter <- function(param_name, param_value, required = TRUE) {
+  if (required && missing(param_value)) {
+    stop(paste("Required ADL parameter", param_name, "must be provided"), call. = FALSE)
   }
-#'
-#'  This newly derived variable (ADL_der_B) uses ADL_01 to ADL_06 which are
-#'  consistent across survey cycles from 2003-2014. ADL_der_B is recommended when using multiple
-#'  survey cycles.     
-#' 
-#' @param ADL_01 Needs help preparing meals
-#' 
-#' @param ADL_02 Needs help getting to appointments/errands
-#' 
-#' @param ADL_03 Needs help doing housework
-#' 
-#' @param ADL_04 Needs help doing personal care
-#' 
-#' @param ADL_05 Needs help moving inside house
-#' 
-#' @param ADL_06 Needs help doing finances
-#' 
-#' #' # Using adl_fun_C() to generate to ADL_der_C based on user inputted values.
-#' # 
-#' # Let's say you do not need help preparing meals, you need help getting to
-#' # appointments or errands, you need help doing housework, do not need help
-#' # doing personal care, do not need help moving inside the house, and do not 
-#' # need help doing fiances. Using adl_fun_B() we can check if you need help 
-#' # doing tasks
-#' 
-#' ADL_der_C <- adl_fun_B(2, 1, 1, 2, 2, 2)
-#' 
-#' print(ADL_der_C)
-#' 
-#' @export
-adl_fun_B <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
-  # Check to see if all values are in range
-  if_else2((ADL_01 %in% 1:2) & (ADL_02 %in% 1:2) & (ADL_03 %in% 1:2) &
-             (ADL_04 %in% 1:2) & (ADL_05 %in% 1:2) & (ADL_06 %in% 1:2),
-           # Examining if respondents needed help with any task
-           if_else2(ADL_01 == 1 | ADL_02 == 1 | ADL_03 == 1 | ADL_04 == 1 |
-                      ADL_05 == 1 | ADL_06 == 1, 1,
-                    # Examining if respondents do not need help with any task
-                    if_else2(ADL_01 == 2 & ADL_02 == 2 & ADL_03 == 2 &
-                               ADL_04 == 2 & ADL_05 == 2 & ADL_06 == 2, 2, "NA(b)")),
-           # Return NA if any ADL variable is out of range
-           "NA(b)"
-  )
-  
+  return(param_value)
 }
-#' @title The number of activities of daily living tasks that require help.
+
+#' Check vector length compatibility for ADL inputs
+#' @param ... Input vectors to check
+#' @return Logical indicating compatibility
+#' @noRd
+check_adl_length_compatibility <- function(...) {
+  lengths <- lengths(list(...))
+  # All lengths must be equal OR some can be length 1 (scalar)
+  return(length(unique(lengths[lengths > 1])) <= 1)
+}
+
+#' Preprocess single ADL variable with comprehensive missing data handling
+#' @param adl_var Single ADL variable
+#' @return Preprocessed ADL variable with haven::tagged_na()
+#' @noRd
+preprocess_adl_variable <- function(adl_var) {
+  dplyr::case_when(
+    # Handle original CCHS missing codes
+    adl_var == 6 ~ haven::tagged_na("a"),  # Not applicable
+    adl_var %in% c(7, 8, 9) ~ haven::tagged_na("b"),  # Don't know, refusal, not stated
+    
+    # Handle string-based missing values (legacy support)
+    is.character(adl_var) & adl_var == "NA(a)" ~ haven::tagged_na("a"),
+    is.character(adl_var) & adl_var == "NA(b)" ~ haven::tagged_na("b"),
+    is.character(adl_var) & adl_var %in% c("Not applicable", "not applicable") ~ haven::tagged_na("a"),
+    is.character(adl_var) & adl_var %in% c("Missing", "Don't know", "Refusal") ~ haven::tagged_na("b"),
+    
+    # Handle existing haven::tagged_na (passthrough)
+    haven::is_tagged_na(adl_var, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(adl_var, "b") ~ haven::tagged_na("b"),
+    
+    # Handle regular NAs
+    is.na(adl_var) ~ haven::tagged_na("b"),
+    
+    # Valid responses (1, 2) pass through
+    adl_var %in% ADL_VALID_RESPONSES ~ as.numeric(adl_var),
+    
+    # Invalid responses become missing
+    .default = haven::tagged_na("b")
+  )
+}
+
+# ==============================================================================
+# 3. SPECIALIZED HELPER FUNCTIONS
+# ==============================================================================
+
+#' Calculate ADL score with comprehensive missing data propagation
+#' @param adl_list List of preprocessed ADL variables
+#' @param total_items Total number of ADL items (5 or 6)
+#' @return ADL score with proper missing data handling
+#' @noRd
+calculate_adl_score <- function(adl_list, total_items) {
+  
+  # Check for any not applicable values (highest priority)
+  has_not_applicable <- any(sapply(adl_list, function(x) haven::is_tagged_na(x, "a")))
+  
+  # Check for any missing values
+  has_missing <- any(sapply(adl_list, function(x) haven::is_tagged_na(x, "b") | is.na(x)))
+  
+  # Count valid "needs help" responses (value = 1)
+  valid_responses <- sapply(adl_list, function(x) !haven::is_tagged_na(x) & !is.na(x))
+  help_needed_count <- sum(sapply(adl_list, function(x) 
+    if(!haven::is_tagged_na(x) & !is.na(x)) x == 1 else FALSE))
+  
+  # Return score based on missing data priority
+  dplyr::case_when(
+    has_not_applicable ~ haven::tagged_na("a"),
+    has_missing ~ haven::tagged_na("b"),
+    all(valid_responses) ~ as.numeric(help_needed_count),
+    .default = haven::tagged_na("b")
+  )
+}
+
+#' Create ADL binary indicator with enhanced logic
+#' @param adl_list List of preprocessed ADL variables
+#' @return Binary ADL indicator (1 = needs help, 2 = no help needed)
+#' @noRd
+calculate_adl_binary <- function(adl_list) {
+  
+  # Check for any not applicable values
+  has_not_applicable <- any(sapply(adl_list, function(x) haven::is_tagged_na(x, "a")))
+  
+  # Check for any missing values
+  has_missing <- any(sapply(adl_list, function(x) haven::is_tagged_na(x, "b") | is.na(x)))
+  
+  # Check if any ADL requires help (value = 1)
+  needs_help <- any(sapply(adl_list, function(x) 
+    if(!haven::is_tagged_na(x) & !is.na(x)) x == 1 else FALSE))
+  
+  # Check if all ADLs are "no help needed" (value = 2)
+  all_no_help <- all(sapply(adl_list, function(x) 
+    if(!haven::is_tagged_na(x) & !is.na(x)) x == 2 else FALSE))
+  
+  # Return binary indicator
+  dplyr::case_when(
+    has_not_applicable ~ haven::tagged_na("a"),
+    has_missing ~ haven::tagged_na("b"),
+    needs_help ~ 1L,
+    all_no_help ~ 2L,
+    .default = haven::tagged_na("b")
+  )
+}
+
+# ==============================================================================
+# 4. PUBLIC API FUNCTIONS (Enhanced)
+# ==============================================================================
+
+#' Enhanced Activities of Daily Living (ADL) help indicator
 #'
-#' @description A 7 category variable (ADL_score_6) representing the number of
-#'  activities of daily living tasks that require help. This variable tallies
-#'  the number of daily living tasks that a respondent requires help with based
-#'  on various ADL variables that a respondent answered yes or no to. The ADL
-#'  variables used are common across all CCHS cycles from 2003 to 2014.
+#' @description 
+#' **Purpose**: Create binary indicator for ADL help requirements using variables consistent across CCHS cycles
+#' **Method**: Examines 5 core ADL tasks available in all cycles (2001-2018)
+#' **Clinical Context**: Functional limitation assessment for population health research
 #'
-#' @param ADL_01 Needs help preparing meals.
-#' @param ADL_02 Needs help getting to appointments/errands.
-#' @param ADL_03 Needs help doing housework.
-#' @param ADL_04 Needs help doing personal care.
-#' @param ADL_05 Needs help moving inside house.
-#' @param ADL_06 Needs help doing finances
+#' @param ADL_01 Help needed preparing meals (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#' @param ADL_02 Help needed getting to appointments/errands (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#' @param ADL_03 Help needed doing housework (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#' @param ADL_04 Help needed doing personal care (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#' @param ADL_05 Help needed moving inside house (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
 #'
-#' @return A derived variable (ADL_score_6) with 7 categories:
-#' \enumerate{
-#'   \item 0 - Needs help with 0 tasks
-#'   \item 1 - Needs help with at least 1 task
-#'   \item 2 - Needs help with at least 2 tasks
-#'   \item 3 - Needs help with at least 3 tasks
-#'   \item 4 - Needs help with at least 4 tasks
-#'   \item 5 - Needs help with at least 5 tasks
-#'   \item 6 - Needs help with at least 6 tasks
+#' @return 
+#' **Data Type**: Numeric binary indicator
+#' **Missing Data Handling**: 
+#' - Returns `haven::tagged_na("a")` for not applicable cases
+#' - Returns `haven::tagged_na("b")` for missing/invalid responses
+#' **Values**: 1 = needs help with ≥1 task, 2 = no help needed with any task
+#'
+#' @details
+#' **Transformation Warnings**:
+#' ⚠️ **CAUTION - Temporal Changes**: Original CCHS derived variable ADLF6R uses 
+#' different ADL components across cycles. This function uses consistent 5-item 
+#' subset for cross-cycle comparability.
+#' 
+#' ⚠️ **CAUTION - Population Restrictions**: ADL questions typically restricted 
+#' to respondents with activity limitations. Not applicable responses preserved.
+#'
+#' **Calculation Details**:
+#' - Uses ADL_01 through ADL_05 (consistent across all CCHS cycles)
+#' - Any "needs help" (=1) response results in overall score of 1
+#' - All "no help needed" (=2) responses result in overall score of 2
+#' - Missing Data: Comprehensive preprocessing of CCHS codes (6,7,8,9)
+#' - Priority: Not applicable > Missing > Valid responses
+#'
+#' @examples
+#' # Basic usage - needs help with one task
+#' adl_enhanced(1, 2, 2, 2, 2)  # Returns: 1
+#'
+#' # No help needed with any task
+#' adl_enhanced(2, 2, 2, 2, 2)  # Returns: 2
+#'
+#' # Vector processing with missing data
+#' adl_enhanced(c(1, 2, 6), c(2, 2, 7), c(2, 2, 2), c(2, 2, 2), c(2, 2, 2))
+#'
+#' # Integration with rec_with_table()
+#' \dontrun{
+#' result <- rec_with_table(cchs2010_p, 
+#'                         variables = c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der"))
 #' }
 #'
+#' @seealso
+#' \code{\link{adl_score_enhanced}} for count-based ADL scoring
+#' \code{\link{adl_score_6_enhanced}} for 6-item ADL scoring
+#'
+#' @references
+#' Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL. 
+#' JAMA, 185(12), 914-919.
+#'
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
+#' @export
+adl_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
+  
+  # 1. Enhanced input validation
+  validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
+  validate_adl_parameter("ADL_02", ADL_02, required = TRUE)
+  validate_adl_parameter("ADL_03", ADL_03, required = TRUE)
+  validate_adl_parameter("ADL_04", ADL_04, required = TRUE)
+  validate_adl_parameter("ADL_05", ADL_05, required = TRUE)
+  
+  # 2. Length compatibility check
+  if (!check_adl_length_compatibility(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)) {
+    stop("Input vectors must have compatible lengths", call. = FALSE)
+  }
+  
+  # 3. Handle edge cases gracefully
+  if (all(is.na(c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)))) {
+    warning("All ADL inputs are missing. Results will be entirely NA.", call. = FALSE)
+  }
+  
+  # 4. Preprocess all ADL variables
+  adl_01_processed <- preprocess_adl_variable(ADL_01)
+  adl_02_processed <- preprocess_adl_variable(ADL_02)
+  adl_03_processed <- preprocess_adl_variable(ADL_03)
+  adl_04_processed <- preprocess_adl_variable(ADL_04)
+  adl_05_processed <- preprocess_adl_variable(ADL_05)
+  
+  # 5. Calculate binary ADL indicator
+  adl_list <- list(adl_01_processed, adl_02_processed, adl_03_processed, 
+                   adl_04_processed, adl_05_processed)
+  
+  calculate_adl_binary(adl_list)
+}
+
+#' Enhanced ADL help score (count of tasks requiring help)
+#'
+#' @description 
+#' **Purpose**: Count number of ADL tasks requiring help (0-5 scale) for granular functional assessment
+#' **Method**: Sums "needs help" responses across 5 consistent ADL items
+#' **Clinical Context**: Graduated disability measure for research and clinical assessment
+#'
+#' @param ADL_01,ADL_02,ADL_03,ADL_04,ADL_05 ADL variables as in adl_enhanced()
+#'
+#' @return 
+#' **Data Type**: Numeric count (0-5)
+#' **Missing Data Handling**: 
+#' - Returns `haven::tagged_na("a")` if any input is not applicable
+#' - Returns `haven::tagged_na("b")` if any input is missing/invalid
+#' **Values**: 0-5 representing count of tasks requiring help
+#'
+#' @details
+#' **Transformation Warnings**:
+#' ⚠️ **CAUTION - Methodological Changes**: Count-based scoring provides more 
+#' granular assessment than binary indicator but requires complete data for valid interpretation.
+#'
+#' **Calculation Details**:
+#' - Counts number of ADL tasks with "needs help" response (=1)
+#' - Range: 0 (independent) to 5 (maximum dependence)
+#' - Missing data in ANY item invalidates entire score
+#' - Preserves not applicable semantics across all items
 #'
 #' @examples
-#' # Use adl_score_6_fun() to create the variable ADL_score_6 across CCHS 
-#' # cycles adl_score_6_fun() is specified in variable_details.csv along with 
-#' # the CCHS variables and cycles included.
+#' # No help needed (score = 0)
+#' adl_score_enhanced(2, 2, 2, 2, 2)
 #'
-#' # To transform ADL_score_6, use rec_with_table() for each CCHS cycle
-#' # and specify ADL_score_6, along with the various ADL variables.
-#' # Then by using merge_rec_data() you can combine ADL_der across cycles.
+#' # Help needed with 2 tasks (score = 2)
+#' adl_score_enhanced(1, 2, 1, 2, 2)
 #'
-#' library(cchsflow)
-#' adl2003 <- rec_with_table(
-#'   cchs2003_p, c(
-#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_score_6"
-#'   )
-#' )
+#' # Complete dependence (score = 5)
+#' adl_score_enhanced(1, 1, 1, 1, 1)
 #'
-#' head(adl2003)
-#'
-#' adl2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06", "ADL_score_6"
-#'   )
-#' )
-#'
-#' tail(adl2009_2010)
-#'
-#' combined_adl <- merge_rec_data(adl2003, adl2009_2010)
-#'
-#' head(combined_adl)
-#'
-#' tail(combined_adl)
-#'
-#' # Using adl_score_6_fun() to generate to ADL_score_6 based on user inputted
-#' # values.
-#' # Let's say you do not need help preparing meals, you need help getting to
-#' # appointments or errands, you need help doing housework, do not need help
-#' # doing personal care, do not need help moving inside the house, and do not 
-#' # need help with finances. Using adl_score_6_fun() we can check the number of 
-#' # tasks you need help with
-#'
-#' ADL_score_6 <- adl_score_6_fun(2, 1, 1, 2, 2, 2)
-#'
-#' print(ADL_score_6)
-#'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: New function for 6-item ADL scoring with comprehensive validation
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced scoring with comprehensive missing data validation
 #' @export
-adl_score_6_fun <-
-  function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
-    
-    # Create vector of ADL input variables
-    all_adl_vector <- c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06)
-    # Count the number of missing values in vector
-    count_missing_adl <- sum(all_adl_vector == "NA(b)")
-    # Count the number of not applicable values in vector
-    count_not_applicable_adl <- sum(all_adl_vector == "NA(a)")
-    # Count the number of ADLs that require help (value of 1)
-    count_adl <- sum(all_adl_vector == 1)
-    
-    
-    # If the individual had missing data for any of the variables then set
-    # the score to missing
-    # If the individual has "not applicable" for any of the variables, then
-    # set the score to "not applicable"
-    # Otherwise set the score for each individual to the count of the number
-    # of tasks they needed help with
-    total_num_adls <- 6
-    ADL_score_6 <-
-      ifelse(
-        count_not_applicable_adl >= 1,
-        "NA(a)",
-        ifelse(
-          count_missing_adl >= 1,
-          "NA(b)",
-          count_adl
-        )
-      )
-    
-    return(ADL_score_6)
+adl_score_5_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
+  
+  # 1. Input validation (reuse from binary function)
+  validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
+  validate_adl_parameter("ADL_02", ADL_02, required = TRUE)
+  validate_adl_parameter("ADL_03", ADL_03, required = TRUE)
+  validate_adl_parameter("ADL_04", ADL_04, required = TRUE)
+  validate_adl_parameter("ADL_05", ADL_05, required = TRUE)
+  
+  # 2. Length compatibility check
+  if (!check_adl_length_compatibility(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)) {
+    stop("Input vectors must have compatible lengths", call. = FALSE)
   }
+  
+  # 3. Preprocess all ADL variables
+  adl_01_processed <- preprocess_adl_variable(ADL_01)
+  adl_02_processed <- preprocess_adl_variable(ADL_02)
+  adl_03_processed <- preprocess_adl_variable(ADL_03)
+  adl_04_processed <- preprocess_adl_variable(ADL_04)
+  adl_05_processed <- preprocess_adl_variable(ADL_05)
+  
+  # 4. Calculate ADL score
+  adl_list <- list(adl_01_processed, adl_02_processed, adl_03_processed, 
+                   adl_04_processed, adl_05_processed)
+  
+  calculate_adl_score(adl_list, total_items = 5)
+}
+
+#' Enhanced 6-item ADL help score with comprehensive validation
+#'
+#' @description 
+#' **Purpose**: Count ADL help requirements using 6-item scale including financial management
+#' **Method**: Extends 5-item ADL to include financial management (available 2003+)
+#' **Clinical Context**: Comprehensive functional assessment including instrumental ADL component
+#'
+#' @param ADL_01,ADL_02,ADL_03,ADL_04,ADL_05 Core ADL variables as in other functions
+#' @param ADL_06 Help needed doing finances (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#'
+#' @return 
+#' **Data Type**: Numeric count (0-6)
+#' **Missing Data Handling**: Same as 5-item version
+#' **Values**: 0-6 representing count of tasks requiring help
+#'
+#' @details
+#' **Transformation Warnings**:
+#' ⚠️ **CAUTION - Temporal Changes**: ADL_06 (finances) available only in CCHS 
+#' 2003-2014 cycles. Use 5-item version for 2001 or 2015+ analyses.
+#' 
+#' ⚠️ **CAUTION - Population Restrictions**: Financial management questions may 
+#' have different age restrictions or applicability rules across cycles.
+#'
+#' **Calculation Details**:
+#' - Extends 5-item ADL with financial management component
+#' - Range: 0 (independent) to 6 (maximum dependence)
+#' - Same missing data handling as 5-item version
+#' - Recommended for 2003-2014 cycle analyses
+#'
+#' @examples
+#' # Independent across all 6 tasks
+#' adl_score_6_enhanced(2, 2, 2, 2, 2, 2)
+#'
+#' # Help needed with 3 tasks including finances
+#' adl_score_6_enhanced(1, 2, 1, 2, 2, 1)
+#'
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced 6-item scoring for comprehensive functional assessment
+#' @export
+adl_score_6_fun <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
+  
+  # 1. Enhanced input validation
+  validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
+  validate_adl_parameter("ADL_02", ADL_02, required = TRUE)
+  validate_adl_parameter("ADL_03", ADL_03, required = TRUE)
+  validate_adl_parameter("ADL_04", ADL_04, required = TRUE)
+  validate_adl_parameter("ADL_05", ADL_05, required = TRUE)
+  validate_adl_parameter("ADL_06", ADL_06, required = TRUE)
+  
+  # 2. Length compatibility check
+  if (!check_adl_length_compatibility(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06)) {
+    stop("Input vectors must have compatible lengths", call. = FALSE)
+  }
+  
+  # 3. Preprocess all ADL variables
+  adl_01_processed <- preprocess_adl_variable(ADL_01)
+  adl_02_processed <- preprocess_adl_variable(ADL_02)
+  adl_03_processed <- preprocess_adl_variable(ADL_03)
+  adl_04_processed <- preprocess_adl_variable(ADL_04)
+  adl_05_processed <- preprocess_adl_variable(ADL_05)
+  adl_06_processed <- preprocess_adl_variable(ADL_06)
+  
+  # 4. Calculate 6-item ADL score
+  adl_list <- list(adl_01_processed, adl_02_processed, adl_03_processed, 
+                   adl_04_processed, adl_05_processed, adl_06_processed)
+  
+  calculate_adl_score(adl_list, total_items = 6)
+}
