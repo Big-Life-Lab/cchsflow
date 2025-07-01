@@ -80,7 +80,17 @@ validate_csv_against_schema <- function(csv_path, schema_path, mode = "basic") {
   
   # Get mode-specific requirements
   mode_config <- schema_def$validation_modes[[mode]]
-  required_fields <- if (!is.null(mode_config)) mode_config$required_fields else schema_def$fields[sapply(schema_def$fields, function(f) f$constraints$required)]
+  
+  # Extract required fields safely
+  if (!is.null(mode_config)) {
+    required_fields <- mode_config$required_fields
+  } else {
+    # Extract required fields from schema definition
+    required_indices <- sapply(schema_def$fields, function(f) {
+      isTRUE(f$constraints$required)
+    })
+    required_fields <- sapply(schema_def$fields[required_indices], function(f) f$name)
+  }
   
   # 1. Column existence and order validation
   validation_result$column_order_check <- validate_column_order(data, schema_def)
