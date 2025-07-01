@@ -121,4 +121,30 @@ short_term_drink <- low_drink_short_fun(DHH_SEX = 1, ALWDWKY = 30, ALC_1 = 1,
  ALW_2A6 = 8, ALW_2A7 = 2)
 
 print(short_term_drink)
+
+library(cchsflow)
+DHH_SEX <- c(1, 2) 
+ALWDWKY <- c(30, 15)
+ALC_1 <- c(1, 1)
+ALW_1 <- c(1, 1)
+ALW_2A1 <- c(3, 1)
+ALW_2A2 <- c(1, 5)
+ALW_2A3 <- c(6, 2)
+ALW_2A4 <- c(0, 4)
+ALW_2A5 <- c(3, 0)
+ALW_2A6 <- c(8, 1)
+ALW_2A7 <- c(2, 2)
+
+short_term_risk_data <- data.frame(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, 
+                               ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
+short_term_risk_data[,"Short_Term_Risk"] <- NA
+print(short_term_risk_data)
+
+short_term_risk_data$Short_Term_Risk<-low_drink_short_fun(short_term_risk_data[[1]], short_term_risk_data[[2]], 
+                                                 short_term_risk_data[[3]], short_term_risk_data[[4]], 
+                                                 short_term_risk_data[[5]], short_term_risk_data[[6]],
+                                                 short_term_risk_data[7]], short_term_risk_data[[8]], 
+                                                 short_term_risk_data[[9]], short_term_risk_data[[10]],
+                                                 short_term_risk_data[[11]])
+print(short_term_risk_data)
 }

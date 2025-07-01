@@ -2,32 +2,39 @@
 % Please edit documentation in R/adl.R
 \name{adl_fun}
 \alias{adl_fun}
-\title{Derived needs help with tasks}
+\title{Activities of Daily Living (ADL) help indicator}
 \usage{
 adl_fun(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
 }
 \arguments{
-\item{ADL_01}{Needs help preparing meals}
+\item{ADL_01}{A numeric value indicating if help is needed preparing meals.
+Valid values: 1 = needs help, 2 = does not need help.}
 
-\item{ADL_02}{Needs help getting to appointments/errands}
+\item{ADL_02}{A numeric value indicating if help is needed getting to
+appointments/errands. Valid values: 1 = needs help, 2 = does not need help.}
 
-\item{ADL_03}{Needs help doing housework}
+\item{ADL_03}{A numeric value indicating if help is needed doing housework.
+Valid values: 1 = needs help, 2 = does not need help.}
 
-\item{ADL_04}{Needs help doing personal care}
+\item{ADL_04}{A numeric value indicating if help is needed doing personal care.
+Valid values: 1 = needs help, 2 = does not need help.}
 
-\item{ADL_05}{Needs help moving inside house}
+\item{ADL_05}{A numeric value indicating if help is needed moving inside house.
+Valid values: 1 = needs help, 2 = does not need help.}
 }
 \value{
-A derived variable (ADL_der) with 2 categories:
- \enumerate{
-  \item - Needs help with tasks
-  \item - Does not need help with tasks
- }
+A numeric value with the following categories:
+  \itemize{
+    \item \code{1}: Needs help with at least one task
+    \item \code{2}: Does not need help with any task
+    \item \code{"NA(b)"}: Missing or invalid input values
+  }
 }
 \description{
-This derived variable (ADL_der) is based on the CCHS derived
- variable ADLF6R which flags respondents who need help with tasks based on
- their response to the various activities of daily living (ADL) variables.
+Creates a binary indicator variable for whether a person needs
+  help with any activities of daily living. This harmonized variable is based
+  on the CCHS derived variable ADLF6R but uses ADL variables that are
+  consistent across all CCHS survey cycles.
 }
 \details{
 The CCHS derived variable ADLF6R uses different ADL variables across
@@ -74,46 +81,24 @@ The CCHS derived variable ADLF6R uses different ADL variables across
  survey cycles.
 }
 \examples{
-# Using adl_fun() to create ADL_der values across CCHS cycles
-# adl_fun() is specified in variable_details.csv along with the
-# CCHS variables and cycles included.
+# Person who needs help with at least one task
+adl_fun(ADL_01 = 1, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
+# Returns: 1 (needs help with preparing meals)
 
-# To transform ADL_der, use rec_with_table() for each CCHS cycle
-# and specify ADL_der, along with the various ADL variables.
-# Then by using merge_rec_data() you can combine ADL_der across cycles.
+# Person who needs no help with any task
+adl_fun(ADL_01 = 2, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
+# Returns: 2 (does not need help)
 
-library(cchsflow)
-adl2001 <- rec_with_table(
-  cchs2001_p, c(
-    "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der"
-  )
-)
+# Person who needs help with multiple tasks
+adl_fun(ADL_01 = 1, ADL_02 = 1, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
+# Returns: 1 (needs help with meals and appointments)
 
-head(adl2001)
+# Invalid input
+adl_fun(ADL_01 = 0, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
+# Returns: "NA(b)" (invalid input value)
 
-adl2009_2010 <- rec_with_table(
-  cchs2009_2010_p, c(
-    "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der"
-  )
-)
-
-tail(adl2009_2010)
-
-combined_adl <- merge_rec_data(adl2001, adl2009_2010)
-
-head(combined_adl)
-
-tail(combined_adl)
-
-# Using adl_fun() to generate to ADL_der based on user inputted values.
-# 
-# Let's say you do not need help preparing meals, you need help getting to
-# appointments or errands, you need help doing housework, do not need help
-# doing personal care, and do not need help moving inside the house. Using
-# adl_fun() we can check if you need help doing tasks
-
-ADL_der <- adl_fun(2, 1, 1, 2, 2)
-
-print(ADL_der)
-
+}
+\seealso{
+\code{\link{adl_score_5_fun}} for counting the number of ADL tasks
+  requiring help.
 }

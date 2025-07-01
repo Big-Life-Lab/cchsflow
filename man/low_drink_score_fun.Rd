@@ -75,4 +75,15 @@ head(combined_low_drink)
 
 tail(combined_low_drink)
 
+library(cchsflow)
+DHH_SEX <- c(1, 2) 
+ALWDWKY <- c(30, 15)
+
+low_drink_score_data <- data.frame(DHH_SEX, ALWDWKY)
+low_drink_score_data[,"Low_Drink_Score"] <- NA
+print(low_drink_score_data)
+
+low_drink_score_data$Low_Drink_Score <-low_drink_score_fun(low_drink_score_data[[1]], 
+                                                       low_drink_score_data[[2]])
+print(low_drink_score_data)
 }

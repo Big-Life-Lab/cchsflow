@@ -7,66 +7,11 @@
 bmi_fun_cat(HWTGBMI_der)
 }
 \arguments{
-\item{HWTGBMI_der}{derived variable that calculates numeric value for BMI.
-See \code{\link{bmi_fun}} for documentation on how variable
-was derived.}
+\item{HWTGBMI_der}{derived BMI variable}
 }
 \value{
-value for BMI categories in the HWTGBMI_der_cat4 variable.
+BMI category (1=underweight, 2=normal, 3=overweight, 4=obese)
 }
 \description{
-This function creates a categorical derived variable
-(HWTGBMI_der_cat4) that categorizes derived BMI (HWTGBMI_der).
-}
-\details{
-The categories were based on international standards and are divided
-into four categories: underweight for BMI < 18.5 (1), normal weight for BMI 
-between 18.5 to 25 (2), overweight for BMI between 25 to 30 (3), and obese 
-for BMI over 30 (4). 
-
-HWTGBMI_der_cat4 uses the derived variable HWTGBMI_der. HWTGBMI_der uses
-height and weight that have been transformed by cchsflow. In order to 
-categorize BMI across CCHS cycles, height and weight variables must be 
-transformed and harmonized.
-}
-\examples{
- 
-# Using bmi_fun_cat() to categorize BMI across CCHS cycles
-# bmi_fun_cat() is specified in variable_details.csv along with the 
-# CCHS variables and cycles included.
-
-# To transform HWTGBMI_der_cat4 across all cycles, use rec_with_table() for 
-# each CCHS cycle.
-# Since HWTGBMI_der is also a derived variable, you will have to specify 
-# the variables that are derived from it.
-
-library(cchsflow)
-
-bmi_cat_2009_2010 <- rec_with_table(
-  cchs2009_2010_p, c(
-    "HWTGHTM",
-    "HWTGWTK",
-    "HWTGBMI_der",
-    "HWTGBMI_der_cat4"
-  )
-)
-
-head(bmi_cat_2009_2010)
-
-bmi_cat_2011_2012 <- rec_with_table(
-  cchs2011_2012_p,c(
-    "HWTGHTM",
-    "HWTGWTK",
-    "HWTGBMI_der",
-    "HWTGBMI_der_cat4"
-  )
-)
-
-tail(bmi_cat_2011_2012)
-
-combined_bmi_cat <- suppressWarnings(merge_rec_data
-(bmi_cat_2009_2010,bmi_cat_2011_2012))
-
-head(combined_bmi_cat)
-tail(combined_bmi_cat)
+Categorizes BMI into 4 standard categories.
 }

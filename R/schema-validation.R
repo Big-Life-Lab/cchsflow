@@ -1,11 +1,7 @@
-#' YAML Schema Validation System
+#' Recodeflow Schema Validation System
+#' @name recodeflow_schema_validation
 #' 
-#' Comprehensive validation system for testing variables.yaml and variable_details.yaml
-#' schemas against real CSV data. Provides detailed validation reports and identifies
-#' schema improvements needed.
-#' 
-#' Phase 0A/0B: Simple YAML syntax validation with cross-platform regex consistency
-#' Phase 1+: Full schema validation against CSV data
+#' Comprehensive validation for Recodeflow YAML schemas.
 
 library(yaml)
 library(stringr)  # For cross-platform regex consistency (ICU engine)

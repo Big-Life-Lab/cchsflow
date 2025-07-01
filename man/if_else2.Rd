@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility-functions.R
 \name{if_else2}
 \alias{if_else2}
-\title{if_else2}
+\title{if_else2 (DEPRECATED)}
 \usage{
 if_else2(x, a, b)
 }
@@ -17,7 +17,10 @@ if_else2(x, a, b)
 a or b based on the evaluation of x
 }
 \description{
-Custom ifelse function that evaluates missing (NA) values. If
+**DEPRECATED**: This function is deprecated and will be removed 
+ in a future version. Please use \code{dplyr::if_else()} instead.
+ 
+ Custom ifelse function that evaluates missing (NA) values. If
  the logical argument (x) compares to a value that is `NA`, it is set to
  `FALSE`
 }

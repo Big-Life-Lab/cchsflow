@@ -3,6 +3,8 @@ Type: Package
 Title: Transforming and Harmonizing CCHS Variables
 Version: 2.2.0
 Date: 2025-06-29
+Author: See Authors@R
+Maintainer: Kitty Chen <kitchen@ohri.ca>
 Authors@R: c(
     person(given = "Doug",
            family = "Manuel",
@@ -55,7 +57,7 @@ Encoding: UTF-8
 LazyData: true
 URL: https://big-life-lab.github.io/cchsflow/, https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.2
 Suggests: 
     testthat (>= 3.0.0),
     kableExtra,

@@ -84,7 +84,7 @@
 #' 
 #' adl2009_2010 <- rec_with_table(
 #'   cchs2009_2010_p, c(
-#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06", ADL_der_B"
+#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06", "ADL_der_B"
 #'   )
 #' )
 #' 

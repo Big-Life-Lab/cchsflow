@@ -5,11 +5,25 @@
 \title{Type of drinker (12 months)}
 \usage{
 ALCDTTM(ALCDTTM)
+
+ALCDTTM(ALCDTTM)
 }
 \arguments{
 \item{ALCDTTM}{cchsflow variable name for type of drinker (12 months)}
 }
 \description{
+\strong{NOTE:} this is not a function.
+
+ This is a categorical variable derived by Statistics Canada that uses
+ various intermediate alcohol variables to categorize individuals into 3
+ distinct groups:
+
+ \enumerate{
+  \item Regular Drinker
+  \item Occasional Drinker
+  \item No drink in the last 12 months.
+  }
+
 \strong{NOTE:} this is not a function.
 
  This is a categorical variable derived by Statistics Canada that uses
@@ -27,8 +41,18 @@ This variable was introduced in the 2007-2008 cycle of the CCHS, and
  became the sole derived variable that categorized people into various
  drinker types from 2009 onwards. Unlike ALCDTYP, this variable does not
  distinguish between former and never drinkers.
+
+This variable was introduced in the 2007-2008 cycle of the CCHS, and
+ became the sole derived variable that categorized people into various
+ drinker types from 2009 onwards. Unlike ALCDTYP, this variable does not
+ distinguish between former and never drinkers. Please note that ALCDTMM for
+ cycles from 2001 to 2005 utilize ALCDTYP where 'former' and 'never' drinkers
+ are re-coded into 'no drink in the last 12 months' category.
 }
 \examples{
+library(cchsflow)
+ ?ALCDTTM
+
 library(cchsflow)
  ?ALCDTTM
 
