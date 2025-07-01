@@ -188,6 +188,58 @@ is_valid <- validate_height_weight(...)
 
 ---
 
+## **5. Smoking Functions - Research Standards vs Implementation Decisions**
+
+### **Issue**: Constants and Age Boundaries Based on Research vs Team Decisions
+
+**Research Foundation**: Functions follow Holford et al. (2014) and Manuel et al. (2020) smoking initiation/cessation standards
+
+#### **✅ Research-Confirmed Constants (Implemented Correctly)**
+**Location**: `R/smoking.R` constants section
+```r
+MIN_SMOKING_INITIATION_AGE <- 8  # ✅ Holford et al. standard
+```
+
+**Evidence-Based Decisions**:
+- **Age 8 minimum**: All smoking initiation variables correctly use Holford et al. minimum age 8
+- **2-year cessation rule**: Former smoker definition aligns with ≥2 years research standard
+- **Model age range**: Research covers ages 8-99 for projection models
+
+#### **❓ Implementation Decisions Requiring Team Review**
+
+**Location**: `R/smoking.R` - SMOKING_AGE_BOUNDS, TIME_QUIT_BOUNDS
+
+**Age Maximums (Not Specified in Research)**:
+```r
+SMOKING_AGE_BOUNDS <- list(
+  SMKG203_cont = list(min = 8, max = 84),    # ❓ Max age decision
+  SMKG207_cont = list(min = 8, max = 84),    # ❓ Max age decision  
+  SMKG040_cont = list(min = 8, max = 95),    # ❓ Max age decision
+  current_age = list(min = 12, max = 102)    # ❓ CCHS-specific
+)
+
+TIME_QUIT_BOUNDS <- list(
+  max = 82     # ❓ Maximum time since quitting - not research-specified
+)
+```
+
+**Team Decisions Made vs Still Needed**:
+- ✅ **Decided**: Youngest smoking initiation age = 8 (Holford standard)
+- ❓ **Team Decision Needed**: Maximum age of smoking cessation (currently 84)
+- ❓ **Team Decision Needed**: Upper bound for time since quit smoking (currently 82 years)
+- ❓ **Team Decision Needed**: CCHS categorical-to-continuous age mappings
+
+**Discussion Points**:
+1. **Max cessation age**: Research doesn't specify upper bounds - should we use 84, 95, or CCHS max age (102)?
+2. **Time since quit maximum**: 82 years may exclude elderly former smokers - is this appropriate?
+3. **Categorical mappings**: CCHS-specific conversions (e.g., category 3 = age 16 vs 17 across cycles)
+
+**Documentation**: Comprehensive analysis available in `/cchsflow-temp/scope-docs/smoking-constants-comprehensive-review.md`
+
+**Recommendation**: Review implementation decisions for consistency with current research and CCHS data characteristics
+
+---
+
 ## **Next Steps**
 
 1. **Team Discussion**: Review identified issues and prioritize fixes
@@ -195,3 +247,4 @@ is_valid <- validate_height_weight(...)
 3. **Function Reorganization**: Implement alcohol.R (enhanced) + alcohol-legacy.R structure
 4. **Documentation Updates**: Update variable_details.csv and function metadata
 5. **Migration Planning**: Develop user communication strategy for function transitions
+6. **Smoking Constants Review**: Team decision on age maximums and boundary constants not specified in research
