@@ -57,6 +57,9 @@ A 7 category variable (ADL_score_6) representing the number of
  on various ADL variables that a respondent answered yes or no to. The ADL
  variables used are common across all CCHS cycles from 2003 to 2014.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: New function for 6-item ADL scoring with comprehensive validation
+}
 \examples{
 # Use adl_score_6_fun() to create the variable ADL_score_6 across CCHS 
 # cycles adl_score_6_fun() is specified in variable_details.csv along with 

@@ -1,4 +1,4 @@
-# cchsflow v2.2.0 Changelog
+# cchsflow v3.0.0 Changelog
 
 **Release Date:** 2025-06-28
 **Type:** Major infrastructure enhancement

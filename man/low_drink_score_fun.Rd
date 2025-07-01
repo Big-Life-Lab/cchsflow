@@ -39,6 +39,8 @@ step 2 are not asked in any of the CCHS cycles. The score is only based on
 step 1.
 
 See \url{https://osf.io/eprg7/} for more details on the guideline and score.
+
+v2.2.0, last updated: 2025-06-30, status: active, Note: Improved scoring algorithm with enhanced validation
 }
 \examples{
  

@@ -32,6 +32,9 @@ ALCDTYP_A(ALCDTYP_A)
  Drinker". If your research requires you to differentiate between former 
  and never drinkers, we recommend using earlier cycles of the CCHS.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: New function for alcohol type processing in master data files
+}
 \examples{
 library(cchsflow)
  ?ALCDTYP_A

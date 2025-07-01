@@ -83,7 +83,7 @@ versioning_system:
       format: "date"
       usage: "Track when changes were made for collaboration and maintenance"
       examples:
-        - "2025-06-30: Release date for v2.2.0 changes"
+        - "2025-06-30: Release date for v3.0.0 changes"
         - "2024-01-01: Earlier date for stable v2.1.0 items"
         
     harmonizationStatus:
@@ -102,7 +102,7 @@ versioning_system:
       usage: "Document what changed, why, and any important considerations"
       examples:
         - "Enhanced with expanded database support and improved metadata"
-        - "New variable added in v2.2.0 release"
+        - "New variable added in v3.0.0 release"
         - "Major refactoring with tidyverse modernization"
 
   # Application across different metadata types
@@ -151,15 +151,15 @@ versioning_system:
     pattern: "^v[0-9]+\\.[0-9]+\\.[0-9]+, last updated: [0-9]{4}-[0-9]{2}-[0-9]{2}, status: (development|active|deprecated|pending_review), Note: .+$"
     
     examples:
-      major_change: "v2.2.0, last updated: 2025-06-30, status: active, Note: Major refactoring with tidyverse modernization and enhanced validation"
-      enhancement: "v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation for new BMI variables (HWTDBMI, HWTDHTM, HWTDWTK)"
+      major_change: "v3.0.0, last updated: 2025-06-30, status: active, Note: Major refactoring with tidyverse modernization and enhanced validation"
+      enhancement: "v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation for new BMI variables (HWTDBMI, HWTDHTM, HWTDWTK)"
       bug_fix: "v2.1.1, last updated: 2025-01-15, status: active, Note: Fixed edge case handling in age validation"
-      new_function: "v2.2.0, last updated: 2025-06-30, status: active, Note: New function for 6-item ADL scoring with comprehensive validation"
+      new_function: "v3.0.0, last updated: 2025-06-30, status: active, Note: New function for 6-item ADL scoring with comprehensive validation"
     
     usage_instructions:
       placement: "Add as @note tag immediately before @export in roxygen2 documentation"
       human_labels:
-        version: "Use semantic version (v2.2.0 format for clarity)"
+        version: "Use semantic version (v3.0.0 format for clarity)"
         last_updated: "ISO date format (YYYY-MM-DD)"
         status: "One of: development, active, deprecated, pending_review"
         Note: "Human-readable description of changes and rationale"
@@ -178,9 +178,9 @@ versioning_system:
     pattern: "^Test v[0-9]+\\.[0-9]+\\.[0-9]+, last updated: [0-9]{4}-[0-9]{2}-[0-9]{2}, status: (passing|failing|pending|needs_update), Coverage: .+$"
     
     examples:
-      passing_tests: "Test v2.2.0, last updated: 2025-06-30, status: passing, Coverage: Updated for enhanced BMI validation functions"
-      updated_tests: "Test v2.2.0, last updated: 2025-06-30, status: passing, Coverage: New tests for ADL_score_6 function with edge cases"
-      failing_tests: "Test v2.2.0, last updated: 2025-06-30, status: failing, Coverage: Tagged NA handling needs update for smoking functions"
+      passing_tests: "Test v3.0.0, last updated: 2025-06-30, status: passing, Coverage: Updated for enhanced BMI validation functions"
+      updated_tests: "Test v3.0.0, last updated: 2025-06-30, status: passing, Coverage: New tests for ADL_score_6 function with edge cases"
+      failing_tests: "Test v3.0.0, last updated: 2025-06-30, status: failing, Coverage: Tagged NA handling needs update for smoking functions"
     
     placement: "Add as comment at top of test file or in specific test blocks"
     usage: "Track test compatibility with function versions and coverage scope"

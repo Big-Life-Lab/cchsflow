@@ -31,3 +31,6 @@ numeric value for adjusted BMI. Returns tagged_na("b") for invalid measurements.
 \description{
 BMI with sex-specific corrections for self-reporting bias.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and correction algorithms
+}

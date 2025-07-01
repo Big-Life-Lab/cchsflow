@@ -140,7 +140,7 @@ calculate_validated_bmi <- function(height, weight, min_height, max_height,
 #' @param HWTGWTK CCHS variable for weight (in kilograms)
 #' @param min_HWTGHTM,max_HWTGHTM,min_HWTGWTK,max_HWTGWTK,BMI_min,BMI_max Validation parameters
 #' @return numeric value for BMI. Returns tagged_na("b") for invalid measurements.
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation for new BMI variables (HWTDBMI, HWTDHTM, HWTDWTK)
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation for new BMI variables (HWTDBMI, HWTDHTM, HWTDWTK)
 #' @export
 bmi_fun <-
   function(HWTGHTM, HWTGWTK, min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
@@ -186,7 +186,7 @@ bmi_fun_D <-
 #' @param HWTGWTK CCHS variable for weight (in kilograms)
 #' @param min_HWTGHTM,max_HWTGHTM,min_HWTGWTK,max_HWTGWTK,BMI_min,BMI_max Validation parameters
 #' @return numeric value for adjusted BMI. Returns tagged_na("b") for invalid measurements.
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and correction algorithms
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and correction algorithms
 #' @export
 adjusted_bmi_fun <-
   function(DHH_SEX, HWTGHTM, HWTGWTK, min_HWTGHTM = 0.82,

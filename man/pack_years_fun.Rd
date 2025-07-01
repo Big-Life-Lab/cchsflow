@@ -107,6 +107,9 @@ This function creates a derived variable (pack_years_der) that
  variables. This is a popular variable used by researchers to quantify
  lifetime exposure to cigarette use.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced calculation logic with better edge case handling
+}
 \examples{
 # Standard CCHS processing (no validation)
 pack_years_fun(1, 45, NA, 18, NA, 20, NA, NA, NA, NA, 1)

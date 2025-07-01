@@ -107,7 +107,7 @@ ALCDTYP <- function(ALCDTYP) {
 #' library(cchsflow)
 #'  ?ALCDTTM
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced for expanded database coverage
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced for expanded database coverage
 #' @export
 ALCDTTM <- function(ALCDTTM) {
   # this is for documentation purposes only
@@ -471,7 +471,7 @@ ALW_2A7 <- function(ALW_2A7) {
 #'                                                  binge_drink_data[[7]], binge_drink_data[[8]], 
 #'                                                  binge_drink_data[[9]])
 #'print(binge_drink_data)
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and improved logic
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and improved logic
 #' @export
 binge_drinker_fun <-
   function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6,
@@ -909,7 +909,7 @@ low_drink_long_fun <-
 #' low_drink_score_data$Low_Drink_Score <-low_drink_score_fun(low_drink_score_data[[1]], 
 #'                                                        low_drink_score_data[[2]])
 #'print(low_drink_score_data)
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Improved scoring algorithm with enhanced validation
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Improved scoring algorithm with enhanced validation
 #' @export
 #' 
 low_drink_score_fun <-
@@ -1095,7 +1095,7 @@ low_drink_score_fun1 <-
 #' library(cchsflow)
 #'  ?ALCDTYP_A
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: New function for alcohol type processing in master data files
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: New function for alcohol type processing in master data files
 #' @export
 ALCDTYP_A <- function(ALCDTYP_A) {
   # this is for documentation purposes only

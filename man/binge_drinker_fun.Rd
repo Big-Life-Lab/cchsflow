@@ -55,6 +55,9 @@ In health research, binge drinking is defined as having an excess
  respondents are asked to count the number of drinks they had during each
  day of the last week.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and improved logic
+}
 \examples{
  
 # Using binge_drinker_fun() to create binge_drinker values across CCHS cycles
