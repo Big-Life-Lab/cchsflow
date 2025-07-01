@@ -196,9 +196,9 @@ cchs_metadata:
       type_safe_expectations: "Implement type-safe validation using assertthat or checkmate"
       mixed_input_handling: "Handle both character and numeric inputs in derived functions"
       
-  # Database suffix deprecation (v2.2.0)
+  # Database suffix deprecation (v3.0.0)
   deprecated_suffixes:
-    description: "Database suffixes deprecated in v2.2.0 due to identical variable structure"
+    description: "Database suffixes deprecated in v3.0.0 due to identical variable structure"
     
     deprecated:
       _i:

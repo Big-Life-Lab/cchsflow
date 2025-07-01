@@ -28,3 +28,6 @@ numeric value for BMI. Returns tagged_na("b") for invalid measurements.
 \description{
 This function creates a harmonized BMI variable across CCHS cycles.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation for new BMI variables (HWTDBMI, HWTDHTM, HWTDWTK)
+}

@@ -22,3 +22,6 @@ smoker type with 6 categories: daily smoker, current occasional smoker (former d
 current occasional smoker (never daily), current nonsmoker (former daily),
 current nonsmoker (never daily), nonsmoker
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Major refactoring with tidyverse modernization and enhanced validation
+}

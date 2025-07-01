@@ -16,3 +16,6 @@ value for pack year categories in the pack_years_cat variable.
 This function creates a categorical derived variable
 (pack_years_cat) that categorizes smoking pack-years (pack_years_der).
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Improved categorization with tidyverse patterns
+}

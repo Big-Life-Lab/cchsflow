@@ -47,6 +47,9 @@ Counts the number of activities of daily living (ADL) tasks
   ADL indicator. Uses ADL variables that are consistent across all CCHS
   cycles from 2001 to 2014.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and calculation improvements
+}
 \examples{
 # Person needing no help with any tasks
 adl_score_5_fun(ADL_01 = 2, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)

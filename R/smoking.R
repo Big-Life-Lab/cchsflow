@@ -263,7 +263,7 @@ classify_smoking_status <- function(smkdsty_value) {
 #' \emph{Health Reports}, 31(11), 16-31. 
 #' \url{https://www150.statcan.gc.ca/n1/pub/82-003-x/2020011/article/00002-eng.htm}
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Modernized with improved time calculation and validation
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Modernized with improved time calculation and validation
 #' @export
 time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C, 
                                   min_SMKG09C = NULL, max_SMKG09C = NULL,
@@ -356,7 +356,7 @@ time_quit_smoking_fun_A <- function(SMK_09A_B, SMKG09C_cont,
 #'
 #' @return value for simple smoking status categories
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Simplified logic with enhanced validation and documentation
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Simplified logic with enhanced validation and documentation
 #' @export
 smoke_simple_fun <- function(SMKDSTY_cat5, time_quit_smoking,
                             min_time_quit = NULL, max_time_quit = NULL,
@@ -466,7 +466,7 @@ smoke_simple_fun_A <- function(SMKDSTY_cat5, time_quit_smoking,
 #'
 #' @return value for smoker type in the SMKDSTY_A variable
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Major refactoring with tidyverse modernization and enhanced validation
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Major refactoring with tidyverse modernization and enhanced validation
 #' @export
 SMKDSTY_fun <- function(SMK_005, SMK_030, SMK_01A) {
   # Preprocess original CCHS missing codes before main logic
@@ -552,7 +552,7 @@ SMKDSTY_fun <- function(SMK_005, SMK_030, SMK_01A) {
 #' \emph{Health Reports}, 31(11), 16-31. 
 #' \url{https://www150.statcan.gc.ca/n1/pub/82-003-x/2020011/article/00002-eng.htm}
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced calculation logic with better edge case handling
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced calculation logic with better edge case handling
 #' @export
 pack_years_fun <- function(SMKDSTY_A, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
                           SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C, 
@@ -678,7 +678,7 @@ pack_years_fun_A <- function(SMKDSTY_A, DHHGAGE_cont, time_quit_smoking, SMKG203
 #'
 #' @return value for pack year categories in the pack_years_cat variable.
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Improved categorization with tidyverse patterns
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Improved categorization with tidyverse patterns
 #' @export
 pack_years_fun_cat <- function(pack_years_der) {
   dplyr::case_when(

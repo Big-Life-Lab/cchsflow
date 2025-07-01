@@ -49,6 +49,9 @@ This variable was introduced in the 2007-2008 cycle of the CCHS, and
  cycles from 2001 to 2005 utilize ALCDTYP where 'former' and 'never' drinkers
  are re-coded into 'no drink in the last 12 months' category.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced for expanded database coverage
+}
 \examples{
 library(cchsflow)
  ?ALCDTTM

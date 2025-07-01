@@ -86,7 +86,7 @@
 #' @seealso \code{\link{adl_score_5_fun}} for counting the number of ADL tasks
 #'   requiring help.
 #' 
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced for new ADL_score_6 variable support
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced for new ADL_score_6 variable support
 #' @export
 adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
   # Check to see if all values are in range
@@ -160,7 +160,7 @@ adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #'
 #' @seealso \code{\link{adl_fun}} for a binary ADL help indicator.
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and calculation improvements
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and calculation improvements
 #' @export
 adl_score_5_fun <-
   function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
@@ -311,7 +311,7 @@ adl_fun_B <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
 #'
 #' print(ADL_score_6)
 #'
-#' @note v2.2.0, last updated: 2025-06-30, status: active, Note: New function for 6-item ADL scoring with comprehensive validation
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: New function for 6-item ADL scoring with comprehensive validation
 #' @export
 adl_score_6_fun <-
   function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {

@@ -80,6 +80,9 @@ The CCHS derived variable ADLF6R uses different ADL variables across
  it is appropriate to use ADLF6R. ADL_der is recommended when using multiple
  survey cycles.
 }
+\note{
+v2.2.0, last updated: 2025-06-30, status: active, Note: Enhanced for new ADL_score_6 variable support
+}
 \examples{
 # Person who needs help with at least one task
 adl_fun(ADL_01 = 1, ADL_02 = 2, ADL_03 = 2, ADL_04 = 2, ADL_05 = 2)
