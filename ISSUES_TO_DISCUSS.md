@@ -171,14 +171,15 @@ is_valid <- validate_height_weight(...)
 ## **Priority Recommendations**
 
 ### **High Priority**
-1. **Test enhanced functions with real CCHS data and rec_with_table()**
-2. **Fix physical activity tagged_na() namespace issue**
-3. **Decide on function organization strategy**
+1. **Test enhanced functions with real CCHS data and rec_with_table()** ⚠️ **PENDING**
+2. **Fix physical activity tagged_na() namespace issue** ✅ **COMPLETED** - Fixed in commit 4b03cef
+3. **Decide on function organization strategy** ✅ **COMPLETED** - Implemented enhanced functions with original names
 
 ### **Medium Priority**  
 1. **Review alcohol function thresholds with clinical team**
 2. **Standardize BMI validation approaches**
 3. **Update variable_details.csv for enhanced functions**
+4. **R/Tidyverse documentation standardization** ✅ **COMPLETED** - All derived variable functions updated to community standards
 
 ### **Low Priority**
 1. **Implement more realistic alcohol consumption bounds**
