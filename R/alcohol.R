@@ -212,18 +212,18 @@ assess_drinking_risk <- function(daily_drinks_list, weekly_drinks, sex, risk_typ
 #'                           "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDBINGE_der"))
 #'
 #' # Male binge drinker (6 drinks Tuesday, 8 drinks Friday)
-#' binge_drinker_fun(1, 1, 3, 1, 6, 0, 3, 8, 2)  # Returns: 1
+#' assess_binge_drinking(1, 1, 3, 1, 6, 0, 3, 8, 2)  # Returns: 1
 #'
 #' # Female non-binge drinker (all days ≤3 drinks)
-#' binge_drinker_fun(2, 1, 1, 2, 2, 3, 0, 1, 2)  # Returns: 2
+#' assess_binge_drinking(2, 1, 1, 2, 2, 3, 0, 1, 2)  # Returns: 2
 #'
 #' # Vector processing with missing data
-#' binge_drinker_fun(c(1, 2, 6), c(1, 1, 7), c(5, 4, 2), c(0, 0, 2), 
-#'                  c(0, 0, 2), c(0, 0, 2), c(0, 0, 2), c(0, 0, 2), c(0, 0, 2))
+#' assess_binge_drinking(c(1, 2, 6), c(1, 1, 7), c(5, 4, 2), c(0, 0, 2), 
+#'                      c(0, 0, 2), c(0, 0, 2), c(0, 0, 2), c(0, 0, 2), c(0, 0, 2))
 #'
 #' @seealso
-#' \\code{\\link{low_drink_short_fun}} for short-term drinking risk assessment
-#' \\code{\\link{low_drink_long_fun}} for long-term drinking risk assessment
+#' \\code{\\link{assess_drinking_risk_short}} for short-term drinking risk assessment
+#' \\code{\\link{assess_drinking_risk_long}} for long-term drinking risk assessment
 #'
 #' @references
 #' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines 
@@ -231,7 +231,7 @@ assess_drinking_risk <- function(daily_drinks_list, weekly_drinks, sex, risk_typ
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
 #' @export
-binge_drinker_fun <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, 
+assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, 
                               ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
   
   # 1. Enhanced input validation
@@ -319,7 +319,7 @@ binge_drinker_fun <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
 #' Evaluates daily and weekly consumption against sex-specific acute risk thresholds for 
 #' injury and overdose risk assessment.
 #'
-#' @param DHH_SEX,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in binge_drinker_fun()
+#' @param DHH_SEX,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in assess_binge_drinking()
 #' @param ALC_1 Had drinks in past year (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
 #' @param ALWDWKY Total drinks in past week. Accepts raw CCHS codes or preprocessed values.
 #'
@@ -346,14 +346,14 @@ binge_drinker_fun <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
 #'                           "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDLOWI_der"))
 #'
 #' # Male with increased short-term risk (5 drinks one day, 20 drinks/week)
-#' low_drink_short_fun(1, 20, 1, 1, 0, 0, 5, 0, 0, 0, 0)  # Returns: 1
+#' assess_drinking_risk_short(1, 20, 1, 1, 0, 0, 5, 0, 0, 0, 0)  # Returns: 1
 #'
 #' # Female with no increased risk (2 drinks max/day, 8 drinks/week)
-#' low_drink_short_fun(2, 8, 1, 1, 2, 1, 2, 1, 1, 1, 0)  # Returns: 2
+#' assess_drinking_risk_short(2, 8, 1, 1, 2, 1, 2, 1, 1, 1, 0)  # Returns: 2
 #'
 #' @seealso
-#' \code{\link{binge_drinker_fun}} for binge drinking assessment
-#' \code{\link{low_drink_long_fun}} for long-term drinking risk assessment
+#' \code{\link{assess_binge_drinking}} for binge drinking assessment
+#' \code{\link{assess_drinking_risk_long}} for long-term drinking risk assessment
 #'
 #' @references
 #' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines 
@@ -361,7 +361,7 @@ binge_drinker_fun <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive risk assessment and missing data handling
 #' @export
-low_drink_short_fun <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, 
+assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, 
                                 ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
   
   # 1. Input validation
@@ -438,7 +438,7 @@ low_drink_short_fun <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 #' Evaluates daily and weekly consumption against sex-specific chronic risk thresholds for 
 #' long-term health outcomes assessment.
 #'
-#' @param DHH_SEX,ALWDWKY,ALC_1,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in low_drink_short_fun()
+#' @param DHH_SEX,ALWDWKY,ALC_1,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in assess_drinking_risk_short()
 #'
 #' @return Integer long-term risk indicator. Missing data handled as:
 #'   \itemize{
@@ -460,14 +460,14 @@ low_drink_short_fun <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 #'                           "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDLOWL_der"))
 #'
 #' # Male with increased long-term risk (4 drinks one day, 20 drinks/week)
-#' low_drink_long_fun(1, 20, 1, 1, 0, 0, 4, 0, 0, 0, 0)  # Returns: 1
+#' assess_drinking_risk_long(1, 20, 1, 1, 0, 0, 4, 0, 0, 0, 0)  # Returns: 1
 #'
 #' # Female with no increased risk (2 drinks max/day, 8 drinks/week)
-#' low_drink_long_fun(2, 8, 1, 1, 2, 1, 2, 1, 1, 0, 0)  # Returns: 2
+#' assess_drinking_risk_long(2, 8, 1, 1, 2, 1, 2, 1, 1, 0, 0)  # Returns: 2
 #'
 #' @seealso
-#' \code{\link{low_drink_short_fun}} for short-term drinking risk assessment
-#' \code{\link{binge_drinker_fun}} for binge drinking assessment
+#' \code{\link{assess_drinking_risk_short}} for short-term drinking risk assessment
+#' \code{\link{assess_binge_drinking}} for binge drinking assessment
 #'
 #' @references
 #' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines 
@@ -475,7 +475,7 @@ low_drink_short_fun <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive long-term risk assessment
 #' @export
-low_drink_long_fun <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, 
+assess_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, 
                                ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
   
   # 1. Input validation (same as short-term)

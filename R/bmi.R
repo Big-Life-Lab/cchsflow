@@ -177,17 +177,17 @@ calculate_bmi_enhanced <- function(height, weight,
 #'                         c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
 #'
 #' # Basic usage
-#' bmi_fun(1.75, 70)
+#' calculate_bmi(1.75, 70)
 #'
 #' # Vector processing with missing data
-#' bmi_fun(c(1.75, 1.80, 6), c(70, 75, 7))
+#' calculate_bmi(c(1.75, 1.80, 6), c(70, 75, 7))
 #'
 #' # Research mode with custom validation
-#' bmi_fun(1.75, 70, min_HWTGHTM = 1.0, max_HWTGHTM = 2.0)
+#' calculate_bmi(1.75, 70, min_HWTGHTM = 1.0, max_HWTGHTM = 2.0)
 #'
 #' @seealso
-#' \code{\link{adjusted_bmi_fun}} for bias-corrected BMI calculations
-#' \code{\link{bmi_fun_cat}} for BMI category classification
+#' \code{\link{adjust_bmi}} for bias-corrected BMI calculations
+#' \code{\link{categorize_bmi}} for BMI category classification
 #'
 #' @references
 #' World Health Organization. (2000). Obesity: preventing and managing the global epidemic. 
@@ -198,7 +198,7 @@ calculate_bmi_enhanced <- function(height, weight,
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and validation following development guide
 #' @export
-bmi_fun <- function(HWTGHTM, HWTGWTK, 
+calculate_bmi <- function(HWTGHTM, HWTGWTK, 
                         min_HWTGHTM = BMI_VALIDATION_BOUNDS$height$min, 
                         max_HWTGHTM = BMI_VALIDATION_BOUNDS$height$max,
                         min_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$min, 
@@ -286,11 +286,11 @@ bmi_fun <- function(HWTGHTM, HWTGWTK,
 #'                         c("DHH_SEX", "HWTGHTM", "HWTGWTK", "HWTGBMI_adjusted_der"))
 #'
 #' # Basic usage
-#' adjusted_bmi_fun(1, 1.75, 70)  # Male
-#' adjusted_bmi_fun(2, 1.65, 60)  # Female
+#' adjust_bmi(1, 1.75, 70)  # Male
+#' adjust_bmi(2, 1.65, 60)  # Female
 #'
 #' # Vector processing with missing data
-#' adjusted_bmi_fun(c(1, 2, 6), c(1.75, 1.65, 1.80), c(70, 60, 7))
+#' adjust_bmi(c(1, 2, 6), c(1.75, 1.65, 1.80), c(70, 60, 7))
 #'
 #' @references
 #' Connor Gorber, S., et al. (2008). The accuracy of self-reported height and weight 
@@ -298,7 +298,7 @@ bmi_fun <- function(HWTGHTM, HWTGWTK,
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and sex-specific bias correction
 #' @export
-adjusted_bmi_fun <- function(DHH_SEX, HWTGHTM, HWTGWTK, 
+adjust_bmi <- function(DHH_SEX, HWTGHTM, HWTGWTK, 
                                  min_HWTGHTM = BMI_VALIDATION_BOUNDS$height$min, 
                                  max_HWTGHTM = BMI_VALIDATION_BOUNDS$height$max,
                                  min_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$min, 
@@ -379,7 +379,7 @@ adjusted_bmi_fun <- function(DHH_SEX, HWTGHTM, HWTGWTK,
 #' Uses international BMI categories: Underweight (<18.5), Normal (18.5-24.9), Overweight (25.0-29.9), 
 #' Obese (≥30.0) for standard population health assessment.
 #'
-#' @param bmi_value BMI values (from bmi_fun or adjusted_bmi_fun). Accepts raw values or preprocessed.
+#' @param bmi_value BMI values (from calculate_bmi or adjust_bmi). Accepts raw values or preprocessed.
 #' @param categorical_labels Return factor labels instead of numeric codes (default TRUE)
 #'
 #' @return Factor with BMI category labels or numeric codes. Missing data handled as:
@@ -404,13 +404,13 @@ adjusted_bmi_fun <- function(DHH_SEX, HWTGHTM, HWTGWTK,
 #'                         c("HWTGHTM", "HWTGWTK", "HWTGBMI_cat_der"))
 #'
 #' # Basic categorization
-#' bmi_fun_cat(c(17, 22, 27, 32))
+#' categorize_bmi(c(17, 22, 27, 32))
 #'
 #' # With missing data
-#' bmi_fun_cat(c(22, haven::tagged_na("a"), 27, 997))
+#' categorize_bmi(c(22, haven::tagged_na("a"), 27, 997))
 #'
 #' # Numeric codes instead of labels
-#' bmi_fun_cat(c(17, 22, 27, 32), categorical_labels = FALSE)
+#' categorize_bmi(c(17, 22, 27, 32), categorical_labels = FALSE)
 #'
 #' @references
 #' World Health Organization. (2000). Obesity: preventing and managing the global epidemic. 
@@ -418,7 +418,7 @@ adjusted_bmi_fun <- function(DHH_SEX, HWTGHTM, HWTGWTK,
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced categorization with comprehensive missing data handling
 #' @export
-bmi_fun_cat <- function(bmi_value, categorical_labels = TRUE) {
+categorize_bmi <- function(bmi_value, categorical_labels = TRUE) {
   
   # 1. Input validation
   validate_bmi_parameter("bmi_value", bmi_value, required = TRUE)
