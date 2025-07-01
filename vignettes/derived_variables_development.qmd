@@ -907,12 +907,91 @@ update_variable_version("HWTGBMI_der", "v3.0.0", "modernized")
 - **Type safety**: Ensure consistent output types
 - **Performance**: Validate execution time for large datasets
 
-### 2. Integration testing
+### 2. Integration testing (CRITICAL)
+
+**rec_with_table() testing is MANDATORY** - This is the primary function of cchsflow and all derived variables must be tested with it.
+
+#### Required rec_with_table() test pattern
+
+Every derived variable function MUST include comprehensive rec_with_table() tests:
+
+```r
+test_that("function_name() integrates with rec_with_table() across all cycles", {
+  # Test with multiple CCHS cycles
+  cycles_to_test <- c("cchs2001_p", "cchs2005_p", "cchs2009_2010_p", 
+                      "cchs2011_2012_p", "cchs2013_2014_p")
+  
+  for (cycle in cycles_to_test) {
+    # Skip if cycle data not available in test environment
+    if (!exists(cycle)) {
+      skip(paste("Test data", cycle, "not available"))
+    }
+    
+    # Test rec_with_table() integration
+    result <- expect_silent(
+      rec_with_table(get(cycle), c("input_var1", "input_var2", "derived_var_name"))
+    )
+    
+    # Validate output structure
+    expect_true("derived_var_name" %in% names(result))
+    expect_true(nrow(result) > 0)
+    
+    # Test that function produces valid results
+    valid_results <- sum(!is.na(result$derived_var_name))
+    expect_gt(valid_results, 0, info = paste("No valid results in", cycle))
+    
+    # Test missing data handling
+    missing_results <- sum(haven::is_tagged_na(result$derived_var_name))
+    expect_gte(missing_results, 0, info = paste("Missing data handling failed in", cycle))
+  }
+})
+
+test_that("function_name() maintains cross-cycle consistency", {
+  # Test that same inputs produce same outputs across cycles
+  
+  # Create test scenarios
+  test_scenarios <- list(
+    valid_case = list(input1 = 1, input2 = 2, expected = 1),
+    missing_case = list(input1 = 6, input2 = 2, expected = haven::tagged_na("a")),
+    invalid_case = list(input1 = 99, input2 = 2, expected = haven::tagged_na("b"))
+  )
+  
+  for (scenario_name in names(test_scenarios)) {
+    scenario <- test_scenarios[[scenario_name]]
+    
+    # Test direct function call consistency
+    result <- function_name(scenario$input1, scenario$input2)
+    expect_equal(result, scenario$expected, 
+                info = paste("Direct call failed for", scenario_name))
+  }
+})
+
+test_that("function_name() performance with real data volumes", {
+  # Test performance with realistic data volumes
+  skip_if_not(exists("cchs2013_2014_p"), "Large test dataset not available")
+  
+  # Benchmark rec_with_table() performance
+  start_time <- Sys.time()
+  result <- rec_with_table(cchs2013_2014_p, 
+                          c("input_var1", "input_var2", "derived_var_name"))
+  end_time <- Sys.time()
+  
+  # Should complete within reasonable time (adjust threshold as needed)
+  execution_time <- as.numeric(difftime(end_time, start_time, units = "secs"))
+  expect_lt(execution_time, 30, "rec_with_table() performance too slow")
+  
+  # Validate output quality
+  completion_rate <- sum(!is.na(result$derived_var_name)) / nrow(result)
+  expect_gt(completion_rate, 0.1, "Too many missing results in real data")
+})
+```
+
+#### Additional integration requirements
 
 - **Cross-cycle compatibility**: Test with multiple CCHS cycles
-- **rec_with_table() integration**: Ensure transformation workflows work
-- **Backward compatibility**: Compare against legacy implementations
+- **Backward compatibility**: Compare against legacy implementations  
 - **Real-world validation**: Test with actual CCHS datasets
+- **Performance benchmarking**: Ensure acceptable speed with large datasets
 
 ### 3. Regression testing
 
@@ -956,20 +1035,189 @@ microbenchmark(
 )
 ```
 
+# R/Tidyverse Documentation Standards
+
+## Professional roxygen2 documentation requirements
+
+All cchsflow derived variable functions must follow R community documentation standards. **Do NOT use custom formatting** (e.g., bold headings, non-standard sections).
+
+### Standard roxygen2 pattern (REQUIRED)
+
+```r
+#' Descriptive function title (active voice, verb phrase)
+#'
+#' @description 
+#' One paragraph describing what the function does. Focus on purpose and method.
+#' Avoid unnecessary styling or custom formatting.
+#'
+#' @details
+#' Additional implementation details, methodology notes, or important caveats.
+#' Include transformation warnings here if needed.
+#' 
+#' **Transformation Warnings**:
+#' ⚠️ **CAUTION - Breaking Changes**: Description of any breaking changes
+#' ⚠️ **CAUTION - Population Restrictions**: Any restrictions on applicability
+#'
+#' @param param_name Description of parameter. Include valid values and data types.
+#'   Use consistent formatting across all parameters.
+#' @param param_name2 Second parameter description following same pattern.
+#'
+#' @return Description of return value including data type, possible values, and 
+#'   missing data handling approach. Be specific about output structure.
+#'
+#' @examples
+#' # Primary example using rec_with_table() (REQUIRED)
+#' library(cchsflow)
+#' result <- rec_with_table(
+#'   cchs2013_2014_p, 
+#'   c("input_var1", "input_var2", "derived_var_name")
+#' )
+#' 
+#' # Basic usage examples
+#' function_name(param1 = 1, param2 = 2)
+#' 
+#' # Vector processing example
+#' function_name(c(1, 2, 6), c(2, 2, 7))
+#'
+#' @seealso 
+#' \\code{\\link{related_function}} for related functionality
+#'
+#' @references
+#' Academic citations with DOI when applicable:
+#' Author, A. (Year). Title. Journal, Volume(Issue), pages. \\doi{10.xxxx/xxxxx}
+#'
+#' @note v3.0.0, last updated: YYYY-MM-DD, status: active, Note: Brief change description
+#' @export
+```
+
+### Documentation anti-patterns (AVOID)
+
+❌ **Custom formatting with bold headings**:
+```r
+#' @description 
+#' **Purpose**: Custom formatting is non-standard
+#' **Method**: Avoid this pattern
+#' **Clinical Context**: Not following R conventions
+```
+
+❌ **Overly verbose descriptions**:
+```r
+#' @description 
+#' This function creates a derived variable for the purpose of calculating
+#' a very specific measure that does something complex with multiple steps
+#' and various intermediate calculations... [continues for many lines]
+```
+
+❌ **Missing rec_with_table() examples**:
+```r
+#' @examples
+#' # Only direct function calls
+#' function_name(1, 2, 3)
+```
+
+✅ **Correct tidyverse-style documentation**:
+```r
+#' @description 
+#' Calculate BMI from height and weight with comprehensive validation.
+#'
+#' @examples
+#' # Primary usage with rec_with_table()
+#' library(cchsflow)
+#' result <- rec_with_table(cchs2013_2014_p, c("HWTGHTM", "HWTGWTK", "BMI_der"))
+#' 
+#' # Direct usage
+#' bmi_fun(1.75, 70)
+```
+
+### Examples section requirements
+
+The `@examples` section must prioritize cchsflow workflows:
+
+1. **First example**: Always show `rec_with_table()` usage
+2. **Second example**: Basic direct function usage
+3. **Third example**: Vector processing or edge cases
+4. **Fourth example**: Advanced usage or validation modes
+
+```r
+#' @examples
+#' # Standard cchsflow workflow (REQUIRED FIRST)
+#' library(cchsflow)
+#' bmi_data <- rec_with_table(
+#'   cchs2013_2014_p, 
+#'   c("HWTGHTM", "HWTGWTK", "BMI_der")
+#' )
+#' head(bmi_data)
+#' 
+#' # Basic usage
+#' bmi_fun(1.75, 70)
+#' 
+#' # Vector processing with missing data
+#' bmi_fun(c(1.75, 1.80, 6), c(70, 75, 7))
+#' 
+#' # Research mode with custom validation
+#' bmi_fun(1.75, 70, min_HWTGHTM = 1.0, max_HWTGHTM = 2.0)
+```
+
+### Parameter documentation standards
+
+Follow tidyverse conventions for parameter descriptions:
+
+```r
+#' @param HWTGHTM Height in meters. Accepts raw CCHS codes or preprocessed values.
+#' @param HWTGWTK Weight in kilograms. Accepts raw CCHS codes or preprocessed values.
+#' @param min_HWTGHTM Minimum valid height in meters (default 0.82).
+#' @param validate_params Enable parameter validation (default NULL for auto-detection).
+```
+
+**Key principles**:
+- Start with data type/content description
+- Mention CCHS code compatibility
+- Include defaults for optional parameters
+- Use parallel structure across similar parameters
+
+### Return value documentation
+
+Be specific about output structure and missing data handling:
+
+```r
+#' @return Numeric vector of BMI values. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases
+#'     \item \code{haven::tagged_na("b")} for missing/invalid measurements
+#'   }
+#'   Valid range typically 10-100 for realistic measurements.
+```
+
 # Migration from legacy functions
 
 ## Modernization checklist
 
 When updating existing derived variables to v3.0.0 standards:
 
+**Code Modernization**:
 - [ ] Replace nested `ifelse()` with `dplyr::case_when()`
 - [ ] Add missing data preprocessing helpers
 - [ ] Implement auto-detection for validation modes
 - [ ] Add comprehensive parameter validation
-- [ ] Update documentation with modern examples
 - [ ] Maintain backward compatibility
-- [ ] Add comprehensive test coverage
-- [ ] Update @note metadata with v3.0.0
+
+**Documentation Standards** (CRITICAL):
+- [ ] Remove custom formatting (bold headings, non-standard sections)
+- [ ] Use standard roxygen2 pattern: @description, @details, @param, @return, @examples
+- [ ] Lead @examples with rec_with_table() usage
+- [ ] Include academic @references with DOI when applicable
+- [ ] Use tidyverse-style parameter descriptions
+- [ ] Specify missing data handling in @return
+
+**Testing Requirements**:
+- [ ] Add mandatory rec_with_table() integration tests across cycles
+- [ ] Add comprehensive test coverage for direct function calls
+- [ ] Include performance testing with real data volumes
+- [ ] Test cross-cycle consistency
+
+**Metadata**:
+- [ ] Update @note metadata with v3.0.0 version format
+- [ ] Ensure @export tag is present for public functions
 
 ## Example migration
 

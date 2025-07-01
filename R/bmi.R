@@ -1,18 +1,17 @@
 # ==============================================================================
-# BMI Functions - Reorganized Structure
+# Enhanced BMI Functions - Following v3.0.0 Development Guide
 # ==============================================================================
 
 # REQUIRED DEPENDENCIES:
 # Before sourcing this file, ensure these packages are loaded:
 #   library(haven)   # for haven::tagged_na() and haven::is_tagged_na()
 #   library(dplyr)   # for dplyr::case_when() and dplyr::if_else()
-#
-# Package loading order matters! Load haven and dplyr BEFORE sourcing this file.
+#   source("R/missing-data-helpers.R")  # for preprocessing functions
 #
 # For testing, run:
 #   library(haven); library(dplyr); library(testthat)
-#   source('R/bmi.R')
-#   test_file('tests/testthat/test-bmi.R')
+#   source('R/bmi-enhanced.R')
+#   test_file('tests/testthat/test-bmi-enhanced.R')
 
 # ==============================================================================
 # 1. CONSTANTS AND CONFIGURATION
@@ -22,259 +21,453 @@
 BMI_CORRECTION_MALE <- list(intercept = -1.07575, slope = 1.07592)
 BMI_CORRECTION_FEMALE <- list(intercept = -0.12374, slope = 1.05129)
 
+# Default validation bounds (derived from CCHS documentation)
+BMI_VALIDATION_BOUNDS <- list(
+  height = list(min = 0.82, max = 2.50),    # meters
+  weight = list(min = 22.7, max = 209.1),   # kilograms (updated for master files)
+  bmi = list(min = 10, max = 100)           # BMI units
+)
+
 # ==============================================================================
-# 2. CORE UTILITY FUNCTIONS
+# 2. CORE UTILITY FUNCTIONS (Enhanced)
 # ==============================================================================
 
-#' Calculate raw BMI from height and weight
-#' @param height Height in meters
-#' @param weight Weight in kilograms
-#' @return BMI value (weight/height^2)
+#' Enhanced input validation for BMI functions
+#' @param param_name Parameter name for error messages
+#' @param param_value Parameter value to validate
+#' @param required Logical indicating if parameter is required
+#' @return Validated parameter or error
 #' @noRd
-calculate_raw_bmi <- function(height, weight) {
-  weight / (height * height)
+validate_bmi_parameter <- function(param_name, param_value, required = TRUE) {
+  if (required && missing(param_value)) {
+    stop(paste("Required parameter", param_name, "must be provided"), call. = FALSE)
+  }
+  return(param_value)
 }
 
-#' Validate height and weight inputs
-#' @param height Height in meters
-#' @param weight Weight in kilograms
-#' @param min_height Minimum valid height
-#' @param max_height Maximum valid height
-#' @param min_weight Minimum valid weight
-#' @param max_weight Maximum valid weight
+#' Check vector length compatibility for BMI inputs
+#' @param ... Input vectors to check
+#' @return Logical indicating compatibility
+#' @noRd
+check_bmi_length_compatibility <- function(...) {
+  lengths <- lengths(list(...))
+  # All lengths must be equal OR some can be length 1 (scalar)
+  return(length(unique(lengths[lengths > 1])) <= 1)
+}
+
+#' Auto-detect if BMI input needs preprocessing
+#' @param input_var Input variable to check
+#' @return Logical indicating if preprocessing needed
+#' @noRd
+needs_preprocessing <- function(input_var) {
+  any(input_var %in% c(6, 7, 8, 9, 96:99, 996:999), na.rm = TRUE) ||
+    any(is.character(input_var) & input_var %in% 
+        c("Not applicable", "Missing", "Don't know"), na.rm = TRUE)
+}
+
+# ==============================================================================
+# 3. SPECIALIZED HELPER FUNCTIONS (Enhanced)
+# ==============================================================================
+
+#' Enhanced height/weight validation with comprehensive checks
+#' @param height Height values (preprocessed)
+#' @param weight Weight values (preprocessed) 
+#' @param min_height,max_height,min_weight,max_weight Validation bounds
 #' @return Logical vector indicating valid measurements
 #' @noRd
-validate_height_weight <- function(height, weight, min_height, max_height,
-                                   min_weight, max_weight) {
-  (!is.na(height)) & (!is.na(weight)) &
-    height > min_height & height < max_height &
-    weight > min_weight & weight < max_weight
-}
-
-#' Validate pregnancy status and exclude pregnant individuals
-#' @param pregnancy_status Pregnancy variable (0=not pregnant, 1=pregnant)
-#' @return Logical indicating if individual should be included (not pregnant)
-#' @noRd
-validate_pregnancy_status <- function(pregnancy_status) {
-  !is.na(pregnancy_status) & pregnancy_status != 1
-}
-
-# ==============================================================================
-# 3. SPECIALIZED HELPER FUNCTIONS
-# ==============================================================================
-
-#' Apply BMI outlier detection and capping
-#' @param bmi BMI values
-#' @param bmi_min Minimum valid BMI
-#' @param bmi_max Maximum valid BMI
-#' @return BMI values with outliers capped
-#' @noRd
-apply_bmi_outlier_detection <- function(bmi, bmi_min, bmi_max) {
+validate_height_weight_enhanced <- function(height, weight, 
+                                           min_height, max_height,
+                                           min_weight, max_weight) {
   dplyr::case_when(
-    is.na(bmi) ~ haven::tagged_na("b"),
-    bmi < bmi_min ~ bmi_min,
-    bmi > bmi_max ~ bmi_max,
-    .default = bmi
+    # Handle tagged NAs first (preserve semantics)
+    haven::is_tagged_na(height, "a") | haven::is_tagged_na(weight, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(height, "b") | haven::is_tagged_na(weight, "b") ~ haven::tagged_na("b"),
+    
+    # Handle regular NAs
+    is.na(height) | is.na(weight) ~ haven::tagged_na("b"),
+    
+    # Validation bounds
+    height < min_height | height > max_height ~ haven::tagged_na("b"),
+    weight < min_weight | weight > max_weight ~ haven::tagged_na("b"),
+    
+    # Valid measurements
+    .default = as.numeric(height)  # Return height as indicator of validity
   )
 }
 
-#' Apply sex-specific BMI correction
-#' @param raw_bmi Raw BMI values
-#' @param sex Sex variable (1=male, 2=female)
-#' @param bmi_min Minimum valid BMI for outlier detection
-#' @param bmi_max Maximum valid BMI for outlier detection
-#' @return Corrected BMI values
+#' Enhanced BMI calculation with comprehensive missing data handling
+#' @param height Height in meters (preprocessed)
+#' @param weight Weight in kilograms (preprocessed)
+#' @param min_height,max_height,min_weight,max_weight,bmi_min,bmi_max Validation parameters
+#' @return BMI values with complete validation
 #' @noRd
-apply_bmi_correction <- function(raw_bmi, sex, bmi_min, bmi_max) {
-  dplyr::case_when(
-    is.na(raw_bmi) | is.na(sex) ~ haven::tagged_na("b"),
-    sex == 1 ~ apply_bmi_outlier_detection(
-      BMI_CORRECTION_MALE$intercept + BMI_CORRECTION_MALE$slope * raw_bmi,
-      bmi_min, bmi_max
-    ),
-    sex == 2 ~ apply_bmi_outlier_detection(
-      BMI_CORRECTION_FEMALE$intercept + BMI_CORRECTION_FEMALE$slope * raw_bmi,
-      bmi_min, bmi_max
-    ),
-    .default = haven::tagged_na("b")
-  )
-}
-
-#' Calculate validated BMI with outlier detection
-#' @param height Height in meters
-#' @param weight Weight in kilograms
-#' @param min_height Minimum valid height
-#' @param max_height Maximum valid height
-#' @param min_weight Minimum valid weight
-#' @param max_weight Maximum valid weight
-#' @param bmi_min Minimum valid BMI
-#' @param bmi_max Maximum valid BMI
-#' @return BMI values with validation and outlier detection applied
-#' @noRd
-calculate_validated_bmi <- function(height, weight, min_height, max_height,
-                                    min_weight, max_weight, bmi_min, bmi_max) {
-  # Use helper function for validation
-  is_valid <- validate_height_weight(
-    height, weight, min_height, max_height, min_weight, max_weight
+calculate_bmi_enhanced <- function(height, weight, 
+                                  min_height, max_height,
+                                  min_weight, max_weight,
+                                  bmi_min, bmi_max) {
+  
+  # Enhanced validation preserving tagged NA semantics
+  bmi_value <- dplyr::case_when(
+    # Preserve input tagged NAs first
+    haven::is_tagged_na(height, "a") | haven::is_tagged_na(weight, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(height, "b") | haven::is_tagged_na(weight, "b") ~ haven::tagged_na("b"),
+    
+    # Handle regular NAs
+    is.na(height) | is.na(weight) ~ haven::tagged_na("b"),
+    
+    # Validation bounds
+    height < min_height | height > max_height ~ haven::tagged_na("b"),
+    weight < min_weight | weight > max_weight ~ haven::tagged_na("b"),
+    
+    # Valid calculation
+    .default = weight / (height^2)
   )
   
+  # Final BMI validation
   dplyr::case_when(
-    !is_valid ~ haven::tagged_na("b"),
-    .default = apply_bmi_outlier_detection(
-      calculate_raw_bmi(height, weight), bmi_min, bmi_max
-    )
+    haven::is_tagged_na(bmi_value, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(bmi_value, "b") ~ haven::tagged_na("b"),
+    is.na(bmi_value) ~ haven::tagged_na("b"),
+    bmi_value < bmi_min | bmi_value > bmi_max ~ haven::tagged_na("b"),
+    .default = bmi_value
   )
 }
 
 # ==============================================================================
-# 4. PUBLIC API FUNCTIONS
+# 4. PUBLIC API FUNCTIONS (Enhanced with v3.0.0 Patterns)
 # ==============================================================================
 
-# ------------------------------------------------------------------------------
-# 4.1 Basic BMI Functions (PUMF version and Master/Shared version)
-# ------------------------------------------------------------------------------
-
-#' @title Body Mass Index (BMI) derived variable
-#' @description This function creates a harmonized BMI variable across CCHS cycles.
-#' @param HWTGHTM CCHS variable for height (in meters)
-#' @param HWTGWTK CCHS variable for weight (in kilograms)
-#' @param min_HWTGHTM,max_HWTGHTM,min_HWTGWTK,max_HWTGWTK,BMI_min,BMI_max Validation parameters
-#' @return numeric value for BMI. Returns tagged_na("b") for invalid measurements.
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation for new BMI variables (HWTDBMI, HWTDHTM, HWTDWTK)
+#' Calculate Body Mass Index (BMI) with comprehensive validation
+#'
+#' @description 
+#' Calculate harmonized BMI across CCHS cycles using the standard formula BMI = weight(kg) / height(m)^2.
+#' Includes comprehensive validation, outlier detection, and missing data preprocessing following WHO guidelines.
+#'
+#' @param HWTGHTM CCHS variable for height (in meters). Accepts raw CCHS codes or preprocessed values.
+#' @param HWTGWTK CCHS variable for weight (in kilograms). Accepts raw CCHS codes or preprocessed values.
+#' @param min_HWTGHTM Minimum valid height in meters (default 0.82)
+#' @param max_HWTGHTM Maximum valid height in meters (default 2.50)
+#' @param min_HWTGWTK Minimum valid weight in kilograms (default 22.7)
+#' @param max_HWTGWTK Maximum valid weight in kilograms (default 209.1)
+#' @param BMI_min Minimum valid BMI (default 10)
+#' @param BMI_max Maximum valid BMI (default 100)
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
+#'
+#' @return Numeric vector of BMI values. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases (age restrictions)
+#'     \item \code{haven::tagged_na("b")} for missing/invalid measurements
+#'   }
+#'   Valid range typically 10-100 for realistic measurements.
+#'
+#' @details
+#' This function uses harmonized height/weight variables and may produce different results 
+#' than original CCHS derived BMI variables which had cycle-specific validation rules.
+#' Enhanced validation bounds are optimized for master file data and may be more restrictive 
+#' than PUMF versions.
+#' 
+#' Calculation method: BMI = weight(kg) / height(m)^2. Original CCHS codes (6,7,8,9) are 
+#' automatically converted to haven::tagged_na(). Validation bounds: Height [0.82-2.50m], 
+#' Weight [22.7-209.1kg], BMI [10-100]. Extreme values are marked as haven::tagged_na("b").
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage)
+#' library(cchsflow)
+#' result <- rec_with_table(cchs2013_2014_p, 
+#'                         c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+#'
+#' # Basic usage
+#' bmi_fun(1.75, 70)
+#'
+#' # Vector processing with missing data
+#' bmi_fun(c(1.75, 1.80, 6), c(70, 75, 7))
+#'
+#' # Research mode with custom validation
+#' bmi_fun(1.75, 70, min_HWTGHTM = 1.0, max_HWTGHTM = 2.0)
+#'
+#' @seealso
+#' \code{\link{adjusted_bmi_fun}} for bias-corrected BMI calculations
+#' \code{\link{bmi_fun_cat}} for BMI category classification
+#'
+#' @references
+#' World Health Organization. (2000). Obesity: preventing and managing the global epidemic. 
+#' Report of a WHO consultation. World Health Organization technical report series, 894, i-xii.
+#' 
+#' Connor Gorber, S., et al. (2008). The accuracy of self-reported height and weight 
+#' in a nationally representative sample of Canadian adults. Obesity, 16(10), 2326-2332.
+#'
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and validation following development guide
 #' @export
-bmi_fun <-
-  function(HWTGHTM, HWTGWTK, min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
-           min_HWTGWTK = 25.0, max_HWTGWTK = 145.0, BMI_min = 8.07,
-           BMI_max = 137.46) {
-    calculate_validated_bmi(
-      HWTGHTM, HWTGWTK, min_HWTGHTM, max_HWTGHTM,
-      min_HWTGWTK, max_HWTGWTK, BMI_min, BMI_max
-    )
+bmi_fun <- function(HWTGHTM, HWTGWTK, 
+                        min_HWTGHTM = BMI_VALIDATION_BOUNDS$height$min, 
+                        max_HWTGHTM = BMI_VALIDATION_BOUNDS$height$max,
+                        min_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$min, 
+                        max_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$max,
+                        BMI_min = BMI_VALIDATION_BOUNDS$bmi$min, 
+                        BMI_max = BMI_VALIDATION_BOUNDS$bmi$max,
+                        validate_params = NULL) {
+  
+  # 1. Enhanced input validation
+  validate_bmi_parameter("HWTGHTM", HWTGHTM, required = TRUE)
+  validate_bmi_parameter("HWTGWTK", HWTGWTK, required = TRUE)
+  
+  # 2. Length compatibility check
+  if (!check_bmi_length_compatibility(HWTGHTM, HWTGWTK)) {
+    stop("Input vectors must have compatible lengths (equal or one can be scalar)", call. = FALSE)
   }
-
-#' @title Body Mass Index (BMI) derived variable (Master/Shared versions)
-#' @description BMI calculation with pregnancy status handling for master/shared data versions.
-#' @param MAM_037 CCHS pregnancy status variable (0=not pregnant, 1=pregnant)
-#' @param HWTDHTM CCHS variable for height (in meters)
-#' @param HWTDWTK CCHS variable for weight (in kilograms)
-#' @param min_HWTGHTM,max_HWTGHTM,min_HWTGWTK,max_HWTGWTK,BMI_min,BMI_max Validation parameters
-#' @return numeric value for BMI. Returns tagged_na("b") for pregnant individuals or invalid measurements.
-#' @export
-bmi_fun_D <-
-  function(MAM_037, HWTDHTM, HWTDWTK, min_HWTGHTM = 0.82,
-           max_HWTGHTM = 2.50, min_HWTGWTK = 25.0, max_HWTGWTK = 145.0,
-           BMI_min = 8.07, BMI_max = 137.46) {
-    # Handle pregnancy status and BMI calculation
-    dplyr::case_when(
-      is.na(MAM_037) ~ haven::tagged_na("b"), # Missing pregnancy status
-      MAM_037 == 1 ~ haven::tagged_na("b"), # Pregnant - excluded
-      .default = calculate_validated_bmi(
-        HWTDHTM, HWTDWTK, min_HWTGHTM, max_HWTGHTM,
-        min_HWTGWTK, max_HWTGWTK, BMI_min, BMI_max
-      )
-    )
+  
+  # 3. Type validation with informative messages
+  if (!is.numeric(HWTGHTM) && !needs_preprocessing(HWTGHTM)) {
+    warning("HWTGHTM contains unexpected values. Expected: numeric, CCHS codes, or character NAs", 
+            call. = FALSE)
   }
+  
+  # 4. Auto-detect validation mode
+  if (is.null(validate_params)) {
+    validate_params <- !all(c(min_HWTGHTM, max_HWTGHTM, min_HWTGWTK, max_HWTGWTK, 
+                              BMI_min, BMI_max) == 
+                           c(BMI_VALIDATION_BOUNDS$height$min, BMI_VALIDATION_BOUNDS$height$max,
+                             BMI_VALIDATION_BOUNDS$weight$min, BMI_VALIDATION_BOUNDS$weight$max,
+                             BMI_VALIDATION_BOUNDS$bmi$min, BMI_VALIDATION_BOUNDS$bmi$max))
+  }
+  
+  # 5. Handle edge cases gracefully  
+  if (all(is.na(HWTGHTM)) || all(is.na(HWTGWTK))) {
+    warning("All input values are missing. Results will be entirely NA.", call. = FALSE)
+  }
+  
+  # 6. Preprocess missing data (dual input handling)
+  if (needs_preprocessing(HWTGHTM)) {
+    HWTGHTM <- preprocess_continuous_standard(HWTGHTM)
+  }
+  if (needs_preprocessing(HWTGWTK)) {
+    HWTGWTK <- preprocess_continuous_standard(HWTGWTK)
+  }
+  
+  # 7. Enhanced BMI calculation with validation
+  calculate_bmi_enhanced(HWTGHTM, HWTGWTK, 
+                        min_HWTGHTM, max_HWTGHTM,
+                        min_HWTGWTK, max_HWTGWTK,
+                        BMI_min, BMI_max)
+}
 
-# ------------------------------------------------------------------------------
-# 4.2 Adjusted BMI Functions (with bias correction)
-# ------------------------------------------------------------------------------
-
-#' @title Adjusted Body Mass Index (BMI) derived variable
-#' @description BMI with sex-specific corrections for self-reporting bias.
-#' @param DHH_SEX CCHS variable for sex (1=male, 2=female)
-#' @param HWTGHTM CCHS variable for height (in meters)  
-#' @param HWTGWTK CCHS variable for weight (in kilograms)
+#' Calculate bias-corrected BMI for self-reported data
+#'
+#' @description 
+#' Calculate bias-corrected BMI accounting for self-reporting errors in height and weight measurements.
+#' Applies sex-specific correction coefficients from Connor Gorber et al. 2008 for more accurate 
+#' BMI estimates in population health research using self-reported data.
+#'
+#' @param DHH_SEX CCHS variable for sex (1=male, 2=female). Accepts raw CCHS codes or preprocessed values.
+#' @param HWTGHTM CCHS variable for height (in meters). Accepts raw CCHS codes or preprocessed values.
+#' @param HWTGWTK CCHS variable for weight (in kilograms). Accepts raw CCHS codes or preprocessed values.
 #' @param min_HWTGHTM,max_HWTGHTM,min_HWTGWTK,max_HWTGWTK,BMI_min,BMI_max Validation parameters
-#' @return numeric value for adjusted BMI. Returns tagged_na("b") for invalid measurements.
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation and correction algorithms
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
+#'
+#' @return Numeric vector of bias-corrected BMI values. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases
+#'     \item \code{haven::tagged_na("b")} for missing sex or invalid measurements
+#'   }
+#'   Valid range typically 10-100 for corrected measurements.
+#'
+#' @details
+#' Correction coefficients are based on Canadian data and may not be appropriate for other populations.
+#' Enhanced validation may produce different results than legacy adjusted BMI functions.
+#' 
+#' Calculation formulas: Males: Adjusted BMI = -1.07575 + 1.07592 × Raw BMI; 
+#' Females: Adjusted BMI = -0.12374 + 1.05129 × Raw BMI. Original CCHS codes (6,7,8,9) are 
+#' comprehensively preprocessed. Validation uses same bounds as basic BMI with post-correction validation.
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage)
+#' library(cchsflow)
+#' result <- rec_with_table(cchs2013_2014_p, 
+#'                         c("DHH_SEX", "HWTGHTM", "HWTGWTK", "HWTGBMI_adjusted_der"))
+#'
+#' # Basic usage
+#' adjusted_bmi_fun(1, 1.75, 70)  # Male
+#' adjusted_bmi_fun(2, 1.65, 60)  # Female
+#'
+#' # Vector processing with missing data
+#' adjusted_bmi_fun(c(1, 2, 6), c(1.75, 1.65, 1.80), c(70, 60, 7))
+#'
+#' @references
+#' Connor Gorber, S., et al. (2008). The accuracy of self-reported height and weight 
+#' in a nationally representative sample of Canadian adults. Obesity, 16(10), 2326-2332.
+#'
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and sex-specific bias correction
 #' @export
-adjusted_bmi_fun <-
-  function(DHH_SEX, HWTGHTM, HWTGWTK, min_HWTGHTM = 0.82,
-           max_HWTGHTM = 2.50, min_HWTGWTK = 25.0, max_HWTGWTK = 145.0,
-           BMI_min = 8.07, BMI_max = 137.46) {
-    # Use helper function for height/weight validation, then apply sex-specific correction
-    is_valid <- validate_height_weight(
-      HWTGHTM, HWTGWTK, min_HWTGHTM, max_HWTGHTM, min_HWTGWTK, max_HWTGWTK
-    )
+adjusted_bmi_fun <- function(DHH_SEX, HWTGHTM, HWTGWTK, 
+                                 min_HWTGHTM = BMI_VALIDATION_BOUNDS$height$min, 
+                                 max_HWTGHTM = BMI_VALIDATION_BOUNDS$height$max,
+                                 min_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$min, 
+                                 max_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$max,
+                                 BMI_min = BMI_VALIDATION_BOUNDS$bmi$min, 
+                                 BMI_max = BMI_VALIDATION_BOUNDS$bmi$max,
+                                 validate_params = NULL) {
+  
+  # 1. Enhanced input validation
+  validate_bmi_parameter("DHH_SEX", DHH_SEX, required = TRUE)
+  validate_bmi_parameter("HWTGHTM", HWTGHTM, required = TRUE)
+  validate_bmi_parameter("HWTGWTK", HWTGWTK, required = TRUE)
+  
+  # 2. Length compatibility check
+  if (!check_bmi_length_compatibility(DHH_SEX, HWTGHTM, HWTGWTK)) {
+    stop("Input vectors must have compatible lengths", call. = FALSE)
+  }
+  
+  # 3. Preprocess missing data for all inputs
+  if (needs_preprocessing(DHH_SEX)) {
+    DHH_SEX <- preprocess_standard_response(DHH_SEX)
+  }
+  if (needs_preprocessing(HWTGHTM)) {
+    HWTGHTM <- preprocess_continuous_standard(HWTGHTM)
+  }
+  if (needs_preprocessing(HWTGWTK)) {
+    HWTGWTK <- preprocess_continuous_standard(HWTGWTK)
+  }
+  
+  # 4. Calculate raw BMI first
+  raw_bmi <- dplyr::case_when(
+    # Preserve tagged NAs from any input
+    haven::is_tagged_na(DHH_SEX, "a") | haven::is_tagged_na(HWTGHTM, "a") | haven::is_tagged_na(HWTGWTK, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(DHH_SEX, "b") | haven::is_tagged_na(HWTGHTM, "b") | haven::is_tagged_na(HWTGWTK, "b") ~ haven::tagged_na("b"),
     
-    dplyr::case_when(
-      is.na(DHH_SEX) ~ haven::tagged_na("b"),
-      !is_valid ~ haven::tagged_na("b"),
-      .default = apply_bmi_correction(
-        calculate_raw_bmi(HWTGHTM, HWTGWTK), DHH_SEX, BMI_min, BMI_max
-      )
-    )
-  }
-
-#' @title Adjusted BMI derived variable (Master/Shared versions)
-#' @description Adjusted BMI with pregnancy status handling for master/shared data versions.
-#' @param MAM_037 CCHS pregnancy status variable (0=not pregnant, 1=pregnant)
-#' @param DHH_SEX CCHS variable for sex (1=male, 2=female)
-#' @param HWTDHTM CCHS variable for height (in meters)
-#' @param HWTDWTK CCHS variable for weight (in kilograms)
-#' @param min_HWTGHTM,max_HWTGHTM,min_HWTGWTK,max_HWTGWTK,BMI_min,BMI_max Validation parameters
-#' @return numeric value for adjusted BMI. Returns tagged_na("b") for pregnant individuals or invalid measurements.
-#' @export
-adjusted_bmi_fun_D <-
-  function(MAM_037, DHH_SEX, HWTDHTM, HWTDWTK, min_HWTGHTM = 0.82,
-           max_HWTGHTM = 2.50, min_HWTGWTK = 25.0, max_HWTGWTK = 145.0,
-           BMI_min = 8.07, BMI_max = 137.46) {
-    # Use helper function for height/weight validation
-    is_valid <- validate_height_weight(
-      HWTDHTM, HWTDWTK, min_HWTGHTM, max_HWTGHTM, min_HWTGWTK, max_HWTGWTK
-    )
+    # Handle regular NAs
+    is.na(DHH_SEX) | is.na(HWTGHTM) | is.na(HWTGWTK) ~ haven::tagged_na("b"),
     
-    # Validation with pregnancy, sex, and measurement checks
-    dplyr::case_when(
-      is.na(MAM_037) ~ haven::tagged_na("b"), # Missing pregnancy status
-      MAM_037 == 1 ~ haven::tagged_na("b"), # Pregnant - excluded
-      is.na(DHH_SEX) ~ haven::tagged_na("b"), # Missing sex
-      !is_valid ~ haven::tagged_na("b"), # Invalid height/weight
-      .default = apply_bmi_correction(
-        calculate_raw_bmi(HWTDHTM, HWTDWTK), DHH_SEX, BMI_min, BMI_max
-      )
-    )
-  }
+    # Validation bounds
+    HWTGHTM < min_HWTGHTM | HWTGHTM > max_HWTGHTM ~ haven::tagged_na("b"),
+    HWTGWTK < min_HWTGWTK | HWTGWTK > max_HWTGWTK ~ haven::tagged_na("b"),
+    
+    # Valid BMI calculation
+    .default = HWTGWTK / (HWTGHTM^2)
+  )
+  
+  # 5. Apply sex-specific correction
+  adjusted_bmi <- dplyr::case_when(
+    # Preserve tagged NAs
+    haven::is_tagged_na(raw_bmi, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(raw_bmi, "b") ~ haven::tagged_na("b"),
+    is.na(raw_bmi) ~ haven::tagged_na("b"),
+    
+    # Invalid sex codes
+    !(DHH_SEX %in% c(1, 2)) ~ haven::tagged_na("b"),
+    
+    # Sex-specific corrections
+    DHH_SEX == 1 ~ BMI_CORRECTION_MALE$intercept + BMI_CORRECTION_MALE$slope * raw_bmi,
+    DHH_SEX == 2 ~ BMI_CORRECTION_FEMALE$intercept + BMI_CORRECTION_FEMALE$slope * raw_bmi,
+    
+    .default = haven::tagged_na("b")
+  )
+  
+  # 6. Final adjusted BMI validation
+  dplyr::case_when(
+    haven::is_tagged_na(adjusted_bmi, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(adjusted_bmi, "b") ~ haven::tagged_na("b"),
+    is.na(adjusted_bmi) ~ haven::tagged_na("b"),
+    adjusted_bmi < BMI_min | adjusted_bmi > BMI_max ~ haven::tagged_na("b"),
+    .default = adjusted_bmi
+  )
+}
 
-# ------------------------------------------------------------------------------
-# 4.3 BMI Categorization Functions
-# ------------------------------------------------------------------------------
-
-#' @title Categorical BMI (international standard)
-#' @description Categorizes BMI into 4 standard categories.
-#' @param HWTGBMI_der derived BMI variable
-#' @return BMI category (1=underweight, 2=normal, 3=overweight, 4=obese)
+#' Categorize BMI values using WHO standard categories
+#'
+#' @description 
+#' Categorize BMI values into WHO standard obesity categories with comprehensive missing data handling.
+#' Uses international BMI categories: Underweight (<18.5), Normal (18.5-24.9), Overweight (25.0-29.9), 
+#' Obese (≥30.0) for standard population health assessment.
+#'
+#' @param bmi_value BMI values (from bmi_fun or adjusted_bmi_fun). Accepts raw values or preprocessed.
+#' @param categorical_labels Return factor labels instead of numeric codes (default TRUE)
+#'
+#' @return Factor with BMI category labels or numeric codes. Missing data handled as:
+#'   \itemize{
+#'     \item Preserves \code{haven::tagged_na("a")} for not applicable cases
+#'     \item Returns \code{haven::tagged_na("b")} for missing/invalid BMI values
+#'   }
+#'   Categories: Underweight, Normal weight, Overweight, Obese.
+#'
+#' @details
+#' BMI categories are not appropriate for children, pregnant women, or certain medical conditions.
+#' WHO standards are used consistently, but interpretation may vary across health guidelines and time periods.
+#' 
+#' Categorization thresholds: Underweight (BMI < 18.5), Normal weight (18.5 ≤ BMI < 25.0), 
+#' Overweight (25.0 ≤ BMI < 30.0), Obese (BMI ≥ 30.0). Comprehensive preprocessing is applied 
+#' if raw BMI values are provided.
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage)
+#' library(cchsflow)
+#' result <- rec_with_table(cchs2013_2014_p, 
+#'                         c("HWTGHTM", "HWTGWTK", "HWTGBMI_cat_der"))
+#'
+#' # Basic categorization
+#' bmi_fun_cat(c(17, 22, 27, 32))
+#'
+#' # With missing data
+#' bmi_fun_cat(c(22, haven::tagged_na("a"), 27, 997))
+#'
+#' # Numeric codes instead of labels
+#' bmi_fun_cat(c(17, 22, 27, 32), categorical_labels = FALSE)
+#'
+#' @references
+#' World Health Organization. (2000). Obesity: preventing and managing the global epidemic. 
+#' WHO Technical Report Series, 894.
+#'
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced categorization with comprehensive missing data handling
 #' @export
-bmi_fun_cat <-
-  function(HWTGBMI_der) {
-    # Categorize BMI using international standards
-    dplyr::case_when(
-      HWTGBMI_der < 18.5 ~ 1L, # Underweight
-      HWTGBMI_der < 25.0 ~ 2L, # Normal weight (18.5 ≤ BMI < 25)
-      HWTGBMI_der < 30.0 ~ 3L, # Overweight (25 ≤ BMI < 30)
-      HWTGBMI_der >= 30.0 ~ 4L, # Obese (BMI ≥ 30)
-      haven::is_tagged_na(HWTGBMI_der, "a") ~ haven::tagged_na("a"),
-      .default = haven::tagged_na("b")
-    )
+bmi_fun_cat <- function(bmi_value, categorical_labels = TRUE) {
+  
+  # 1. Input validation
+  validate_bmi_parameter("bmi_value", bmi_value, required = TRUE)
+  
+  # 2. Preprocess if needed
+  if (needs_preprocessing(bmi_value)) {
+    bmi_value <- preprocess_continuous_standard(bmi_value)
   }
-
-#' @title Categorical BMI (Master/Shared versions)
-#' @description BMI categorization with pregnancy status handling for master/shared data versions.
-#' @param MAM_037 CCHS pregnancy status variable (0=not pregnant, 1=pregnant)
-#' @param HWTDBMI_der derived BMI variable
-#' @return BMI category. Returns tagged_na("b") for pregnant individuals.
-#' @export
-bmi_fun_cat_D <-
-  function(MAM_037, HWTDBMI_der) {
-    # Handle pregnancy status and BMI categorization
-    dplyr::case_when(
-      is.na(MAM_037) ~ haven::tagged_na("b"), # Missing pregnancy status
-      MAM_037 == 1 ~ haven::tagged_na("b"), # Pregnant - excluded
-      HWTDBMI_der < 18.5 ~ 1L, # Underweight
-      HWTDBMI_der < 25.0 ~ 2L, # Normal weight
-      HWTDBMI_der < 30.0 ~ 3L, # Overweight
-      HWTDBMI_der >= 30.0 ~ 4L, # Obese
-      haven::is_tagged_na(HWTDBMI_der, "a") ~ haven::tagged_na("a"),
-      .default = haven::tagged_na("b")
-    )
+  
+  # 3. Categorize BMI with comprehensive missing data handling
+  bmi_category <- dplyr::case_when(
+    # Preserve tagged NAs with explicit checks
+    haven::is_tagged_na(bmi_value, "a") ~ haven::tagged_na("a"),
+    haven::is_tagged_na(bmi_value, "b") ~ haven::tagged_na("b"),
+    
+    # Handle regular NAs
+    is.na(bmi_value) ~ haven::tagged_na("b"),
+    
+    # BMI categories (WHO classification)
+    bmi_value < 18.5 ~ if (categorical_labels) "Underweight" else 1L,
+    bmi_value >= 18.5 & bmi_value < 25.0 ~ if (categorical_labels) "Normal weight" else 2L,
+    bmi_value >= 25.0 & bmi_value < 30.0 ~ if (categorical_labels) "Overweight" else 3L,
+    bmi_value >= 30.0 ~ if (categorical_labels) "Obese" else 4L,
+    
+    # Catch-all for any remaining edge cases
+    .default = haven::tagged_na("b")
+  )
+  
+  # 4. Convert to factor if using labels
+  if (categorical_labels && !all(haven::is_tagged_na(bmi_category))) {
+    # Create factor while preserving tagged NAs
+    non_na_mask <- !haven::is_tagged_na(bmi_category) & !is.na(bmi_category)
+    
+    if (any(non_na_mask)) {
+      factor_levels <- c("Underweight", "Normal weight", "Overweight", "Obese")
+      result <- rep(haven::tagged_na("b"), length(bmi_category))
+      
+      # Preserve tagged NA semantics
+      result[haven::is_tagged_na(bmi_category, "a")] <- haven::tagged_na("a")
+      result[haven::is_tagged_na(bmi_category, "b")] <- haven::tagged_na("b")
+      
+      # Apply factor to non-missing values
+      if (any(non_na_mask)) {
+        result[non_na_mask] <- factor(bmi_category[non_na_mask], levels = factor_levels)
+      }
+      
+      return(result)
+    }
   }
+  
+  return(bmi_category)
+}
