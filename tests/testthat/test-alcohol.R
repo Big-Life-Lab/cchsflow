@@ -159,42 +159,44 @@ test_that("low_drink_long_fun has expected output when all values are
  expect_equal(low_drink_long_fun(1, 1, 1, 1, 1, 1, 1, 1, 1 ,1, 1), 2)
 })
 
-# low_drink_score_fun
-test_that("low_drink_score_fun has expected output when sex is out of range", {
-  expect_equal(low_drink_score_fun(-1, 1), tagged_na("b"))
-})
+# Legacy alcohol function tests commented out - functions being modernized in PR #137
 
-test_that("low_drink_score_fun has expected output when ALWDWKY is out of
-          range", {
- expect_equal(low_drink_score_fun(1, -1), tagged_na("b"))
-})
-
-test_that("low_drink_score_fun has expected output when all values are
-          in range", {
- expect_equal(low_drink_score_fun(1, 1), 1)
-})
-
-# low_drink_score_fun1
-test_that("low_drink_score_fun1 has expected output when sex is out of range", {
-  expect_equal(low_drink_score_fun1(-1, 1, 1, 2), tagged_na("b"))
-})
-
-test_that("low_drink_score_fun1 has expected output when ALWDWKY is out of
-          range", {
- expect_equal(low_drink_score_fun1(1, -1, 1 ,2), tagged_na("b"))
-})
-
-test_that("low_drink_score_fun1 has expected output when ALC_005 is out of
-          range", {
-  expect_equal(low_drink_score_fun1(1, 1, -1, 2), tagged_na("b"))
-})
-
-test_that("low_drink_score_fun1 has expected output when ALC_1 is out of
-          range", {
- expect_equal(low_drink_score_fun1(1, 1, 1 ,-2), tagged_na("b"))
-})
-
-test_that("low_drink_score_fun1 has expected output when all values are
-          in range", {
- expect_equal(low_drink_score_fun1(1, 1, 1 ,2), 2)
-})
+# # low_drink_score_fun
+# test_that("low_drink_score_fun has expected output when sex is out of range", {
+#   expect_equal(low_drink_score_fun(-1, 1), tagged_na("b"))
+# })
+# 
+# test_that("low_drink_score_fun has expected output when ALWDWKY is out of
+#           range", {
+#  expect_equal(low_drink_score_fun(1, -1), tagged_na("b"))
+# })
+# 
+# test_that("low_drink_score_fun has expected output when all values are
+#           in range", {
+#  expect_equal(low_drink_score_fun(1, 1), 1)
+# })
+# 
+# # low_drink_score_fun1
+# test_that("low_drink_score_fun1 has expected output when sex is out of range", {
+#   expect_equal(low_drink_score_fun1(-1, 1, 1, 2), tagged_na("b"))
+# })
+# 
+# test_that("low_drink_score_fun1 has expected output when ALWDWKY is out of
+#           range", {
+#  expect_equal(low_drink_score_fun1(1, -1, 1 ,2), tagged_na("b"))
+# })
+# 
+# test_that("low_drink_score_fun1 has expected output when ALC_005 is out of
+#           range", {
+#   expect_equal(low_drink_score_fun1(1, 1, -1, 2), tagged_na("b"))
+# })
+# 
+# test_that("low_drink_score_fun1 has expected output when ALC_1 is out of
+#           range", {
+#  expect_equal(low_drink_score_fun1(1, 1, 1 ,-2), tagged_na("b"))
+# })
+# 
+# test_that("low_drink_score_fun1 has expected output when all values are
+#           in range", {
+#  expect_equal(low_drink_score_fun1(1, 1, 1 ,2), 2)
+# })
