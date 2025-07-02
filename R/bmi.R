@@ -433,11 +433,11 @@ categorize_bmi <- function(bmi_value, categorical_labels = TRUE) {
     # Return character labels
     bmi_category <- dplyr::case_when(
       # Preserve tagged NAs with explicit checks
-      haven::is_tagged_na(bmi_value, "a") ~ haven::tagged_na("a"),
-      haven::is_tagged_na(bmi_value, "b") ~ haven::tagged_na("b"),
+      haven::is_tagged_na(bmi_value, "a") ~ "NA(a)",
+      haven::is_tagged_na(bmi_value, "b") ~ "NA(b)",
       
       # Handle regular NAs
-      is.na(bmi_value) ~ haven::tagged_na("b"),
+      is.na(bmi_value) ~ "NA(b)",
       
       # BMI categories (WHO classification)
       bmi_value < 18.5 ~ "Underweight",
@@ -446,7 +446,7 @@ categorize_bmi <- function(bmi_value, categorical_labels = TRUE) {
       bmi_value >= 30.0 ~ "Obese",
       
       # Catch-all for any remaining edge cases
-      .default = haven::tagged_na("b")
+      .default = "NA(b)"
     )
   } else {
     # Return numeric codes
@@ -467,28 +467,6 @@ categorize_bmi <- function(bmi_value, categorical_labels = TRUE) {
       # Catch-all for any remaining edge cases
       .default = haven::tagged_na("b")
     )
-  }
-  
-  # 4. Convert to factor if using labels
-  if (categorical_labels && !all(haven::is_tagged_na(bmi_category))) {
-    # Create factor while preserving tagged NAs
-    non_na_mask <- !haven::is_tagged_na(bmi_category) & !is.na(bmi_category)
-    
-    if (any(non_na_mask)) {
-      factor_levels <- c("Underweight", "Normal weight", "Overweight", "Obese")
-      result <- rep(haven::tagged_na("b"), length(bmi_category))
-      
-      # Preserve tagged NA semantics
-      result[haven::is_tagged_na(bmi_category, "a")] <- haven::tagged_na("a")
-      result[haven::is_tagged_na(bmi_category, "b")] <- haven::tagged_na("b")
-      
-      # Apply factor to non-missing values
-      if (any(non_na_mask)) {
-        result[non_na_mask] <- factor(bmi_category[non_na_mask], levels = factor_levels)
-      }
-      
-      return(result)
-    }
   }
   
   return(bmi_category)
