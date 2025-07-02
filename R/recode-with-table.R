@@ -364,6 +364,8 @@ recode_call <-
 #' @param variable_being_checked the name of the recoded variable
 #'
 #' @return the data equivalent of variable_being_checked
+#' 
+#' @keywords internal
 get_data_variable_name <-
   function(data_name,
            data,
@@ -424,6 +426,8 @@ get_data_variable_name <-
 #' @param else_default default else value to use if no else is present
 #'
 #' @return Returns recoded and labeled data
+#' 
+#' @keywords internal
 recode_columns <-
   function(data,
            variables_to_process,
@@ -695,7 +699,7 @@ recode_columns <-
 #' Compare Value Based On Interval
 #'
 #' Compare values on the scientific notation interval
-#'
+#' 
 #' @param left_boundary the min value
 #' @param right_boundary the max value
 #' @param data the data that contains values being compared
@@ -704,6 +708,7 @@ recode_columns <-
 #'
 #' @return a boolean vector containing true for rows where the
 #' comparison is true
+#' @keywords internal
 compare_value_based_on_interval <-
   function(left_boundary,
            right_boundary,
@@ -803,6 +808,8 @@ update_variable_details_based_on_variable_sheet <-
 #' @param var_type the toType of a variable
 #' 
 #' @return an appropriately coded tagged NA
+#' 
+#' @keywords internal
 recode_variable_NA_formating <- function(cell_value, var_type) {
   recode_value <- NULL
   if (grepl("NA", cell_value)) {

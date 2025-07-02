@@ -1,17 +1,21 @@
-#' @title Set Data Labels
-#' @description sets labels for passed database, Uses the names of final
-#' variables in variable_details/variables_sheet as well as the labels contained
+#' @title Set data labels
+#' @description Set variable labels for a working CCHS dataframe.  The function 
+#' extracts variables from the provided dataframe and assigns labels according 
+#' the provided variables and variable_details dataframes.
 #' in the passed dataframes
 #'
-#' @param data_to_label newly transformed dataset
-#' @param variable_details variable_details.csv
-#' @param variables_sheet variables.csv
+#' @param data_to_lab.el A dataframe of CCHS data that lacks labels.
+#' @param variable_details A dataframe containing the details of each variable, 
+#' with category labels in the 'catLabel' column.
+#' @param variables_sheet (Optional) A dataframe containing variable labels in 
+#' the 'label' column.
 #'
-#' @return labeled data_to_label
+#' @return The dataframe with labelled CCHS variables.
 #'
 #' @examples
 #' library(cchsflow)
-#' library(sjlabelled)
+#' library(sjlabelled) # used to get labels in the example.
+#' 
 #' bmi2001 <- rec_with_table(
 #'  cchs2001_p, c(
 #'     "HWTGHTM",
@@ -160,9 +164,9 @@ create_label_list_element <- function(variable_rows) {
 
 #' @title label_data
 #'
-#' @description Attaches labels to the DataToLabel to preserve metadata
+#' @description Labels a dataframe according to a given label list.
 #'
-#' @param label_list the label list object that contains extracted labels
+#' @param label_list The label list that contains labels
 #' from variable details
 #' @param data_to_label The data that is to be labeled
 #' @importFrom sjlabelled set_labels set_label set_label<-
