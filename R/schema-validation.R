@@ -1,7 +1,8 @@
 #' Schema Validation Functions
-#' @name schema_validation
+#' 
 #' @description Functions for schema validation.
 #' @keywords internal
+#' @name schema-validation-functions
 
 library(yaml)
 library(stringr)  # For cross-platform regex consistency (ICU engine)
@@ -560,7 +561,7 @@ run_comprehensive_schema_tests <- function() {
 #' \dontrun{
 #' # Validate core harmonization schema
 #' result <- validate_yaml_schema("inst/metadata/schemas/core/variables.yaml")
-#' print(result$message)  # "✓ variables.yaml - YAML syntax valid"
+#' print(result$message)  # "PASS variables.yaml - YAML syntax valid"
 #' cat("Patterns tested:", result$patterns_tested, "Valid:", result$patterns_valid)
 #' 
 #' # Check for validation errors
@@ -586,7 +587,7 @@ validate_yaml_schema <- function(yaml_path) {
   # Check file exists
   if (!file.exists(yaml_path)) {
     result$errors <- "File does not exist"
-    result$message <- paste("✗", basename(yaml_path), "- File not found")
+    result$message <- paste("FAIL", basename(yaml_path), "- File not found")
     return(result)
   }
   
@@ -594,7 +595,7 @@ validate_yaml_schema <- function(yaml_path) {
   tryCatch({
     schema <- yaml::read_yaml(yaml_path)
     result$valid <- TRUE
-    result$message <- paste("✓", basename(yaml_path), "- YAML syntax valid")
+    result$message <- paste("PASS", basename(yaml_path), "- YAML syntax valid")
     
     # Extract schema version if available
     if ("schema_version" %in% names(schema)) {
@@ -613,7 +614,7 @@ validate_yaml_schema <- function(yaml_path) {
     
   }, error = function(e) {
     result$errors <- e$message
-    result$message <- paste("✗", basename(yaml_path), "- YAML syntax error:", e$message)
+    result$message <- paste("FAIL", basename(yaml_path), "- YAML syntax error:", e$message)
   })
   
   return(result)
@@ -848,7 +849,7 @@ validate_core_schemas <- function() {
     
     # Print immediate feedback
     if (result$valid) {
-      cat("✓ PASS")
+      cat("PASS PASS")
       if (result$patterns_tested > 0) {
         cat(" (", result$patterns_valid, "/", result$patterns_tested, " patterns valid)", sep = "")
       }
@@ -857,7 +858,7 @@ validate_core_schemas <- function() {
       }
       cat("\n")
     } else {
-      cat("✗ FAIL\n")
+      cat("FAIL FAIL\n")
       for (error in result$errors) {
         cat("  ERROR:", error, "\n")
       }
@@ -904,7 +905,7 @@ validate_registry_schemas <- function() {
       
       # Print immediate feedback
       if (result$valid) {
-        cat("✓ PASS")
+        cat("PASS PASS")
         if (result$patterns_tested > 0) {
           cat(" (", result$patterns_valid, "/", result$patterns_tested, " patterns valid)", sep = "")
         }
@@ -913,7 +914,7 @@ validate_registry_schemas <- function() {
         }
         cat("\n")
       } else {
-        cat("✗ FAIL\n")
+        cat("FAIL FAIL\n")
         for (error in result$errors) {
           cat("  ERROR:", error, "\n")
         }
@@ -959,7 +960,7 @@ validate_cchs_extension_schemas <- function() {
       
       # Print immediate feedback
       if (result$valid) {
-        cat("✓ PASS")
+        cat("PASS PASS")
         if (result$patterns_tested > 0) {
           cat(" (", result$patterns_valid, "/", result$patterns_tested, " patterns valid)", sep = "")
         }
@@ -968,7 +969,7 @@ validate_cchs_extension_schemas <- function() {
         }
         cat("\n")
       } else {
-        cat("✗ FAIL\n")
+        cat("FAIL FAIL\n")
         for (error in result$errors) {
           cat("  ERROR:", error, "\n")
         }
@@ -1034,7 +1035,7 @@ run_recodeflow_schema_validation <- function(include_registry = TRUE, include_cc
     }
     
   } else {
-    cat("\n⚠️  Core schemas failed - skipping additional validations\n")
+    cat("\nWARNING  Core schemas failed - skipping additional validations\n")
     cat("Fix core schema issues before testing registry and extensions.\n")
   }
   
@@ -1057,7 +1058,7 @@ run_recodeflow_schema_validation <- function(include_registry = TRUE, include_cc
   
   cat("Total files validated:", total_files, "\n")
   cat("Files passing validation:", valid_files, "/", total_files, "\n")
-  cat("Core schemas status:", ifelse(core_all_valid, "✅ PASS", "❌ FAIL"), "\n")
+  cat("Core schemas status:", ifelse(core_all_valid, "PASS PASS", "FAIL FAIL"), "\n")
   
   return(results)
 }
@@ -1074,7 +1075,7 @@ validate_core_schemas_only <- function() {
   core_all_valid <- all(sapply(core_results, `[[`, "valid"))
   
   cat("\n=== Quick Validation Complete ===\n")
-  cat("Core schemas status:", ifelse(core_all_valid, "✅ PASS", "❌ FAIL"), "\n")
+  cat("Core schemas status:", ifelse(core_all_valid, "PASS PASS", "FAIL FAIL"), "\n")
   
   return(core_results)
 }

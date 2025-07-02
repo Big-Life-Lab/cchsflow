@@ -65,7 +65,7 @@ Critical for preventing runtime errors in data harmonization workflows.
 \dontrun{
 # Validate core harmonization schema
 result <- validate_yaml_schema("inst/metadata/schemas/core/variables.yaml")
-print(result$message)  # "✓ variables.yaml - YAML syntax valid"
+print(result$message)  # "PASS variables.yaml - YAML syntax valid"
 cat("Patterns tested:", result$patterns_tested, "Valid:", result$patterns_valid)
 
 # Check for validation errors

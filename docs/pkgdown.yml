@@ -1,7 +1,8 @@
-pandoc: '3.4'
+pandoc: 3.1.2
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
+  derived_variables_development: derived_variables_development.html
   derived_variables: derived_variables.html
   duplicate_datasets: duplicate_datasets.html
   get_started: get_started.html
@@ -9,7 +10,7 @@ articles:
   tagged_na_usage: tagged_na_usage.html
   variable_details: variable_details.html
   variables_sheet: variables_sheet.html
-last_built: 2025-06-04T10:59Z
+last_built: 2025-07-01T21:10Z
 urls:
   reference: https://big-life-lab.github.io/cchsflow/reference
   article: https://big-life-lab.github.io/cchsflow/articles

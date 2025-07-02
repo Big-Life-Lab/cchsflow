@@ -14,7 +14,7 @@ test_that("time_quit_smoking_fun() has expected outputs when
 test_that("smoke_simple_fun() has expected outputs when
           SMKDSTY is out of range", {
             expect_equal(smoke_simple_fun(100, 2),
-                         "NA(b)")
+                         haven::tagged_na("b"))
           })
 
 test_that("smoke_simple_fun() has expected outputs when
@@ -53,7 +53,7 @@ test_that("pack_years_fun", {
 test_that("pack_years_fun_cat() has expected outputs when
           pack_years_der is out of range", {
             expect_equal(pack_years_fun_cat(-1),
-                         "NA(b)")
+                         haven::tagged_na("b"))
           })
 
 test_that("pack_years_fun_cat() has expected outputs when

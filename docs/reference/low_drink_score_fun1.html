@@ -19,7 +19,7 @@ alcohol use according to Canada's Low-Risk Alcohol Drinking Guideline."><meta pr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cchsflow</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@ alcohol use according to Canada's Low-Risk Alcohol Drinking Guideline."><meta pr
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Low drinking score (select cycles)</h1>
-    <small class="dont-index">Source: <a href="https://github.com/Big-Life-Lab/cchsflow/blob/HEAD/R/alcohol.R" class="external-link"><code>R/alcohol.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/Big-Life-Lab/cchsflow/blob/HEAD/R/alcohol-legacy.R" class="external-link"><code>R/alcohol-legacy.R</code></a></small>
     <div class="hidden name"><code>low_drink_score_fun1.Rd</code></div>
     </div>
 
@@ -216,6 +216,28 @@ step 1.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 399    &lt;NA&gt;     2      NA       2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 400    &lt;NA&gt;     1       0       2</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://big-life-lab.github.io/cchsflow/">cchsflow</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">DHH_SEX</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span> </span></span>
+<span class="r-in"><span><span class="va">ALWDWKY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">15</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ALC_005</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ALC_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">low_drink_score1_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">DHH_SEX</span>, <span class="va">ALWDWKY</span>, <span class="va">ALC_005</span>, <span class="va">ALC_1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">low_drink_score1_data</span><span class="op">[</span>,<span class="st">"Low_Drink_Score"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">low_drink_score1_data</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   DHH_SEX ALWDWKY ALC_005 ALC_1 Low_Drink_Score</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       1      30       1     1              NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       2      15       1     1              NA</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">low_drink_score1_data</span><span class="op">$</span><span class="va">Low_Drink_Score</span> <span class="op">&lt;-</span><span class="fu">low_drink_score1_fun</span><span class="op">(</span><span class="va">low_drink_score_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, </span></span>
+<span class="r-in"><span>                                                       <span class="va">low_drink_score_data</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>                                                       <span class="va">low_drink_score_data</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>                                                       <span class="va">low_drink_score_data</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in low_drink_score1_fun(low_drink_score_data[[1]], low_drink_score_data[[2]],     low_drink_score_data[[3]], low_drink_score_data[[4]]):</span> could not find function "low_drink_score1_fun"</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">low_drink_score1_data</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   DHH_SEX ALWDWKY ALC_005 ALC_1 Low_Drink_Score</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       1      30       1     1              NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       2      15       1     1              NA</span>
 </code></pre></div>
     </div>
   </div>
