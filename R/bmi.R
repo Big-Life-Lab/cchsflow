@@ -429,23 +429,45 @@ categorize_bmi <- function(bmi_value, categorical_labels = TRUE) {
   }
   
   # 3. Categorize BMI with comprehensive missing data handling
-  bmi_category <- dplyr::case_when(
-    # Preserve tagged NAs with explicit checks
-    haven::is_tagged_na(bmi_value, "a") ~ haven::tagged_na("a"),
-    haven::is_tagged_na(bmi_value, "b") ~ haven::tagged_na("b"),
-    
-    # Handle regular NAs
-    is.na(bmi_value) ~ haven::tagged_na("b"),
-    
-    # BMI categories (WHO classification)
-    bmi_value < 18.5 ~ if (categorical_labels) "Underweight" else 1L,
-    bmi_value >= 18.5 & bmi_value < 25.0 ~ if (categorical_labels) "Normal weight" else 2L,
-    bmi_value >= 25.0 & bmi_value < 30.0 ~ if (categorical_labels) "Overweight" else 3L,
-    bmi_value >= 30.0 ~ if (categorical_labels) "Obese" else 4L,
-    
-    # Catch-all for any remaining edge cases
-    .default = haven::tagged_na("b")
-  )
+  if (categorical_labels) {
+    # Return character labels
+    bmi_category <- dplyr::case_when(
+      # Preserve tagged NAs with explicit checks
+      haven::is_tagged_na(bmi_value, "a") ~ haven::tagged_na("a"),
+      haven::is_tagged_na(bmi_value, "b") ~ haven::tagged_na("b"),
+      
+      # Handle regular NAs
+      is.na(bmi_value) ~ haven::tagged_na("b"),
+      
+      # BMI categories (WHO classification)
+      bmi_value < 18.5 ~ "Underweight",
+      bmi_value >= 18.5 & bmi_value < 25.0 ~ "Normal weight",
+      bmi_value >= 25.0 & bmi_value < 30.0 ~ "Overweight",
+      bmi_value >= 30.0 ~ "Obese",
+      
+      # Catch-all for any remaining edge cases
+      .default = haven::tagged_na("b")
+    )
+  } else {
+    # Return numeric codes
+    bmi_category <- dplyr::case_when(
+      # Preserve tagged NAs with explicit checks
+      haven::is_tagged_na(bmi_value, "a") ~ haven::tagged_na("a"),
+      haven::is_tagged_na(bmi_value, "b") ~ haven::tagged_na("b"),
+      
+      # Handle regular NAs
+      is.na(bmi_value) ~ haven::tagged_na("b"),
+      
+      # BMI categories (WHO classification)
+      bmi_value < 18.5 ~ 1L,
+      bmi_value >= 18.5 & bmi_value < 25.0 ~ 2L,
+      bmi_value >= 25.0 & bmi_value < 30.0 ~ 3L,
+      bmi_value >= 30.0 ~ 4L,
+      
+      # Catch-all for any remaining edge cases
+      .default = haven::tagged_na("b")
+    )
+  }
   
   # 4. Convert to factor if using labels
   if (categorical_labels && !all(haven::is_tagged_na(bmi_category))) {

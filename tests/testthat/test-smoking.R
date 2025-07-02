@@ -11,11 +11,11 @@ test_that("time_quit_smoking_fun() has expected outputs when
           })
 
 
-# test_that("smoke_simple_fun() has expected outputs when
-#           SMKDSTY is out of range", {
-#             expect_equal(smoke_simple_fun(100, 2),
-#                          "NA(b)")
-#           })
+test_that("smoke_simple_fun() has expected outputs when
+          SMKDSTY is out of range", {
+            expect_equal(smoke_simple_fun(100, 2),
+                         haven::tagged_na("b"))
+          })
 
 test_that("smoke_simple_fun() has expected outputs when
           all parameters are in range", {
@@ -52,6 +52,13 @@ test_that("pack_years_fun() has expected outputs for former daily current
           occasional smoker", {
   expect_equal(pack_years_fun(2, 45, 10, NA, 21, NA, 5, 20, 15, NA, NA), 15.25)
 })
+
+
+test_that("pack_years_fun_cat() has expected outputs when
+          pack_years_der is out of range", {
+            expect_equal(pack_years_fun_cat(-1),
+                         haven::tagged_na("b"))
+          })
 
 test_that("pack_years_fun_cat() has expected outputs when
           pack_years_der is in range", {

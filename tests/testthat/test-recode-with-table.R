@@ -51,15 +51,16 @@ test_that("rec_with_table works across all major CCHS cycles", {
     cycle_data <- get(cycle_name)
     
     # Test that rec_with_table() completes successfully with core variables
-    expect_no_error({
+    expect_no_error(
       result <- suppressWarnings(
         cchsflow::rec_with_table(cycle_data, 
                                 variables = core_variables,
                                 database_name = cycle_name,
                                 variable_details = variable_details,
                                 note = FALSE)
-      )
-    }, info = paste("rec_with_table failed for cycle:", cycle_name))
+      ),
+      info = paste("rec_with_table failed for cycle:", cycle_name)
+    )
     
     # Verify result structure
     result <- suppressWarnings(
