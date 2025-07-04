@@ -16,12 +16,12 @@ test_that("assess_adl() handles basic scalar inputs correctly", {
   result_help <- assess_adl(1, 2, 2, 2, 2)
   expect_equal(result_help, 1L)
   expect_type(result_help, "integer")
-  
+
   # Test valid scalar inputs - no help needed
   result_no_help <- assess_adl(2, 2, 2, 2, 2)
   expect_equal(result_no_help, 2L)
   expect_type(result_no_help, "integer")
-  
+
   # Test multiple tasks requiring help
   result_multiple <- assess_adl(1, 1, 2, 2, 2)
   expect_equal(result_multiple, 1L)
@@ -34,10 +34,10 @@ test_that("assess_adl() handles vector inputs correctly", {
   adl_03 <- c(2, 2, 2)
   adl_04 <- c(2, 2, 2)
   adl_05 <- c(2, 2, 2)
-  
+
   results <- assess_adl(adl_01, adl_02, adl_03, adl_04, adl_05)
-  expected <- c(1L, 2L, 1L)  # help needed, no help, help needed
-  
+  expected <- c(1L, 2L, 1L) # help needed, no help, help needed
+
   expect_equal(results, expected)
   expect_equal(length(results), 3)
   expect_type(results, "integer")
@@ -46,11 +46,11 @@ test_that("assess_adl() handles vector inputs correctly", {
 test_that("assess_adl() handles scalar/vector combinations", {
   # Scalar ADL_01, vector others
   result1 <- assess_adl(1, c(2, 2, 2), c(2, 2, 2), c(2, 2, 2), c(2, 2, 2))
-  expect_equal(result1, c(1L, 1L, 1L))  # All need help because ADL_01=1
-  
+  expect_equal(result1, c(1L, 1L, 1L)) # All need help because ADL_01=1
+
   # Vector ADL_01, scalar others
   result2 <- assess_adl(c(1, 2, 2), 2, 2, 2, 2)
-  expect_equal(result2, c(1L, 2L, 2L))  # Only first needs help
+  expect_equal(result2, c(1L, 2L, 2L)) # Only first needs help
 })
 
 # ==============================================================================
@@ -59,16 +59,16 @@ test_that("assess_adl() handles scalar/vector combinations", {
 
 test_that("assess_adl() handles raw CCHS missing codes correctly", {
   # Test original CCHS missing codes
-  result_6 <- assess_adl(6, 2, 2, 2, 2)  # Not applicable
+  result_6 <- assess_adl(6, 2, 2, 2, 2) # Not applicable
   expect_true(haven::is_tagged_na(result_6, "a"))
-  
-  result_7 <- assess_adl(2, 7, 2, 2, 2)  # Don't know
+
+  result_7 <- assess_adl(2, 7, 2, 2, 2) # Don't know
   expect_true(haven::is_tagged_na(result_7, "b"))
-  
-  result_8 <- assess_adl(2, 2, 8, 2, 2)  # Refusal
+
+  result_8 <- assess_adl(2, 2, 8, 2, 2) # Refusal
   expect_true(haven::is_tagged_na(result_8, "b"))
-  
-  result_9 <- assess_adl(2, 2, 2, 9, 2)  # Not stated
+
+  result_9 <- assess_adl(2, 2, 2, 9, 2) # Not stated
   expect_true(haven::is_tagged_na(result_9, "b"))
 })
 
@@ -76,13 +76,13 @@ test_that("assess_adl() handles string NA inputs", {
   # Test string-based missing values
   result_na_string <- assess_adl("Not applicable", 2, 2, 2, 2)
   expect_true(haven::is_tagged_na(result_na_string, "a"))
-  
+
   result_missing_string <- assess_adl(2, "Missing", 2, 2, 2)
   expect_true(haven::is_tagged_na(result_missing_string, "b"))
-  
+
   result_dk_string <- assess_adl(2, 2, "Don't know", 2, 2)
   expect_true(haven::is_tagged_na(result_dk_string, "b"))
-  
+
   result_refusal_string <- assess_adl(2, 2, 2, "Refusal", 2)
   expect_true(haven::is_tagged_na(result_refusal_string, "b"))
 })
@@ -91,10 +91,10 @@ test_that("assess_adl() preserves haven::tagged_na inputs", {
   # Test that pre-processed tagged NAs are preserved
   result_na_a <- assess_adl(haven::tagged_na("a"), 2, 2, 2, 2)
   expect_true(haven::is_tagged_na(result_na_a, "a"))
-  
+
   result_na_b <- assess_adl(2, haven::tagged_na("b"), 2, 2, 2)
   expect_true(haven::is_tagged_na(result_na_b, "b"))
-  
+
   # Test passthrough behavior
   input_tagged <- haven::tagged_na("a")
   result_tagged <- assess_adl(input_tagged, 2, 2, 2, 2)
@@ -108,15 +108,15 @@ test_that("assess_adl() handles mixed missing data scenarios", {
   adl_03 <- c(2, 2, 2, 2, 2)
   adl_04 <- c(2, 2, 2, 2, 2)
   adl_05 <- c(2, 2, 2, 2, 2)
-  
+
   results <- assess_adl(adl_01, adl_02, adl_03, adl_04, adl_05)
-  
+
   expect_equal(length(results), 5)
-  expect_equal(results[1], 1L)  # Valid - needs help
-  expect_true(haven::is_tagged_na(results[2], "a"))  # Not applicable
-  expect_true(haven::is_tagged_na(results[3], "a"))  # Not applicable (6 code)
-  expect_true(haven::is_tagged_na(results[4], "a"))  # Not applicable (string)
-  expect_true(haven::is_tagged_na(results[5], "b"))  # Missing (string)
+  expect_equal(results[1], 1L) # Valid - needs help
+  expect_true(haven::is_tagged_na(results[2], "a")) # Not applicable
+  expect_true(haven::is_tagged_na(results[3], "a")) # Not applicable (6 code)
+  expect_true(haven::is_tagged_na(results[4], "a")) # Not applicable (string)
+  expect_true(haven::is_tagged_na(results[5], "b")) # Missing (string)
 })
 
 # ==============================================================================
@@ -127,11 +127,11 @@ test_that("score_adl() calculates scores correctly", {
   # Test zero score (no help needed)
   result_zero <- score_adl(2, 2, 2, 2, 2)
   expect_equal(result_zero, 0)
-  
+
   # Test score of 2
   result_two <- score_adl(1, 2, 1, 2, 2)
   expect_equal(result_two, 2)
-  
+
   # Test maximum score
   result_max <- score_adl(1, 1, 1, 1, 1)
   expect_equal(result_max, 5)
@@ -141,11 +141,11 @@ test_that("score_adl() handles missing data in scoring", {
   # Test not applicable priority
   result_na_a <- score_adl(haven::tagged_na("a"), 1, 1, 1, 1)
   expect_true(haven::is_tagged_na(result_na_a, "a"))
-  
+
   # Test missing data
   result_na_b <- score_adl(1, haven::tagged_na("b"), 1, 1, 1)
   expect_true(haven::is_tagged_na(result_na_b, "b"))
-  
+
   # Test mixed: not applicable should take priority
   result_mixed <- score_adl(haven::tagged_na("a"), haven::tagged_na("b"), 1, 1, 1)
   expect_true(haven::is_tagged_na(result_mixed, "a"))
@@ -159,11 +159,11 @@ test_that("score_adl_6() works with 6 items", {
   # Test zero score with 6 items
   result_zero <- score_adl_6(2, 2, 2, 2, 2, 2)
   expect_equal(result_zero, 0)
-  
+
   # Test partial score with finances
   result_partial <- score_adl_6(1, 2, 1, 2, 2, 1)
   expect_equal(result_partial, 3)
-  
+
   # Test maximum score with 6 items
   result_max <- score_adl_6(1, 1, 1, 1, 1, 1)
   expect_equal(result_max, 6)
@@ -173,7 +173,7 @@ test_that("score_adl_6() handles missing data correctly", {
   # Test not applicable in 6-item version
   result_na_a <- score_adl_6(2, 2, 2, 2, 2, haven::tagged_na("a"))
   expect_true(haven::is_tagged_na(result_na_a, "a"))
-  
+
   # Test missing data in 6-item version
   result_na_b <- score_adl_6(1, 1, 1, haven::tagged_na("b"), 1, 1)
   expect_true(haven::is_tagged_na(result_na_b, "b"))
@@ -195,13 +195,13 @@ test_that("assess_adl() validates required parameters", {
 test_that("assess_adl() validates vector length compatibility", {
   # Test incompatible vector lengths
   expect_error(
-    assess_adl(c(1, 2), c(2, 2, 2), c(2, 2), c(2, 2), c(2, 2)), 
+    assess_adl(c(1, 2), c(2, 2, 2), c(2, 2), c(2, 2), c(2, 2)),
     "Input vectors must have compatible lengths"
   )
-  
+
   # Test compatible lengths (equal or scalar)
-  expect_silent(assess_adl(c(1, 2), c(2, 2), c(2, 2), c(2, 2), c(2, 2)))  # Equal lengths
-  expect_silent(assess_adl(1, c(2, 2), c(2, 2), c(2, 2), c(2, 2)))  # Scalar + vector
+  expect_silent(assess_adl(c(1, 2), c(2, 2), c(2, 2), c(2, 2), c(2, 2))) # Equal lengths
+  expect_silent(assess_adl(1, c(2, 2), c(2, 2), c(2, 2), c(2, 2))) # Scalar + vector
 })
 
 test_that("assess_adl() provides informative warnings", {
@@ -226,22 +226,22 @@ test_that("assess_adl() works with data frame contexts", {
     ADL_05 = c(2, 2, 2, 2, 2),
     stringsAsFactors = FALSE
   )
-  
+
   # Test function application to data frame columns
   test_data$ADL_calculated <- assess_adl(
-    test_data$ADL_01, test_data$ADL_02, test_data$ADL_03, 
+    test_data$ADL_01, test_data$ADL_02, test_data$ADL_03,
     test_data$ADL_04, test_data$ADL_05
   )
-  
+
   expect_equal(nrow(test_data), 5)
   expect_true("ADL_calculated" %in% names(test_data))
-  
+
   # Check results
-  expect_equal(test_data$ADL_calculated[1], 1L)  # Needs help
-  expect_equal(test_data$ADL_calculated[2], 2L)  # No help needed
-  expect_equal(test_data$ADL_calculated[3], 1L)  # Needs help (ADL_02=1)
-  expect_true(haven::is_tagged_na(test_data$ADL_calculated[4], "a"))  # Not applicable
-  expect_true(haven::is_tagged_na(test_data$ADL_calculated[5], "b"))  # Missing
+  expect_equal(test_data$ADL_calculated[1], 1L) # Needs help
+  expect_equal(test_data$ADL_calculated[2], 2L) # No help needed
+  expect_equal(test_data$ADL_calculated[3], 1L) # Needs help (ADL_02=1)
+  expect_true(haven::is_tagged_na(test_data$ADL_calculated[4], "a")) # Not applicable
+  expect_true(haven::is_tagged_na(test_data$ADL_calculated[5], "b")) # Missing
 })
 
 # ==============================================================================
@@ -253,20 +253,20 @@ test_that("assess_adl() maintains logical consistency", {
   # Someone needing help with any task should get score 1
   result_any_help <- assess_adl(1, 2, 2, 2, 2)
   expect_equal(result_any_help, 1L)
-  
+
   # Someone needing no help should get score 2
   result_no_help <- assess_adl(2, 2, 2, 2, 2)
   expect_equal(result_no_help, 2L)
-  
+
   # Test with multiple values
   adl_scenarios <- list(
-    c(1, 2, 2, 2, 2),  # Needs help with meals
-    c(2, 2, 2, 2, 2),  # No help needed
-    c(1, 1, 1, 1, 1)   # Needs help with all
+    c(1, 2, 2, 2, 2), # Needs help with meals
+    c(2, 2, 2, 2, 2), # No help needed
+    c(1, 1, 1, 1, 1) # Needs help with all
   )
-  
+
   expected_results <- c(1L, 2L, 1L)
-  
+
   for (i in seq_along(adl_scenarios)) {
     result <- assess_adl(
       adl_scenarios[[i]][1], adl_scenarios[[i]][2], adl_scenarios[[i]][3],
@@ -288,21 +288,21 @@ test_that("assess_adl() handles large datasets efficiently", {
   adl_03 <- sample(c(1, 2), n, replace = TRUE)
   adl_04 <- sample(c(1, 2), n, replace = TRUE)
   adl_05 <- sample(c(1, 2), n, replace = TRUE)
-  
+
   # Should complete without error
   expect_silent({
     start_time <- Sys.time()
     results <- assess_adl(adl_01, adl_02, adl_03, adl_04, adl_05)
     end_time <- Sys.time()
   })
-  
+
   expect_equal(length(results), n)
   expect_type(results, "integer")
-  
+
   # All results should be 1 or 2
   valid_results <- results[!haven::is_tagged_na(results)]
   expect_true(all(valid_results %in% c(1L, 2L)))
-  
+
   # Performance should be reasonable (less than 1 second for 10k observations)
   execution_time <- as.numeric(end_time - start_time)
   expect_lt(execution_time, 1.0)
@@ -320,17 +320,17 @@ test_that("assess_adl() has proper version metadata", {
   expect_true(is.function(score_adl))
   expect_true(exists("score_adl_6"))
   expect_true(is.function(score_adl_6))
-  
+
   # Verify function accepts expected parameters
   formals_names <- names(formals(assess_adl))
   expected_params <- c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05")
-  
+
   expect_true(all(expected_params %in% formals_names))
-  
+
   # Verify score functions have correct parameters
   score_formals <- names(formals(score_adl))
   expect_true(all(expected_params %in% score_formals))
-  
+
   score_6_formals <- names(formals(score_adl_6))
   expected_6_params <- c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06")
   expect_true(all(expected_6_params %in% score_6_formals))
@@ -340,26 +340,34 @@ test_that("assess_adl() functions have proper @note version metadata", {
   # Test that @note metadata exists in function documentation
   function_content <- readLines("R/adl.R")
   note_lines <- function_content[grep("@note", function_content)]
-  
+
   expect_gt(length(note_lines), 0, "Functions must include @note metadata")
-  
+
   # Test version format (semantic versioning vX.Y.Z)
   version_pattern <- "v\\d+\\.\\d+\\.\\d+"
-  expect_true(any(grepl(version_pattern, note_lines)), 
-              "Version must follow semantic versioning (vX.Y.Z)")
-  
+  expect_true(
+    any(grepl(version_pattern, note_lines)),
+    "Version must follow semantic versioning (vX.Y.Z)"
+  )
+
   # Test date format (YYYY-MM-DD)
   date_pattern <- "\\d{4}-\\d{2}-\\d{2}"
-  expect_true(any(grepl(date_pattern, note_lines)),
-              "Date must be in YYYY-MM-DD format")
-  
+  expect_true(
+    any(grepl(date_pattern, note_lines)),
+    "Date must be in YYYY-MM-DD format"
+  )
+
   # Test status is valid
   status_pattern <- "status: (active|deprecated|experimental|legacy)"
-  expect_true(any(grepl(status_pattern, note_lines)),
-              "Status must be active, deprecated, experimental, or legacy")
-  
+  expect_true(
+    any(grepl(status_pattern, note_lines)),
+    "Status must be active, deprecated, experimental, or legacy"
+  )
+
   # Test v3.0.0 version for modernized functions
   v3_pattern <- "v3\\.0\\.0"
-  expect_true(any(grepl(v3_pattern, note_lines)),
-              "Modernized functions should be marked as v3.0.0")
+  expect_true(
+    any(grepl(v3_pattern, note_lines)),
+    "Modernized functions should be marked as v3.0.0"
+  )
 })

@@ -4,15 +4,19 @@ test_that("labels are properly applied to random variables", {
   var_names <- as.character(unique(names(cchs2001Standard)))
   max_num_of_vars <- length(names(cchs2001Standard))
   list_of_vars_to_check <- sample(1:max_num_of_vars,
-                                  floor(max_num_of_vars) / 2,
-                                  replace = TRUE)
-  labeled2001 <- set_data_labels(cchs2001Standard,
-                                 variable_details,
-                                 variables)
+    floor(max_num_of_vars) / 2,
+    replace = TRUE
+  )
+  labeled2001 <- set_data_labels(
+    cchs2001Standard,
+    variable_details,
+    variables
+  )
   for (var_name_index in (list_of_vars_to_check)) {
     first <- as.character(get_label(labeled2001[[var_names[[var_name_index]]]]))
     second <- as.character(variables[
-      variables$variable == var_names[[var_name_index]], "label"])
+      variables$variable == var_names[[var_name_index]], "label"
+    ])
     expect_equal(first, second)
   }
 })

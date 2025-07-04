@@ -45,21 +45,21 @@ test_that("pct_time_fun_cat has expected output when input is in range", {
 
 # immigration_fun
 test_that("immigration_fun has expected output when SDCFIMM is out of range", {
-  expect_equal(immigration_fun(-1,2, 2, 1), "NA(b)")
+  expect_equal(immigration_fun(-1, 2, 2, 1), "NA(b)")
 })
 
 test_that("immigration_fun has expected output when SDCGCBG is out of range", {
-  expect_equal(immigration_fun(1,-2, 2, 1), "NA(b)")
+  expect_equal(immigration_fun(1, -2, 2, 1), "NA(b)")
 })
 
 test_that("immigration_fun has expected output when SDCGCGT is out of range", {
-  expect_equal(immigration_fun(1,2, -2, 1), "NA(b)")
+  expect_equal(immigration_fun(1, 2, -2, 1), "NA(b)")
 })
 
 test_that("immigration_fun has expected output when SDCGRES is out of range", {
-  expect_equal(immigration_fun(1,2, 2, -1), "NA(b)")
+  expect_equal(immigration_fun(1, 2, 2, -1), "NA(b)")
 })
 
 test_that("immigration_fun has expected output when all values are in range", {
-  expect_equal(immigration_fun(1,2, 2, 1), 4)
+  expect_equal(immigration_fun(1, 2, 2, 1), 4)
 })

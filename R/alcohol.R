@@ -13,8 +13,8 @@
 
 # Binge drinking thresholds by sex
 BINGE_THRESHOLDS <- list(
-  male = 5,     # 5+ drinks for males
-  female = 4    # 4+ drinks for females
+  male = 5, # 5+ drinks for males
+  female = 4 # 4+ drinks for females
 )
 
 # Low-risk drinking guidelines (Canada)
@@ -71,26 +71,26 @@ check_alcohol_length_compatibility <- function(...) {
 preprocess_alcohol_variable <- function(alcohol_var) {
   dplyr::case_when(
     # Handle original CCHS missing codes
-    alcohol_var == 6 ~ haven::tagged_na("a"),  # Not applicable
-    alcohol_var %in% c(7, 8, 9) ~ haven::tagged_na("b"),  # Don't know, refusal, not stated
-    
+    alcohol_var == 6 ~ haven::tagged_na("a"), # Not applicable
+    alcohol_var %in% c(7, 8, 9) ~ haven::tagged_na("b"), # Don't know, refusal, not stated
+
     # Handle continuous missing codes (996-999)
-    alcohol_var == 996 ~ haven::tagged_na("a"),  # Not applicable
-    alcohol_var %in% c(997, 998, 999) ~ haven::tagged_na("b"),  # Don't know, refusal, not stated
-    
+    alcohol_var == 996 ~ haven::tagged_na("a"), # Not applicable
+    alcohol_var %in% c(997, 998, 999) ~ haven::tagged_na("b"), # Don't know, refusal, not stated
+
     # Handle string-based missing values (legacy support)
     is.character(alcohol_var) & alcohol_var == "NA(a)" ~ haven::tagged_na("a"),
     is.character(alcohol_var) & alcohol_var == "NA(b)" ~ haven::tagged_na("b"),
     is.character(alcohol_var) & alcohol_var %in% c("Not applicable", "not applicable") ~ haven::tagged_na("a"),
     is.character(alcohol_var) & alcohol_var %in% c("Missing", "Don't know", "Refusal") ~ haven::tagged_na("b"),
-    
+
     # Handle existing haven::tagged_na (passthrough)
     haven::is_tagged_na(alcohol_var, "a") ~ haven::tagged_na("a"),
     haven::is_tagged_na(alcohol_var, "b") ~ haven::tagged_na("b"),
-    
+
     # Handle regular NAs
     is.na(alcohol_var) ~ haven::tagged_na("b"),
-    
+
     # Valid responses pass through as numeric
     .default = as.numeric(alcohol_var)
   )
@@ -106,23 +106,23 @@ preprocess_alcohol_variable <- function(alcohol_var) {
 #' @return Logical indicating binge drinking
 #' @noRd
 check_binge_drinking <- function(daily_drinks_list, sex_threshold) {
-  
   # Check for any not applicable values (highest priority)
   has_not_applicable <- any(sapply(daily_drinks_list, function(x) haven::is_tagged_na(x, "a")))
-  
+
   # Check for any missing values
   has_missing <- any(sapply(daily_drinks_list, function(x) haven::is_tagged_na(x, "b") | is.na(x)))
-  
+
   # Check for binge drinking (any day >= threshold)
-  has_binge_day <- any(sapply(daily_drinks_list, function(x) 
-    if(!haven::is_tagged_na(x) & !is.na(x)) x >= sex_threshold else FALSE))
-  
+  has_binge_day <- any(sapply(daily_drinks_list, function(x) {
+    if (!haven::is_tagged_na(x) & !is.na(x)) x >= sex_threshold else FALSE
+  }))
+
   # Return result based on missing data priority
   dplyr::case_when(
     has_not_applicable ~ haven::tagged_na("a"),
     has_missing ~ haven::tagged_na("b"),
-    has_binge_day ~ 1L,  # Binge drinker
-    .default = 2L  # Non-binge drinker
+    has_binge_day ~ 1L, # Binge drinker
+    .default = 2L # Non-binge drinker
   )
 }
 
@@ -134,38 +134,40 @@ check_binge_drinking <- function(daily_drinks_list, sex_threshold) {
 #' @return Risk level indicator
 #' @noRd
 assess_drinking_risk <- function(daily_drinks_list, weekly_drinks, sex, risk_type = "short") {
-  
   # Get appropriate thresholds
   if (risk_type == "short") {
-    daily_threshold <- if (sex == 1) 4 else 3  # Short-term daily limits
-    weekly_threshold <- if (sex == 1) 15 else 10  # Short-term weekly limits
-  } else {  # long-term
-    daily_threshold <- if (sex == 1) 3 else 2  # Long-term daily limits  
-    weekly_threshold <- if (sex == 1) 15 else 10  # Long-term weekly limits
+    daily_threshold <- if (sex == 1) 4 else 3 # Short-term daily limits
+    weekly_threshold <- if (sex == 1) 15 else 10 # Short-term weekly limits
+  } else { # long-term
+    daily_threshold <- if (sex == 1) 3 else 2 # Long-term daily limits
+    weekly_threshold <- if (sex == 1) 15 else 10 # Long-term weekly limits
   }
-  
+
   # Check for any not applicable values
   has_not_applicable <- any(sapply(daily_drinks_list, function(x) haven::is_tagged_na(x, "a"))) ||
-                        haven::is_tagged_na(weekly_drinks, "a")
-  
+    haven::is_tagged_na(weekly_drinks, "a")
+
   # Check for any missing values
   has_missing <- any(sapply(daily_drinks_list, function(x) haven::is_tagged_na(x, "b") | is.na(x))) ||
-                 haven::is_tagged_na(weekly_drinks, "b") || is.na(weekly_drinks)
-  
+    haven::is_tagged_na(weekly_drinks, "b") || is.na(weekly_drinks)
+
   # Check for high-risk drinking
-  has_high_daily <- any(sapply(daily_drinks_list, function(x) 
-    if(!haven::is_tagged_na(x) & !is.na(x)) x > daily_threshold else FALSE))
-  
-  has_high_weekly <- if(!haven::is_tagged_na(weekly_drinks) & !is.na(weekly_drinks)) {
+  has_high_daily <- any(sapply(daily_drinks_list, function(x) {
+    if (!haven::is_tagged_na(x) & !is.na(x)) x > daily_threshold else FALSE
+  }))
+
+  has_high_weekly <- if (!haven::is_tagged_na(weekly_drinks) & !is.na(weekly_drinks)) {
     weekly_drinks > weekly_threshold
-  } else FALSE
-  
+  } else {
+    FALSE
+  }
+
   # Return risk assessment
   dplyr::case_when(
     has_not_applicable ~ haven::tagged_na("a"),
     has_missing ~ haven::tagged_na("b"),
-    has_high_daily | has_high_weekly ~ 1L,  # Increased risk
-    .default = 2L  # No increased risk
+    has_high_daily | has_high_weekly ~ 1L, # Increased risk
+    .default = 2L # No increased risk
   )
 }
 
@@ -175,9 +177,9 @@ assess_drinking_risk <- function(daily_drinks_list, weekly_drinks, sex, risk_typ
 
 #' Identify binge drinking patterns with sex-specific thresholds
 #'
-#' @description 
-#' Identify binge drinking patterns based on sex-specific daily consumption thresholds. Examines 
-#' daily alcohol consumption across the week, applying sex-specific binge criteria for acute 
+#' @description
+#' Identify binge drinking patterns based on sex-specific daily consumption thresholds. Examines
+#' daily alcohol consumption across the week, applying sex-specific binge criteria for acute
 #' alcohol risk assessment in population health research.
 #'
 #' @param DHH_SEX CCHS variable for sex (1=male, 2=female). Accepts raw CCHS codes or preprocessed values.
@@ -200,40 +202,45 @@ assess_drinking_risk <- function(daily_drinks_list, weekly_drinks, sex, risk_typ
 #' @details
 #' Only applied to respondents who had alcohol in past week. Non-drinkers receive not applicable status.
 #' Enhanced preprocessing may identify different patterns compared to legacy if_else2() implementation.
-#' 
+#'
 #' Calculation criteria: Males: Binge = ≥5 drinks on any single day; Females: Binge = ≥4 drinks on any single day.
 #' Comprehensive preprocessing of CCHS codes (6,7,8,9 and 996-999) is applied. Priority: Not applicable > Missing > Valid assessment.
 #'
 #' @examples
 #' # Standard cchsflow workflow (primary usage)
 #' library(cchsflow)
-#' result <- rec_with_table(cchs2013_2014_p, 
-#'                         c("DHH_SEX", "ALW_1", "ALW_2A1", "ALW_2A2", "ALW_2A3", 
-#'                           "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDBINGE_der"))
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c(
+#'     "DHH_SEX", "ALW_1", "ALW_2A1", "ALW_2A2", "ALW_2A3",
+#'     "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDBINGE_der"
+#'   )
+#' )
 #'
 #' # Male binge drinker (6 drinks Tuesday, 8 drinks Friday)
-#' assess_binge_drinking(1, 1, 3, 1, 6, 0, 3, 8, 2)  # Returns: 1
+#' assess_binge_drinking(1, 1, 3, 1, 6, 0, 3, 8, 2) # Returns: 1
 #'
 #' # Female non-binge drinker (all days ≤3 drinks)
-#' assess_binge_drinking(2, 1, 1, 2, 2, 3, 0, 1, 2)  # Returns: 2
+#' assess_binge_drinking(2, 1, 1, 2, 2, 3, 0, 1, 2) # Returns: 2
 #'
 #' # Vector processing with missing data
-#' assess_binge_drinking(c(1, 2, 6), c(1, 1, 7), c(5, 4, 2), c(0, 0, 2), 
-#'                      c(0, 0, 2), c(0, 0, 2), c(0, 0, 2), c(0, 0, 2), c(0, 0, 2))
+#' assess_binge_drinking(
+#'   c(1, 2, 6), c(1, 1, 7), c(5, 4, 2), c(0, 0, 2),
+#'   c(0, 0, 2), c(0, 0, 2), c(0, 0, 2), c(0, 0, 2), c(0, 0, 2)
+#' )
 #'
 #' @seealso
 #' \\code{\\link{assess_drinking_risk_short}} for short-term drinking risk assessment
 #' \\code{\\link{assess_drinking_risk_long}} for long-term drinking risk assessment
 #'
 #' @references
-#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines 
+#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines
 #' for low-risk drinking. Canadian Centre on Substance Abuse.
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
 #' @export
-assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, 
-                              ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
-  
+assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
+                                  ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
   # 1. Enhanced input validation
   validate_alcohol_parameter("DHH_SEX", DHH_SEX, required = TRUE)
   validate_alcohol_parameter("ALW_1", ALW_1, required = TRUE)
@@ -244,13 +251,15 @@ assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
   validate_alcohol_parameter("ALW_2A5", ALW_2A5, required = TRUE)
   validate_alcohol_parameter("ALW_2A6", ALW_2A6, required = TRUE)
   validate_alcohol_parameter("ALW_2A7", ALW_2A7, required = TRUE)
-  
+
   # 2. Length compatibility check
-  if (!check_alcohol_length_compatibility(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, 
-                                         ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)) {
+  if (!check_alcohol_length_compatibility(
+    DHH_SEX, ALW_1, ALW_2A1, ALW_2A2,
+    ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7
+  )) {
     stop("Input vectors must have compatible lengths", call. = FALSE)
   }
-  
+
   # 3. Preprocess all alcohol variables
   dhh_sex_processed <- preprocess_alcohol_variable(DHH_SEX)
   alw_1_processed <- preprocess_alcohol_variable(ALW_1)
@@ -261,62 +270,64 @@ assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
   alw_2a5_processed <- preprocess_alcohol_variable(ALW_2A5)
   alw_2a6_processed <- preprocess_alcohol_variable(ALW_2A6)
   alw_2a7_processed <- preprocess_alcohol_variable(ALW_2A7)
-  
+
   # 4. Calculate binge drinking status
-  daily_drinks_list <- list(alw_2a1_processed, alw_2a2_processed, alw_2a3_processed,
-                           alw_2a4_processed, alw_2a5_processed, alw_2a6_processed,
-                           alw_2a7_processed)
-  
+  daily_drinks_list <- list(
+    alw_2a1_processed, alw_2a2_processed, alw_2a3_processed,
+    alw_2a4_processed, alw_2a5_processed, alw_2a6_processed,
+    alw_2a7_processed
+  )
+
   # Vectorized calculation
   result <- vector("integer", length(dhh_sex_processed))
-  
+
   for (i in seq_along(dhh_sex_processed)) {
     # Check prerequisites first
     sex_val <- dhh_sex_processed[i]
     alw_1_val <- alw_1_processed[i]
-    
+
     # Handle missing sex or drinking status
     if (haven::is_tagged_na(sex_val, "a") | haven::is_tagged_na(alw_1_val, "a")) {
       result[i] <- haven::tagged_na("a")
       next
     }
-    
+
     if (haven::is_tagged_na(sex_val, "b") | haven::is_tagged_na(alw_1_val, "b") |
-        is.na(sex_val) | is.na(alw_1_val)) {
+      is.na(sex_val) | is.na(alw_1_val)) {
       result[i] <- haven::tagged_na("b")
       next
     }
-    
+
     # Not applicable if no drinking in past week
     if (alw_1_val == 2) {
       result[i] <- haven::tagged_na("a")
       next
     }
-    
+
     # Invalid sex
     if (!(sex_val %in% c(1, 2))) {
       result[i] <- haven::tagged_na("b")
       next
     }
-    
+
     # Get daily drinks for this observation
     daily_drinks_i <- lapply(daily_drinks_list, function(x) x[i])
-    
+
     # Determine binge threshold
     binge_threshold <- if (sex_val == 1) BINGE_THRESHOLDS$male else BINGE_THRESHOLDS$female
-    
+
     # Check binge drinking
     result[i] <- check_binge_drinking(daily_drinks_i, binge_threshold)
   }
-  
+
   return(result)
 }
 
 #' Assess short-term alcohol health risks using Low-Risk Guidelines
 #'
-#' @description 
+#' @description
 #' Assess short-term health risks from drinking patterns following Canada's Low-Risk Guidelines.
-#' Evaluates daily and weekly consumption against sex-specific acute risk thresholds for 
+#' Evaluates daily and weekly consumption against sex-specific acute risk thresholds for
 #' injury and overdose risk assessment.
 #'
 #' @param DHH_SEX,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in assess_binge_drinking()
@@ -333,37 +344,40 @@ assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
 #' @details
 #' Based on Canada's Low-Risk Alcohol Drinking Guidelines. Thresholds may differ from other national guidelines.
 #' Non-drinkers (past year or week) receive "no increased risk" classification.
-#' 
+#'
 #' Risk criteria: Males: >4 drinks/day OR >15 drinks/week; Females: >3 drinks/day OR >10 drinks/week.
-#' Comprehensive preprocessing with priority handling is applied. Non-drinkers are automatically 
+#' Comprehensive preprocessing with priority handling is applied. Non-drinkers are automatically
 #' classified as "no increased risk".
 #'
 #' @examples
 #' # Standard cchsflow workflow (primary usage)
 #' library(cchsflow)
-#' result <- rec_with_table(cchs2013_2014_p, 
-#'                         c("DHH_SEX", "ALWDWKY", "ALC_1", "ALW_1", "ALW_2A1", "ALW_2A2", 
-#'                           "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDLOWI_der"))
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c(
+#'     "DHH_SEX", "ALWDWKY", "ALC_1", "ALW_1", "ALW_2A1", "ALW_2A2",
+#'     "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDLOWI_der"
+#'   )
+#' )
 #'
 #' # Male with increased short-term risk (5 drinks one day, 20 drinks/week)
-#' assess_drinking_risk_short(1, 20, 1, 1, 0, 0, 5, 0, 0, 0, 0)  # Returns: 1
+#' assess_drinking_risk_short(1, 20, 1, 1, 0, 0, 5, 0, 0, 0, 0) # Returns: 1
 #'
 #' # Female with no increased risk (2 drinks max/day, 8 drinks/week)
-#' assess_drinking_risk_short(2, 8, 1, 1, 2, 1, 2, 1, 1, 1, 0)  # Returns: 2
+#' assess_drinking_risk_short(2, 8, 1, 1, 2, 1, 2, 1, 1, 1, 0) # Returns: 2
 #'
 #' @seealso
 #' \code{\link{assess_binge_drinking}} for binge drinking assessment
 #' \code{\link{assess_drinking_risk_long}} for long-term drinking risk assessment
 #'
 #' @references
-#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines 
+#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines
 #' for low-risk drinking. Canadian Centre on Substance Abuse.
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive risk assessment and missing data handling
 #' @export
-assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, 
-                                ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
-  
+assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
+                                       ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
   # 1. Input validation
   validate_alcohol_parameter("DHH_SEX", DHH_SEX, required = TRUE)
   validate_alcohol_parameter("ALWDWKY", ALWDWKY, required = TRUE)
@@ -376,13 +390,15 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
   validate_alcohol_parameter("ALW_2A5", ALW_2A5, required = TRUE)
   validate_alcohol_parameter("ALW_2A6", ALW_2A6, required = TRUE)
   validate_alcohol_parameter("ALW_2A7", ALW_2A7, required = TRUE)
-  
+
   # 2. Length compatibility check
-  if (!check_alcohol_length_compatibility(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, 
-                                         ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)) {
+  if (!check_alcohol_length_compatibility(
+    DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
+    ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7
+  )) {
     stop("Input vectors must have compatible lengths", call. = FALSE)
   }
-  
+
   # 3. Preprocess all variables
   dhh_sex_processed <- preprocess_alcohol_variable(DHH_SEX)
   alwdwky_processed <- preprocess_alcohol_variable(ALWDWKY)
@@ -395,37 +411,36 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
   alw_2a5_processed <- preprocess_alcohol_variable(ALW_2A5)
   alw_2a6_processed <- preprocess_alcohol_variable(ALW_2A6)
   alw_2a7_processed <- preprocess_alcohol_variable(ALW_2A7)
-  
+
   # 4. Risk assessment with comprehensive missing data handling
   dplyr::case_when(
     # Handle missing data priority
     haven::is_tagged_na(dhh_sex_processed, "a") | haven::is_tagged_na(alwdwky_processed, "a") |
-    haven::is_tagged_na(alc_1_processed, "a") | haven::is_tagged_na(alw_1_processed, "a") ~ haven::tagged_na("a"),
-    
+      haven::is_tagged_na(alc_1_processed, "a") | haven::is_tagged_na(alw_1_processed, "a") ~ haven::tagged_na("a"),
     haven::is_tagged_na(dhh_sex_processed, "b") | haven::is_tagged_na(alwdwky_processed, "b") |
-    haven::is_tagged_na(alc_1_processed, "b") | haven::is_tagged_na(alw_1_processed, "b") |
-    is.na(dhh_sex_processed) | is.na(alwdwky_processed) | is.na(alc_1_processed) | is.na(alw_1_processed) ~ haven::tagged_na("b"),
-    
+      haven::is_tagged_na(alc_1_processed, "b") | haven::is_tagged_na(alw_1_processed, "b") |
+      is.na(dhh_sex_processed) | is.na(alwdwky_processed) | is.na(alc_1_processed) | is.na(alw_1_processed) ~ haven::tagged_na("b"),
+
     # Invalid values
     !(dhh_sex_processed %in% c(1, 2)) | !(alc_1_processed %in% c(1, 2)) | !(alw_1_processed %in% c(1, 2)) ~ haven::tagged_na("b"),
-    
+
     # Non-drinkers (no increased risk)
     alc_1_processed == 2 | alw_1_processed == 2 ~ 2L,
-    
+
     # Risk assessment for males
     dhh_sex_processed == 1 & (
       alw_2a1_processed >= 5 | alw_2a2_processed >= 5 | alw_2a3_processed >= 5 |
-      alw_2a4_processed >= 5 | alw_2a5_processed >= 5 | alw_2a6_processed >= 5 |
-      alw_2a7_processed >= 5 | alwdwky_processed >= 16
+        alw_2a4_processed >= 5 | alw_2a5_processed >= 5 | alw_2a6_processed >= 5 |
+        alw_2a7_processed >= 5 | alwdwky_processed >= 16
     ) ~ 1L,
-    
-    # Risk assessment for females  
+
+    # Risk assessment for females
     dhh_sex_processed == 2 & (
       alw_2a1_processed >= 4 | alw_2a2_processed >= 4 | alw_2a3_processed >= 4 |
-      alw_2a4_processed >= 4 | alw_2a5_processed >= 4 | alw_2a6_processed >= 4 |
-      alw_2a7_processed >= 4 | alwdwky_processed >= 11
+        alw_2a4_processed >= 4 | alw_2a5_processed >= 4 | alw_2a6_processed >= 4 |
+        alw_2a7_processed >= 4 | alwdwky_processed >= 11
     ) ~ 1L,
-    
+
     # No increased risk (within guidelines)
     .default = 2L
   )
@@ -433,9 +448,9 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 
 #' Assess long-term alcohol health risks using Low-Risk Guidelines
 #'
-#' @description 
+#' @description
 #' Assess long-term health risks from drinking patterns following Canada's Low-Risk Guidelines.
-#' Evaluates daily and weekly consumption against sex-specific chronic risk thresholds for 
+#' Evaluates daily and weekly consumption against sex-specific chronic risk thresholds for
 #' long-term health outcomes assessment.
 #'
 #' @param DHH_SEX,ALWDWKY,ALC_1,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in assess_drinking_risk_short()
@@ -449,35 +464,38 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 #'
 #' @details
 #' Risk criteria: Males: >3 drinks/day OR >15 drinks/week; Females: >2 drinks/day OR >10 drinks/week.
-#' Focus on chronic health risks (liver disease, cancer, cardiovascular). Same preprocessing and 
+#' Focus on chronic health risks (liver disease, cancer, cardiovascular). Same preprocessing and
 #' missing data handling as short-term version.
 #'
 #' @examples
 #' # Standard cchsflow workflow (primary usage)
 #' library(cchsflow)
-#' result <- rec_with_table(cchs2013_2014_p, 
-#'                         c("DHH_SEX", "ALWDWKY", "ALC_1", "ALW_1", "ALW_2A1", "ALW_2A2", 
-#'                           "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDLOWL_der"))
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c(
+#'     "DHH_SEX", "ALWDWKY", "ALC_1", "ALW_1", "ALW_2A1", "ALW_2A2",
+#'     "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDLOWL_der"
+#'   )
+#' )
 #'
 #' # Male with increased long-term risk (4 drinks one day, 20 drinks/week)
-#' assess_drinking_risk_long(1, 20, 1, 1, 0, 0, 4, 0, 0, 0, 0)  # Returns: 1
+#' assess_drinking_risk_long(1, 20, 1, 1, 0, 0, 4, 0, 0, 0, 0) # Returns: 1
 #'
 #' # Female with no increased risk (2 drinks max/day, 8 drinks/week)
-#' assess_drinking_risk_long(2, 8, 1, 1, 2, 1, 2, 1, 1, 0, 0)  # Returns: 2
+#' assess_drinking_risk_long(2, 8, 1, 1, 2, 1, 2, 1, 1, 0, 0) # Returns: 2
 #'
 #' @seealso
 #' \code{\link{assess_drinking_risk_short}} for short-term drinking risk assessment
 #' \code{\link{assess_binge_drinking}} for binge drinking assessment
 #'
 #' @references
-#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines 
+#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines
 #' for low-risk drinking. Canadian Centre on Substance Abuse.
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive long-term risk assessment
 #' @export
-assess_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, 
-                               ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
-  
+assess_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
+                                      ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7) {
   # 1. Input validation (same as short-term)
   validate_alcohol_parameter("DHH_SEX", DHH_SEX, required = TRUE)
   validate_alcohol_parameter("ALWDWKY", ALWDWKY, required = TRUE)
@@ -490,13 +508,15 @@ assess_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
   validate_alcohol_parameter("ALW_2A5", ALW_2A5, required = TRUE)
   validate_alcohol_parameter("ALW_2A6", ALW_2A6, required = TRUE)
   validate_alcohol_parameter("ALW_2A7", ALW_2A7, required = TRUE)
-  
+
   # 2. Length compatibility check
-  if (!check_alcohol_length_compatibility(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, 
-                                         ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)) {
+  if (!check_alcohol_length_compatibility(
+    DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
+    ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7
+  )) {
     stop("Input vectors must have compatible lengths", call. = FALSE)
   }
-  
+
   # 3. Preprocess all variables (same as short-term)
   dhh_sex_processed <- preprocess_alcohol_variable(DHH_SEX)
   alwdwky_processed <- preprocess_alcohol_variable(ALWDWKY)
@@ -509,37 +529,36 @@ assess_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
   alw_2a5_processed <- preprocess_alcohol_variable(ALW_2A5)
   alw_2a6_processed <- preprocess_alcohol_variable(ALW_2A6)
   alw_2a7_processed <- preprocess_alcohol_variable(ALW_2A7)
-  
+
   # 4. Long-term risk assessment with different thresholds
   dplyr::case_when(
     # Handle missing data priority (same logic as short-term)
     haven::is_tagged_na(dhh_sex_processed, "a") | haven::is_tagged_na(alwdwky_processed, "a") |
-    haven::is_tagged_na(alc_1_processed, "a") | haven::is_tagged_na(alw_1_processed, "a") ~ haven::tagged_na("a"),
-    
+      haven::is_tagged_na(alc_1_processed, "a") | haven::is_tagged_na(alw_1_processed, "a") ~ haven::tagged_na("a"),
     haven::is_tagged_na(dhh_sex_processed, "b") | haven::is_tagged_na(alwdwky_processed, "b") |
-    haven::is_tagged_na(alc_1_processed, "b") | haven::is_tagged_na(alw_1_processed, "b") |
-    is.na(dhh_sex_processed) | is.na(alwdwky_processed) | is.na(alc_1_processed) | is.na(alw_1_processed) ~ haven::tagged_na("b"),
-    
+      haven::is_tagged_na(alc_1_processed, "b") | haven::is_tagged_na(alw_1_processed, "b") |
+      is.na(dhh_sex_processed) | is.na(alwdwky_processed) | is.na(alc_1_processed) | is.na(alw_1_processed) ~ haven::tagged_na("b"),
+
     # Invalid values
     !(dhh_sex_processed %in% c(1, 2)) | !(alc_1_processed %in% c(1, 2)) | !(alw_1_processed %in% c(1, 2)) ~ haven::tagged_na("b"),
-    
+
     # Non-drinkers (no increased risk)
     alc_1_processed == 2 | alw_1_processed == 2 ~ 2L,
-    
+
     # Long-term risk assessment for males (≥4 drinks/day OR ≥16 drinks/week)
     dhh_sex_processed == 1 & (
       alw_2a1_processed >= 4 | alw_2a2_processed >= 4 | alw_2a3_processed >= 4 |
-      alw_2a4_processed >= 4 | alw_2a5_processed >= 4 | alw_2a6_processed >= 4 |
-      alw_2a7_processed >= 4 | alwdwky_processed >= 16
+        alw_2a4_processed >= 4 | alw_2a5_processed >= 4 | alw_2a6_processed >= 4 |
+        alw_2a7_processed >= 4 | alwdwky_processed >= 16
     ) ~ 1L,
-    
+
     # Long-term risk assessment for females (≥3 drinks/day OR ≥11 drinks/week)
     dhh_sex_processed == 2 & (
       alw_2a1_processed >= 3 | alw_2a2_processed >= 3 | alw_2a3_processed >= 3 |
-      alw_2a4_processed >= 3 | alw_2a5_processed >= 3 | alw_2a6_processed >= 3 |
-      alw_2a7_processed >= 3 | alwdwky_processed >= 11
+        alw_2a4_processed >= 3 | alw_2a5_processed >= 3 | alw_2a6_processed >= 3 |
+        alw_2a7_processed >= 3 | alwdwky_processed >= 11
     ) ~ 1L,
-    
+
     # No increased long-term risk (within guidelines)
     .default = 2L
   )

@@ -27,4 +27,3 @@ test_that("binge_drinker_fun has expected output when all values are
           in range", {
   expect_equal(binge_drinker_fun(1, 1, 1, 1, 1, 1, 1, 1, 1), 2)
 })
-
