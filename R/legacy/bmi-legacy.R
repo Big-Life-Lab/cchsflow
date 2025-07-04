@@ -117,7 +117,7 @@ calculate_validated_bmi <- function(height, weight, min_height, max_height,
   is_valid <- validate_height_weight(
     height, weight, min_height, max_height, min_weight, max_weight
   )
-  
+
   dplyr::case_when(
     !is_valid ~ haven::tagged_na("b"),
     .default = apply_bmi_outlier_detection(
@@ -182,7 +182,7 @@ bmi_fun_D <-
 #' @title Adjusted Body Mass Index (BMI) derived variable
 #' @description BMI with sex-specific corrections for self-reporting bias.
 #' @param DHH_SEX CCHS variable for sex (1=male, 2=female)
-#' @param HWTGHTM CCHS variable for height (in meters)  
+#' @param HWTGHTM CCHS variable for height (in meters)
 #' @param HWTGWTK CCHS variable for weight (in kilograms)
 #' @param min_HWTGHTM,max_HWTGHTM,min_HWTGWTK,max_HWTGWTK,BMI_min,BMI_max Validation parameters
 #' @return numeric value for adjusted BMI. Returns tagged_na("b") for invalid measurements.
@@ -196,7 +196,7 @@ adjusted_bmi_fun <-
     is_valid <- validate_height_weight(
       HWTGHTM, HWTGWTK, min_HWTGHTM, max_HWTGHTM, min_HWTGWTK, max_HWTGWTK
     )
-    
+
     dplyr::case_when(
       is.na(DHH_SEX) ~ haven::tagged_na("b"),
       !is_valid ~ haven::tagged_na("b"),
@@ -223,7 +223,7 @@ adjusted_bmi_fun_D <-
     is_valid <- validate_height_weight(
       HWTDHTM, HWTDWTK, min_HWTGHTM, max_HWTGHTM, min_HWTGWTK, max_HWTGWTK
     )
-    
+
     # Validation with pregnancy, sex, and measurement checks
     dplyr::case_when(
       is.na(MAM_037) ~ haven::tagged_na("b"), # Missing pregnancy status

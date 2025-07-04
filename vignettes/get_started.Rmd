@@ -168,7 +168,6 @@ sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX",
 Labels can then be used in plots and tables.
 
 ```{r fig1, fig.height = 5, fig.width = 7, warning=FALSE}
-
 barplot(
   table(as_label(sex2001$DHH_SEX)),
   col = cm.colors(5),

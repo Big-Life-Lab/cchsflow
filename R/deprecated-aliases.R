@@ -22,24 +22,27 @@
 #' @rdname calculate_bmi
 #' @export
 bmi_fun <- function(...) {
-  .Deprecated("calculate_bmi", 
-              msg = "bmi_fun() is deprecated. Use calculate_bmi() instead. See ?calculate_bmi for details.")
+  .Deprecated("calculate_bmi",
+    msg = "bmi_fun() is deprecated. Use calculate_bmi() instead. See ?calculate_bmi for details."
+  )
   calculate_bmi(...)
 }
 
 #' @rdname adjust_bmi
 #' @export
 adjusted_bmi_fun <- function(...) {
-  .Deprecated("adjust_bmi", 
-              msg = "adjusted_bmi_fun() is deprecated. Use adjust_bmi() instead. See ?adjust_bmi for details.")
+  .Deprecated("adjust_bmi",
+    msg = "adjusted_bmi_fun() is deprecated. Use adjust_bmi() instead. See ?adjust_bmi for details."
+  )
   adjust_bmi(...)
 }
 
 #' @rdname categorize_bmi
 #' @export
 bmi_fun_cat <- function(...) {
-  .Deprecated("categorize_bmi", 
-              msg = "bmi_fun_cat() is deprecated. Use categorize_bmi() instead. See ?categorize_bmi for details.")
+  .Deprecated("categorize_bmi",
+    msg = "bmi_fun_cat() is deprecated. Use categorize_bmi() instead. See ?categorize_bmi for details."
+  )
   categorize_bmi(...)
 }
 
@@ -50,24 +53,27 @@ bmi_fun_cat <- function(...) {
 #' @rdname assess_adl
 #' @export
 adl_fun <- function(...) {
-  .Deprecated("assess_adl", 
-              msg = "adl_fun() is deprecated. Use assess_adl() instead. See ?assess_adl for details.")
+  .Deprecated("assess_adl",
+    msg = "adl_fun() is deprecated. Use assess_adl() instead. See ?assess_adl for details."
+  )
   assess_adl(...)
 }
 
 #' @rdname score_adl
 #' @export
 adl_score_5_fun <- function(...) {
-  .Deprecated("score_adl", 
-              msg = "adl_score_5_fun() is deprecated. Use score_adl() instead. See ?score_adl for details.")
+  .Deprecated("score_adl",
+    msg = "adl_score_5_fun() is deprecated. Use score_adl() instead. See ?score_adl for details."
+  )
   score_adl(...)
 }
 
 #' @rdname score_adl_6
 #' @export
 adl_score_6_fun <- function(...) {
-  .Deprecated("score_adl_6", 
-              msg = "adl_score_6_fun() is deprecated. Use score_adl_6() instead. See ?score_adl_6 for details.")
+  .Deprecated("score_adl_6",
+    msg = "adl_score_6_fun() is deprecated. Use score_adl_6() instead. See ?score_adl_6 for details."
+  )
   score_adl_6(...)
 }
 
@@ -78,24 +84,27 @@ adl_score_6_fun <- function(...) {
 #' @rdname assess_binge_drinking
 #' @export
 binge_drinker_fun <- function(...) {
-  .Deprecated("assess_binge_drinking", 
-              msg = "binge_drinker_fun() is deprecated. Use assess_binge_drinking() instead. See ?assess_binge_drinking for details.")
+  .Deprecated("assess_binge_drinking",
+    msg = "binge_drinker_fun() is deprecated. Use assess_binge_drinking() instead. See ?assess_binge_drinking for details."
+  )
   assess_binge_drinking(...)
 }
 
 #' @rdname assess_drinking_risk_short
 #' @export
 low_drink_short_fun <- function(...) {
-  .Deprecated("assess_drinking_risk_short", 
-              msg = "low_drink_short_fun() is deprecated. Use assess_drinking_risk_short() instead. See ?assess_drinking_risk_short for details.")
+  .Deprecated("assess_drinking_risk_short",
+    msg = "low_drink_short_fun() is deprecated. Use assess_drinking_risk_short() instead. See ?assess_drinking_risk_short for details."
+  )
   assess_drinking_risk_short(...)
 }
 
 #' @rdname assess_drinking_risk_long
 #' @export
 low_drink_long_fun <- function(...) {
-  .Deprecated("assess_drinking_risk_long", 
-              msg = "low_drink_long_fun() is deprecated. Use assess_drinking_risk_long() instead. See ?assess_drinking_risk_long for details.")
+  .Deprecated("assess_drinking_risk_long",
+    msg = "low_drink_long_fun() is deprecated. Use assess_drinking_risk_long() instead. See ?assess_drinking_risk_long for details."
+  )
   assess_drinking_risk_long(...)
 }
 
@@ -106,8 +115,9 @@ low_drink_long_fun <- function(...) {
 #' @rdname calculate_energy_expenditure
 #' @export
 energy_exp_fun <- function(...) {
-  .Deprecated("calculate_energy_expenditure", 
-              msg = "energy_exp_fun() is deprecated. Use calculate_energy_expenditure() instead. See ?calculate_energy_expenditure for details.")
+  .Deprecated("calculate_energy_expenditure",
+    msg = "energy_exp_fun() is deprecated. Use calculate_energy_expenditure() instead. See ?calculate_energy_expenditure for details."
+  )
   calculate_energy_expenditure(...)
 }
 

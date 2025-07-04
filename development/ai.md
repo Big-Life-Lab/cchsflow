@@ -61,20 +61,32 @@ This folder contains development documentation specifically designed for AI assi
 
 ## Code Quality Standards
 
+### Style and Linting ⚠️ **Critical for PRs**
+- **ALWAYS run before committing**:
+  - `lintr::lint_package()` or `lintr::lint_dir()` for style checking
+  - `styler::style_pkg()` or `styler::style_dir()` for automatic formatting
+  - `markdownlint **/*.md **/*.qmd` for documentation consistency
+- **Follow Tidyverse Style Guide** strictly (see development/style-guide.md)
+- **Canadian English spelling**: behaviour, centre, analyze, licence (noun)/license (verb)
+- **Sentence case headings**: "Function implementation details" (not "Function Implementation Details")
+
 ### Testing
 - All functions must have comprehensive testthat tests
 - Test both success and failure paths
 - Include edge cases and missing data scenarios
+- Follow test documentation standards from development/style-guide.md
 
 ### Documentation
-- roxygen2 documentation for all exported functions
+- roxygen2 documentation for all exported functions following development/style-guide.md
 - Clear parameter descriptions and examples
-- Version notes for internal functions
+- Version notes for internal functions (v3.0.0 standard)
+- **AMA Manual of Style** for scientific writing standards
 
 ### Architecture Compliance
 - Use established helper functions from missing-data-helpers.R
 - Follow DRY principles for tagged NA handling
 - Maintain backward compatibility with rec_with_table()
+- Validation bounds managed through variable_details.csv (not hard-coded constants)
 
 ## Common Patterns
 
@@ -114,6 +126,31 @@ test_that("function handles vectors correctly", {
 - haven package for tagged_na functionality
 - dplyr for data manipulation
 - vctrs for vector compatibility checking
+
+## Related Documentation
+
+### 📋 **development/style-guide.md** - Writing and Code Standards
+- AMA Manual of Style guidelines for scientific writing
+- Tidyverse Style Guide compliance and enforcement
+- markdownlint and styler configuration
+- Documentation templates and standards
+- **Use this for**: Code review, writing standards, linting setup
+
+### 📋 **development/TODO.md** - Current Development Tasks
+- Active task list with priorities and status
+- Session-to-session continuity tracking
+- **Use this for**: Understanding current work and next steps
+
+### 📋 **development/ISSUES_TO_DISCUSS.md** - Technical Issues
+- Known technical issues requiring team discussion
+- Implementation decisions and research vs. practice trade-offs
+- **Use this for**: Understanding context behind code decisions
+
+### 📋 **inst/metadata/schemas/core/** - Authoritative Data Structure Reference
+- **variables.yaml** - Schema for variables.csv (variable definitions, types, labels)
+- **variable_details.yaml** - Schema for variable_details.csv (transformation rules, recoding)
+- **Use this for**: Understanding proper CSV structure, validation patterns, naming conventions
+- **Critical**: These define the canonical structure for CCHS data harmonization
 
 ---
 
