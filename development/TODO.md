@@ -25,6 +25,20 @@
 
 ## 📋 Medium Priority 
 
+### Documentation & User Experience
+- [ ] **Update derived_variables_development.qmd vignette**
+  - Add examples and tutorials for reading/creating derived variables
+  - Document helper functions (generate_tagged_na_conditions, validation functions)
+  - Provide walkthrough of BMI modernization as template
+  - Include !!! splice operator explanation with examples
+  - Status: Needed after a few more function refactors
+
+- [ ] **Create "cut and paste" usage vignette**
+  - Document how to use derived variables outside cchsflow package
+  - Show standalone function usage with embedded constants
+  - Provide extraction patterns for research use
+  - Status: Low priority
+
 ### Infrastructure Improvements
 - [ ] **Review and consolidate function naming conventions**
   - Current: calculate_, categorize_, score_, adjust_, validate_
@@ -40,6 +54,14 @@
   - Update vignettes to reflect v3.0.0 patterns
   - Create tutorials for new helper function architecture
   - Document CSV-driven validation approach
+
+### Validation Synchronization
+- [ ] **Implement validation bounds synchronization system**
+  - Create tests to ensure function constants match variable_details.csv
+  - Consider helper function to generate/inject constants from CSV
+  - Explore automated code generation vs manual synchronization
+  - Ideas: configuration file generation, code modification helpers
+  - Status: Low priority discussion item - many considerations
 
 ## 🔧 Low Priority
 
