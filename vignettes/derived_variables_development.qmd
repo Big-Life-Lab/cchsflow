@@ -30,27 +30,29 @@ opts_chunk$set(
 
 # Introduction
 
-This guide provides comprehensive instructions for developing, testing, and implementing derived variables in cchsflow using modern tidyverse patterns. The approach emphasizes type safety, readable code, robust missing data handling, and comprehensive validation.
+This guide provides instructions for developing, testing, and implementing derived variables in cchsflow using modern tidyverse patterns. The approach emphasizes type safety, readable code, robust missing data handling, and comprehensive validation.
 
 ## Types of derived variables
 
 cchsflow supports two primary types of derived variables:
 
 1. **Variable mapping** - harmonizing existing CCHS variables across cycles
-2. **Calculated variables** - creating new variables from mathematical functions or complex logic
+2. **Calculated (derived) variables** (aka 'derived variables') - creating new variables from mathematical functions or complex logic
 
-This guide focuses on **calculated derived variables** that require custom R functions.
+This guide focuses on ** derived variables** that require custom R functions.
 
-## Modern design principles
+## Design principles
 
-Our current approach follows these key principles established through the v3.0.0 modernization:
+Our current approach follows these key principles:
 
-- **Tidyverse-first**: Use `dplyr::case_when()`, `haven::tagged_na()`, and type-safe operations
-- **Universal robustness**: Functions work across all database types (PUMF, shared, master)
-- **Copy-paste philosophy**: Functions work seamlessly on scalars, vectors, and in `rec_with_table()` workflows
-- **Dual input handling**: Functions accept both raw CCHS data (6,7,8,9 codes) AND preprocessed `haven::tagged_na()` 
-- **Comprehensive missing data handling**: Standardized preprocessing with automatic detection
-- **Conventional R naming**: Functions follow tidyverse verb-first naming conventions
+- **Tidyverse-first**: Use `dplyr::case_when()`, `haven::tagged_na()`, and type-safe operations.
+- **Universal robustness**: Functions work across all database types (PUMF, shared, master).
+- **Copy-paste philosophy**: Functions work seamlessly on scalars, vectors, and in `rec_with_table()` workflows.
+- **Comprehensive missing data handling**: Standardized preprocessing that returns `haven::tagged()`.
+- **Conventional R naming**: Functions follow tidyverse verb-first naming conventions.
+- **Dual input handling**: Functions accept both raw CCHS data (6,7,8,9 codes) AND preprocessed `haven::tagged_na()` (for discussion).
+- **Conventional Roxygen documentation**: Functions are documented using R community standard approach.
+- **Versioning** - Fuction and test versioning is supported and encouraged. The same version approach for `variables.csv` and `variable_details.csv` is used within the @note field. 
 
 ## Function naming standards
 
@@ -59,12 +61,22 @@ All derived variable functions must follow R community naming conventions for co
 ### Standard verb patterns
 
 ```r
-# Primary verbs for derived variables
-calculate_*()   # Mathematical computations (BMI, energy expenditure, pack-years)
-assess_*()      # Health risk evaluations (drinking risk, ADL needs, smoking status)
-categorize_*()  # Classification into groups (BMI categories, risk levels)
+# PRIMARY VERBS for derived variables (simplified to 3 core verbs)
+calculate_*()   # All computations and evaluations (BMI, drinking risk, smoking status)
+categorize_*()  # Classification into groups (BMI categories, risk levels)  
 score_*()       # Scoring systems (ADL scores, composite indices)
-classify_*()    # Alternative to categorize for complex classification rules
+
+# HELPER VERBS for infrastructure (internal functions, not exported)
+clean_*()       # Data preprocessing and validation
+preprocess_*()  # CCHS missing code handling
+validate_*()    # Parameter and input validation
+generate_*()    # Helper utilities
+
+# DEPRECATED VERBS (migrate to primary verbs)
+assess_*()      # → Use calculate_*()
+derive_*()      # → Use calculate_*()
+classify_*()    # → Use categorize_*()
+apply_*()       # → Use calculate_*()
 ```
 
 ### Naming convention rules
@@ -74,11 +86,11 @@ Follow this pattern: `{verb}_{health_domain}_{modifier}`
 ```r
 # Examples of proper naming
 calculate_bmi()                    # Simple calculation
-assess_drinking_risk_short()       # Assessment with modifier
+calculate_drinking_risk_short()    # Evaluation with modifier
 categorize_bmi()                   # Classification
 score_adl()                        # Default scoring (5-item)
 score_adl_6()                      # Modified scoring (6-item)
-adjust_bmi()                       # Data adjustment/correction
+adjust_bmi()                       # Data adjustment/correction (legacy name)
 ```
 
 ### Function name migration (v3.0.0)
@@ -92,14 +104,14 @@ adjusted_bmi_fun()  → adjust_bmi()
 bmi_fun_cat()       → categorize_bmi()
 
 # ADL Functions  
-adl_fun()           → assess_adl()
+adl_fun()           → calculate_adl()        # Evaluate ADL status
 adl_score_5_fun()   → score_adl()            # Default 5-item
 adl_score_6_fun()   → score_adl_6()
 
 # Alcohol Functions
-binge_drinker_fun()     → assess_binge_drinking()
-low_drink_short_fun()   → assess_drinking_risk_short()
-low_drink_long_fun()    → assess_drinking_risk_long()
+binge_drinker_fun()     → calculate_binge_drinking()
+low_drink_short_fun()   → calculate_drinking_risk_short()
+low_drink_long_fun()    → calculate_drinking_risk_long()
 
 # Physical Activity
 energy_exp_fun()    → calculate_energy_expenditure()
@@ -119,6 +131,148 @@ This requires functions to handle both:
 - **Raw CCHS codes**: `c(1, 2, 6, 7, 8, 9)` - Original survey responses
 - **Preprocessed data**: `c(1, 2, haven::tagged_na("a"), haven::tagged_na("b"))` - Already processed inputs
 
+# New architecture components
+
+## Logging architecture
+
+### Future development - comprehensive logging system
+
+**Note**: Detailed logging and validation warnings are planned for a future version as part of the comprehensive recodeflow logging system. Current v3.0.0 functions include `log_level` parameters for forward compatibility but operate in silent mode.
+
+```{r eval=FALSE}
+# Current v3.0.0 behavior - all modes operate silently
+calculate_bmi(height, weight)                           # Silent (default)
+calculate_bmi(height, weight, log_level = "warning")     # Silent (future: validation warnings)
+calculate_bmi(height, weight, log_level = "verbose")     # Silent (future: detailed messages)
+```
+
+### Future logging design goals
+
+1. **Scalability**: Thousands of derivations won't produce warning spam
+2. **Granular control**: Enable logging only where needed
+3. **Development friendly**: Easy to debug specific functions
+4. **Integration**: Unified with recodeflow logging infrastructure
+
+## Generic helper functions
+
+### Universal validation and preprocessing
+
+All derived variable functions use generic helpers from `missing-data-helpers.R`:
+
+```{r eval=FALSE}
+# Generic parameter validation (replaces stop() calls)
+validate_parameter <- function(param_name, param_value, required = TRUE, 
+                              na_type = "b", log_level = "silent") {
+  if (required && missing(param_value)) {
+    if (log_level %in% c("warning", "verbose")) {
+      warning(paste("Required parameter", param_name, "not provided"))
+    }
+    return(haven::tagged_na(na_type))
+  }
+  return(param_value)
+}
+
+# Generic preprocessing detection
+needs_preprocessing <- function(input_var) {
+  has_cchs_codes <- has_cchs_missing_codes(input_var)
+  has_char_nas <- any(is.character(input_var) & input_var %in% 
+                     c("Not applicable", "Missing", "Don't know", "NA(a)", "NA(b)"), 
+                     na.rm = TRUE)
+  return(has_cchs_codes || has_char_nas)
+}
+
+# Unified preprocessing with pattern types
+preprocess_cchs_missing_codes <- function(input_var, 
+                                        pattern_type = "standard_response",
+                                        preserve_numeric = TRUE) {
+  # Handles all CCHS missing data patterns with single function
+}
+```
+
+### Benefits of generic helpers
+
+1. **Consistency**: All functions use same validation logic
+2. **Maintainability**: Fix bugs in one place
+3. **No stops**: Functions return `haven::tagged_na()` instead of stopping
+4. **Reusability**: Same helpers across all derived variables
+5. **Versioning**: Internal functions have simple version tracking
+
+## Hybrid validation architecture
+
+### Constants + CSV integration
+
+Supports both standalone users and `rec_with_table()` workflows:
+
+```{r eval=FALSE}
+# For standalone (copy-paste) users
+BMI_VALIDATION_BOUNDS <- list(
+  height = list(min = 0.82, max = 2.50),
+  weight = list(min = 22.7, max = 209.1)
+)
+
+# Function uses constants as defaults
+validate_height_bounds <- function(height, 
+                                 min_height = BMI_VALIDATION_BOUNDS$height$min, 
+                                 max_height = BMI_VALIDATION_BOUNDS$height$max, ...) {
+  # Validation logic
+}
+
+# For rec_with_table() CSV integration
+ANTHROPOMETRIC_BOUNDS <- list(
+  HWTGHTM = list(min = 0.82, max = 2.50),
+  HWTGWTK = list(min = 22.7, max = 209.1)
+)
+
+# Future: variable_details.csv integration
+# Uses existing rec_with_table() range notation: "[0.82,2.50]"
+validate_anthropometric_variable <- function(value, variable_name) {
+  bounds <- ANTHROPOMETRIC_BOUNDS[[variable_name]]
+  # Apply bounds from CSV when available
+}
+```
+
+### Range notation in variable_details.csv
+
+`rec_with_table()` already supports range notation like `[7,9]` for missing codes. This can be extended to validation bounds:
+
+```csv
+# Current pattern in variable_details.csv
+variable,recStart,notes
+ADL_01,"[7,9]","don't know (7); refusal (8); not stated (9)"
+
+# Future pattern for validation bounds
+variable,validation_range,notes
+HWTGHTM,"[0.82,2.50]","Height validation bounds in meters"
+HWTGWTK,"[22.7,209.1]","Weight validation bounds in kilograms"
+```
+
+## Internal function versioning
+
+### Simple versioning for internal functions
+
+Internal functions include lightweight versioning:
+
+```{r eval=FALSE}
+#' Validate height bounds with comprehensive checks
+#' 
+#' @param height Numeric height value(s) to validate (in meters)
+#' @param min_height Minimum valid height (default from BMI_VALIDATION_BOUNDS)
+#' @param max_height Maximum valid height (default from BMI_VALIDATION_BOUNDS)
+#' @param na_handling Character tag for NA handling ("a" or "b")
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#' @return Validated height or haven::tagged_na
+#' @note Internal v1.0.0 (2025-01-02) - Created for BMI validation consistency
+#' @keywords internal
+validate_height_bounds <- function(...) { ... }
+```
+
+### Versioning principles
+
+1. **Internal functions**: Simple v1.0.0 format with creation date
+2. **Public functions**: Full semantic versioning in @note
+3. **Change tracking**: Brief description in @note
+4. **Status tracking**: active, deprecated, experimental, legacy
+
 # Architecture and design patterns
 
 ## Function architecture (four-tier design)
@@ -126,6 +280,8 @@ This requires functions to handle both:
 Based on the smoking function modernization, derived variable functions follow a standardized four-tier architecture:
 
 ### Tier 1: Constants and configuration
+
+Where possible, contants should be recorded in `variables.csv` and `variable_details.csv`.
 ```{r eval=FALSE}
 # Age bounds and validation constants
 MIN_SMOKING_INITIATION_AGE <- 8

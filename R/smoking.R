@@ -19,8 +19,9 @@
 library(dplyr)
 library(haven)
 
-# Load missing data preprocessing helpers
+# Load missing data preprocessing helpers and validation constants
 source("R/missing-data-helpers.R")
+source("R/validation-constants.R")
 
 # ============================================================================
 # PHASE 1: FOUNDATION - HELPER FUNCTIONS AND VALIDATION FRAMEWORK
@@ -30,71 +31,25 @@ source("R/missing-data-helpers.R")
 # Age Validation Constants and Bounds
 # ----------------------------------------------------------------------------
 
-# FUTURE WORK: These constants should migrate to variable_details.csv
-# with columns like min_value, max_value, validation_rules
-# See smoking-refactoring.md "Phase 5: Constants Migration to variable_details.csv"
-#
-# Current approach follows cchsflow constants management philosophy:
-# ✅ Constants declared outside functions (not embedded in logic)
-# ✅ Function parameter defaults are acceptable
-# ❌ Avoid hard-coded constants within function bodies
-
-# Minimum smoking initiation age (corrects implausible early ages)
-MIN_SMOKING_INITIATION_AGE <- 8
-
-# Maximum plausible smoking initiation age  
-MAX_SMOKING_INITIATION_AGE <- 95
-
-# Age bounds for different CCHS variables
-SMOKING_AGE_BOUNDS <- list(
-  SMKG203_cont = list(min = 8, max = 84),    # Age started daily (daily smokers)
-  SMKG207_cont = list(min = 8, max = 84),    # Age started daily (former daily)
-  SMKG040_cont = list(min = 8, max = 95),    # Combined age started daily
-  SMKG01C_cont = list(min = 8, max = 84),    # Age first cigarette
-  current_age = list(min = 12, max = 102)    # Current age bounds
-)
-
-# Time since quit bounds
-TIME_QUIT_BOUNDS <- list(
-  min = 0.5,   # Minimum time since quitting (6 months)
-  max = 82     # Maximum plausible time since quitting
-)
-
-# Pack-years calculation constants
-PACK_YEARS_CONSTANTS <- list(
-  cigarettes_per_pack = 20,
-  min_pack_years = 0.0137,      # Minimum for former occasional smokers  
-  min_pack_years_never = 0.007  # Minimum for never-daily smokers
-)
+# CONSTANTS NOW CENTRALIZED IN validation-constants.R
+# All smoking validation bounds, thresholds, and constants are loaded from
+# validation-constants.R to ensure consistency across all derived variable domains.
 
 # ----------------------------------------------------------------------------
 # Core Helper Functions
 # ----------------------------------------------------------------------------
 
-#' Validate age with bounds checking
-#' 
-#' @param age Numeric age value to validate
-#' @param min_age Minimum valid age (default 8, aligns with Holford et al. smoking initiation standards)
-#' @param max_age Maximum valid age (default 95)
-#' @param na_handling Character tag for NA handling ("a" or "b")
-#' @return Validated age or haven::tagged_na
-#' @keywords internal
-validate_age_bounds <- function(age, min_age = 8, max_age = 95, na_handling = "b") {
-  dplyr::case_when(
-    is.na(age) ~ haven::tagged_na(na_handling),
-    age < min_age | age > max_age ~ haven::tagged_na("b"),
-    TRUE ~ age
-  )
-}
+# Removed redundant validate_age_bounds() function - use validate_age_variable() instead
 
-#' Generic age bounds validation using predefined bounds
+#' Generic smoking age bounds validation using centralized constants
 #' 
 #' @param age Numeric age value to validate
 #' @param variable_name Name of CCHS variable for bounds lookup
 #' @return Validated age or haven::tagged_na with appropriate bounds
 #' @keywords internal
+#' @note Internal v3.0.0, last updated: 2025-06-30, status: active
 validate_age_variable <- function(age, variable_name) {
-  bounds <- SMOKING_AGE_BOUNDS[[variable_name]]
+  bounds <- SMOKING_VARIABLE_BOUNDS[[variable_name]]
   if (is.null(bounds)) {
     warning(paste("No bounds defined for variable:", variable_name))
     return(age)
@@ -109,17 +64,18 @@ validate_age_variable <- function(age, variable_name) {
   )
 }
 
-#' Apply smoking initiation age bounds
+#' Apply smoking initiation age bounds using centralized constants
 #' 
 #' @param age Age when smoking initiation occurred
-#' @return Validated age with smoking-specific bounds
+#' @return Validated age with smoking-specific bounds (min=8, max=95)
 #' @keywords internal
+#' @note Internal v3.0.0, last updated: 2025-06-30, status: active
 validate_smoking_initiation_age <- function(age) {
   dplyr::case_when(
     is.na(age) ~ haven::tagged_na("b"),
     age == "NA(a)" ~ haven::tagged_na("a"),
-    age < MIN_SMOKING_INITIATION_AGE ~ MIN_SMOKING_INITIATION_AGE,
-    age > MAX_SMOKING_INITIATION_AGE ~ haven::tagged_na("b"),
+    age < SMOKING_AGE_BOUNDS$min_initiation ~ SMOKING_AGE_BOUNDS$min_initiation,
+    age > SMOKING_AGE_BOUNDS$max_initiation ~ haven::tagged_na("b"),
     TRUE ~ age
   )
 }
@@ -131,6 +87,7 @@ validate_smoking_initiation_age <- function(age) {
 #' @param labels Character vector of labels for categories
 #' @return Categorized time value
 #' @keywords internal
+#' @note Internal v3.0.0, last updated: 2025-06-30, status: active
 categorize_time_ranges <- function(time_value, breaks, labels) {
   dplyr::case_when(
     is.na(time_value) ~ haven::tagged_na("b"),
@@ -147,6 +104,7 @@ categorize_time_ranges <- function(time_value, breaks, labels) {
 #' @param min_pack_years Minimum pack-years value (default 0.0137)
 #' @return Pack-years calculation with minimum threshold
 #' @keywords internal
+#' @note Internal v3.0.0, last updated: 2025-06-30, status: active
 calculate_pack_years <- function(cigarettes_per_day, years_smoked, min_pack_years = 0.0137) {
   pack_years <- (cigarettes_per_day / 20) * years_smoked
   pmax(pack_years, min_pack_years, na.rm = TRUE)
@@ -254,6 +212,7 @@ classify_smoking_status <- function(smkdsty_value) {
 #' @param min_SMKG09C minimum valid value for SMKG09C (NULL for no validation)
 #' @param max_SMKG09C maximum valid value for SMKG09C (NULL for no validation)
 #' @param validate_params logical, enable parameter validation (auto-detected if NULL)
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
 #' @return value for time since quit smoking in time_quit_smoking_der.
 #'
@@ -277,16 +236,33 @@ classify_smoking_status <- function(smkdsty_value) {
 #' @export
 time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C, 
                                   min_SMKG09C = NULL, max_SMKG09C = NULL,
-                                  validate_params = NULL) {
+                                  validate_params = NULL,
+                                  log_level = "silent") {
   
-  # Preprocess original CCHS missing codes
-  SMK_09A_B <- preprocess_smoking_variable(SMK_09A_B, variable_name = "SMK_09A_B")
+  # 1. Enhanced input validation using generic helpers
+  SMK_09A_B <- validate_parameter("SMK_09A_B", SMK_09A_B, required = TRUE, na_type = "b", log_level)
+  SMKG09C <- validate_parameter("SMKG09C", SMKG09C, required = TRUE, na_type = "b", log_level)
+  
+  # Handle case where validation returned tagged NA
+  if (any(sapply(list(SMK_09A_B, SMKG09C), function(x) {
+    length(x) == 1 && haven::is_tagged_na(x, "b")
+  }))) {
+    return(haven::tagged_na("b"))
+  }
+  
+  # 2. Preprocess missing data using generic helper
+  if (needs_preprocessing(SMK_09A_B)) {
+    SMK_09A_B <- preprocess_smoking_variable(SMK_09A_B, variable_name = "SMK_09A_B")
+  }
+  
   # SMKG09C can be categorical age or continuous - determine pattern automatically
-  if (any(SMKG09C %in% c(96, 97, 98, 99), na.rm = TRUE)) {
-    SMKG09C <- preprocess_categorical_age(SMKG09C)
-  } else {
-    # Handle as standard response or continuous values
-    SMKG09C <- preprocess_smoking_variable(SMKG09C, pattern_type = "standard_response")
+  if (needs_preprocessing(SMKG09C)) {
+    if (any(SMKG09C %in% c(96, 97, 98, 99), na.rm = TRUE)) {
+      SMKG09C <- preprocess_categorical_age(SMKG09C)
+    } else {
+      # Handle as standard response or continuous values
+      SMKG09C <- preprocess_smoking_variable(SMKG09C, pattern_type = "standard_response")
+    }
   }
   
   # Auto-detect validation mode based on parameters
@@ -470,19 +446,39 @@ smoke_simple_fun_A <- function(SMKDSTY_cat5, time_quit_smoking,
 #' current occasional smoker (never daily), current nonsmoker (former daily),
 #' current nonsmoker (never daily), nonsmoker
 #'
-#' @param SMK_005 type of smoker presently
-#' @param SMK_030 smoked daily - lifetime (occasional/former smoker)
-#' @param SMK_01A smoked 100 or more cigarettes in lifetime
+#' @param SMK_005 type of smoker presently (1=daily, 2=occasionally, 3=not at all)
+#' @param SMK_030 smoked daily - lifetime (1=yes, 2=no)
+#' @param SMK_01A smoked 100 or more cigarettes in lifetime (1=yes, 2=no)
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
 #' @return value for smoker type in the SMKDSTY_A variable
 #'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Major refactoring with tidyverse modernization and enhanced validation
+#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and generic helper functions
 #' @export
-SMKDSTY_fun <- function(SMK_005, SMK_030, SMK_01A) {
-  # Preprocess original CCHS missing codes before main logic
-  SMK_005 <- preprocess_smoking_variable(SMK_005, variable_name = "SMK_005")
-  SMK_030 <- preprocess_smoking_variable(SMK_030, variable_name = "SMK_030")
-  SMK_01A <- preprocess_smoking_variable(SMK_01A, variable_name = "SMK_01A")
+SMKDSTY_fun <- function(SMK_005, SMK_030, SMK_01A, log_level = "silent") {
+  
+  # 1. Enhanced input validation using generic helpers
+  SMK_005 <- validate_parameter("SMK_005", SMK_005, required = TRUE, na_type = "b", log_level)
+  SMK_030 <- validate_parameter("SMK_030", SMK_030, required = TRUE, na_type = "b", log_level)
+  SMK_01A <- validate_parameter("SMK_01A", SMK_01A, required = TRUE, na_type = "b", log_level)
+  
+  # Handle case where validation returned tagged NA
+  if (any(sapply(list(SMK_005, SMK_030, SMK_01A), function(x) {
+    length(x) == 1 && haven::is_tagged_na(x, "b")
+  }))) {
+    return(haven::tagged_na("b"))
+  }
+  
+  # 2. Preprocess missing data using generic helper
+  if (needs_preprocessing(SMK_005)) {
+    SMK_005 <- preprocess_smoking_variable(SMK_005, variable_name = "SMK_005")
+  }
+  if (needs_preprocessing(SMK_030)) {
+    SMK_030 <- preprocess_smoking_variable(SMK_030, variable_name = "SMK_030")
+  }
+  if (needs_preprocessing(SMK_01A)) {
+    SMK_01A <- preprocess_smoking_variable(SMK_01A, variable_name = "SMK_01A")
+  }
   
   dplyr::case_when(
     SMK_005 == 1 ~ 1L,  # Daily smoker

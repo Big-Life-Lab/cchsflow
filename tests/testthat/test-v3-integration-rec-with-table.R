@@ -26,6 +26,10 @@ MODERNIZED_FUNCTIONS <- list(
     derived_vars = c("HWTGBMI_der"),
     test_cycles = c("cchs2001_p", "cchs2003_p", "cchs2005_p", "cchs2015_2016_p", "cchs2017_2018_p")
   ),
+  adjust_bmi = list(
+    derived_vars = c("HWTGCOR_der"),
+    test_cycles = c("cchs2001_p", "cchs2015_2016_p", "cchs2017_2018_p")
+  ),
   categorize_bmi = list(
     derived_vars = c("HWTGBMI_der_cat4"),
     test_cycles = c("cchs2001_p", "cchs2015_2016_p", "cchs2017_2018_p")
@@ -125,6 +129,60 @@ test_that("calculate_bmi integration works across CCHS cycles", {
     if (length(bmi_values) > 0) {
       expect_true(all(bmi_values >= 15 & bmi_values <= 50), 
                   paste("BMI values should be reasonable for", cycle))
+    }
+  }
+})
+
+test_that("adjust_bmi integration works with bias correction", {
+  skip_if_not(exists("rec_with_table"), "rec_with_table function required")
+  
+  test_data <- data.frame(
+    DHH_SEX = c(1, 2, 1, 2),        # Male, Female, Male, Female
+    HWTGHTM = c(1.75, 1.65, 1.80, 1.70),
+    HWTGWTK = c(70, 60, 85, 55),
+    stringsAsFactors = FALSE
+  )
+  
+  # Test with cycles that have adjusted BMI functionality
+  test_cycles <- c("cchs2015_2016_p", "cchs2017_2018_p", "cchs2001_p")
+  
+  for (cycle in test_cycles) {
+    skip_if_not(file.exists(paste0("data/", cycle, ".RData")), paste("Data file for", cycle, "not available"))
+    
+    expect_silent({
+      result <- rec_with_table(
+        data = test_data,
+        variables = "HWTGCOR_der",
+        database_name = cycle,
+        variable_details = variable_details
+      )
+    })
+    
+    expect_true("HWTGCOR_der" %in% names(result), paste("Adjusted BMI variable should exist for", cycle))
+    expect_equal(nrow(result), 4, paste("Should return 4 rows for", cycle))
+    
+    # Verify adjusted BMI values are reasonable (slightly different from raw BMI)
+    adj_bmi_values <- result$HWTGCOR_der[!is.na(result$HWTGCOR_der)]
+    if (length(adj_bmi_values) > 0) {
+      expect_true(all(adj_bmi_values >= 15 & adj_bmi_values <= 50), 
+                  paste("Adjusted BMI values should be reasonable for", cycle))
+    }
+    
+    # Compare with raw BMI to ensure adjustment is applied
+    raw_result <- rec_with_table(
+      data = test_data,
+      variables = "HWTGBMI_der",
+      database_name = cycle,
+      variable_details = variable_details
+    )
+    
+    if ("HWTGBMI_der" %in% names(raw_result)) {
+      raw_bmi_values <- raw_result$HWTGBMI_der[!is.na(raw_result$HWTGBMI_der)]
+      if (length(raw_bmi_values) > 0 && length(adj_bmi_values) > 0) {
+        # Adjusted BMI should be different from raw BMI (bias correction applied)
+        expect_false(identical(adj_bmi_values, raw_bmi_values), 
+                     paste("Adjusted BMI should differ from raw BMI for", cycle))
+      }
     }
   }
 })
