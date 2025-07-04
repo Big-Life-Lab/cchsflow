@@ -49,6 +49,7 @@ or coded in CCHS surveys, recoded to NA(a)
 | NA(b) | 8                  | refusal            |
 | NA(b) | 9                  | not stated         |
 | NA(c) | | question not asked in the survey cycle  |
+| NA(d) | | required variable not in data frame |
 
 ## Example `haven::tagged_na()`
 ```{r}

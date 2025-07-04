@@ -68,14 +68,14 @@ versioning_system:
   # Core versioning fields used across all metadata
   core_versioning_fields:
     version:
-      description: "Semantic version number (e.g., 2.2.0)"
+      description: "Semantic version number (e.g., 3.0.0)"
       format: "MAJOR.MINOR.PATCH"
       rules:
         - "MAJOR: Breaking changes or major functionality additions"
         - "MINOR: New features, enhanced functionality, backward compatible"
         - "PATCH: Bug fixes, documentation updates, minor improvements"
       examples:
-        - "2.2.0: Major feature release with new variables and enhanced functions"
+        - "3.0.0: Major infrastructure release with BMI function modernization and validation architecture"
         - "2.1.1: Patch release with bug fixes"
         
     lastUpdated:
