@@ -62,7 +62,10 @@ BMI_CORRECTION_FEMALE <- list(intercept = -0.12374, slope = 1.05129)
 calculate_bmi_core <- function(height, weight) {
   # Use case_when for element-wise processing with tagged NA handling
   dplyr::case_when(
-    # Use standardized tagged NA conditions
+    # !!! (splice operator) expands generate_tagged_na_conditions() output:
+    # Creates 5 conditions per variable checking tagged NAs in priority order
+    # c (question not asked) → d (variable missing) → a (not applicable) → b (unknown/refusal)
+    # Equivalent to: is_tagged_na(height,"c") ~ tagged_na("c"), is_tagged_na(height,"d") ~ tagged_na("d"), etc.
     !!!generate_tagged_na_conditions(height, categorical_labels = FALSE),
     !!!generate_tagged_na_conditions(weight, categorical_labels = FALSE),
 
