@@ -19,6 +19,13 @@
 #' haven::tagged_na() format. Supports all CCHS variable patterns while
 #' preserving existing string and haven NA values.
 #'
+#' **IMPORTANT LIMITATION**: Due to R's type coercion system, if you mix
+#' haven::tagged_na() values with character strings in the same vector,
+#' the tagged_na properties will be lost. For example:
+#' `c(1, haven::tagged_na("a"), "string")` converts everything to character,
+#' losing the tagged_na information. Use separate processing for mixed-type
+#' data or avoid mixing tagged_na with character strings.
+#'
 #' @param input_var Vector with potential original CCHS codes, string NA values,
 #'   or haven::tagged_na() values
 #' @param pattern_type Character string specifying CCHS missing code pattern:
@@ -56,6 +63,8 @@
 #' **Existing NA Handling:**
 #' - "NA(a)" → haven::tagged_na("a") - String-based NA(a)
 #' - "NA(b)" → haven::tagged_na("b") - String-based NA(b)
+#' - "Not applicable" → haven::tagged_na("a") - Domain-specific string (case-insensitive)
+#' - "Missing", "Don't know", "Refusal" → haven::tagged_na("b") - Domain-specific strings (case-insensitive)
 #' - haven::tagged_na("a") → preserved as-is
 #' - haven::tagged_na("b") → preserved as-is
 #'
@@ -102,6 +111,7 @@ preprocess_cchs_missing_codes <- function(input_var,
 
   # Apply preprocessing transformation with safe numeric conversion
   result <- dplyr::case_when(
+    
     # Original CCHS "not applicable" codes → NA::a
     input_var %in% not_applicable_codes ~ haven::tagged_na("a"),
 
@@ -111,8 +121,12 @@ preprocess_cchs_missing_codes <- function(input_var,
     # String-based NA values → haven::tagged_na
     input_var == "NA(a)" ~ haven::tagged_na("a"),
     input_var == "NA(b)" ~ haven::tagged_na("b"),
+    
+    # Common domain-specific string values (case-insensitive)
+    is.character(input_var) & grepl("^not applicable$", input_var, ignore.case = TRUE) ~ haven::tagged_na("a"),
+    is.character(input_var) & grepl("^(missing|don't know|refusal)$", input_var, ignore.case = TRUE) ~ haven::tagged_na("b"),
 
-    # Preserve existing haven::tagged_na values
+    # Preserve existing haven::tagged_na values (for pure numeric vectors)
     haven::is_tagged_na(input_var, "a") ~ haven::tagged_na("a"),
     haven::is_tagged_na(input_var, "b") ~ haven::tagged_na("b"),
 

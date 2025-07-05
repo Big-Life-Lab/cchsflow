@@ -1,145 +1,120 @@
 # ==============================================================================
-# Enhanced ADL Functions - Following v3.0.0 Development Guide
+# ADL (Activities of Daily Living) Functions
 # ==============================================================================
 
 # REQUIRED DEPENDENCIES:
-#   library(haven)   # for haven::tagged_na() and haven::is_tagged_na()
-#   library(dplyr)   # for dplyr::case_when() and dplyr::if_else()
-#   source("R/missing-data-helpers.R")  # for preprocessing functions
+library(haven) # for haven::tagged_na() and haven::is_tagged_na()
+library(dplyr) # for dplyr::case_when() and dplyr::if_else()
+
+# Source required helper functions (conditional loading for package context)
+tryCatch(
+  {
+    source("R/missing-data-helpers.R", local = FALSE)
+    source("R/utility-functions.R", local = FALSE)
+  },
+  error = function(e) {
+    # Functions will be loaded via package imports during package build
+  }
+)
+
+# For testing, run:
+#   library(haven); library(dplyr); library(testthat)
+#   source('R/adl.R')
+#   test_file('tests/testthat/test-assess-adl.R')
 
 # ==============================================================================
 # 1. CONSTANTS AND CONFIGURATION
 # ==============================================================================
 
-# ADL validation constants
-ADL_VALID_RESPONSES <- c(1, 2) # 1 = needs help, 2 = does not need help
-ADL_ITEM_NAMES <- list(
-  five_item = c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05"),
-  six_item = c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06")
+# ADL validation bounds for standalone function use
+# NOTE: These constants ensure ADL functions work independently ("cut and paste")
+# while rec_with_table() uses variable_details.csv for CSV-driven validation.
+# IMPORTANT: Keep synchronized with variable_details.csv ground truth values
+ADL_VALIDATION_BOUNDS <- list(
+  response = list(min = 1, max = 2) # 1 = needs help, 2 = does not need help
 )
 
 # ==============================================================================
-# 2. CORE UTILITY FUNCTIONS
+# 2. SPECIALIZED HELPER FUNCTIONS
 # ==============================================================================
 
-#' Enhanced ADL input validation
-#' @param param_name Parameter name for error messages
-#' @param param_value Parameter value to validate
-#' @param required Logical indicating if parameter is required
-#' @return Validated parameter or error
+#' Core ADL binary assessment (internal helper)
+#'
+#' Vector-aware ADL assessment without validation - used as building block
+#' @param adl_01,adl_02,adl_03,adl_04,adl_05 Cleaned ADL variables (already validated)
+#' @return Binary ADL indicator with proper tagged NA handling
+#' @note Internal v3.0.0, last updated: 2025-07-04, status: active - Vector aware
 #' @noRd
-validate_adl_parameter <- function(param_name, param_value, required = TRUE) {
-  if (required && missing(param_value)) {
-    stop(paste("Required ADL parameter", param_name, "must be provided"), call. = FALSE)
-  }
-  return(param_value)
-}
-
-#' Check vector length compatibility for ADL inputs
-#' @param ... Input vectors to check
-#' @return Logical indicating compatibility
-#' @noRd
-check_adl_length_compatibility <- function(...) {
-  lengths <- lengths(list(...))
-  # All lengths must be equal OR some can be length 1 (scalar)
-  return(length(unique(lengths[lengths > 1])) <= 1)
-}
-
-#' Preprocess single ADL variable with comprehensive missing data handling
-#' @param adl_var Single ADL variable
-#' @return Preprocessed ADL variable with haven::tagged_na()
-#' @noRd
-preprocess_adl_variable <- function(adl_var) {
+calculate_adl_binary_core <- function(adl_01, adl_02, adl_03, adl_04, adl_05) {
+  # Use case_when for element-wise processing with tagged NA handling
   dplyr::case_when(
-    # Handle original CCHS missing codes
-    adl_var == 6 ~ haven::tagged_na("a"), # Not applicable
-    adl_var %in% c(7, 8, 9) ~ haven::tagged_na("b"), # Don't know, refusal, not stated
+    # !!! (splice operator) expands generate_tagged_na_conditions() output for each variable
+    !!!generate_tagged_na_conditions(adl_01, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_02, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_03, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_04, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_05, categorical_labels = FALSE),
 
-    # Handle string-based missing values (legacy support)
-    is.character(adl_var) & adl_var == "NA(a)" ~ haven::tagged_na("a"),
-    is.character(adl_var) & adl_var == "NA(b)" ~ haven::tagged_na("b"),
-    is.character(adl_var) & adl_var %in% c("Not applicable", "not applicable") ~ haven::tagged_na("a"),
-    is.character(adl_var) & adl_var %in% c("Missing", "Don't know", "Refusal") ~ haven::tagged_na("b"),
+    # Any help needed (any value = 1)
+    (adl_01 == 1 | adl_02 == 1 | adl_03 == 1 | adl_04 == 1 | adl_05 == 1) ~ 1L,
 
-    # Handle existing haven::tagged_na (passthrough)
-    haven::is_tagged_na(adl_var, "a") ~ haven::tagged_na("a"),
-    haven::is_tagged_na(adl_var, "b") ~ haven::tagged_na("b"),
+    # No help needed (all values = 2)
+    .default = 2L
+  )
+}
 
-    # Handle regular NAs
-    is.na(adl_var) ~ haven::tagged_na("b"),
+#' Core ADL score calculation (internal helper)
+#'
+#' Vector-aware ADL score calculation without validation - used as building block
+#' @param adl_01,adl_02,adl_03,adl_04,adl_05 Cleaned ADL variables (already validated)
+#' @return ADL score (0-5) with proper tagged NA handling
+#' @note Internal v3.0.0, last updated: 2025-07-04, status: active - Vector aware
+#' @noRd
+calculate_adl_score_core <- function(adl_01, adl_02, adl_03, adl_04, adl_05) {
+  # Use case_when for element-wise processing with tagged NA handling
+  dplyr::case_when(
+    # !!! (splice operator) expands generate_tagged_na_conditions() output for each variable
+    !!!generate_tagged_na_conditions(adl_01, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_02, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_03, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_04, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_05, categorical_labels = FALSE),
 
-    # Valid responses (1, 2) pass through
-    adl_var %in% ADL_VALID_RESPONSES ~ as.numeric(adl_var),
+    # Calculate help needed count (sum of 1s)
+    .default = as.numeric(
+      (adl_01 == 1) + (adl_02 == 1) + (adl_03 == 1) + (adl_04 == 1) + (adl_05 == 1)
+    )
+  )
+}
 
-    # Invalid responses become missing
-    .default = haven::tagged_na("b")
+#' Core 6-item ADL score calculation (internal helper)
+#'
+#' Vector-aware 6-item ADL score calculation without validation - used as building block
+#' @param adl_01,adl_02,adl_03,adl_04,adl_05,adl_06 Cleaned ADL variables (already validated)
+#' @return ADL score (0-6) with proper tagged NA handling
+#' @note Internal v3.0.0, last updated: 2025-07-04, status: active - Vector aware
+#' @noRd
+calculate_adl_score_6_core <- function(adl_01, adl_02, adl_03, adl_04, adl_05, adl_06) {
+  # Use case_when for element-wise processing with tagged NA handling
+  dplyr::case_when(
+    # !!! (splice operator) expands generate_tagged_na_conditions() output for each variable
+    !!!generate_tagged_na_conditions(adl_01, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_02, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_03, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_04, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_05, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(adl_06, categorical_labels = FALSE),
+
+    # Calculate help needed count (sum of 1s)
+    .default = as.numeric(
+      (adl_01 == 1) + (adl_02 == 1) + (adl_03 == 1) +
+        (adl_04 == 1) + (adl_05 == 1) + (adl_06 == 1)
+    )
   )
 }
 
 # ==============================================================================
-# 3. SPECIALIZED HELPER FUNCTIONS
-# ==============================================================================
-
-#' Calculate ADL score with comprehensive missing data propagation
-#' @param adl_list List of preprocessed ADL variables
-#' @param total_items Total number of ADL items (5 or 6)
-#' @return ADL score with proper missing data handling
-#' @noRd
-calculate_adl_score <- function(adl_list, total_items) {
-  # Check for any not applicable values (highest priority)
-  has_not_applicable <- any(sapply(adl_list, function(x) haven::is_tagged_na(x, "a")))
-
-  # Check for any missing values
-  has_missing <- any(sapply(adl_list, function(x) haven::is_tagged_na(x, "b") | is.na(x)))
-
-  # Count valid "needs help" responses (value = 1)
-  valid_responses <- sapply(adl_list, function(x) !haven::is_tagged_na(x) & !is.na(x))
-  help_needed_count <- sum(sapply(adl_list, function(x) {
-    if (!haven::is_tagged_na(x) & !is.na(x)) x == 1 else FALSE
-  }))
-
-  # Return score based on missing data priority
-  dplyr::case_when(
-    has_not_applicable ~ haven::tagged_na("a"),
-    has_missing ~ haven::tagged_na("b"),
-    all(valid_responses) ~ as.numeric(help_needed_count),
-    .default = haven::tagged_na("b")
-  )
-}
-
-#' Create ADL binary indicator with enhanced logic
-#' @param adl_list List of preprocessed ADL variables
-#' @return Binary ADL indicator (1 = needs help, 2 = no help needed)
-#' @noRd
-calculate_adl_binary <- function(adl_list) {
-  # Check for any not applicable values
-  has_not_applicable <- any(sapply(adl_list, function(x) haven::is_tagged_na(x, "a")))
-
-  # Check for any missing values
-  has_missing <- any(sapply(adl_list, function(x) haven::is_tagged_na(x, "b") | is.na(x)))
-
-  # Check if any ADL requires help (value = 1)
-  needs_help <- any(sapply(adl_list, function(x) {
-    if (!haven::is_tagged_na(x) & !is.na(x)) x == 1 else FALSE
-  }))
-
-  # Check if all ADLs are "no help needed" (value = 2)
-  all_no_help <- all(sapply(adl_list, function(x) {
-    if (!haven::is_tagged_na(x) & !is.na(x)) x == 2 else FALSE
-  }))
-
-  # Return binary indicator
-  dplyr::case_when(
-    has_not_applicable ~ haven::tagged_na("a"),
-    has_missing ~ haven::tagged_na("b"),
-    needs_help ~ 1L,
-    all_no_help ~ 2L,
-    .default = haven::tagged_na("b")
-  )
-}
-
-# ==============================================================================
-# 4. PUBLIC API FUNCTIONS (Enhanced)
+# 3. PUBLIC API FUNCTIONS
 # ==============================================================================
 
 #' Enhanced Activities of Daily Living (ADL) help indicator
@@ -154,6 +129,9 @@ calculate_adl_binary <- function(adl_list) {
 #' @param ADL_03 Help needed doing housework (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
 #' @param ADL_04 Help needed doing personal care (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
 #' @param ADL_05 Help needed moving inside house (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#' @param min_ADL_01,max_ADL_01,min_ADL_02,max_ADL_02,min_ADL_03,max_ADL_03,min_ADL_04,max_ADL_04,min_ADL_05,max_ADL_05 Validation parameters (defaults from variable_details.csv)
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
 #' @return
 #' **Data Type**: Numeric binary indicator
@@ -179,21 +157,37 @@ calculate_adl_binary <- function(adl_list) {
 #' - Priority: Not applicable > Missing > Valid responses
 #'
 #' @examples
-#' # Basic usage - needs help with one task
-#' assess_adl(1, 2, 2, 2, 2) # Returns: 1
-#'
-#' # No help needed with any task
-#' assess_adl(2, 2, 2, 2, 2) # Returns: 2
-#'
-#' # Vector processing with missing data
-#' assess_adl(c(1, 2, 6), c(2, 2, 7), c(2, 2, 2), c(2, 2, 2), c(2, 2, 2))
-#'
-#' # Integration with rec_with_table()
-#' \dontrun{
-#' result <- rec_with_table(cchs2010_p,
-#'   variables = c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der")
+#' # Standard cchsflow workflow (primary usage)
+#' library(cchsflow)
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADLF6R_der")
 #' )
-#' }
+#'
+#' # Scalar usage examples
+#' # assess_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
+#' #           (meals, appts,  house,  care,   move)
+#' assess_adl(1, 2, 2, 2, 2) # Returns: 1 (needs help with meals only)
+#' assess_adl(2, 2, 2, 2, 2) # Returns: 2 (no help needed with any task)
+#' assess_adl(1, 1, 1, 1, 1) # Returns: 1 (needs help with all tasks)
+#'
+#' # Vector processing with missing data and edge cases
+#' assess_adl(
+#'   c(1, 2, 6, 7, 8, 9), # Mixed valid/CCHS codes
+#'   c(2, 2, 2, 2, 2, 2),
+#'   c(2, 2, 2, 2, 2, 2),
+#'   c(2, 2, 2, 2, 2, 2),
+#'   c(2, 2, 2, 2, 2, 2)
+#' ) # Returns: c(1, 2, tagged_na("a"), tagged_na("b"), tagged_na("b"), tagged_na("b"))
+#'
+#' # Vector with string missing values
+#' assess_adl(
+#'   c(1, 2, "Not applicable"),
+#'   c(2, 2, 2),
+#'   c(2, 2, 2),
+#'   c(2, 2, 2),
+#'   c(2, 2, 2)
+#' ) # Returns: c(1, 2, tagged_na("a"))
 #'
 #' @seealso
 #' \code{\link{score_adl}} for count-based ADL scoring
@@ -205,38 +199,44 @@ calculate_adl_binary <- function(adl_list) {
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
 #' @export
-assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-  # 1. Enhanced input validation
-  validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
-  validate_adl_parameter("ADL_02", ADL_02, required = TRUE)
-  validate_adl_parameter("ADL_03", ADL_03, required = TRUE)
-  validate_adl_parameter("ADL_04", ADL_04, required = TRUE)
-  validate_adl_parameter("ADL_05", ADL_05, required = TRUE)
-
-  # 2. Length compatibility check
-  if (!check_adl_length_compatibility(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)) {
-    stop("Input vectors must have compatible lengths", call. = FALSE)
-  }
-
-  # 3. Handle edge cases gracefully
-  if (all(is.na(c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)))) {
-    warning("All ADL inputs are missing. Results will be entirely NA.", call. = FALSE)
-  }
-
-  # 4. Preprocess all ADL variables
-  adl_01_processed <- preprocess_adl_variable(ADL_01)
-  adl_02_processed <- preprocess_adl_variable(ADL_02)
-  adl_03_processed <- preprocess_adl_variable(ADL_03)
-  adl_04_processed <- preprocess_adl_variable(ADL_04)
-  adl_05_processed <- preprocess_adl_variable(ADL_05)
-
-  # 5. Calculate binary ADL indicator
-  adl_list <- list(
-    adl_01_processed, adl_02_processed, adl_03_processed,
-    adl_04_processed, adl_05_processed
+assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
+                       # Validation bounds: defaults from variable_details.csv for standalone use
+                       # Use rec_with_table() for full CSV-driven validation workflow
+                       min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
+                       max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
+                       min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
+                       max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
+                       min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
+                       max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
+                       min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
+                       max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
+                       min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
+                       max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
+                       validate_params = NULL,
+                       log_level = "silent") {
+  # Clean categorical variables (handles missing variables with tagged_na("d"))
+  cleaned <- clean_categorical_variables(
+    ADL_01 = ADL_01,
+    ADL_02 = ADL_02,
+    ADL_03 = ADL_03,
+    ADL_04 = ADL_04,
+    ADL_05 = ADL_05,
+    valid_values = list(
+      ADL_01 = min_ADL_01:max_ADL_01,
+      ADL_02 = min_ADL_02:max_ADL_02,
+      ADL_03 = min_ADL_03:max_ADL_03,
+      ADL_04 = min_ADL_04:max_ADL_04,
+      ADL_05 = min_ADL_05:max_ADL_05
+    ),
+    pattern_type = "standard_response",
+    log_level = log_level
   )
 
-  calculate_adl_binary(adl_list)
+  # Calculate binary ADL indicator from clean inputs
+  calculate_adl_binary_core(
+    cleaned$ADL_01_clean, cleaned$ADL_02_clean, cleaned$ADL_03_clean,
+    cleaned$ADL_04_clean, cleaned$ADL_05_clean
+  )
 }
 
 #' Enhanced ADL help score (count of tasks requiring help)
@@ -247,6 +247,9 @@ assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #' **Clinical Context**: Graduated disability measure for research and clinical assessment
 #'
 #' @param ADL_01,ADL_02,ADL_03,ADL_04,ADL_05 ADL variables as in assess_adl()
+#' @param min_ADL_01,max_ADL_01,min_ADL_02,max_ADL_02,min_ADL_03,max_ADL_03,min_ADL_04,max_ADL_04,min_ADL_05,max_ADL_05 Validation parameters (defaults from variable_details.csv)
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
 #' @return
 #' **Data Type**: Numeric count (0-5)
@@ -267,63 +270,79 @@ assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #' - Preserves not applicable semantics across all items
 #'
 #' @examples
-#' # Scalar usage - No help needed (score = 0)
-#' score_adl(2, 2, 2, 2, 2)
-#'
-#' # Scalar usage - Help needed with 2 tasks (score = 2)
-#' score_adl(1, 2, 1, 2, 2)
-#'
-#' # Scalar usage - Complete dependence (score = 5)
-#' score_adl(1, 1, 1, 1, 1)
-#'
-#' # Vector processing with missing data and outliers
-#' adl_01 <- c(1, 2, 2, 6, "NA(a)") # Includes not applicable and missing
-#' adl_02 <- c(2, 2, 1, 2, 7) # Includes don't know
-#' adl_03 <- c(2, 2, 2, 2, 2)
-#' adl_04 <- c(2, 2, 2, 2, 2)
-#' adl_05 <- c(2, 2, 2, 2, 2)
-#' score_adl(adl_01, adl_02, adl_03, adl_04, adl_05)
-#'
-#' # rec_with_table() integration for production use
-#' \dontrun{
+#' # Standard cchsflow workflow (primary usage)
 #' library(cchsflow)
 #' result <- rec_with_table(
-#'   data = cchs2015_2016_p,
-#'   variables = "ADL_score_5",
-#'   database_name = "cchs2015_2016_p"
+#'   cchs2013_2014_p,
+#'   c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADLSCORE_der")
 #' )
-#' head(result$ADL_score_5)
-#' }
+#'
+#' # Scalar usage examples
+#' # score_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
+#' #          (meals, appts,  house,  care,   move)
+#' score_adl(2, 2, 2, 2, 2) # Returns: 0 (no help needed)
+#' score_adl(1, 2, 1, 2, 2) # Returns: 2 (help with 2 tasks: meals and housework)
+#' score_adl(1, 1, 1, 1, 1) # Returns: 5 (complete dependence)
+#' score_adl(1, 2, 2, 2, 2) # Returns: 1 (help with 1 task: meals only)
+#'
+#' # Vector processing with missing data
+#' score_adl(
+#'   c(1, 2, 6, 7), # Mixed valid/missing codes
+#'   c(1, 2, 2, 2),
+#'   c(2, 1, 2, 2),
+#'   c(2, 2, 2, 2),
+#'   c(2, 2, 2, 2)
+#' ) # Returns: c(2, 1, tagged_na("a"), tagged_na("b"))
+#'
+#' # Vector with mixed missing types
+#' score_adl(
+#'   c(1, 2, "Missing", haven::tagged_na("a")),
+#'   c(1, 2, 2, 2),
+#'   c(2, 2, 2, 2),
+#'   c(2, 2, 2, 2),
+#'   c(2, 2, 2, 2)
+#' ) # Returns: c(2, 1, tagged_na("b"), tagged_na("a"))
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced scoring with comprehensive missing data validation
 #' @export
-score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-  # 1. Input validation (reuse from binary function)
-  validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
-  validate_adl_parameter("ADL_02", ADL_02, required = TRUE)
-  validate_adl_parameter("ADL_03", ADL_03, required = TRUE)
-  validate_adl_parameter("ADL_04", ADL_04, required = TRUE)
-  validate_adl_parameter("ADL_05", ADL_05, required = TRUE)
-
-  # 2. Length compatibility check
-  if (!check_adl_length_compatibility(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)) {
-    stop("Input vectors must have compatible lengths", call. = FALSE)
-  }
-
-  # 3. Preprocess all ADL variables
-  adl_01_processed <- preprocess_adl_variable(ADL_01)
-  adl_02_processed <- preprocess_adl_variable(ADL_02)
-  adl_03_processed <- preprocess_adl_variable(ADL_03)
-  adl_04_processed <- preprocess_adl_variable(ADL_04)
-  adl_05_processed <- preprocess_adl_variable(ADL_05)
-
-  # 4. Calculate ADL score
-  adl_list <- list(
-    adl_01_processed, adl_02_processed, adl_03_processed,
-    adl_04_processed, adl_05_processed
+score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
+                      # Validation bounds: defaults from variable_details.csv for standalone use
+                      # Use rec_with_table() for full CSV-driven validation workflow
+                      min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
+                      max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
+                      min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
+                      max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
+                      min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
+                      max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
+                      min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
+                      max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
+                      min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
+                      max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
+                      validate_params = NULL,
+                      log_level = "silent") {
+  # Clean categorical variables (handles missing variables with tagged_na("d"))
+  cleaned <- clean_categorical_variables(
+    ADL_01 = ADL_01,
+    ADL_02 = ADL_02,
+    ADL_03 = ADL_03,
+    ADL_04 = ADL_04,
+    ADL_05 = ADL_05,
+    valid_values = list(
+      ADL_01 = min_ADL_01:max_ADL_01,
+      ADL_02 = min_ADL_02:max_ADL_02,
+      ADL_03 = min_ADL_03:max_ADL_03,
+      ADL_04 = min_ADL_04:max_ADL_04,
+      ADL_05 = min_ADL_05:max_ADL_05
+    ),
+    pattern_type = "standard_response",
+    log_level = log_level
   )
 
-  calculate_adl_score(adl_list, total_items = 5)
+  # Calculate ADL score from clean inputs
+  calculate_adl_score_core(
+    cleaned$ADL_01_clean, cleaned$ADL_02_clean, cleaned$ADL_03_clean,
+    cleaned$ADL_04_clean, cleaned$ADL_05_clean
+  )
 }
 
 #' Enhanced 6-item ADL help score with comprehensive validation
@@ -335,6 +354,9 @@ score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #'
 #' @param ADL_01,ADL_02,ADL_03,ADL_04,ADL_05 Core ADL variables as in other functions
 #' @param ADL_06 Help needed doing finances (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#' @param min_ADL_01,max_ADL_01,min_ADL_02,max_ADL_02,min_ADL_03,max_ADL_03,min_ADL_04,max_ADL_04,min_ADL_05,max_ADL_05,min_ADL_06,max_ADL_06 Validation parameters (defaults from variable_details.csv)
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
 #' @return
 #' **Data Type**: Numeric count (0-6)
@@ -356,61 +378,83 @@ score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
 #' - Recommended for 2003-2014 cycle analyses
 #'
 #' @examples
-#' # Scalar usage - Independent across all 6 tasks
-#' score_adl_6(2, 2, 2, 2, 2, 2)
-#'
-#' # Scalar usage - Help needed with 3 tasks including finances
-#' score_adl_6(1, 2, 1, 2, 2, 1)
-#'
-#' # Vector processing with missing data
-#' adl_01 <- c(1, 2, 2, "NA(a)") # Mixed responses with not applicable
-#' adl_02 <- c(2, 2, 1, 7) # Includes don't know
-#' adl_03 <- c(2, 2, 2, 2)
-#' adl_04 <- c(2, 2, 2, 2)
-#' adl_05 <- c(2, 2, 2, 2)
-#' adl_06 <- c(1, 2, 1, 8) # Finances task with refusal
-#' score_adl_6(adl_01, adl_02, adl_03, adl_04, adl_05, adl_06)
-#'
-#' # rec_with_table() integration for DemPoRT analysis
-#' \dontrun{
+#' # Standard cchsflow workflow (primary usage)
 #' library(cchsflow)
 #' result <- rec_with_table(
-#'   data = cchs2015_2016_p,
-#'   variables = "ADL_score_6",
-#'   database_name = "cchs2015_2016_p"
+#'   cchs2007_2008_p,
+#'   c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06", "ADLSCORE6_der")
 #' )
-#' summary(result$ADL_score_6)
-#' }
+#'
+#' # Scalar usage examples
+#' # score_adl_6(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06)
+#' #            (meals, appts,  house,  care,   move,   finances)
+#' score_adl_6(2, 2, 2, 2, 2, 2) # Returns: 0 (independent with all tasks)
+#' score_adl_6(1, 2, 1, 2, 2, 1) # Returns: 3 (help with 3 tasks: meals, housework, finances)
+#' score_adl_6(1, 1, 1, 1, 1, 1) # Returns: 6 (complete dependence)
+#' score_adl_6(2, 2, 2, 2, 2, 1) # Returns: 1 (help only with finances)
+#'
+#' # Vector processing with missing data and edge cases
+#' score_adl_6(
+#'   c(1, 2, 6, 96), # Mixed valid/categorical age codes
+#'   c(1, 2, 2, 2),
+#'   c(2, 1, 2, 2),
+#'   c(2, 2, 2, 2),
+#'   c(2, 2, 2, 2),
+#'   c(2, 2, 2, 97) # "Don't know" for finances
+#' ) # Returns: c(2, 1, tagged_na("a"), tagged_na("b"))
+#'
+#' # Vector demonstrating financial component (ADL_06)
+#' score_adl_6(
+#'   c(2, 2, 2), # No help with basic ADLs
+#'   c(2, 2, 2),
+#'   c(2, 2, 2),
+#'   c(2, 2, 2),
+#'   c(2, 2, 2),
+#'   c(1, "Refusal", 2) # Different financial help needs
+#' ) # Returns: c(1, tagged_na("b"), 0)
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced 6-item scoring for comprehensive functional assessment
 #' @export
-score_adl_6 <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06) {
-  # 1. Enhanced input validation
-  validate_adl_parameter("ADL_01", ADL_01, required = TRUE)
-  validate_adl_parameter("ADL_02", ADL_02, required = TRUE)
-  validate_adl_parameter("ADL_03", ADL_03, required = TRUE)
-  validate_adl_parameter("ADL_04", ADL_04, required = TRUE)
-  validate_adl_parameter("ADL_05", ADL_05, required = TRUE)
-  validate_adl_parameter("ADL_06", ADL_06, required = TRUE)
-
-  # 2. Length compatibility check
-  if (!check_adl_length_compatibility(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06)) {
-    stop("Input vectors must have compatible lengths", call. = FALSE)
-  }
-
-  # 3. Preprocess all ADL variables
-  adl_01_processed <- preprocess_adl_variable(ADL_01)
-  adl_02_processed <- preprocess_adl_variable(ADL_02)
-  adl_03_processed <- preprocess_adl_variable(ADL_03)
-  adl_04_processed <- preprocess_adl_variable(ADL_04)
-  adl_05_processed <- preprocess_adl_variable(ADL_05)
-  adl_06_processed <- preprocess_adl_variable(ADL_06)
-
-  # 4. Calculate 6-item ADL score
-  adl_list <- list(
-    adl_01_processed, adl_02_processed, adl_03_processed,
-    adl_04_processed, adl_05_processed, adl_06_processed
+score_adl_6 <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06,
+                        # Validation bounds: defaults from variable_details.csv for standalone use
+                        # Use rec_with_table() for full CSV-driven validation workflow
+                        min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
+                        max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
+                        min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
+                        max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
+                        min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
+                        max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
+                        min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
+                        max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
+                        min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
+                        max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
+                        min_ADL_06 = ADL_VALIDATION_BOUNDS$response$min,
+                        max_ADL_06 = ADL_VALIDATION_BOUNDS$response$max,
+                        validate_params = NULL,
+                        log_level = "silent") {
+  # Clean categorical variables (handles missing variables with tagged_na("d"))
+  cleaned <- clean_categorical_variables(
+    ADL_01 = ADL_01,
+    ADL_02 = ADL_02,
+    ADL_03 = ADL_03,
+    ADL_04 = ADL_04,
+    ADL_05 = ADL_05,
+    ADL_06 = ADL_06,
+    valid_values = list(
+      ADL_01 = min_ADL_01:max_ADL_01,
+      ADL_02 = min_ADL_02:max_ADL_02,
+      ADL_03 = min_ADL_03:max_ADL_03,
+      ADL_04 = min_ADL_04:max_ADL_04,
+      ADL_05 = min_ADL_05:max_ADL_05,
+      ADL_06 = min_ADL_06:max_ADL_06
+    ),
+    pattern_type = "standard_response",
+    log_level = log_level
   )
 
-  calculate_adl_score(adl_list, total_items = 6)
+  # Calculate 6-item ADL score from clean inputs
+  calculate_adl_score_6_core(
+    cleaned$ADL_01_clean, cleaned$ADL_02_clean, cleaned$ADL_03_clean,
+    cleaned$ADL_04_clean, cleaned$ADL_05_clean, cleaned$ADL_06_clean
+  )
 }
