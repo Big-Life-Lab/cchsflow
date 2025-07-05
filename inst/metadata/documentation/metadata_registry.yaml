@@ -1,0 +1,212 @@
+schema_version: "1.0.0"
+schema_date: "2025-06-22"
+description: "Central registry for recodeflow metadata schemas and shared specifications."
+purpose: "Single source of truth for shared specifications used across variables.yaml and variable_details.yaml schemas."
+
+# ============================================================================
+# SHARED SPECIFICATIONS - DRY compliance
+# ============================================================================
+
+shared_specifications:
+  csv_format:
+    description: "Standard CSV formatting rules used across all recodeflow metadata files."
+    encoding: "UTF-8"
+    bom: false
+    delimiter: ","
+    quote_char: '"'
+    escape_char: '"'
+    line_terminator: "\n"
+    header_required: true
+    header_case_sensitive: true
+    quote_when_needed: true
+    trailing_delimiter: false
+    blank_lines: "skip"
+    comment_char: null
+    
+  validation_patterns:
+    description: "Common regex patterns and validation rules used across schemas."
+    patterns:
+      variable_name: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+      semantic_version: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      iso_date: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      
+    # variableStart transformation patterns (used in both schemas)
+    transformation_patterns:
+      simple_reference:
+        pattern: "^\\[[a-zA-Z][a-zA-Z0-9_]*\\]$"
+        description: "References variable from default/any source database (case-insensitive)."
+        example: "[ADL_005] or [adl_005]"
+        
+      database_mapping:
+        pattern: "^[a-zA-Z0-9_]+::[a-zA-Z][a-zA-Z0-9_]*$"
+        description: "Explicit database::variable mapping for single source (case-insensitive)."
+        example: "cchs2001_p::RACA_6A or cchs2001_p::raca_6a"
+        
+      derived_variable:
+        pattern: "^DerivedVar::\\[([a-zA-Z][a-zA-Z0-9_]*(,\\s*[a-zA-Z][a-zA-Z0-9_]*)*)\\]$"
+        description: "Computed variable from multiple inputs using derivation function."
+        example: "DerivedVar::[PAC_4A_cont, PAC_4B_cont]"
+        
+      multiple_database_mapping:
+        pattern: "^[a-zA-Z0-9_]+::[a-zA-Z][a-zA-Z0-9_]*(,\\s*[a-zA-Z0-9_]+::[a-zA-Z][a-zA-Z0-9_]*)*$"
+        description: "Variable exists in multiple databases with different names (case-insensitive)."
+        example: "cchs2001_p::RACA_6A, cchs2003_p::RACC_6A"
+        
+      mixed_pattern:
+        pattern: "^(\\[[a-zA-Z][a-zA-Z0-9_]*\\]|[a-zA-Z0-9_]+::[a-zA-Z][a-zA-Z0-9_]*|DerivedVar::\\[[a-zA-Z][a-zA-Z0-9_]+(,\\s*[a-zA-Z][a-zA-Z0-9_]*)*\\])(,\\s*(\\[[a-zA-Z][a-zA-Z0-9_]*\\]|[a-zA-Z0-9_]+::[a-zA-Z][a-zA-Z0-9_]*|DerivedVar::\\[[a-zA-Z][a-zA-Z0-9_]+(,\\s*[a-zA-Z][a-zA-Z0-9_]*)*\\]))*$"
+        description: "Complex patterns combining multiple transformation types (case-insensitive)."
+        example: "cchs2001_p::RACA_6A, cchs2003_p::RACC_6A, [ADL_01]"
+        
+    # recStart interval notation patterns
+    interval_notation:
+      simple_values:
+        pattern: "^[a-zA-Z0-9]+$"
+        description: "Single values (text or numeric)."
+        examples: ["1", "english", "male"]
+        
+      closed_intervals:
+        pattern: "^\\[[0-9]*\\.?[0-9]*,\\s*[0-9]*\\.?[0-9]*\\]$"
+        description: "Closed intervals [a,b] - includes both endpoints."
+        examples: ["[1,3]", "[18.5,24.9]"]
+        
+      open_intervals:
+        pattern: "^\\([0-9]*\\.?[0-9]*,\\s*[0-9]*\\.?[0-9]*\\)$"
+        description: "Open intervals (a,b) - excludes both endpoints."
+        examples: ["(0,18.5)", "(65,120)"]
+        
+      half_open_intervals:
+        pattern: "^[\\[\\(][0-9]*\\.?[0-9]*,\\s*[0-9]*\\.?[0-9]*[\\]\\)]$"
+        description: "Half-open intervals [a,b) or (a,b]."
+        examples: ["[25,30)", "(18.5,25]"]
+        
+      complex_decimal_intervals:
+        pattern: "^\\[[-]?[0-9]*\\.?[0-9]*,\\s*[-]?[0-9]*\\.?[0-9]*[\\)\\]]$"
+        description: "Advanced intervals with negative decimals (Health Utility Index, complex scores)."
+        examples: ["[-0.359,1]", "[0.0487,0.1846)", "[-0.2231,-0.0872)"]
+        
+    # dummyVariable naming patterns
+    dummy_variable_patterns:
+      recommended_pattern: "^[a-zA-Z0-9_]+_(cat|cont)[0-9]+(_[0-9]+|_NA::[a-z])?$"
+      description: "Systematic naming for generated variables providing natural grouping."
+      examples:
+        categorical: ["age_cat4_1", "age_cat4_2", "smoking_cat3_1"]
+        continuous: ["bmi_cont1", "height_cont1"]
+      benefits: "Provides natural grouping and stable ordering for CSV files and git diffs."
+      
+  missing_data_standards:
+    description: "Standardized missing data handling across recodeflow system."
+    csv_metadata_fields: ["", "NA", "N/A"]
+    r_compliant_values: ["NA::a", "NA::b", "NA::c", "NA::d"]
+    usage_guidelines: |
+      - Use empty strings, "NA", or "N/A" for missing metadata fields
+      - Use tagged missing values (NA::a, etc.) for survey data patterns
+      
+  tier_system:
+    description: "Standard tier classification system used across schemas."
+    philosophy: "Users specify tier, system handles complexity."
+    tiers:
+      core:
+        description: "Essential fields required for basic functionality."
+        presence: "required"
+        validation_strictness: "strict"
+        
+      optional:
+        description: "Extensions for enhanced documentation and organization."
+        presence: "recommended"
+        validation_strictness: "permissive"
+        
+      extension:
+        description: "Enhanced functionality fields for advanced features."
+        presence: "conditional"
+        validation_strictness: "permissive"
+        
+      versioning:
+        description: "Best practices for project management, transparency, and reproducibility."
+        presence: "recommended"
+        validation_strictness: "permissive"
+
+# ============================================================================
+# SCHEMA REGISTRY - Current implementation
+# ============================================================================
+
+schema_registry:
+  # Schema file locations within package structure
+  schema_locations:
+    base_path: "inst/metadata"
+    core_schemas_path: "inst/metadata/schemas/core"
+    documentation_path: "inst/metadata/documentation"
+    
+  harmonization_schemas:
+    variables:
+      file: "variables.yaml"
+      full_path: "inst/metadata/schemas/core/variables.yaml"
+      purpose: "Define harmonized variable attributes, types, labels, and specifications."
+      target_csv: "variables.csv"
+      
+    variable_details:
+      file: "variable_details.yaml"
+      full_path: "inst/metadata/schemas/core/variable_details.yaml"
+      purpose: "Define value-level transformations, recoding logic, and categorical mappings."
+      target_csv: "variable_details.csv"
+      
+  supporting_schemas:
+    metadata_registry:
+      file: "metadata_registry.yaml"
+      full_path: "inst/metadata/documentation/metadata_registry.yaml"
+      purpose: "Central registry for shared specifications and schema definitions."
+      
+    database_metadata:
+      file: "database_metadata.yaml" 
+      full_path: "inst/metadata/documentation/database_metadata.yaml"
+      purpose: "Database-specific metadata and configuration."
+      
+  cross_validation_requirements:
+    variable_consistency: "variable_details.variable must exist in variables.variable"
+    database_consistency: "databaseStart values must match between schemas"
+    template_consistency: "templateVariable references must be valid"
+
+# ============================================================================
+# EXTENSION REGISTRY - Current extensions
+# ============================================================================
+
+extension_registry:
+  template_variables:
+    description: "Reusable transformation patterns to avoid categorical structure duplication."
+    affects_schemas: ["variable_details"]
+    field_location: "templateVariable field in variable_details.csv"
+    status: "active"
+    values: ["Yes", "No", null, "", "<template_name>"]
+  
+  tagged_missing_data:
+    description: "Integration with haven::tagged_na() for survey missing data patterns."
+    affects_schemas: ["variables", "variable_details"]
+    field_location: "recEnd, recStart fields"
+    status: "active"
+    standard_codes: ["NA::a", "NA::b", "NA::c", "NA::d"]
+
+# ============================================================================
+# DATABASE-SPECIFIC EXTENSIONS - Project-specific metadata
+# ============================================================================
+
+database_specific_extensions:
+  description: "Framework for database/project-specific schema extensions and validation rules."
+  versioning_strategy: |
+    Database-specific extensions use independent versioning from core schemas:
+    - Core schemas (variables.yaml, variable_details.yaml): version 1.0.0
+    - Database extensions (e.g., variables_cchs.yaml): version 2.2.0+
+    - Registry coordination: metadata_registry.yaml version 1.0.0
+    
+  extension_mechanism:
+    description: "Projects can create database-specific extensions as separate YAML files."
+    note: "Implementation patterns may vary based on project needs and validation tool requirements."
+      
+  supported_databases:
+    cchs:
+      description: "Canadian Community Health Survey extensions"
+      files: ["variables_cchs_example.yaml", "variable_details_cchs_example.yaml"]
+      version: "2.2.0"
+      status: "production"
+
+# Note: Usage guidance and implementation examples are documented separately
+# in the metadata schema documentation and individual schema files.
+

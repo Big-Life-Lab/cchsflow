@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking.R
 \name{SMKDSTY_fun}
 \alias{SMKDSTY_fun}
-\title{Type of smokers}
+\title{Type of smokers (unified approach)}
 \usage{
 SMKDSTY_fun(SMK_005, SMK_030, SMK_01A)
 }
@@ -17,55 +17,11 @@ SMKDSTY_fun(SMK_005, SMK_030, SMK_01A)
 value for smoker type in the SMKDSTY_A variable
 }
 \description{
-This function creates a derived variable (SMKDSTY_A) for 
-smoker type with 5 categories:
-
-\itemize{
-  \item daily smoker
-  \item current occasional smoker (former daily) 
-  \item current occasional smoker (never daily) 
-  \item current nonsmoker (former daily)
-  \item current nonsmoker (never daily)
-  \item nonsmoker
- }
+This function creates a derived variable (SMKDSTY_A) for
+smoker type with 6 categories: daily smoker, current occasional smoker (former daily),
+current occasional smoker (never daily), current nonsmoker (former daily),
+current nonsmoker (never daily), nonsmoker
 }
-\details{
-For CCHS 2001-2014, smoker type is derived from smoking more than 
-100 cigarettes in lifetime, type of smoker at present time, and ever smoked 
-daily. For CCHS 2015-2018, smoker type was derived differently with different 
-variables and categories. A function was created for a consistent smoker 
-status across all cycles.
-}
-\examples{
- 
-# Using SMKDSTY_fun() to derive smoke type values across CCHS cycles
-# SMKDSTY_fun() is specified in variable_details.csv along with the 
-# CCHS variables and cycles included.
-
-# To transform SMKDSTY_A across cycles, use rec_with_table() for each
-# CCHS cycle and specify SMKDSTY_A.
-# For CCHS 2001-2014, only specify SMKDSTY_A for smoker type.
-# For CCHS 2015-2018, specify the parameters and SMKDSTY_A for smoker type.
-
-library(cchsflow)
-
-smoker_type_2009_2010 <- rec_with_table(
-  cchs2009_2010_p, "SMKDSTY_A")
-
-head(smoker_type_2009_2010)
-
-smoker_type_2017_2018 <- rec_with_table(
-  cchs2017_2018_p,c(
-    "SMK_01A", "SMK_005","SMK_030","SMKDSTY_A"
-  )
-)
-
-tail(smoker_type_2017_2018)
-
-combined_smoker_type <- suppressWarnings(merge_rec_data
-(smoker_type_2009_2010,smoker_type_2017_2018))
-
-head(combined_smoker_type)
-tail(combined_smoker_type)
-
+\note{
+v3.0.0, last updated: 2025-06-30, status: active, Note: Major refactoring with tidyverse modernization and enhanced validation
 }
