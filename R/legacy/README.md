@@ -50,7 +50,6 @@ For users with direct function calls, see `R/deprecated-aliases.R` for backward 
 
 - **v2.2.0 and earlier**: Legacy functions were the primary implementation
 - **v3.0.0**: Modern functions introduced, legacy functions archived
-- **v4.0.0 (planned)**: Legacy code may be removed entirely
 
 ## Usage
 

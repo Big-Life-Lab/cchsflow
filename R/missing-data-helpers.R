@@ -29,9 +29,9 @@
 #' @param input_var Vector with potential original CCHS codes, string NA values,
 #'   or haven::tagged_na() values
 #' @param pattern_type Character string specifying CCHS missing code pattern:
-#'   - "standard_response": codes 6,7,8,9 (default)
-#'   - "categorical_age": codes 96,97,98,99
-#'   - "continuous_standard": codes 996,997,998,999
+#'   - "single_digit_missing": codes 6,7,8,9 (for binary/ternary variables) [default]
+#'   - "double_digit_missing": codes 96,97,98,99 (for multi-category scales)
+#'   - "triple_digit_missing": codes 996,997,998,999 (for continuous variables)
 #' @param preserve_numeric Logical. If TRUE, valid numeric values are preserved
 #'   as numeric. If FALSE, all values are converted through the preprocessing.
 #'   Default TRUE.
@@ -69,49 +69,50 @@
 #' - haven::tagged_na("b") → preserved as-is
 #'
 #' @examples
-#' # Standard response pattern (SMK_005, SMK_030, SMK_01A)
+#' # Single digit missing pattern (SMK_005, SMK_030, SMK_01A)
 #' smk_data <- c(1, 2, 3, 6, 7, 8, 9, "NA(a)", NA)
-#' preprocess_cchs_missing_codes(smk_data, "standard_response")
+#' preprocess_cchs_missing_codes(smk_data, "single_digit_missing")
 #'
-#' # Categorical age pattern (SMKG203, SMKG207)
+#' # Double digit missing pattern (SMKG203, SMKG207, smoking status)
 #' age_data <- c(1, 5, 8, 96, 97, 98, 99, "NA(b)")
-#' preprocess_cchs_missing_codes(age_data, "categorical_age")
+#' preprocess_cchs_missing_codes(age_data, "double_digit_missing")
 #'
-#' # Continuous pattern (SMK_204, HWTDGWTK)
+#' # Triple digit missing pattern (SMK_204, HWTDGWTK)
 #' cont_data <- c(15, 25, 996, 997, 998, 999)
-#' preprocess_cchs_missing_codes(cont_data, "continuous_standard")
+#' preprocess_cchs_missing_codes(cont_data, "triple_digit_missing")
 #'
 #' @seealso
-#' - [preprocess_standard_response()] for SMK_005-type variables
-#' - [preprocess_categorical_age()] for SMKG203-type variables
-#' - [preprocess_continuous_standard()] for SMK_204-type variables
 #' - inst/metadata/schemas/cchs/cchs_missing_data.yaml for complete specification
+#' - vignettes/missing_value_conventions.qmd for user guidance
+#' - R/validation-constants.R for CCHS_MISSING_CODES constants
 #'
 #' @export
 preprocess_cchs_missing_codes <- function(input_var,
-                                          pattern_type = "standard_response",
+                                          pattern_type = "single_digit_missing",
                                           preserve_numeric = TRUE) {
   # Parameter validation
-  if (!pattern_type %in% c("standard_response", "categorical_age", "continuous_standard")) {
-    warning("pattern_type must be one of: 'standard_response', 'categorical_age', 'continuous_standard' - using 'standard_response'")
-    pattern_type <- "standard_response"
+  valid_patterns <- c("single_digit_missing", "double_digit_missing", "triple_digit_missing")
+
+  if (!pattern_type %in% valid_patterns) {
+    warning("pattern_type must be one of: ", paste(valid_patterns, collapse = ", "), " - using 'single_digit_missing'")
+    pattern_type <- "single_digit_missing"
   }
 
-  # Define missing code patterns based on CCHS specification
-  if (pattern_type == "standard_response") {
+  # Define missing code patterns based on CCHS specification (using standardized names)
+  if (pattern_type == "single_digit_missing") {
     not_applicable_codes <- 6
     missing_codes <- c(7, 8, 9)
-  } else if (pattern_type == "categorical_age") {
+  } else if (pattern_type == "double_digit_missing") {
     not_applicable_codes <- 96
     missing_codes <- c(97, 98, 99)
-  } else if (pattern_type == "continuous_standard") {
+  } else if (pattern_type == "triple_digit_missing") {
     not_applicable_codes <- 996
     missing_codes <- c(997, 998, 999)
   }
 
   # Apply preprocessing transformation with safe numeric conversion
   result <- dplyr::case_when(
-    
+
     # Original CCHS "not applicable" codes → NA::a
     input_var %in% not_applicable_codes ~ haven::tagged_na("a"),
 
@@ -121,7 +122,7 @@ preprocess_cchs_missing_codes <- function(input_var,
     # String-based NA values → haven::tagged_na
     input_var == "NA(a)" ~ haven::tagged_na("a"),
     input_var == "NA(b)" ~ haven::tagged_na("b"),
-    
+
     # Common domain-specific string values (case-insensitive)
     is.character(input_var) & grepl("^not applicable$", input_var, ignore.case = TRUE) ~ haven::tagged_na("a"),
     is.character(input_var) & grepl("^(missing|don't know|refusal)$", input_var, ignore.case = TRUE) ~ haven::tagged_na("b"),
@@ -141,114 +142,6 @@ preprocess_cchs_missing_codes <- function(input_var,
   return(result)
 }
 
-# ============================================================================
-# PATTERN-SPECIFIC HELPER FUNCTIONS
-# ============================================================================
-
-#' Preprocess standard response CCHS variables
-#'
-#' Specialized preprocessing for standard CCHS response variables that use
-#' the 6,7,8,9 missing code pattern. Common for variables like SMK_005,
-#' SMK_030, SMK_01A with typical response ranges 1-3 or 1-5.
-#'
-#' @param input_var Vector with potential codes 6,7,8,9 and string/haven NA values
-#' @param preserve_numeric Logical. Preserve valid numeric responses (default TRUE)
-#'
-#' @return Vector with missing codes converted to appropriate haven::tagged_na()
-#'
-#' @details
-#' **Transformation Pattern:**
-#' - 6 → haven::tagged_na("a") - Not applicable (age restrictions, skip patterns)
-#' - 7 → haven::tagged_na("b") - Don't know
-#' - 8 → haven::tagged_na("b") - Refusal
-#' - 9 → haven::tagged_na("b") - Not stated
-#'
-#' **Common Variables Using This Pattern:**
-#' - SMK_005: Type of smoker presently (1=daily, 2=occasionally, 3=not at all)
-#' - SMK_030: Ever smoked daily (1=yes, 2=no)
-#' - SMK_01A: Smoked 100+ cigarettes in lifetime (1=yes, 2=no)
-#'
-#' @examples
-#' # Typical SMK_005 data with original CCHS codes
-#' smk_005_data <- c(1, 2, 3, 6, 7, 8, 9, "NA(a)")
-#' preprocess_standard_response(smk_005_data)
-#'
-#' @export
-preprocess_standard_response <- function(input_var, preserve_numeric = TRUE) {
-  preprocess_cchs_missing_codes(input_var, "standard_response", preserve_numeric)
-}
-
-#' Preprocess categorical age CCHS variables
-#'
-#' Specialized preprocessing for CCHS categorical age variables that use
-#' the 96,97,98,99 missing code pattern. Common for age category variables
-#' like SMKG203, SMKG207 with response ranges 1-11.
-#'
-#' @param input_var Vector with potential codes 96,97,98,99 and string/haven NA values
-#' @param preserve_numeric Logical. Preserve valid numeric responses (default TRUE)
-#'
-#' @return Vector with missing codes converted to appropriate haven::tagged_na()
-#'
-#' @details
-#' **Transformation Pattern:**
-#' - 96 → haven::tagged_na("a") - Not applicable (non-smokers, skip patterns)
-#' - 97 → haven::tagged_na("b") - Don't know age
-#' - 98 → haven::tagged_na("b") - Refusal to provide age
-#' - 99 → haven::tagged_na("b") - Age not stated
-#'
-#' **Common Variables Using This Pattern:**
-#' - SMKG203: Age started smoking daily (current daily smokers)
-#' - SMKG207: Age started smoking daily (former daily smokers)
-#' - Age categories typically: 1=<15, 2=15-16, 3=17, 4=18, 5=19-20, 6=21-24,
-#'   7=25-29, 8=30-34, 9=35-39, 10=40-44, 11=45+
-#'
-#' @examples
-#' # Typical SMKG203 data with original CCHS codes
-#' smkg203_data <- c(1, 5, 8, 11, 96, 97, 98, 99, "NA(a)")
-#' preprocess_categorical_age(smkg203_data)
-#'
-#' @export
-preprocess_categorical_age <- function(input_var, preserve_numeric = TRUE) {
-  preprocess_cchs_missing_codes(input_var, "categorical_age", preserve_numeric)
-}
-
-#' Preprocess continuous CCHS variables with extended missing codes
-#'
-#' Specialized preprocessing for CCHS continuous variables that use the
-#' 996,997,998,999 missing code pattern. Common for measurement variables
-#' like cigarettes per day, height, weight.
-#'
-#' @param input_var Vector with potential codes 996,997,998,999 and string/haven NA values
-#' @param preserve_numeric Logical. Preserve valid numeric responses (default TRUE)
-#'
-#' @return Vector with missing codes converted to appropriate haven::tagged_na()
-#'
-#' @details
-#' **Transformation Pattern:**
-#' - 996 → haven::tagged_na("a") - Not applicable (non-smokers, proxy respondents)
-#' - 997 → haven::tagged_na("b") - Don't know measurement value
-#' - 998 → haven::tagged_na("b") - Refusal to provide measurement
-#' - 999 → haven::tagged_na("b") - Measurement not stated
-#'
-#' **Common Variables Using This Pattern:**
-#' - SMK_204: Number of cigarettes smoked per day (daily smokers)
-#' - SMK_208: Number of cigarettes smoked per day (former daily smokers)
-#' - HWTDGHTM: Height in meters
-#' - HWTDGWTK: Weight in kilograms
-#'
-#' @examples
-#' # Typical SMK_204 data (cigarettes per day)
-#' smk_204_data <- c(10, 15, 20, 25, 996, 997, 998, 999, "NA(a)")
-#' preprocess_continuous_standard(smk_204_data)
-#'
-#' # Typical weight data
-#' weight_data <- c(65.5, 78.2, 996, 997, 998, 999)
-#' preprocess_continuous_standard(weight_data)
-#'
-#' @export
-preprocess_continuous_standard <- function(input_var, preserve_numeric = TRUE) {
-  preprocess_cchs_missing_codes(input_var, "continuous_standard", preserve_numeric)
-}
 
 # ============================================================================
 # DOMAIN-SPECIFIC HELPER FUNCTIONS
@@ -264,16 +157,16 @@ preprocess_continuous_standard <- function(input_var, preserve_numeric = TRUE) {
 #' @param variable_name Character. CCHS variable name for automatic pattern detection.
 #'   If NULL, uses pattern_type parameter.
 #' @param pattern_type Character. Manual pattern specification if variable_name not provided.
-#'   One of: "standard_response", "categorical_age", "continuous_standard"
+#'   One of: "single_digit_missing", "double_digit_missing", "triple_digit_missing"
 #' @param preserve_numeric Logical. Preserve valid numeric responses (default TRUE)
 #'
 #' @return Vector with smoking variable missing codes converted to haven::tagged_na()
 #'
 #' @details
 #' **Automatic Pattern Detection:**
-#' - Standard response (6,7,8,9): SMK_005, SMK_030, SMK_01A, SMK_09A_B
-#' - Categorical age (96,97,98,99): SMKG203, SMKG207, SMKG209
-#' - Continuous (996,997,998,999): SMK_204, SMK_208, SMK_05B, SMK_05C
+#' - Single digit missing (6,7,8,9): SMK_005, SMK_030, SMK_01A, SMK_09A_B
+#' - Double digit missing (96,97,98,99): SMKG203, SMKG207, SMKG209
+#' - Triple digit missing (996,997,998,999): SMK_204, SMK_208, SMK_05B, SMK_05C
 #'
 #' **Manual Pattern Override:**
 #' Use pattern_type parameter to override automatic detection.
@@ -285,7 +178,7 @@ preprocess_continuous_standard <- function(input_var, preserve_numeric = TRUE) {
 #' preprocess_smoking_variable(c(15, 20, 996, 997), variable_name = "SMK_204")
 #'
 #' # Manual pattern specification
-#' preprocess_smoking_variable(c(1, 2, 6, 7), pattern_type = "standard_response")
+#' preprocess_smoking_variable(c(1, 2, 6, 7), pattern_type = "single_digit_missing")
 #'
 #' @export
 preprocess_smoking_variable <- function(input_var,
@@ -294,27 +187,27 @@ preprocess_smoking_variable <- function(input_var,
                                         preserve_numeric = TRUE) {
   # Automatic pattern detection based on variable name
   if (!is.null(variable_name)) {
-    # Standard response pattern variables
-    standard_response_vars <- c("SMK_005", "SMK_030", "SMK_01A", "SMK_09A_B")
+    # Single digit missing pattern variables
+    single_digit_vars <- c("SMK_005", "SMK_030", "SMK_01A", "SMK_09A_B")
 
-    # Categorical age pattern variables
-    categorical_age_vars <- c("SMKG203", "SMKG207", "SMKG209")
+    # Double digit missing pattern variables
+    double_digit_vars <- c("SMKG203", "SMKG207", "SMKG209")
 
-    # Continuous pattern variables
-    continuous_vars <- c("SMK_204", "SMK_208", "SMK_05B", "SMK_05C")
+    # Triple digit missing pattern variables
+    triple_digit_vars <- c("SMK_204", "SMK_208", "SMK_05B", "SMK_05C")
 
-    if (variable_name %in% standard_response_vars) {
-      detected_pattern <- "standard_response"
-    } else if (variable_name %in% categorical_age_vars) {
-      detected_pattern <- "categorical_age"
-    } else if (variable_name %in% continuous_vars) {
-      detected_pattern <- "continuous_standard"
+    if (variable_name %in% single_digit_vars) {
+      detected_pattern <- "single_digit_missing"
+    } else if (variable_name %in% double_digit_vars) {
+      detected_pattern <- "double_digit_missing"
+    } else if (variable_name %in% triple_digit_vars) {
+      detected_pattern <- "triple_digit_missing"
     } else {
-      # Default to standard response for unknown smoking variables
-      detected_pattern <- "standard_response"
+      # Default to single digit missing for unknown smoking variables
+      detected_pattern <- "single_digit_missing"
       warning(paste(
         "Unknown smoking variable:", variable_name,
-        "- using standard_response pattern"
+        "- using single_digit_missing pattern"
       ))
     }
 
@@ -323,8 +216,8 @@ preprocess_smoking_variable <- function(input_var,
     # Manual pattern specification
     return(preprocess_cchs_missing_codes(input_var, pattern_type, preserve_numeric))
   } else {
-    warning("Either variable_name or pattern_type must be specified - using 'standard_response'")
-    return(preprocess_cchs_missing_codes(input_var, "standard_response", preserve_numeric))
+    warning("Either variable_name or pattern_type must be specified - using 'single_digit_missing'")
+    return(preprocess_cchs_missing_codes(input_var, "single_digit_missing", preserve_numeric))
   }
 }
 
@@ -354,8 +247,8 @@ preprocess_smoking_variable <- function(input_var,
 #'
 #' @examples
 #' original <- c(1, 2, 3, 6, 7, 8, 9)
-#' processed <- preprocess_standard_response(original)
-#' validate_missing_code_preprocessing(original, processed, "standard_response")
+#' processed <- preprocess_cchs_missing_codes(original, "single_digit_missing")
+#' validate_missing_code_preprocessing(original, processed, "single_digit_missing")
 #'
 #' @export
 validate_missing_code_preprocessing <- function(original_var,
@@ -363,14 +256,14 @@ validate_missing_code_preprocessing <- function(original_var,
                                                 pattern_type,
                                                 report_details = FALSE) {
   # Define expected missing codes for pattern
-  if (pattern_type == "standard_response") {
+  if (pattern_type == "single_digit_missing") {
     expected_missing_codes <- c(6, 7, 8, 9)
-  } else if (pattern_type == "categorical_age") {
+  } else if (pattern_type == "double_digit_missing") {
     expected_missing_codes <- c(96, 97, 98, 99)
-  } else if (pattern_type == "continuous_standard") {
+  } else if (pattern_type == "triple_digit_missing") {
     expected_missing_codes <- c(996, 997, 998, 999)
   } else {
-    warning("Invalid pattern_type - cannot validate preprocessing")
+    warning("Invalid pattern_type - must be one of: 'single_digit_missing', 'double_digit_missing', 'triple_digit_missing'")
     return(FALSE)
   }
 
@@ -412,8 +305,8 @@ validate_missing_code_preprocessing <- function(original_var,
 #' @param min_values Named list of minimum values for continuous variables
 #' @param max_values Named list of maximum values for continuous variables
 #' @param valid_values Named list of valid values for categorical variables
-#' @param continuous_pattern CCHS missing code pattern for continuous variables (default "continuous_standard")
-#' @param categorical_pattern CCHS missing code pattern for categorical variables (default "standard_response")
+#' @param continuous_pattern CCHS missing code pattern for continuous variables (default "triple_digit_missing")
+#' @param categorical_pattern CCHS missing code pattern for categorical variables (default "single_digit_missing")
 #' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
 #' @return List with all cleaned variables, ensuring consistent lengths across all outputs
@@ -425,8 +318,8 @@ clean_variables <- function(continuous_vars = NULL,
                             min_values = NULL,
                             max_values = NULL,
                             valid_values = NULL,
-                            continuous_pattern = "continuous_standard",
-                            categorical_pattern = "standard_response",
+                            continuous_pattern = "triple_digit_missing",
+                            categorical_pattern = "single_digit_missing",
                             log_level = "silent") {
   # Combine all variables for unified length checking
   all_vars <- c(continuous_vars, categorical_vars)
@@ -541,7 +434,7 @@ clean_variables <- function(continuous_vars = NULL,
 #' @examples
 #' has_cchs_missing_codes(c(1, 2, 3, 6, 7)) # TRUE
 #' has_cchs_missing_codes(c(1, 2, 3, NA)) # FALSE
-#' has_cchs_missing_codes(c(1, 5, 96, 97), "categorical_age") # TRUE
+#' has_cchs_missing_codes(c(1, 5, 96, 97), "double_digit_missing") # TRUE
 #'
 #' @export
 has_cchs_missing_codes <- function(input_var, pattern_type = NULL) {
@@ -552,11 +445,11 @@ has_cchs_missing_codes <- function(input_var, pattern_type = NULL) {
   }
 
   # Check specific pattern
-  if (pattern_type == "standard_response") {
+  if (pattern_type == "single_digit_missing") {
     return(any(input_var %in% c(6, 7, 8, 9), na.rm = TRUE))
-  } else if (pattern_type == "categorical_age") {
+  } else if (pattern_type == "double_digit_missing") {
     return(any(input_var %in% c(96, 97, 98, 99), na.rm = TRUE))
-  } else if (pattern_type == "continuous_standard") {
+  } else if (pattern_type == "triple_digit_missing") {
     return(any(input_var %in% c(996, 997, 998, 999), na.rm = TRUE))
   } else {
     return(FALSE) # Invalid pattern_type returns FALSE instead of stop
@@ -692,7 +585,7 @@ clean_continuous_variables <- function(..., min_values, max_values, log_level = 
   for (name in var_names) {
     var <- input_vars[[name]]
     if (needs_preprocessing(var)) {
-      preprocessed_vars[[name]] <- preprocess_cchs_missing_codes(var, "continuous_standard")
+      preprocessed_vars[[name]] <- preprocess_cchs_missing_codes(var, "triple_digit_missing")
     } else {
       preprocessed_vars[[name]] <- var
     }
@@ -734,7 +627,7 @@ clean_continuous_variables <- function(..., min_values, max_values, log_level = 
 #'
 #' @param ... Named categorical variables to clean (e.g., sex = DHH_SEX, smoker_type = SMK_005)
 #' @param valid_values Named list of valid values (e.g., list(sex = c(1, 2), smoker_type = c(1, 2, 3)))
-#' @param pattern_type CCHS missing code pattern to use (default "standard_response")
+#' @param pattern_type CCHS missing code pattern to use (default "single_digit_missing")
 #' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #' @param skip_validation Logical. Skip parameter/length validation if already done upstream (default FALSE)
 #' @return Named list with cleaned variables (e.g., list(sex_clean, smoker_type_clean))
@@ -745,16 +638,16 @@ clean_continuous_variables <- function(..., min_values, max_values, log_level = 
 #' cleaned <- clean_categorical_variables(
 #'   smoker_type = SMK_005, ever_daily = SMK_030,
 #'   valid_values = list(smoker_type = c(1, 2, 3), ever_daily = c(1, 2)),
-#'   pattern_type = "standard_response"
+#'   pattern_type = "single_digit_missing"
 #' )
 #'
 #' # Sex and age category usage
 #' cleaned <- clean_categorical_variables(
 #'   sex = DHH_SEX, age_started_cat = SMKG203,
 #'   valid_values = list(sex = c(1, 2), age_started_cat = 1:11),
-#'   pattern_type = "categorical_age"
+#'   pattern_type = "double_digit_missing"
 #' )
-clean_categorical_variables <- function(..., valid_values, pattern_type = "standard_response", log_level = "silent") {
+clean_categorical_variables <- function(..., valid_values, pattern_type = "single_digit_missing", log_level = "silent") {
   # Get input variables
   input_vars <- list(...)
   var_names <- names(input_vars)
@@ -1016,21 +909,21 @@ get_priority_tagged_na <- function(..., include_regular_na = TRUE) {
 #' across all derived variable domains.
 #'
 #' @param value Single value to clean (numeric, character, or tagged_na)
-#' @param pattern_type CCHS missing code pattern to use (default "continuous_standard")
+#' @param pattern_type CCHS missing code pattern to use (default "triple_digit_missing")
 #' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #' @return Cleaned single value with appropriate tagged NA handling
 #' @note Internal v3.0.0, last updated: 2025-06-30, status: active
 #' @keywords internal
 #' @examples
 #' # BMI categorization usage
-#' clean_bmi <- clean_single_value(bmi_value, "continuous_standard")
+#' clean_bmi <- clean_single_value(bmi_value, "triple_digit_missing")
 #'
 #' # Smoking categorization usage
-#' clean_status <- clean_single_value(smoking_status, "standard_response")
+#' clean_status <- clean_single_value(smoking_status, "single_digit_missing")
 #'
 #' # ADL categorization usage
-#' clean_score <- clean_single_value(adl_score, "continuous_standard")
-clean_single_value <- function(value, pattern_type = "continuous_standard", log_level = "silent") {
+#' clean_score <- clean_single_value(adl_score, "triple_digit_missing")
+clean_single_value <- function(value, pattern_type = "triple_digit_missing", log_level = "silent") {
   # 1. Handle missing input (not provided to function)
   if (missing(value) || is.null(value)) {
     if (log_level %in% c("warning", "verbose")) {
@@ -1063,7 +956,7 @@ clean_single_value <- function(value, pattern_type = "continuous_standard", log_
 #' ready for categorization, or the properly formatted tagged NA.
 #'
 #' @param value Single value to clean and check (numeric, character, or tagged_na)
-#' @param pattern_type CCHS missing code pattern to use (default "continuous_standard")
+#' @param pattern_type CCHS missing code pattern to use (default "triple_digit_missing")
 #' @param categorical_labels Return string labels for tagged NAs vs tagged_na objects (default TRUE)
 #' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #' @return List with is_na (logical) and value (cleaned value or formatted tagged NA)
@@ -1071,19 +964,19 @@ clean_single_value <- function(value, pattern_type = "continuous_standard", log_
 #' @keywords internal
 #' @examples
 #' # BMI categorization usage
-#' result <- clean_and_check_for_categorization(bmi_value, "continuous_standard", TRUE)
+#' result <- clean_and_check_for_categorization(bmi_value, "triple_digit_missing", TRUE)
 #' if (result$is_na) {
 #'   return(result$value)
 #' }
 #' # categorize result$value...
 #'
 #' # Smoking categorization usage
-#' result <- clean_and_check_for_categorization(smoking_status, "standard_response", FALSE)
+#' result <- clean_and_check_for_categorization(smoking_status, "single_digit_missing", FALSE)
 #' if (result$is_na) {
 #'   return(result$value)
 #' }
 #' # categorize result$value...
-clean_and_check_for_categorization <- function(value, pattern_type = "continuous_standard",
+clean_and_check_for_categorization <- function(value, pattern_type = "triple_digit_missing",
                                                categorical_labels = TRUE, log_level = "silent") {
   # 1. Clean single value (handles missing data, preprocessing, tagged_na("c"/"d"))
   clean_value <- clean_single_value(value, pattern_type, log_level)
@@ -1111,17 +1004,17 @@ clean_and_check_for_categorization <- function(value, pattern_type = "continuous
 #' derived variable categorization functions.
 #'
 #' @param values Values to clean (single value, vector, numeric, character, or tagged_na)
-#' @param pattern_type CCHS missing code pattern to use (default "continuous_standard")
+#' @param pattern_type CCHS missing code pattern to use (default "triple_digit_missing")
 #' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #' @return Cleaned values ready for case_when() logic with proper tagged NA handling
 #' @note Internal v3.0.0, last updated: 2025-07-04, status: active - VECTOR AWARE
 #' @keywords internal
 #' @examples
 #' # BMI categorization usage (vector)
-#' clean_bmi <- clean_for_categorization(c(17, 22, 27, 997), "continuous_standard")
+#' clean_bmi <- clean_for_categorization(c(17, 22, 27, 997), "triple_digit_missing")
 #'
 #' # Smoking categorization usage (single)
-#' clean_status <- clean_for_categorization(smoking_status, "standard_response")
+#' clean_status <- clean_for_categorization(smoking_status, "single_digit_missing")
 #'
 #' # Integration with case_when
 #' result <- dplyr::case_when(
@@ -1129,7 +1022,7 @@ clean_and_check_for_categorization <- function(value, pattern_type = "continuous
 #'   clean_bmi >= 18.5 & clean_bmi < 25.0 ~ "Normal weight",
 #'   # ... tagged NAs are handled automatically by preprocessing
 #' )
-clean_for_categorization <- function(values, pattern_type = "continuous_standard", log_level = "silent") {
+clean_for_categorization <- function(values, pattern_type = "triple_digit_missing", log_level = "silent") {
   # 1. Handle missing input (not provided to function)
   if (missing(values) || is.null(values)) {
     if (log_level %in% c("warning", "verbose")) {
