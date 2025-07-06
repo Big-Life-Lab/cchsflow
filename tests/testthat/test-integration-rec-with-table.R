@@ -50,15 +50,15 @@ MODERNIZED_FUNCTIONS <- list(
   ),
 
   # Alcohol Functions
-  assess_binge_drinking = list(
+  calculate_binge_drinking = list(
     derived_vars = c("binge_drinker"),
     test_cycles = c("cchs2001_p", "cchs2007_2008_p", "cchs2015_2016_p", "cchs2017_2018_p")
   ),
-  assess_drinking_risk_short = list(
+  calculate_drinking_risk_short = list(
     derived_vars = c("ALWDVSTR_der"),
     test_cycles = c("cchs2001_p", "cchs2007_2008_p", "cchs2015_2016_p")
   ),
-  assess_drinking_risk_long = list(
+  calculate_drinking_risk_long = list(
     derived_vars = c("ALWDVLTR_der"),
     test_cycles = c("cchs2001_p", "cchs2007_2008_p", "cchs2015_2016_p")
   ),
@@ -83,7 +83,7 @@ test_that("rec_with_table() loads successfully with all required dependencies", 
   # Test that modernized functions exist
   expect_true(exists("calculate_bmi"), "calculate_bmi function must exist")
   expect_true(exists("assess_adl"), "assess_adl function must exist")
-  expect_true(exists("assess_binge_drinking"), "assess_binge_drinking function must exist")
+  expect_true(exists("calculate_binge_drinking"), "calculate_binge_drinking function must exist")
   expect_true(exists("calculate_energy_expenditure"), "calculate_energy_expenditure function must exist")
 })
 
@@ -304,7 +304,7 @@ test_that("score_adl integration calculates correct scores", {
 # 4. ALCOHOL FUNCTIONS INTEGRATION TESTS
 # ==============================================================================
 
-test_that("assess_binge_drinking integration works across cycles", {
+test_that("calculate_binge_drinking integration works across cycles", {
   skip_if_not(exists("rec_with_table"), "rec_with_table function required")
 
   test_cycles <- c("cchs2001_p", "cchs2015_2016_p", "cchs2017_2018_p")
