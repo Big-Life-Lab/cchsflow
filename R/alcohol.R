@@ -215,16 +215,16 @@ assess_risk_core <- function(sex_clean, weekly_drinks_clean, alc_1_clean, alw_1_
 #' )
 #'
 #' # Scalar usage examples with variable labels
-#' # assess_binge_drinking(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
+#' # calculate_binge_drinking(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
 #' #                      (sex,    drinks, sun,     mon,     tue,     wed,     thu,     fri,     sat)
-#' assess_binge_drinking(1, 1, 3, 1, 6, 0, 3, 8, 2) # Returns: 1L (male binge: 6 drinks Tue, 8 drinks Fri)
-#' assess_binge_drinking(2, 1, 1, 2, 2, 3, 0, 1, 2) # Returns: 2L (female non-binge: all days ≤3 drinks)
-#' assess_binge_drinking(1, 1, 4, 4, 4, 4, 4, 4, 4) # Returns: 2L (male non-binge: all days <5 drinks)
-#' assess_binge_drinking(2, 1, 0, 0, 0, 0, 4, 0, 0) # Returns: 1L (female binge: 4 drinks Thu exactly threshold)
-#' assess_binge_drinking(1, 2, 0, 0, 0, 0, 0, 0, 0) # Returns: tagged_na("a") (non-drinker: not applicable)
+#' calculate_binge_drinking(1, 1, 3, 1, 6, 0, 3, 8, 2) # Returns: 1L (male binge: 6 drinks Tue, 8 drinks Fri)
+#' calculate_binge_drinking(2, 1, 1, 2, 2, 3, 0, 1, 2) # Returns: 2L (female non-binge: all days ≤3 drinks)
+#' calculate_binge_drinking(1, 1, 4, 4, 4, 4, 4, 4, 4) # Returns: 2L (male non-binge: all days <5 drinks)
+#' calculate_binge_drinking(2, 1, 0, 0, 0, 0, 4, 0, 0) # Returns: 1L (female binge: 4 drinks Thu exactly threshold)
+#' calculate_binge_drinking(1, 2, 0, 0, 0, 0, 0, 0, 0) # Returns: tagged_na("a") (non-drinker: not applicable)
 #'
 #' # Vector processing with missing data and edge cases
-#' assess_binge_drinking(
+#' calculate_binge_drinking(
 #'   c(1, 2, 6, 7, 8, 9), # Mixed valid/CCHS codes for sex
 #'   c(1, 1, 1, 2, 1, 1), # Mixed drinking statuses
 #'   c(5, 4, 2, 0, 7, 996), # Mixed Sunday drinks with CCHS codes
@@ -237,7 +237,7 @@ assess_risk_core <- function(sex_clean, weekly_drinks_clean, alc_1_clean, alw_1_
 #' ) # Returns: c(1L, 1L, tagged_na("b"), tagged_na("a"), tagged_na("b"), tagged_na("b"))
 #'
 #' # Vector with string missing values
-#' assess_binge_drinking(
+#' calculate_binge_drinking(
 #'   c(1, 2, "Not applicable"), # Mixed sex with string NA
 #'   c(1, 1, 1),
 #'   c(6, 3, 2), c(0, 0, 0), c(0, 0, 0), c(0, 0, 0),
@@ -245,8 +245,8 @@ assess_risk_core <- function(sex_clean, weekly_drinks_clean, alc_1_clean, alw_1_
 #' ) # Returns: c(1L, 2L, tagged_na("b"))
 #'
 #' @seealso
-#' \\code{\\link{assess_drinking_risk_short}} for short-term drinking risk assessment
-#' \\code{\\link{assess_drinking_risk_long}} for long-term drinking risk assessment
+#' \\code{\\link{calculate_drinking_risk_short}} for short-term drinking risk assessment
+#' \\code{\\link{calculate_drinking_risk_long}} for long-term drinking risk assessment
 #'
 #' @references
 #' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines
@@ -254,30 +254,30 @@ assess_risk_core <- function(sex_clean, weekly_drinks_clean, alc_1_clean, alw_1_
 #'
 #' @note v3.0.0, last updated: 2025-07-05, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
 #' @export
-assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
-                                  ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7,
-                                  # Validation bounds: defaults from variable_details.csv for standalone use
-                                  # Use rec_with_table() for full CSV-driven validation workflow
-                                  min_DHH_SEX = ALCOHOL_VALIDATION_BOUNDS$sex$min,
-                                  max_DHH_SEX = ALCOHOL_VALIDATION_BOUNDS$sex$max,
-                                  min_ALW_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$min,
-                                  max_ALW_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$max,
-                                  min_ALW_2A1 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                  max_ALW_2A1 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                  min_ALW_2A2 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                  max_ALW_2A2 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                  min_ALW_2A3 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                  max_ALW_2A3 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                  min_ALW_2A4 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                  max_ALW_2A4 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                  min_ALW_2A5 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                  max_ALW_2A5 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                  min_ALW_2A6 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                  max_ALW_2A6 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                  min_ALW_2A7 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                  max_ALW_2A7 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                  validate_params = NULL,
-                                  log_level = "silent") {
+calculate_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
+                                     ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7,
+                                     # Validation bounds: defaults from variable_details.csv for standalone use
+                                     # Use rec_with_table() for full CSV-driven validation workflow
+                                     min_DHH_SEX = 1,
+                                     max_DHH_SEX = 2,
+                                     min_ALW_1 = 1,
+                                     max_ALW_1 = 2,
+                                     min_ALW_2A1 = 0,
+                                     max_ALW_2A1 = 995,
+                                     min_ALW_2A2 = 0,
+                                     max_ALW_2A2 = 995,
+                                     min_ALW_2A3 = 0,
+                                     max_ALW_2A3 = 995,
+                                     min_ALW_2A4 = 0,
+                                     max_ALW_2A4 = 995,
+                                     min_ALW_2A5 = 0,
+                                     max_ALW_2A5 = 995,
+                                     min_ALW_2A6 = 0,
+                                     max_ALW_2A6 = 995,
+                                     min_ALW_2A7 = 0,
+                                     max_ALW_2A7 = 995,
+                                     validate_params = NULL,
+                                     log_level = "silent") {
   # Clean variables using standardized helpers (handles missing variables with tagged_na("d"))
   cleaned <- clean_variables(
     categorical_vars = list(DHH_SEX = DHH_SEX, ALW_1 = ALW_1),
@@ -297,8 +297,8 @@ assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
       ALW_2A1 = max_ALW_2A1, ALW_2A2 = max_ALW_2A2, ALW_2A3 = max_ALW_2A3,
       ALW_2A4 = max_ALW_2A4, ALW_2A5 = max_ALW_2A5, ALW_2A6 = max_ALW_2A6, ALW_2A7 = max_ALW_2A7
     ),
-    categorical_pattern = "standard_response",
-    continuous_pattern = "continuous_standard",
+    categorical_pattern = "single_digit_missing",
+    continuous_pattern = "triple_digit_missing",
     log_level = log_level
   )
 
@@ -316,7 +316,7 @@ assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
 #' Evaluates daily and weekly consumption against sex-specific acute risk thresholds for
 #' injury and overdose risk assessment.
 #'
-#' @param DHH_SEX,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in assess_binge_drinking()
+#' @param DHH_SEX,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in calculate_binge_drinking()
 #' @param ALC_1 Had drinks in past year (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
 #' @param ALWDWKY Total drinks in past week. Accepts raw CCHS codes or preprocessed values.
 #'
@@ -347,16 +347,16 @@ assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
 #' )
 #'
 #' # Scalar usage examples with variable labels
-#' # assess_drinking_risk_short(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
+#' # calculate_drinking_risk_short(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
 #' #                           (sex,    weekly,  year, week,  sun,     mon,     tue,     wed,     thu,     fri,     sat)
-#' assess_drinking_risk_short(1, 20, 1, 1, 0, 0, 5, 0, 0, 0, 0) # Returns: 1L (male short-term risk: 5 drinks/day OR 20/week)
-#' assess_drinking_risk_short(2, 8, 1, 1, 2, 1, 2, 1, 1, 1, 0) # Returns: 2L (female no risk: ≤2 drinks/day AND ≤10/week)
-#' assess_drinking_risk_short(1, 15, 1, 1, 3, 3, 3, 3, 3, 0, 0) # Returns: 2L (male no risk: ≤3 drinks/day AND ≤15/week)
-#' assess_drinking_risk_short(2, 11, 1, 1, 2, 2, 2, 2, 2, 1, 0) # Returns: 1L (female risk: 11 drinks/week exceeds 10)
-#' assess_drinking_risk_short(1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0) # Returns: tagged_na("a") (non-drinker: not applicable)
+#' calculate_drinking_risk_short(1, 20, 1, 1, 0, 0, 5, 0, 0, 0, 0) # Returns: 1L (male short-term risk: 5 drinks/day OR 20/week)
+#' calculate_drinking_risk_short(2, 8, 1, 1, 2, 1, 2, 1, 1, 1, 0) # Returns: 2L (female no risk: ≤2 drinks/day AND ≤10/week)
+#' calculate_drinking_risk_short(1, 15, 1, 1, 3, 3, 3, 3, 3, 0, 0) # Returns: 2L (male no risk: ≤3 drinks/day AND ≤15/week)
+#' calculate_drinking_risk_short(2, 11, 1, 1, 2, 2, 2, 2, 2, 1, 0) # Returns: 1L (female risk: 11 drinks/week exceeds 10)
+#' calculate_drinking_risk_short(1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0) # Returns: tagged_na("a") (non-drinker: not applicable)
 #'
 #' # Vector processing with missing data and edge cases
-#' assess_drinking_risk_short(
+#' calculate_drinking_risk_short(
 #'   c(1, 2, 6, 8, 9), # Mixed valid/CCHS codes for sex
 #'   c(16, 11, 5, 996, 997), # Mixed weekly drinks with CCHS codes
 #'   c(1, 1, 1, 1, 2), # Mixed alcohol use statuses
@@ -367,8 +367,8 @@ assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
 #' ) # Returns: c(1L, 1L, tagged_na("b"), tagged_na("b"), tagged_na("a"))
 #'
 #' @seealso
-#' \code{\link{assess_binge_drinking}} for binge drinking assessment
-#' \code{\link{assess_drinking_risk_long}} for long-term drinking risk assessment
+#' \code{\link{calculate_binge_drinking}} for binge drinking assessment
+#' \code{\link{calculate_drinking_risk_long}} for long-term drinking risk assessment
 #'
 #' @references
 #' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines
@@ -376,34 +376,34 @@ assess_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3,
 #'
 #' @note v3.0.0, last updated: 2025-07-05, status: active, Note: Enhanced with comprehensive risk assessment and missing data handling
 #' @export
-assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
-                                       ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7,
-                                       # Validation bounds: defaults from variable_details.csv for standalone use
-                                       # Use rec_with_table() for full CSV-driven validation workflow
-                                       min_DHH_SEX = ALCOHOL_VALIDATION_BOUNDS$sex$min,
-                                       max_DHH_SEX = ALCOHOL_VALIDATION_BOUNDS$sex$max,
-                                       min_ALWDWKY = ALCOHOL_VALIDATION_BOUNDS$drinks_weekly$min,
-                                       max_ALWDWKY = ALCOHOL_VALIDATION_BOUNDS$drinks_weekly$max,
-                                       min_ALC_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$min,
-                                       max_ALC_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$max,
-                                       min_ALW_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$min,
-                                       max_ALW_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$max,
-                                       min_ALW_2A1 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                       max_ALW_2A1 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                       min_ALW_2A2 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                       max_ALW_2A2 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                       min_ALW_2A3 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                       max_ALW_2A3 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                       min_ALW_2A4 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                       max_ALW_2A4 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                       min_ALW_2A5 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                       max_ALW_2A5 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                       min_ALW_2A6 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                       max_ALW_2A6 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                       min_ALW_2A7 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                       max_ALW_2A7 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                       validate_params = NULL,
-                                       log_level = "silent") {
+calculate_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
+                                          ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7,
+                                          # Validation bounds: defaults from variable_details.csv for standalone use
+                                          # Use rec_with_table() for full CSV-driven validation workflow
+                                          min_DHH_SEX = 1,
+                                          max_DHH_SEX = 2,
+                                          min_ALWDWKY = 0,
+                                          max_ALWDWKY = 995,
+                                          min_ALC_1 = 1,
+                                          max_ALC_1 = 2,
+                                          min_ALW_1 = 1,
+                                          max_ALW_1 = 2,
+                                          min_ALW_2A1 = 0,
+                                          max_ALW_2A1 = 995,
+                                          min_ALW_2A2 = 0,
+                                          max_ALW_2A2 = 995,
+                                          min_ALW_2A3 = 0,
+                                          max_ALW_2A3 = 995,
+                                          min_ALW_2A4 = 0,
+                                          max_ALW_2A4 = 995,
+                                          min_ALW_2A5 = 0,
+                                          max_ALW_2A5 = 995,
+                                          min_ALW_2A6 = 0,
+                                          max_ALW_2A6 = 995,
+                                          min_ALW_2A7 = 0,
+                                          max_ALW_2A7 = 995,
+                                          validate_params = NULL,
+                                          log_level = "silent") {
   # Clean variables using standardized helpers (handles missing variables with tagged_na("d"))
   cleaned <- clean_variables(
     categorical_vars = list(DHH_SEX = DHH_SEX, ALC_1 = ALC_1, ALW_1 = ALW_1),
@@ -424,8 +424,8 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
       ALWDWKY = max_ALWDWKY, ALW_2A1 = max_ALW_2A1, ALW_2A2 = max_ALW_2A2, ALW_2A3 = max_ALW_2A3,
       ALW_2A4 = max_ALW_2A4, ALW_2A5 = max_ALW_2A5, ALW_2A6 = max_ALW_2A6, ALW_2A7 = max_ALW_2A7
     ),
-    categorical_pattern = "standard_response",
-    continuous_pattern = "continuous_standard",
+    categorical_pattern = "single_digit_missing",
+    continuous_pattern = "triple_digit_missing",
     log_level = log_level
   )
 
@@ -445,7 +445,7 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 #' Evaluates daily and weekly consumption against sex-specific chronic risk thresholds for
 #' long-term health outcomes assessment.
 #'
-#' @param DHH_SEX,ALWDWKY,ALC_1,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in assess_drinking_risk_short()
+#' @param DHH_SEX,ALWDWKY,ALC_1,ALW_1,ALW_2A1,ALW_2A2,ALW_2A3,ALW_2A4,ALW_2A5,ALW_2A6,ALW_2A7 As in calculate_drinking_risk_short()
 #'
 #' @return Integer long-term risk indicator. Missing data handled as:
 #'   \itemize{
@@ -471,16 +471,16 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 #' )
 #'
 #' # Scalar usage examples with variable labels
-#' # assess_drinking_risk_long(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
+#' # calculate_drinking_risk_long(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
 #' #                          (sex,    weekly,  year, week,  sun,     mon,     tue,     wed,     thu,     fri,     sat)
-#' assess_drinking_risk_long(1, 20, 1, 1, 0, 0, 4, 0, 0, 0, 0) # Returns: 1L (male long-term risk: 4 drinks/day OR 20/week)
-#' assess_drinking_risk_long(2, 14, 1, 1, 2, 2, 2, 2, 2, 2, 2) # Returns: 2L (female no risk: <3 drinks/day AND <15/week)
-#' assess_drinking_risk_long(1, 19, 1, 1, 3, 3, 3, 3, 3, 3, 1) # Returns: 2L (male no risk: <4 drinks/day AND <20/week)
-#' assess_drinking_risk_long(2, 15, 1, 1, 2, 2, 2, 2, 2, 2, 3) # Returns: 1L (female risk: 15 drinks/week exactly threshold)
-#' assess_drinking_risk_long(1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0) # Returns: tagged_na("a") (non-drinker: not applicable)
+#' calculate_drinking_risk_long(1, 20, 1, 1, 0, 0, 4, 0, 0, 0, 0) # Returns: 1L (male long-term risk: 4 drinks/day OR 20/week)
+#' calculate_drinking_risk_long(2, 14, 1, 1, 2, 2, 2, 2, 2, 2, 2) # Returns: 2L (female no risk: <3 drinks/day AND <15/week)
+#' calculate_drinking_risk_long(1, 19, 1, 1, 3, 3, 3, 3, 3, 3, 1) # Returns: 2L (male no risk: <4 drinks/day AND <20/week)
+#' calculate_drinking_risk_long(2, 15, 1, 1, 2, 2, 2, 2, 2, 2, 3) # Returns: 1L (female risk: 15 drinks/week exactly threshold)
+#' calculate_drinking_risk_long(1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0) # Returns: tagged_na("a") (non-drinker: not applicable)
 #'
 #' # Vector processing with missing data and edge cases
-#' assess_drinking_risk_long(
+#' calculate_drinking_risk_long(
 #'   c(1, 2, 6, 8, 9), # Mixed valid/CCHS codes for sex
 #'   c(20, 15, 8, 996, 997), # Mixed weekly drinks with CCHS codes
 #'   c(1, 1, 1, 1, 2), # Mixed alcohol use statuses
@@ -491,8 +491,8 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 #' ) # Returns: c(1L, 1L, tagged_na("b"), tagged_na("b"), tagged_na("a"))
 #'
 #' @seealso
-#' \code{\link{assess_drinking_risk_short}} for short-term drinking risk assessment
-#' \code{\link{assess_binge_drinking}} for binge drinking assessment
+#' \code{\link{calculate_drinking_risk_short}} for short-term drinking risk assessment
+#' \code{\link{calculate_binge_drinking}} for binge drinking assessment
 #'
 #' @references
 #' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines
@@ -500,34 +500,34 @@ assess_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
 #'
 #' @note v3.0.0, last updated: 2025-07-05, status: active, Note: Enhanced with comprehensive long-term risk assessment
 #' @export
-assess_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
-                                      ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7,
-                                      # Validation bounds: defaults from variable_details.csv for standalone use
-                                      # Use rec_with_table() for full CSV-driven validation workflow
-                                      min_DHH_SEX = ALCOHOL_VALIDATION_BOUNDS$sex$min,
-                                      max_DHH_SEX = ALCOHOL_VALIDATION_BOUNDS$sex$max,
-                                      min_ALWDWKY = ALCOHOL_VALIDATION_BOUNDS$drinks_weekly$min,
-                                      max_ALWDWKY = ALCOHOL_VALIDATION_BOUNDS$drinks_weekly$max,
-                                      min_ALC_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$min,
-                                      max_ALC_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$max,
-                                      min_ALW_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$min,
-                                      max_ALW_1 = ALCOHOL_VALIDATION_BOUNDS$binary_response$max,
-                                      min_ALW_2A1 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                      max_ALW_2A1 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                      min_ALW_2A2 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                      max_ALW_2A2 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                      min_ALW_2A3 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                      max_ALW_2A3 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                      min_ALW_2A4 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                      max_ALW_2A4 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                      min_ALW_2A5 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                      max_ALW_2A5 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                      min_ALW_2A6 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                      max_ALW_2A6 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                      min_ALW_2A7 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$min,
-                                      max_ALW_2A7 = ALCOHOL_VALIDATION_BOUNDS$drinks_daily$max,
-                                      validate_params = NULL,
-                                      log_level = "silent") {
+calculate_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
+                                         ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7,
+                                         # Validation bounds: defaults from variable_details.csv for standalone use
+                                         # Use rec_with_table() for full CSV-driven validation workflow
+                                         min_DHH_SEX = 1,
+                                         max_DHH_SEX = 2,
+                                         min_ALWDWKY = 0,
+                                         max_ALWDWKY = 995,
+                                         min_ALC_1 = 1,
+                                         max_ALC_1 = 2,
+                                         min_ALW_1 = 1,
+                                         max_ALW_1 = 2,
+                                         min_ALW_2A1 = 0,
+                                         max_ALW_2A1 = 995,
+                                         min_ALW_2A2 = 0,
+                                         max_ALW_2A2 = 995,
+                                         min_ALW_2A3 = 0,
+                                         max_ALW_2A3 = 995,
+                                         min_ALW_2A4 = 0,
+                                         max_ALW_2A4 = 995,
+                                         min_ALW_2A5 = 0,
+                                         max_ALW_2A5 = 995,
+                                         min_ALW_2A6 = 0,
+                                         max_ALW_2A6 = 995,
+                                         min_ALW_2A7 = 0,
+                                         max_ALW_2A7 = 995,
+                                         validate_params = NULL,
+                                         log_level = "silent") {
   # Clean variables using standardized helpers (handles missing variables with tagged_na("d"))
   cleaned <- clean_variables(
     categorical_vars = list(DHH_SEX = DHH_SEX, ALC_1 = ALC_1, ALW_1 = ALW_1),
@@ -548,8 +548,8 @@ assess_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1,
       ALWDWKY = max_ALWDWKY, ALW_2A1 = max_ALW_2A1, ALW_2A2 = max_ALW_2A2, ALW_2A3 = max_ALW_2A3,
       ALW_2A4 = max_ALW_2A4, ALW_2A5 = max_ALW_2A5, ALW_2A6 = max_ALW_2A6, ALW_2A7 = max_ALW_2A7
     ),
-    categorical_pattern = "standard_response",
-    continuous_pattern = "continuous_standard",
+    categorical_pattern = "single_digit_missing",
+    continuous_pattern = "triple_digit_missing",
     log_level = log_level
   )
 

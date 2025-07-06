@@ -81,31 +81,31 @@ adl_score_6_fun <- function(...) {
 # ALCOHOL FUNCTION ALIASES
 # ==============================================================================
 
-#' @rdname assess_binge_drinking
+#' @rdname calculate_binge_drinking
 #' @export
 binge_drinker_fun <- function(...) {
-  .Deprecated("assess_binge_drinking",
-    msg = "binge_drinker_fun() is deprecated. Use assess_binge_drinking() instead. See ?assess_binge_drinking for details."
+  .Deprecated("calculate_binge_drinking",
+    msg = "binge_drinker_fun() is deprecated. Use calculate_binge_drinking() instead. See ?calculate_binge_drinking for details."
   )
-  assess_binge_drinking(...)
+  calculate_binge_drinking(...)
 }
 
-#' @rdname assess_drinking_risk_short
+#' @rdname calculate_drinking_risk_short
 #' @export
 low_drink_short_fun <- function(...) {
-  .Deprecated("assess_drinking_risk_short",
-    msg = "low_drink_short_fun() is deprecated. Use assess_drinking_risk_short() instead. See ?assess_drinking_risk_short for details."
+  .Deprecated("calculate_drinking_risk_short",
+    msg = "low_drink_short_fun() is deprecated. Use calculate_drinking_risk_short() instead. See ?calculate_drinking_risk_short for details."
   )
-  assess_drinking_risk_short(...)
+  calculate_drinking_risk_short(...)
 }
 
-#' @rdname assess_drinking_risk_long
+#' @rdname calculate_drinking_risk_long
 #' @export
 low_drink_long_fun <- function(...) {
-  .Deprecated("assess_drinking_risk_long",
-    msg = "low_drink_long_fun() is deprecated. Use assess_drinking_risk_long() instead. See ?assess_drinking_risk_long for details."
+  .Deprecated("calculate_drinking_risk_long",
+    msg = "low_drink_long_fun() is deprecated. Use calculate_drinking_risk_long() instead. See ?calculate_drinking_risk_long for details."
   )
-  assess_drinking_risk_long(...)
+  calculate_drinking_risk_long(...)
 }
 
 # ==============================================================================
@@ -138,9 +138,9 @@ energy_exp_fun <- function(...) {
 #   adl_score_6_fun(   → score_adl_6(
 #
 # Alcohol Functions:
-#   binge_drinker_fun(       → assess_binge_drinking(
-#   low_drink_short_fun(     → assess_drinking_risk_short(
-#   low_drink_long_fun(      → assess_drinking_risk_long(
+#   binge_drinker_fun(       → calculate_binge_drinking(
+#   low_drink_short_fun(     → calculate_drinking_risk_short(
+#   low_drink_long_fun(      → calculate_drinking_risk_long(
 #
 # Physical Activity:
 #   energy_exp_fun(    → calculate_energy_expenditure(
