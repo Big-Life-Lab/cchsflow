@@ -229,8 +229,8 @@ adjust_bmi <- function(DHH_SEX = NULL, HWTGHTM = NULL, HWTGWTK = NULL,
     min_values = list(height = min_HWTGHTM, weight = min_HWTGWTK),
     max_values = list(height = max_HWTGHTM, weight = max_HWTGWTK),
     valid_values = list(sex = c(1, 2)),
-    continuous_pattern = "continuous_standard",
-    categorical_pattern = "standard_response",
+    continuous_pattern = "triple_digit_missing",
+    categorical_pattern = "single_digit_missing",
     log_level = log_level
   )
 
@@ -303,7 +303,7 @@ adjust_bmi <- function(DHH_SEX = NULL, HWTGHTM = NULL, HWTGWTK = NULL,
 #' @export
 categorize_bmi <- function(bmi_value = NULL, categorical_labels = TRUE, log_level = "silent") {
   # 1. Preprocess values using vector-aware helper (standardized pattern)
-  clean_bmi <- clean_for_categorization(bmi_value, "continuous_standard", log_level)
+  clean_bmi <- clean_for_categorization(bmi_value, "triple_digit_missing", log_level)
 
   # 2. Categorize BMI values with standardized tagged NA handling
   if (categorical_labels) {

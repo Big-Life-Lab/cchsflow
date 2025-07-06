@@ -228,7 +228,7 @@ assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
       ADL_04 = min_ADL_04:max_ADL_04,
       ADL_05 = min_ADL_05:max_ADL_05
     ),
-    pattern_type = "standard_response",
+    pattern_type = "single_digit_missing",
     log_level = log_level
   )
 
@@ -334,7 +334,7 @@ score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
       ADL_04 = min_ADL_04:max_ADL_04,
       ADL_05 = min_ADL_05:max_ADL_05
     ),
-    pattern_type = "standard_response",
+    pattern_type = "single_digit_missing",
     log_level = log_level
   )
 
@@ -448,7 +448,7 @@ score_adl_6 <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06,
       ADL_05 = min_ADL_05:max_ADL_05,
       ADL_06 = min_ADL_06:max_ADL_06
     ),
-    pattern_type = "standard_response",
+    pattern_type = "single_digit_missing",
     log_level = log_level
   )
 

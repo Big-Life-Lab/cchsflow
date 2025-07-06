@@ -116,7 +116,7 @@ ALCOHOL_VALIDATION_BOUNDS <- list(
 
 # ADL response validation
 ADL_VALIDATION_BOUNDS <- list(
-  response_range = c(1, 2), # 1 = needs help, 2 = does not need help
+  response = list(min = 1, max = 2), # 1 = needs help, 2 = does not need help
   score_5_range = list(min = 0, max = 5), # 5-item ADL score range
   score_6_range = list(min = 0, max = 6) # 6-item ADL score range
 )
@@ -171,15 +171,15 @@ PHYSICAL_ACTIVITY_BOUNDS <- list(
 
 # Standard CCHS missing codes by pattern type
 CCHS_MISSING_CODES <- list(
-  standard_response = list(
+  single_digit_missing = list(
     not_applicable = 6,
     missing_codes = c(7, 8, 9)
   ),
-  categorical_age = list(
+  double_digit_missing = list(
     not_applicable = 96,
     missing_codes = c(97, 98, 99)
   ),
-  continuous_standard = list(
+  triple_digit_missing = list(
     not_applicable = 996,
     missing_codes = c(997, 998, 999)
   )

@@ -1,1033 +1,690 @@
-# Smoking Derived Variable Functions (Modernized)
-#
-# This file contains smoking derived variable functions using modern tidyverse patterns.
-# Legacy version preserved in R/smoking_legacy.R for reference.
-#
-# Modernization completed: 2025-01 (Phases 1-3 of smoking refactoring plan)
-#
-# Refactoring Goals:
-# - Replace deeply nested ifelse() with readable case_when() patterns
-# - Consolidate base functions with _A variants using unified validation approach
-# - Standardize parameter validation and age bounds checking
-# - Preserve all existing functionality and backward compatibility
-# - Maintain support for both basic CCHS processing and research validation modes
-# - Follow copy-paste philosophy: functions work standalone with explicit package references
-#
-# Note: Uses explicit haven::tagged_na() and dplyr::case_when() for clarity to users
-# unfamiliar with cchsflow who might copy-paste these functions.
+# ==============================================================================
+# Smoking Functions
+# ==============================================================================
 
-library(dplyr)
-library(haven)
+# REQUIRED DEPENDENCIES:
+library(haven) # for haven::tagged_na() and haven::is_tagged_na()
+library(dplyr) # for dplyr::case_when() and dplyr::if_else()
 
-# Load missing data preprocessing helpers and validation constants
-source("R/missing-data-helpers.R")
-source("R/validation-constants.R")
-
-# ============================================================================
-# PHASE 1: FOUNDATION - HELPER FUNCTIONS AND VALIDATION FRAMEWORK
-# ============================================================================
-
-# ----------------------------------------------------------------------------
-# Age Validation Constants and Bounds
-# ----------------------------------------------------------------------------
-
-# CONSTANTS NOW CENTRALIZED IN validation-constants.R
-# All smoking validation bounds, thresholds, and constants are loaded from
-# validation-constants.R to ensure consistency across all derived variable domains.
-
-# ----------------------------------------------------------------------------
-# Core Helper Functions
-# ----------------------------------------------------------------------------
-
-# Removed redundant validate_age_bounds() function - use validate_age_variable() instead
-
-#' Generic smoking age bounds validation using centralized constants
-#'
-#' @param age Numeric age value to validate
-#' @param variable_name Name of CCHS variable for bounds lookup
-#' @return Validated age or haven::tagged_na with appropriate bounds
-#' @keywords internal
-#' @note Internal v3.0.0, last updated: 2025-06-30, status: active
-validate_age_variable <- function(age, variable_name) {
-  bounds <- SMOKING_VARIABLE_BOUNDS[[variable_name]]
-  if (is.null(bounds)) {
-    warning(paste("No bounds defined for variable:", variable_name))
-    return(age)
+# Source required helper functions (conditional loading for package context)
+tryCatch(
+  {
+    source("R/missing-data-helpers.R", local = FALSE)
+    source("R/utility-functions.R", local = FALSE)
+  },
+  error = function(e) {
+    # Functions will be loaded via package imports during package build
   }
+)
 
-  dplyr::case_when(
-    is.na(age) ~ haven::tagged_na("b"),
-    age == "NA(a)" ~ haven::tagged_na("a"),
-    age < bounds$min ~ haven::tagged_na("b"),
-    age > bounds$max ~ haven::tagged_na("b"),
-    TRUE ~ age
-  )
-}
+# For testing, run:
+#   library(haven); library(dplyr); library(testthat)
+#   source('R/smoking.R')
+#   test_file('tests/testthat/test-smoking.R')
 
-#' Apply smoking initiation age bounds using centralized constants
+# ==============================================================================
+# 1. CONSTANTS AND CONFIGURATION
+# ==============================================================================
+
+# Smoking initiation age bounds (evidence-based from Holford et al.)
+SMOKING_AGE_BOUNDS <- list(
+  min_initiation = 8, # Minimum plausible smoking initiation age
+  max_initiation = 95, # Maximum plausible smoking initiation age
+  min_current_age = 12, # Minimum age for smoking questions
+  max_current_age = 102 # Maximum age in CCHS
+)
+
+# Time since quit smoking bounds
+TIME_QUIT_BOUNDS <- list(
+  min = 0.5, # Minimum time since quitting (6 months)
+  max = 82 # Maximum plausible time since quitting
+)
+
+# Pack-years calculation constants
+PACK_YEARS_CONSTANTS <- list(
+  cigarettes_per_pack = 20,
+  min_pack_years = 0.0137, # Minimum for former occasional smokers
+  min_pack_years_never = 0.007 # Minimum for never-daily smokers
+)
+
+# Smoking validation bounds for standalone function use
+# NOTE: These constants ensure smoking functions work independently ("cut and paste")
+# while rec_with_table() uses variable_details.csv for CSV-driven validation.
+# IMPORTANT: Keep synchronized with variable_details.csv ground truth values
+SMOKING_VALIDATION_BOUNDS <- list(
+  # Categorical variables (1-6 scale for smoking status)
+  smoking_status = list(min = 1, max = 6), # Daily, occasional, former daily, former occasional, never
+  binary_response = list(min = 1, max = 2), # 1 = yes, 2 = no
+  # Age variables
+  age_initiation = list(min = 8, max = 95), # Age started smoking
+  current_age = list(min = 12, max = 102), # Current age bounds
+  # Continuous smoking variables
+  cigarettes_daily = list(min = 1, max = 80), # Cigarettes per day
+  days_monthly = list(min = 1, max = 30), # Days smoked per month
+  time_quit = list(min = 0.5, max = 82), # Time since quitting
+  pack_years = list(min = 0.001, max = 250) # Pack-years range
+)
+
+# ==============================================================================
+# 2. SPECIALIZED HELPER FUNCTIONS
+# ==============================================================================
+
+#' Core smoking status assessment (internal helper)
 #'
-#' @param age Age when smoking initiation occurred
-#' @return Validated age with smoking-specific bounds (min=8, max=95)
-#' @keywords internal
-#' @note Internal v3.0.0, last updated: 2025-06-30, status: active
-validate_smoking_initiation_age <- function(age) {
+#' Vector-aware smoking status assessment without validation - used as building block
+#' @param smk_005_clean,smk_030_clean,smk_01a_clean Cleaned smoking variables (already validated)
+#' @return Smoking status indicator with proper tagged NA handling
+#' @note Internal v3.0.0, last updated: 2025-07-05, status: active - Vector aware
+#' @noRd
+calculate_smoking_status_core <- function(smk_005_clean, smk_030_clean, smk_01a_clean) {
+  # Use case_when for element-wise processing with tagged NA handling
   dplyr::case_when(
-    is.na(age) ~ haven::tagged_na("b"),
-    age == "NA(a)" ~ haven::tagged_na("a"),
-    age < SMOKING_AGE_BOUNDS$min_initiation ~ SMOKING_AGE_BOUNDS$min_initiation,
-    age > SMOKING_AGE_BOUNDS$max_initiation ~ haven::tagged_na("b"),
-    TRUE ~ age
-  )
-}
+    # !!! (splice operator) expands generate_tagged_na_conditions() output for each variable
+    !!!generate_tagged_na_conditions(smk_005_clean, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(smk_030_clean, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(smk_01a_clean, categorical_labels = FALSE),
 
-#' Time categorization helper for smoking cessation
-#'
-#' @param time_value Continuous time value
-#' @param breaks Numeric vector of break points
-#' @param labels Character vector of labels for categories
-#' @return Categorized time value
-#' @keywords internal
-#' @note Internal v3.0.0, last updated: 2025-06-30, status: active
-categorize_time_ranges <- function(time_value, breaks, labels) {
-  dplyr::case_when(
-    is.na(time_value) ~ haven::tagged_na("b"),
-    time_value < breaks[1] ~ labels[1],
-    time_value >= breaks[length(breaks)] ~ labels[length(labels)],
-    TRUE ~ labels[findInterval(time_value, breaks)]
-  )
-}
+    # Smoking status classification logic
+    smk_005_clean == 1 ~ 1L, # Daily smoker
+    smk_005_clean == 2 & smk_030_clean == 1 ~ 2L, # Occasional smoker (former daily)
+    smk_005_clean == 2 & (smk_030_clean == 2 | haven::is_tagged_na(smk_030_clean, "a") | haven::is_tagged_na(smk_030_clean, "b")) ~ 3L, # Occasional smoker (never daily)
+    smk_005_clean == 3 & smk_030_clean == 1 ~ 4L, # Former daily
+    smk_005_clean == 3 & smk_030_clean == 2 & smk_01a_clean == 1 ~ 5L, # Former occasional
+    smk_005_clean == 3 & smk_01a_clean == 2 ~ 6L, # Never smoked
 
-#' Pack-years calculation helper
-#'
-#' @param cigarettes_per_day Number of cigarettes smoked per day
-#' @param years_smoked Number of years smoking
-#' @param min_pack_years Minimum pack-years value (default 0.0137)
-#' @return Pack-years calculation with minimum threshold
-#' @keywords internal
-#' @note Internal v3.0.0, last updated: 2025-06-30, status: active
-calculate_pack_years <- function(cigarettes_per_day, years_smoked, min_pack_years = 0.0137) {
-  pack_years <- (cigarettes_per_day / 20) * years_smoked
-  pmax(pack_years, min_pack_years, na.rm = TRUE)
-}
-
-#' CCHS variable recoding helper
-#'
-#' @param variable Variable to recode
-#' @param recode_map Named vector mapping old values to new values
-#' @return Recoded variable with proper NA handling
-#' @keywords internal
-recode_cchs_categories <- function(variable, recode_map) {
-  dplyr::case_when(
-    variable == "NA(a)" ~ haven::tagged_na("a"),
-    variable == "NA(b)" ~ haven::tagged_na("b"),
-    variable %in% names(recode_map) ~ recode_map[as.character(variable)],
-    TRUE ~ haven::tagged_na("b")
-  )
-}
-
-# ----------------------------------------------------------------------------
-# Smoking-Specific Helper Functions
-# ----------------------------------------------------------------------------
-
-#' Current vs former smoker classification
-#'
-#' @param smkdsty_cat5 5-category smoking status variable
-#' @return Binary current smoker indicator (1 = current, 0 = not current)
-#' @keywords internal
-derive_current_smoker <- function(smkdsty_cat5) {
-  dplyr::case_when(
-    smkdsty_cat5 %in% c(1, 2) ~ 1L, # Current smoker (daily + occasional)
-    smkdsty_cat5 %in% c(3, 4, 5) ~ 0L, # Not current (former + never)
-    smkdsty_cat5 == "NA(a)" ~ haven::tagged_na("a"), # String-based NA(a)
-    haven::is_tagged_na(smkdsty_cat5, "a") ~ haven::tagged_na("a"), # haven tagged NA(a)
+    # Default to missing for any unhandled cases
     .default = haven::tagged_na("b")
   )
 }
 
-#' Ever smoker classification
+#' Core time since quitting calculation (internal helper)
 #'
-#' @param smkdsty_cat5 5-category smoking status variable
-#' @return Binary ever smoker indicator (1 = ever smoked, 0 = never)
-#' @keywords internal
-derive_ever_smoker <- function(smkdsty_cat5) {
+#' Vector-aware time since quitting assessment without validation - used as building block
+#' @param smk_09a_b_clean,smkg09c_clean Cleaned time variables (already validated)
+#' @return Time since quitting with proper tagged NA handling
+#' @note Internal v3.0.0, last updated: 2025-07-05, status: active - Vector aware
+#' @noRd
+calculate_time_quit_core <- function(smk_09a_b_clean, smkg09c_clean) {
   dplyr::case_when(
-    smkdsty_cat5 %in% c(1, 2, 3, 4) ~ 1L, # Ever smoked (current + former)
-    smkdsty_cat5 == 5 ~ 0L, # Never smoked
-    smkdsty_cat5 == "NA(a)" ~ haven::tagged_na("a"), # String-based NA(a)
-    haven::is_tagged_na(smkdsty_cat5, "a") ~ haven::tagged_na("a"), # haven tagged NA(a)
+    # Calculate time since quitting: continuous variable takes precedence over everything
+    !is.na(smkg09c_clean) & smkg09c_clean >= TIME_QUIT_BOUNDS$min & smkg09c_clean <= TIME_QUIT_BOUNDS$max ~ smkg09c_clean,
+
+    # Handle invalid continuous values
+    !is.na(smkg09c_clean) & (smkg09c_clean < TIME_QUIT_BOUNDS$min | smkg09c_clean > TIME_QUIT_BOUNDS$max) ~ haven::tagged_na("b"),
+
+    # Handle missing data from categorical variable (only when continuous is NA)
+    !!!generate_tagged_na_conditions(smk_09a_b_clean, categorical_labels = FALSE),
+
+    # Categorical variable conversion to continuous (when continuous is NA and categorical is valid)
+    smk_09a_b_clean == 1 ~ 0.5, # Less than 1 year
+    smk_09a_b_clean == 2 ~ 1.5, # 1-2 years
+    smk_09a_b_clean == 3 ~ 4.0, # 3-5 years
+    smk_09a_b_clean == 4 ~ 7.5, # 6-10 years
+    smk_09a_b_clean == 5 ~ 12.5, # 11-15 years
+    smk_09a_b_clean == 6 ~ 20.0, # 16+ years
     .default = haven::tagged_na("b")
   )
 }
 
-#' Time since quit categorization for former smokers
+#' Core pack-years calculation (internal helper)
 #'
-#' @param time_value Continuous time since quitting value
-#' @return Categorized time with standard CCHS categories
-#' @keywords internal
-categorize_quit_time <- function(time_value) {
+#' Vector-aware pack-years calculation without validation - used as building block
+#' @param smoking_status_clean,current_age_clean,time_quit_clean,age_started_clean,cigarettes_daily_clean Cleaned variables (already validated)
+#' @return Pack-years with proper tagged NA handling
+#' @note Internal v3.0.0, last updated: 2025-07-05, status: active - Vector aware
+#' @noRd
+calculate_pack_years_core <- function(smoking_status_clean, current_age_clean, time_quit_clean, age_started_clean, cigarettes_daily_clean) {
   dplyr::case_when(
-    is.na(time_value) ~ haven::tagged_na("b"),
-    time_value == "NA(a)" ~ haven::tagged_na("a"),
-    time_value < 1 ~ 0.5, # <1 year
-    time_value >= 1 & time_value < 2 ~ 1.5, # 1-2 years
-    time_value >= 2 & time_value < 3 ~ 2.5, # 2-3 years
-    TRUE ~ time_value # Use continuous value for 3+ years
-  )
-}
+    # Handle missing data
+    !!!generate_tagged_na_conditions(smoking_status_clean, categorical_labels = FALSE),
+    !!!generate_tagged_na_conditions(current_age_clean, categorical_labels = FALSE),
 
-#' Smoking status classification helper
-#'
-#' @param smkdsty_value SMKDSTY smoking status value
-#' @return Character classification of smoking status
-#' @keywords internal
-classify_smoking_status <- function(smkdsty_value) {
-  dplyr::case_when(
-    smkdsty_value %in% c(1, 2) ~ "current",
-    smkdsty_value %in% c(3, 4) ~ "former",
-    smkdsty_value == 5 ~ "never",
-    haven::is_tagged_na(smkdsty_value, "a") ~ haven::tagged_na("a"),
+    # Never smokers
+    smoking_status_clean == 6 ~ 0.0,
+
+    # Current daily smokers
+    smoking_status_clean == 1 ~ ((current_age_clean - age_started_clean) * cigarettes_daily_clean) / PACK_YEARS_CONSTANTS$cigarettes_per_pack,
+
+    # Former daily smokers
+    smoking_status_clean == 4 ~ ((current_age_clean - time_quit_clean - age_started_clean) * cigarettes_daily_clean) / PACK_YEARS_CONSTANTS$cigarettes_per_pack,
+
+    # Occasional smokers (current or former) - minimum pack-years
+    smoking_status_clean %in% c(2, 3, 5) ~ PACK_YEARS_CONSTANTS$min_pack_years,
     .default = haven::tagged_na("b")
   )
 }
 
-# ============================================================================
-# PHASE 2: CORE FUNCTION REFACTORING - TIME AND STATUS FUNCTIONS
-# ============================================================================
+# ==============================================================================
+# 3. PUBLIC API FUNCTIONS
+# ==============================================================================
 
-# ----------------------------------------------------------------------------
-# Time Since Quit Smoking Functions (Modernized)
-# ----------------------------------------------------------------------------
-
-#' Time since quit smoking (unified approach)
+#' Assess smoking status with comprehensive classification
 #'
-#' @description This function creates a derived variable (time_quit_smoking_der)
-#'  that calculates the approximate time a former smoker has quit smoking based
-#'  on various CCHS smoking variables. This variable is for CCHS respondents in
-#'  CCHS surveys 2003-2014.
+#' @description
+#' Classify smoking status into 6 categories using consistent CCHS variables across cycles.
+#' Provides comprehensive smoking status assessment for population health research and
+#' clinical applications using harmonized variable approach.
 #'
-#' @param SMK_09A_B number of years since quitting smoking. Variable asked to
-#'  former daily smokers who quit <3 years ago.
-#' @param SMKG09C number of years since quitting smoking. Variable asked to
-#'  former daily smokers who quit >=3 years ago. Can be categorical (1,2,3) or continuous.
-#' @param min_SMKG09C minimum valid value for SMKG09C (NULL for no validation)
-#' @param max_SMKG09C maximum valid value for SMKG09C (NULL for no validation)
-#' @param validate_params logical, enable parameter validation (auto-detected if NULL)
+#' @param SMK_005 Current smoking status (1=daily, 2=occasional, 3=not at all). Accepts raw CCHS codes or preprocessed values.
+#' @param SMK_030 Ever smoked daily (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#' @param SMK_01A Ever smoked (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.
+#' @param min_SMK_005,max_SMK_005,min_SMK_030,max_SMK_030,min_SMK_01A,max_SMK_01A Validation parameters (defaults from variable_details.csv)
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
 #' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
-#' @return value for time since quit smoking in time_quit_smoking_der.
+#' @return Integer smoking status indicator. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Values: 1 = daily smoker, 2 = occasional smoker (former daily), 3 = occasional smoker (never daily),
+#'   4 = former daily smoker, 5 = former occasional smoker, 6 = never smoked.
+#'
+#' @details
+#' Based on harmonized CCHS smoking variables available across all cycles. Classification follows
+#' Health Canada guidelines for smoking status assessment.
 #'
 #' @examples
-#' # Standard CCHS processing (basic mode)
-#' time_quit_smoking_fun(SMK_09A_B = 4, SMKG09C = 2) # Returns 8 years
-#'
-#' # Research with validation (enhanced mode)
-#' time_quit_smoking_fun(
-#'   SMK_09A_B = 4, SMKG09C_cont = 15,
-#'   min_SMKG09C = 3, max_SMKG09C = 82
-#' ) # Returns 15 years
-#'
-#' @references
-#' Holford, T.R., et al. (2014). Patterns of Birth Cohort–Specific Smoking Histories, 1965–2009.
-#' \emph{Am J Prev Med}, 46(2), e31-7. \doi{10.1016/j.amepre.2013.10.022}
-#'
-#' Manuel, D.G., et al. (2020). Smoking Patterns Based on Birth-Cohort-Specific Histories from 1965 to 2013, with Projections to 2041.
-#' \emph{Health Reports}, 31(11), 16-31.
-#' \url{https://www150.statcan.gc.ca/n1/pub/82-003-x/2020011/article/00002-eng.htm}
-#'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Modernized with improved time calculation and validation
-#' @export
-time_quit_smoking_fun <- function(SMK_09A_B, SMKG09C,
-                                  min_SMKG09C = NULL, max_SMKG09C = NULL,
-                                  validate_params = NULL,
-                                  log_level = "silent") {
-  # 1. Enhanced input validation using generic helpers
-  SMK_09A_B <- validate_parameter("SMK_09A_B", SMK_09A_B, required = TRUE, na_type = "b", log_level)
-  SMKG09C <- validate_parameter("SMKG09C", SMKG09C, required = TRUE, na_type = "b", log_level)
-
-  # Handle case where validation returned tagged NA
-  if (any(sapply(list(SMK_09A_B, SMKG09C), function(x) {
-    length(x) == 1 && haven::is_tagged_na(x, "b")
-  }))) {
-    return(haven::tagged_na("b"))
-  }
-
-  # 2. Preprocess missing data using generic helper
-  if (needs_preprocessing(SMK_09A_B)) {
-    SMK_09A_B <- preprocess_smoking_variable(SMK_09A_B, variable_name = "SMK_09A_B")
-  }
-
-  # SMKG09C can be categorical age or continuous - determine pattern automatically
-  if (needs_preprocessing(SMKG09C)) {
-    if (any(SMKG09C %in% c(96, 97, 98, 99), na.rm = TRUE)) {
-      SMKG09C <- preprocess_categorical_age(SMKG09C)
-    } else {
-      # Handle as standard response or continuous values
-      SMKG09C <- preprocess_smoking_variable(SMKG09C, pattern_type = "standard_response")
-    }
-  }
-
-  # Auto-detect validation mode based on parameters
-  if (is.null(validate_params)) {
-    validate_params <- !is.null(min_SMKG09C) || !is.null(max_SMKG09C)
-  }
-
-  # Set default bounds for validation mode
-  if (validate_params && is.null(min_SMKG09C)) min_SMKG09C <- 3
-  if (validate_params && is.null(max_SMKG09C)) max_SMKG09C <- 82
-
-  # Convert categorical SMKG09C to continuous if needed
-  SMKG09C_cont <- dplyr::case_when(
-    is.numeric(SMKG09C) ~ as.numeric(SMKG09C), # Already continuous (research use)
-    SMKG09C == 1 ~ 4, # 3-5 years category (standard CCHS)
-    SMKG09C == 2 ~ 8, # 6-10 years category
-    SMKG09C == 3 ~ 12, # 11+ years category
-    haven::is_tagged_na(SMKG09C, "a") ~ haven::tagged_na("a"), # haven tagged NA(a)
-    .default = haven::tagged_na("b")
-  )
-
-  # Apply parameter validation for research use cases
-  if (validate_params) {
-    SMKG09C_cont <- dplyr::case_when(
-      SMKG09C_cont < min_SMKG09C | SMKG09C_cont > max_SMKG09C ~ haven::tagged_na("b"),
-      .default = SMKG09C_cont
-    )
-  }
-
-  # Main calculation using case_when
-  dplyr::case_when(
-    SMK_09A_B == 1 ~ 0.5, # <1 year
-    SMK_09A_B == 2 ~ 1.5, # 1-2 years
-    SMK_09A_B == 3 ~ 2.5, # 2-3 years
-    SMK_09A_B == 4 ~ SMKG09C_cont, # Use continuous value
-    haven::is_tagged_na(SMK_09A_B, "a") ~ haven::tagged_na("a"), # haven tagged NA(a)
-    .default = haven::tagged_na("b")
-  )
-}
-
-#' Time since quit smoking (enhanced validation wrapper)
-#'
-#' @description Enhanced version with robust parameter validation and bounds checking.
-#'  Maintained for backward compatibility.
-#'
-#' @param SMK_09A_B number of years since quitting smoking (categorical)
-#' @param SMKG09C_cont continuous years since quitting smoking
-#' @param min_SMKG09C_cont minimum valid value (default 3)
-#' @param max_SMKG09C_cont maximum valid value (default 82)
-#'
-#' @return value for time since quit smoking
-#'
-#' @export
-time_quit_smoking_fun_A <- function(SMK_09A_B, SMKG09C_cont,
-                                    min_SMKG09C_cont = 3, max_SMKG09C_cont = 82) {
-  time_quit_smoking_fun(SMK_09A_B, SMKG09C_cont,
-    min_SMKG09C = min_SMKG09C_cont,
-    max_SMKG09C = max_SMKG09C_cont,
-    validate_params = TRUE
-  )
-}
-
-# ----------------------------------------------------------------------------
-# Smoking Status Classification Functions (Modernized)
-# ----------------------------------------------------------------------------
-
-#' Simple smoking status (unified approach)
-#'
-#' @description This function creates a derived smoking variable (smoke_simple)
-#'  with four categories: non-smoker, current smoker, former daily smoker quit <=5 years
-#'  or former occasional smoker, former daily smoker quit >5 years
-#'
-#' @param SMKDSTY_cat5 derived variable that classifies an individual's smoking status
-#' @param time_quit_smoking derived variable that calculates the approximate time a former smoker has quit smoking
-#' @param min_time_quit minimum valid time since quitting (NULL for no validation)
-#' @param max_time_quit maximum valid time since quitting (NULL for no validation)
-#' @param validate_params logical, enable parameter validation (auto-detected if NULL)
-#'
-#' @return value for simple smoking status categories
-#'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Simplified logic with enhanced validation and documentation
-#' @export
-smoke_simple_fun <- function(SMKDSTY_cat5, time_quit_smoking,
-                             min_time_quit = NULL, max_time_quit = NULL,
-                             validate_params = NULL) {
-  # Convert string-based NAs to proper types at the start (vectorized)
-  SMKDSTY_cat5 <- dplyr::case_when(
-    SMKDSTY_cat5 == "NA(a)" ~ haven::tagged_na("a"),
-    SMKDSTY_cat5 == "NA(b)" ~ haven::tagged_na("b"),
-    is.character(SMKDSTY_cat5) ~ as.numeric(SMKDSTY_cat5), # Convert other character values to numeric
-    .default = as.numeric(SMKDSTY_cat5) # Ensure all values are numeric
-  )
-
-  time_quit_smoking <- dplyr::case_when(
-    time_quit_smoking == "NA(a)" ~ haven::tagged_na("a"),
-    time_quit_smoking == "NA(b)" ~ haven::tagged_na("b"),
-    is.character(time_quit_smoking) ~ as.numeric(time_quit_smoking), # Convert other character values to numeric
-    .default = as.numeric(time_quit_smoking) # Ensure all values are numeric
-  )
-
-  # Auto-detect validation mode
-  if (is.null(validate_params)) {
-    validate_params <- !is.null(min_time_quit) || !is.null(max_time_quit)
-  }
-
-  # Set default bounds for validation mode
-  if (validate_params && is.null(min_time_quit)) min_time_quit <- 0.5
-  if (validate_params && is.null(max_time_quit)) max_time_quit <- 82
-
-  # Apply validation if requested
-  if (validate_params) {
-    time_quit_smoking <- dplyr::case_when(
-      haven::is_tagged_na(time_quit_smoking, "a") ~ haven::tagged_na("a"), # Preserve tagged NA(a)
-      haven::is_tagged_na(time_quit_smoking, "b") ~ haven::tagged_na("b"), # Preserve tagged NA(b)
-      is.na(time_quit_smoking) ~ haven::tagged_na("b"),
-      time_quit_smoking < min_time_quit | time_quit_smoking > max_time_quit ~ haven::tagged_na("b"),
-      .default = time_quit_smoking # Valid numeric value
-    )
-  }
-
-  # Use helper functions for classification
-  smoker <- derive_current_smoker(SMKDSTY_cat5)
-  eversmoker <- derive_ever_smoker(SMKDSTY_cat5)
-
-  # Main smoking status classification using case_when
-  dplyr::case_when(
-    # Handle NA cases for smoking status variables first
-    haven::is_tagged_na(smoker, "a") | haven::is_tagged_na(eversmoker, "a") ~ haven::tagged_na("a"),
-
-    # Non-smoker (never smoked)
-    smoker == 0L & eversmoker == 0L ~ 0L,
-
-    # Current smoker (daily and occasional) - time_quit_smoking not relevant
-    smoker == 1L & eversmoker == 1L ~ 1L,
-
-    # Former occasional smoker (always category 2, regardless of time)
-    SMKDSTY_cat5 == 4 ~ 2L,
-
-    # Handle time_quit_smoking NA for former smokers only
-    smoker == 0L & eversmoker == 1L & haven::is_tagged_na(time_quit_smoking, "a") ~ haven::tagged_na("a"),
-
-    # Former daily smoker quit <=5 years
-    smoker == 0L & eversmoker == 1L & !is.na(time_quit_smoking) & time_quit_smoking <= 5 ~ 2L,
-
-    # Former daily smoker quit >5 years
-    smoker == 0L & eversmoker == 1L & !is.na(time_quit_smoking) & time_quit_smoking > 5 ~ 3L,
-    .default = haven::tagged_na("b")
-  )
-}
-
-#' Simple smoking status (enhanced validation wrapper)
-#'
-#' @description Enhanced version with parameter validation.
-#'  Maintained for backward compatibility.
-#'
-#' @param SMKDSTY_cat5 smoking status category variable
-#' @param time_quit_smoking time since quitting smoking
-#' @param min_time_quit_smoking minimum valid time (default 0.5)
-#' @param max_time_quit_smoking maximum valid time (default 82)
-#'
-#' @return simple smoking status value
-#'
-#' @export
-smoke_simple_fun_A <- function(SMKDSTY_cat5, time_quit_smoking,
-                               min_time_quit_smoking = 0.5, max_time_quit_smoking = 82) {
-  smoke_simple_fun(SMKDSTY_cat5, time_quit_smoking,
-    min_time_quit = min_time_quit_smoking,
-    max_time_quit = max_time_quit_smoking,
-    validate_params = TRUE
-  )
-}
-
-# ----------------------------------------------------------------------------
-# Smoking Type Classification Function (Modernized)
-# ----------------------------------------------------------------------------
-
-#' Type of smokers (unified approach)
-#'
-#' @description This function creates a derived variable (SMKDSTY_A) for
-#' smoker type with 6 categories: daily smoker, current occasional smoker (former daily),
-#' current occasional smoker (never daily), current nonsmoker (former daily),
-#' current nonsmoker (never daily), nonsmoker
-#'
-#' @param SMK_005 type of smoker presently (1=daily, 2=occasionally, 3=not at all)
-#' @param SMK_030 smoked daily - lifetime (1=yes, 2=no)
-#' @param SMK_01A smoked 100 or more cigarettes in lifetime (1=yes, 2=no)
-#' @param log_level Logging level: "silent" (default), "warning", "verbose"
-#'
-#' @return value for smoker type in the SMKDSTY_A variable
-#'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and generic helper functions
-#' @export
-SMKDSTY_fun <- function(SMK_005, SMK_030, SMK_01A, log_level = "silent") {
-  # 1. Enhanced input validation using generic helpers
-  SMK_005 <- validate_parameter("SMK_005", SMK_005, required = TRUE, na_type = "b", log_level)
-  SMK_030 <- validate_parameter("SMK_030", SMK_030, required = TRUE, na_type = "b", log_level)
-  SMK_01A <- validate_parameter("SMK_01A", SMK_01A, required = TRUE, na_type = "b", log_level)
-
-  # Handle case where validation returned tagged NA
-  if (any(sapply(list(SMK_005, SMK_030, SMK_01A), function(x) {
-    length(x) == 1 && haven::is_tagged_na(x, "b")
-  }))) {
-    return(haven::tagged_na("b"))
-  }
-
-  # 2. Preprocess missing data using generic helper
-  if (needs_preprocessing(SMK_005)) {
-    SMK_005 <- preprocess_smoking_variable(SMK_005, variable_name = "SMK_005")
-  }
-  if (needs_preprocessing(SMK_030)) {
-    SMK_030 <- preprocess_smoking_variable(SMK_030, variable_name = "SMK_030")
-  }
-  if (needs_preprocessing(SMK_01A)) {
-    SMK_01A <- preprocess_smoking_variable(SMK_01A, variable_name = "SMK_01A")
-  }
-
-  dplyr::case_when(
-    SMK_005 == 1 ~ 1L, # Daily smoker
-
-    SMK_005 == 2 & SMK_030 == 1 ~ 2L, # Occasional smoker (former daily)
-
-    SMK_005 == 2 & (SMK_030 == 2 | haven::is_tagged_na(SMK_030, "a") | haven::is_tagged_na(SMK_030, "b")) ~ 3L, # Occasional smoker (never daily)
-
-    SMK_005 == 3 & SMK_030 == 1 ~ 4L, # Former daily
-
-    SMK_005 == 3 & SMK_030 == 2 & SMK_01A == 1 ~ 5L, # Former occasional
-
-    SMK_005 == 3 & SMK_01A == 2 ~ 6L, # Never smoked
-
-    haven::is_tagged_na(SMK_005, "a") ~ haven::tagged_na("a"),
-    .default = haven::tagged_na("b")
-  )
-}
-
-# ----------------------------------------------------------------------------
-# Pack-Years Calculation Functions (Modernized)
-# ----------------------------------------------------------------------------
-
-#' Smoking pack-years (unified approach)
-#'
-#' @description This function creates a derived variable (pack_years_der) that
-#'  measures an individual's smoking pack-years based on various CCHS smoking
-#'  variables. This is a popular variable used by researchers to quantify
-#'  lifetime exposure to cigarette use.
-#'
-#' @param SMKDSTY_A variable used in CCHS cycles 2001-2014 that classifies smoking status
-#' @param DHHGAGE_cont continuous age variable
-#' @param time_quit_smoking derived variable for time since quitting smoking
-#' @param SMKG203_cont age started smoking daily (daily smokers)
-#' @param SMKG207_cont age started smoking daily (former daily smokers)
-#' @param SMK_204 number of cigarettes smoked per day (daily smokers)
-#' @param SMK_05B number of cigarettes smoked per day (occasional smokers)
-#' @param SMK_208 number of cigarettes smoked per day (former daily smokers)
-#' @param SMK_05C number of days smoked at least one cigarette
-#' @param SMKG01C_cont age smoked first cigarette
-#' @param SMK_01A smoked 100 cigarettes in lifetime (y/n)
-#' @param validate_params logical, enable parameter validation (default FALSE)
-#' @param min_DHHGAGE_cont minimum valid age (default 12)
-#' @param max_DHHGAGE_cont maximum valid age (default 102)
-#' @param min_time_quit_smoking minimum valid time since quitting (default 0.5)
-#' @param max_time_quit_smoking maximum valid time since quitting (default 82)
-#' @param min_SMKG203_cont minimum valid age started daily (default 5)
-#' @param max_SMKG203_cont maximum valid age started daily (default 84)
-#' @param min_SMKG207_cont minimum valid age started daily former (default 5)
-#' @param max_SMKG207_cont maximum valid age started daily former (default 80)
-#' @param min_SMK_204 minimum cigarettes per day daily (default 1)
-#' @param max_SMK_204 maximum cigarettes per day daily (default 99)
-#' @param min_SMK_05B minimum cigarettes per day occasional (default 1)
-#' @param max_SMK_05B maximum cigarettes per day occasional (default 99)
-#' @param min_SMK_208 minimum cigarettes per day former (default 1)
-#' @param max_SMK_208 maximum cigarettes per day former (default 99)
-#' @param min_SMK_05C minimum days smoked (default 0)
-#' @param max_SMK_05C maximum days smoked (default 31)
-#' @param min_SMKG01C_cont minimum age first cigarette (default 8)
-#' @param max_SMKG01C_cont maximum age first cigarette (default 84)
-#'
-#' @return value for smoking pack-years in the pack_years_der variable
-#'
-#' @examples
-#' # Standard CCHS processing (no validation)
-#' pack_years_fun(1, 45, NA, 18, NA, 20, NA, NA, NA, NA, 1)
-#'
-#' # RDC with validation for data quality
-#' pack_years_fun(1, 45, NA, 18, NA, 20, NA, NA, NA, NA, 1,
-#'   validate_params = TRUE, min_DHHGAGE_cont = 12, max_DHHGAGE_cont = 102
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c("SMK_005", "SMK_030", "SMK_01A", "SMKDSTY_der")
 #' )
 #'
+#' # Scalar usage examples with variable and value labels
+#' # calculate_smoking_status(SMK_005,    SMK_030,      SMK_01A)
+#' #                      (current,    ever_daily,   ever_smoked)
+#' #                      1=daily      1=yes         1=yes
+#' #                      2=occasional 2=no          2=no
+#' #                      3=not_at_all
+#' calculate_smoking_status(1, 1, 1) # Returns: 1L (daily smoker)
+#' calculate_smoking_status(2, 1, 1) # Returns: 2L (occasional, former daily)
+#' calculate_smoking_status(2, 2, 1) # Returns: 3L (occasional, never daily)
+#' calculate_smoking_status(3, 1, 1) # Returns: 4L (former daily)
+#' calculate_smoking_status(3, 2, 1) # Returns: 5L (former occasional)
+#' calculate_smoking_status(3, 2, 2) # Returns: 6L (never smoked)
+#'
+#' # Vector examples with real-world scenarios
+#' # John (daily), Mary (former daily), Bob (never), Sarah (missing data),
+#' # Mike (out of bounds), Lisa (occasional never daily)
+#' smoking_scenarios <- data.frame(
+#'   person = c("John", "Mary", "Bob", "Sarah", "Mike", "Lisa"),
+#'   SMK_005 = c(1, 3, 3, 7, 99, 2), # Current: daily, not_at_all, not_at_all, don't_know, invalid, occasional
+#'   SMK_030 = c(1, 1, 2, 8, 1, 2), # Ever daily: yes, yes, no, refusal, yes, no
+#'   SMK_01A = c(1, 1, 2, 1, 1, 1), # Ever smoked: yes, yes, no, yes, yes, yes
+#'   description = c(
+#'     "45-year-old daily smoker since age 20",
+#'     "60-year-old quit daily smoking 5 years ago",
+#'     "30-year-old never smoked",
+#'     "Missing data - participant refused to answer",
+#'     "Invalid response code in data",
+#'     "25-year-old occasional smoker, never smoked daily"
+#'   )
+#' )
+#'
+#' # Calculate smoking status for all scenarios
+#' smoking_scenarios$status <- calculate_smoking_status(
+#'   smoking_scenarios$SMK_005,
+#'   smoking_scenarios$SMK_030,
+#'   smoking_scenarios$SMK_01A
+#' )
+#'
+#' # Results: c(1L, 4L, 6L, tagged_na("b"), tagged_na("b"), 3L)
+#'
+#' @seealso
+#' \\code{\\link{calculate_time_quit_smoking}} for time since quitting assessment
+#' \\code{\\link{calculate_pack_years}} for pack-years calculation
+#'
 #' @references
-#' Holford, T.R., et al. (2014). Patterns of Birth Cohort–Specific Smoking Histories, 1965–2009.
-#' \emph{Am J Prev Med}, 46(2), e31-7. \doi{10.1016/j.amepre.2013.10.022}
+#' Health Canada. (2013). Canadian Tobacco Use Monitoring Survey (CTUMS).
+#' Health Canada Controlled Documents.
 #'
-#' Manuel, D.G., et al. (2020). Smoking Patterns Based on Birth-Cohort-Specific Histories from 1965 to 2013, with Projections to 2041.
-#' \emph{Health Reports}, 31(11), 16-31.
-#' \url{https://www150.statcan.gc.ca/n1/pub/82-003-x/2020011/article/00002-eng.htm}
+#' @note v3.0.0, last updated: 2025-07-05, status: active
 #'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced calculation logic with better edge case handling
+#' **Testing**: Run comprehensive tests with:
+#' \code{library(testthat); source('R/smoking.R'); test_file('tests/testthat/test-smoking-v3.R')}
+#'
+#' **Development**: Enhanced with comprehensive preprocessing and modern missing data handling
 #' @export
-pack_years_fun <- function(SMKDSTY_A, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
-                           SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C,
-                           SMKG01C_cont, SMK_01A,
-                           validate_params = FALSE,
-                           min_DHHGAGE_cont = 12, max_DHHGAGE_cont = 102,
-                           min_time_quit_smoking = 0.5, max_time_quit_smoking = 82,
-                           min_SMKG203_cont = 8, max_SMKG203_cont = 84,
-                           min_SMKG207_cont = 8, max_SMKG207_cont = 84,
-                           min_SMK_204 = 1, max_SMK_204 = 99,
-                           min_SMK_05B = 1, max_SMK_05B = 99,
-                           min_SMK_208 = 1, max_SMK_208 = 99,
-                           min_SMK_05C = 0, max_SMK_05C = 31,
-                           min_SMKG01C_cont = 8, max_SMKG01C_cont = 84) {
-  # Preprocess original CCHS missing codes for relevant variables
-  SMK_01A <- preprocess_smoking_variable(SMK_01A, variable_name = "SMK_01A")
-  SMK_204 <- preprocess_smoking_variable(SMK_204, variable_name = "SMK_204")
-  SMK_208 <- preprocess_smoking_variable(SMK_208, variable_name = "SMK_204") # Same pattern as SMK_204
-  SMK_05B <- preprocess_smoking_variable(SMK_05B, variable_name = "SMK_204") # Same pattern as SMK_204
-  SMK_05C <- preprocess_smoking_variable(SMK_05C, variable_name = "SMK_204") # Same pattern as SMK_204
-
-  # Age verification logic (will be integrated into main case_when)
-  age_valid <- dplyr::case_when(
-    is.na(DHHGAGE_cont) ~ FALSE,
-    DHHGAGE_cont < 0 ~ FALSE,
-    validate_params & (DHHGAGE_cont < min_DHHGAGE_cont | DHHGAGE_cont > max_DHHGAGE_cont) ~ FALSE,
-    .default = TRUE
+calculate_smoking_status <- function(SMK_005, SMK_030, SMK_01A,
+                                     # Validation bounds: defaults from variable_details.csv for standalone use
+                                     # Use rec_with_table() for full CSV-driven validation workflow
+                                     min_SMK_005 = SMOKING_VALIDATION_BOUNDS$smoking_status$min,
+                                     max_SMK_005 = SMOKING_VALIDATION_BOUNDS$smoking_status$max,
+                                     min_SMK_030 = SMOKING_VALIDATION_BOUNDS$binary_response$min,
+                                     max_SMK_030 = SMOKING_VALIDATION_BOUNDS$binary_response$max,
+                                     min_SMK_01A = SMOKING_VALIDATION_BOUNDS$binary_response$min,
+                                     max_SMK_01A = SMOKING_VALIDATION_BOUNDS$binary_response$max,
+                                     validate_params = NULL,
+                                     log_level = "silent") {
+  # Clean categorical variables (handles missing variables with tagged_na("d"))
+  cleaned <- clean_categorical_variables(
+    SMK_005 = SMK_005,
+    SMK_030 = SMK_030,
+    SMK_01A = SMK_01A,
+    valid_values = list(
+      SMK_005 = min_SMK_005:max_SMK_005,
+      SMK_030 = min_SMK_030:max_SMK_030,
+      SMK_01A = min_SMK_01A:max_SMK_01A
+    ),
+    pattern_type = "double_digit_missing", # Use double_digit_missing pattern since smoking status 1-6 are all valid
+    log_level = log_level
   )
 
-  # Apply validation if requested
-  if (validate_params) {
-    # Validate all input parameters
-    time_quit_smoking <- dplyr::case_when(
-      time_quit_smoking < min_time_quit_smoking | time_quit_smoking > max_time_quit_smoking ~ haven::tagged_na("b"),
-      TRUE ~ time_quit_smoking
-    )
-
-    SMKG203_cont <- validate_age_variable(SMKG203_cont, "SMKG203_cont")
-    SMKG207_cont <- validate_age_variable(SMKG207_cont, "SMKG207_cont")
-    SMKG01C_cont <- validate_age_variable(SMKG01C_cont, "SMKG01C_cont")
-  }
-
-  # Calculate pack-years based on smoking status using case_when
-  dplyr::case_when(
-    # Age validation check first
-    !age_valid ~ haven::tagged_na("b"),
-
-    # Daily Smoker
-    SMKDSTY_A == 1 & (!validate_params | (SMK_204 >= min_SMK_204 & SMK_204 <= max_SMK_204 & SMKG203_cont >= min_SMKG203_cont & SMKG203_cont <= max_SMKG203_cont)) ~
-      pmax(((DHHGAGE_cont - SMKG203_cont) * (SMK_204 / 20)), 0.0137),
-
-    # Occasional Smoker (former daily)
-    SMKDSTY_A == 2 & (!validate_params | (all(c(SMKG207_cont, time_quit_smoking, SMK_05B, SMK_208) >= c(min_SMKG207_cont, min_time_quit_smoking, min_SMK_05B, min_SMK_208) &
-      c(SMKG207_cont, time_quit_smoking, SMK_05B, SMK_208) <= c(max_SMKG207_cont, max_time_quit_smoking, max_SMK_05B, max_SMK_208)))) ~
-      pmax(((DHHGAGE_cont - SMKG207_cont - time_quit_smoking) * (SMK_208 / 20)), 0.0137) +
-      ((pmax((SMK_05B * SMK_05C / 30), 1) / 20) * time_quit_smoking),
-
-    # Occasional Smoker (never daily)
-    SMKDSTY_A == 3 & (!validate_params | (SMK_05C >= min_SMK_05C & SMK_05C <= max_SMK_05C & SMKG01C_cont >= min_SMKG01C_cont & SMKG01C_cont <= max_SMKG01C_cont)) ~
-      (pmax((SMK_05B * SMK_05C / 30), 1) / 20) * (DHHGAGE_cont - SMKG01C_cont),
-
-    # Former daily smoker (non-smoker now)
-    SMKDSTY_A == 4 & (!validate_params | (all(c(SMKG207_cont, time_quit_smoking, SMK_208) >= c(min_SMKG207_cont, min_time_quit_smoking, min_SMK_208) &
-      c(SMKG207_cont, time_quit_smoking, SMK_208) <= c(max_SMKG207_cont, max_time_quit_smoking, max_SMK_208)))) ~
-      pmax(((DHHGAGE_cont - SMKG207_cont - time_quit_smoking) * (SMK_208 / 20)), 0.0137),
-
-    # Former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime
-    SMKDSTY_A == 5 & SMK_01A == 1 ~ 0.0137,
-
-    # Former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime
-    SMKDSTY_A == 5 & SMK_01A == 2 ~ 0.007,
-
-    # Non-smoker
-    SMKDSTY_A == 6 ~ 0,
-
-    # Account for NA(a)
-
-    TRUE ~ haven::tagged_na("b")
+  # Calculate smoking status from clean inputs
+  calculate_smoking_status_core(
+    cleaned$SMK_005_clean, cleaned$SMK_030_clean, cleaned$SMK_01A_clean
   )
 }
 
-#' Smoking pack-years (enhanced validation wrapper)
+#' Assess time since quitting smoking with comprehensive validation
 #'
-#' @description Enhanced version with comprehensive parameter validation.
-#'  Maintained for backward compatibility.
+#' @description
+#' Calculate time since quitting smoking using harmonized CCHS variables across cycles.
+#' Provides comprehensive time assessment for former smokers using categorical and continuous
+#' time variables with automatic conversion to unified continuous scale.
 #'
-#' @export
-pack_years_fun_A <- function(SMKDSTY_A, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
-                             SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C,
-                             SMKG01C_cont, SMK_01A,
-                             min_DHHGAGE_cont = 12, max_DHHGAGE_cont = 102,
-                             min_time_quit_smoking = 0.5, max_time_quit_smoking = 82,
-                             min_SMKG203_cont = 8, max_SMKG203_cont = 84,
-                             min_SMKG207_cont = 8, max_SMKG207_cont = 84,
-                             min_SMK_204 = 1, max_SMK_204 = 99,
-                             min_SMK_05B = 1, max_SMK_05B = 99,
-                             min_SMK_208 = 1, max_SMK_208 = 99,
-                             min_SMK_05C = 0, max_SMK_05C = 31,
-                             min_SMKG01C_cont = 8, max_SMKG01C_cont = 84) {
-  pack_years_fun(SMKDSTY_A, DHHGAGE_cont, time_quit_smoking, SMKG203_cont,
-    SMKG207_cont, SMK_204, SMK_05B, SMK_208, SMK_05C,
-    SMKG01C_cont, SMK_01A,
-    validate_params = TRUE,
-    min_DHHGAGE_cont = min_DHHGAGE_cont, max_DHHGAGE_cont = max_DHHGAGE_cont,
-    min_time_quit_smoking = min_time_quit_smoking, max_time_quit_smoking = max_time_quit_smoking,
-    min_SMKG203_cont = min_SMKG203_cont, max_SMKG203_cont = max_SMKG203_cont,
-    min_SMKG207_cont = min_SMKG207_cont, max_SMKG207_cont = max_SMKG207_cont,
-    min_SMK_204 = min_SMK_204, max_SMK_204 = max_SMK_204,
-    min_SMK_05B = min_SMK_05B, max_SMK_05B = max_SMK_05B,
-    min_SMK_208 = min_SMK_208, max_SMK_208 = max_SMK_208,
-    min_SMK_05C = min_SMK_05C, max_SMK_05C = max_SMK_05C,
-    min_SMKG01C_cont = min_SMKG01C_cont, max_SMKG01C_cont = max_SMKG01C_cont
-  )
-}
-
-#' Categorical smoking pack-years
+#' @param SMK_09A_B Time since quitting (categorical: 1=<1yr, 2=1-2yrs, 3=3-5yrs, 4=6-10yrs, 5=11-15yrs, 6=16+yrs). Accepts raw CCHS codes or preprocessed values.
+#' @param SMKG09C Time since quitting (continuous, in years). Accepts raw CCHS codes or preprocessed values.
+#' @param min_SMK_09A_B,max_SMK_09A_B,min_SMKG09C,max_SMKG09C Validation parameters (defaults from variable_details.csv)
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
-#' @description This function creates a categorical derived variable
-#' (pack_years_cat) that categorizes smoking pack-years (pack_years_der).
-#'
-#' @param pack_years_der derived variable that calculates smoking pack-years
-#'
-#' @return value for pack year categories in the pack_years_cat variable.
-#'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Improved categorization with tidyverse patterns
-#' @export
-pack_years_fun_cat <- function(pack_years_der) {
-  dplyr::case_when(
-    pack_years_der == 0 ~ 1L,
-    pack_years_der > 0 & pack_years_der <= 0.01 ~ 2L,
-    pack_years_der > 0.01 & pack_years_der <= 3.0 ~ 3L,
-    pack_years_der > 3.0 & pack_years_der <= 9.0 ~ 4L,
-    pack_years_der > 9.0 & pack_years_der <= 16.2 ~ 5L,
-    pack_years_der > 16.2 & pack_years_der <= 25.7 ~ 6L,
-    pack_years_der > 25.7 & pack_years_der <= 40.0 ~ 7L,
-    pack_years_der > 40.0 ~ 8L,
-    haven::is_tagged_na(pack_years_der, "a") ~ haven::tagged_na("a"),
-    .default = haven::tagged_na("b")
-  )
-}
-
-# ----------------------------------------------------------------------------
-# Age-Related Smoking Functions (Modernized)
-# ----------------------------------------------------------------------------
-
-#' Age started smoking daily - daily/former daily smokers (unified approach)
-#'
-#' @description This function creates a continuous derived variable
-#' (SMKG040_fun) that calculates the approximate age that a daily or former
-#' daily smoker began smoking daily.
-#'
-#' @param SMKG203_cont age started smoking daily (daily smokers)
-#' @param SMKG207_cont age started smoking daily (former daily smokers)
-#' @param validate_params logical, enable parameter validation (default FALSE)
-#' @param min_SMKG203_cont minimum valid age for daily smokers (default 5)
-#' @param max_SMKG203_cont maximum valid age for daily smokers (default 84)
-#' @param min_SMKG207_cont minimum valid age for former daily (default 5)
-#' @param max_SMKG207_cont maximum valid age for former daily (default 80)
-#'
-#' @return value for age started smoking daily for daily/former daily smokers
+#' @return Numeric time in years since quitting. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases (current smokers)
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Range: 0.5-82 years (minimum 6 months, maximum plausible time).
 #'
 #' @examples
-#' # Standard CCHS processing
-#' SMKG040_fun(c(18, NA), c(NA, 25)) # Returns c(18, 25)
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c("SMK_09A_B", "SMKG09C", "time_quit_smoking_der")
+#' )
 #'
-#' # With validation for research data quality
-#' SMKG040_fun(c(18, 4), c(NA, 25), validate_params = TRUE) # Returns c(18, tagged_na("b"))
+#' # Scalar usage examples with variable and value labels
+#' # calculate_time_quit_smoking(SMK_09A_B,    SMKG09C)
+#' #                         (categorical,  continuous_years)
+#' #                         1=<1yr         (exact years)
+#' #                         2=1-2yrs
+#' #                         3=3-5yrs
+#' #                         4=6-10yrs
+#' #                         5=11-15yrs
+#' #                         6=16+yrs
+#' calculate_time_quit_smoking(1, NA) # Returns: 0.5 (quit <1 year ago)
+#' calculate_time_quit_smoking(3, NA) # Returns: 4.0 (quit 3-5 years ago, midpoint)
+#' calculate_time_quit_smoking(NA, 2.5) # Returns: 2.5 (continuous takes precedence)
+#' calculate_time_quit_smoking(2, 1.8) # Returns: 1.8 (continuous takes precedence)
 #'
-#' # Copy-paste standalone usage
-#' library(dplyr)
-#' library(haven)
-#' SMKG040_fun(18, NA) # Works independently
+#' # Vector examples with real-world scenarios
+#' # Former smokers with different quit patterns
+#' quit_scenarios <- data.frame(
+#'   person = c("Anne", "Bob", "Carol", "David", "Eve", "Frank"),
+#'   SMK_09A_B = c(2, 4, 6, 7, 6, NA), # Categories: 1-2yrs, 6-10yrs, 16+yrs, missing, not_applicable, missing
+#'   SMKG09C = c(NA, NA, 25.0, NA, 996, 5.2), # Continuous: missing, missing, 25yrs, missing, not_applicable, 5.2yrs
+#'   description = c(
+#'     "52-year-old quit daily smoking 1-2 years ago",
+#'     "68-year-old quit daily smoking 6-10 years ago",
+#'     "75-year-old quit daily smoking 25 years ago",
+#'     "45-year-old former smoker, time unknown",
+#'     "35-year-old current smoker (not applicable)",
+#'     "50-year-old quit exactly 5.2 years ago (precise measurement)"
+#'   )
+#' )
 #'
+#' # Calculate time since quitting for all scenarios
+#' quit_scenarios$time_quit <- calculate_time_quit_smoking(
+#'   quit_scenarios$SMK_09A_B,
+#'   quit_scenarios$SMKG09C
+#' )
+#'
+#' # Results: c(1.5, 7.5, 25.0, tagged_na("b"), tagged_na("a"), 5.2)
+#'
+#' @note v3.0.0, last updated: 2025-07-05, status: active
+#'
+#' **Testing**: Run comprehensive tests with:
+#' \code{library(testthat); source('R/smoking.R'); test_file('tests/testthat/test-smoking-v3.R')}
+#'
+#' **Development**: Enhanced with comprehensive preprocessing and modern missing data handling
 #' @export
-SMKG040_fun <- function(SMKG203_cont, SMKG207_cont,
-                        validate_params = FALSE,
-                        min_SMKG203_cont = 8, max_SMKG203_cont = 84,
-                        min_SMKG207_cont = 8, max_SMKG207_cont = 84) {
-  # Note: SMKG203_cont and SMKG207_cont are typically already processed continuous values
-  # from SMKG203_fun() and SMKG207_fun(), but we'll add minimal preprocessing for robustness
+calculate_time_quit_smoking <- function(SMK_09A_B, SMKG09C,
+                                        # Validation bounds: defaults from variable_details.csv for standalone use
+                                        min_SMK_09A_B = SMOKING_VALIDATION_BOUNDS$binary_response$min,
+                                        max_SMK_09A_B = 6,
+                                        min_SMKG09C = SMOKING_VALIDATION_BOUNDS$time_quit$min,
+                                        max_SMKG09C = SMOKING_VALIDATION_BOUNDS$time_quit$max,
+                                        validate_params = NULL,
+                                        log_level = "silent") {
+  # Clean mixed variables (categorical + continuous)
+  cleaned <- clean_variables(
+    continuous_vars = list(smkg09c = SMKG09C),
+    categorical_vars = list(smk_09a_b = SMK_09A_B),
+    min_values = list(smkg09c = min_SMKG09C),
+    max_values = list(smkg09c = max_SMKG09C),
+    valid_values = list(smk_09a_b = min_SMK_09A_B:max_SMK_09A_B),
+    continuous_pattern = "triple_digit_missing",
+    categorical_pattern = "single_digit_missing",
+    log_level = log_level
+  )
 
-  # Apply validation if requested
-  if (validate_params) {
-    SMKG203_cont <- dplyr::case_when(
-      !is.na(SMKG203_cont) & (SMKG203_cont < min_SMKG203_cont | SMKG203_cont > max_SMKG203_cont) ~ haven::tagged_na("b"),
-      .default = SMKG203_cont
-    )
+  # Calculate time since quitting from clean inputs
+  calculate_time_quit_core(cleaned$smk_09a_b_clean, cleaned$smkg09c_clean)
+}
 
-    SMKG207_cont <- dplyr::case_when(
-      !is.na(SMKG207_cont) & (SMKG207_cont < min_SMKG207_cont | SMKG207_cont > max_SMKG207_cont) ~ haven::tagged_na("b"),
-      .default = SMKG207_cont
-    )
+#' Calculate pack-years of smoking with comprehensive validation
+#'
+#' @description
+#' Calculate pack-years of smoking exposure using harmonized CCHS variables across cycles.
+#' Provides comprehensive pack-years assessment for smoking history analysis using smoking
+#' status, duration, and intensity variables with automatic conversions.
+#'
+#' @param smoking_status Smoking status (1=daily, 2=occasional former daily, 3=occasional never daily, 4=former daily, 5=former occasional, 6=never). Accepts raw CCHS codes or preprocessed values.
+#' @param current_age Current age in years. Accepts raw CCHS codes or preprocessed values.
+#' @param time_quit Time since quitting (in years). Accepts raw CCHS codes or preprocessed values.
+#' @param age_started Age started smoking regularly. Accepts raw CCHS codes or preprocessed values.
+#' @param cigarettes_daily Average cigarettes per day. Accepts raw CCHS codes or preprocessed values.
+#' @param min_smoking_status,max_smoking_status Validation parameters for smoking status
+#' @param min_current_age,max_current_age Validation parameters for current age
+#' @param min_time_quit,max_time_quit Validation parameters for time since quitting
+#' @param min_age_started,max_age_started Validation parameters for age started
+#' @param min_cigarettes_daily,max_cigarettes_daily Validation parameters for cigarettes daily
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric pack-years of smoking exposure. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Range: 0.0-250 pack-years (0.0 for never smokers, minimum values for occasional smokers).
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c("smoking_status", "current_age", "time_quit", "age_started", "cigarettes_daily", "pack_years_der")
+#' )
+#'
+#' # Scalar usage examples with variable and value labels
+#' # calculate_pack_years(smoking_status, current_age, time_quit, age_started, cigarettes_daily)
+#' #                     (1=daily,       (years),     (years),   (years),     (per_day)
+#' #                      2=occ_former,
+#' #                      3=occ_never,
+#' #                      4=former_daily,
+#' #                      5=former_occ,
+#' #                      6=never)
+#' calculate_pack_years(1, 45, NA, 18, 20) # Returns: 27.0 (45yr old daily, started at 18, 1 pack/day = 27 pack-years)
+#' calculate_pack_years(4, 50, 10, 20, 15) # Returns: 15.0 (50yr old quit 10yrs ago, started at 20, 15/day = 15 pack-years)
+#' calculate_pack_years(6, 30, 996, 996, 996) # Returns: 0.0 (30yr old never smoker)
+#' calculate_pack_years(2, 40, NA, 25, 996) # Returns: 0.0137 (40yr old occasional former daily, minimum exposure)
+#'
+#' # Vector examples with complex real-world smoking histories
+#' # Different smoking patterns with detailed life stories
+#' smoking_histories <- data.frame(
+#'   person = c("Alice", "Bob", "Carol", "David", "Eve", "Frank"),
+#'   smoking_status = c(1, 4, 6, 2, 97, 3), # Status: daily, former_daily, never, occ_former, missing, occ_never
+#'   current_age = c(45, 60, 35, 52, 40, 28), # Current ages
+#'   time_quit = c(NA, 5, 996, NA, NA, 996), # Years since quit: current, 5yrs, not_applicable, current, missing, not_applicable
+#'   age_started = c(18, 16, 996, 22, 20, 996), # Age started: 18, 16, not_applicable, 22, 20, not_applicable
+#'   cigarettes_daily = c(25, 20, 996, 996, 15, 996), # Per day: 25, 20, not_applicable, not_applicable, 15, not_applicable
+#'   description = c(
+#'     "45yr old current daily smoker, started at 18, smokes 25/day (1.25 packs)",
+#'     "60yr old former daily smoker, quit 5yrs ago, started at 16, smoked 20/day (1 pack)",
+#'     "35yr old never smoker, healthy lifestyle",
+#'     "52yr old occasional smoker who formerly smoked daily, started at 22",
+#'     "40yr old with missing smoking data, incomplete survey responses",
+#'     "28yr old occasional smoker who never smoked daily, social smoking only"
+#'   )
+#' )
+#'
+#' # Calculate pack-years for all complex scenarios
+#' smoking_histories$pack_years <- calculate_pack_years(
+#'   smoking_histories$smoking_status,
+#'   smoking_histories$current_age,
+#'   smoking_histories$time_quit,
+#'   smoking_histories$age_started,
+#'   smoking_histories$cigarettes_daily
+#' )
+#'
+#' # Results: c(33.75, 39.0, 0.0, 0.0137, tagged_na("b"), 0.0137)
+#' # Alice: (45-18) * 25/20 = 27 * 1.25 = 33.75 pack-years
+#' # Bob: (60-5-16) * 20/20 = 39 * 1.0 = 39.0 pack-years
+#' # Carol: 0.0 (never smoker)
+#' # David: 0.0137 (minimum for occasional former daily)
+#' # Eve: tagged_na("b") (missing data)
+#' # Frank: 0.0137 (minimum for occasional never daily)
+#'
+#' @note v3.0.0, last updated: 2025-07-05, status: active
+#'
+#' **Testing**: Run comprehensive tests with:
+#' \code{library(testthat); source('R/smoking.R'); test_file('tests/testthat/test-smoking-v3.R')}
+#'
+#' **Development**: Enhanced with comprehensive preprocessing and modern missing data handling
+#' @export
+calculate_pack_years <- function(smoking_status, current_age, time_quit, age_started, cigarettes_daily,
+                                 # Validation bounds: defaults from variable_details.csv for standalone use
+                                 min_smoking_status = SMOKING_VALIDATION_BOUNDS$smoking_status$min,
+                                 max_smoking_status = SMOKING_VALIDATION_BOUNDS$smoking_status$max,
+                                 min_current_age = SMOKING_VALIDATION_BOUNDS$current_age$min,
+                                 max_current_age = SMOKING_VALIDATION_BOUNDS$current_age$max,
+                                 min_time_quit = SMOKING_VALIDATION_BOUNDS$time_quit$min,
+                                 max_time_quit = SMOKING_VALIDATION_BOUNDS$time_quit$max,
+                                 min_age_started = SMOKING_VALIDATION_BOUNDS$age_initiation$min,
+                                 max_age_started = SMOKING_VALIDATION_BOUNDS$age_initiation$max,
+                                 min_cigarettes_daily = SMOKING_VALIDATION_BOUNDS$cigarettes_daily$min,
+                                 max_cigarettes_daily = SMOKING_VALIDATION_BOUNDS$cigarettes_daily$max,
+                                 validate_params = NULL,
+                                 log_level = "silent") {
+  # Clean mixed variables (categorical + continuous)
+  cleaned <- clean_variables(
+    continuous_vars = list(
+      current_age = current_age,
+      time_quit = time_quit,
+      age_started = age_started,
+      cigarettes_daily = cigarettes_daily
+    ),
+    categorical_vars = list(smoking_status = smoking_status),
+    min_values = list(
+      current_age = min_current_age,
+      time_quit = min_time_quit,
+      age_started = min_age_started,
+      cigarettes_daily = min_cigarettes_daily
+    ),
+    max_values = list(
+      current_age = max_current_age,
+      time_quit = max_time_quit,
+      age_started = max_age_started,
+      cigarettes_daily = max_cigarettes_daily
+    ),
+    valid_values = list(smoking_status = min_smoking_status:max_smoking_status),
+    continuous_pattern = "triple_digit_missing",
+    categorical_pattern = "double_digit_missing", # Use double_digit_missing pattern since smoking status 1-6 are all valid
+    log_level = log_level
+  )
+
+  # Calculate pack-years from clean inputs
+  calculate_pack_years_core(
+    cleaned$smoking_status_clean, cleaned$current_age_clean, cleaned$time_quit_clean,
+    cleaned$age_started_clean, cleaned$cigarettes_daily_clean
+  )
+}
+
+#' Core simple smoking status assessment (internal helper)
+#'
+#' Vector-aware simple smoking status assessment without validation - used as building block
+#' @param smkdsty_cat5_clean,time_quit_smoking_clean Cleaned smoking variables (already validated)
+#' @return Simple smoking status indicator with proper tagged NA handling
+#' @note Internal v3.0.0, last updated: 2025-07-05, status: active - Vector aware
+#' @noRd
+smoke_simple_core <- function(smkdsty_cat5_clean, time_quit_smoking_clean) {
+  # Use case_when for element-wise processing with tagged NA handling
+  dplyr::case_when(
+    # Handle missing data first
+    haven::is_tagged_na(smkdsty_cat5_clean, "c") ~ haven::tagged_na("c"), # Question not asked
+    haven::is_tagged_na(smkdsty_cat5_clean, "d") ~ haven::tagged_na("d"), # Variable missing
+    haven::is_tagged_na(smkdsty_cat5_clean, "a") ~ haven::tagged_na("a"), # Not applicable
+    haven::is_tagged_na(smkdsty_cat5_clean, "b") ~ haven::tagged_na("b"), # Missing/unknown
+    haven::is_tagged_na(time_quit_smoking_clean, "c") ~ haven::tagged_na("c"), # Question not asked
+    haven::is_tagged_na(time_quit_smoking_clean, "d") ~ haven::tagged_na("d"), # Variable missing
+    haven::is_tagged_na(time_quit_smoking_clean, "a") ~ haven::tagged_na("a"), # Not applicable
+    haven::is_tagged_na(time_quit_smoking_clean, "b") ~ haven::tagged_na("b"), # Missing/unknown
+
+    # Simple smoking status classification logic
+    smkdsty_cat5_clean == 5 ~ 0L, # Never smoked
+    smkdsty_cat5_clean %in% c(1, 2) ~ 1L, # Current smoker (daily and occasional)
+    smkdsty_cat5_clean == 4 ~ 2L, # Former occasional smoker
+    smkdsty_cat5_clean == 3 & !is.na(time_quit_smoking_clean) & time_quit_smoking_clean < 5 ~ 2L, # Former daily smoker quit <5 years
+    smkdsty_cat5_clean == 3 & !is.na(time_quit_smoking_clean) & time_quit_smoking_clean >= 5 ~ 3L, # Former daily smoker quit >=5 years
+    smkdsty_cat5_clean == 3 & (is.na(time_quit_smoking_clean) | haven::is_tagged_na(time_quit_smoking_clean)) ~ 2L, # Former daily smoker, time unknown - default to category 2
+
+    # Default to missing for any unhandled cases
+    .default = haven::tagged_na("b")
+  )
+}
+
+#' Assess simple smoking status with comprehensive classification
+#'
+#' @description
+#' Classify smoking status into 4 simplified categories using harmonized CCHS variables across cycles.
+#' Provides simplified smoking status assessment for population health research by combining
+#' detailed smoking status with time since quitting information.
+#'
+#' @param SMKDSTY_cat5 5-category smoking status (1=daily, 2=occasional, 3=former daily, 4=former occasional, 5=never). Accepts raw CCHS codes or preprocessed values.
+#' @param time_quit_smoking Time since quitting smoking (continuous, in years). Accepts raw CCHS codes or preprocessed values.
+#' @param min_SMKDSTY_cat5,max_SMKDSTY_cat5 Validation parameters for smoking status (defaults from variable_details.csv)
+#' @param min_time_quit_smoking,max_time_quit_smoking Validation parameters for time since quitting (defaults from variable_details.csv)
+#' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Integer simple smoking status indicator. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Values: 0 = non-smoker (never smoked), 1 = current smoker (daily and occasional),
+#'   2 = former daily smoker quit <5 years or former occasional smoker, 3 = former daily smoker quit >=5 years.
+#'
+#' @details
+#' Based on harmonized CCHS smoking variables available across all cycles. Classification simplifies
+#' detailed smoking status into 4 categories commonly used in health research and policy analysis.
+#'
+#' **Classification Logic:**
+#' - Category 0: Never smoked (SMKDSTY_cat5 = 5)
+#' - Category 1: Current smoker (SMKDSTY_cat5 = 1 or 2)
+#' - Category 2: Former daily smoker quit <5 years (SMKDSTY_cat5 = 3 and time_quit_smoking < 5) OR former occasional smoker (SMKDSTY_cat5 = 4)
+#' - Category 3: Former daily smoker quit >=5 years (SMKDSTY_cat5 = 3 and time_quit_smoking >= 5)
+#' - When time since quitting is missing for former daily smokers, defaults to category 2
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c("SMKDSTY_cat5", "time_quit_smoking", "smoke_simple")
+#' )
+#'
+#' # Scalar usage examples with variable and value labels
+#' # smoke_simple_fun(SMKDSTY_cat5, time_quit_smoking)
+#' #                  (smoking_status, years_since_quit)
+#' #                  1=daily         (continuous)
+#' #                  2=occasional
+#' #                  3=former_daily
+#' #                  4=former_occ
+#' #                  5=never
+#' smoke_simple_fun(5, NA) # Returns: 0L (never smoked)
+#' smoke_simple_fun(1, NA) # Returns: 1L (current daily smoker)
+#' smoke_simple_fun(2, NA) # Returns: 1L (current occasional smoker)
+#' smoke_simple_fun(4, 2.5) # Returns: 2L (former occasional smoker)
+#' smoke_simple_fun(3, 3.0) # Returns: 2L (former daily smoker quit <5 years)
+#' smoke_simple_fun(3, 10.0) # Returns: 3L (former daily smoker quit >5 years)
+#' smoke_simple_fun(3, NA) # Returns: 2L (former daily smoker, time unknown)
+#'
+#' # Vector examples with real-world scenarios
+#' # Mixed smoking histories with different quit patterns
+#' smoking_scenarios <- data.frame(
+#'   person = c("Alice", "Bob", "Carol", "David", "Eve", "Frank"),
+#'   SMKDSTY_cat5 = c(5, 1, 2, 3, 3, 4), # Status: never, daily, occasional, former_daily, former_daily, former_occ
+#'   time_quit_smoking = c(NA, NA, NA, 2.5, 8.0, 1.5), # Years quit: n/a, n/a, n/a, 2.5yrs, 8yrs, 1.5yrs
+#'   description = c(
+#'     "30-year-old never smoked",
+#'     "45-year-old current daily smoker",
+#'     "52-year-old current occasional smoker",
+#'     "60-year-old former daily smoker, quit 2.5 years ago",
+#'     "65-year-old former daily smoker, quit 8 years ago",
+#'     "38-year-old former occasional smoker, quit 1.5 years ago"
+#'   )
+#' )
+#'
+#' # Calculate simple smoking status for all scenarios
+#' smoking_scenarios$smoke_simple <- smoke_simple_fun(
+#'   smoking_scenarios$SMKDSTY_cat5,
+#'   smoking_scenarios$time_quit_smoking
+#' )
+#'
+#' # Results: c(0L, 1L, 1L, 2L, 3L, 2L)
+#' # Alice: 0 (never smoked)
+#' # Bob: 1 (current daily smoker)
+#' # Carol: 1 (current occasional smoker)
+#' # David: 2 (former daily smoker, quit <5 years)
+#' # Eve: 3 (former daily smoker, quit >5 years)
+#' # Frank: 2 (former occasional smoker)
+#'
+#' @seealso
+#' \\code{\\link{calculate_smoking_status}} for detailed smoking status assessment
+#' \\code{\\link{calculate_time_quit_smoking}} for time since quitting assessment
+#'
+#' @references
+#' Health Canada. (2013). Canadian Tobacco Use Monitoring Survey (CTUMS).
+#' Health Canada Controlled Documents.
+#'
+#' @note v3.0.0, last updated: 2025-07-05, status: active
+#'
+#' **Testing**: Run comprehensive tests with:
+#' \code{library(testthat); source('R/smoking.R'); test_file('tests/testthat/test-smoking-v3.R')}
+#'
+#' **Development**: Enhanced with comprehensive preprocessing and modern missing data handling
+#' @export
+calculate_smoke_simple <- function(SMKDSTY_cat5, time_quit_smoking,
+                                   # Validation bounds: defaults from variable_details.csv for standalone use
+                                   min_SMKDSTY_cat5 = 1,
+                                   max_SMKDSTY_cat5 = 5,
+                                   min_time_quit_smoking = SMOKING_VALIDATION_BOUNDS$time_quit$min,
+                                   max_time_quit_smoking = SMOKING_VALIDATION_BOUNDS$time_quit$max,
+                                   validate_params = NULL,
+                                   log_level = "silent") {
+  # Use simple preprocessing approach to ensure reliability
+  # The clean_variables function integration can be done later when helper functions are stable
+
+  # Simple preprocessing for missing data codes
+  smkdsty_cat5_clean <- SMKDSTY_cat5
+  time_quit_smoking_clean <- time_quit_smoking
+
+  # Convert common CCHS missing codes to tagged_na
+  # For SMKDSTY_cat5 (double digit missing pattern)
+  if (is.numeric(smkdsty_cat5_clean)) {
+    smkdsty_cat5_clean[smkdsty_cat5_clean == 96] <- haven::tagged_na("a")
+    smkdsty_cat5_clean[smkdsty_cat5_clean == 97] <- haven::tagged_na("b")
+    smkdsty_cat5_clean[smkdsty_cat5_clean == 98] <- haven::tagged_na("b")
+    smkdsty_cat5_clean[smkdsty_cat5_clean == 99] <- haven::tagged_na("b")
+    # Also handle out-of-bounds values
+    smkdsty_cat5_clean[smkdsty_cat5_clean < min_SMKDSTY_cat5 | smkdsty_cat5_clean > max_SMKDSTY_cat5] <- haven::tagged_na("b")
   }
 
-  dplyr::case_when(
-    (haven::is_tagged_na(SMKG203_cont, "a") & haven::is_tagged_na(SMKG207_cont, "a")) ~ haven::tagged_na("a"),
-    (haven::is_tagged_na(SMKG203_cont, "b") & haven::is_tagged_na(SMKG207_cont, "b")) ~ haven::tagged_na("b"),
-    !is.na(SMKG203_cont) ~ SMKG203_cont,
-    !is.na(SMKG207_cont) ~ SMKG207_cont,
-    .default = haven::tagged_na("b")
-  )
+  # For time_quit_smoking (triple digit missing pattern)
+  if (is.numeric(time_quit_smoking_clean)) {
+    time_quit_smoking_clean[time_quit_smoking_clean == 996] <- haven::tagged_na("a")
+    time_quit_smoking_clean[time_quit_smoking_clean == 997] <- haven::tagged_na("b")
+    time_quit_smoking_clean[time_quit_smoking_clean == 998] <- haven::tagged_na("b")
+    time_quit_smoking_clean[time_quit_smoking_clean == 999] <- haven::tagged_na("b")
+    # Also handle out-of-bounds values
+    time_quit_smoking_clean[time_quit_smoking_clean < min_time_quit_smoking | time_quit_smoking_clean > max_time_quit_smoking] <- haven::tagged_na("b")
+  }
+
+  # Calculate simple smoking status from clean inputs
+  smoke_simple_core(smkdsty_cat5_clean, time_quit_smoking_clean)
 }
-
-#' Age started smoking daily - daily/former daily smokers (enhanced validation wrapper)
-#'
-#' @description Enhanced version with parameter validation.
-#'  Maintained for backward compatibility.
-#'
-#' @export
-SMKG040_fun_A <- function(SMKG203_cont, SMKG207_cont,
-                          min_SMKG203_cont = 8, max_SMKG203_cont = 84,
-                          min_SMKG207_cont = 8, max_SMKG207_cont = 84) {
-  SMKG040_fun(SMKG203_cont, SMKG207_cont,
-    validate_params = TRUE,
-    min_SMKG203_cont = min_SMKG203_cont, max_SMKG203_cont = max_SMKG203_cont,
-    min_SMKG207_cont = min_SMKG207_cont, max_SMKG207_cont = max_SMKG207_cont
-  )
-}
-
-#' Age started to smoke daily - daily smoker (from combined variable)
-#'
-#' @description This function creates a continuous derived variable
-#' (SMKG203_cont) for age started to smoke daily for daily smokers.
-#'
-#' @param SMK_005 type of smoker presently
-#' @param SMKG040 age started to smoke daily - daily/former daily smoker
-#'
-#' @return value for continuous age started to smoke daily for daily smokers
-#'
-#' @export
-SMKG203_fun <- function(SMK_005, SMKG040) {
-  # Preprocess original CCHS missing codes
-  SMK_005 <- preprocess_smoking_variable(SMK_005, variable_name = "SMK_005")
-  SMKG040 <- preprocess_smoking_variable(SMKG040, variable_name = "SMKG203") # SMKG040 uses categorical age pattern
-
-  SMKG203 <- dplyr::case_when(
-    SMK_005 == 1 ~ SMKG040,
-    haven::is_tagged_na(SMK_005, "a") | haven::is_tagged_na(SMKG040, "a") ~ haven::tagged_na("a"),
-    .default = haven::tagged_na("b")
-  )
-
-  # Convert categorical to continuous ages
-  dplyr::case_when(
-    SMKG203 == 1 ~ 8,
-    SMKG203 == 2 ~ 13,
-    SMKG203 == 3 ~ 16,
-    SMKG203 == 4 ~ 18.5,
-    SMKG203 == 5 ~ 22,
-    SMKG203 == 6 ~ 27,
-    SMKG203 == 7 ~ 32,
-    SMKG203 == 8 ~ 37,
-    SMKG203 == 9 ~ 42,
-    SMKG203 == 10 ~ 47,
-    SMKG203 == 11 ~ 55,
-    haven::is_tagged_na(SMKG203, "a") ~ haven::tagged_na("a"),
-    .default = haven::tagged_na("b")
-  )
-}
-
-#' Age started to smoke daily - former daily smoker (from combined variable)
-#'
-#' @description This function creates a continuous derived variable
-#' (SMKG207_cont) for age started to smoke daily for former daily smokers.
-#'
-#' @param SMK_030 smoked daily - lifetime (occasional/former smoker)
-#' @param SMKG040 age started to smoke daily - daily/former daily smoker
-#'
-#' @return value for continuous age started to smoke daily for former daily smokers
-#'
-#' @export
-SMKG207_fun <- function(SMK_030, SMKG040) {
-  # Preprocess original CCHS missing codes
-  SMK_030 <- preprocess_smoking_variable(SMK_030, variable_name = "SMK_030")
-  SMKG040 <- preprocess_smoking_variable(SMKG040, variable_name = "SMKG207") # SMKG040 uses categorical age pattern
-
-  SMKG207 <- dplyr::case_when(
-    SMK_030 == 1 ~ SMKG040,
-    haven::is_tagged_na(SMK_030, "a") | haven::is_tagged_na(SMKG040, "a") ~ haven::tagged_na("a"),
-    .default = haven::tagged_na("b")
-  )
-
-  # Convert categorical to continuous ages
-  dplyr::case_when(
-    SMKG207 == 1 ~ 8,
-    SMKG207 == 2 ~ 13,
-    SMKG207 == 3 ~ 16,
-    SMKG207 == 4 ~ 18.5,
-    SMKG207 == 5 ~ 22,
-    SMKG207 == 6 ~ 27,
-    SMKG207 == 7 ~ 32,
-    SMKG207 == 8 ~ 37,
-    SMKG207 == 9 ~ 42,
-    SMKG207 == 10 ~ 47,
-    SMKG207 == 11 ~ 55,
-    haven::is_tagged_na(SMKG207, "a") ~ haven::tagged_na("a"),
-    .default = haven::tagged_na("b")
-  )
-}
-
-#' Age started to smoke daily - daily smoker (modern CCHS 2015+)
-#'
-#' @description This function creates a derived variable (SMKG203_cont)
-#'  that provides the age started to smoke daily for current daily smokers.
-#'
-#' @param SMK_005 Type of smoker presently
-#' @param SMKG040_I Age started to smoke daily - daily/former daily smoker (continuous)
-#'
-#' @return the CCHS derived variable SMKG203_cont is a continuous variable
-#'
-#' @export
-SMKG203I_fun <- function(SMK_005, SMKG040_I) {
-  SMKG203 <- dplyr::case_when(
-    SMK_005 == 1 ~ SMKG040_I,
-    haven::is_tagged_na(SMK_005, "a") | haven::is_tagged_na(SMKG040_I, "a") ~ haven::tagged_na("a"),
-    TRUE ~ haven::tagged_na("b")
-  )
-
-  dplyr::case_when(
-    SMKG203 %in% 8:95 ~ SMKG203,
-    haven::is_tagged_na(SMKG203, "a") ~ haven::tagged_na("a"),
-    TRUE ~ haven::tagged_na("b")
-  )
-}
-
-#' Age started to smoke daily - former daily smoker (modern CCHS 2015+)
-#'
-#' @description This function creates a derived variable (SMKG207_cont)
-#'  that provides the age started to smoke daily for former daily smokers.
-#'
-#' @param SMK_030 Smoked daily - lifetime (occasional/former smoker)
-#' @param SMKG040_I Age started to smoke daily - daily/former daily smoker (continuous)
-#'
-#' @return the CCHS derived variable SMKG207_cont is a continuous variable
-#'
-#' @export
-SMKG207I_fun <- function(SMK_030, SMKG040_I) {
-  SMKG207 <- dplyr::case_when(
-    SMK_030 == 1 ~ SMKG040_I,
-    haven::is_tagged_na(SMK_030, "a") | haven::is_tagged_na(SMKG040_I, "a") ~ haven::tagged_na("a"),
-    TRUE ~ haven::tagged_na("b")
-  )
-
-  dplyr::case_when(
-    SMKG207 %in% 8:95 ~ SMKG207,
-    haven::is_tagged_na(SMKG207, "a") ~ haven::tagged_na("a"),
-    TRUE ~ haven::tagged_na("b")
-  )
-}
-
-# ----------------------------------------------------------------------------
-# Modern CCHS Functions (2022+) - Modernized
-# ----------------------------------------------------------------------------
-
-#' Time since stopped smoking for former daily smokers (cycle 2022)
-#'
-#' @description This function creates a derived variable (SPU_25I)
-#'  that calculates the approximate time since a former daily smoker has quit smoking based
-#'  on 2022 CCHS variables.
-#'
-#' @param SPU_25A_I stopped smoking daily - month (former daily smoker)
-#' @param SPU_25B_I stopped smoking daily - year (former daily smoker)
-#' @param ADM_MOI_I month of interview
-#' @param ADM_YOI_I year of interview
-#'
-#' @return the CCHS derived variable SPU_25I is a continuous variable
-#'
-#' @export
-SPU25_fun <- function(SPU_25A_I, SPU_25B_I, ADM_MOI_I, ADM_YOI_I) {
-  # Preprocess original CCHS missing codes for modern CCHS variables
-  # Note: 2022+ variables may use different patterns, but we'll handle standard codes
-  SPU_25A_I <- preprocess_smoking_variable(SPU_25A_I, pattern_type = "standard_response")
-  SPU_25B_I <- preprocess_smoking_variable(SPU_25B_I, pattern_type = "continuous_standard")
-  ADM_MOI_I <- preprocess_smoking_variable(ADM_MOI_I, pattern_type = "standard_response")
-  ADM_YOI_I <- preprocess_smoking_variable(ADM_YOI_I, pattern_type = "continuous_standard")
-
-  # The interview date calculation
-  end <- dplyr::case_when(
-    (!haven::is_tagged_na(ADM_YOI_I, "a") & !haven::is_tagged_na(ADM_YOI_I, "b")) & (ADM_MOI_I %in% 1:12) ~
-      as.Date(ISOdate(ADM_YOI_I, ADM_MOI_I, 01)),
-    haven::is_tagged_na(ADM_YOI_I, "a") | haven::is_tagged_na(ADM_MOI_I, "a") ~ haven::tagged_na("a"),
-    .default = haven::tagged_na("b")
-  )
-
-  # The quit date calculation
-  start <- dplyr::case_when(
-    SPU_25B_I == "NA(b)" ~ haven::tagged_na("b"),
-    haven::is_tagged_na(SPU_25B_I, "b") ~ haven::tagged_na("b"),
-    haven::is_tagged_na(SPU_25B_I, "a") ~ haven::tagged_na("a"),
-    SPU_25A_I %in% 1:12 ~ as.Date(ISOdate(SPU_25B_I, SPU_25A_I, 01)),
-    .default = as.Date(ISOdate(SPU_25B_I, ADM_MOI_I, 01))
-  )
-
-  # Calculate years difference
-  dplyr::case_when(
-    end == "NA(b)" ~ haven::tagged_na("b"),
-    haven::is_tagged_na(end, "b") ~ haven::tagged_na("b"),
-    start != "NA(a)" & start != "NA(b)" & !haven::is_tagged_na(start, "a") & !haven::is_tagged_na(start, "b") ~ (end - start) / 365.2422,
-    .default = start
-  )
-}
-
-#' Years since stopped smoking for former daily smokers (categorical - version 1)
-#'
-#' @description This function creates a derived variable (SMK_09A_I)
-#'  that calculates the approximate time since a former daily smoker has quit smoking
-#'  with categories: half a year, one and a half years, two and a half years, 4 years or more
-#'
-#' @param SPU_25I Time since stopped smoking for former daily smokers
-#'
-#' @return the CCHS derived variable SMK_09A_I is a categorical variable
-#'
-#' @export
-SMK09AI_fun <- function(SPU_25I) {
-  dplyr::case_when(
-    haven::is_tagged_na(SPU_25I, "a") ~ haven::tagged_na("a"),
-    haven::is_tagged_na(SPU_25I, "b") ~ haven::tagged_na("b"),
-    SPU_25I < 1 ~ 0.5,
-    SPU_25I >= 1 & SPU_25I < 2 ~ 1.5,
-    SPU_25I >= 2 & SPU_25I < 3 ~ 2.5,
-    TRUE ~ 4
-  )
-}
-
-#' Years since stopped smoking for former daily smokers (categorical - version 2)
-#'
-#' @description This function creates a derived variable (SMK_09A_B)
-#'  that calculates the approximate time since a former daily smoker has quit smoking
-#'  with categories: less than a year, 1 to <2 years, 2 to <3 years, 3 years or more
-#'
-#' @param SPU_25I Time since stopped smoking for former daily smokers
-#'
-#' @return the CCHS derived variable SMK_09A_B is a categorical variable
-#'
-#' @export
-SMK09AB_fun <- function(SPU_25I) {
-  dplyr::case_when(
-    haven::is_tagged_na(SPU_25I, "a") ~ haven::tagged_na("a"),
-    haven::is_tagged_na(SPU_25I, "b") ~ haven::tagged_na("b"),
-    SPU_25I < 1 ~ 1,
-    SPU_25I >= 1 & SPU_25I < 2 ~ 2,
-    SPU_25I >= 2 & SPU_25I < 3 ~ 3,
-    TRUE ~ 4
-  )
-}
-
-#' Years since stopped smoking for former daily smokers (categorical - version 3)
-#'
-#' @description This function creates a derived variable (SMKG09C)
-#'  that calculates the approximate years since a former daily smoker has quit smoking
-#'  with categories: 3 to 5 years, 6 to 10 years, 11 years or more
-#'
-#' @param SPU_25I Time since stopped smoking for former daily smokers
-#'
-#' @return the CCHS derived variable SMKG09C_I is a categorical variable
-#'
-#' @export
-SMK09C_fun <- function(SPU_25I) {
-  dplyr::case_when(
-    haven::is_tagged_na(SPU_25I, "a") ~ haven::tagged_na("a"),
-    haven::is_tagged_na(SPU_25I, "b") ~ haven::tagged_na("b"),
-    SPU_25I >= 3 & SPU_25I < 6 ~ 1,
-    SPU_25I >= 6 & SPU_25I < 11 ~ 2,
-    SPU_25I >= 11 ~ 3,
-    TRUE ~ haven::tagged_na("a")
-  )
-}
-
-# ============================================================================
-# PHASE 2 COMPLETE: All core functions refactored with case_when()
-# Ready for Phase 3: Consolidation and standardization
-# ============================================================================
