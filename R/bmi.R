@@ -26,15 +26,9 @@ tryCatch(
 # 1. CONSTANTS AND CONFIGURATION
 # ==============================================================================
 
-# BMI validation bounds for standalone function use
-# NOTE: These constants ensure BMI functions work independently ("cut and paste")
-# while rec_with_table() uses variable_details.csv for CSV-driven validation.
-# IMPORTANT: Keep synchronized with variable_details.csv ground truth values
-BMI_VALIDATION_BOUNDS <- list(
-  height = list(min = 0.914, max = 2.134), # Height in meters [0.914,2.134] from variable_details.csv
-  weight = list(min = 27.0, max = 135.0), # Weight in kilograms [27.0,135.0] from variable_details.csv
-  bmi = list(min = 10, max = 100) # BMI valid range [10,100] from variable_details.csv
-)
+# BMI validation bounds are now defined in variable_details.csv as single source of truth
+# Functions use explicit parameter defaults matching CSV validation ranges
+# See @examples in function documentation for transparent validation bound usage
 
 # BMI correction coefficients from Connor Gorber et al. 2008
 BMI_CORRECTION_MALE <- list(intercept = -1.07575, slope = 1.07592)
@@ -44,8 +38,7 @@ BMI_CORRECTION_FEMALE <- list(intercept = -0.12374, slope = 1.05129)
 # 2. VALIDATION FUNCTIONS
 # ==============================================================================
 
-
-
+# Standard valiation using utility functions and helpers.
 
 # ==============================================================================
 # 3. SPECIALIZED HELPER FUNCTIONS
@@ -74,9 +67,8 @@ calculate_bmi_core <- function(height, weight) {
   )
 }
 
-
 # ==============================================================================
-# 4. PUBLIC API FUNCTIONS
+# 4. PUBLIC FUNCTIONS
 # ==============================================================================
 
 #' Calculate Body Mass Index (BMI) with comprehensive validation
@@ -87,10 +79,6 @@ calculate_bmi_core <- function(height, weight) {
 #'
 #' @param HWTGHTM CCHS variable for height (in meters). Accepts raw CCHS codes or preprocessed values.
 #' @param HWTGWTK CCHS variable for weight (in kilograms). Accepts raw CCHS codes or preprocessed values.
-#' @param min_HWTGHTM Minimum valid height in meters (default 0.914)
-#' @param max_HWTGHTM Maximum valid height in meters (default 2.134)
-#' @param min_HWTGWTK Minimum valid weight in kilograms (default 27.0)
-#' @param max_HWTGWTK Maximum valid weight in kilograms (default 135.0)
 #' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
 #' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
@@ -99,7 +87,6 @@ calculate_bmi_core <- function(height, weight) {
 #'     \item \code{haven::tagged_na("a")} for not applicable cases (age restrictions)
 #'     \item \code{haven::tagged_na("b")} for missing/invalid measurements
 #'   }
-#'   Valid range typically 10-100 for realistic measurements.
 #'
 #' @details
 #' This function uses harmonized height/weight variables and may produce different results
@@ -109,24 +96,70 @@ calculate_bmi_core <- function(height, weight) {
 #'
 #' Calculation method: BMI = weight(kg) / height(m)^2. Original CCHS codes (6,7,8,9) are
 #' automatically converted to haven::tagged_na(). Validation bounds: Height [0.914-2.134m],
-#' Weight [27.0-135.0kg], BMI [10-100]. Extreme values are marked as haven::tagged_na("b").
+#' Weight [27.0-135.0kg], BMI [15-50]. Extreme values are marked as haven::tagged_na("b") 
+#' when using rec_with_table(). 
+#' See variable_details.csv (or variable_details.RData) for up-to-date boundaries.
 #'
 #' @examples
-#' # Standard cchsflow workflow (primary usage)
+#' # rec_with_table workflow (RECOMMENDED - handles all validation automatically):
+#' # Generate test data with correct and incorrect input
+#' test_data <- data.frame(
+#'   HWTGHTM = c(1.75, 1.60, 0.80, 2.134, 0.914, 996, 997, 998, 999, NA),
+#'   HWTGWTK = c(70, 55, 70, 27, 135, 70, 998, 999, 70, NA)
+#' )
 #' library(cchsflow)
 #' result <- rec_with_table(
-#'   cchs2013_2014_p,
+#'   test_data,
 #'   c("HWTGHTM", "HWTGWTK", "HWTGBMI_der")
 #' )
+#' # Returns:
+#' #   HWTGHTM HWTGWTK HWTGBMI_der
+#' # 1    1.75      70       22.86  
+#' # 2    1.60      55       21.48  
+#' # 3    0.80      70    <NA+b>     # Height below valid range
+#' # 4    2.134     27    <NA+b>     # Valid inputs, BMI too low (≈5.93 < 15)
+#' # 5    0.914    135    <NA+b>     # Valid inputs, BMI too high (≈161.6 > 50)
+#' # 6  996.00     70    <NA+a>     # CCHS missing code
+#' # 7  997.00    998    <NA+b>     # CCHS missing codes
+#' # 8  998.00    999    <NA+b>     # CCHS missing codes  
+#' # 9  999.00     70    <NA+b>     # CCHS missing code
+#' #10      NA     NA    <NA+b>     # Regular NAs
+#' # Comprehensive validation and error handling applied automatically
+#' 
+#' # Basic scalar examples:
+#' # Validation for missing data handled. 
+#' # HWTGHTM: height in meters. See variable_details.csv for valid range: [0.914, 2.134]
+#' # HWTGWTK: weight in kilograms. See variable_details.csv for valid range: [27.0, 135.0]
+#' calculate_bmi(1.75, 70)    # Returns: 22.85714
+#' calculate_bmi(1.60, 55)    # Returns: 21.48437 
+#' calculate_bmi("1.75", 70)  # Returns: 22.85714 (string converted by R)
+#' 
+#' # Check internal tagged NA structure:
+#' result <- calculate_bmi(0.80, 70) # Returns: 109.375 (calculates BMI - no bounds validation)
+#' haven::is_tagged_na(result, "b")  # Returns: FALSE (BMI calculated normally)
+#' result2 <- calculate_bmi(996, 70) # Returns: NA (CCHS not applicable)
+#' haven::is_tagged_na(result2, "a")  # Returns: TRUE (not applicable)
+#' result3 <- calculate_bmi(998, 70) # Returns: NA (CCHS missing code)
+#' haven::is_tagged_na(result3, "b") # Returns: TRUE (missing/invalid)
+#' # Note: Basic validation applied - use rec_with_table() for comprehensive validation
 #'
-#' # Basic usage
-#' calculate_bmi(1.75, 70)
+#' # Basic vector examples:
+#' # Same validation as scalar examples
+#' # CCHS missing codes (automatically handled for PUMF/master data):
+#' calculate_bmi(c(1.75, 996, 997), c(70, 998, 999))
+#' # Returns: c(22.85714, NA, NA)
+#' 
+#' # Real CCHS data patterns:
+#' heights <- c(1.75, 1.80, 996, 997, 998, 999, NA)  # Real PUMF pattern
+#' weights <- c(70, 75, 996, 997, 998, 999, NA)      # Real PUMF pattern
+#' calculate_bmi(heights, weights)
+#' # Handles: valid values + all CCHS missing codes + regular NAs
 #'
-#' # Vector processing with missing data
-#' calculate_bmi(c(1.75, 1.80, 996), c(70, 75, 997))
-#'
-#' # Research mode with custom validation
-#' calculate_bmi(1.75, 70, min_HWTGHTM = 1.0, max_HWTGHTM = 2.0)
+#' # For production analysis, rec_with_table() provides comprehensive handling:
+#' # - Full CSV-driven validation from variable_details.csv
+#' # - Robust error handling and recovery
+#' # - Consistent preprocessing across all variables
+#' # - Better performance with large datasets
 #'
 #' @seealso
 #' \code{\link{adjust_bmi}} for bias-corrected BMI calculations
@@ -142,25 +175,26 @@ calculate_bmi_core <- function(height, weight) {
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and validation following development guide
 #' @export
 calculate_bmi <- function(HWTGHTM = NULL, HWTGWTK = NULL,
-                          # Validation bounds: defaults from variable_details.csv for standalone use
-                          # Use rec_with_table() for full CSV-driven validation workflow
-                          min_HWTGHTM = BMI_VALIDATION_BOUNDS$height$min,
-                          max_HWTGHTM = BMI_VALIDATION_BOUNDS$height$max,
-                          min_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$min,
-                          max_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$max,
                           validate_params = NULL,
                           log_level = "silent") {
-  # Clean continuous variables (handles missing variables with tagged_na("d"))
-  cleaned <- clean_continuous_variables(
-    height = HWTGHTM,
-    weight = HWTGWTK,
-    min_values = list(height = min_HWTGHTM, weight = min_HWTGWTK),
-    max_values = list(height = max_HWTGHTM, weight = max_HWTGWTK),
-    log_level = log_level
-  )
+  # Simple preprocessing for CCHS missing data codes (essential for PUMF/master data)
+  # For comprehensive validation, use rec_with_table() with variable_details.csv
+  
+  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
+  height_clean <- if(is.null(HWTGHTM)) {
+    haven::tagged_na("d")
+  } else {
+    clean_single_value(HWTGHTM, pattern_type = "triple_digit_missing", log_level = log_level)
+  }
+  
+  weight_clean <- if(is.null(HWTGWTK)) {
+    haven::tagged_na("d") 
+  } else {
+    clean_single_value(HWTGWTK, pattern_type = "triple_digit_missing", log_level = log_level)
+  }
 
   # Calculate BMI from clean inputs
-  calculate_bmi_core(cleaned$height_clean, cleaned$weight_clean)
+  calculate_bmi_core(height_clean, weight_clean)
 }
 
 #' Calculate bias-corrected BMI for self-reported data
@@ -173,7 +207,6 @@ calculate_bmi <- function(HWTGHTM = NULL, HWTGWTK = NULL,
 #' @param DHH_SEX CCHS variable for sex (1=male, 2=female). Accepts raw CCHS codes or preprocessed values.
 #' @param HWTGHTM CCHS variable for height (in meters). Accepts raw CCHS codes or preprocessed values.
 #' @param HWTGWTK CCHS variable for weight (in kilograms). Accepts raw CCHS codes or preprocessed values.
-#' @param min_HWTGHTM,max_HWTGHTM,min_HWTGWTK,max_HWTGWTK Validation parameters (defaults from variable_details.csv)
 #' @param validate_params Auto-detect validation mode (default NULL for auto-detection)
 #' @param log_level Logging level: "silent" (default), "warning", "verbose"
 #'
@@ -182,7 +215,7 @@ calculate_bmi <- function(HWTGHTM = NULL, HWTGWTK = NULL,
 #'     \item \code{haven::tagged_na("a")} for not applicable cases
 #'     \item \code{haven::tagged_na("b")} for missing sex or invalid measurements
 #'   }
-#'   Valid range typically 10-100 for corrected measurements.
+#'   Valid range typically 15-50 for corrected measurements.
 #'
 #' @details
 #' Correction coefficients are based on Canadian data and may not be appropriate for other populations.
@@ -193,19 +226,75 @@ calculate_bmi <- function(HWTGHTM = NULL, HWTGWTK = NULL,
 #' comprehensively preprocessed. Validation uses same bounds as basic BMI with post-correction validation.
 #'
 #' @examples
-#' # Standard cchsflow workflow (primary usage)
+#' # rec_with_table workflow (RECOMMENDED - handles all validation automatically):
+#' # Generate test data with correct and incorrect input
+#' test_data <- data.frame(
+#'   DHH_SEX = c(1, 2, 1, 2, 6, 7, 8, 9),
+#'   HWTGHTM = c(1.75, 1.65, 1.80, 1.60, 996, 997, 998, 999),
+#'   HWTGWTK = c(70, 60, 80, 55, 70, 998, 999, NA)
+#' )
 #' library(cchsflow)
 #' result <- rec_with_table(
-#'   cchs2013_2014_p,
+#'   test_data,
 #'   c("DHH_SEX", "HWTGHTM", "HWTGWTK", "HWTGCOR_der")
 #' )
+#' # Returns:
+#' #   DHH_SEX HWTGHTM HWTGWTK HWTGCOR_der
+#' # 1       1    1.75      70       23.52  
+#' # 2       2    1.65      60       23.05  
+#' # 3       1    1.80      80       23.46  
+#' # 4       2    1.60      55       22.74  
+#' # 5       6  996.00      70    <NA+b>     # Invalid sex code
+#' # 6       7  997.00     998    <NA+b>     # CCHS missing codes
+#' # 7       8  998.00     999    <NA+b>     # CCHS missing codes
+#' # 8       9     999      NA    <NA+b>     # CCHS missing codes
+#' # Comprehensive validation and error handling applied automatically
+#' 
+#' # Basic scalar examples:
+#' # Validation for missing data handled. Other validation (out-of-bound ranges, 
+#' # variable type) not performed - use rec_with_table() for comprehensive validation.
+#' # DHH_SEX: sex (1=male, 2=female). See variable_details.csv for valid values: [1, 2]
+#' # HWTGHTM: height in meters. See variable_details.csv for valid range: [0.914, 2.134]
+#' # HWTGWTK: weight in kilograms. See variable_details.csv for valid range: [27.0, 135.0]
+#' adjust_bmi(1, 1.75, 70)   # Returns: 23.51671 (male correction applied)
+#' adjust_bmi(2, 1.65, 60)   # Returns: 23.04519 (female correction applied)
+#' adjust_bmi("1", 1.75, 70) # Returns: 23.51671 (string converted by R)
+#' adjust_bmi(6, 1.75, 70)   # Returns: NA (invalid sex code)
+#' adjust_bmi(1, 998, 70)    # Returns: NA (CCHS missing code)
+#' adjust_bmi(1, 3.5, 70)   # Returns: 5.072364 (calculates despite height beyond max = 2.134)
+#' 
+#' # Check internal tagged NA structure:
+#' result <- adjust_bmi(6, 1.75, 70)     # Invalid sex code
+#' haven::is_tagged_na(result, "a")      # Returns: TRUE (not applicable)
+#' result2 <- adjust_bmi(1, 997, 70)     # CCHS missing height
+#' haven::is_tagged_na(result2, "b")     # Returns: TRUE (missing/invalid)
+#' result3 <- adjust_bmi(3, 1.5, 70)     # Invalid sex code (beyond max = 2)
+#' haven::is_tagged_na(result3, "b")     # Returns: TRUE (sex validation: only 1,2 valid)
+#' 
+#' # ARCHITECTURAL NOTE: adjust_bmi() validates sex codes (1=male, 2=female) because
+#' # correction coefficients are sex-specific and undefined for other values.
+#' # However, height/weight bounds are NOT validated (consistent with calculate_bmi()).
+#' # Use rec_with_table() for comprehensive validation of all parameters.
+#' # Note: Basic validation applied - use rec_with_table() for comprehensive validation
 #'
-#' # Basic usage
-#' adjust_bmi(1, 1.75, 70) # Male
-#' adjust_bmi(2, 1.65, 60) # Female
-#'
-#' # Vector processing with missing data
+#' # Basic vector examples:
+#' # Same validation as scalar examples
+#' # CCHS missing codes (automatically handled for PUMF/master data):
 #' adjust_bmi(c(1, 2, 6), c(1.75, 1.65, 1.80), c(70, 60, 997))
+#' # Returns: c(23.51671, 23.04519, NA)
+#' 
+#' # Real CCHS data patterns:
+#' sex_codes <- c(1, 2, 6, 7, 8, 9, NA)      # Real PUMF pattern  
+#' heights <- c(1.75, 1.65, 996, 997, 998, 999, NA)
+#' weights <- c(70, 60, 996, 997, 998, 999, NA)
+#' adjust_bmi(sex_codes, heights, weights)
+#' # Handles: valid combinations + all CCHS missing codes + regular NAs
+#'
+#' # For production analysis, rec_with_table() provides comprehensive handling:
+#' # - Full CSV-driven validation from variable_details.csv
+#' # - Robust error handling and recovery
+#' # - Consistent preprocessing across all variables
+#' # - Better performance with large datasets
 #'
 #' @references
 #' Connor Gorber, S., et al. (2008). The accuracy of self-reported height and weight
@@ -213,22 +302,15 @@ calculate_bmi <- function(HWTGHTM = NULL, HWTGWTK = NULL,
 #'
 #' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and sex-specific bias correction
 #' @export
-adjust_bmi <- function(DHH_SEX = NULL, HWTGHTM = NULL, HWTGWTK = NULL,
-                       # Validation bounds: defaults from variable_details.csv for standalone use
-                       # Use rec_with_table() for full CSV-driven validation workflow
-                       min_HWTGHTM = BMI_VALIDATION_BOUNDS$height$min,
-                       max_HWTGHTM = BMI_VALIDATION_BOUNDS$height$max,
-                       min_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$min,
-                       max_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$max,
-                       validate_params = NULL,
-                       log_level = "silent") {
-  # 1. Clean all variables together with unified length compatibility checking
+adjust_bmi <- function(DHH_SEX = NULL, 
+                        HWTGHTM = NULL, 
+                        HWTGWTK = NULL,
+                        validate_params = NULL,
+                        log_level = "silent") {
+  # 1. Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
   cleaned <- clean_variables(
     continuous_vars = list(height = HWTGHTM, weight = HWTGWTK),
     categorical_vars = list(sex = DHH_SEX),
-    min_values = list(height = min_HWTGHTM, weight = min_HWTGWTK),
-    max_values = list(height = max_HWTGHTM, weight = max_HWTGWTK),
-    valid_values = list(sex = c(1, 2)),
     continuous_pattern = "triple_digit_missing",
     categorical_pattern = "single_digit_missing",
     log_level = log_level
@@ -279,21 +361,70 @@ adjust_bmi <- function(DHH_SEX = NULL, HWTGHTM = NULL, HWTGWTK = NULL,
 #' if raw BMI values are provided.
 #'
 #' @examples
-#' # Standard cchsflow workflow (primary usage)
+#' # rec_with_table workflow (RECOMMENDED - handles all validation automatically):
+#' # Generate test data with correct and incorrect input
+#' test_data <- data.frame(
+#'   HWTGHTM = c(1.75, 1.60, 1.80, 1.70, 996, 997, 998, 999),
+#'   HWTGWTK = c(50, 55, 90, 110, 70, 998, 999, NA)
+#' )
 #' library(cchsflow)
 #' result <- rec_with_table(
-#'   cchs2013_2014_p,
+#'   test_data,
 #'   c("HWTGHTM", "HWTGWTK", "HWTGBMI_cat_der")
 #' )
+#' # Returns:
+#' #   HWTGHTM HWTGWTK HWTGBMI_cat_der
+#' # 1    1.75      50    "Underweight"  
+#' # 2    1.60      55    "Normal weight"  
+#' # 3    1.80      90    "Overweight"  
+#' # 4    1.70     110    "Obese"  
+#' # 5  996.00      70         <NA+b>     # CCHS missing code
+#' # 6  997.00     998         <NA+b>     # CCHS missing codes
+#' # 7  998.00     999         <NA+b>     # CCHS missing codes
+#' # 8  999.00      NA         <NA+b>     # CCHS missing codes
+#' # Comprehensive validation and error handling applied automatically
+#' 
+#' # Basic scalar examples:
+#' # Validation for missing data handled. Other validation (out-of-bound ranges, 
+#' # variable type) not performed - use rec_with_table() for comprehensive validation.
+#' # bmi_value: BMI values (typically 15-50). See variable_details.csv for context
+#' categorize_bmi(17.0)   # Returns: "Underweight" (BMI < 18.5)
+#' categorize_bmi(22.0)   # Returns: "Normal weight" (18.5 ≤ BMI < 25.0)
+#' categorize_bmi(27.0)   # Returns: "Overweight" (25.0 ≤ BMI < 30.0)
+#' categorize_bmi(32.0)   # Returns: "Obese" (BMI ≥ 30.0)
+#' categorize_bmi("22")   # Returns: "Normal weight" (string converted by R)
+#' categorize_bmi(997)    # Returns: "NA(b)" (CCHS missing code)
+#' 
+#' # Check internal tagged NA structure (with categorical_labels = FALSE):
+#' result <- categorize_bmi(996, categorical_labels = FALSE)  # CCHS not applicable
+#' haven::is_tagged_na(result, "a")                          # Returns: TRUE
+#' result2 <- categorize_bmi(997, categorical_labels = FALSE) # CCHS missing
+#' haven::is_tagged_na(result2, "b")                         # Returns: TRUE
+#' # Note: Basic validation applied - use rec_with_table() for comprehensive validation
 #'
-#' # Basic categorization
+#' # Basic vector examples:
+#' # Same validation as scalar examples
+#' # CCHS missing codes (automatically handled for PUMF/master data):
 #' categorize_bmi(c(17, 22, 27, 32))
-#'
-#' # With missing data
+#' # Returns: c("Underweight", "Normal weight", "Overweight", "Obese")
+#' 
 #' categorize_bmi(c(22, haven::tagged_na("a"), 27, 997))
+#' # Returns: c("Normal weight", "NA(a)", "Overweight", "NA(b)")
 #'
-#' # Numeric codes instead of labels
+#' # Real CCHS data patterns:
+#' bmi_values <- c(18.0, 23.5, 28.0, 35.0, 996, 997, 998, 999, NA)
+#' categorize_bmi(bmi_values)
+#' # Handles: valid BMI values + all CCHS missing codes + regular NAs
+#'
+#' # Numeric codes instead of labels:
 #' categorize_bmi(c(17, 22, 27, 32), categorical_labels = FALSE)
+#' # Returns: c(1L, 2L, 3L, 4L) where 1=Underweight, 2=Normal, 3=Overweight, 4=Obese
+#'
+#' # For production analysis, rec_with_table() provides comprehensive handling:
+#' # - Full CSV-driven validation from variable_details.csv
+#' # - Robust error handling and recovery
+#' # - Consistent preprocessing across all variables
+#' # - Better performance with large datasets
 #'
 #' @references
 #' World Health Organization. (2000). Obesity: preventing and managing the global epidemic.

@@ -429,7 +429,7 @@ Functions automatically detect validation requirements and database contexts:
 calculate_bmi <- function(HWTGHTM, HWTGWTK,
                           min_HWTGHTM = 0.82, max_HWTGHTM = 2.50,
                           min_HWTGWTK = 22.7, max_HWTGWTK = 209.1,
-                          BMI_min = 10, BMI_max = 100) {
+                          BMI_min = 15, BMI_max = 50) {
   # Auto-detect validation mode based on parameters
   validate_params <- !all(is.null(c(
     min_HWTGHTM, max_HWTGHTM,
@@ -1408,7 +1408,7 @@ Be specific about output structure and missing data handling:
 #'     \item \code{haven::tagged_na("a")} for not applicable cases
 #'     \item \code{haven::tagged_na("b")} for missing/invalid measurements
 #'   }
-#'   Valid range typically 10-100 for realistic measurements.
+#'   Valid range typically 15-50 for realistic measurements.
 ```
 
 # Migration from legacy functions
