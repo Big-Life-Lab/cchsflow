@@ -1,0 +1,3 @@
+The files in /Extra were created by Maikol Diasparra https://github.com/mdiaspar and were merged into the cchsfow-temp repo (a private temporary repo) at PR#3 https://github.com/Big-Life-Lab/cchsflow-temp/pull/3.
+
+The contain detailed review and analyses of the smoking derived variables for the planned project to create a Canadian Smoking History Generator model. Included in the review and development was analyses of the CCHS Master data from 2001 to 204 and update to the smoking derived variables for CCHS 2024.

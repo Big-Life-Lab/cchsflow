@@ -1,0 +1,851 @@
+---
+title: "Code Flow - Smoking File Functions"
+author: "Maikol Diasparra"
+date: last-modified
+date-format: long
+format: html
+toc: true
+number-sections: true
+---
+
+## `time_quit_smoking_fun`
+
+Title: Time since quit smoking
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SMKG09C == 1", shape = diamond]
+  node6 [label = "4", shape = rectangle]
+  node7 [label = "SMKG09C == 2", shape = diamond]
+  node8 [label = "8", shape = rectangle]
+  node9 [label = "SMKG09C == 3", shape = diamond]
+  node10 [label = "12", shape = rectangle]
+  node11 [label = "SMKG09C == 'NA(a)'", shape = diamond]
+  node12 [label = "'NA(a)'", shape = rectangle]
+  node13 [label = "'NA(b)'", shape = rectangle]
+  node16 [label = "SMK_09A_B == 1", shape = diamond]
+  node17 [label = "0.5", shape = rectangle]
+  node18 [label = "SMK_09A_B == 2", shape = diamond]
+  node19 [label = "1.5", shape = rectangle]
+  node20 [label = "SMK_09A_B == 3", shape = diamond]
+  node21 [label = "2.5", shape = rectangle]
+  node22 [label = "SMK_09A_B == 4", shape = diamond]
+  node24 [label = "SMK_09A_B == 'NA(a)'", shape = diamond]
+  node25 [label = "'NA(a)'", shape = rectangle]
+  node26 [label = "'NA(b)'", shape = rectangle]
+  node22 -> node5 [label = "Y"]
+  node5 -> node6 [label = "Y"]
+  node5 -> node7 [label = "N"]
+  node7 -> node8 [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10 [label = "Y"]
+  node9 -> node11 [label = "N"]
+  node11 -> node12 [label = "Y"]
+  node11 -> node13 [label = "N"]
+  node16 -> node17 [label = "Y"]
+  node16 -> node18 [label = "N"]
+  node18 -> node19 [label = "Y"]
+  node18 -> node20 [label = "N"]
+  node20 -> node21 [label = "Y"]
+  node20 -> node22 [label = "N"]
+  node22 -> node24 [label = "N"]
+  node24 -> node25 [label = "Y"]
+  node24 -> node26 [label = "N"]
+}
+```
+
+
+## `time_quit_smoking_fun_A`
+
+Title: Time since quit smoking (version A)
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  
+  node5 [label = "SMK_09A_B == 1", shape = diamond]
+  node6 [label = "0.5", shape = rectangle]
+  node7 [label = "SMK_09A_B == 2", shape = diamond]
+  node8 [label = "1.5", shape = rectangle]
+  node9 [label = "SMK_09A_B == 3", shape = diamond]
+  node10 [label = "2.5", shape = rectangle]
+  node11 [label = "SMK_09A_B == 4 & SMKG09C_cont \n& SMKG09C_cont > min_SMKG09C_cont \n& SMKG09C_cont < max_SMKG09C_cont", shape = diamond]
+  node12 [label = "SMKG09C_cont", shape = rectangle]
+  node13 [label = "SMK_09A_B == 'NA(a)'", shape = diamond]
+  node14 [label = "'NA(a)'", shape = rectangle]
+  node15 [label = "'NA(b)'", shape = rectangle]
+  node5 -> node6 [label = "Y"]
+  node5 -> node7 [label = "N"]
+  node7 -> node8 [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10 [label = "Y"]
+  node9 -> node11 [label = "N"]
+  node11 -> node12 [label = "Y"]
+  node11 -> node13 [label = "N"]
+  node13 -> node14 [label = "Y"]
+  node13 -> node15 [label = "N"]
+}
+```
+
+
+## `smoke_simple_fun`
+
+Title: Simple smoking status
+```{dot}
+digraph flowchart {
+  node [fontname=Helvetica]
+  node9 [label = "smoker", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node10 [label = "SMKDSTY_cat5 in c(1, 2)", shape = diamond]
+  node11 [label = "1", shape = rectangle]
+  node12 [label = "SMKDSTY_cat5 in c(3, 4, 5)", shape = diamond]
+  node13 [label = "0", shape = rectangle]
+  node14 [label = "SMKDSTY_cat5 == 'NA(a)'", shape = diamond]
+  node15 [label = "'NA(a)'", shape = rectangle]
+  node16 [label = "'NA(b)'", shape = rectangle]
+  node17 [label = "return", shape=rect, style="rounded,filled"]
+  node30 [label = "eversmoker", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node31 [label = "SMKDSTY_cat5 in c(1, 2, 3, 4)", shape = diamond]
+  node32 [label = "1", shape = rectangle]
+  node33 [label = "SMKDSTY_cat5 == 5", shape = diamond]
+  node34 [label = "0", shape = rectangle]
+  node35 [label = "SMKDSTY_cat5 == 'NA(a)'", shape = diamond]
+  node36 [label = "'NA(a)'", shape = rectangle]
+  node37 [label = "'NA(b)'", shape = rectangle]
+  node38 [label = "return", shape=rect, style="rounded,filled"]
+  node47 [label = "smoker == 0 \n& eversmoker == 0", shape = diamond]
+  node48 [label = "0", shape = rectangle]
+  node49 [label = "smoker == 1 \n& eversmoker == 1", shape = diamond]
+  node50 [label = "1", shape = rectangle]
+  node51 [label = "smoker == 0 \n& eversmoker == 1 \n& time_quit_smoking <= 5 \n| SMKDSTY_cat5 == 4", shape = diamond]
+  node52 [label = "2", shape = rectangle]
+  node53 [label = "smoker == 0 \n& eversmoker == 1 \n&time_quit_smoking > 5", shape = diamond]
+  node54 [label = "3", shape = rectangle]
+  node55 [label = "smoker == 'NA(a)' \n& eversmoker == 'NA(a)'", shape = diamond]
+  node56 [label = "'NA(a)'", shape = rectangle]
+  node57 [label = "'NA(b)'", shape = rectangle]
+  node10 -> node11 [label = "Y"]
+  node11 -> node17 [style = "dotted"]
+  node10 -> node12 [label = "N"]
+  node12 -> node13 [label = "Y"]
+  node13 -> node17 [style = "dotted"]
+  node12 -> node14 [label = "N"]
+  node14 -> node15 [label = "Y"]
+  node15 -> node17 [style = "dotted"]
+  node14 -> node16 [label = "N"]
+  node16 -> node17 [style = "dotted"]
+  node17 -> node9
+  node38 ->node30
+  node31 -> node32 [label = "Y"]
+  node32 -> node38 [style = "dotted"]
+  node31 -> node33 [label = "N"]
+  node33 -> node34 [label = "Y"]
+  node34 -> node38 [style = "dotted"]
+  node33 -> node35 [label = "N"]
+  node35 -> node36 [label = "Y"]
+  node36 -> node38 [style = "dotted"]
+  node35 -> node37 [label = "N"]
+  node37 -> node38 [style = "dotted"]
+  node47 -> node48 [label = "Y"]
+  node47 -> node49 [label = "N"]
+  node49 -> node50 [label = "Y"]
+  node49 -> node51 [label = "N"]
+  node51 -> node52 [label = "Y"]
+  node51 -> node53 [label = "N"]
+  node53 -> node54 [label = "Y"]
+  node53 -> node55 [label = "N"]
+  node55 -> node56 [label = "Y"]
+  node55 -> node57 [label = "N"]
+}
+```
+
+
+## `smoke_simple_fun_A`
+
+Title: Simple smoking status (version A)
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node9 [label = "smoker", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node10 [label = "SMKDSTY_cat5 in c(1, 2)", shape = diamond]
+  node11 [label = "1", shape = rectangle]
+  node12 [label = "SMKDSTY_cat5 in c(3, 4, 5)", shape = diamond]
+  node13 [label = "0", shape = rectangle]
+  node14 [label = "SMKDSTY_cat5 == 'NA(a)'", shape = diamond]
+  node15 [label = "'NA(a)'", shape = rectangle]
+  node16 [label = "'NA(b)'", shape = rectangle]
+  node17 [label = "return", shape=rect, style="rounded,filled"]
+  node30 [label = "eversmoker", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node31 [label = "SMKDSTY_cat5 in c(1, 2, 3, 4)", shape = diamond]
+  node32 [label = "1", shape = rectangle]
+  node33 [label = "SMKDSTY_cat5 == 5", shape = diamond]
+  node34 [label = "0", shape = rectangle]
+  node35 [label = "SMKDSTY_cat5 == 'NA(a)'", shape = diamond]
+  node36 [label = "'NA(a)'", shape = rectangle]
+  node37 [label = "'NA(b)'", shape = rectangle]
+  node38 [label = "return", shape=rect, style="rounded,filled"]
+  node47 [label = "smoker == 0 \n& eversmoker == 0", shape = diamond]
+  node48 [label = "0", shape = rectangle]
+  node49 [label = "smoker == 1 \n& eversmoker == 1", shape = diamond]
+  node50 [label = "1", shape = rectangle]
+  node51 [label = "smoker == 0 \n& eversmoker == 1 \n& time_quit_smoking <= 5 \n& time_quit_smoking >= min_time_quit_smoking \n& time_quit_smoking <= max_time_quit_smoking \n| SMKDSTY_cat5 == 4", shape = diamond]
+  node52 [label = "2", shape = rectangle]
+  node53 [label = "smoker == 0 \n& eversmoker == 1 \n&time_quit_smoking > 5 \n& time_quit_smoking >= min_time_quit_smoking \n& time_quit_smoking <= max_time_quit_smoking", shape = diamond]
+  node54 [label = "3", shape = rectangle]
+  node55 [label = "smoker == 'NA(a)' \n& eversmoker == 'NA(a)'  \n& time_quit_smoking == 'NA(a)'", shape = diamond]
+  node56 [label = "'NA(a)'", shape = rectangle]
+  node57 [label = "'NA(b)'", shape = rectangle]
+  node10 -> node11 [label = "Y"]
+  node11 -> node17 [style = "dotted"]
+  node10 -> node12 [label = "N"]
+  node12 -> node13 [label = "Y"]
+  node13 -> node17 [style = "dotted"]
+  node12 -> node14 [label = "N"]
+  node14 -> node15 [label = "Y"]
+  node15 -> node17 [style = "dotted"]
+  node14 -> node16 [label = "N"]
+  node16 -> node17 [style = "dotted"]
+  node17 -> node9
+  node38 ->node30
+  node31 -> node32 [label = "Y"]
+  node32 -> node38 [style = "dotted"]
+  node31 -> node33 [label = "N"]
+  node33 -> node34 [label = "Y"]
+  node34 -> node38 [style = "dotted"]
+  node33 -> node35 [label = "N"]
+  node35 -> node36 [label = "Y"]
+  node36 -> node38 [style = "dotted"]
+  node35 -> node37 [label = "N"]
+  node37 -> node38 [style = "dotted"]
+  node47 -> node48 [label = "Y"]
+  node47 -> node49 [label = "N"]
+  node49 -> node50 [label = "Y"]
+  node49 -> node51 [label = "N"]
+  node51 -> node52 [label = "Y"]
+  node51 -> node53 [label = "N"]
+  node53 -> node54 [label = "Y"]
+  node53 -> node55 [label = "N"]
+  node55 -> node56 [label = "Y"]
+  node55 -> node57 [label = "N"]
+}
+```
+
+
+## `pack_years_fun`
+
+Title: Smoking pack-years
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node3 [label = "is.na(DHHGAGE_cont)", shape = diamond]
+  node6 [label = "'NA(b)'", shape = rectangle]
+  node7 [label = "DHHGAGE_cont < 0", shape = diamond]
+  node10 [label = "'NA(b)'", shape = rectangle]
+  node13 [label = "SMKDSTY_A == 1", shape = diamond]
+  node14 [label = "pmax(((DHHGAGE_cont - SMKG203_cont)*(SMK_204 / 20)), 0.0137)", shape = rectangle]
+  node26 [label = "SMKDSTY_A == 2", shape = diamond]
+  node27 [label = "pmax(((DHHGAGE_cont - SMKG207_cont - time_quit_smoking) * (SMK_208 / 20)), 0.0137) \n+ ((pmax((SMK_05B * SMK_05C / 30), 1) / 20) *time_quit_smoking)", shape = rectangle]
+  node30 [label = "SMKDSTY_A == 3", shape = diamond]
+  node31 [label = "(pmax((SMK_05B * SMK_05C / 30), 1) / 20) * (DHHGAGE_cont - SMKG01C_cont)", shape = rectangle]
+  node73 [label = "SMKDSTY_A == 4", shape = diamond]
+  node74 [label = "pmax(((DHHGAGE_cont - SMKG207_cont - time_quit_smoking) * (SMK_208 / 20)), 0.0137)", shape = rectangle]
+  node88 [label = "SMKDSTY_A == 5 & SMK_01A == 1", shape = diamond]
+  node89 [label = "0.0137", shape = rectangle]
+  node90 [label = "SMKDSTY_A == 5 & SMK_01A == 2", shape = diamond]
+  node91 [label = "0.007", shape = rectangle]
+  node92 [label = "SMKDSTY_A == 6", shape = diamond]
+  node93 [label = "0", shape = rectangle]
+  node94 [label = "SMKDSTY_A == 'NA(a)'", shape = diamond]
+  node95 [label = "'NA(a)'", shape = rectangle]
+  node96 [label = "'NA(b)'", shape = rectangle]
+  node3 -> node6  [label = "Y"]
+  node3 -> node7 [label = "N"]
+  node7 -> node10  [label = "Y"]
+  node7 -> node13  [label = "N"]
+  node13 -> node14 [label = "Y"]
+  node13 -> node26 [label = "N"]
+  node26 -> node27 [label = "Y"]
+  node26 -> node30 [label = "N"]
+  node30 -> node31 [label = "Y"]
+  node30 -> node73 [label = "N"]
+  node73 -> node74 [label = "Y"]
+  node73 -> node88  [label = "N"]
+  node88 -> node89 [label = "Y"]
+  node88 -> node90  [label = "N"]
+  node90 -> node91 [label = "Y"]
+  node90 -> node92  [label = "N"]
+  node92 -> node93 [label = "Y"]
+  node92 -> node94  [label = "N"]
+  node94 -> node95 [label = "Y"]
+  node94 -> node96  [label = "N"]
+}
+```
+
+
+## `pack_years_fun_A`
+
+Title: Smoking pack-years (version A)
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node1 [label = "is.na(DHHGAGE_cont)", shape = diamond]
+  node2 [label = "'NA(b)'", shape = rectangle]
+  node3 [label = "DHHGAGE_cont < 0", shape = diamond]
+  node4 [label = "'NA(b)'", shape = rectangle]
+  node5 [label = "DHHGAGE_cont < min_DHHGAGE_cont", shape =  diamond]
+  node6 [label = "'NA(b)'", shape = rectangle]
+  node7 [label = "DHHGAGE_cont > max_DHHGAGE_cont", shape =  diamond]
+  node8 [label = "'NA(b)'", shape = rectangle]
+  node9 [label = "DHHGAGE_cont", shape = rectangle]
+  node10 [label = "return", shape=rect, style="rounded,filled"]
+  node11 [label = "DHHGAGE_cont", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node13 [label = "SMKDSTY_A == 1 \n& SMKG203_cont > min_SMKG203_cont \n& SMKG203_cont < max_SMKG203_cont \n& SMK_204 > min_SMK_204 & SMK_204 < max_SMK_204", shape = diamond]
+  node14 [label = "pmax(((DHHGAGE_cont - SMKG203_cont)*(SMK_204 / 20)), 0.0137)", shape = rectangle]
+  node26 [label = "SMKDSTY_A == 2 \n& SMKG207_cont > min_SMKG207_cont \n& SMKG207_cont < max_SMKG207_cont \n& time_quit_smoking > min_time_quit_smoking \n& time_quit_smoking < max_time_quit_smoking \n& SMK_05B > min_SMK_05B \n& SMK_05B < max_SMK_05B \n& SMK_208 > min_SMK_208 \n& SMK_208 < max_SMK_208", shape = diamond]
+  node27 [label = "pmax(((DHHGAGE_cont - SMKG207_cont - time_quit_smoking) * (SMK_208 / 20)), 0.0137) \n+ ((pmax((SMK_05B * SMK_05C / 30), 1) / 20) *time_quit_smoking)", shape = rectangle]
+  node30 [label = "SMKDSTY_A == 3 \n& SMK_05C > min_SMK_05C \n& SMK_05C < max_SMK_05C \n& SMKG207_cont > min_SMKG207_cont \n& SMKG207_cont < max_SMKG207_cont", shape = diamond]
+  node31 [label = "(pmax((SMK_05B * SMK_05C / 30), 1) / 20) * (DHHGAGE_cont - SMKG01C_cont)", shape = rectangle]
+  node73 [label = "SMKDSTY_A == 4 \n& SMKG207_cont > min_SMKG207_cont \n& SMKG207_cont < max_SMKG207_cont \n& time_quit_smoking > min_time_quit_smoking \n& time_quit_smoking < max_time_quit_smoking \n& SMK_208 > min_SMK_208 \n& SMK_208 < max_SMK_208", shape = diamond]
+  node74 [label = "pmax(((DHHGAGE_cont - SMKG207_cont - time_quit_smoking) * (SMK_208 / 20)), 0.0137)", shape = rectangle]
+  node88 [label = "SMKDSTY_A == 5 \n& SMK_01A == 1", shape = diamond]
+  node89 [label = "0.0137", shape = rectangle]
+  node90 [label = "SMKDSTY_A == 5 \n& SMK_01A == 2", shape = diamond]
+  node91 [label = "0.007", shape = rectangle]
+  node92 [label = "SMKDSTY_A == 6", shape = diamond]
+  node93 [label = "0", shape = rectangle]
+  node94 [label = "SMKDSTY_A == 'NA(a)'", shape = diamond]
+  node95 [label = "'NA(a)'", shape = rectangle]
+  node96 [label = "'NA(b)'", shape = rectangle]
+  node1 -> node2  [label = "Y"]
+  node2 -> node10 [style = "dotted"]
+  node1 -> node3 [label = "N"]
+  node3 -> node4  [label = "Y"]
+  node4 -> node10 [style = "dotted"]
+  node3 -> node5  [label = "N"]
+  node5 -> node6  [label = "Y"]
+  node6 -> node10 [style = "dotted"]
+  node5 -> node7  [label = "N"]
+  node7 -> node8  [label = "Y"]
+  node8 -> node10 [style = "dotted"]
+  node7 -> node9  [label = "N"]
+  node9 -> node10 [style = "dotted"]
+  node10 -> node11 
+  node13 -> node14 [label = "Y"]
+  node13 -> node26 [label = "N"]
+  node26 -> node27 [label = "Y"]
+  node26 -> node30 [label = "N"]
+  node30 -> node31 [label = "Y"]
+  node30 -> node73 [label = "N"]
+  node73 -> node74 [label = "Y"]
+  node73 -> node88  [label = "N"]
+  node88 -> node89 [label = "Y"]
+  node88 -> node90  [label = "N"]
+  node90 -> node91 [label = "Y"]
+  node90 -> node92  [label = "N"]
+  node92 -> node93 [label = "Y"]
+  node92 -> node94  [label = "N"]
+  node94 -> node95 [label = "Y"]
+  node94 -> node96  [label = "N"]
+}
+```
+
+
+## `SMKG040_fun`
+
+Title: Age started smoking daily - daily/former daily smokers
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SMKG203_cont == 'NA(a)' \n& SMKG207_cont == 'NA(a)'", shape = diamond]
+  node6 [label = "'NA(a)'", shape = rectangle]
+  node7 [label = "SMKG203_cont == 'NA(b)' \n& SMKG207_cont == 'NA(b)'", shape = diamond]
+  node8 [label = "'NA(b)'", shape = rectangle]
+  node9 [label = "!is.na(SMKG203_cont)", shape = diamond]
+  node10 [label = "SMKG203_cont", shape = rectangle]
+  node11 [label = "!is.na(SMKG207_cont)", shape = diamond]
+  node12 [label = "SMKG207_cont", shape = rectangle]
+  node13 [label = "'NA(b)'", shape = rectangle]
+  node5 -> node6  [label = "Y"]
+  node5 -> node7  [label = "N"]
+  node7 -> node8  [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10  [label = "Y"]
+  node9 -> node11 [label = "N"]
+  node11 -> node12  [label = "Y"]
+  node11 -> node13 [label = "N"]
+}
+```
+
+
+## `SMKG040_fun_A`
+
+Title: Age started smoking daily - daily/former daily smokers (version A)
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SMKG203_cont == 'NA(a)' \n& SMKG207_cont == 'NA(a)'", shape = diamond]
+  node6 [label = "'NA(a)'", shape = rectangle]
+  node7 [label = "SMKG203_cont == 'NA(b)' \n& SMKG207_cont == 'NA(b)'", shape = diamond]
+  node8 [label = "'NA(b)'", shape = rectangle]
+  node9 [label = "!is.na(SMKG203_cont) \n& SMKG203_cont > min_SMKG203_cont \n& SMKG203_cont < max_SMKG203_cont", shape = diamond]
+  node10 [label = "SMKG203_cont", shape = rectangle]
+  node11 [label = "!is.na(SMKG207_cont) \n& SMKG207_cont > min_SMKG207_cont \n& SMKG207_cont < max_SMKG207_cont", shape = diamond]
+  node12 [label = "SMKG207_cont", shape = rectangle]
+  node13 [label = "'NA(b)'", shape = rectangle]
+  node5 -> node6  [label = "Y"]
+  node5 -> node7  [label = "N"]
+  node7 -> node8  [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10  [label = "Y"]
+  node9 -> node11 [label = "N"]
+  node11 -> node12  [label = "Y"]
+  node11 -> node13 [label = "N"]
+}
+```
+
+
+## `pack_years_fun_cat`
+
+Title: Categorical smoking pack-years
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "pack_years_der == 0", shape = diamond]
+  node6 [label = "1", shape = rectangle]
+  node7 [label = "pack_years_der > 0 \n& pack_years_der <= 0.01", shape = diamond]
+  node8 [label = "2", shape = rectangle]
+  node9 [label = "pack_years_der > 0.01 \n& pack_years_der <= 3.0", shape = diamond]
+  node10 [label = "3", shape = rectangle]
+  node11 [label = "pack_years_der > 3.0 \n& ppack_years_der <= 9.0", shape = diamond]
+  node12 [label = "4", shape = rectangle]
+  node13 [label = "pack_years_der > 9.0 \n& pack_years_der <= 16.2", shape = diamond]
+  node14 [label = "5", shape = rectangle]
+  node15 [label = "pack_years_der > 16.2 \n& pack_years_der <= 25.7", shape = diamond]
+  node16 [label = "6", shape = rectangle]
+  node17 [label = "pack_years_der > 25.7 \n& pack_years_der <= 40.0", shape = diamond]
+  node18 [label = "7", shape = rectangle]
+  node19 [label = "pack_years_der > 40", shape = diamond]
+  node20 [label = "8", shape = rectangle]
+  node21 [label = "haven::is_tagged_na(pack_years_der, 'a')", shape = diamond]
+  node22 [label = "'NA(a)'", shape = rectangle]
+  node23 [label = "'NA(b)'", shape = rectangle]
+  node5 -> node6 [label = "Y"]
+  node5 -> node7 [label = "N"]
+  node7 -> node8 [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10 [label = "Y"]
+  node9 -> node11  [label = "N"]
+  node11 -> node12 [label = "Y"]
+  node11 -> node13 [label = "N"]
+  node13 -> node14 [label = "Y"]
+  node13 -> node15 [label = "N"]
+  node15 -> node16 [label = "Y"]
+  node15 -> node17 [label = "N"]
+  node17 -> node18 [label = "Y"]
+  node17 -> node19 [label = "N"]
+  node19 -> node20 [label = "Y"]
+  node19 -> node21  [label = "N"]
+  node21 -> node22 [label = "Y"]
+  node21 -> node23  [label = "N"]
+}
+```
+
+
+## `SMKDSTY_fun`
+
+Title: Type of smokers
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node3 [label = "SMK_005 == 1", shape = diamond]
+  node4 [label = "1", shape = rectangle]
+  node5 [label = "SMK_005 == 2 \n& SMK_030 == 1", shape = diamond]
+  node6 [label = "2", shape = rectangle]
+  node7 [label = "SMK_005 == 2 \n& (SMK_030 == 2 | SMK_030 == 'NA(a)' | SMK_030 == 'NA(b)')", shape = diamond]
+  node8 [label = "3", shape = rectangle]
+  node9 [label = "SMK_005 == 3 \n& SMK_030 == 1", shape = diamond]
+  node10 [label = "4", shape = rectangle]
+  node11 [label = "SMK_005 == 3 \n& SMK_030 == 2 \n& SMK_01A == 1", shape = diamond]
+  node12 [label = "5", shape = rectangle]
+  node13 [label = "SMK_005 == 3 \n& SMK_01A == 2", shape = diamond]
+  node14 [label = "6", shape = rectangle]
+  node15 [label = "SMK_005 == 'NA(a)'", shape = diamond]
+  node16 [label = "'NA(a)'", shape = rectangle]
+  node17 [label = "'NA(b)'", shape = rectangle]
+  node3 -> node4 [label = "Y"]
+  node3 -> node5 [label = "N"]
+  node5 -> node6 [label = "Y"]
+  node5 -> node7 [label = "N"]
+  node7 -> node8 [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10 [label = "Y"]
+  node9 -> node11 [label = "N"]
+  node11 -> node12 [label = "Y"]
+  node11 -> node13 [label = "N"]
+  node13 -> node14 [label = "Y"]
+  node13 -> node15 [label = "N"]
+  node15 -> node16 [label = "Y"]
+  node15 -> node17 [label = "N"]
+}
+```
+
+
+## `SMKG203_fun`
+
+Title: Age started to smoke daily - daily smoker
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SMK_005 == 1", shape = diamond]
+  node6 [label = "SMKG040", shape = rectangle]
+  node7 [label = "SMK_005 == 'NA(a)' \n| SMKG040 == 'NA(a)'", shape = diamond]
+  node8 [label = "'NA(a)'", shape = rectangle]
+  node9 [label = "'NA(b)'", shape = rectangle]
+  node10 [label = "return", shape=rect, style="rounded,filled"]
+  node11 [label = "SMKG203", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node12 [label = "SMKG203 == 1", shape = diamond]
+  node13 [label = "8", shape = rectangle]
+  node14 [label = "SMKG203 == 2", shape = diamond]
+  node15 [label = "13", shape = rectangle]
+  node16 [label = "SMKG203 == 3", shape = diamond]
+  node17 [label = "16", shape = rectangle]
+  node18 [label = "SMKG203 == 4", shape = diamond]
+  node19 [label = "18.5", shape = rectangle]
+  node20 [label = "SMKG203 == 5", shape = diamond]
+  node21 [label = "22", shape = rectangle]
+  node22 [label = "SMKG203 == 6", shape = diamond]
+  node23 [label = "27", shape = rectangle]
+  node24 [label = "SMKG203 == 7", shape = diamond]
+  node25 [label = "32", shape = rectangle]
+  node26 [label = "SMKG203 == 8", shape = diamond]
+  node27 [label = "37", shape = rectangle]
+  node28 [label = "SMKG203 == 9", shape = diamond]
+  node29 [label = "42", shape = rectangle]
+  node30 [label = "SMKG203 == 10", shape = diamond]
+  node31 [label = "47", shape = rectangle]
+  node32 [label = "SMKG203 == 11", shape = diamond]
+  node33 [label = "55", shape = rectangle]
+  node34 [label = "SMKG203 == 'NA(a)'", shape = diamond]
+  node35 [label = "'NA(a)'", shape = rectangle]
+  node36 [label = "'NA(b)'", shape = rectangle]
+  node5 -> node6  [label = "Y"]
+  node6 -> node10 [style="dotted"]
+  node5 -> node7  [label = "N"]
+  node7 -> node8  [label = "Y"]
+  node8 -> node10 [style="dotted"]
+  node7 -> node9   [label = "N"]
+  node9 -> node10 [style="dotted"]
+  node10 -> node11 
+  node12 -> node13 [label = "Y"]
+  node12 -> node14 [label = "N"]
+  node14 -> node15 [label = "Y"]
+  node14 -> node16 [label = "N"]
+  node16 -> node17 [label = "Y"]
+  node16 -> node18 [label = "N"]
+  node18 -> node19 [label = "Y"]
+  node18 -> node20 [label = "N"]
+  node20 -> node21 [label = "Y"]
+  node20 -> node22 [label = "N"]
+  node22 -> node23 [label = "Y"]
+  node22 -> node24 [label = "N"]
+  node24 -> node25 [label = "Y"]
+  node24 -> node26 [label = "N"]
+  node26 -> node27 [label = "Y"]
+  node26 -> node28 [label = "N"]
+  node28 -> node29 [label = "Y"]
+  node28 -> node30 [label = "N"]
+  node30 -> node31 [label = "Y"]
+  node30 -> node32 [label = "N"]
+  node32 -> node33 [label = "Y"]
+  node32 -> node34 [label = "N"]
+  node34 -> node35 [label = "Y"]
+  node34 -> node36 [label = "N"]
+}
+```
+
+
+## `SMKG207_fun`
+
+Title: Age started to smoke daily - former daily smoker
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SMK_030 == 1", shape = diamond]
+  node6 [label = "SMKG040", shape = rectangle]
+  node7 [label = "SMK_030 == 'NA(a)' \n| SMKG040 == 'NA(a)'", shape = diamond]
+  node8 [label = "'NA(a)'", shape = rectangle]
+  node9 [label = "'NA(b)'", shape = rectangle]
+  node10 [label = "return", shape=rect, style="rounded,filled"]
+  node11 [label = "SMKG207", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node12 [label = "SMKG207 == 1", shape = diamond]
+  node13 [label = "8", shape = rectangle]
+  node14 [label = "SMKG207 == 2", shape = diamond]
+  node15 [label = "13", shape = rectangle]
+  node16 [label = "SMKG207 == 3", shape = diamond]
+  node17 [label = "16", shape = rectangle]
+  node18 [label = "SMKG207 == 4", shape = diamond]
+  node19 [label = "18.5", shape = rectangle]
+  node20 [label = "SMKG207 == 5", shape = diamond]
+  node21 [label = "22", shape = rectangle]
+  node22 [label = "SMKG207 == 6", shape = diamond]
+  node23 [label = "27", shape = rectangle]
+  node24 [label = "SMKG207 == 7", shape = diamond]
+  node25 [label = "32", shape = rectangle]
+  node26 [label = "SMKG207 == 8", shape = diamond]
+  node27 [label = "37", shape = rectangle]
+  node28 [label = "SMKG207 == 9", shape = diamond]
+  node29 [label = "42", shape = rectangle]
+  node30 [label = "SMKG207 == 10", shape = diamond]
+  node31 [label = "47", shape = rectangle]
+  node32 [label = "SMKG207 == 11", shape = diamond]
+  node33 [label = "55", shape = rectangle]
+  node34 [label = "SMKG207 == 'NA(a)'", shape = diamond]
+  node35 [label = "'NA(a)'", shape = rectangle]
+  node36 [label = "'NA(b)'", shape = rectangle]
+  node5 -> node6  [label = "Y"]
+  node6 -> node10 [style="dotted"]
+  node5 -> node7  [label = "N"]
+  node7 -> node8  [label = "Y"]
+  node8 -> node10 [style="dotted"]
+  node7 -> node9   [label = "N"]
+  node9 -> node10 [style="dotted"]
+  node10 -> node11 
+  node12 -> node13 [label = "Y"]
+  node12 -> node14 [label = "N"]
+  node14 -> node15 [label = "Y"]
+  node14 -> node16 [label = "N"]
+  node16 -> node17 [label = "Y"]
+  node16 -> node18 [label = "N"]
+  node18 -> node19 [label = "Y"]
+  node18 -> node20 [label = "N"]
+  node20 -> node21 [label = "Y"]
+  node20 -> node22 [label = "N"]
+  node22 -> node23 [label = "Y"]
+  node22 -> node24 [label = "N"]
+  node24 -> node25 [label = "Y"]
+  node24 -> node26 [label = "N"]
+  node26 -> node27 [label = "Y"]
+  node26 -> node28 [label = "N"]
+  node28 -> node29 [label = "Y"]
+  node28 -> node30 [label = "N"]
+  node30 -> node31 [label = "Y"]
+  node30 -> node32 [label = "N"]
+  node32 -> node33 [label = "Y"]
+  node32 -> node34 [label = "N"]
+  node34 -> node35 [label = "Y"]
+  node34 -> node36 [label = "N"]
+}
+```
+
+
+## `SPU25_fun`
+
+Title: Time since stopped smoking for former daily smokers (cycle 2022)
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node2 [label = "(ADM_YOI_I != 'NA(a)' \n& ADM_YOI_I != 'NA(b)') \n& (ADM_MOI_I in 1:12)", shape = diamond]
+  node3 [label = "as.Date(ISOdate(ADM_YOI_I, ADM_MOI_I, 01)", shape = rectangle]
+  node4 [label = "ADM_YOI_I == 'NA(a)' \n| ADM_MOI_I == 'NA(a)'", shape = diamond]
+  node5 [label = "'NA(a)'", shape = rectangle]
+  node6 [label = "'NA(b)'", shape = rectangle]
+  node7 [label = "return", shape=rect, style="rounded,filled"]
+  node8 [label = "end", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node16 [label = "SPU_25_B_I == 'NA(b)'", shape = diamond]
+  node17 [label = "'NA(b)'", shape = rectangle]
+  node18 [label = "SPU_25_B_I == 'NA(a)'", shape = diamond]
+  node19 [label = "'NA(a)'", shape = rectangle]
+  node20 [label = "SPU_25_A_I in 1:12", shape = diamond]
+  node21 [label = "as.Date(ISOdate(SPU_25_B_I, SPU_25_A_I, 01)", shape = rectangle]
+  node22 [label = "as.Date(ISOdate(SPU_25_B_I, ADM_MOI_I, 01)", shape = rectangle]
+  node23 [label = "return", shape=rect, style="rounded,filled"]
+  node24 [label = "start",  shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node33 [label = "end == 'NA(b)'", shape = diamond]
+  node34 [label = "'NA(b)'", shape = rectangle]
+  node35 [label = "start != 'NA(a)'\n & start != 'NA(b)'", shape = diamond]
+  node36 [label = "(end - start) / 365.2422", shape = rectangle]
+  node37 [label = "start", shape = rectangle]
+  node2 -> node3 [label = "Y"]
+  node3 -> node7 [style="dotted"]
+  node2 -> node4 [label = "N"]
+  node4 -> node5 [label = "Y"]
+  node5 -> node7 [style="dotted"]
+  node4 -> node6 [label = "N"]
+  node6 -> node7 [style="dotted"]
+  node7 -> node8 
+  node16 -> node17 [label = "Y"]
+  node17 -> node23 [style="dotted"]
+  node16 -> node18 [label = "N"]
+  node18 -> node19 [label = "Y"]
+  node19 -> node23 [style="dotted"]
+  node18 -> node20 [label = "N"]
+  node20 -> node21 [label = "Y"]
+  node21 -> node23 [style="dotted"]
+  node20 -> node22 [label = "N"]
+  node22 -> node23 [style="dotted"]
+  node23 -> node24
+  node33 -> node34 [label = "Y"]
+  node33 -> node35 [label = "N"]
+  node35 -> node36 [label = "Y"]
+  node35 -> node37 [label = "N"]
+}
+```
+
+
+## `SMK09AI_fun`
+
+Title: Years since stopped smoking for former daily smokers
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SPU_25I == 'NA(a)'", shape = diamond]
+  node6 [label = "'NA(a)'", shape = rectangle]
+  node7 [label = "SPU_25I == 'NA(b)'", shape = diamond]
+  node8 [label = "'NA(b)'", shape = rectangle]
+  node9 [label = "SPU_25I < 1", shape = diamond]
+  node10 [label = "0.5", shape = rectangle]
+  node11 [label = "SPU_25I >= 1 \n& SPU_25I < 2", shape = diamond]
+  node12 [label = "1.5", shape = rectangle]
+  node13 [label = "SPU_25I >= 2 \n& SPU_25I < 3", shape = diamond]
+  node14 [label = "2.5", shape = rectangle]
+  node15 [label = "4", shape = rectangle]
+  node5 -> node6 [label = "Y"]
+  node5 -> node7 [label = "N"]
+  node7 -> node8 [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10 [label = "Y"]
+  node9 -> node11 [label = "N"]
+  node11 -> node12 [label = "Y"]
+  node11 -> node13 [label = "N"]
+  node13 -> node14 [label = "Y"]
+  node13 -> node15 [label = "N"]
+}
+```
+
+
+## `SMK09AB_fun`
+
+Title: Years since stopped smoking for former daily smokers (categorical - version 2)
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SPU_25I == 'NA(a)'", shape = diamond]
+  node6 [label = "'NA(a)'", shape = rectangle]
+  node7 [label = "SPU_25I == 'NA(b)'", shape = diamond]
+  node8 [label = "'NA(b)'", shape = rectangle]
+  node9 [label = "SPU_25I < 1", shape = diamond]
+  node10 [label = "1", shape = rectangle]
+  node11 [label = "SPU_25I >= 1 \n& SPU_25I < 2", shape = diamond]
+  node12 [label = "2", shape = rectangle]
+  node13 [label = "SPU_25I >= 2 \n& SPU_25I < 3", shape = diamond]
+  node14 [label = "3", shape = rectangle]
+  node15 [label = "4", shape = rectangle]
+  node5 -> node6 [label = "Y"]
+  node5 -> node7 [label = "N"]
+  node7 -> node8 [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10 [label = "Y"]
+  node9 -> node11 [label = "N"]
+  node11 -> node12 [label = "Y"]
+  node11 -> node13 [label = "N"]
+  node13 -> node14 [label = "Y"]
+  node13 -> node15 [label = "N"]
+}
+```
+
+
+## `SMK09C_fun`
+
+Title: Years since stopped smoking for former daily smokers (categorical - version 3)
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SPU_25I == 'NA(a)'", shape = diamond]
+  node6 [label = "'NA(a)'", shape = rectangle]
+  node7 [label = "SPU_25I == 'NA(b)'", shape = diamond]
+  node8 [label = "'NA(b)'", shape = rectangle]
+  node9 [label = "SPU_25I >= 3 \n& SPU_25I < 6", shape = diamond]
+  node10 [label = "1", shape = rectangle]
+  node11 [label = "SPU_25I >= 6 \n& SPU_25I < 11", shape = diamond]
+  node12 [label = "2", shape = rectangle]
+  node13 [label = "SPU_25I >= 11", shape = diamond]
+  node14 [label = "3", shape = rectangle]
+  node15 [label = "'NA(a)'", shape = rectangle]
+  node5 -> node6 [label = "Y"]
+  node5 -> node7 [label = "N"]
+  node7 -> node8 [label = "Y"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10 [label = "Y"]
+  node9 -> node11 [label = "N"]
+  node11 -> node12 [label = "Y"]
+  node11 -> node13 [label = "N"]
+  node13 -> node14 [label = "Y"]
+  node13 -> node15 [label = "N"]
+}
+```
+
+
+## `SMKG207I_fun`
+
+Title: Age started to smoke daily - former daily smoker
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node5 [label = "SMK_030 == 1", shape = diamond]
+  node6 [label = "SMKG040_I", shape = rectangle]
+  node7 [label = "SMK_030 == 'NA(a)' \n| SMKG040_I == 'NA(a)'", shape = diamond]
+  node8 [label = "'NA(a)'", shape = rectangle]
+  node9 [label = "'NA(b)'", shape = rectangle]
+  node10 [label = "return", shape=rect, style="rounded,filled"]
+  node11 [label = "SMKG207", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node12 [label = "SMKG207 in 5:95", shape = diamond]
+  node13 [label = "SMKG207", shape = rectangle]
+  node14 [label = "SMKG207 == 'NA(a)'", shape = diamond]
+  node15 [label = "'NA(a)'", shape = rectangle]
+  node16 [label = "'NA(b)'", shape = rectangle]
+  node5 -> node6 [label = "Y"]
+  node6 -> node10 [style="dotted"]
+  node5 -> node7 [label = "N"]
+  node7 -> node8 [label = "Y"]
+  node8 -> node10 [style="dotted"]
+  node7 -> node9 [label = "N"]
+  node9 -> node10 [style="dotted"]
+  node10 -> node11
+  node12 -> node13 [label = "Y"]
+  node12 -> node14 [label = "N"]
+  node14 -> node15 [label = "Y"]
+  node14 -> node16 [label = "N"]
+}
+```
+
+
+## `SMKG203I_fun`
+
+Title: Age started to smoke daily - daily smoker
+```{dot}
+digraph flowchart {
+  node [fontname = Helvetica]
+  node4 [label = "SMKG203", shape=rect, style="rounded,filled", fillcolor=black, fontcolor=white, fixedsize=FALSE]
+  node5 [label = "SMK_005 == 1", shape = diamond]
+  node6 [label = "SMKG040_I", shape = rectangle]
+  node7 [label = "SMK_005 == 'NA(a)' \n| SMKG040_I= 'NA(a)'", shape = diamond]
+  node8 [label = "'NA(a)'", shape = rectangle]
+  node9 [label = "'NA(b)'", shape = rectangle]
+  node10 [label = "return", shape=rect, style="rounded,filled"]
+  node12 [label = "SMKG203 in 5:95", shape = diamond]
+  node13 [label = "SMKG203", shape = rectangle]
+  node14 [label = "SMKG203 == 'NA(a)'", shape = diamond]
+  node15 [label = "'NA(a)'", shape = rectangle]
+  node16 [label = "'NA(b)'", shape = rectangle]
+  node10 -> node4
+  node5 -> node6  [label = "Y"]
+  node6 -> node10 [style="dotted"]
+  node5 -> node7  [label = "N"]
+  node7 -> node8  [label = "Y"]
+  node8 -> node10 [style="dotted"]
+  node7 -> node9  [label = "N"]
+  node9 -> node10 [style="dotted"]
+  node12 -> node13  [label = "Y"]
+  node12 -> node14  [label = "N"]
+  node14 -> node15  [label = "Y"]
+  node14 -> node16  [label = "N"]
+}
+```
