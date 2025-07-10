@@ -1,0 +1,180 @@
+schema_version: "1.0.0"
+schema_date: "2025-01-20"
+description: "CCHS missing data patterns and transformation rules - machine-actionable metadata reference"
+
+# Cross-reference with human-readable documentation
+related_documentation:
+  user_guide: "vignettes/missing_value_conventions.qmd"
+  implementation_guide: "vignettes/derived_variables_development.qmd"
+  
+# ============================================================================
+# MISSING DATA PATTERN DEFINITIONS
+# ============================================================================
+pattern_definitions:
+  title: "CCHS Missing Data Code Patterns"
+  description: "Authoritative specification of missing data patterns for cchsflow implementation"
+  version: "1.0.0"
+  
+  # Core pattern specifications
+  patterns:
+    single_digit_missing:
+      description: "Binary/ternary variables with valid responses 1-5"
+      valid_response_range: [1, 5]
+      missing_codes: [6, 7, 8, 9]
+      transformation_map:
+        6: "haven::tagged_na('a')"  # Not applicable
+        7: "haven::tagged_na('b')"  # Don't know
+        8: "haven::tagged_na('b')"  # Refusal
+        9: "haven::tagged_na('b')"  # Not stated
+    
+    double_digit_missing:
+      description: "Multi-category scales with valid responses 1-95"
+      valid_response_range: [1, 95]
+      missing_codes: [96, 97, 98, 99]
+      critical_usage_note: "Required when max valid response > 5 (e.g., smoking status 6=never smoked)"
+      transformation_map:
+        96: "haven::tagged_na('a')"  # Not applicable
+        97: "haven::tagged_na('b')"  # Don't know
+        98: "haven::tagged_na('b')"  # Refusal
+        99: "haven::tagged_na('b')"  # Not stated
+    
+    triple_digit_missing:
+      description: "Continuous measurements with variable-specific valid ranges"
+      valid_response_range: "variable_specific"
+      missing_codes: [996, 997, 998, 999]
+      decimal_variations: [999.6, 999.7, 999.8, 999.9]  # Early cycles
+      transformation_map:
+        996: "haven::tagged_na('a')"  # Not applicable
+        997: "haven::tagged_na('b')"  # Don't know
+        998: "haven::tagged_na('b')"  # Refusal
+        999: "haven::tagged_na('b')"  # Not stated
+        999.6: "haven::tagged_na('a')"  # Not applicable (decimal)
+        999.7: "haven::tagged_na('b')"  # Don't know (decimal)
+        999.8: "haven::tagged_na('b')"  # Refusal (decimal)
+        999.9: "haven::tagged_na('b')"  # Not stated (decimal)
+
+# ============================================================================
+# VARIABLE PATTERN ASSIGNMENTS
+# ============================================================================
+variable_assignments:
+  title: "CCHS Variable Pattern Assignments"
+  description: "Machine-actionable assignments of missing data patterns to specific CCHS variables"
+  reference_guide: "vignettes/missing_value_conventions.qmd#pattern-selection-guidelines"
+  
+  smoking_variables:
+    SMK_005:
+      pattern: "single_digit_missing"
+      valid_range: [1, 3]
+      description: "Type of smoker presently"
+    SMK_030:
+      pattern: "single_digit_missing" 
+      valid_range: [1, 2]
+      description: "Ever smoked daily"
+    SMK_01A:
+      pattern: "single_digit_missing"
+      valid_range: [1, 2]
+      description: "Smoked 100+ cigarettes in lifetime"
+    SMOKING_STATUS_DERIVED:
+      pattern: "double_digit_missing"  # CRITICAL: 6 is valid (never smoked)
+      valid_range: [1, 6]
+      description: "Derived smoking status (6-category)"
+      critical_note: "Category 6 (never smoked) is VALID, not missing"
+    SMKG203:
+      pattern: "double_digit_missing"
+      valid_range: [1, 11]
+      description: "Age started smoking daily (categorical)"
+    SMKG207:
+      pattern: "double_digit_missing"
+      valid_range: [1, 11]
+      description: "Age started smoking daily (former daily smokers)"
+    SMK_204:
+      pattern: "triple_digit_missing"
+      valid_range: [0, 150]
+      description: "Cigarettes per day (daily smokers)"
+    SMK_208:
+      pattern: "triple_digit_missing"
+      valid_range: [0, 150]
+      description: "Cigarettes per day (former daily smokers)"
+      
+  anthropometric_variables:
+    HWTDGHTM:
+      pattern: "triple_digit_missing"
+      valid_range: [0.5, 2.5]
+      description: "Height in meters"
+    HWTDGWTK:
+      pattern: "triple_digit_missing"
+      valid_range: [20, 300]
+      description: "Weight in kilograms"
+
+# ============================================================================
+# TRANSFORMATION RULES
+# ============================================================================
+transformation_rules:
+  title: "CCHS Missing Data Transformation Implementation"
+  description: "Machine-actionable rules for converting original CCHS codes to standardized NA categories"
+  reference_documentation: "vignettes/missing_value_conventions.qmd#current-classification-used-in-cchsflow"
+  
+  na_category_definitions:
+    "NA::a":
+      semantic_meaning: "Not applicable"
+      original_codes: [6, 96, 996]
+      statistical_treatment: "Exclude from denominators and percentage calculations"
+        
+    "NA::b":
+      semantic_meaning: "Missing data"
+      original_codes: [7, 8, 9, 97, 98, 99, 997, 998, 999]
+      statistical_treatment: "Include in denominators, exclude from numerators"
+  
+  implementation:
+    primary_function: "preprocess_cchs_missing_codes"
+    pattern_aliases:
+      # Deprecated names for backward compatibility
+      standard_response: "single_digit_missing"
+      categorical_age: "double_digit_missing"
+      continuous_standard: "triple_digit_missing"
+    
+    pattern_selection_rules:
+      reference: "vignettes/missing_value_conventions.qmd#pattern-selection-guidelines"
+      decision_logic:
+        continuous_variables: "triple_digit_missing"
+        max_valid_over_5: "double_digit_missing"
+        max_valid_under_6: "single_digit_missing"
+
+# ============================================================================
+# IMPLEMENTATION REFERENCE
+# ============================================================================
+implementation:
+  primary_function: "preprocess_cchs_missing_codes"
+  pattern_names: ["single_digit_missing", "double_digit_missing", "triple_digit_missing"]
+  constants_file: "R/validation-constants.R"
+  
+  testing_requirements:
+    boundary_testing: "Test all valid category endpoints and missing codes"
+    type_safety: "Validate haven::tagged_na() preservation"
+    integration: "Verify rec_with_table() workflow compatibility"
+    
+  cycle_considerations:
+    stable_patterns: "Core missing codes (6,7,8,9) consistent since CCHS 2001"
+    decimal_variations: "Early cycles use 999.6, later cycles use whole numbers"
+    handled_automatically: "cchsflow normalizes all variations"
+
+# ============================================================================
+# METADATA AND VERSIONING
+# ============================================================================
+metadata:
+  schema_authority: "cchsflow development team"
+  last_reviewed: "2025-01-20"
+  next_review_due: "2025-07-20"
+  version_history:
+    "1.0.0": "Initial comprehensive specification with standardized pattern names (single/double/triple_digit_missing)"
+  
+  related_documents:
+    primary_reference: "vignettes/missing_value_conventions.qmd"
+    implementation_guide: "vignettes/derived_variables_development.qmd"
+    constants_file: "R/validation-constants.R"
+    helper_functions: "R/missing-data-helpers.R"
+  
+  contact_information:
+    maintainer: "cchsflow development team"
+    issues: "https://github.com/Big-Life-Lab/cchsflow/issues"
+    documentation: "https://big-life-lab.github.io/cchsflow/"
