@@ -732,12 +732,15 @@ calculate_pack_years <- function(smoking_status, current_age, time_quit = NA, ag
 #' @export
 calculate_age_started_daily_current <- function(SMK_005, SMKG040, log_level = "silent") {
   
-  # Convert CCHS missing codes to tagged_na for all inputs
-  smk_005_clean <- preprocess_cchs_missing_codes(SMK_005, "single_digit_missing")
-  smkg040_clean <- preprocess_cchs_missing_codes(SMKG040, "double_digit_missing")
+  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
+  cleaned <- clean_variables(
+    categorical_vars = list(smk_005 = SMK_005, smkg040 = SMKG040),
+    categorical_pattern = "single_digit_missing",
+    log_level = log_level
+  )
   
   # Calculate age started for current daily smokers
-  age_started_current_core(smk_005_clean, smkg040_clean)
+  age_started_current_core(cleaned$smk_005_clean, cleaned$smkg040_clean)
 }
 
 #' Convert age started smoking daily for former daily smokers (categorical to continuous)
@@ -798,12 +801,15 @@ calculate_age_started_daily_current <- function(SMK_005, SMKG040, log_level = "s
 #' @export
 calculate_age_started_daily_former <- function(SMK_030, SMKG040, log_level = "silent") {
   
-  # Convert CCHS missing codes to tagged_na for all inputs
-  smk_030_clean <- preprocess_cchs_missing_codes(SMK_030, "single_digit_missing")
-  smkg040_clean <- preprocess_cchs_missing_codes(SMKG040, "double_digit_missing")
+  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
+  cleaned <- clean_variables(
+    categorical_vars = list(smk_030 = SMK_030, smkg040 = SMKG040),
+    categorical_pattern = "single_digit_missing",
+    log_level = log_level
+  )
   
   # Calculate age started for former daily smokers
-  age_started_former_core(smk_030_clean, smkg040_clean)
+  age_started_former_core(cleaned$smk_030_clean, cleaned$smkg040_clean)
 }
 
 #' Calculate simple smoking status (4-category classification)
