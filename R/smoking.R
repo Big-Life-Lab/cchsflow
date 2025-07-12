@@ -382,18 +382,9 @@ age_started_former_core <- function(smk_030_clean, smkg040_clean) {
 #' @keywords internal
 calculate_time_quit_core <- function(smk_09a_b_clean, smkg09c_clean) {
   
-  # Load time period mappings from metadata (cached for performance)
-  if (!exists(".smk_09a_b_mappings_cache", envir = .GlobalEnv)) {
-    tryCatch({
-      source("R/metadata-management.R", local = FALSE)
-      .GlobalEnv$.smk_09a_b_mappings_cache <- get_time_period_mappings("SMK_09A_B")
-    }, error = function(e) {
-      warning("Failed to load SMK_09A_B mappings from metadata, using fallback values: ", e$message)
-      .GlobalEnv$.smk_09a_b_mappings_cache <- c("1" = 0.5, "2" = 1.5, "3" = 2.5, "4" = 3.5)
-    })
-  }
-  
-  time_mappings <- .GlobalEnv$.smk_09a_b_mappings_cache
+  # Time period mappings (methodological constants)
+  # TODO: Move to variable_details.csv in future iteration
+  time_mappings <- c("1" = 0.5, "2" = 1.5, "3" = 2.5, "4" = 3.5)
   
   # Main time calculation - SMKG09C (continuous) takes precedence when available
   dplyr::case_when(
@@ -479,28 +470,18 @@ smkg040_core <- function(smkg203_clean, smkg207_clean) {
 #' @keywords internal
 pack_years_cat_core <- function(pack_years_clean) {
   
-  # Load cutoffs from metadata (cached for performance)
-  if (!exists(".pack_years_cutoffs_cache", envir = .GlobalEnv)) {
-    tryCatch({
-      source("R/metadata-management.R", local = FALSE)
-      .GlobalEnv$.pack_years_cutoffs_cache <- get_pack_years_cutoffs()
-    }, error = function(e) {
-      # Fallback to hardcoded values if metadata loading fails
-      warning("Failed to load pack_years cutoffs from metadata, using fallback values: ", e$message)
-      .GlobalEnv$.pack_years_cutoffs_cache <- list(
-        "1" = list(min = 0, max = 0, exclusive_min = FALSE, exclusive_max = FALSE),
-        "2" = list(min = 0, max = 0.01, exclusive_min = TRUE, exclusive_max = FALSE),
-        "3" = list(min = 0.01, max = 3.0, exclusive_min = TRUE, exclusive_max = FALSE),
-        "4" = list(min = 3.0, max = 9.0, exclusive_min = TRUE, exclusive_max = FALSE),
-        "5" = list(min = 9.0, max = 16.2, exclusive_min = TRUE, exclusive_max = FALSE),
-        "6" = list(min = 16.2, max = 25.7, exclusive_min = TRUE, exclusive_max = FALSE),
-        "7" = list(min = 25.7, max = 40.0, exclusive_min = TRUE, exclusive_max = FALSE),
-        "8" = list(min = 40.0, max = Inf, exclusive_min = TRUE, exclusive_max = FALSE)
-      )
-    })
-  }
-  
-  cutoffs <- .GlobalEnv$.pack_years_cutoffs_cache
+  # Pack-years cutoffs (CVD Risk Tool, Manuel et al. 2018)
+  # TODO: Move to variable_details.csv in future iteration
+  cutoffs <- list(
+    "1" = list(min = 0, max = 0, exclusive_min = FALSE, exclusive_max = FALSE),
+    "2" = list(min = 0, max = 0.01, exclusive_min = TRUE, exclusive_max = FALSE),
+    "3" = list(min = 0.01, max = 3.0, exclusive_min = TRUE, exclusive_max = FALSE),
+    "4" = list(min = 3.0, max = 9.0, exclusive_min = TRUE, exclusive_max = FALSE),
+    "5" = list(min = 9.0, max = 16.2, exclusive_min = TRUE, exclusive_max = FALSE),
+    "6" = list(min = 16.2, max = 25.7, exclusive_min = TRUE, exclusive_max = FALSE),
+    "7" = list(min = 25.7, max = 40.0, exclusive_min = TRUE, exclusive_max = FALSE),
+    "8" = list(min = 40.0, max = Inf, exclusive_min = TRUE, exclusive_max = FALSE)
+  )
   
   # Extract cutoff values for case_when (maintaining original logic structure)
   c1 <- cutoffs[["1"]]  # 0
