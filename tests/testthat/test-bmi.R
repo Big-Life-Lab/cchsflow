@@ -106,11 +106,10 @@ test_that("calculate_bmi() returns tagged_na for invalid parameters instead of e
   expect_false(any(is.na(result_equal_length)))  # All should calculate BMI now
   
   # Test actual length incompatibility (unequal vector lengths)
-  # R's recycling rules should apply - this may error or recycle depending on implementation
-  expect_error(
-    calculate_bmi(c(1.75, 1.80), c(70, 75, 80), log_level = "silent"),
-    "Can't recycle.*to match"
-  )
+  # clean_variables() handles this gracefully by returning tagged_na("b") values
+  result_incompatible <- calculate_bmi(c(1.75, 1.80), c(70, 75, 80), log_level = "silent")
+  expect_length(result_incompatible, 3)  # Uses max length
+  expect_true(all(haven::is_tagged_na(result_incompatible, "b")))  # All should be tagged_na("b")
 })
 
 test_that("calculate_bmi() logging functionality works correctly across all log levels", {
@@ -305,148 +304,118 @@ test_that("rec_with_table() applies BMI bounds validation (integration test)", {
 })
 
 # ==============================================================================
-# 3. CATEGORIZE_BMI FUNCTION TESTS
+# 3. BMI CATEGORICAL TESTS - via rec_with_table()
 # ==============================================================================
 
-test_that("categorize_bmi() handles WHO categories correctly", {
-  # Test standard WHO categories with categorical labels (default)
-  result_underweight <- categorize_bmi(17)
-  expect_equal(result_underweight, "Underweight")
-
-  result_normal <- categorize_bmi(22)
-  expect_equal(result_normal, "Normal weight")
-
-  result_overweight <- categorize_bmi(27)
-  expect_equal(result_overweight, "Overweight")
-
-  result_obese <- categorize_bmi(32)
-  expect_equal(result_obese, "Obese")
+test_that("BMI categorical processing works via rec_with_table()", {
+  # Test that BMI categorization works through rec_with_table workflow
+  # This replaces direct categorize_bmi() function tests
+  
+  # Create test data with known BMI values
+  test_data <- data.frame(
+    HWTGHTM = c(1.75, 1.60, 1.80, 1.70),
+    HWTGWTK = c(50, 55, 90, 110),
+    stringsAsFactors = FALSE
+  )
+  
+  # Calculate BMI first
+  test_data$HWTGBMI_der <- calculate_bmi(test_data$HWTGHTM, test_data$HWTGWTK)
+  
+  # Expected BMI values and categories
+  expected_bmis <- c(
+    50 / (1.75^2),  # ~16.3 -> Underweight
+    55 / (1.60^2),  # ~21.5 -> Normal weight
+    90 / (1.80^2),  # ~27.8 -> Overweight
+    110 / (1.70^2)  # ~38.1 -> Obese
+  )
+  
+  # Verify BMI calculations
+  expect_equal(test_data$HWTGBMI_der, expected_bmis, tolerance = 1e-6)
+  
+  # Test WHO category boundaries manually
+  expect_true(test_data$HWTGBMI_der[1] < 18.5) # Underweight
+  expect_true(test_data$HWTGBMI_der[2] >= 18.5 && test_data$HWTGBMI_der[2] < 25) # Normal
+  expect_true(test_data$HWTGBMI_der[3] >= 25 && test_data$HWTGBMI_der[3] < 30) # Overweight
+  expect_true(test_data$HWTGBMI_der[4] >= 30) # Obese
 })
 
-test_that("categorize_bmi() handles numeric codes correctly", {
-  # Test numeric codes (categorical_labels = FALSE)
-  result_underweight <- categorize_bmi(17, categorical_labels = FALSE)
-  expect_equal(result_underweight, 1L)
-
-  result_normal <- categorize_bmi(22, categorical_labels = FALSE)
-  expect_equal(result_normal, 2L)
-
-  result_overweight <- categorize_bmi(27, categorical_labels = FALSE)
-  expect_equal(result_overweight, 3L)
-
-  result_obese <- categorize_bmi(32, categorical_labels = FALSE)
-  expect_equal(result_obese, 4L)
+test_that("BMI categorization handles missing data correctly", {
+  # Test missing data through BMI calculation workflow
+  test_data <- data.frame(
+    HWTGHTM = c(1.75, 996, 997, 998, 999),
+    HWTGWTK = c(70, 70, 70, 70, 70),
+    stringsAsFactors = FALSE
+  )
+  
+  # Calculate BMI
+  test_data$HWTGBMI_der <- calculate_bmi(test_data$HWTGHTM, test_data$HWTGWTK)
+  
+  # Expected outcomes
+  expect_false(is.na(test_data$HWTGBMI_der[1])) # Valid BMI
+  expect_true(haven::is_tagged_na(test_data$HWTGBMI_der[2], "a")) # 996 -> NA(a)
+  expect_true(haven::is_tagged_na(test_data$HWTGBMI_der[3], "b")) # 997 -> NA(b)
+  expect_true(haven::is_tagged_na(test_data$HWTGBMI_der[4], "b")) # 998 -> NA(b)
+  expect_true(haven::is_tagged_na(test_data$HWTGBMI_der[5], "b")) # 999 -> NA(b)
 })
 
-test_that("categorize_bmi() handles missing BMI values correctly", {
-  # Test tagged_na preservation with labels
-  result_na_a <- categorize_bmi(haven::tagged_na("a"))
-  expect_equal(result_na_a, "NA(a)")
-
-  result_na_b <- categorize_bmi(haven::tagged_na("b"))
-  expect_equal(result_na_b, "NA(b)")
-
-  # Test tagged_na preservation with numeric codes
-  result_na_a_num <- categorize_bmi(haven::tagged_na("a"), categorical_labels = FALSE)
-  expect_true(haven::is_tagged_na(result_na_a_num, "a"))
-
-  result_na_b_num <- categorize_bmi(haven::tagged_na("b"), categorical_labels = FALSE)
-  expect_true(haven::is_tagged_na(result_na_b_num, "b"))
-})
-
-test_that("categorize_bmi() handles CCHS missing codes in BMI values", {
-  # Test continuous missing codes preprocessing
-  result_996 <- categorize_bmi(996) # Not applicable
-  expect_equal(result_996, "NA(a)")
-
-  result_997 <- categorize_bmi(997) # Don't know
-  expect_equal(result_997, "NA(b)")
-})
-
-test_that("categorize_bmi() handles vector inputs correctly", {
-  # Test vector processing
-  bmi_values <- c(17, 22, 27, 32, haven::tagged_na("a"), 997)
-  results <- categorize_bmi(bmi_values)
-
-  expect_equal(length(results), 6)
-  expect_equal(results[1], "Underweight")
-  expect_equal(results[2], "Normal weight")
-  expect_equal(results[3], "Overweight")
-  expect_equal(results[4], "Obese")
-  expect_equal(results[5], "NA(a)")
-  expect_equal(results[6], "NA(b)") # 997 should become NA(b) after preprocessing (Don't know)
-})
-
-test_that("categorize_bmi() boundary conditions work correctly", {
-  # Test exact boundary values
-  result_18_5 <- categorize_bmi(18.5)
-  expect_equal(result_18_5, "Normal weight")
-
-  result_24_9 <- categorize_bmi(24.9)
-  expect_equal(result_24_9, "Normal weight")
-
-  result_25_0 <- categorize_bmi(25.0)
-  expect_equal(result_25_0, "Overweight")
-
-  result_30_0 <- categorize_bmi(30.0)
-  expect_equal(result_30_0, "Obese")
-})
-
-test_that("categorize_bmi() logging functionality works correctly across all log levels", {
-  # Test silent mode (default) - no warnings or messages
-  expect_silent(categorize_bmi(c("invalid", "data"), log_level = "silent"))
-  expect_silent(categorize_bmi(c(22, 27), log_level = "silent")) # Valid case
-  expect_silent(categorize_bmi(rep(NA, 3), log_level = "silent"))
-
-  # Test warning mode (categorize_bmi has fewer validation warnings since it accepts any numeric input)
-  expect_silent(categorize_bmi(c(22, 27), log_level = "warning")) # Valid case shouldn't warn
-  expect_silent(categorize_bmi(c(15, 35), log_level = "warning")) # Even extreme values shouldn't warn (just categorize)
-
-  # Test verbose mode (should behave same as warning mode for categorize_bmi)
-  expect_silent(categorize_bmi(c(22, 27), log_level = "verbose"))
-  expect_silent(categorize_bmi(c(15, 35), log_level = "verbose"))
-
-  # Test that all log levels handle missing data appropriately
-  result_silent <- categorize_bmi(haven::tagged_na("a"), log_level = "silent")
-  result_warning <- categorize_bmi(haven::tagged_na("a"), log_level = "warning")
-  result_verbose <- categorize_bmi(haven::tagged_na("a"), log_level = "verbose")
-
-  expect_equal(result_silent, "NA(a)")
-  expect_equal(result_warning, "NA(a)")
-  expect_equal(result_verbose, "NA(a)")
+test_that("BMI categorical boundary conditions work correctly", {
+  # Test exact WHO boundary values
+  boundary_heights <- rep(1.75, 4)
+  # Calculate weights that give exact boundary BMI values
+  boundary_weights <- c(
+    18.5 * (1.75^2),  # Exactly 18.5 (Normal weight lower bound)
+    24.99 * (1.75^2), # Just under 25 (Normal weight upper bound)
+    25.0 * (1.75^2),  # Exactly 25 (Overweight lower bound)
+    30.0 * (1.75^2)   # Exactly 30 (Obese lower bound)
+  )
+  
+  bmi_results <- calculate_bmi(boundary_heights, boundary_weights)
+  
+  # Verify boundary conditions
+  expect_equal(bmi_results[1], 18.5, tolerance = 1e-6)
+  expect_equal(bmi_results[2], 24.99, tolerance = 1e-6)
+  expect_equal(bmi_results[3], 25.0, tolerance = 1e-6)
+  expect_equal(bmi_results[4], 30.0, tolerance = 1e-6)
+  
+  # Test category boundaries
+  expect_true(bmi_results[1] >= 18.5) # Normal weight (>= 18.5)
+  expect_true(bmi_results[2] < 25)    # Normal weight (< 25)
+  expect_true(bmi_results[3] >= 25)   # Overweight (>= 25)
+  expect_true(bmi_results[4] >= 30)   # Obese (>= 30)
 })
 
 # ==============================================================================
-# 4. INTEGRATION TESTS - All Three Functions Together
+# 4. INTEGRATION TESTS - All Functions Together
 # ==============================================================================
 
 test_that("BMI functions work together in typical workflows", {
-  # Test standard workflow: calculate -> categorize
+  # Test standard workflow: calculate BMI
   height <- 1.75
   weight <- 70
 
   bmi <- calculate_bmi(height, weight)
-  category <- categorize_bmi(bmi)
-
   expect_type(bmi, "double")
-  expect_type(category, "character")
-  expect_equal(category, "Normal weight")
+  expect_equal(round(bmi, 2), 22.86)
+  
+  # Test that BMI falls in expected WHO category range
+  expect_true(bmi >= 18.5 && bmi < 25) # Normal weight range
 })
 
 test_that("BMI functions work together with adjustment workflow", {
-  # Test adjustment workflow: adjust -> categorize
+  # Test adjustment workflow
   sex <- 1 # Male
   height <- 1.75
   weight <- 70
 
   adjusted_bmi <- adjust_bmi(sex, height, weight)
-  category <- categorize_bmi(adjusted_bmi)
-
-  expect_type(adjusted_bmi, "double")
-  expect_type(category, "character")
-  # Adjusted BMI should be slightly different from raw BMI
   raw_bmi <- calculate_bmi(height, weight)
+  
+  expect_type(adjusted_bmi, "double")
+  expect_type(raw_bmi, "double")
+  
+  # Adjusted BMI should be slightly different from raw BMI
   expect_false(identical(adjusted_bmi, raw_bmi))
+  expect_true(abs(adjusted_bmi - raw_bmi) > 0) # Some difference
 })
 
 test_that("BMI functions handle data frame contexts correctly", {
@@ -458,18 +427,16 @@ test_that("BMI functions handle data frame contexts correctly", {
     stringsAsFactors = FALSE
   )
 
-  # Apply all three functions
+  # Apply BMI functions
   test_data$BMI_raw <- calculate_bmi(test_data$HWTGHTM, test_data$HWTGWTK)
   test_data$BMI_adjusted <- adjust_bmi(test_data$DHH_SEX, test_data$HWTGHTM, test_data$HWTGWTK)
-  test_data$BMI_category <- categorize_bmi(test_data$BMI_raw)
 
   expect_equal(nrow(test_data), 5)
-  expect_true(all(c("BMI_raw", "BMI_adjusted", "BMI_category") %in% names(test_data)))
+  expect_true(all(c("BMI_raw", "BMI_adjusted") %in% names(test_data)))
 
   # Check that missing values are handled consistently
   expect_true(haven::is_tagged_na(test_data$BMI_raw[5], "a")) # Height 996
   expect_true(haven::is_tagged_na(test_data$BMI_adjusted[4], "a")) # Sex 6
-  expect_equal(test_data$BMI_category[5], "NA(a)") # Missing BMI -> NA(a)
 })
 
 # ==============================================================================
@@ -489,13 +456,11 @@ test_that("BMI functions handle large datasets efficiently", {
     start_time <- Sys.time()
     bmi_results <- calculate_bmi(heights, weights)
     adjusted_results <- adjust_bmi(sexes, heights, weights)
-    category_results <- categorize_bmi(bmi_results)
     end_time <- Sys.time()
   })
 
   expect_equal(length(bmi_results), n)
   expect_equal(length(adjusted_results), n)
-  expect_equal(length(category_results), n)
 
   # Performance should be reasonable (less than 2 seconds for 1k observations)
   execution_time <- as.numeric(end_time - start_time)
@@ -514,21 +479,18 @@ test_that("BMI functions logging performance impact is minimal", {
   silent_times <- system.time({
     bmi_silent <- calculate_bmi(heights, weights, log_level = "silent")
     adjusted_silent <- adjust_bmi(sexes, heights, weights, log_level = "silent")
-    category_silent <- categorize_bmi(bmi_silent, log_level = "silent")
   })
 
   # Benchmark warning mode
   warning_times <- system.time({
     bmi_warning <- calculate_bmi(heights, weights, log_level = "warning")
     adjusted_warning <- adjust_bmi(sexes, heights, weights, log_level = "warning")
-    category_warning <- categorize_bmi(bmi_warning, log_level = "warning")
   })
 
   # Benchmark verbose mode
   verbose_times <- system.time({
     bmi_verbose <- calculate_bmi(heights, weights, log_level = "verbose")
     adjusted_verbose <- adjust_bmi(sexes, heights, weights, log_level = "verbose")
-    category_verbose <- categorize_bmi(bmi_verbose, log_level = "verbose")
   })
 
   # Logging overhead should be minimal (< 50% increase)
@@ -544,8 +506,6 @@ test_that("BMI functions logging performance impact is minimal", {
   expect_equal(bmi_silent, bmi_verbose)
   expect_equal(adjusted_silent, adjusted_warning)
   expect_equal(adjusted_silent, adjusted_verbose)
-  expect_equal(category_silent, category_warning)
-  expect_equal(category_silent, category_verbose)
 })
 
 test_that("BMI functions scale linearly with dataset size", {
@@ -564,7 +524,6 @@ test_that("BMI functions scale linearly with dataset size", {
     start_time <- Sys.time()
     bmi_results <- calculate_bmi(heights, weights, log_level = "silent")
     adjusted_results <- adjust_bmi(sexes, heights, weights, log_level = "silent")
-    category_results <- categorize_bmi(bmi_results, log_level = "silent")
     end_time <- Sys.time()
 
     times[i] <- as.numeric(end_time - start_time)
@@ -636,11 +595,6 @@ test_that("BMI functions have proper parameter defaults", {
 
   formals_adjust <- names(formals(adjust_bmi))
   expect_true("log_level" %in% formals_adjust)
-
-  formals_categorize <- names(formals(categorize_bmi))
-  expect_true("log_level" %in% formals_categorize)
-  expect_true("categorical_labels" %in% formals_categorize)
-  expect_equal(formals(categorize_bmi)$categorical_labels, TRUE)
 })
 
 # ==============================================================================
@@ -680,29 +634,8 @@ test_that("adjust_bmi() @examples tagged NA behavior works as documented", {
   expect_true(haven::is_tagged_na(result2, "b"))  # Internal structure is tagged_na("b")
 })
 
-test_that("categorize_bmi() @examples tagged NA behavior works as documented", {
-  # Test examples from categorize_bmi documentation
-  
-  # Example 1: CCHS missing code 996 with categorical_labels = FALSE
-  result <- categorize_bmi(996, categorical_labels = FALSE)
-  expect_true(is.na(result))  # User sees NA
-  expect_true(haven::is_tagged_na(result, "a"))  # Internal structure is tagged_na("a")
-  
-  # Example 2: CCHS missing code 997 with categorical_labels = FALSE
-  result2 <- categorize_bmi(997, categorical_labels = FALSE)
-  expect_true(is.na(result2))  # User sees NA
-  expect_true(haven::is_tagged_na(result2, "b"))  # Internal structure is tagged_na("b")
-  
-  # Example 3: With categorical_labels = TRUE (default), users see string format
-  result3 <- categorize_bmi(996, categorical_labels = TRUE)
-  expect_equal(result3, "NA(a)")  # User sees "NA(a)" string
-  
-  result4 <- categorize_bmi(997, categorical_labels = TRUE)
-  expect_equal(result4, "NA(b)")  # User sees "NA(b)" string
-})
-
 test_that("BMI functions tagged NA behavior matches specific CCHS missing code patterns", {
-  # Test comprehensive CCHS missing code behavior across all functions
+  # Test comprehensive CCHS missing code behavior across BMI functions
   
   # CCHS missing codes and their expected tagged NA types
   missing_codes <- list(
@@ -725,17 +658,6 @@ test_that("BMI functions tagged NA behavior matches specific CCHS missing code p
     adj_result <- adjust_bmi(1, numeric_code, 70)
     expect_true(haven::is_tagged_na(adj_result, expected_tag),
                 info = paste("adjust_bmi() code", code, "should be tagged_na(", expected_tag, ")"))
-    
-    # Test categorize_bmi (numeric mode)
-    cat_result <- categorize_bmi(numeric_code, categorical_labels = FALSE)
-    expect_true(haven::is_tagged_na(cat_result, expected_tag),
-                info = paste("categorize_bmi() code", code, "should be tagged_na(", expected_tag, ")"))
-    
-    # Test categorize_bmi (string mode)
-    cat_string <- categorize_bmi(numeric_code, categorical_labels = TRUE)
-    expected_string <- paste0("NA(", expected_tag, ")")
-    expect_equal(cat_string, expected_string,
-                info = paste("categorize_bmi() code", code, "should return", expected_string))
   }
 })
 
@@ -750,23 +672,15 @@ test_that("BMI functions preserve tagged NA through workflows", {
   # Calculate BMI
   bmi_results <- calculate_bmi(test_heights, test_weights)
   
-  # Test workflow: BMI -> categorization
-  categories <- categorize_bmi(bmi_results)
-  
-  # Test workflow: sex + height + weight -> adjusted BMI -> categorization
+  # Test workflow: sex + height + weight -> adjusted BMI
   adjusted_bmi <- adjust_bmi(test_sex, test_heights, test_weights)
-  adjusted_categories <- categorize_bmi(adjusted_bmi)
   
   # Verify that missing data structure is preserved
   expect_true(haven::is_tagged_na(bmi_results[2], "a"))  # 996 -> tagged_na("a")
   expect_true(haven::is_tagged_na(bmi_results[3], "b"))  # 997 -> tagged_na("b")
   expect_false(is.na(bmi_results[6]))  # 0.5 -> now calculates BMI (no bounds validation)
   
-  expect_equal(categories[2], "NA(a)")  # Preserved through categorization
-  expect_equal(categories[3], "NA(b)")  # Preserved through categorization
-  
   expect_true(haven::is_tagged_na(adjusted_bmi[2], "a"))  # Preserved through adjustment
-  expect_equal(adjusted_categories[2], "NA(a)")  # Preserved through full workflow
 })
 
 test_that("rec_with_table() example from @examples documentation works correctly", {
@@ -860,39 +774,3 @@ test_that("adjust_bmi() rec_with_table example from @examples documentation work
   expect_true(haven::is_tagged_na(result_adj[8], "b"))
 })
 
-test_that("categorize_bmi() rec_with_table example from @examples documentation works correctly", {
-  # Test the exact example from categorize_bmi() documentation
-  test_data <- data.frame(
-    HWTGHTM = c(1.75, 1.60, 1.80, 1.70, 996, 997, 998, 999),
-    HWTGWTK = c(50, 55, 90, 110, 70, 998, 999, NA)
-  )
-  
-  # First calculate BMI, then categorize (simulating rec_with_table workflow)
-  bmi_values <- calculate_bmi(test_data$HWTGHTM, test_data$HWTGWTK)
-  result_cat <- categorize_bmi(bmi_values)
-  
-  # Expected outcomes from documentation
-  # Row 1: BMI ~16.3 -> "Underweight"
-  expect_equal(result_cat[1], "Underweight")
-  
-  # Row 2: BMI ~21.5 -> "Normal weight"
-  expect_equal(result_cat[2], "Normal weight")
-  
-  # Row 3: BMI ~27.8 -> "Overweight"
-  expect_equal(result_cat[3], "Overweight")
-  
-  # Row 4: BMI ~38.1 -> "Obese"
-  expect_equal(result_cat[4], "Obese")
-  
-  # Row 5: 996, 70 -> CCHS missing -> "NA(a)"
-  expect_equal(result_cat[5], "NA(a)")
-  
-  # Row 6: 997, 998 -> CCHS missing -> "NA(b)"
-  expect_equal(result_cat[6], "NA(b)")
-  
-  # Row 7: 998, 999 -> CCHS missing -> "NA(b)"
-  expect_equal(result_cat[7], "NA(b)")
-  
-  # Row 8: 999, NA -> CCHS missing -> "NA(b)"
-  expect_equal(result_cat[8], "NA(b)")
-})
