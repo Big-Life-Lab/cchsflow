@@ -35,10 +35,63 @@ BMI_CORRECTION_MALE <- list(intercept = -1.07575, slope = 1.07592)
 BMI_CORRECTION_FEMALE <- list(intercept = -0.12374, slope = 1.05129)
 
 # ==============================================================================
-# 2. VALIDATION FUNCTIONS
+# 2. Data flow and function catalog
 # ==============================================================================
 
-# Standard valiation using utility functions and helpers.
+# RECOMMENDED WORKFLOW:
+#   Raw CCHS Data → rec_with_table() → Validated Results
+#   
+# ARCHITECTURE:
+#   Derived functions → Internal helper functions → Results
+#   Variable documentation → Help system access (?variable_name)
+
+# SPECIFIC BMI DERIVATION FLOWS (variable = function → helper → result):
+#   HWTGBMI_der      = calculate_bmi(HWTGHTM, HWTGWTK) → calculate_bmi_core() → BMI value (weight/height²)
+#   HWTGCOR_der      = adjust_bmi(DHH_SEX, HWTGHTM, HWTGWTK) → calculate_bmi_core() → Bias-corrected BMI value
+#   HWTGBMI_cat4 = rec_with_table() → WHO thresholds → BMI category (1-4)
+
+# ==============================================================================
+# Function catalog
+# ==============================================================================
+
+# DERIVED FUNCTIONS (Variables calculated with multiple starting variables, formulas or scales):
+#   Functions:
+#   • calculate_bmi()                   - Standard BMI calculation (HWTGHTM, HWTGWTK)
+#   • adjust_bmi()                      - Bias-corrected BMI for self-reported data (DHH_SEX, HWTGHTM, HWTGWTK)
+#
+#   Internal helper functions:
+#   • calculate_bmi_core()              - Core BMI calculation logic
+
+# VARIABLE DOCUMENTATION FUNCTIONS (Reference & help system):
+#   Raw CCHS anthropometric variables (Statistics Canada):
+#   • HWTGHTM()    - Height in meters (self-reported, converted from feet/inches)
+#   • HWTGWTK()    - Weight in kilograms (self-reported, converted from pounds)
+#   
+#   Derived BMI variables:
+#   • HWTGBMI_der()      - BMI continuous value
+#   • HWTGCOR_der()      - Bias-corrected BMI (Connor Gorber et al. 2008)
+#   • HWTGBMI_cat4() - BMI WHO categories (underweight, normal, overweight, obese)
+
+# ==============================================================================
+# Usage patterns  
+# ==============================================================================
+
+# Direct anthropometric variable analysis (harmonized):
+#   bmi_data <- rec_with_table(cchs_data, c("HWTGHTM", "HWTGWTK", "DHH_SEX", "DHH_AGE"))
+#
+# Comprehensive BMI analysis:
+#   bmi_results <- rec_with_table(cchs_data, c(
+#     "HWTGHTM", "HWTGWTK", "DHH_SEX", "DHH_AGE",
+#     "HWTGBMI_der", "HWTGCOR_der", "HWTGBMI_cat4"
+#   ))
+
+# Variable documentation access:
+#   ?HWTGHTM     # Height variable documentation
+#   ?HWTGWTK     # Weight variable documentation
+
+# VALIDATION RESPONSIBILITY:
+#   • Standalone functions: Basic CCHS code preprocessing only
+#   • rec_with_table():     Comprehensive validation via variable_details.csv
 
 # ==============================================================================
 # 3. SPECIALIZED HELPER FUNCTIONS
@@ -47,20 +100,20 @@ BMI_CORRECTION_FEMALE <- list(intercept = -0.12374, slope = 1.05129)
 #' Core BMI calculation (internal helper)
 #'
 #' Vector-aware BMI calculation without validation - used as building block
-#' @param height Height in meters (already validated, can be scalar or vector)
-#' @param weight Weight in kilograms (already validated, can be scalar or vector)
+#' @param height Height in meters (CCHS missing codes preprocessed to tagged_na, can be scalar or vector)
+#' @param weight Weight in kilograms (CCHS missing codes preprocessed to tagged_na, can be scalar or vector)
 #' @return BMI value(s) with proper tagged NA handling
-#' @note Internal v3.0.0, last updated: 2025-07-04, status: active - Vector aware
+#' @note v3.0.0, last updated: 2025-07-04, status: active, Note: NA
 #' @noRd
 calculate_bmi_core <- function(height, weight) {
   # Use case_when for element-wise processing with tagged NA handling
   dplyr::case_when(
-    # !!! (splice operator) expands generate_tagged_na_conditions() output:
+    # !!! (splice operator) expands assign_tagged_na() output:
     # Creates 5 conditions per variable checking tagged NAs in priority order
     # c (question not asked) → d (variable missing) → a (not applicable) → b (unknown/refusal)
     # Equivalent to: is_tagged_na(height,"c") ~ tagged_na("c"), is_tagged_na(height,"d") ~ tagged_na("d"), etc.
-    !!!generate_tagged_na_conditions(height, categorical_labels = FALSE),
-    !!!generate_tagged_na_conditions(weight, categorical_labels = FALSE),
+    !!!assign_tagged_na(height),
+    !!!assign_tagged_na(weight),
 
     # Calculate BMI for valid values
     .default = weight / (height^2)
@@ -68,7 +121,7 @@ calculate_bmi_core <- function(height, weight) {
 }
 
 # ==============================================================================
-# 4. PUBLIC FUNCTIONS
+# 4. DERIVED VARIABLE FUNCTIONS
 # ==============================================================================
 
 #' Calculate Body Mass Index (BMI) with comprehensive validation
@@ -163,7 +216,6 @@ calculate_bmi_core <- function(height, weight) {
 #'
 #' @seealso
 #' \code{\link{adjust_bmi}} for bias-corrected BMI calculations
-#' \code{\link{categorize_bmi}} for BMI category classification
 #'
 #' @references
 #' World Health Organization. (2000). Obesity: preventing and managing the global epidemic.
@@ -181,20 +233,14 @@ calculate_bmi <- function(HWTGHTM = NULL, HWTGWTK = NULL,
   # For comprehensive validation, use rec_with_table() with variable_details.csv
   
   # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
-  height_clean <- if(is.null(HWTGHTM)) {
-    haven::tagged_na("d")
-  } else {
-    clean_single_value(HWTGHTM, pattern_type = "triple_digit_missing", log_level = log_level)
-  }
-  
-  weight_clean <- if(is.null(HWTGWTK)) {
-    haven::tagged_na("d") 
-  } else {
-    clean_single_value(HWTGWTK, pattern_type = "triple_digit_missing", log_level = log_level)
-  }
+  cleaned <- clean_variables(
+    continuous_vars = list(height = HWTGHTM, weight = HWTGWTK),
+    continuous_pattern = "triple_digit_missing",
+    log_level = log_level
+  )
 
   # Calculate BMI from clean inputs
-  calculate_bmi_core(height_clean, weight_clean)
+  calculate_bmi_core(cleaned$height_clean, cleaned$weight_clean)
 }
 
 #' Calculate bias-corrected BMI for self-reported data
@@ -306,7 +352,9 @@ adjust_bmi <- function(DHH_SEX = NULL,
                         HWTGHTM = NULL, 
                         HWTGWTK = NULL,
                         validate_params = NULL,
-                        log_level = "silent") {
+                        log_level = "silent",
+                        male_correction = list(intercept = -1.07575, slope = 1.07592),
+                        female_correction = list(intercept = -0.12374, slope = 1.05129)) {
   # 1. Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
   cleaned <- clean_variables(
     continuous_vars = list(height = HWTGHTM, weight = HWTGWTK),
@@ -322,148 +370,247 @@ adjust_bmi <- function(DHH_SEX = NULL,
   # 3. Apply sex-specific bias correction with comprehensive tagged NA handling
   dplyr::case_when(
     # Use standardized tagged NA conditions from both inputs
-    !!!generate_tagged_na_conditions(raw_bmi, categorical_labels = FALSE),
-    !!!generate_tagged_na_conditions(cleaned$sex_clean, categorical_labels = FALSE),
+    !!!assign_tagged_na(raw_bmi),
+    !!!assign_tagged_na(cleaned$sex_clean),
 
     # Apply sex-specific corrections for valid data
-    cleaned$sex_clean == 1 ~ BMI_CORRECTION_MALE$intercept + BMI_CORRECTION_MALE$slope * raw_bmi,
-    cleaned$sex_clean == 2 ~ BMI_CORRECTION_FEMALE$intercept + BMI_CORRECTION_FEMALE$slope * raw_bmi,
+    cleaned$sex_clean == 1 ~ male_correction$intercept + male_correction$slope * raw_bmi,
+    cleaned$sex_clean == 2 ~ female_correction$intercept + female_correction$slope * raw_bmi,
 
     # Catch-all for invalid sex values
     .default = haven::tagged_na("b")
   )
 }
 
-#' Categorize BMI values using WHO standard categories
+# IMPORTANT: categorize_bmi function removed in BMI refactoring (2025-07-10)
+# BMI categorization now handled via rec_with_table() with HWTGBMI_cat4 variable
+# See variable_details.csv for range-based mapping: [0,18.5) → 1, [18.5,25) → 2, etc.
+
+# ==============================================================================
+# 5. VARIABLE DOCUMENTATION FUNCTIONS (Reference & help system):
+# ==============================================================================
+#
+# These functions provide documentation for CCHS variables and derived variables.
+# Can be used directly in recodeflow for harmonized analysis or as inputs to derived functions.
+# Usage: ?HWTGHTM, ?HWTGWTK, etc.
+
+#' @title Height in meters
 #'
-#' @description
-#' Categorize BMI values into WHO standard obesity categories with comprehensive missing data handling.
-#' Uses international BMI categories: Underweight (<18.5), Normal (18.5-24.9), Overweight (25.0-29.9),
-#' Obese (≥30.0) for standard population health assessment.
+#' @description 
+#' \strong{NOTE:} This is a documentation function, not a computational function.
 #'
-#' @param bmi_value BMI values (from calculate_bmi or adjust_bmi). Accepts raw values or preprocessed.
-#' @param categorical_labels Return factor labels instead of numeric codes (default TRUE)
-#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#' Continuous variable for respondent height in meters. Used as input to BMI 
+#' calculations and anthropometric analyses. Can be used directly in recodeflow 
+#' for harmonized analysis or as input to BMI-related derived functions.
 #'
-#' @return Factor with BMI category labels or numeric codes. Missing data handled as:
-#'   \itemize{
-#'     \item Preserves \code{haven::tagged_na("a")} for not applicable cases
-#'     \item Returns \code{haven::tagged_na("b")} for missing/invalid BMI values
-#'   }
-#'   Categories: Underweight, Normal weight, Overweight, Obese.
+#' @details 
+#' **Data Source:** CCHS respondent measurements
+#' **Units:** Meters (m)
+#' **Range:** 0.914-2.134 meters (typical range 1.4-2.0m). See variable_details.csv for updates.
+#' **Availability:** Present in all CCHS cycles used in cchsflow
+#' **Measurement:** Self-reported height converted to meters
+#' **Harmonization:** Use recodeflow for consistent cross-cycle analysis
+#' **Quality Note:** Subject to self-reporting bias; consider adjust_bmi() for bias correction
 #'
-#' @details
-#' BMI categories are not appropriate for children, pregnant women, or certain medical conditions.
-#' WHO standards are used consistently, but interpretation may vary across health guidelines and time periods.
-#'
-#' Categorization thresholds: Underweight (BMI < 18.5), Normal weight (18.5 ≤ BMI < 25.0),
-#' Overweight (25.0 ≤ BMI < 30.0), Obese (BMI ≥ 30.0). Comprehensive preprocessing is applied
-#' if raw BMI values are provided.
+#' @param HWTGHTM Variable name for height in meters
 #'
 #' @examples
-#' # rec_with_table workflow (RECOMMENDED - handles all validation automatically):
-#' # Generate test data with correct and incorrect input
-#' test_data <- data.frame(
-#'   HWTGHTM = c(1.75, 1.60, 1.80, 1.70, 996, 997, 998, 999),
-#'   HWTGWTK = c(50, 55, 90, 110, 70, 998, 999, NA)
-#' )
+#' # Access variable documentation
 #' library(cchsflow)
-#' result <- rec_with_table(
-#'   test_data,
-#'   c("HWTGHTM", "HWTGWTK", "HWTGBMI_cat_der")
+#' ?HWTGHTM
+#' 
+#' # Use in BMI calculation functions
+#' ?calculate_bmi  # Uses HWTGHTM as input
+#' ?adjust_bmi     # Uses HWTGHTM as input
+#' 
+#' # Variable usage in rec_with_table()
+#' \dontrun{
+#' # Basic anthropometric analysis
+#' height_data <- rec_with_table(cchs2009_2010_p, 
+#'   c("HWTGHTM", "DHH_SEX", "DHHGAGE"))
+#' summary(height_data$HWTGHTM)
+#' 
+#' # Combined with BMI calculation
+#' bmi_data <- rec_with_table(cchs2009_2010_p, 
+#'   c("HWTGHTM", "HWTGWTK", "DHH_SEX", "calculate_bmi"))
+#' 
+#' # Multi-cycle harmonized analysis
+#' combined_data <- bind_rows(
+#'   rec_with_table(cchs2001_p, c("HWTGHTM", "HWTGWTK", "DHH_SEX")),
+#'   rec_with_table(cchs2009_2010_p, c("HWTGHTM", "HWTGWTK", "DHH_SEX"))
 #' )
-#' # Returns:
-#' #   HWTGHTM HWTGWTK HWTGBMI_cat_der
-#' # 1    1.75      50    "Underweight"  
-#' # 2    1.60      55    "Normal weight"  
-#' # 3    1.80      90    "Overweight"  
-#' # 4    1.70     110    "Obese"  
-#' # 5  996.00      70         <NA+b>     # CCHS missing code
-#' # 6  997.00     998         <NA+b>     # CCHS missing codes
-#' # 7  998.00     999         <NA+b>     # CCHS missing codes
-#' # 8  999.00      NA         <NA+b>     # CCHS missing codes
-#' # Comprehensive validation and error handling applied automatically
+#' }
+#'
+#' @seealso 
+#' \code{\link{HWTGWTK}} for weight variable (required for BMI calculation)
+#' \code{\link{calculate_bmi}}, \code{\link{adjust_bmi}} for BMI functions using this variable
+#'
+#' @note v3.0.0, last updated: 2025-07-09, status: active, Note: Enhanced documentation with BMI calculation guidance
+#' @export
+HWTGHTM <- function(HWTGHTM) {
+  # this is for documentation purposes only
+}
+
+#' @title Weight in kilograms
+#'
+#' @description 
+#' \strong{NOTE:} This is a documentation function, not a computational function.
+#'
+#' Continuous variable for respondent weight in kilograms. Used as input to BMI 
+#' calculations and anthropometric analyses. Can be used directly in recodeflow 
+#' for harmonized analysis or as input to BMI-related derived functions.
+#'
+#' @details 
+#' **Data Source:** CCHS respondent measurements
+#' **Units:** Kilograms (kg)
+#' **Range:** 27.0-135.0 kilograms (typical range 40-120kg). See variable_details for updates.
+#' **Availability:** Present in all CCHS cycles used in cchsflow
+#' **Measurement:** Self-reported weight in kilograms
+#' **Harmonization:** Use recodeflow for consistent cross-cycle analysis
+#' **Quality Note:** Subject to self-reporting bias; consider adjust_bmi() for bias correction
+#'
+#' @param HWTGWTK Variable name for weight in kilograms
+#'
+#' @examples
+#' # Access variable documentation
+#' library(cchsflow)
+#' ?HWTGWTK
 #' 
-#' # Basic scalar examples:
-#' # Validation for missing data handled. Other validation (out-of-bound ranges, 
-#' # variable type) not performed - use rec_with_table() for comprehensive validation.
-#' # bmi_value: BMI values (typically 15-50). See variable_details.csv for context
-#' categorize_bmi(17.0)   # Returns: "Underweight" (BMI < 18.5)
-#' categorize_bmi(22.0)   # Returns: "Normal weight" (18.5 ≤ BMI < 25.0)
-#' categorize_bmi(27.0)   # Returns: "Overweight" (25.0 ≤ BMI < 30.0)
-#' categorize_bmi(32.0)   # Returns: "Obese" (BMI ≥ 30.0)
-#' categorize_bmi("22")   # Returns: "Normal weight" (string converted by R)
-#' categorize_bmi(997)    # Returns: "NA(b)" (CCHS missing code)
+#' # Use in BMI calculation functions
+#' ?calculate_bmi  # Uses HWTGWTK as input
+#' ?adjust_bmi     # Uses HWTGWTK as input
 #' 
-#' # Check internal tagged NA structure (with categorical_labels = FALSE):
-#' result <- categorize_bmi(996, categorical_labels = FALSE)  # CCHS not applicable
-#' haven::is_tagged_na(result, "a")                          # Returns: TRUE
-#' result2 <- categorize_bmi(997, categorical_labels = FALSE) # CCHS missing
-#' haven::is_tagged_na(result2, "b")                         # Returns: TRUE
-#' # Note: Basic validation applied - use rec_with_table() for comprehensive validation
-#'
-#' # Basic vector examples:
-#' # Same validation as scalar examples
-#' # CCHS missing codes (automatically handled for PUMF/master data):
-#' categorize_bmi(c(17, 22, 27, 32))
-#' # Returns: c("Underweight", "Normal weight", "Overweight", "Obese")
+#' # Variable usage in rec_with_table()
+#' \dontrun{
+#' # Basic anthropometric analysis
+#' weight_data <- rec_with_table(cchs2009_2010_p, 
+#'   c("HWTGWTK", "DHH_SEX", "DHHGAGE"))
+#' summary(weight_data$HWTGWTK)
 #' 
-#' categorize_bmi(c(22, haven::tagged_na("a"), 27, 997))
-#' # Returns: c("Normal weight", "NA(a)", "Overweight", "NA(b)")
+#' # Combined with BMI calculation
+#' bmi_data <- rec_with_table(cchs2009_2010_p, 
+#'   c("HWTGHTM", "HWTGWTK", "DHH_SEX", "calculate_bmi"))
+#' 
+#' # Multi-cycle harmonized analysis
+#' combined_data <- bind_rows(
+#'   rec_with_table(cchs2001_p, c("HWTGHTM", "HWTGWTK", "DHH_SEX")),
+#'   rec_with_table(cchs2009_2010_p, c("HWTGHTM", "HWTGWTK", "DHH_SEX"))
+#' )
+#' }
 #'
-#' # Real CCHS data patterns:
-#' bmi_values <- c(18.0, 23.5, 28.0, 35.0, 996, 997, 998, 999, NA)
-#' categorize_bmi(bmi_values)
-#' # Handles: valid BMI values + all CCHS missing codes + regular NAs
+#' @seealso 
+#' \code{\link{HWTGHTM}} for height variable (required for BMI calculation)
+#' \code{\link{calculate_bmi}}, \code{\link{adjust_bmi}} for BMI functions using this variable
 #'
-#' # Numeric codes instead of labels:
-#' categorize_bmi(c(17, 22, 27, 32), categorical_labels = FALSE)
-#' # Returns: c(1L, 2L, 3L, 4L) where 1=Underweight, 2=Normal, 3=Overweight, 4=Obese
+#' @note v3.0.0, last updated: 2025-07-09, status: active, Note: Enhanced documentation with BMI calculation guidance
+#' @export
+HWTGWTK <- function(HWTGWTK) {
+  # this is for documentation purposes only
+}
+
+#' BMI continuous value (kg/m²)
 #'
-#' # For production analysis, rec_with_table() provides comprehensive handling:
-#' # - Full CSV-driven validation from variable_details.csv
-#' # - Robust error handling and recovery
-#' # - Consistent preprocessing across all variables
-#' # - Better performance with large datasets
+#' @description 
+#' Continuous Body Mass Index calculated using the standard formula: weight (kg) / height (m)².
+#'
+#' @details
+#' **Derivation Flow:** `HWTGBMI_der = calculate_bmi(HWTGHTM, HWTGWTK) → calculate_bmi_core() → BMI value (weight/height²)`
+#' 
+#' **Values:** Continuous values typically ranging 10-60 kg/m²
+#' - Under 18.5: Underweight
+#' - 18.5-24.9: Normal weight  
+#' - 25.0-29.9: Overweight
+#' - 30.0+: Obese
+#'
+#' @format Numeric vector with BMI values in kg/m². Missing data handled as haven::tagged_na():
+#' \itemize{
+#'   \item tagged_na("a") - Not applicable (missing input data)
+#'   \item tagged_na("b") - Invalid/missing measurements
+#' }
+#'
+#' @seealso 
+#' \code{\link{calculate_bmi}} to generate this variable,
+#' Use rec_with_table() with HWTGBMI_cat4 to convert to WHO categories,
+#' \code{\link{HWTGHTM}}, \code{\link{HWTGWTK}} for input variables
+#'
+#' @note v3.0.0, last updated: 2025-07-10, status: active, Note: Standard BMI calculation documentation
+#' @keywords datasets
+#' @export
+HWTGBMI_der <- function(HWTGBMI_der) {
+  # this is for documentation purposes only
+}
+
+#' Bias-corrected BMI for self-reported data (kg/m²)
+#'
+#' @description 
+#' BMI corrected for systematic reporting bias in self-reported height and weight data.
+#' Applies sex-specific correction coefficients from Connor Gorber et al. 2008 validation study.
+#'
+#' @details
+#' **Derivation Flow:** `HWTGCOR_der = adjust_bmi(DHH_SEX, HWTGHTM, HWTGWTK) → calculate_bmi_core() → Bias-corrected BMI value`
+#' 
+#' **Correction Method:** Sex-specific bias correction using measured vs. self-reported validation data
+#' - Males: Corrected BMI = 1.09 × Standard BMI - 0.05
+#' - Females: Corrected BMI = 1.08 × Standard BMI + 0.07
+#' 
+#' **Values:** Continuous values typically ranging 10-60 kg/m² (bias-corrected)
+#'
+#' @format Numeric vector with bias-corrected BMI values in kg/m². Missing data handled as haven::tagged_na():
+#' \itemize{
+#'   \item tagged_na("a") - Not applicable (missing input data) 
+#'   \item tagged_na("b") - Invalid/missing measurements or sex
+#' }
+#'
+#' @seealso 
+#' \code{\link{adjust_bmi}} to generate this variable,
+#' \code{\link{calculate_bmi}} for standard BMI,
+#' \code{\link{DHH_SEX}}, \code{\link{HWTGHTM}}, \code{\link{HWTGWTK}} for input variables
+#'
+#' @references
+#' Connor Gorber, S., et al. (2008). The accuracy of self-reported height and weight
+#' in a nationally representative sample of Canadian adults. Obesity, 16(10), 2326-2332.
+#'
+#' @note v3.0.0, last updated: 2025-07-10, status: active, Note: Bias-corrected BMI documentation
+#' @keywords datasets
+#' @export
+HWTGCOR_der <- function(HWTGCOR_der) {
+  # this is for documentation purposes only
+}
+
+#' BMI WHO categories (4-level classification)
+#'
+#' @description 
+#' Body Mass Index classified into World Health Organization standard categories using direct range mapping.
+#' Four-level classification system for weight status assessment in population health research.
+#'
+#' @details
+#' **Derivation Flow:** `HWTGBMI_cat4 = rec_with_table() → WHO thresholds → BMI category (1-4)`
+#' 
+#' **WHO Categories:**
+#' - 1 = "Underweight" (BMI < 18.5)
+#' - 2 = "Normal weight" (BMI 18.5-24.9)  
+#' - 3 = "Overweight" (BMI 25.0-29.9)
+#' - 4 = "Obese" (BMI ≥ 30.0)
+#' 
+#' **Values:** Can be returned as numeric codes (1-4) or character labels
+#'
+#' @format Factor or character vector with BMI categories. Missing data handled as haven::tagged_na():
+#' \itemize{
+#'   \item "NA(a)" or tagged_na("a") - Not applicable (missing BMI data)
+#'   \item "NA(b)" or tagged_na("b") - Invalid/missing BMI values
+#' }
+#'
+#' @seealso 
+#' \code{\link{HWTGBMI_der}} for continuous BMI input,
+#' \code{\link{calculate_bmi}}, \code{\link{adjust_bmi}} for BMI calculation
 #'
 #' @references
 #' World Health Organization. (2000). Obesity: preventing and managing the global epidemic.
 #' WHO Technical Report Series, 894.
 #'
-#' @note v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced categorization with comprehensive missing data handling
+#' @note v3.0.0, last updated: 2025-07-10, status: active, Note: WHO BMI categories documentation
+#' @keywords datasets
 #' @export
-categorize_bmi <- function(bmi_value = NULL, categorical_labels = TRUE, log_level = "silent") {
-  # 1. Preprocess values using vector-aware helper (standardized pattern)
-  clean_bmi <- clean_for_categorization(bmi_value, "triple_digit_missing", log_level)
-
-  # 2. Categorize BMI values with standardized tagged NA handling
-  if (categorical_labels) {
-    dplyr::case_when(
-      # Use standardized tagged NA conditions
-      !!!generate_tagged_na_conditions(clean_bmi, categorical_labels = TRUE),
-
-      # BMI categories (WHO classification)
-      clean_bmi < 18.5 ~ "Underweight",
-      clean_bmi >= 18.5 & clean_bmi < 25.0 ~ "Normal weight",
-      clean_bmi >= 25.0 & clean_bmi < 30.0 ~ "Overweight",
-      clean_bmi >= 30.0 ~ "Obese",
-
-      # Catch-all for any remaining edge cases
-      .default = "NA(b)"
-    )
-  } else {
-    dplyr::case_when(
-      # Use standardized tagged NA conditions
-      !!!generate_tagged_na_conditions(clean_bmi, categorical_labels = FALSE),
-
-      # BMI categories (WHO classification)
-      clean_bmi < 18.5 ~ 1L,
-      clean_bmi >= 18.5 & clean_bmi < 25.0 ~ 2L,
-      clean_bmi >= 25.0 & clean_bmi < 30.0 ~ 3L,
-      clean_bmi >= 30.0 ~ 4L,
-
-      # Catch-all for any remaining edge cases
-      .default = haven::tagged_na("b")
-    )
-  }
+HWTGBMI_cat4 <- function(HWTGBMI_cat4) {
+  # this is for documentation purposes only
 }
