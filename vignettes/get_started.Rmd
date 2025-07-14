@@ -168,7 +168,6 @@ sex2001 <- rec_with_table(cchs2001_p, "DHH_SEX",
 Labels can then be used in plots and tables.
 
 ```{r fig1, fig.height = 5, fig.width = 7, warning=FALSE}
-
 barplot(
   table(as_label(sex2001$DHH_SEX)),
   col = cm.colors(5),
@@ -379,12 +378,16 @@ combined, and labeled for the 2001 and 2012 CCHS cycles.
 options(htmlwidgets.TOJSON_ARGS = list(na = "string"))
 ```
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, eval=FALSE}
+# Example of transforming and merging data
 transformed2001 <- rec_with_table(data = cchs2001_p, notes = FALSE)
-
 transformed2012 <- rec_with_table(data = cchs2012_p, notes = FALSE)
-
 combined_cchs <- merge_rec_data(transformed2001, transformed2012)
+```
+
+```{r, echo=FALSE}
+# Just display sample data
+knitr::kable(head(cchs2001_p[1:5]), caption = "Sample of CCHS 2001 data")
 ```
 
 ## Example 7. Transform CCHS derived variables such as Body Mass Index (BMI) {#example7}

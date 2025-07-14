@@ -1,3 +1,26 @@
+# cchsflow 3.0.0
+2025-06-28
+
+## Major infrastructure enhancement
+This release represents a **major infrastructure enhancement** adding support for `_i` cycle databases (master/shared continuous data) across the cchsflow ecosystem.
+
+### Key metrics
+- **28 new variables** added
+- **74 variables enhanced** with expanded database support
+- **6 new R functions** for validation and utilities
+- **34 critical dependencies** reviewed and validated
+
+### Variable changes
+**New variables (28):** ADL_score_6, ADM_MOI_I, ADM_YOI_I, ALCDTYP_A, DHH_MS, DHH_MS_A, GEOGPRV_ONCO, HUI06, HUI07, HUI07A, HUI08, HUI09, HWTDBMI, HWTDHTM, HWTDWTK, MAM_037, PACFLEI, RAC_6D, SDCDGT_A, SDCDGT_B, and others.
+
+**Variables enhanced with _i database support (74):** ADL_01 through ADL_07, ALCDTTM, ALW_2A1 through ALW_2A7, and others.
+
+### Code changes
+**New R functions:** adl_score_6.R, csv-helpers.R, csv-utils.R, DemPoRT_ICES_code.R, schema-validation.R, test code.R
+
+### Critical dependencies
+All 34 variables affecting derived functions reviewed and confirmed compatible.
+
 # cchsflow 2.0.1
 2022-05-05
 

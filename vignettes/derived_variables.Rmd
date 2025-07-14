@@ -36,14 +36,16 @@ if_else2 <- function(x, a, b) {
   ifelse(falseifNA(x), a, b)
 }
 
-#BMI derived variable
+# BMI derived variable
 # HWTGHTM: height (in meters)
 # HWTGWTK: weight (in kilograms)
-bmi_fun <- 
-  function(HWTGHTM, 
+bmi_fun <-
+  function(HWTGHTM,
            HWTGWTK) {
-    ifelse2((!is.na(HWTGHTM)) & (!is.na(HWTGWTK)), 
-            (HWTGWTK/(HWTGHTM*HWTGHTM)), NA)
+    ifelse2(
+      (!is.na(HWTGHTM)) & (!is.na(HWTGWTK)),
+      (HWTGWTK / (HWTGHTM * HWTGHTM)), NA
+    )
   }
 ```
 
@@ -52,11 +54,15 @@ library(cchsflow)
 ```
 
 ```{r, warning = FALSE}
-bmi2003 <- rec_with_table(cchs2003_p, variables = c("HWTGHTM", "HWTGWTK", 
-            "HWTGBMI_der"), log = TRUE)
+bmi2003 <- rec_with_table(cchs2003_p, variables = c(
+  "HWTGHTM", "HWTGWTK",
+  "HWTGBMI_der"
+), log = TRUE)
 
-bmi2010 <- rec_with_table(cchs2010_p, variables = c("HWTGHTM", "HWTGWTK",
-            "HWTGBMI_der"), log = TRUE)
+bmi2010 <- rec_with_table(cchs2010_p, variables = c(
+  "HWTGHTM", "HWTGWTK",
+  "HWTGBMI_der"
+), log = TRUE)
 ```
 
 Since derived variables are based on previously transformed variables, if you want to only transform your derived variable, you must also specify its base CCHS variables in `rec_with_table()` as shown above. So for the derived BMI variable, you will have to also specify the height (`HWTGHTM`) and weight (`HWTGWTK`) variables.

@@ -1,0 +1,135 @@
+
+⸻
+
+title: “Understanding and validating missing data codes in the Canadian Community Health Survey”
+author: “cchsflow development team”
+format: html
+editor: visual
+
+## Purpose
+
+Missing data codes in the Canadian Community Health Survey (CCHS) follow a structured but sometimes inconsistent system across survey cycles. This vignette documents the conventions used for missing data and offers a practical guide for ensuring accuracy when handling missing codes in harmonised workflows. It also describes how cchsflow recodes missing values and provides a rationale for the standard categories we use.
+
+## Standard conventions in Statistics Canada CCHS PUMFs
+
+CCHS public use microdata files (PUMFs) use a combination of single-digit, double-digit, and triple-digit codes to represent different forms of missing data. These are generally consistent across cycles, but exceptions exist.
+
+### Common codes
+
+| Variable type         | Code pattern        | Description                                                    |
+|-----------------------|---------------------|----------------------------------------------------------------|
+| Categorical           | 6, 7, 8, 9           | 6 = Not applicable; 7 = Don’t know; 8 = Refusal; 9 = Not stated |
+| Ordinal (age recodes) | 96–99                | Same as above, extended for two-digit recoded categories       |
+| Continuous            | 996–999, 9996+       | Same meanings, scaled to match numeric field widths            |
+
+For example:
+	•	A BMI value of 999.6 is recoded as NA_a to indicate not applicable.
+	•	Values like 999.7, 999.8, and 999.9 are mapped to NA_b, NA_c, and NA_d respectively.
+
+### Official sources
+
+These conventions are documented across various Statistics Canada sources. Key references include:
+	•	CCHS 2012 User Guide (PDF)
+	•	CCHS Cycle 2.2 (2004) – Guide to Accessing and Interpreting Data
+	•	Community Data Program Webinar on CCHS (April 2024)
+	•	CCHSflow OSF archive of documentation and data files
+
+## Current classification used in cchsflow
+
+To standardise missing value handling, cchsflow uses the following internal categories:
+
+| Category name | Pattern | Used for |
+|---------------|---------|----------|
+| single_digit_missing | 6–9 | Binary/ternary variables (valid responses 1-5) |
+| double_digit_missing | 96–99 | Multi-category scales (valid responses 1-95) |
+| triple_digit_missing | 996–999 | Continuous numeric variables |
+
+**CRITICAL PATTERN SELECTION RULE**: Use `double_digit_missing` for any variable where 6 is a VALID response (e.g., smoking status where 6=never smoked).
+
+Note: some cycles use codes like 999.6 or 9996. These are both normalised within cchsflow and treated as triple_digit_missing.
+
+Tagged NA recoding follows this general pattern:
+
+| Original Code | Pattern | Tagged NA | Meaning |
+|---------------|---------|-----------|---------|
+| 6, 96, 996, 999.6 | Not applicable | `haven::tagged_na("a")` | Question doesn't apply |
+| 7, 97, 997, 999.7 | Don't know | `haven::tagged_na("b")` | Respondent doesn't know |
+| 8, 98, 998, 999.8 | Refusal | `haven::tagged_na("b")` | Respondent refused |
+| 9, 99, 999, 999.9 | Not stated | `haven::tagged_na("b")` | No response recorded |
+
+For more details on how these are applied in practice, see:
+	•	https://big-life-lab.github.io/cchsflow/articles/tagged_na_usage.html
+
+## Recommendations for users
+
+While cchsflow automates much of the missing data handling, users must understand the underlying patterns to avoid errors:
+
+- **Do not treat missing-value codes as numeric data** - Always check for codes like 999.6 or 96 before analysis
+- **Always convert raw codes to missing values** using the tagged NA system or cchsflow functions
+- **Understand your variable's valid range** - Know whether 6 is a valid response or missing code
+- **Use appropriate cchsflow functions** - `rec_with_table()` or standalone functions with proper pattern selection
+- **Test all valid category boundaries** when developing derived variables - Don't assume patterns without verification
+- **Consult cycle-specific codebooks** for edge cases and exceptions
+- **Report anomalies** via GitHub issues to help improve the package
+
+**Key principle**: cchsflow provides tools and automation, but users remain responsible for understanding their data structure and choosing appropriate methods.
+
+## Validation process
+
+To confirm the correctness of this mapping, we carried out the following steps:
+	•	Reviewed cycle-specific documentation, including data dictionaries and user guides across major CCHS cycles.
+	•	Compiled variable-specific codebooks to detect exceptions or inconsistent patterns.
+	•	Compared outputs from cchsflow with raw PUMF data to ensure that all missing values were appropriately recoded.
+	•	Used frequency tables to confirm that all expected missing value codes were observed and recoded as intended.
+	•	Benchmarked recoded data against other harmonised datasets and internal examples from the OSF archive:
+https://osf.io/g6d84/
+
+
+## Known exceptions and caveats
+
+Some early cycles (e.g., 2001–2003) used trailing decimals for continuous variables (999.6, 999.7, etc.), while later cycles shifted to whole numbers (9996, 9997). These patterns are handled automatically in cchsflow.
+
+In a few variables, other codes (e.g., 0) may indicate a missing or undefined state. These are handled individually and documented as part of variable-specific transformation tables.
+
+## Pattern selection guidelines
+
+### Quick reference
+
+| Variable Type | Valid Range | Pattern | Missing Codes | Example |
+|---------------|-------------|---------|---------------|---------|
+| Binary | 1-2 | single_digit_missing | 6,7,8,9 | SMK_030 (yes/no) |
+| Ternary | 1-3 | single_digit_missing | 6,7,8,9 | SMK_005 (daily/occasional/not at all) |
+| Multi-category | 1-6+ | double_digit_missing | 96,97,98,99 | Smoking status (1-6) |
+| Age categories | 1-11+ | double_digit_missing | 96,97,98,99 | SMKG203 (age groups) |
+| Continuous | Variable | triple_digit_missing | 996,997,998,999 | Height, weight |
+
+### Decision flowchart
+
+1. **Is it a continuous measurement?** → Use `triple_digit_missing`
+2. **Is the maximum valid response > 5?** → Use `double_digit_missing`  
+3. **Is the maximum valid response ≤ 5?** → Use `single_digit_missing`
+
+### Common pitfall: Multi-category variables
+
+Users can easily make errors when working with variables that have more than 5 valid categories. Here's an illustrative example:
+
+**Smoking status classification** uses a 6-category scale:
+- 1 = Daily smoker, 2 = Occasional smoker (former daily), 3 = Occasional smoker (never daily)
+- 4 = Former daily smoker, 5 = Former occasional smoker, **6 = Never smoked**
+
+**The potential error**: A user might assume that since most CCHS variables use 6,7,8,9 as missing codes, they should use `single_digit_missing` pattern for smoking status. This would incorrectly treat category 6 (never smoked) as "not applicable" instead of a valid response.
+
+**The correct approach**: Since the valid range (1-6) exceeds 5, smoking status requires `double_digit_missing` pattern, where 96,97,98,99 are the missing codes and 6 remains a valid response.
+
+**How cchsflow helps**: The package functions handle this automatically when used properly, but users developing custom derived variables must understand the underlying logic.
+
+**The lesson**: Always verify the complete valid response range before selecting a missing data pattern.
+
+### Best practices for implementation
+
+When implementing missing data patterns, always:
+- **Test all valid category endpoints** (both minimum and maximum values)
+- **Test invalid categories** (values above maximum, standard missing codes)  
+- **Test boundary combinations** (valid + missing data scenarios)
+- **Verify assumptions** about valid ranges using actual data or codebooks
+

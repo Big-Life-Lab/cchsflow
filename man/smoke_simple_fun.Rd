@@ -2,64 +2,35 @@
 % Please edit documentation in R/smoking.R
 \name{smoke_simple_fun}
 \alias{smoke_simple_fun}
-\title{Simple smoking status}
+\title{Simple smoking status (unified approach)}
 \usage{
-smoke_simple_fun(SMKDSTY_cat5, time_quit_smoking)
+smoke_simple_fun(
+  SMKDSTY_cat5,
+  time_quit_smoking,
+  min_time_quit = NULL,
+  max_time_quit = NULL,
+  validate_params = NULL
+)
 }
 \arguments{
-\item{SMKDSTY_cat5}{derived variable that classifies an individual's smoking
-status. This variable captures cycles 2001-2018.}
+\item{SMKDSTY_cat5}{derived variable that classifies an individual's smoking status}
 
-\item{time_quit_smoking}{derived variable that calculates the approximate
-time a former smoker has quit smoking. 
-See \code{\link{time_quit_smoking_fun}} for documentation on how variable
-was derived.}
+\item{time_quit_smoking}{derived variable that calculates the approximate time a former smoker has quit smoking}
+
+\item{min_time_quit}{minimum valid time since quitting (NULL for no validation)}
+
+\item{max_time_quit}{maximum valid time since quitting (NULL for no validation)}
+
+\item{validate_params}{logical, enable parameter validation (auto-detected if NULL)}
+}
+\value{
+value for simple smoking status categories
 }
 \description{
-This function creates a derived smoking variable (smoke_simple)  
- with four categories: 
- 
-\itemize{
-  \item non-smoker (never smoked)
-  \item current smoker (daily and occasional?)
-  \item former daily smoker quit =<5 years or former occasional smoker 
-  \item former daily smoker quit >5 years
- }
+This function creates a derived smoking variable (smoke_simple)
+ with four categories: non-smoker, current smoker, former daily smoker quit <=5 years
+ or former occasional smoker, former daily smoker quit >5 years
 }
-\examples{
-# Using the 'smoke_simple_fun' function to create the derived smoking   
-# variable across CCHS cycles.
-# smoke_simple_fun() is specified in the variable_details.csv
-
-# To create a harmonized smoke_simple variable across CCHS cycles, use 
-# rec_with_table() for each CCHS cycle and specify smoke_simple_fun and 
-# the required base variables. Since time_quit_smoking_der is also a derived 
-# variable, you will have to specify the variables that are derived from it.
-# Using merge_rec_data(), you can combine smoke_simple across cycles.
-
-library(cchsflow)
-
-smoke_simple2009_2010 <- rec_with_table(
-  cchs2009_2010_p, c(
-    "SMKDSTY", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
-    "smoke_simple"
-  )
-)
-
-head(smoke_simple2009_2010)
-
-smoke_simple2011_2012 <- rec_with_table(
-  cchs2011_2012_p,c(
-   "SMKDSTY", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
-   "smoke_simple"
-  )
-)
-
-tail(smoke_simple2011_2012)
-
-combined_smoke_simple <- 
-suppressWarnings(merge_rec_data(smoke_simple2009_2010,smoke_simple2011_2012))
-
-head(combined_smoke_simple)
-tail(combined_smoke_simple)
+\note{
+v3.0.0, last updated: 2025-06-30, status: active, Note: Simplified logic with enhanced validation and documentation
 }
