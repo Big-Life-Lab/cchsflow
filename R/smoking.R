@@ -383,23 +383,63 @@ PACK_YEARS_CONSTANTS <- list(
 #' - **2015-2024**: Derived from SMK_005, SMK_030, SMK_01A using this function
 #'
 #' @examples
-#' # Standard cchsflow workflow (primary usage - recommended)
-#' library(cchsflow)
-#' 
-#' result <- rec_with_table(
-#'   data = your_data,
-#'   variables = "SMKDSTY_A", 
-#'   database_name = "cchs2017_2018_p",
-#'   variable_details = variable_details
+#' # rec_with_table workflow (RECOMMENDED - handles all validation automatically):
+#' # Generate test data with smoking status variables
+#' test_data <- data.frame(
+#'   SMK_005 = c(1, 2, 2, 3, 3, 3, 6, 7, 8, 9),
+#'   SMK_030 = c(1, 1, 2, 1, 2, 2, 1, 996, 997, 998),
+#'   SMK_01A = c(1, 1, 1, 1, 1, 2, 1, 1, 998, 999)
 #' )
+#' library(cchsflow)
+#' result <- rec_with_table(
+#'   test_data,
+#'   c("SMK_005", "SMK_030", "SMK_01A", "SMKDSTY_A")
+#' )
+#' # Returns:
+#' #   SMK_005 SMK_030 SMK_01A SMKDSTY_A
+#' # 1       1       1       1         1  # Daily smoker
+#' # 2       2       1       1         2  # Occasional (former daily)
+#' # 3       2       2       1         3  # Occasional (never daily)
+#' # 4       3       1       1         4  # Former daily
+#' # 5       3       2       1         5  # Former occasional
+#' # 6       3       2       2         6  # Never smoked
+#' # 7-10: Missing data patterns with tagged_na
 #' 
-#' # Direct function usage (advanced users)
-#' smoking_status <- calculate_smoking_status_detailed(
+#' # Direct function usage (advanced users - scalar input):
+#' smoking_status_scalar <- calculate_smoking_status_detailed(
+#'   SMK_005 = 1, SMK_030 = 1, SMK_01A = 1
+#' )
+#' # Result: 1 (daily smoker)
+#' 
+#' # Direct function usage (advanced users - vector input):
+#' smoking_status_vector <- calculate_smoking_status_detailed(
 #'   SMK_005 = c(1, 2, 2, 3, 3, 3), # Daily, occasional, occasional, former, former, former
 #'   SMK_030 = c(1, 1, 2, 1, 2, 2), # Ever daily status
 #'   SMK_01A = c(1, 1, 1, 1, 1, 2)  # ≥100 cigarettes lifetime
 #' )
 #' # Result: c(1, 2, 3, 4, 5, 6) - daily, occ-former, occ-never, former-daily, former-occ, never
+#' 
+#' # Missing data and edge cases (IMPORTANT - shows function logic):
+#' missing_data_examples <- calculate_smoking_status_detailed(
+#'   SMK_005 = c(6, 7, 8, 9, 3, 3, 2),    # Missing codes, former smokers, occasional
+#'   SMK_030 = c(1, 2, 996, 997, 996, 2, 6), # Valid, missing codes
+#'   SMK_01A = c(1, 1, 1, 1, 1, 1, 1)     # All valid
+#' )
+#' # Result: c(NA::a, NA::b, NA::b, NA::b, NA::b, 5, 3)
+#' # - Codes 6 → tagged_na("a"), codes 7-9 → tagged_na("b") 
+#' # - SMK_005=3 with SMK_030=996 (missing) → tagged_na("b")
+#' # - SMK_005=3, SMK_030=2, SMK_01A=1 → 5 (former occasional)
+#' # - SMK_005=2, SMK_030=6 (missing) → 3 (occasional never daily)
+#' 
+#' # Edge case: Former smokers with missing SMK_030 data
+#' # **IMPORTANT**: This case falls through to missing (matches legacy behavior)
+#' edge_case <- calculate_smoking_status_detailed(
+#'   SMK_005 = 3,    # Former smoker
+#'   SMK_030 = 996,  # Missing: "not applicable" 
+#'   SMK_01A = 1     # Smoked ≥100 cigarettes
+#' )
+#' # Result: tagged_na("b") 
+#' # NOTE: Should be validated against actual CCHS question flow
 #'
 #' @note v3.0.0, last updated: 2025-07-14, status: active - Complete SMKDSTY_A implementation
 #' @export
@@ -434,6 +474,8 @@ calculate_smoking_status_detailed <- function(SMK_005, SMK_030, SMK_01A, log_lev
     cleaned$smk_005_clean == 3 & cleaned$smk_030_clean == 2 & cleaned$smk_01a_clean == 1 ~ 5L,  # Former occasional
     
     # Default to missing for any unhandled cases
+    # NOTE: Cases like SMK_005=3, SMK_030=missing, SMK_01A=1 fall through to missing
+    # This matches legacy behavior but should be validated against actual CCHS question flow
     .default = haven::tagged_na("b")
   )
 }
@@ -455,30 +497,181 @@ calculate_smoking_status <- function(SMK_005, SMK_030, SMK_01A, log_level = "sil
 }
 
 # ==============================================================================
-# 3.2 OTHER SMOKING STATUS VARIANTS (IMPLEMENTED AS NEEDED)
+# 3.2 OTHER SMOKING STATUS VARIANTS (VARIABLE DOCUMENTATION)
 # ==============================================================================
 #
-# These functions provide alternative smoking status classifications for specific
+# These variables provide alternative smoking status classifications for specific
 # research needs. The primary function above (SMKDSTY_A) should be used for most
 # smoking history generator models.
 #
-# ADDITIONAL VARIANTS (CAN BE IMPLEMENTED WHEN NEEDED):
+# SMOKING STATUS VARIABLE FAMILY:
 # 
 # ┌─────────────────────────────────────────────────────────────────────────────┐
-# │                  OPTIONAL SMOKING STATUS CLASSIFICATIONS                   │
+# │                  SMOKING STATUS CLASSIFICATION VARIANTS                    │
 # └─────────────────────────────────────────────────────────────────────────────┘
 #
-# calculate_smoking_status_simplified() → SMKDSTY_B (6 categories, 2015+ cycles)
-# calculate_smoking_status_intermediate() → SMKDSTY_cat5 (5 categories, all cycles)  
-# calculate_smoking_status_basic() → SMKDSTY_cat3 (3 categories, all cycles)
-#
-# IMPLEMENTATION STATUS:
-# • These functions can be added to the CSV and implemented here when specific
-#   research projects require them
-# • The core logic patterns from SMKDSTY_A can be adapted for each variant
-# • All variants use the same input variables: SMK_005, SMK_030, SMK_01A
+# PRIMARY: SMKDSTY_A (6 categories) - Implemented above in section 3.1
+# VARIANTS: SMKDSTY_B, SMKDSTY_cat5, SMKDSTY_cat3 - Documentation functions below  
+# DERIVED: smoke_simple (4 categories) - See section 3.3 time-based functions
 #
 # ==============================================================================
+
+#' SMKDSTY_B: Smoking status (6-category alternative classification)
+#'
+#' @description 
+#' \strong{NOTE:} This is a documentation function, not a computational function.
+#'
+#' Alternative 6-category smoking status classification available in 2015-2024 cycles.
+#' Similar to SMKDSTY_A but with different category definitions, particularly for
+#' occasional and experimental smoking patterns. Can be used directly in recodeflow
+#' for harmonized analysis when specific research requires this classification.
+#'
+#' @details 
+#' **Data Source:** CCHS derived variable (Statistics Canada)
+#' **Categories:** 6-level classification
+#' - 1 = "Daily smoker"
+#' - 2 = "Occasional smoker" 
+#' - 3 = "Former daily smoker"
+#' - 4 = "Former occasional smoker"
+#' - 5 = "Experimental smoker" (key difference from SMKDSTY_A)
+#' - 6 = "Never smoked"
+#' 
+#' **Cycle Coverage:** 2015-2024 (newer cycles only)
+#' **Derivation:** Uses SMK_005, SMK_030, SMK_01A with different logic than SMKDSTY_A
+#' **Usage:** Available directly from CCHS, no function implementation needed
+#'
+#' @param SMKDSTY_B Variable name for 6-category smoking status (alternative)
+#'
+#' @examples
+#' # rec_with_table workflow for SMKDSTY_B (available 2015-2024 cycles):
+#' library(cchsflow)
+#' \dontrun{
+#' # Use directly from CCHS - no function needed
+#' result <- rec_with_table(
+#'   cchs2017_2018_p,
+#'   c("SMKDSTY_B", "DHH_SEX", "DHHGAGE")
+#' )
+#' summary(result$SMKDSTY_B)
+#' 
+#' # Compare with SMKDSTY_A classification
+#' comparison <- rec_with_table(
+#'   cchs2017_2018_p,
+#'   c("SMK_005", "SMK_030", "SMK_01A", "SMKDSTY_A", "SMKDSTY_B")
+#' )
+#' table(comparison$SMKDSTY_A, comparison$SMKDSTY_B, useNA = "ifany")
+#' }
+#'
+#' @seealso 
+#' \code{\link{calculate_smoking_status_detailed}} for SMKDSTY_A (primary classification),
+#' \code{\link{SMKDSTY_cat5}}, \code{\link{SMKDSTY_cat3}} for other variants
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: documentation-only
+#' @export
+SMKDSTY_B <- function(SMKDSTY_B) {
+  # this is for documentation purposes only
+}
+
+#' SMKDSTY_cat5: Smoking status (5-category classification)
+#'
+#' @description 
+#' \strong{NOTE:} This is a documentation function, not a computational function.
+#'
+#' Five-category smoking status classification available across all CCHS cycles.
+#' Consolidates the 6-category classifications into 5 broader groups, commonly
+#' used for population health research and epidemiological studies. Can be used
+#' directly in recodeflow or as input to smoke_simple classification.
+#'
+#' @details 
+#' **Data Source:** CCHS derived variable (Statistics Canada)
+#' **Categories:** 5-level classification
+#' - 1 = "Daily smoker"
+#' - 2 = "Occasional smoker"
+#' - 3 = "Former daily smoker" 
+#' - 4 = "Former occasional smoker"
+#' - 5 = "Never smoked"
+#' 
+#' **Cycle Coverage:** 2001-2024 (all cycles)
+#' **Derivation:** Consolidation of 6-category classifications
+#' **Common Usage:** Input variable for smoke_simple time-based classification
+#'
+#' @param SMKDSTY_cat5 Variable name for 5-category smoking status
+#'
+#' @examples
+#' # rec_with_table workflow for SMKDSTY_cat5 (all cycles):
+#' library(cchsflow)
+#' \dontrun{
+#' # Use directly from CCHS - no function needed
+#' result <- rec_with_table(
+#'   cchs2009_2010_p,
+#'   c("SMKDSTY_cat5", "DHH_SEX", "DHHGAGE")
+#' )
+#' summary(result$SMKDSTY_cat5)
+#' 
+#' # Common usage as input to smoke_simple classification
+#' smoke_analysis <- rec_with_table(
+#'   cchs2009_2010_p,
+#'   c("SMKDSTY_cat5", "SMK_09A_B", "SMKG09C", "time_quit_smoking", "smoke_simple")
+#' )
+#' table(smoke_analysis$SMKDSTY_cat5, smoke_analysis$smoke_simple, useNA = "ifany")
+#' }
+#'
+#' @seealso 
+#' \code{\link{calculate_smoke_simple}} (uses SMKDSTY_cat5 as input),
+#' \code{\link{calculate_smoking_status_detailed}}, \code{\link{SMKDSTY_B}}, \code{\link{SMKDSTY_cat3}}
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: documentation-only
+#' @export
+SMKDSTY_cat5 <- function(SMKDSTY_cat5) {
+  # this is for documentation purposes only
+}
+
+#' SMKDSTY_cat3: Smoking status (3-category simplified classification)
+#'
+#' @description 
+#' \strong{NOTE:} This is a documentation function, not a computational function.
+#'
+#' Three-category smoking status classification for basic population health analysis.
+#' Provides the simplest smoking status grouping across all CCHS cycles, suitable
+#' for general epidemiological research and basic smoking prevalence studies.
+#'
+#' @details 
+#' **Data Source:** CCHS derived variable (Statistics Canada)
+#' **Categories:** 3-level classification
+#' - 1 = "Current smoker" (includes daily and occasional)
+#' - 2 = "Former smoker" (includes former daily and former occasional)
+#' - 3 = "Never smoked"
+#' 
+#' **Cycle Coverage:** 2001-2024 (all cycles)
+#' **Derivation:** Simplified grouping of detailed smoking status categories
+#' **Common Usage:** Basic smoking prevalence analysis, simple risk factor studies
+#'
+#' @param SMKDSTY_cat3 Variable name for 3-category smoking status
+#'
+#' @examples
+#' # rec_with_table workflow for SMKDSTY_cat3 (all cycles):
+#' library(cchsflow)
+#' \dontrun{
+#' # Use directly from CCHS - no function needed
+#' result <- rec_with_table(
+#'   cchs2011_2012_p,
+#'   c("SMKDSTY_cat3", "DHH_SEX", "DHHGAGE")
+#' )
+#' summary(result$SMKDSTY_cat3)
+#' 
+#' # Basic prevalence analysis
+#' prevalence <- table(result$SMKDSTY_cat3, useNA = "ifany")
+#' prop.table(prevalence) * 100  # Percentage distribution
+#' }
+#'
+#' @seealso 
+#' \code{\link{calculate_smoking_status_detailed}} for detailed 6-category classification,
+#' \code{\link{SMKDSTY_cat5}}, \code{\link{SMKDSTY_B}} for other variants
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: documentation-only
+#' @export
+SMKDSTY_cat3 <- function(SMKDSTY_cat3) {
+  # this is for documentation purposes only
+}
 
 # ==============================================================================
 # 3.3 TIME-BASED SMOKING FUNCTIONS  
@@ -868,8 +1061,8 @@ calculate_smoke_simple <- function(SMKDSTY_cat5, time_quit_smoking, log_level = 
     cleaned$smkdsty_cat5_clean == 5 ~ 0L, # Never smoked
     cleaned$smkdsty_cat5_clean %in% c(1, 2) ~ 1L, # Current smoker (daily and occasional)
     cleaned$smkdsty_cat5_clean == 4 ~ 2L, # Former occasional smoker
-    cleaned$smkdsty_cat5_clean == 3 & !is.na(cleaned$time_quit_smoking_clean) & !haven::is_tagged_na(cleaned$time_quit_smoking_clean) & cleaned$time_quit_smoking_clean < 5 ~ 2L,
-    cleaned$smkdsty_cat5_clean == 3 & !is.na(cleaned$time_quit_smoking_clean) & !haven::is_tagged_na(cleaned$time_quit_smoking_clean) & cleaned$time_quit_smoking_clean >= 5 ~ 3L,
+    cleaned$smkdsty_cat5_clean == 3 & !is.na(cleaned$time_quit_smoking_clean) & !haven::is_tagged_na(cleaned$time_quit_smoking_clean) & cleaned$time_quit_smoking_clean <= 5 ~ 2L,
+    cleaned$smkdsty_cat5_clean == 3 & !is.na(cleaned$time_quit_smoking_clean) & !haven::is_tagged_na(cleaned$time_quit_smoking_clean) & cleaned$time_quit_smoking_clean > 5 ~ 3L,
     cleaned$smkdsty_cat5_clean == 3 & (is.na(cleaned$time_quit_smoking_clean) | haven::is_tagged_na(cleaned$time_quit_smoking_clean)) ~ 2L,
 
     # Use standardized tagged NA conditions for both inputs
