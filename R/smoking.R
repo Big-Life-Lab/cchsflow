@@ -674,6 +674,638 @@ SMKDSTY_cat3 <- function(SMKDSTY_cat3) {
 }
 
 # ==============================================================================
+# 3.2 SMOKING INITIATION FUNCTIONS
+# ==============================================================================
+#
+# Age at smoking initiation is a critical variable for smoking history generator 
+# models and epidemiological research. The >100 cigarettes criterion is embedded
+# throughout these measures as the standard threshold for established smoking.
+#
+# PRIMARY CONTINUOUS MEASURES (Priority for smoking history models):
+# ├── SMKG01C_cont - Age smoked first cigarette (>100 cigarettes context)
+# ├── SMKG203_cont - Age started daily smoking (current daily smokers)  
+# ├── SMKG207_cont - Age started daily smoking (former daily smokers)
+# └── SMKG040_cont - Combined age started daily (harmonized across cycles)
+#
+# CATEGORICAL ALTERNATIVES (Available for research/testing):
+# ├── SMKG01C_A/B - Age first cigarette (10/11 categories)
+# ├── SMKG203_A/B - Age started daily (current, 10/11 categories)
+# └── SMKG207_A/B - Age started daily (former, 10/11 categories)
+#
+# All functions use comprehensive CSV-driven mappings in variable_details.csv
+# for harmonization across CCHS cycles 2001-2024.
+
+#' Convert age at first cigarette (categorical to continuous)
+#'
+#' @description
+#' Convert categorical age at first cigarette to continuous age using midpoint mappings.
+#' The >100 cigarettes criterion provides context for established smoking history.
+#' Essential for smoking history generator models and epidemiological research.
+#'
+#' @param SMKG01C Age smoked first cigarette categories (1-10 or 1-11). Accepts raw CCHS codes.
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric continuous age at first cigarette with structured missing data:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Age values: 8, 13, 16, 18.5, 22, 27, 32, 37, 42, 47, 55 (category midpoints)
+#'
+#' @details
+#' **Priority Variable for Smoking History Models**
+#' 
+#' SMKG01C_cont is the primary continuous measure for age at smoking initiation,
+#' representing the >100 cigarettes threshold that defines established smoking.
+#' This is critical for pack-years calculations and smoking exposure modeling.
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' 
+#' result <- rec_with_table(
+#'   data = your_data,
+#'   variables = "SMKG01C_cont", 
+#'   database_name = "cchs2017_2018_p",
+#'   variable_details = variable_details
+#' )
+#' 
+#' # Direct function usage (advanced users)
+#' ages <- calculate_age_first_cigarette(
+#'   SMKG01C = c(1, 3, 10, 96, 99) # Various age categories and missing codes
+#' )
+#' # Result: c(8, 17, 55, tagged_na("a"), tagged_na("b"))
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: active - CSV-driven age conversion
+#' @export
+calculate_age_first_cigarette <- function(SMKG01C, log_level = "silent") {
+  
+  # Clean CCHS missing codes
+  cleaned <- clean_variables(
+    categorical_vars = list(smkg01c = SMKG01C),
+    categorical_pattern = "single_digit_missing",
+    log_level = log_level
+  )
+  
+  # Use lookup_recEnd to convert categories to continuous values using variable_details.csv
+  # This leverages the comprehensive SMKG01C_cont mappings already defined in the CSV
+  lookup_recEnd(cleaned$smkg01c_clean, "SMKG01C_cont", variable_details)
+}
+
+#' Convert age started smoking daily for current daily smokers (categorical to continuous)
+#'
+#' @description
+#' Convert categorical age started smoking daily to continuous age for current daily smokers.
+#' Filters for current daily smokers (SMK_005 = 1) and converts SMKG040 categories to 
+#' continuous age values using midpoint mappings for harmonization across CCHS cycles.
+#'
+#' @param SMK_005 Type of smoker presently (1=daily, 2=occasional, 3=not at all). Accepts raw CCHS codes.
+#' @param SMKG040 Age started smoking daily categories (1-11 representing age ranges). Accepts raw CCHS codes.
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric continuous age for current daily smokers. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases (non-daily smokers)
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Age values: 8, 13, 16, 18.5, 22, 27, 32, 37, 42, 47, 55 (category midpoints)
+#'
+#' @details
+#' **Conversion Logic:**
+#' - **Filter**: Only current daily smokers (SMK_005 = 1) get age values
+#' - **Mapping**: SMKG040 categories converted to continuous age using midpoints:
+#'   - Category 1 → 8 years (5-11 years)
+#'   - Category 2 → 13 years (12-14 years)  
+#'   - Category 3 → 16 years (15-17 years)
+#'   - Category 4 → 18.5 years (18-19 years)
+#'   - Category 5 → 22 years (20-24 years)
+#'   - Category 6 → 27 years (25-29 years)
+#'   - Category 7 → 32 years (30-34 years)
+#'   - Category 8 → 37 years (35-39 years)
+#'   - Category 9 → 42 years (40-44 years)
+#'   - Category 10 → 47 years (45-49 years)
+#'   - Category 11 → 55 years (50+ years)
+#'
+#' **Cycle coverage:** 2015-2018 (specific cycles requiring this conversion)
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' 
+#' result <- rec_with_table(
+#'   data = your_data,
+#'   variables = "SMKG203_cont", 
+#'   database_name = "cchs2015_2016_p",
+#'   variable_details = variable_details
+#' )
+#' 
+#' # Direct function usage (advanced users)
+#' smkg203_cont <- calculate_age_started_daily_current(
+#'   SMK_005 = c(1, 2, 1, 3, 1), # Daily, occasional, daily, former, daily
+#'   SMKG040 = c(3, 5, 7, 4, 11) # Age categories
+#' )
+#' # Result: c(16, tagged_na("a"), 32, tagged_na("a"), 55)
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: active - Age conversion support
+#' @export
+calculate_age_started_daily_current <- function(SMK_005, SMKG040, log_level = "silent") {
+  
+  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
+  cleaned <- clean_variables(
+    categorical_vars = list(smk_005 = SMK_005, smkg040 = SMKG040),
+    categorical_pattern = "single_digit_missing",
+    log_level = log_level
+  )
+  
+  # Filter for current daily smokers only, then convert using CSV mappings
+  filtered_ages <- dplyr::case_when(
+    !!!assign_tagged_na(cleaned$smk_005_clean),
+    !!!assign_tagged_na(cleaned$smkg040_clean),
+    
+    # Only current daily smokers get age values
+    cleaned$smk_005_clean == 1 ~ cleaned$smkg040_clean,
+    
+    # Not applicable for non-daily smokers
+    .default = haven::tagged_na("a")
+  )
+  
+  # Use lookup_recEnd to convert categories to continuous values using variable_details.csv
+  # This leverages the comprehensive SMKG203_cont mappings already defined in the CSV
+  lookup_recEnd(filtered_ages, "SMKG203_cont", variable_details)
+}
+
+#' Convert age started smoking daily for former daily smokers (categorical to continuous)
+#'
+#' @description
+#' Convert categorical age started smoking daily to continuous age for former daily smokers.
+#' Filters for former daily smokers (SMK_030 = 1) and converts SMKG040 categories to 
+#' continuous age values using midpoint mappings for harmonization across CCHS cycles.
+#'
+#' @param SMK_030 Ever smoked daily in lifetime (1=yes, 2=no). Accepts raw CCHS codes.
+#' @param SMKG040 Age started smoking daily categories (1-11 representing age ranges). Accepts raw CCHS codes.
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric continuous age for former daily smokers. Missing data handled as:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases (never daily smokers)
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Age values: 8, 13, 16, 18.5, 22, 27, 32, 37, 42, 47, 55 (category midpoints)
+#'
+#' @details
+#' **Conversion Logic:**
+#' - **Filter**: Only former daily smokers (SMK_030 = 1) get age values
+#' - **Mapping**: SMKG040 categories converted to continuous age using midpoints:
+#'   - Category 1 → 8 years (5-11 years)
+#'   - Category 2 → 13 years (12-14 years)  
+#'   - Category 3 → 16 years (15-17 years)
+#'   - Category 4 → 18.5 years (18-19 years)
+#'   - Category 5 → 22 years (20-24 years)
+#'   - Category 6 → 27 years (25-29 years)
+#'   - Category 7 → 32 years (30-34 years)
+#'   - Category 8 → 37 years (35-39 years)
+#'   - Category 9 → 42 years (40-44 years)
+#'   - Category 10 → 47 years (45-49 years)
+#'   - Category 11 → 55 years (50+ years)
+#'
+#' **Cycle coverage:** 2015-2018 (specific cycles requiring this conversion)
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' 
+#' result <- rec_with_table(
+#'   data = your_data,
+#'   variables = "SMKG207_cont", 
+#'   database_name = "cchs2015_2016_p",
+#'   variable_details = variable_details
+#' )
+#' 
+#' # Direct function usage (advanced users)
+#' smkg207_cont <- calculate_age_started_daily_former(
+#'   SMK_030 = c(1, 2, 1, 1, 2), # Ever daily, never daily, ever daily, ever daily, never daily
+#'   SMKG040 = c(3, 5, 7, 4, 11) # Age categories
+#' )
+#' # Result: c(16, tagged_na("a"), 32, 18.5, tagged_na("a"))
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: active - Age conversion support
+#' @export
+calculate_age_started_daily_former <- function(SMK_030, SMKG040, log_level = "silent") {
+  
+  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
+  cleaned <- clean_variables(
+    categorical_vars = list(smk_030 = SMK_030, smkg040 = SMKG040),
+    categorical_pattern = "single_digit_missing",
+    log_level = log_level
+  )
+  
+  # Filter for former daily smokers only, then convert using CSV mappings
+  filtered_ages <- dplyr::case_when(
+    !!!assign_tagged_na(cleaned$smk_030_clean),
+    !!!assign_tagged_na(cleaned$smkg040_clean),
+    
+    # Only former daily smokers get age values
+    cleaned$smk_030_clean == 1 ~ cleaned$smkg040_clean,
+    
+    # Not applicable for never daily smokers
+    .default = haven::tagged_na("a")
+  )
+  
+  # Use lookup_recEnd to convert categories to continuous values using variable_details.csv
+  # This leverages the comprehensive SMKG207_cont mappings already defined in the CSV
+  lookup_recEnd(filtered_ages, "SMKG207_cont", variable_details)
+}
+
+#' Combine age started smoking daily variables (harmonization across cycles)
+#'
+#' @description
+#' Combine SMKG203_cont (current daily) and SMKG207_cont (former daily) into 
+#' unified SMKG040_cont variable for harmonization across CCHS cycles.
+#' Essential for creating consistent age started smoking variables across survey evolution.
+#'
+#' @param SMKG203_cont Age started smoking daily for current daily smokers (continuous).
+#' @param SMKG207_cont Age started smoking daily for former daily smokers (continuous).
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric continuous age started smoking daily, prioritizing current daily smokers.
+#'   Uses first valid value: SMKG203_cont → SMKG207_cont → missing
+#'
+#' @details
+#' **Harmonization Logic:**
+#' 
+#' This function creates SMKG040_cont for early CCHS cycles (2001-2014) by combining:
+#' - **SMKG203_cont**: Age started daily smoking (current daily smokers)
+#' - **SMKG207_cont**: Age started daily smoking (former daily smokers)
+#' 
+#' **Priority Order:**
+#' 1. Use SMKG203_cont if valid (current daily smokers take priority)
+#' 2. Use SMKG207_cont if SMKG203_cont invalid (former daily smokers)
+#' 3. Return appropriate tagged_na if both invalid
+#' 
+#' **Cycle Coverage:**
+#' - **2001-2014**: Derived from SMKG203_cont + SMKG207_cont using this function
+#' - **2015-2024**: Direct from categorical SMKG040 using midpoint values
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' 
+#' result <- rec_with_table(
+#'   data = your_data,
+#'   variables = "SMKG040_cont", 
+#'   database_name = "cchs2009_2010_p",
+#'   variable_details = variable_details
+#' )
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: active - Age harmonization across cycles
+#' @export
+calculate_SMKG040 <- function(SMKG203_cont, SMKG207_cont, log_level = "silent") {
+  
+  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
+  cleaned <- clean_variables(
+    continuous_vars = list(smkg203 = SMKG203_cont, smkg207 = SMKG207_cont),
+    continuous_pattern = "triple_digit_missing",
+    log_level = log_level
+  )
+  
+  # Combine SMKG203 and SMKG207 - harmonization logic for cycle compatibility
+  dplyr::case_when(
+    # Current daily smoker takes priority - use if valid
+    !is.na(cleaned$smkg203_clean) & !haven::is_tagged_na(cleaned$smkg203_clean) ~ cleaned$smkg203_clean,
+    
+    # Former daily smoker - use if valid
+    !is.na(cleaned$smkg207_clean) & !haven::is_tagged_na(cleaned$smkg207_clean) ~ cleaned$smkg207_clean,
+    
+    # Use standardized tagged NA conditions if both invalid
+    !!!assign_tagged_na(cleaned$smkg203_clean),
+    !!!assign_tagged_na(cleaned$smkg207_clean),
+    
+    # Default to missing if both are missing
+    .default = haven::tagged_na("b")
+  )
+}
+
+#' Convert age started smoking daily from SMKG040 categories (current daily smokers)
+#'
+#' @description
+#' Extract and convert age started smoking daily for current daily smokers from combined
+#' SMKG040 variable. Filters by smoking status (SMK_005 = 1) and converts categorical
+#' ages to continuous values using comprehensive CSV-driven mappings.
+#'
+#' @param SMK_005 Type of smoker presently (1=daily, 2=occasional, 3=not at all). Accepts raw CCHS codes.
+#' @param SMKG040 Age started smoking daily categories (1-11). Accepts raw CCHS codes.
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric continuous age for current daily smokers with structured missing data:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases (non-daily smokers)
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Age values: 8, 13, 16, 18.5, 22, 27, 32, 37, 42, 47, 55 (category midpoints)
+#'
+#' @details
+#' **Legacy Function Modernized with CSV-Driven Approach**
+#'
+#' This function modernizes the legacy SMKG203_fun with full lookup_recEnd integration:
+#' - **Filter**: Only current daily smokers (SMK_005 = 1) receive age values
+#' - **Age Conversion**: Uses comprehensive variable_details.csv mappings for SMKG203_cont
+#' - **Cycle Coverage**: 2015-2024 (when SMKG040 combined variable introduced)
+#' - **Legacy Compatibility**: Maintains exact behavioral compatibility with legacy SMKG203_fun
+#'
+#' **Midpoint Mappings** (from variable_details.csv):
+#' - Category 1 → 8 years (5-11 years)
+#' - Category 2 → 13 years (12-14 years)
+#' - Category 3 → 16 years (15-17 years) for _B variants / 17 years (15-19 years) for _A variants
+#' - Category 4 → 18.5 years (18-19 years)
+#' - Category 5 → 22 years (20-24 years)
+#' - Category 6 → 27 years (25-29 years)
+#' - Category 7 → 32 years (30-34 years)
+#' - Category 8 → 37 years (35-39 years)
+#' - Category 9 → 42 years (40-44 years)
+#' - Category 10 → 47 years (45-49 years)
+#' - Category 11 → 55 years (50+ years)
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' 
+#' result <- rec_with_table(
+#'   data = your_data,
+#'   variables = "SMKG203_cont", 
+#'   database_name = "cchs2015_2016_p",
+#'   variable_details = variable_details
+#' )
+#' 
+#' # Direct function usage (advanced users)
+#' smkg203_cont <- calculate_SMKG203_from_combined(
+#'   SMK_005 = c(1, 2, 1, 3, 1), # Daily, occasional, daily, former, daily
+#'   SMKG040 = c(3, 5, 7, 4, 11) # Age categories
+#' )
+#' # Result: c(16, tagged_na("a"), 32, tagged_na("a"), 55)
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: active - Modernized legacy SMKG203_fun
+#' @export
+calculate_SMKG203_from_combined <- function(SMK_005, SMKG040, log_level = "silent") {
+  
+  # Clean CCHS missing codes
+  cleaned <- clean_variables(
+    categorical_vars = list(smk_005 = SMK_005, smkg040 = SMKG040),
+    categorical_pattern = "single_digit_missing",
+    log_level = log_level
+  )
+  
+  # Filter for current daily smokers only, then convert using CSV mappings
+  filtered_ages <- dplyr::case_when(
+    !!!assign_tagged_na(cleaned$smk_005_clean),
+    !!!assign_tagged_na(cleaned$smkg040_clean),
+    
+    # Only current daily smokers get age values
+    cleaned$smk_005_clean == 1 ~ cleaned$smkg040_clean,
+    
+    # Not applicable for non-daily smokers
+    .default = haven::tagged_na("a")
+  )
+  
+  # Use lookup_recEnd to convert categories to continuous values using variable_details.csv
+  # This leverages the comprehensive SMKG203_cont mappings already defined in the CSV
+  lookup_recEnd(filtered_ages, "SMKG203_cont", variable_details)
+}
+
+#' Convert age started smoking daily from SMKG040 categories (former daily smokers)
+#'
+#' @description
+#' Extract and convert age started smoking daily for former daily smokers from combined
+#' SMKG040 variable. Filters by ever daily status (SMK_030 = 1) and converts categorical
+#' ages to continuous values using comprehensive CSV-driven mappings.
+#'
+#' @param SMK_030 Ever smoked daily in lifetime (1=yes, 2=no). Accepts raw CCHS codes.
+#' @param SMKG040 Age started smoking daily categories (1-11). Accepts raw CCHS codes.
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric continuous age for former daily smokers with structured missing data:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases (never daily smokers)
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses
+#'   }
+#'   Age values: 8, 13, 16, 18.5, 22, 27, 32, 37, 42, 47, 55 (category midpoints)
+#'
+#' @details
+#' **Legacy Function Modernized with CSV-Driven Approach**
+#'
+#' This function modernizes the legacy SMKG207_fun with full lookup_recEnd integration:
+#' - **Filter**: Only former daily smokers (SMK_030 = 1) receive age values
+#' - **Age Conversion**: Uses comprehensive variable_details.csv mappings for SMKG207_cont
+#' - **Cycle Coverage**: 2015-2024 (when SMKG040 combined variable introduced)
+#' - **Legacy Compatibility**: Maintains exact behavioral compatibility with legacy SMKG207_fun
+#'
+#' **Midpoint Mappings** (from variable_details.csv):
+#' - Category 1 → 8 years (5-11 years)
+#' - Category 2 → 13 years (12-14 years)
+#' - Category 3 → 16 years (15-17 years) for _B variants / 17 years (15-19 years) for _A variants
+#' - Category 4 → 18.5 years (18-19 years)
+#' - Category 5 → 22 years (20-24 years)
+#' - Category 6 → 27 years (25-29 years)
+#' - Category 7 → 32 years (30-34 years)
+#' - Category 8 → 37 years (35-39 years)
+#' - Category 9 → 42 years (40-44 years)
+#' - Category 10 → 47 years (45-49 years)
+#' - Category 11 → 55 years (50+ years)
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' 
+#' result <- rec_with_table(
+#'   data = your_data,
+#'   variables = "SMKG207_cont", 
+#'   database_name = "cchs2015_2016_p",
+#'   variable_details = variable_details
+#' )
+#' 
+#' # Direct function usage (advanced users)
+#' smkg207_cont <- calculate_SMKG207_from_combined(
+#'   SMK_030 = c(1, 2, 1, 1, 2), # Ever daily, never daily, ever daily, ever daily, never daily
+#'   SMKG040 = c(3, 5, 7, 4, 11) # Age categories
+#' )
+#' # Result: c(16, tagged_na("a"), 32, 18.5, tagged_na("a"))
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: active - Modernized legacy SMKG207_fun
+#' @export
+calculate_SMKG207_from_combined <- function(SMK_030, SMKG040, log_level = "silent") {
+  
+  # Clean CCHS missing codes
+  cleaned <- clean_variables(
+    categorical_vars = list(smk_030 = SMK_030, smkg040 = SMKG040),
+    categorical_pattern = "single_digit_missing",
+    log_level = log_level
+  )
+  
+  # Filter for former daily smokers only, then convert using CSV mappings
+  filtered_ages <- dplyr::case_when(
+    !!!assign_tagged_na(cleaned$smk_030_clean),
+    !!!assign_tagged_na(cleaned$smkg040_clean),
+    
+    # Only former daily smokers get age values
+    cleaned$smk_030_clean == 1 ~ cleaned$smkg040_clean,
+    
+    # Not applicable for never daily smokers
+    .default = haven::tagged_na("a")
+  )
+  
+  # Use lookup_recEnd to convert categories to continuous values using variable_details.csv
+  # This leverages the comprehensive SMKG207_cont mappings already defined in the CSV
+  lookup_recEnd(filtered_ages, "SMKG207_cont", variable_details)
+}
+
+#' Handle continuous age started smoking daily for current daily smokers (2015+ cycles)
+#'
+#' @description
+#' Process continuous age values for current daily smokers from SMKG040_I variable.
+#' Filters by smoking status (SMK_005 = 1) and validates continuous age ranges
+#' for 2015+ CCHS cycles with direct continuous data.
+#'
+#' @param SMK_005 Type of smoker presently (1=daily, 2=occasional, 3=not at all). Accepts raw CCHS codes.
+#' @param SMKG040_I Age started smoking daily (continuous). Accepts raw CCHS codes.
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric continuous age for current daily smokers with structured missing data:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases (non-daily smokers)
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses or out-of-range ages
+#'   }
+#'   Age range: [8,95] years (validated continuous values)
+#'
+#' @details
+#' **Legacy Function Modernized for 2015+ Continuous Data**
+#'
+#' This function modernizes the legacy SMKG203I_fun for handling continuous age data:
+#' - **Filter**: Only current daily smokers (SMK_005 = 1) receive age values
+#' - **Age Validation**: Continuous ages in range [8,95] years accepted
+#' - **Cycle Coverage**: 2015-2024 (_M databases with continuous SMKG040_I)
+#' - **Legacy Compatibility**: Maintains exact behavioral compatibility with legacy SMKG203I_fun
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' 
+#' result <- rec_with_table(
+#'   data = your_data,
+#'   variables = "SMKG203_cont", 
+#'   database_name = "cchs2015_2016_m",
+#'   variable_details = variable_details
+#' )
+#' 
+#' # Direct function usage (advanced users)
+#' smkg203_cont <- calculate_SMKG203_continuous(
+#'   SMK_005 = c(1, 2, 1, 3, 1), # Daily, occasional, daily, former, daily
+#'   SMKG040_I = c(18, 25, 32, 28, 55) # Continuous ages
+#' )
+#' # Result: c(18, tagged_na("a"), 32, tagged_na("a"), 55)
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: active - Modernized legacy SMKG203I_fun
+#' @export
+calculate_SMKG203_continuous <- function(SMK_005, SMKG040_I, log_level = "silent") {
+  
+  # Clean CCHS missing codes
+  cleaned <- clean_variables(
+    categorical_vars = list(smk_005 = SMK_005),
+    continuous_vars = list(smkg040_i = SMKG040_I),
+    categorical_pattern = "single_digit_missing",
+    continuous_pattern = "triple_digit_missing",
+    log_level = log_level
+  )
+  
+  # Filter and validate continuous ages
+  dplyr::case_when(
+    !!!assign_tagged_na(cleaned$smk_005_clean),
+    !!!assign_tagged_na(cleaned$smkg040_i_clean),
+    
+    # Only current daily smokers get age values
+    cleaned$smk_005_clean != 1 ~ haven::tagged_na("a"),
+    
+    # Validate age range for continuous values
+    cleaned$smkg040_i_clean >= 8 & cleaned$smkg040_i_clean <= 95 ~ cleaned$smkg040_i_clean,
+    
+    # Out of range values marked as invalid
+    .default = haven::tagged_na("b")
+  )
+}
+
+#' Handle continuous age started smoking daily for former daily smokers (2015+ cycles)
+#'
+#' @description
+#' Process continuous age values for former daily smokers from SMKG040_I variable.
+#' Filters by ever daily status (SMK_030 = 1) and validates continuous age ranges
+#' for 2015+ CCHS cycles with direct continuous data.
+#'
+#' @param SMK_030 Ever smoked daily in lifetime (1=yes, 2=no). Accepts raw CCHS codes.
+#' @param SMKG040_I Age started smoking daily (continuous). Accepts raw CCHS codes.
+#' @param log_level Logging level: "silent" (default), "warning", "verbose"
+#'
+#' @return Numeric continuous age for former daily smokers with structured missing data:
+#'   \itemize{
+#'     \item \code{haven::tagged_na("a")} for not applicable cases (never daily smokers)
+#'     \item \code{haven::tagged_na("b")} for missing/invalid responses or out-of-range ages
+#'   }
+#'   Age range: [8,95] years (validated continuous values)
+#'
+#' @details
+#' **Legacy Function Modernized for 2015+ Continuous Data**
+#'
+#' This function modernizes the legacy SMKG207I_fun for handling continuous age data:
+#' - **Filter**: Only former daily smokers (SMK_030 = 1) receive age values
+#' - **Age Validation**: Continuous ages in range [8,95] years accepted
+#' - **Cycle Coverage**: 2015-2024 (_M databases with continuous SMKG040_I)
+#' - **Legacy Compatibility**: Maintains exact behavioral compatibility with legacy SMKG207I_fun
+#'
+#' @examples
+#' # Standard cchsflow workflow (primary usage - recommended)
+#' library(cchsflow)
+#' 
+#' result <- rec_with_table(
+#'   data = your_data,
+#'   variables = "SMKG207_cont", 
+#'   database_name = "cchs2015_2016_m",
+#'   variable_details = variable_details
+#' )
+#' 
+#' # Direct function usage (advanced users)
+#' smkg207_cont <- calculate_SMKG207_continuous(
+#'   SMK_030 = c(1, 2, 1, 1, 2), # Ever daily, never daily, ever daily, ever daily, never daily
+#'   SMKG040_I = c(18, 25, 32, 28, 55) # Continuous ages
+#' )
+#' # Result: c(18, tagged_na("a"), 32, 28, tagged_na("a"))
+#'
+#' @note v3.0.0, last updated: 2025-07-14, status: active - Modernized legacy SMKG207I_fun
+#' @export
+calculate_SMKG207_continuous <- function(SMK_030, SMKG040_I, log_level = "silent") {
+  
+  # Clean CCHS missing codes
+  cleaned <- clean_variables(
+    categorical_vars = list(smk_030 = SMK_030),
+    continuous_vars = list(smkg040_i = SMKG040_I),
+    categorical_pattern = "single_digit_missing",
+    continuous_pattern = "triple_digit_missing",
+    log_level = log_level
+  )
+  
+  # Filter and validate continuous ages
+  dplyr::case_when(
+    !!!assign_tagged_na(cleaned$smk_030_clean),
+    !!!assign_tagged_na(cleaned$smkg040_i_clean),
+    
+    # Only former daily smokers get age values
+    cleaned$smk_030_clean != 1 ~ haven::tagged_na("a"),
+    
+    # Validate age range for continuous values
+    cleaned$smkg040_i_clean >= 8 & cleaned$smkg040_i_clean <= 95 ~ cleaned$smkg040_i_clean,
+    
+    # Out of range values marked as invalid
+    .default = haven::tagged_na("b")
+  )
+}
+
+# ==============================================================================
 # 3.3 TIME-BASED SMOKING FUNCTIONS  
 # ==============================================================================
 
@@ -759,30 +1391,6 @@ calculate_time_quit_smoking <- function(SMK_09A_B, SMKG09C, log_level = "silent"
 
 # Custom function removed - now using standard rec_with_table() approach
 # All mapping logic is handled by variable_details.csv configuration
-
-#' @export
-calculate_age_first_cigarette <- function(SMKG01C, log_level = "silent") {
-  
-  # Clean CCHS missing codes
-  cleaned <- clean_variables(
-    categorical_vars = list(smkg01c = SMKG01C),
-    categorical_pattern = "single_digit_missing",
-    log_level = log_level
-  )
-  
-  # Load metadata for lookup
-  var_details <- load_variable_details()
-  
-  # Use lookup_recEnd to convert categories to continuous values
-  age_first_cig <- lookup_recEnd(cleaned$smkg01c_clean, "SMKG01C", var_details)
-  
-  # Final case_when for explicit NA handling
-  dplyr::case_when(
-    haven::is_tagged_na(age_first_cig) ~ age_first_cig,
-    is.na(age_first_cig) ~ haven::tagged_na("b"),
-    TRUE ~ age_first_cig
-  )
-}
 
 
 #' Calculate pack-years (simplified version)
@@ -899,37 +1507,7 @@ calculate_pack_years <- function(SMKDSTY_A, DHHGAGE_cont, time_quit_smoking,
 #'   variable_details = variable_details
 #' )
 #' 
-#' # Direct function usage (advanced users)
-#' smkg203_cont <- calculate_age_started_daily_current(
-#'   SMK_005 = c(1, 2, 1, 3, 1), # Daily, occasional, daily, former, daily
-#'   SMKG040 = c(3, 5, 7, 4, 11) # Age categories
-#' )
-#' # Result: c(16, tagged_na("a"), 32, tagged_na("a"), 55)
-#'
-#' @note v3.0.0, last updated: 2025-07-10, status: active - Age conversion support
-#' @export
-calculate_age_started_daily_current <- function(SMK_005, SMKG040, log_level = "silent") {
-  
-  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
-  cleaned <- clean_variables(
-    categorical_vars = list(smk_005 = SMK_005, smkg040 = SMKG040),
-    categorical_pattern = "single_digit_missing",
-    log_level = log_level
-  )
-  
-  # Convert categories to continuous age - values from variable_details.csv in rec_with_table()
-  # Simplified logic here, full midpoint mappings via CSV-driven approach
-  dplyr::case_when(
-    !!!assign_tagged_na(cleaned$smk_005_clean),
-    !!!assign_tagged_na(cleaned$smkg040_clean),
-    
-    # Only current daily smokers get age values
-    cleaned$smk_005_clean != 1 ~ haven::tagged_na("a"),
-    
-    # Basic mapping - full implementation via rec_with_table() with variable_details.csv
-    .default = haven::tagged_na("b")
-  )
-}
+# Function moved to section 3.2 SMOKING INITIATION FUNCTIONS
 
 #' Convert age started smoking daily for former daily smokers (categorical to continuous)
 #'
@@ -978,37 +1556,7 @@ calculate_age_started_daily_current <- function(SMK_005, SMKG040, log_level = "s
 #'   variable_details = variable_details
 #' )
 #' 
-#' # Direct function usage (advanced users)
-#' smkg207_cont <- calculate_age_started_daily_former(
-#'   SMK_030 = c(1, 2, 1, 1, 2), # Ever daily, never daily, ever daily, ever daily, never daily
-#'   SMKG040 = c(3, 5, 7, 4, 11) # Age categories
-#' )
-#' # Result: c(16, tagged_na("a"), 32, 18.5, tagged_na("a"))
-#'
-#' @note v3.0.0, last updated: 2025-07-10, status: active - Age conversion support
-#' @export
-calculate_age_started_daily_former <- function(SMK_030, SMKG040, log_level = "silent") {
-  
-  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
-  cleaned <- clean_variables(
-    categorical_vars = list(smk_030 = SMK_030, smkg040 = SMKG040),
-    categorical_pattern = "single_digit_missing",
-    log_level = log_level
-  )
-  
-  # Convert categories to continuous age - values from variable_details.csv in rec_with_table()
-  # Simplified logic here, full midpoint mappings via CSV-driven approach
-  dplyr::case_when(
-    !!!assign_tagged_na(cleaned$smk_030_clean),
-    !!!assign_tagged_na(cleaned$smkg040_clean),
-    
-    # Only former daily smokers get age values
-    cleaned$smk_030_clean != 1 ~ haven::tagged_na("a"),
-    
-    # Basic mapping - full implementation via rec_with_table() with variable_details.csv
-    .default = haven::tagged_na("b")
-  )
-}
+# Function moved to section 3.2 SMOKING INITIATION FUNCTIONS
 
 #' Calculate simple smoking status (4-category classification)
 #'
@@ -1162,33 +1710,7 @@ calculate_pack_years_categorical <- function(pack_years_der, log_level = "silent
 #'   variable_details = variable_details
 #' )
 #'
-#' @note v3.0.0, last updated: 2025-07-10, status: active - Age harmonization across cycles
-#' @export
-calculate_SMKG040 <- function(SMKG203_cont, SMKG207_cont, log_level = "silent") {
-  
-  # Clean CCHS missing codes only - comprehensive validation handled by rec_with_table()
-  cleaned <- clean_variables(
-    continuous_vars = list(smkg203 = SMKG203_cont, smkg207 = SMKG207_cont),
-    continuous_pattern = "triple_digit_missing",
-    log_level = log_level
-  )
-  
-  # Combine SMKG203 and SMKG207 - harmonization logic for cycle compatibility
-  dplyr::case_when(
-    # Current daily smoker takes priority - use if valid
-    !is.na(cleaned$smkg203_clean) & !haven::is_tagged_na(cleaned$smkg203_clean) ~ cleaned$smkg203_clean,
-    
-    # Former daily smoker - use if valid
-    !is.na(cleaned$smkg207_clean) & !haven::is_tagged_na(cleaned$smkg207_clean) ~ cleaned$smkg207_clean,
-    
-    # Use standardized tagged NA conditions if both invalid
-    !!!assign_tagged_na(cleaned$smkg203_clean),
-    !!!assign_tagged_na(cleaned$smkg207_clean),
-    
-    # Default to missing if both are missing
-    .default = haven::tagged_na("b")
-  )
-}
+# Function moved to section 3.2 SMOKING INITIATION FUNCTIONS
 
 
 # ==============================================================================
