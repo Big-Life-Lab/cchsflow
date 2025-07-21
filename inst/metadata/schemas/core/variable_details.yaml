@@ -36,7 +36,7 @@ variable_details_schema:
     # Versioning fields (far right)
     - "version"
     - "lastUpdated"
-    - "harmonizationStatus"
+    - "status"
     - "reviewNotes"
 
   # Field definitions organized by tier
@@ -132,10 +132,13 @@ variable_details_schema:
       description: "The harmonized value after transformation."
       type: "string"
       tier: "core"
+      constraints:
+        pattern: "^([0-9]+|[0-9]+\\.[0-9]+|NA::[ab]|Func::[a-zA-Z_][a-zA-Z0-9_]*|copy)$"
       notes: |
         Defines what value this rule produces in the harmonized dataset.
         Common patterns:
-        - Categorical codes: "1", "2", "3"
+        - Categorical codes: "1", "2", "3" (integers only)
+        - Decimal values: "1.5", "2.75"
         - Missing data: "NA::a", "NA::b"
         - Functions: "Func::bmi_calculation"
         - Copy original: "copy"
@@ -198,8 +201,11 @@ variable_details_schema:
         - Complex decimals: "[-0.359,1]", "[0.0487,0.1846)"
         - Missing data: "NA::a", "NA::b"
         - Default case: "else"
+        - **Derived variables**: "N/A" (for variables computed from other variables)
         
-        For complete interval notation patterns, see metadata_registry.yaml interval_notation.
+        **Usage Guidelines for N/A:**
+        - Function-based derivations: Variables with recEnd="Func::function_name" should have recStart="N/A"
+        - Non-function derivations: Computed variables without original CCHS forms should have recStart="N/A"
         
     - name: "catStartLabel"
       title: "Source category label"
@@ -287,17 +293,19 @@ variable_details_schema:
         Use ISO date format: YYYY-MM-DD
         Helps track when changes were made for collaboration and maintenance.
         
-    - name: "harmonizationStatus"
-      title: "Harmonization status"
-      description: "Current status of this transformation in your workflow."
+    - name: "status"
+      title: "Variable status"
+      description: "Current lifecycle status of this variable."
       type: "string"
       tier: "versioning"
       constraints:
-        enum: ["development", "active", "not_harmonizable", "pending_review"]
+        enum: ["development", "active", "deprecated", "discontinued", "not_harmonizable", "pending_review"]
       notes: |
-        Track the progress of harmonization work:
+        Track the variable lifecycle:
         - "development": Still being developed or tested
         - "active": Ready for production use
+        - "deprecated": Still available but use discouraged, will be removed in future version
+        - "discontinued": No longer supported, removed from active use
         - "not_harmonizable": Cannot be harmonized (document why in reviewNotes)
         - "pending_review": Needs review before finalization
         
