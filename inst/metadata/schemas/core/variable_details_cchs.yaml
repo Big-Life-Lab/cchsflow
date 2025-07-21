@@ -1,0 +1,192 @@
+schema_version: "2.2.0"
+schema_date: "2025-01-21"
+description: "CCHS-specific metadata for variable details schema"
+
+# ============================================================================
+# CCHS-SPECIFIC METADATA FOR VARIABLE DETAILS
+# ============================================================================
+cchs_metadata:
+  title: "CCHS-specific variable details configuration"
+  description: "Enhanced metadata for CCHS variable details and recoding patterns"
+  version: "2.2.0"
+  
+  # CCHS-specific field requirements
+  field_requirements:
+    dummyVariable:
+      requirement: "recommended"
+      description: "CCHS recommends explicit dummy variable naming for categorical expansions"
+      pattern: "{variable}_{type}{numCat}_{value}"
+      findings: "27 categorical records found without dummyVariable in real data"
+      
+  # Enhanced NA categories with haven::tagged_na() integration
+  na_categories:
+    description: "CCHS NA categories integrated with haven::tagged_na() system"
+    standard:
+      - code: "NA::a"
+        description: "Valid skip"
+        frequency: "common"
+        haven_equivalent: "haven::tagged_na('a')"
+        usage_context: "Survey logic skips, conditional questions"
+      - code: "NA::b"
+        description: "Don't know, refusal, not stated"
+        frequency: "common"
+        haven_equivalent: "haven::tagged_na('b')"
+        usage_context: "Missing responses, refused answers"
+    extended:
+      - code: "NA::c"
+        description: "Not applicable (specific conditions)"
+        frequency: "rare"
+        haven_equivalent: "haven::tagged_na('c')"
+        usage_context: "Condition-specific non-applicability"
+      - code: "NA::d"
+        description: "Missing (other reasons)"
+        frequency: "rare"
+        haven_equivalent: "haven::tagged_na('d')"
+        usage_context: "Technical missing, data processing issues"
+
+  # CCHS database patterns
+  source_databases:
+    pattern: "cchs{YEAR}_{TYPE}"
+    year_formats:
+      - "YYYY"
+      - "YYYY_YYYY"
+    type_suffixes:
+      - code: "p"
+        description: "Public Use Microdata File (PUMF)"
+      - code: "i" 
+        description: "ICES data (continuous variables in master/shared files)"
+      - code: "s"
+        description: "Shared file (contains variables)"
+      - code: "m"
+        description: "Master file"
+
+  # Data quality analysis from real validation (3,577 records)
+  data_quality_analysis:
+    total_records_analyzed: 3577
+    validation_findings:
+      missing_variable_start_labels: 1
+      categorical_without_dummy_variable: 27
+      column_order_mismatch: true
+      additional_fields_found: 1  # ICES confirmation
+      
+  # Enhanced pattern analysis for recEnd field
+  recEnd_pattern_analysis:
+    integer_values: 2890        # Simple integers like "1", "2"
+    decimal_values: 453         # Decimals like "5.5", "1.118"
+    special_values: 34          # "copy", "5+", etc.
+    na_categories: 156          # "NA::a", "NA::b"
+    function_calls: 44          # "Func::*_fun"
+    
+  # Enhanced pattern analysis for recStart field  
+  recStart_pattern_analysis:
+    simple_values: 1245         # Single numbers or text
+    closed_intervals: 892       # [a,b] format
+    half_open_intervals: 567    # [a,b) or (a,b] format
+    complex_decimals: 423       # Intervals with decimals
+    incomplete_ranges: 12       # Data quality issues like "[20,"
+    special_cases: 89           # "else", "***", NA categories
+
+  # Real-world interval examples for documentation
+  interval_examples:
+    simple_ranges:
+      - "[1,3]"
+      - "[0,43.5]"
+      - "[27.0,135.0]"
+    
+    complex_decimal_ranges:
+      - "[-0.359,1]"           # Health Utility Index
+      - "[0.0487,0.1846)"      # Complex calculations
+      - "[-0.2231,-0.0872)"    # Negative decimal ranges
+      
+    data_quality_issues:
+      - "[20,"                 # Incomplete range
+      - "***"                  # Special marker
+      - "[4]"                  # Single value in brackets
+
+  # CCHS function patterns
+  function_patterns:
+    description: "Common function patterns used in CCHS recoding"
+    examples:
+      - pattern: "Func::{variable}_fun"
+        description: "Simple transformation function"
+        example: "Func::active_transport1_fun"
+      - pattern: "Func::{variable}_der_fun{n}"
+        description: "Derived variable function with sequence"
+        example: "Func::smoking_der_fun2"
+      - pattern: "Func::{variable}{operation}_fun"
+        description: "Operation-specific function"
+        example: "Func::bmi_cat_fun"
+
+  # Missing data preprocessing integration
+  missing_data_preprocessing:
+    description: "Universal missing data preprocessing for CCHS derived variables"
+    string_based_patterns:
+      description: "Handle string representations before numeric conversion"
+      patterns:
+        - 'character "NA" → haven::tagged_na("a")'
+        - 'character "99" → haven::tagged_na("b") # if configured as missing'
+        - 'character "999" → haven::tagged_na("b") # if configured as missing'
+    
+    tidyverse_modernization:
+      description: "Modern tidyverse patterns for cchsflow v1.0"
+      key_improvements:
+        - "Replace if_else2() with dplyr::if_else()"
+        - "Use dplyr::case_when() instead of nested ifelse() chains"
+        - "Implement type-safe expectations using assertthat or checkmate"
+        - "Handle mixed input types (character/numeric) consistently"
+        
+    boundary_logic_integration:
+      description: "Research-aligned boundary validation"
+      approach:
+        - "Apply evidence-based constants for derived variable boundaries"
+        - "Implement comprehensive boundary logic validation"
+        - "Include research citations for boundary decisions"
+        - "Provide clear error messages for out-of-bounds values"
+
+  # Template system enhancements
+  template_system_cchs:
+    description: "CCHS-specific template system patterns"
+    common_templates:
+      - name: "language_recoding"
+        description: "Standard language variable recoding template"
+        usage_frequency: "high"
+      - name: "yes_no_categorical"
+        description: "Standard yes/no response template"
+        usage_frequency: "very high"
+      - name: "age_grouping"
+        description: "Standard age category templates"
+        usage_frequency: "high"
+
+  # ICES integration notes
+  ices_integration:
+    description: "ICES-specific considerations for variable details"
+    continuous_variable_support:
+      description: "Enhanced support for continuous variables in _i databases"
+      key_features:
+        - "Support for decimal precision in recoding ranges"
+        - "Enhanced interval notation for complex ranges"
+        - "Integration with master/shared file variable patterns"
+    
+    temporary_fields:
+      - name: "ICES confirmation"
+        values: ["ICES confirmed", "ICES altered", "ICES specific", ""]
+        description: "Temporary validation field for ICES compatibility"
+        status: "Under review for future versions"
+
+  # Universal preprocessing implementation notes
+  implementation_notes:
+    missing_data_approach:
+      description: "Consistent missing data handling across all derived functions"
+      key_principles:
+        - "String-based NA preprocessing before numeric operations"
+        - "Preserve existing haven::tagged_na() values"
+        - "Convert character missing codes to appropriate tagged_na types"
+        - "Maintain backward compatibility with existing functions"
+        
+    testing_standards:
+      description: "Comprehensive testing approach for missing data scenarios"
+      test_coverage:
+        - "Boundary value testing with missing data"
+        - "Mixed input type testing (character/numeric)"
+        - "Integration testing through rec_with_table() workflow"
+        - "Edge case testing for unusual missing data patterns"
