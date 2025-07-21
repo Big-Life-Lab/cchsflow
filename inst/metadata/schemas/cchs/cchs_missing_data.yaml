@@ -26,6 +26,18 @@ pattern_definitions:
         7: "haven::tagged_na('b')"  # Don't know
         8: "haven::tagged_na('b')"  # Refusal
         9: "haven::tagged_na('b')"  # Not stated
+      priority_hierarchy:
+        description: "Two-tier priority system: not_applicable wins over any missing_data"
+        not_applicable: 
+          label: "Not applicable"
+          description: "Participant doesn't qualify for this question"
+          original_codes: [6]
+          tagged_na: ["a"]
+        missing_data:
+          label: "Missing data"
+          description: "All missing response types (don't know, refusal, not stated)"
+          original_codes: [7, 8, 9]
+          tagged_na: ["b"]
     
     double_digit_missing:
       description: "Multi-category scales with valid responses 1-95"
@@ -37,6 +49,18 @@ pattern_definitions:
         97: "haven::tagged_na('b')"  # Don't know
         98: "haven::tagged_na('b')"  # Refusal
         99: "haven::tagged_na('b')"  # Not stated
+      priority_hierarchy:
+        description: "Two-tier priority system: not_applicable wins over any missing_data"
+        not_applicable:
+          label: "Not applicable"
+          description: "Participant doesn't qualify for this question"
+          original_codes: [96]
+          tagged_na: ["a"]
+        missing_data:
+          label: "Missing data"
+          description: "All missing response types (don't know, refusal, not stated)"
+          original_codes: [97, 98, 99]
+          tagged_na: ["b"]
     
     triple_digit_missing:
       description: "Continuous measurements with variable-specific valid ranges"
@@ -52,6 +76,20 @@ pattern_definitions:
         999.7: "haven::tagged_na('b')"  # Don't know (decimal)
         999.8: "haven::tagged_na('b')"  # Refusal (decimal)
         999.9: "haven::tagged_na('b')"  # Not stated (decimal)
+      priority_hierarchy:
+        description: "Two-tier priority system: not_applicable wins over any missing_data"
+        not_applicable:
+          label: "Not applicable"
+          description: "Participant doesn't qualify for this question"
+          original_codes: [996]
+          tagged_na: ["a"]
+          decimal_codes: [999.6]
+        missing_data:
+          label: "Missing data"
+          description: "All missing response types (don't know, refusal, not stated)"
+          original_codes: [997, 998, 999]
+          tagged_na: ["b"]
+          decimal_codes: [999.7, 999.8, 999.9]
 
 # ============================================================================
 # VARIABLE PATTERN ASSIGNMENTS
