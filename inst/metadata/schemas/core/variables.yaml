@@ -32,7 +32,7 @@ variables_schema:
     # Versioning fields - professional workflows
     - "version"
     - "lastUpdated"
-    - "harmonizationStatus"
+    - "status"
     - "reviewNotes"
 
   # Field definitions organized by tier
@@ -194,18 +194,20 @@ variables_schema:
         Use ISO date format: YYYY-MM-DD
         Helps track when changes were made for collaboration and maintenance.
         
-    - name: "harmonizationStatus"
-      title: "Harmonization status"
-      description: "Current status of this variable in your harmonization workflow."
+    - name: "status"
+      title: "Variable status"
+      description: "Current lifecycle status of this variable."
       type: "string"
       tier: "versioning"
       constraints:
-        enum: ["development", "active", "not_harmonizable", "pending_review"]
+        enum: ["development", "active", "deprecated", "discontinued", "not_harmonizable", "pending_review"]
       notes: |
-        Track progress of harmonization work:
+        Track the variable lifecycle:
         - "development": Still being developed or tested
         - "active": Ready for production use
-        - "not_harmonizable": Cannot be harmonized across sources
+        - "deprecated": Still available but use discouraged, will be removed in future version
+        - "discontinued": No longer supported, removed from active use
+        - "not_harmonizable": Cannot be harmonized (document why in reviewNotes)
         - "pending_review": Needs review before finalization
         
     - name: "reviewNotes"
