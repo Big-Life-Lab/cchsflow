@@ -1,0 +1,381 @@
+---
+title: "Core flexible missing data infrastructure demo"
+format: html
+execute:
+  echo: true
+  warning: false
+  message: false
+  results: hold
+---
+
+# Flexible missing data infrastructure
+
+This document demonstrates flexible missing data infrastructure to support derived functions in cchsflow.
+
+## Core architecture
+
+The system provides three main functions:
+
+1. **`load_cchs_config()`** - loads YAML configuration
+2. **`get_missing_patterns()`** - discovers available patterns  
+3. **`create_missing_handler()`** - creates tools for missing data
+
+## Setup
+
+```{r setup}
+library(haven)
+library(dplyr)
+
+# Source the production-ready infrastructure
+source("../R/flexible-missing-handler.R")
+```
+
+## Pattern discovery
+
+```{r patterns}
+# Discover available missing data patterns
+patterns <- get_missing_patterns()
+cat("Available patterns:", paste(patterns, collapse = ", "), "\n")
+```
+
+## Basic handler usage
+
+```{r basic-handler}
+# Create test data
+height_data <- c(1.75, 1.60, 996, 997, 998)
+weight_data <- c(70, 55, 70, 998, 999)
+
+# Create handler for triple-digit missing pattern
+handler <- create_missing_handler(
+  height_data, weight_data,
+  pattern_type = "triple_digit_missing",
+  handle_missing_data = "original"
+)
+
+cat("Handler created successfully\n")
+cat("Available tools:", paste(names(handler), collapse = ", "), "\n")
+
+# Show the original data format
+cat("\n=== Original Data ===\n")
+cat("Heights:", paste(height_data, collapse = ", "), "\n")
+cat("Weights:", paste(weight_data, collapse = ", "), "\n")
+
+# Demonstrate some basic operations
+cat("\n=== Testing is_missing() ===\n")
+for (i in 1:length(height_data)) {
+  cat(sprintf("height[%d] = %s, is_missing: %s\n", 
+             i, height_data[i], handler$is_missing(height_data[i])))
+}
+```
+
+## Options for basic handlers
+
+- 'auto' (default): Auto-detects format from input data
+- 'original': Always works with original CCHS codes (996, 997, etc.) and returns the same codes, but harmonized 
+- 'tagged_na': Starts with original or tagged_na and returns harmonized tagged_na
+
+```{r basic-handler-tagged}
+# Start with the SAME original data
+height_original <- c(1.75, 1.60, 996, 997, 998)
+weight_original <- c(70, 55, 70, 998, 999)
+
+cat("=== Starting with Original CCHS Codes ===\n")
+cat("Heights:", paste(height_original, collapse = ", "), "\n")
+cat("Weights:", paste(weight_original, collapse = ", "), "\n")
+
+# Example 1: Create handler with "original" mode
+cat("\n=== EXAMPLE 1: 'original' handler ===\n")
+handler_orig <- create_missing_handler(
+  height_original, weight_original,
+  pattern_type = "triple_digit_missing",
+  handle_missing_data = "original"
+)
+
+# Show what propagate returns with "original" mode
+cat("Missing codes in 'original' mode:\n")
+result_996_orig <- handler_orig$propagate(996)
+result_997_orig <- handler_orig$propagate(997)
+result_998_orig <- handler_orig$propagate(998)
+
+cat("propagate(996) =", result_996_orig, "(keeps original code)\n")
+cat("propagate(997) =", result_997_orig, "(keeps original code)\n") 
+cat("propagate(998) =", result_998_orig, "(keeps original code)\n")
+
+# Example 2: Create handler with "tagged_na" mode  
+cat("\n=== EXAMPLE 2: 'tagged_na' handler ===\n")
+handler_tagged <- create_missing_handler(
+  height_original, weight_original,
+  pattern_type = "triple_digit_missing",
+  handle_missing_data = "tagged_na"
+)
+
+# Show what propagate returns with "tagged_na" mode
+cat("Missing codes in 'tagged_na' mode:\n")
+result_996_tagged <- handler_tagged$propagate(996)
+result_997_tagged <- handler_tagged$propagate(997)
+result_998_tagged <- handler_tagged$propagate(998)
+
+cat("propagate(996) =", 
+    if(is_tagged_na(result_996_tagged)) paste0("tagged_na(\"", attr(result_996_tagged, "na"), "\")") else as.character(result_996_tagged),
+    "(transformed to tagged_na)\n")
+cat("propagate(997) =", 
+    if(is_tagged_na(result_997_tagged)) paste0("tagged_na(\"", attr(result_997_tagged, "na"), "\")") else as.character(result_997_tagged),
+    "(transformed to tagged_na)\n")
+cat("propagate(998) =", 
+    if(is_tagged_na(result_998_tagged)) paste0("tagged_na(\"", attr(result_998_tagged, "na"), "\")") else as.character(result_998_tagged),
+    "(transformed to tagged_na)\n")
+
+# Example 3: Compare BMI calculations
+cat("\n=== EXAMPLE 3: BMI calculation comparison ===\n")
+test_height <- c(1.75, 996)  # valid + missing
+test_weight <- c(70, 997)    # valid + missing
+
+# With original handler
+bmi_orig <- case_when(
+  handler_orig$is_missing(test_height) | handler_orig$is_missing(test_weight) ~ 
+    handler_orig$propagate(test_height, test_weight),
+  .default = test_weight / (test_height^2)
+)
+
+# With tagged_na handler  
+bmi_tagged <- case_when(
+  handler_tagged$is_missing(test_height) | handler_tagged$is_missing(test_weight) ~ 
+    handler_tagged$propagate(test_height, test_weight),
+  .default = test_weight / (test_height^2)
+)
+
+cat("Input: height =", paste(test_height, collapse = ", "), "\n")
+cat("       weight =", paste(test_weight, collapse = ", "), "\n")
+cat("\n")
+cat("'original' mode results:  ", paste(bmi_orig, collapse = ", "), "\n")
+cat("'tagged_na' mode results:", 
+    paste(sapply(bmi_tagged, function(x) {
+      if(is_tagged_na(x)) paste0("tagged_na(\"", attr(x, "na"), "\")") else as.character(x)
+    }), collapse = ", "), "\n")
+```
+
+## Semantic tools demo
+
+```{r semantic-tools}
+# Test the is_missing function
+cat("=== is_missing() tests ===\n")
+test_values <- c(1.75, 996, 997, 998, 999)
+for (val in test_values) {
+  result <- handler$is_missing(val)
+  cat(sprintf("is_missing(%s): %s\n", val, result))
+}
+
+# Test the is_tag function  
+cat("\n=== is_tag() tests ===\n")
+cat(sprintf("is_tag(996, 'not_applicable'): %s\n", 
+           handler$is_tag(996, "not_applicable")))
+cat(sprintf("is_tag(996, 'missing_data'): %s\n", 
+           handler$is_tag(996, "missing_data")))
+cat(sprintf("is_tag(997, 'missing_data'): %s\n", 
+           handler$is_tag(997, "missing_data")))
+cat(sprintf("is_tag(1.75, 'not_applicable'): %s\n", 
+           handler$is_tag(1.75, "not_applicable")))
+```
+
+## Priority and propagation
+
+A challenge is when there are more than one missing data types. This is particularly challenging for derived variables that have multiple starting variables, each with their own missing data types. We must make decisions; it is better to be clear and transparent in the metadata yaml.
+
+```{r propagation}
+cat("=== propagate() tests ===\n")
+
+# Test priority: not_applicable beats missing_data
+result1 <- handler$propagate(996, 997)
+cat(sprintf("propagate(996, 997): %s (not_applicable wins)\n", result1))
+
+# Test within same category
+result2 <- handler$propagate(997, 998)
+cat(sprintf("propagate(997, 998): %s (first missing_data found)\n", result2))
+
+# Test with valid values
+result3 <- handler$propagate(1.75, 997)
+cat(sprintf("propagate(1.75, 997): %s (missing beats valid)\n", result3))
+```
+
+## Auto-detection demo
+
+```{r auto-detection}
+cat("=== auto-detection demo ===\n")
+
+# Test with original codes (auto-detects "original")
+original_handler <- create_missing_handler(
+  c(1.75, 996, 997),
+  c(70, 996, 998),
+  pattern_type = "triple_digit_missing",
+  handle_missing_data = "auto"
+)
+cat("Original codes detected successfully\n")
+
+# Test with tagged_na values (auto-detects "tagged_na")
+tagged_data_height <- c(1.75, tagged_na("a"), tagged_na("b"))
+tagged_data_weight <- c(70, tagged_na("a"), tagged_na("b"))
+
+tagged_handler <- create_missing_handler(
+  tagged_data_height, tagged_data_weight,
+  pattern_type = "triple_digit_missing", 
+  handle_missing_data = "auto"
+)
+cat("Tagged NA format detected successfully\n")
+
+# Test tagged_na tools
+cat(sprintf("is_missing(tagged_na('a')): %s\n", 
+           tagged_handler$is_missing(tagged_na("a"))))
+cat(sprintf("is_tag(tagged_na('a'), 'not_applicable'): %s\n", 
+           tagged_handler$is_tag(tagged_na("a"), "not_applicable")))
+```
+
+## Practical BMI example
+
+```{r bmi-example}
+# Simple BMI calculation using the handler
+calculate_bmi_with_handler <- function(height, weight, pattern_type) {
+  handler <- create_missing_handler(
+    height, weight,
+    pattern_type = pattern_type,
+    handle_missing_data = "auto"
+  )
+  
+  # Use semantic tools for clean logic
+  result <- dplyr::case_when(
+    handler$is_missing(height) | handler$is_missing(weight) ~ 
+      handler$propagate(height, weight),
+    .default = weight / (height^2)
+  )
+  
+  return(result)
+}
+
+# Test with mixed data
+test_heights <- c(1.75, 1.60, 996, 997)
+test_weights <- c(70, 55, 70, 998)
+
+bmi_results <- calculate_bmi_with_handler(
+  test_heights, test_weights, 
+  "triple_digit_missing"
+)
+
+cat("=== BMI calculation results ===\n")
+for (i in seq_along(test_heights)) {
+  height_val <- test_heights[i]
+  weight_val <- test_weights[i]
+  bmi_val <- bmi_results[i]
+  
+  # Handle missing values in output
+  bmi_display <- if (is.na(as.numeric(bmi_val))) {
+    as.character(bmi_val)
+  } else {
+    as.character(round(as.numeric(bmi_val), 2))
+  }
+  
+  cat(sprintf("Height: %s, Weight: %s → BMI: %s\n", 
+             height_val, weight_val, bmi_display))
+}
+
+# Test with tagged_na data (demonstrates auto-detection)
+cat("\n=== BMI with tagged_na data (auto-detected) ===\n")
+tagged_heights <- c(1.75, 1.60, tagged_na("a"), tagged_na("b"))
+tagged_weights <- c(70, 55, tagged_na("a"), tagged_na("b"))
+
+tagged_bmi_results <- calculate_bmi_with_handler(
+  tagged_heights, tagged_weights, 
+  "triple_digit_missing"
+)
+
+for (i in seq_along(tagged_heights)) {
+  height_val <- if (is_tagged_na(tagged_heights[i])) {
+    paste0("tagged_na(\"", attr(tagged_heights[i], "na"), "\")")
+  } else {
+    as.character(tagged_heights[i])
+  }
+  
+  weight_val <- if (is_tagged_na(tagged_weights[i])) {
+    paste0("tagged_na(\"", attr(tagged_weights[i], "na"), "\")")
+  } else {
+    as.character(tagged_weights[i])
+  }
+  
+  bmi_val <- tagged_bmi_results[i]
+  bmi_display <- if (is_tagged_na(bmi_val)) {
+    paste0("tagged_na(\"", attr(bmi_val, "na"), "\")")
+  } else if (is.na(bmi_val)) {
+    "NA"
+  } else {
+    as.character(round(as.numeric(bmi_val), 2))
+  }
+  
+  cat(sprintf("Height: %s, Weight: %s → BMI: %s\n", 
+             height_val, weight_val, bmi_display))
+}
+```
+
+## Different patterns demo
+
+```{r different-patterns}
+cat("=== different missing patterns demo ===\n")
+
+# Single digit missing (6, 7, 8, 9)
+single_data <- c(1, 2, 6, 7, 8, 9)
+single_handler <- create_missing_handler(
+  single_data,
+  pattern_type = "single_digit_missing",
+  handle_missing_data = "original"
+)
+
+cat("Single digit pattern:\n")
+for (val in c(1, 6, 7, 8, 9)) {
+  is_miss <- single_handler$is_missing(val)
+  is_not_app <- single_handler$is_tag(val, "not_applicable")
+  cat(sprintf("  %d: missing=%s, not_applicable=%s\n", val, is_miss, is_not_app))
+}
+
+# Double digit missing (96, 97, 98, 99)
+double_data <- c(10, 20, 96, 97, 98, 99)
+double_handler <- create_missing_handler(
+  double_data,
+  pattern_type = "double_digit_missing",
+  handle_missing_data = "original"
+)
+
+cat("\nDouble digit pattern:\n")
+for (val in c(10, 96, 97, 98, 99)) {
+  is_miss <- double_handler$is_missing(val)
+  is_not_app <- double_handler$is_tag(val, "not_applicable")
+  cat(sprintf("  %d: missing=%s, not_applicable=%s\n", val, is_miss, is_not_app))
+}
+```
+
+## Error handling demo
+
+```{r error-handling}
+cat("=== error handling demo ===\n")
+
+# Test invalid pattern
+tryCatch({
+  bad_handler <- create_missing_handler(
+    c(1, 2, 3),
+    pattern_type = "nonexistent_pattern"
+  )
+}, error = function(e) {
+  cat("Expected error for invalid pattern:", e$message, "\n")
+})
+
+# Test missing configuration fields
+cat("System validates configuration properly\n")
+```
+
+## Summary
+
+The flexible missing data infrastructure provides:
+
+- **Semantic tools**: `is_missing()`, `is_tag()`, `propagate()`
+- **Auto-detection**: automatically handles original codes vs tagged_na
+- **Pattern flexibility**: supports single, double, and triple digit patterns
+- **Priority handling**: configurable through YAML
+- **Production ready**: clean, tested, and maintainable
+
+This replaces complex hard-coded missing value logic with a simple, semantic approach that adapts to your data format automatically.

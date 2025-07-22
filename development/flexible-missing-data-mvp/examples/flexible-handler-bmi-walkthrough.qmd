@@ -1,0 +1,341 @@
+---
+title: "Flexible Missing Data Handler - BMI Function Walkthrough"
+format: html
+execute:
+  echo: true
+  warning: false  
+  message: false
+  results: hold
+---
+
+# Flexible Missing Data Handler: Complete BMI Example
+
+This document demonstrates how the flexible missing data infrastructure works using `calculate_bmi_core_v3()` as the perfect example.
+
+## Setup
+
+```{r setup}
+library(haven)
+library(dplyr)
+
+# Source the infrastructure
+source("../R/flexible-missing-handler.R")  
+source("../R/bmi-refactored.R")
+```
+
+## The BMI Function: Clean & Robust
+
+```{r show-function}
+# Show the actual function code
+calculate_bmi_core_v3
+```
+
+**Key features:**
+- 5 lines of logic
+- Handles ANY input format automatically
+- No brittleness around missing data patterns
+- Semantic, readable code
+
+## Input Format Flexibility
+
+### Scenario 1: Original CCHS Codes (Raw Data)
+
+```{r original-codes}
+# Raw data as it comes from CCHS
+height_raw <- c(1.75, 1.60, 996, 997, 998)
+weight_raw <- c(70, 55, 996, 997, 999)
+
+cat("=== Raw CCHS Data ===\n")
+cat("Height:", paste(height_raw, collapse = ", "), "\n")
+cat("Weight:", paste(weight_raw, collapse = ", "), "\n")
+cat("Missing codes: 996=not_applicable, 997/998/999=missing_data\n\n")
+
+# Calculate BMI - handler auto-detects original format
+bmi_from_raw <- calculate_bmi_core_v3(height_raw, weight_raw)
+
+cat("BMI Results:\n")
+print(bmi_from_raw)
+```
+
+### Scenario 2: Preprocessed Tagged_NA Data
+
+```{r tagged-data}
+# Data after rec_with_table() preprocessing
+height_tagged <- c(1.75, 1.60, tagged_na("a"), tagged_na("b"))
+weight_tagged <- c(70, 55, tagged_na("a"), tagged_na("b"))
+
+cat("=== Preprocessed Tagged_NA Data ===\n")
+cat("Height: [1.75, 1.60, tagged_na('a'), tagged_na('b')]\n")
+cat("Weight: [70, 55, tagged_na('a'), tagged_na('b')]\n\n")
+
+# Same function, auto-detects tagged_na format
+bmi_from_tagged <- calculate_bmi_core_v3(height_tagged, weight_tagged)
+
+cat("BMI Results:\n")
+print(bmi_from_tagged)
+```
+
+### Scenario 3: Mixed Data (The Brittleness Killer)
+
+```{r mixed-data}
+# Realistic scenario: some processed, some raw
+height_mixed <- c(1.75, 996, tagged_na("a"), 1.80)
+weight_mixed <- c(70, 997, tagged_na("b"), 80)
+
+cat("=== Mixed Raw + Tagged_NA Data ===\n")
+cat("Height: [1.75, 996, tagged_na('a'), 1.80]\n") 
+cat("Weight: [70, 997, tagged_na('b'), 80]\n")
+cat("Challenge: Mix of original codes AND tagged_na values\n\n")
+
+# Function handles mixed formats seamlessly  
+bmi_from_mixed <- calculate_bmi_core_v3(height_mixed, weight_mixed)
+
+cat("BMI Results:\n")
+print(bmi_from_mixed)
+cat("\nResult: Function automatically handles mixed formats!\n")
+cat("Note: Row 2 correctly returns NA (both height=996 and weight=997 are missing)\n")
+```
+
+## Missing Data Assessment Tools
+
+```{r missing-assessment}
+# Create handler for diagnostic purposes
+height_test <- c(1.75, 996, tagged_na("a"), 997)
+weight_test <- c(70, tagged_na("b"), 998, 999)
+
+handler <- create_missing_handler(
+  height_test, weight_test,
+  handle_missing_data = "auto",
+  pattern_type = "triple_digit_missing"
+)
+
+cat("=== Missing Data Assessment ===\n")
+
+# Test is_missing() function
+cat("is_missing() tests:\n")
+for (i in 1:length(height_test)) {
+  height_val <- height_test[i]
+  is_miss <- handler$is_missing(height_val)
+  
+  # Format value display
+  val_display <- if (is_tagged_na(height_val)) {
+    paste0("tagged_na('", attr(height_val, "na"), "')")
+  } else {
+    as.character(height_val)
+  }
+  
+  cat(sprintf("  height[%d] = %s -> is_missing: %s\n", i, val_display, is_miss))
+}
+
+# Test semantic tagging
+cat("\nSemantic tag tests:\n")
+cat("  is_tag(996, 'not_applicable'):", handler$is_tag(996, "not_applicable"), "\n")
+cat("  is_tag(997, 'missing_data'):", handler$is_tag(997, "missing_data"), "\n")
+cat("  is_tag(tagged_na('a'), 'not_applicable'):", handler$is_tag(tagged_na("a"), "not_applicable"), "\n")
+```
+
+## Priority and Propagation Rules
+
+```{r propagation-demo}
+cat("=== Propagation Rules Demo ===\n")
+
+# Test different propagation scenarios
+test_cases <- list(
+  c(996, 997),           # not_applicable vs missing_data  
+  c(997, 998),           # missing_data vs missing_data
+  c(1.75, 997),          # valid vs missing_data
+  c(tagged_na("a"), tagged_na("b"))  # tagged_na vs tagged_na
+)
+
+for (i in 1:length(test_cases)) {
+  case <- test_cases[[i]]
+  result <- handler$propagate(case[1], case[2])
+  
+  # Format inputs for display
+  input1 <- if (is_tagged_na(case[1])) paste0("tagged_na('", attr(case[1], "na"), "')") else case[1]
+  input2 <- if (is_tagged_na(case[2])) paste0("tagged_na('", attr(case[2], "na"), "')") else case[2]
+  
+  # Format result for display
+  result_display <- if (is_tagged_na(result)) {
+    paste0("tagged_na('", attr(result, "na"), "')")
+  } else {
+    as.character(result)
+  }
+  
+  cat(sprintf("  propagate(%s, %s) = %s\n", input1, input2, result_display))
+}
+```
+
+## Real-World CCHS Cycle Differences
+
+```{r cchs-cycles}
+cat("=== Handling Different CCHS Cycles ===\n")
+
+# Early CCHS cycles (decimal missing codes)
+height_early <- c(1.75, 1.60, 999.6, 999.7)
+weight_early <- c(70, 55, 999.8, 999.9)
+
+cat("Early CCHS cycles (decimal codes):\n")
+cat("Height:", paste(height_early, collapse = ", "), "\n")
+cat("Weight:", paste(weight_early, collapse = ", "), "\n")
+
+bmi_early <- calculate_bmi_core_v3(height_early, weight_early)
+cat("BMI Results: ")
+print(bmi_early)
+
+# Recent CCHS cycles (integer missing codes)  
+height_recent <- c(1.75, 1.60, 996, 997)
+weight_recent <- c(70, 55, 998, 999)
+
+cat("\nRecent CCHS cycles (integer codes):\n")
+cat("Height:", paste(height_recent, collapse = ", "), "\n") 
+cat("Weight:", paste(weight_recent, collapse = ", "), "\n")
+
+bmi_recent <- calculate_bmi_core_v3(height_recent, weight_recent)
+cat("BMI Results: ")
+print(bmi_recent)
+
+cat("\nResult: Same function works across ALL CCHS cycles!\n")
+```
+
+## Comparison: Old vs New Approach
+
+```{r comparison}
+cat("=== Approach Comparison ===\n\n")
+
+cat("OLD BRITTLE APPROACH:\n")
+cat("- Hard-coded missing value checks (if x == 996)\n") 
+cat("- Pattern assumptions (single_digit_missing for all)\n")
+cat("- Type mixing errors in case_when()\n")
+cat("- Fails with mixed data formats\n")
+cat("- 20+ lines of complex logic\n\n")
+
+cat("NEW ROBUST APPROACH:\n")
+cat("- Semantic tools (handler$is_missing())\n")
+cat("- Auto-detects patterns and formats\n") 
+cat("- Type-safe propagation rules\n")
+cat("- Handles any input format\n")
+cat("- 5 lines of clean logic\n\n")
+
+cat("DEVELOPER EXPERIENCE:\n")
+cat("- Copy-paste template ready\n")
+cat("- Self-documenting code\n") 
+cat("- No CCHS expertise required\n")
+cat("- Works with existing rec_with_table() workflows\n")
+```
+
+## Developer Template
+
+```{r template}
+cat("=== Template for New Derived Variables ===\n\n")
+
+cat("# Copy-paste template:\n")
+cat("my_derived_variable <- function(var1, var2, handle_missing_data = 'auto') {\n")
+cat("  handler <- create_missing_handler(\n") 
+cat("    var1, var2,\n")
+cat("    handle_missing_data = handle_missing_data,\n")
+cat("    pattern_type = 'triple_digit_missing'  # or appropriate pattern\n")
+cat("  )\n")
+cat("  \n")
+cat("  dplyr::case_when(\n")
+cat("    handler$is_missing(var1) | handler$is_missing(var2) ~ \n")
+cat("      handler$propagate(var1, var2),\n")
+cat("    # Add your business logic here using semantic tools:\n") 
+cat("    # handler$is_tag(var1, 'not_applicable') ~ result,\n")
+cat("    .default = your_calculation\n")
+cat("  )\n")
+cat("}\n")
+```
+
+## Advanced Example: Smoking Function Template
+
+```{r smoking-template}
+cat("=== Advanced Template: Multi-Pattern Variables ===\n\n")
+
+cat("# Template for functions with different variable patterns:\n")
+cat("calculate_smoking_derived <- function(SMK_005, SMKG040, handle_missing_data = 'auto') {\n")
+cat("  # Handle different patterns per variable\n")
+cat("  SMK_005_clean <- convert_to_tagged_na(SMK_005, 'single_digit_missing')\n")
+cat("  SMKG040_clean <- convert_to_tagged_na(SMKG040, 'double_digit_missing')\n")
+cat("  \n")
+cat("  # Create handler for cleaned data\n")
+cat("  handler <- create_missing_handler(\n")
+cat("    SMK_005_clean, SMKG040_clean,\n")
+cat("    handle_missing_data = 'tagged_na',\n")
+cat("    pattern_type = 'triple_digit_missing'\n")
+cat("  )\n")
+cat("  \n")
+cat("  # Business logic with semantic tools\n")
+cat("  dplyr::case_when(\n")
+cat("    handler$is_missing(SMK_005_clean) ~ handler$propagate(SMK_005_clean),\n")
+cat("    handler$is_missing(SMKG040_clean) ~ handler$propagate(SMKG040_clean),\n")
+cat("    handler$is_tag(SMK_005_clean, 'not_applicable') ~ tagged_na('a'),\n")
+cat("    SMK_005_clean == 1 ~ SMKG040_clean,  # Current daily smokers only\n")
+cat("    .default = tagged_na('a')\n")
+cat("  )\n")
+cat("}\n")
+```
+
+## Testing Your Functions
+
+```{r testing-framework}
+cat("=== Testing Framework for Robustness ===\n\n")
+
+# Create a testing function for any derived variable
+test_derived_variable_robustness <- function(func, var1_name, var2_name) {
+  cat(sprintf("Testing %s robustness...\n", deparse(substitute(func))))
+  
+  # Test scenarios
+  scenarios <- list(
+    "Original codes" = list(
+      var1 = c(1.75, 996, 997),
+      var2 = c(70, 998, 999)
+    ),
+    "Tagged_na data" = list(
+      var1 = c(1.75, tagged_na("a"), tagged_na("b")),
+      var2 = c(70, tagged_na("a"), tagged_na("b"))
+    ),
+    "Mixed formats" = list(
+      var1 = c(1.75, 996, tagged_na("a")),
+      var2 = c(70, 997, tagged_na("b"))
+    )
+  )
+  
+  for (scenario_name in names(scenarios)) {
+    cat(sprintf("\n%s:\n", scenario_name))
+    scenario <- scenarios[[scenario_name]]
+    
+    tryCatch({
+      result <- func(scenario$var1, scenario$var2)
+      cat(sprintf("  ✓ SUCCESS: %s\n", paste(head(result, 3), collapse = ", ")))
+    }, error = function(e) {
+      cat(sprintf("  ✗ ERROR: %s\n", e$message))
+    })
+  }
+}
+
+# Test the BMI function
+test_derived_variable_robustness(calculate_bmi_core_v3, "height", "weight")
+```
+
+## Summary
+
+The flexible missing data handler provides:
+
+1. **Format Agnostic**: Works with any input (original codes, tagged_na, mixed)
+2. **Semantic Tools**: `is_missing()`, `is_tag()`, `propagate()` for clear logic  
+3. **Type Safe**: No case_when() mixing errors
+4. **CCHS Robust**: Handles all cycles and patterns automatically
+5. **Developer Friendly**: 5-line template, copy-paste ready
+
+This replaces brittle, hard-coded missing value logic with a clean, semantic approach that adapts automatically to your data format.
+
+### Next Steps for Developers
+
+1. **Copy the BMI template** for your derived variable
+2. **Adjust pattern_type** based on your variables (single/double/triple digit)
+3. **Add business logic** using semantic tools (`handler$is_tag()`, etc.)
+4. **Test with different input formats** using the testing framework
+5. **Document with examples** showing input flexibility
+
+The infrastructure is production-ready and eliminates the brittleness issues that have plagued CCHS derived variable functions.

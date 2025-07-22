@@ -1,0 +1,22 @@
+Variable Name,Variable Label,CCHS Cycle & Type,Not Applicable Code(s),Don't Know Code(s),Refused Code(s),Not Stated Code(s),Missing Data Notes
+PACA_1V,Physical Activity,CCHS2001_p,0,85,76,8300,"All missing codes deviate from standard (6–9); NA=0, others are large arbitrary values."
+INCAGHH,HH Income Group,CCHS2001_p,0,Unspecified,Unspecified,14242,NA=0 (should be 96); NS=14242 (should be 99).
+HMCCG3AD,Home Care Group,CCHS2003_p,6,0,0,367,"NA=6 is standard; DK=0, R=0, NS=367 deviate from expected 7, 8, 9."
+BPCC_16B,BP Reading,CCHS2003_p,6,7,0,466,"R=0 (expected 8); NS=466 (expected 9); same for _16E, _16H."
+PACC_1W,PA: Week Activity,CCHS2003_p,0,188,381,2746,All missing codes deviate from 6–9; NA=0.
+REPC_4F,RSI: Injury Info,CCHS2003_p,6,263,5,596,Arbitrary DK/R/NS (expected 7/8/9).
+RACC_8D,Activity Limitation,CCHS2003_p,6,269,82,544,Arbitrary DK/R/NS (expected 7/8/9).
+CCCE_111,Chronic Cond. 111,CCHS2005_s,6,2,0,25,"DK=2, R=0, NS=25 (expected 7/8/9)."
+MEDE_1V,Medication Use,CCHS2005_s,6,1,2,0,"DK=1, R=2, NS=0 (expected 7/8/9)."
+HUIDHSI,Health Utility Index,CCHS2007-2008_p,96,0,0,117,Two-digit NA; DK/R=0 (expected 97/98); NS=117 (expected 99).
+LBSDSCHG,Labour Status Chg.,CCHS2008-2009_p,999.96,999.97,999.98,999.99,Missing codes use decimal values; expected integer codes.
+DOHCS,Do Home Care Survey,CCHS2009-2010_p,77925,0,0,0,NA is large arbitrary number; DK/R/NS all set to 0 (should be 7–9).
+SFRFOPT,SFR Module Flag,CCHS2007–2008_d,96,N/A,N/A,99,96 = “Module not selected”; 99 = “At least one required question not answered”.
+SMKDSTY (related),Smoking Status,CCHS2007–2008_d,996,N/A,N/A,999,996 = “Population exclusions”; 999 = “At least one required question not answered”.
+ALW (summed),Alcohol/Week,CCHS2009–2010_d,996,N/A,N/A,999,996 = “Module not selected” or “Population exclusions”; 999 = “At least one required question not answered”.
+HWTDBMI,Derived BMI,CCHS2013–2014_c,999.96,N/A,N/A,999.99,999.96 = “Population exclusion/NA”; 999.99 = “Not stated”.
+ADM_PRX,Proxy Interview,CCHS2009–2014 (various),N/A,N/A,N/A,9,ADM_PRX = 1 means “Proxy interview”; usually results in NS=9 for associated variables.
+SAC (derived),Sedentary Hrs Total,CCHS2010_d,996,N/A,N/A,999,996 = “Population exclusion”; 999 = “At least one required question not answered”.
+"SAC (derived, 2015+)",Sedentary Hrs 2015+,CCHS2015–2016_d,999.6,N/A,N/A,999.9,999.6 = “Module not selected”; 999.9 = “At least one required question not answered”.
+PAYDVTMN (related),PA: Daily Minutes,CCHS2015–2016_d,99996,N/A,N/A,99999,99996 = “Module not selected”; 99999 = “At least one required question not answered”.
+FVCDVJUI (related),F&V: Daily Juice,CCHS2017–2018_d,9999.6,N/A,N/A,9999.9,9999.6 = “Module not selected”; 9999.9 = “Proxy interview or unanswered question”.

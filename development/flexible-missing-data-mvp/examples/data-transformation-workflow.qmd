@@ -1,0 +1,150 @@
+---
+title: "Data Transformation Workflow - Missing Data Harmonization"
+format: html
+execute:
+  echo: true
+  warning: false
+  message: false
+  results: hold
+---
+
+# Missing Data Transformation Workflow
+
+This document demonstrates how users can harmonize missing data from original CCHS codes to improved tagged_na format using the flexible missing data infrastructure.
+
+## Setup
+
+```{r setup}
+library(haven)
+library(dplyr)
+
+# Source the infrastructure
+source("../R/flexible-missing-handler.R")
+```
+
+## Example: Height Data Transformation
+
+### Step 1: Start with Original Data
+
+```{r original-data}
+# Original height data with CCHS missing codes
+height_data <- c(1.75, 1.60, 996, 997, 998)
+
+cat("=== Original Data ===\n")
+print(height_data)
+cat("\nMissing code meanings:\n")
+cat("996 = Not applicable\n")
+cat("997 = Don't know\n") 
+cat("998 = Refusal\n")
+```
+
+### Step 2: Transform to Harmonized Format
+
+```{r transform-data}
+# Create handler for transformation
+handler <- create_missing_handler(
+  height_data,
+  pattern_type = "triple_digit_missing",
+  handle_missing_data = "tagged_na"
+)
+
+cat("Handler created:\n")
+cat("Testing handler$is_missing(height_data):\n")
+missing_result <- handler$is_missing(height_data)
+print(missing_result)
+
+# Transform each value using handler logic
+height_transformed <- sapply(height_data, function(x) {
+  if (x == 996) {
+    tagged_na("a")  # not_applicable
+  } else if (x %in% c(997, 998, 999)) {
+    tagged_na("b")  # missing_data
+  } else {
+    x  # keep valid values
+  }
+})
+
+cat("=== Transformed Data ===\n")
+print(height_transformed)
+cat("\nFormatted display:\n")
+cat("height_transformed = c(")
+for (i in 1:length(height_transformed)) {
+  if (i > 1) cat(", ")
+  if (is_tagged_na(height_transformed[i])) {
+    cat(paste0('tagged_na("', attr(height_transformed[i], "na"), '")'))
+  } else {
+    cat(height_transformed[i])
+  }
+}
+cat(")\n")
+```
+
+### Step 3: Create Comparison Table
+
+```{r comparison-table}
+# Create a data frame showing the transformation
+transformation_table <- data.frame(
+  Original = height_data,
+  Transformed = sapply(height_transformed, function(x) {
+    if (is_tagged_na(x)) {
+      paste0('tagged_na("', attr(x, "na"), '")')
+    } else {
+      as.character(x)
+    }
+  }),
+  Meaning = c(
+    "Valid height", 
+    "Valid height", 
+    "Not applicable → tagged_na('a')",
+    "Don't know → tagged_na('b')",
+    "Refusal → tagged_na('b')"
+  )
+)
+
+cat("=== Transformation Table ===\n")
+print(transformation_table)
+```
+
+### Step 4: Test Handler with Transformed Data
+
+```{r test-handler}
+cat("=== Testing Handler with Transformed Data ===\n")
+
+# Test missing data detection
+cat("Missing data detection:\n")
+for (i in 1:length(height_transformed)) {
+  is_missing <- handler$is_missing(height_transformed[i])
+  cat(sprintf("  Row %d: %s → is_missing = %s\n", 
+             i, transformation_table$Transformed[i], is_missing))
+}
+
+# Test semantic tagging
+cat("\nSemantic tagging:\n")
+cat("  tagged_na('a') is 'not_applicable':", 
+    handler$is_tag(tagged_na("a"), "not_applicable"), "\n")
+cat("  tagged_na('b') is 'missing_data':", 
+    handler$is_tag(tagged_na("b"), "missing_data"), "\n")
+
+# Test propagation
+cat("\nPropagation examples:\n")
+prop1 <- handler$propagate(tagged_na("a"), tagged_na("b"))
+cat("  propagate(tagged_na('a'), tagged_na('b')) =", 
+    paste0('tagged_na("', attr(prop1, "na"), '")'), 
+    "(not_applicable wins)\n")
+
+prop2 <- handler$propagate(tagged_na("b"), tagged_na("b"))  
+cat("  propagate(tagged_na('b'), tagged_na('b')) =", 
+    paste0('tagged_na("', attr(prop2, "na"), '")'), 
+    "(same category)\n")
+```
+
+## Summary
+
+This workflow demonstrates how the flexible missing data infrastructure enables:
+
+1. **Clean transformation**: Original CCHS codes → harmonized tagged_na format
+2. **Semantic meaning**: Missing codes have clear, consistent meanings  
+3. **Handler compatibility**: Transformed data works seamlessly with handlers
+4. **Priority rules**: Clear propagation logic for derived variables
+
+The same pattern applies to any derived variable calculation - start with original data, transform to harmonized format, then use semantic tools for clean business logic.

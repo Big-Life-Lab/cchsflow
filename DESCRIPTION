@@ -58,11 +58,19 @@ LazyData: true
 URL: https://big-life-lab.github.io/cchsflow/, https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
 RoxygenNote: 7.3.2
-Suggests: 
-    testthat (>= 3.0.0),
-    kableExtra,
-    DT,
-    rmarkdown,
-    knitr,
-    pkgdown
+Imports:
+    Imports: 
+    crayon,
+    dplyr,
+    haven,
+    here,
+    purrr,
+    readr,
+    recodeflow (>= 0.1.0),
+    rlang,
+    stringr,
+    testthat,
+    usethis,
+    utils,
+    yaml
 Config/testthat/edition: 3
