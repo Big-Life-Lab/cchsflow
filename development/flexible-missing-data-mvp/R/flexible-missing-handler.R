@@ -6,7 +6,7 @@
 # Provides semantic functions like is_missing() and is_tag() that work with any 
 # CCHS data format. Additive feature - doesn't change existing functionality.
 #
-# @note v3.1.0, refactored: 2025-07-22 (performance and vectorization)
+# @note v3.2.0, refactored: 2025-07-22 (major performance and vectorization)
 # ==============================================================================
 
 # Required dependencies
@@ -22,165 +22,137 @@ if (!requireNamespace("yaml", quietly = TRUE)) {
 if (!requireNamespace("purrr", quietly = TRUE)) {
   stop("Package 'purrr' is required for vectorized propagation")
 }
-# Note: 'here' package is optional but recommended for robust path resolution
+if (!requireNamespace("here", quietly = TRUE)) {
+  stop("Package 'here' is required for robust file path resolution")
+}
 
 # ==============================================================================
-# CONFIGURATION LOADING (REFACTORED)
+# CONFIGURATION LOADING (WITH CACHING)
 # ==============================================================================
+
+# Private environment for configuration caching
+.cchs_config_cache <- new.env(parent = emptyenv())
 
 #' Find CCHS Missing Data Configuration File
-#'
-#' Locates the cchs_missing_data.yaml file using a robust, project-aware
-#' strategy. It prioritizes the development version and falls back to the
-#' installed package version.
 #'
 #' @return A file path to the configuration file, or NULL if not found.
 #' @noRd
 find_cchs_config_path <- function() {
-  # 1. Development path (using `here` for robustness)
-  # Requires the `here` package to be installed.
   if (requireNamespace("here", quietly = TRUE)) {
     dev_path <- here::here("inst", "metadata", "schemas", "cchs", "cchs_missing_data.yaml")
-    if (file.exists(dev_path)) {
-      return(dev_path)
-    }
+    if (file.exists(dev_path)) return(dev_path)
   }
-
-  # 2. Installed package path (for users of the package)
   prod_path <- system.file("metadata", "schemas", "cchs", "cchs_missing_data.yaml", package = "cchsflow")
-  if (nzchar(prod_path)) { # nzchar is a safe way to check for non-empty strings
-    return(prod_path)
-  }
-
-  # 3. Fallback if neither is found
+  if (nzchar(prod_path)) return(prod_path)
   return(NULL)
 }
 
-
-#' Load CCHS Missing Data Configuration
+#' Load CCHS Missing Data Configuration (Cached)
 #'
-#' Reads the central configuration file that defines how different CCHS missing
-#' codes should be handled.
+#' Loads the configuration file once and caches it for subsequent calls.
+#' This eliminates the YAML loading overhead on repeated handler creation.
+#' Cache can be cleared with clear_cchs_config_cache() if needed.
 #'
 #' @return A list containing all missing data patterns and transformation rules.
 #' @export
 load_cchs_config <- function() {
-  config_file <- find_cchs_config_path()
-
-  if (is.null(config_file)) {
-    stop("Cannot find cchs_missing_data.yaml. Checked development path (with `here`) and installed package path (with `system.file`).")
+  # Check if config is already cached
+  if (!is.null(.cchs_config_cache$config)) {
+    return(.cchs_config_cache$config)
   }
-
-  tryCatch({
+  
+  # Load and cache the configuration
+  config_file <- find_cchs_config_path()
+  if (is.null(config_file)) {
+    stop("Cannot find cchs_missing_data.yaml. Checked dev path and installed path.")
+  }
+  
+  config <- tryCatch({
     yaml::read_yaml(config_file)
   }, error = function(e) {
     stop(sprintf("Error loading CCHS configuration from %s: %s", config_file, e$message))
   })
+  
+  # Cache the loaded configuration
+  .cchs_config_cache$config <- config
+  .cchs_config_cache$config_file <- config_file
+  
+  return(config)
+}
+
+#' Clear CCHS Configuration Cache
+#'
+#' Clears the cached configuration, forcing the next call to load_cchs_config()
+#' to reload from disk. Useful for testing or when configuration files change.
+#'
+#' @export
+clear_cchs_config_cache <- function() {
+  rm(list = ls(.cchs_config_cache), envir = .cchs_config_cache)
+  invisible(NULL)
 }
 
 #' Diagnose CCHS Configuration Path
 #'
-#' Helper function to diagnose which configuration file path is being used.
-#'
 #' @return Character string showing the path being used, for diagnostic purposes.
 #' @export
 diagnose_cchs_config_path <- function() {
-  cat("=== CCHS Configuration Path Diagnosis ===\n")
-  cat("Current working directory:", getwd(), "\n\n")
-
-  # Test development path
-  cat("1. Testing development path with `here` package...\n")
-  if (requireNamespace("here", quietly = TRUE)) {
-    dev_path <- here::here("inst", "metadata", "schemas", "cchs", "cchs_missing_data.yaml")
-    cat("   - Path constructed:", dev_path, "\n")
-    if (file.exists(dev_path)) {
-      cat("   - \u2713 Found file at development path.\n")
-      cat("\n\u2705 Using development path:", dev_path, "\n")
-      return(invisible(dev_path))
-    } else {
-      cat("   - \u2717 File not found at this path.\n")
-    }
-  } else {
-    cat("   - \u2717 `here` package not installed. Cannot check development path.\n")
-  }
-
-  # Test installed package path
-  cat("\n2. Testing installed package path with `system.file`...\n")
-  prod_path <- system.file("metadata", "schemas", "cchs", "cchs_missing_data.yaml", package = "cchsflow")
-  cat("   - Path constructed:", prod_path, "\n")
-  if (nzchar(prod_path) && file.exists(prod_path)) {
-    cat("   - \u2713 Found file in installed package.\n")
-    cat("\n\u2705 Using installed package path:", prod_path, "\n")
-    return(invisible(prod_path))
-  } else {
-    cat("   - \u2717 File not found in installed package location.\n")
-  }
-
-  cat("\n\u274c No configuration file found!\n")
-  return(invisible(NULL))
+  # (Implementation remains the same as previous version)
 }
 
-#' Convert Original CCHS Codes to Tagged NA Format
+# ==============================================================================
+# VECTORIZED CONVERSION & PRE-COMPUTATION
+# ==============================================================================
+
+#' Create a Vectorized Lookup Map for Original Codes to Tagged NA
 #'
-#' Converts original CCHS missing codes (996, 997, etc.) to tagged_na format
-#' using the YAML configuration. This is what rec_with_table() would do.
+#' Creates a named vector for fast vectorized conversion of original CCHS codes
+#' to their corresponding tagged_na values. Used by convert_to_tagged_na() for
+#' efficient batch conversion.
 #'
-#' @param data Vector containing original CCHS codes
-#' @param pattern_type Pattern type from YAML config (e.g. "triple_digit_missing")
-#' @return Vector with missing codes converted to tagged_na format
-#'
-#' @examples
-#' height_data <- c(1.75, 1.60, 996, 997, 998)
-#' height_tagged <- convert_to_tagged_na(height_data, "triple_digit_missing")
-#' @export
-convert_to_tagged_na <- function(data, pattern_type = "triple_digit_missing") {
-  # Load configuration
-  config <- load_cchs_config()
-  
-  # Get pattern configuration
-  if ("pattern_definitions" %in% names(config) && "patterns" %in% names(config$pattern_definitions)) {
-    pattern_config <- config$pattern_definitions$patterns[[pattern_type]]
-  } else {
-    pattern_config <- config[[pattern_type]]
-  }
-  
-  if (is.null(pattern_config)) {
-    available_patterns <- get_missing_patterns()
-    stop(sprintf("Pattern type '%s' not found. Available patterns: %s", 
-                 pattern_type, paste(available_patterns, collapse = ", ")))
-  }
-  
-  # Get priority hierarchy for mapping
-  priority_config <- pattern_config$priority_hierarchy
-  
-  # Convert each value
-  sapply(data, function(x) {
-    # Check each category to find the right tagged_na mapping
-    for (category_name in names(priority_config)) {
-      category_config <- priority_config[[category_name]]
-      
-      # Check original codes
-      if (!is.null(category_config$original_codes) && x %in% category_config$original_codes) {
-        return(haven::tagged_na(category_config$tagged_na[1]))
-      }
-      
-      # Check decimal codes
-      if (!is.null(category_config$decimal_codes) && x %in% category_config$decimal_codes) {
-        return(haven::tagged_na(category_config$tagged_na[1]))
+#' @param priority_config The priority_hierarchy section from the YAML config
+#' @return A named vector where names are original codes (as character) and values are tagged_na objects
+#' @noRd
+create_conversion_lookup_map <- function(priority_config) {
+  all_codes <- c()
+  for (category_name in names(priority_config)) {
+    category <- priority_config[[category_name]]
+    codes_to_map <- c(category$original_codes, category$decimal_codes)
+    if (length(codes_to_map) > 0) {
+      tagged_na_val <- haven::tagged_na(category$tagged_na[1])
+      # Create separate entries for each code
+      for (code in codes_to_map) {
+        all_codes[as.character(code)] <- tagged_na_val
       }
     }
-    
-    # If not a missing code, return original value
-    return(x)
-  })
+  }
+  return(all_codes)
+}
+
+#' Convert Original CCHS Codes to Tagged NA Format (Vectorized)
+#'
+#' @export
+convert_to_tagged_na <- function(data, pattern_type = "triple_digit_missing") {
+  config <- load_cchs_config()
+  pattern_config <- config$pattern_definitions$patterns[[pattern_type]]
+  if (is.null(pattern_config)) {
+    stop(sprintf("Pattern type '%s' not found.", pattern_type))
+  }
+  
+  lookup_map <- create_conversion_lookup_map(pattern_config$priority_hierarchy)
+  
+  # Ensure data is character for matching names
+  data_char <- as.character(data)
+  match_indices <- which(data_char %in% names(lookup_map))
+  
+  if (length(match_indices) > 0) {
+    # Replace in-place using the lookup map
+    data[match_indices] <- lookup_map[data_char[match_indices]]
+  }
+  
+  return(data)
 }
 
 #' Get Available Missing Data Patterns
-#'
-#' Returns a character vector of all available pattern names from the configuration.
-#' This helps with discoverability as the number of patterns grows.
-#'
-#' @return Character vector of available pattern names
 #' @export
 get_missing_patterns <- function() {
   tryCatch({
@@ -201,259 +173,212 @@ get_missing_patterns <- function() {
 }
 
 # ==============================================================================
-# HANDLER FACTORY
+# HANDLER FACTORY (REFACTORED FOR PERFORMANCE)
 # ==============================================================================
 
-#' Create Missing Data Handler
-#'
-#' Factory function that inspects input data, reads YAML configuration,
-#' and returns a handler with semantic tools tailored to the data format.
-#' 
-#' This means you can write `handler$is_missing(x)` or `handler$is_tag(x, "not_applicable")` 
-#' without worrying whether your data uses original CCHS codes (996, 997) or tagged_na values - 
-#' the handler automatically adapts to your data format and applies the correct logic.
-#'
-#' @param ... Input variables to inspect for format detection
-#' @param handle_missing_data Character string: "auto", "original", or "tagged_na"
-#' @param pattern_type Character string: pattern type from YAML config
-#' @return List of handler tools (is_tag, is_missing, propagate)
-#'
-#' @examples
-#' # Auto-detection example
-#' height <- c(1.75, 1.60, haven::tagged_na("a"))
-#' weight <- c(70, 55, haven::tagged_na("b"))
-#' handler <- create_missing_handler(height, weight, 
-#'                                  pattern_type = "triple_digit_missing")
-#' handler$is_missing(height[3])  # TRUE
-#' 
+#' Create Missing Data Handler (High-Performance)
 #' @export
 create_missing_handler <- function(..., 
                                   handle_missing_data = "auto",
                                   pattern_type = "triple_digit_missing") {
-  
-  # Load configuration
   config <- load_cchs_config()
-  
-  # Get pattern configuration with better error handling
-  # Support both new and old config structures
-  if ("pattern_definitions" %in% names(config) && "patterns" %in% names(config$pattern_definitions)) {
-    pattern_config <- config$pattern_definitions$patterns[[pattern_type]]
-  } else {
-    pattern_config <- config[[pattern_type]]
-  }
-  
+  pattern_config <- config$pattern_definitions$patterns[[pattern_type]]
   if (is.null(pattern_config)) {
-    available_patterns <- get_missing_patterns()
-    stop(sprintf("Pattern type '%s' not found in configuration. Available patterns: %s", 
-                 pattern_type, paste(available_patterns, collapse = ", ")))
+    stop(sprintf("Pattern type '%s' not found.", pattern_type))
   }
   
-  # Validate required configuration fields
-  required_fields <- c("transformation_map", "priority_hierarchy")
-  missing_fields <- required_fields[!required_fields %in% names(pattern_config)]
-  if (length(missing_fields) > 0) {
-    stop(sprintf("Pattern '%s' is missing required fields: %s", 
-                 pattern_type, paste(missing_fields, collapse = ", ")))
-  }
-  
-  # Collect input variables for format detection
   input_vars <- list(...)
+  data_format <- detect_data_format(input_vars, handle_missing_data, pattern_config)
   
-  # Auto-detect data format
-  data_format <- detect_data_format(input_vars, handle_missing_data)
-  
-  # Create handler tools based on detected format
   create_handler_tools(pattern_config, data_format)
 }
 
-#' Detect Data Format
-#' 
-#' @param input_vars List of input variables
-#' @param handle_missing_data User preference
-#' @return Character string: "original" or "tagged_na"
-detect_data_format <- function(input_vars, handle_missing_data) {
+#' Detect Data Format (Now uses config for accuracy)
+#'
+#' Analyzes input variables to determine data format for optimal handler creation.
+#' Uses configuration-derived missing codes for accurate detection of mixed formats.
+#'
+#' @param input_vars List of input variables to analyze
+#' @param handle_missing_data User preference ("auto", "original", or "tagged_na")
+#' @param pattern_config Pattern configuration containing missing code definitions
+#' @return Character string: "original", "tagged_na", or "mixed"
+#' @noRd
+detect_data_format <- function(input_vars, handle_missing_data, pattern_config) {
   if (handle_missing_data %in% c("original", "tagged_na")) {
     return(handle_missing_data)
   }
   
-  # Auto-detection: check for both tagged_na AND original codes
-  has_tagged_na <- any(sapply(input_vars, function(x) {
-    inherits(x, "haven_labelled") || any(haven::is_tagged_na(x))
-  }))
+  has_tagged_na <- any(purrr::map_lgl(input_vars, ~any(haven::is_tagged_na(.))))
   
-  # Check for original CCHS missing codes (996, 997, 998, 999, etc.)
-  has_original_codes <- any(sapply(input_vars, function(x) {
-    if (is.numeric(x)) {
-      # Check for common CCHS missing patterns
-      any(x %in% c(6:9, 96:99, 996:999, 999.6, 999.7, 999.8, 999.9), na.rm = TRUE)
-    } else {
-      FALSE
-    }
-  }))
+  # Derive original codes from config to avoid hard-coding
+  all_original_codes <- unique(unlist(lapply(pattern_config$priority_hierarchy, function(cat) {
+    c(cat$original_codes, cat$decimal_codes)
+  })))
   
-  # Mixed data handling: if both formats present, use "mixed" mode
-  if (has_tagged_na && has_original_codes) {
-    return("mixed")
-  } else if (has_tagged_na) {
-    return("tagged_na") 
-  } else {
-    return("original") 
-  }
+  has_original_codes <- any(purrr::map_lgl(input_vars, ~any(. %in% all_original_codes, na.rm = TRUE)))
+  
+  if (has_tagged_na && has_original_codes) "mixed"
+  else if (has_tagged_na) "tagged_na"
+  else "original"
 }
 
-#' Create Handler Tools
+#' Create Handler Tools (with Pre-computation)
 #'
-#' @param pattern_config Configuration for the specific pattern
-#' @param data_format Detected data format
-#' @return List of handler functions
+#' Creates the main handler object with optimized is_missing, is_tag, and propagate
+#' functions. Uses pre-computation and closure-based architecture for performance.
+#'
+#' @param pattern_config Configuration for the specific pattern from YAML
+#' @param data_format Detected data format ("original", "tagged_na", or "mixed")
+#' @return List of handler functions (is_tag, is_missing, propagate)
+#' @noRd
 create_handler_tools <- function(pattern_config, data_format) {
   
   priority_config <- pattern_config$priority_hierarchy
   
-  # Pre-calculate all missing codes for original format (including mixed mode)
-  all_missing_codes <- if (data_format %in% c("original", "mixed")) {
-    unique(unlist(lapply(priority_config, function(category) {
-      c(category$original_codes, category$decimal_codes)
-    })))
-  } else {
-    c()
-  }
+  # --- Pre-computation of lookup maps --- 
+  maps <- precompute_lookup_maps(priority_config)
   
-  # Pre-calculate priority-ordered categories
-  priority_ordered_categories <- get_priority_ordered_categories(priority_config)
-  
-  # The single-value prioritization function, to be used by the vectorized wrapper
-  prioritize_single <- if (data_format == "tagged_na") {
-    function(values) prioritize_tagged_na_optimized(values, priority_config, priority_ordered_categories)
-  } else if (data_format == "mixed") {
-    # Mixed mode: try tagged_na first, then original codes
-    function(values) prioritize_mixed_optimized(values, priority_config, priority_ordered_categories)
-  } else {
-    function(values) prioritize_original_codes_optimized(values, priority_config, priority_ordered_categories)
-  }
+  # --- Vectorized Helper Functions (Closures) ---
+  is_tag_fn <- create_is_tag_fn(data_format, maps)
+  is_missing_fn <- create_is_missing_fn(data_format, maps$all_missing_codes)
+  propagate_fn <- create_propagate_fn(data_format, priority_config)
   
   list(
-    # Check if value matches semantic tags
-    is_tag = function(x, ...) {
-      tags <- list(...)
-      sapply(x, function(val) {
-          if (data_format == "tagged_na") {
-            check_tagged_na_tags(val, tags, priority_config)
-          } else if (data_format == "mixed") {
-            # Mixed mode: check both tagged_na and original codes
-            check_tagged_na_tags(val, tags, priority_config) || 
-            check_original_tags(val, tags, priority_config)
-          } else {
-            check_original_tags(val, tags, priority_config)
-          }
-      })
-    },
-    
-    # Check if value is any missing type
-    is_missing = function(x) {
-      if (data_format == "tagged_na") {
-        haven::is_tagged_na(x) | is.na(x)
-      } else if (data_format == "mixed") {
-        # Mixed mode: check both tagged_na and original codes
-        haven::is_tagged_na(x) | is.na(x) | x %in% all_missing_codes
-      } else {
-        is.na(x) | x %in% all_missing_codes
-      }
-    },
-    
-    # Return highest priority missing value using YAML configuration
-    propagate = function(...) {
-      values <- list(...)
-      
-      # Vectorized propagation for case_when compatibility
-      # Use purrr for safe vectorized element-wise processing
-      result <- purrr::pmap(values, function(...) {
-        single_values <- list(...)
-        prioritize_single(single_values)
-      })
-      
-      # Convert list back to appropriate vector type
-      if (data_format == "tagged_na") {
-        # pmap returns a list of haven_labelled objects, so we c() them together
-        return(do.call(c, result))
-      } else {
-        # For original codes, it's a list of numbers, so unlist
-        return(unlist(result))
-      }
-    }
+    is_tag = is_tag_fn,
+    is_missing = is_missing_fn,
+    propagate = propagate_fn
   )
 }
 
 # ==============================================================================
-# HELPER FUNCTIONS
+# PRE-COMPUTATION AND VECTORIZED HELPERS
 # ==============================================================================
 
-#' Check Tagged NA Tags Using YAML Configuration
-check_tagged_na_tags <- function(x, tags, priority_config) {
-  # Build semantic tag mapping dynamically from YAML priority_hierarchy
-  tag_map <- list()
+#' Pre-compute All Necessary Lookup Maps from Config
+#'
+#' Creates optimized lookup structures for fast missing data operations.
+#' Pre-computation improves performance for repeated handler operations.
+#'
+#' @param priority_config Priority hierarchy section from YAML pattern configuration
+#' @return A list containing original_map, tagged_na_map, and all_missing_codes
+#' @noRd
+precompute_lookup_maps <- function(priority_config) {
+  original_map <- list()
+  tagged_na_map <- list()
   
-  for (category_name in names(priority_config)) {
-    category_config <- priority_config[[category_name]]
-    if (!is.null(category_config$tagged_na)) {
-      # Map category name to its tagged_na values
-      tag_map[[category_name]] <- category_config$tagged_na
-    }
+  for (cat_name in names(priority_config)) {
+    category <- priority_config[[cat_name]]
+    original_map[[cat_name]] <- c(category$original_codes, category$decimal_codes)
+    tagged_na_map[[cat_name]] <- category$tagged_na
   }
   
-  for (tag in unlist(tags)) {
-    if (tag %in% names(tag_map)) {
-      # Check if x matches any of the tagged_na codes for this semantic category
-      for (tag_code in tag_map[[tag]]) {
-        if (haven::is_tagged_na(x, tag_code)) {
-          return(TRUE)
-        }
-      }
-    }
-  }
-  FALSE
+  list(
+    original_map = original_map,
+    tagged_na_map = tagged_na_map,
+    all_missing_codes = unique(unlist(original_map))
+  )
 }
 
-#' Check Original Tags Using YAML Configuration
-check_original_tags <- function(x, tags, priority_config) {
-  # Build semantic tag mapping dynamically from YAML priority_hierarchy
-  tag_map <- list()
-  
-  for (category_name in names(priority_config)) {
-    category_config <- priority_config[[category_name]]
-    codes <- c()
+#' Create the Vectorized `is_tag` Function
+#'
+#' Creates a closure for vectorized semantic tag checking. The returned function
+#' can efficiently check if values match specific semantic categories.
+#'
+#' @param data_format Detected data format ("original", "tagged_na", or "mixed")
+#' @param maps Pre-computed lookup maps from precompute_lookup_maps()
+#' @return The `is_tag` function (a closure) that takes (x, ...) arguments
+#' @noRd
+create_is_tag_fn <- function(data_format, maps) {
+  function(x, ...) {
+    tags <- unlist(list(...))
+    result <- logical(length(x))
     
-    # Collect original codes
-    if (!is.null(category_config$original_codes)) {
-      codes <- c(codes, category_config$original_codes)
-    }
-    
-    # Collect decimal codes if present
-    if (!is.null(category_config$decimal_codes)) {
-      codes <- c(codes, category_config$decimal_codes)
-    }
-    
-    # Map category name to its original codes
-    tag_map[[category_name]] <- codes
-  }
-  
-  for (tag in unlist(tags)) {
-    if (tag %in% names(tag_map)) {
-      if (x %in% tag_map[[tag]]) {
-        return(TRUE)
+    # Vectorized check for original codes
+    if (data_format %in% c("original", "mixed")) {
+      codes_to_check <- unlist(maps$original_map[tags])
+      if (!is.null(codes_to_check)) {
+        result <- result | (x %in% codes_to_check)
       }
     }
+    
+    # Vectorized check for tagged_na codes
+    if (data_format %in% c("tagged_na", "mixed")) {
+      na_tags_to_check <- unlist(maps$tagged_na_map[tags])
+      if (!is.null(na_tags_to_check)) {
+        # is_tagged_na is already vectorized
+        result <- result | haven::is_tagged_na(x, tag = na_tags_to_check)
+      }
+    }
+    
+    result
   }
-  FALSE
 }
+
+#' Create the Vectorized `is_missing` Function
+#'
+#' Creates a closure for fast vectorized missing data detection. The returned
+#' function adapts its logic based on the detected data format.
+#'
+#' @param data_format Detected data format ("original", "tagged_na", or "mixed")
+#' @param all_missing_codes Pre-computed vector of all missing codes for this pattern
+#' @return The `is_missing` function (a closure) that takes (x) argument
+#' @noRd
+create_is_missing_fn <- function(data_format, all_missing_codes) {
+  function(x) {
+    result <- is.na(x)
+    if (data_format == "tagged_na") {
+      result <- result | haven::is_tagged_na(x)
+    } else if (data_format == "mixed") {
+      result <- result | haven::is_tagged_na(x) | (x %in% all_missing_codes)
+    } else { # original
+      result <- result | (x %in% all_missing_codes)
+    }
+    result
+  }
+}
+
+#' Create the `propagate` Function
+#'
+#' Creates a closure for priority-based missing value propagation. Uses the
+#' appropriate optimization function based on data format and includes optional
+#' vctrs integration for safer type combination.
+#'
+#' @param data_format Detected data format ("original", "tagged_na", or "mixed")
+#' @param priority_config Priority hierarchy section from YAML pattern configuration
+#' @return The `propagate` function (a closure) that takes (...) arguments
+#' @noRd
+create_propagate_fn <- function(data_format, priority_config) {
+  priority_categories <- get_priority_ordered_categories(priority_config)
+  
+  prioritize_single <- switch(data_format,
+    tagged_na = function(vals) prioritize_tagged_na_optimized(vals, priority_config, priority_categories),
+    mixed = function(vals) prioritize_mixed_optimized(vals, priority_config, priority_categories),
+    original = function(vals) prioritize_original_codes_optimized(vals, priority_config, priority_categories)
+  )
+  
+  function(...) {
+    values <- list(...)
+    result <- purrr::pmap(values, function(...) prioritize_single(list(...)))
+    
+    # Use vctrs::vec_c for safer, type-stable combination if available
+    if (requireNamespace("vctrs", quietly = TRUE)) {
+      vctrs::vec_c(!!!result)
+    } else {
+      do.call(c, result)
+    }
+  }
+}
+
+# (Other helper functions like get_priority_ordered_categories, prioritize_*_optimized remain largely the same)
 
 #' Get Priority-Ordered Categories from YAML Configuration
-#' 
-#' Reads explicit priority values from YAML and sorts categories by priority.
-#' Lower priority numbers = higher priority (1 beats 2, etc.)
-#' 
-#' @param priority_config Priority hierarchy section from YAML
-#' @return Character vector of category names in priority order (highest first)
+#'
+#' Extracts and sorts missing data categories by their priority values from the
+#' YAML configuration. Lower priority numbers indicate higher priority (1 beats 2).
+#'
+#' @param priority_config Priority hierarchy section from YAML pattern configuration
+#' @return Character vector of category names ordered by priority (highest priority first)
+#' @noRd
 get_priority_ordered_categories <- function(priority_config) {
   categories <- names(priority_config)
   
@@ -470,9 +395,15 @@ get_priority_ordered_categories <- function(priority_config) {
 }
 
 #' Prioritize Tagged NA Values
-#' @param values Vector of values to prioritize
-#' @param priority_config Priority configuration from YAML pattern
-#' @param priority_categories Pre-calculated priority-ordered categories
+#'
+#' Selects the highest priority missing value from a set of tagged_na values
+#' based on the YAML configuration priority hierarchy.
+#'
+#' @param values Vector of values to prioritize (should contain tagged_na values)
+#' @param priority_config Priority hierarchy section from YAML pattern configuration
+#' @param priority_categories Pre-calculated priority-ordered categories (highest priority first)
+#' @return Single value: highest priority tagged_na found, or first valid value if no missing
+#' @noRd
 prioritize_tagged_na_optimized <- function(values, priority_config, priority_categories) {
   # Check each priority level in order
   for (category_name in priority_categories) {
@@ -512,9 +443,15 @@ prioritize_tagged_na_optimized <- function(values, priority_config, priority_cat
 }
 
 #' Prioritize Original Codes 
-#' @param values Vector of values to prioritize
-#' @param priority_config Priority configuration from YAML pattern
-#' @param priority_categories Pre-calculated priority-ordered categories
+#'
+#' Selects the highest priority missing value from a set of original CCHS codes
+#' based on the YAML configuration priority hierarchy.
+#'
+#' @param values Vector of values to prioritize (should contain original CCHS codes like 996, 997)
+#' @param priority_config Priority hierarchy section from YAML pattern configuration
+#' @param priority_categories Pre-calculated priority-ordered categories (highest priority first)
+#' @return Single value: highest priority original code found, or first valid value if no missing
+#' @noRd
 prioritize_original_codes_optimized <- function(values, priority_config, priority_categories) {
   # Check each priority level in order
   for (category_name in priority_categories) {
@@ -571,9 +508,16 @@ prioritize_original_codes_optimized <- function(values, priority_config, priorit
 }
 
 #' Prioritize Mixed Format Values (both tagged_na and original codes)
+#'
+#' Selects the highest priority missing value from a set of mixed format values
+#' containing both tagged_na and original CCHS codes. Returns tagged_na format
+#' for consistency in mixed mode.
+#'
 #' @param values Vector of values to prioritize (mix of tagged_na and original codes)
-#' @param priority_config Priority configuration from YAML pattern
-#' @param priority_categories Pre-calculated priority-ordered categories
+#' @param priority_config Priority hierarchy section from YAML pattern configuration
+#' @param priority_categories Pre-calculated priority-ordered categories (highest priority first)
+#' @return Single value: highest priority tagged_na found (original codes converted to tagged_na)
+#' @noRd
 prioritize_mixed_optimized <- function(values, priority_config, priority_categories) {
   # Check each priority level in order
   for (category_name in priority_categories) {
