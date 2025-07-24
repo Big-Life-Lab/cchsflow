@@ -1,0 +1,391 @@
+---
+title: "Universal Missing Data Converter - BMI Example"
+format: html
+execute:
+  echo: true
+  warning: false  
+  message: false
+  results: hold
+---
+
+# Universal Missing Data Format Converter
+
+This document demonstrates the new `convert_missing()` function that eliminates code duplication across derived variable functions while providing maximum flexibility for different missing data workflows.
+
+## Setup
+
+```{r setup}
+library(haven)
+library(dplyr)
+
+# Source the new universal converter
+source("../R/convert-missing.R")
+
+# Source the flexible missing handler infrastructure  
+source("../R/flexible-missing-handler.R")
+```
+
+## The Problem: Code Duplication
+
+**Before**: Every derived function had to duplicate this conditional logic:
+
+```r
+# OLD PATTERN (duplicated in every function):
+if (output_format == "tagged_na") {
+  height_clean <- convert_to_tagged_na(height, "triple_digit_missing")
+  weight_clean <- convert_to_tagged_na(weight, "triple_digit_missing") 
+  data_format <- "tagged_na"
+} else {
+  height_clean <- height
+  weight_clean <- weight
+  data_format <- output_format
+}
+```
+
+**After**: Clean 2-line pattern with no duplication:
+
+```r
+# NEW PATTERN (consistent across all functions):
+height_clean <- convert_missing(height, "triple_digit_missing", output_format)
+weight_clean <- convert_missing(weight, "triple_digit_missing", output_format)
+```
+
+## New BMI Function Implementation
+
+```{r show-new-bmi-function}
+# New BMI core function using convert_missing
+calculate_bmi_core_new <- function(height, weight, output_format = "tagged_na") {
+  # Universal conversion - eliminates code duplication
+  height_clean <- convert_missing(height, "triple_digit_missing", output_format)
+  weight_clean <- convert_missing(weight, "triple_digit_missing", output_format)
+  
+  # Create check for cleaned data
+  check <- handle_missing(height_clean, weight_clean, 
+                                   output_format = output_format, 
+                                   pattern_type = "triple_digit_missing")
+  
+  # Clean calculation logic
+  dplyr::case_when(
+    check$is_missing(height_clean) | check$is_missing(weight_clean) ~ 
+      check$which_missing(height_clean, weight_clean),
+    .default = weight_clean / (height_clean^2)
+  )
+}
+
+# Show the function
+calculate_bmi_core_new
+```
+
+**Key improvements:**
+- **2 lines of conversion** instead of 8+ lines of conditional logic
+- **Consistent pattern** across all derived functions
+- **Maximum flexibility** with output format control
+- **Auto-detection support** for variable patterns
+
+## Flexibility Demo: Three Output Modes
+
+### Mode 1: Tagged_NA Format (Production Default)
+
+```{r tagged-na-mode}
+cat("=== Tagged_NA Mode (Production Default) ===\n")
+
+# Test data with CCHS missing codes
+height_data <- c(1.75, 1.60, 996, 997, 998)
+weight_data <- c(70, 55, 996, 997, 999)
+
+cat("Input Data:\n")
+cat("Height:", paste(height_data, collapse = ", "), "\n")
+cat("Weight:", paste(weight_data, collapse = ", "), "\n\n")
+
+# Calculate BMI in tagged_na mode (default)
+bmi_tagged <- calculate_bmi_core_new(height_data, weight_data, "tagged_na")
+
+cat("BMI Results (tagged_na mode):\n")
+for(i in 1:length(bmi_tagged)) {
+  if (is_tagged_na(bmi_tagged[i])) {
+    cat(sprintf("  [%d] BMI(%.3g, %.3g) = tagged_na('%s')\n", 
+                i, height_data[i], weight_data[i], attr(bmi_tagged[i], "na")))
+  } else {
+    cat(sprintf("  [%d] BMI(%.3g, %.3g) = %.5f\n", 
+                i, height_data[i], weight_data[i], bmi_tagged[i]))
+  }
+}
+
+cat("\nBehavior: Original CCHS codes converted to semantic tagged_na format\n")
+cat("- 996 (not applicable) → tagged_na('a')\n")
+cat("- 997/998/999 (missing data) → tagged_na('b')\n")
+```
+
+### Mode 2: Original Format (Advanced Users)
+
+```{r original-mode}
+cat("\n=== Original Mode (Advanced Users) ===\n")
+
+# Same input data
+cat("Input Data:\n") 
+cat("Height:", paste(height_data, collapse = ", "), "\n")
+cat("Weight:", paste(weight_data, collapse = ", "), "\n\n")
+
+# Calculate BMI in original mode
+bmi_original <- calculate_bmi_core_new(height_data, weight_data, "original")
+
+cat("BMI Results (original mode):\n")
+for(i in 1:length(bmi_original)) {
+  if (is.na(bmi_original[i]) || is_tagged_na(bmi_original[i])) {
+    cat(sprintf("  [%d] BMI(%.3g, %.3g) = %s\n", 
+                i, height_data[i], weight_data[i], 
+                ifelse(is_tagged_na(bmi_original[i]), "tagged_na", "NA")))
+  } else {
+    cat(sprintf("  [%d] BMI(%.3g, %.3g) = %.5f\n", 
+                i, height_data[i], weight_data[i], bmi_original[i]))
+  }
+}
+
+cat("\nBehavior: CCHS codes preserved in original format\n")
+cat("- Missing data propagation returns original codes (996, 997, etc.)\n")
+cat("- Useful for workflows that need to preserve original data format\n")
+```
+
+### Mode 3: Auto-Detection (Maximum Flexibility)
+
+```{r auto-mode}
+cat("\n=== Auto Mode (Maximum Flexibility) ===\n")
+
+# Test with mixed data formats
+height_mixed <- c(1.75, 996, tagged_na("a"), 1.80)
+weight_mixed <- c(70, 997, tagged_na("b"), 80)
+
+cat("Mixed Input Data:\n")
+cat("Height: [1.75, 996, tagged_na('a'), 1.80]\n")
+cat("Weight: [70, 997, tagged_na('b'), 80]\n\n")
+
+# Calculate BMI in auto mode
+bmi_auto <- calculate_bmi_core_new(height_mixed, weight_mixed, "auto")
+
+cat("BMI Results (auto mode):\n")
+for(i in 1:length(bmi_auto)) {
+  height_val <- ifelse(is_tagged_na(height_mixed[i]), 
+                      paste0("tagged_na('", attr(height_mixed[i], "na"), "')"), 
+                      as.character(height_mixed[i]))
+  weight_val <- ifelse(is_tagged_na(weight_mixed[i]), 
+                      paste0("tagged_na('", attr(weight_mixed[i], "na"), "')"), 
+                      as.character(weight_mixed[i]))
+  
+  if (is.na(bmi_auto[i]) || is_tagged_na(bmi_auto[i])) {
+    result_val <- ifelse(is_tagged_na(bmi_auto[i]), 
+                        paste0("tagged_na('", attr(bmi_auto[i], "na"), "')"), 
+                        "NA")
+    cat(sprintf("  [%d] BMI(%s, %s) = %s\n", i, height_val, weight_val, result_val))
+  } else {
+    cat(sprintf("  [%d] BMI(%s, %s) = %.5f\n", i, height_val, weight_val, bmi_auto[i]))
+  }
+}
+
+cat("\nBehavior: Handles mixed data formats automatically\n")
+cat("- Auto-detects whether input contains original codes or tagged_na\n")
+cat("- Preserves input format in propagation results\n")
+cat("- Perfect for rec_with_table() workflows with mixed preprocessing\n")
+```
+
+## Variable Pattern Auto-Detection
+
+The converter automatically detects missing data patterns from variable names:
+
+```{r pattern-detection}
+cat("=== Variable Pattern Auto-Detection ===\n")
+
+# Test different CCHS variable types
+test_variables <- list(
+  HWTGHTM = c(1.75, 996, 997),      # Height (triple_digit)
+  HWTGWTK = c(70, 996, 997),        # Weight (triple_digit) 
+  DHH_SEX = c(1, 2, 6, 7),          # Sex (single_digit)
+  SMKG040 = c(10, 20, 96, 97),      # Smoking quantity (double_digit)
+  ALCDTYP = c(1, 2, 96, 97)         # Alcohol type (double_digit)
+)
+
+for (var_name in names(test_variables)) {
+  data <- test_variables[[var_name]]
+  
+  # Auto-detect pattern (pattern_type = NULL triggers detection)
+  detected_pattern <- detect_pattern_from_variable(var_name)
+  
+  cat(sprintf("\nVariable: %s\n", var_name))
+  cat(sprintf("  Auto-detected pattern: %s\n", detected_pattern))
+  cat(sprintf("  Input data: %s\n", paste(data, collapse = ", ")))
+  
+  # Convert using auto-detection
+  converted <- convert_missing(data, pattern_type = NULL, output_format = "tagged_na")
+  
+  cat("  Converted result: ")
+  result_strs <- character(length(converted))
+  for (i in 1:length(converted)) {
+    if (is_tagged_na(converted[i])) {
+      result_strs[i] <- sprintf("tagged_na('%s')", attr(converted[i], "na"))
+    } else {
+      result_strs[i] <- as.character(converted[i])
+    }
+  }
+  cat(paste(result_strs, collapse = ", "), "\n")
+}
+
+cat("\nPattern Detection Rules:\n")
+cat("- Variables starting with 'HWTG' → triple_digit_missing\n")
+cat("- Variables starting with 'DHH_' → single_digit_missing\n") 
+cat("- Variables starting with 'SMKG' → double_digit_missing\n")
+cat("- Variables matching 'ALC.*TYP' → double_digit_missing\n")
+cat("- Plus many other CCHS naming conventions...\n")
+```
+
+## Advanced Example: Adjust BMI with Different Patterns
+
+```{r adjust-bmi-example}
+cat("=== Advanced Example: Adjust BMI Function ===\n")
+
+# New adjust_bmi using the universal converter
+adjust_bmi_new <- function(sex, height, weight, output_format = "tagged_na") {
+  # Calculate raw BMI using BMI core function
+  raw_bmi <- calculate_bmi_core_new(height, weight, output_format)
+  
+  # Convert sex variable (different pattern than height/weight)
+  sex_clean <- convert_missing(sex, "single_digit_missing", output_format)
+  sex_check <- handle_missing(sex_clean, 
+                                       output_format = output_format, 
+                                       pattern_type = "single_digit_missing")
+  
+  # Apply sex-specific bias correction
+  dplyr::case_when(
+    # Handle missing BMI values (already handled by calculate_bmi_core_new)
+    is.na(raw_bmi) | haven::is_tagged_na(raw_bmi) ~ raw_bmi,
+    
+    # Handle missing sex values
+    sex_check$is_missing(sex_clean) ~ sex_check$which_missing(sex_clean),
+    
+    # Apply sex-specific corrections (Connor Gorber et al. 2008)
+    sex_clean == 1 ~ -1.07575 + 1.07592 * raw_bmi,  # Male correction
+    sex_clean == 2 ~ -0.12374 + 1.05129 * raw_bmi,  # Female correction
+    
+    # Catch-all for invalid sex values
+    .default = haven::tagged_na("b")
+  )
+}
+
+# Test adjust_bmi with different missing patterns
+test_sex <- c(1, 2, 6, 7)           # Single digit missing pattern
+test_heights <- c(1.75, 1.65, 1.80, 996)  # Triple digit missing pattern  
+test_weights <- c(70, 60, 80, 997)         # Triple digit missing pattern
+
+result_adjusted <- adjust_bmi_new(test_sex, test_heights, test_weights)
+
+cat("Adjust BMI Results:\n")
+for (i in 1:length(result_adjusted)) {
+  if (is_tagged_na(result_adjusted[i])) {
+    cat(sprintf("  adjust_bmi(%d, %.3g, %.3g) = tagged_na('%s')\n", 
+                test_sex[i], test_heights[i], test_weights[i], 
+                attr(result_adjusted[i], "na")))
+  } else {
+    cat(sprintf("  adjust_bmi(%d, %.3g, %.3g) = %.5f\n", 
+                test_sex[i], test_heights[i], test_weights[i], result_adjusted[i]))
+  }
+}
+
+cat("\nKey Features:\n")
+cat("- Different patterns per variable (single_digit for sex, triple_digit for anthropometrics)\n")
+cat("- Same universal converter eliminates duplication\n")
+cat("- Consistent missing data handling across all variables\n")
+```
+
+## Code Comparison: Before vs After
+
+```{r code-comparison}
+cat("=== Code Comparison: Elimination of Duplication ===\n\n")
+
+cat("BEFORE (duplicated in every derived function):\n")
+cat("calculate_old_pattern <- function(var1, var2, output_format = 'tagged_na') {\n")
+cat("  if (output_format == 'tagged_na') {\n")
+cat("    var1_clean <- convert_to_tagged_na(var1, 'triple_digit_missing')\n")
+cat("    var2_clean <- convert_to_tagged_na(var2, 'triple_digit_missing')\n")
+cat("    data_format <- 'tagged_na'\n") 
+cat("  } else {\n")
+cat("    var1_clean <- var1\n")
+cat("    var2_clean <- var2\n")
+cat("    data_format <- output_format\n")
+cat("  }\n")
+cat("  # ... rest of function logic\n")
+cat("}\n\n")
+
+cat("AFTER (universal pattern, no duplication):\n")
+cat("calculate_new_pattern <- function(var1, var2, output_format = 'tagged_na') {\n")
+cat("  var1_clean <- convert_missing(var1, 'triple_digit_missing', output_format)\n")
+cat("  var2_clean <- convert_missing(var2, 'triple_digit_missing', output_format)\n")
+cat("  # ... rest of function logic\n")
+cat("}\n\n")
+
+cat("BENEFITS:\n")
+cat("✓ Reduced from 8+ lines to 2 lines\n")
+cat("✓ Eliminated conditional logic duplication\n")
+cat("✓ Same flexibility, cleaner implementation\n")
+cat("✓ Consistent pattern across all derived functions\n")
+cat("✓ Auto-detection support for variable patterns\n")
+cat("✓ Easy to extend with new output formats\n")
+```
+
+## Developer Template
+
+```{r developer-template}
+cat("=== Copy-Paste Template for New Derived Variables ===\n\n")
+
+cat("# Universal template for any derived variable:\n")
+cat("calculate_any_derived <- function(var1, var2, var3 = NULL, output_format = 'tagged_na') {\n")
+cat("  # Universal conversions (auto-detects patterns from variable names)\n")
+cat("  var1_clean <- convert_missing(var1, NULL, output_format)\n")
+cat("  var2_clean <- convert_missing(var2, NULL, output_format)\n")
+cat("  \n")
+cat("  # For specific patterns, specify explicitly:\n")
+cat("  if (!is.null(var3)) {\n")
+cat("    var3_clean <- convert_missing(var3, 'single_digit_missing', output_format)\n")
+cat("  }\n")
+cat("  \n")
+cat("  # Create check for processed data\n")
+cat("  check <- handle_missing(var1_clean, var2_clean, \n")
+cat("                                   output_format = output_format)\n")
+cat("  \n")
+cat("  # Business logic with semantic tools\n")
+cat("  dplyr::case_when(\n")
+cat("    check$is_missing(var1_clean) | check$is_missing(var2_clean) ~ \n")
+cat("      check$which_missing(var1_clean, var2_clean),\n")
+cat("    # Add your calculation logic here\n")
+cat("    .default = your_calculation_here\n")
+cat("  )\n")
+cat("}\n\n")
+
+cat("USAGE EXAMPLES:\n")
+cat("# Production default (tagged_na format)\n")
+cat("result1 <- calculate_any_derived(HWTGHTM, HWTGWTK)\n\n")
+cat("# Advanced users (preserve original codes)\n")
+cat("result2 <- calculate_any_derived(HWTGHTM, HWTGWTK, output_format = 'original')\n\n")
+cat("# Maximum flexibility (auto-detect input format)\n")
+cat("result3 <- calculate_any_derived(HWTGHTM, HWTGWTK, output_format = 'auto')\n")
+```
+
+## Summary
+
+The `convert_missing()` function provides:
+
+1. **Universal Conversion**: Single function handles all missing data format conversions
+2. **Zero Duplication**: Same 2-line pattern across all derived functions  
+3. **Maximum Flexibility**: Three output modes support different workflows
+4. **Auto-Detection**: Variable pattern detection eliminates manual specification
+5. **Forward-Only**: Avoids lossy reverse conversions that cause data integrity issues
+6. **Production Ready**: Drop-in replacement for existing conversion logic
+
+### Next Steps for Developers
+
+1. **Copy the template** above for your derived variable
+2. **Use auto-detection** (`pattern_type = NULL`) when possible
+3. **Choose output format** based on your workflow needs:
+   - `"tagged_na"` for production consistency
+   - `"original"` to preserve CCHS codes  
+   - `"auto"` for maximum input flexibility
+4. **Test with different input formats** to ensure robustness
+
+This universal converter eliminates the brittleness and code duplication that previously plagued CCHS derived variable functions, while maintaining full flexibility for different analysis workflows.

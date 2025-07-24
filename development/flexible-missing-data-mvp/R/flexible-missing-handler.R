@@ -31,7 +31,10 @@ if (!requireNamespace("here", quietly = TRUE)) {
 # ==============================================================================
 
 # Private environment for configuration caching
-.cchs_config_cache <- new.env(parent = emptyenv())
+# .cchs_config_cache <- new.env(parent = emptyenv()) # REMOVED: Now using internal package environment
+
+# Access the internal package environment defined in zzz.R
+.cchs_config_cache <- ._flexible_missing_data_env
 
 #' Find CCHS Missing Data Configuration File
 #'
@@ -178,9 +181,9 @@ get_missing_patterns <- function() {
 
 #' Create Missing Data Handler (High-Performance)
 #' @export
-create_missing_handler <- function(..., 
-                                  handle_missing_data = "auto",
-                                  pattern_type = "triple_digit_missing") {
+handle_missing <- function(..., 
+                         output_format = "auto",
+                         pattern_type = "triple_digit_missing") {
   config <- load_cchs_config()
   pattern_config <- config$pattern_definitions$patterns[[pattern_type]]
   if (is.null(pattern_config)) {
@@ -188,7 +191,7 @@ create_missing_handler <- function(...,
   }
   
   input_vars <- list(...)
-  data_format <- detect_data_format(input_vars, handle_missing_data, pattern_config)
+  data_format <- detect_data_format(input_vars, output_format, pattern_config)
   
   create_handler_tools(pattern_config, data_format)
 }
@@ -203,9 +206,9 @@ create_missing_handler <- function(...,
 #' @param pattern_config Pattern configuration containing missing code definitions
 #' @return Character string: "original", "tagged_na", or "mixed"
 #' @noRd
-detect_data_format <- function(input_vars, handle_missing_data, pattern_config) {
-  if (handle_missing_data %in% c("original", "tagged_na")) {
-    return(handle_missing_data)
+detect_data_format <- function(input_vars, output_format, pattern_config) {
+  if (output_format %in% c("original", "tagged_na")) {
+    return(output_format)
   }
   
   has_tagged_na <- any(purrr::map_lgl(input_vars, ~any(haven::is_tagged_na(.))))
@@ -241,12 +244,12 @@ create_handler_tools <- function(pattern_config, data_format) {
   # --- Vectorized Helper Functions (Closures) ---
   is_tag_fn <- create_is_tag_fn(data_format, maps)
   is_missing_fn <- create_is_missing_fn(data_format, maps$all_missing_codes)
-  propagate_fn <- create_propagate_fn(data_format, priority_config)
+  which_missing_fn <- create_which_missing_fn(data_format, priority_config)
   
   list(
     is_tag = is_tag_fn,
     is_missing = is_missing_fn,
-    propagate = propagate_fn
+    which_missing = which_missing_fn
   )
 }
 
@@ -337,17 +340,17 @@ create_is_missing_fn <- function(data_format, all_missing_codes) {
   }
 }
 
-#' Create the `propagate` Function
+#' Create the `which_missing` Function
 #'
-#' Creates a closure for priority-based missing value propagation. Uses the
+#' Creates a closure for priority-based missing value selection. Uses the
 #' appropriate optimization function based on data format and includes optional
 #' vctrs integration for safer type combination.
 #'
 #' @param data_format Detected data format ("original", "tagged_na", or "mixed")
 #' @param priority_config Priority hierarchy section from YAML pattern configuration
-#' @return The `propagate` function (a closure) that takes (...) arguments
+#' @return The `which_missing` function (a closure) that takes (...) arguments
 #' @noRd
-create_propagate_fn <- function(data_format, priority_config) {
+create_which_missing_fn <- function(data_format, priority_config) {
   priority_categories <- get_priority_ordered_categories(priority_config)
   
   prioritize_single <- switch(data_format,

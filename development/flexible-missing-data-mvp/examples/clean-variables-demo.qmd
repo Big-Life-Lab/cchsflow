@@ -1,0 +1,274 @@
+---
+title: "Enhanced Clean Variables - Code Elimination Demo"
+format: html
+---
+
+# Enhanced Clean Variables Function
+
+This demo shows how the reimagined `clean_variables()` function eliminates repetitive validation code across derived functions.
+
+## Setup
+
+```{r}
+library(haven)
+library(dplyr)
+
+# Source the enhanced function
+source("../R/clean-variables-enhanced.R")
+
+# Create test data
+test_data <- data.frame(
+  height = c(1.75, 1.60, 996, 997, 1.80),
+  weight = c(70, 55, 998, 999, 80),
+  sex = c(1, 2, 6, 7, 1)
+)
+
+print("Test data:")
+print(test_data)
+```
+
+## Before: Manual Repetitive Code (15+ lines per function)
+
+```{r}
+# What we had to do manually in each derived function
+calculate_bmi_manual <- function(HWTGHTM, HWTGWTK, output_format = "tagged_na") {
+  # 1. NULL checks (throws error - can't return tagged_na("d"))
+  if (is.null(HWTGHTM) || is.null(HWTGWTK)) {
+    stop("Variables cannot be NULL")
+  }
+  
+  # 2. Empty vector checks
+  if (length(HWTGHTM) == 0 || length(HWTGWTK) == 0) {
+    return(numeric(0))
+  }
+  
+  # 3. Vector compatibility checks
+  if (exists("check_vector_compatibility")) {
+    if (!check_vector_compatibility(HWTGHTM, HWTGWTK)) {
+      max_len <- max(length(HWTGHTM), length(HWTGWTK))
+      return(rep(haven::tagged_na("b"), max_len))
+    }
+  }
+  
+  # 4. Individual missing data conversion
+  height_clean <- convert_missing(HWTGHTM, "triple_digit_missing", output_format)
+  weight_clean <- convert_missing(HWTGWTK, "triple_digit_missing", output_format)
+  
+  # 5. Handler creation (if needed for complex logic)
+  check <- handle_missing(height_clean, weight_clean, 
+                         output_format = output_format, 
+                         pattern_type = "triple_digit_missing")
+  
+  # 6. Calculation logic
+  dplyr::case_when(
+    check$is_missing(height_clean) | check$is_missing(weight_clean) ~ 
+      check$which_missing(height_clean, weight_clean),
+    .default = weight_clean / (height_clean^2)
+  )
+}
+
+# Test the manual approach
+tryCatch({
+  result_manual <- calculate_bmi_manual(test_data$height, test_data$weight)
+  print("Manual approach result:")
+  print(result_manual)
+}, error = function(e) {
+  print(paste("Manual approach error:", e$message))
+})
+```
+
+## After: Clean Variables Approach with Auto-Detection (2 lines!)
+
+```{r}
+# Reimagined approach using clean_variables() with auto-detection
+calculate_bmi_clean <- function(HWTGHTM, HWTGWTK, output_format = "tagged_na") {
+  # 1. Single call handles ALL validation and conversion + AUTO-DETECTS patterns!
+  cleaned <- clean_variables(
+    continuous_vars = list(height = HWTGHTM, weight = HWTGWTK),
+    output_format = output_format
+    # No patterns specified - auto-detects: height->triple_digit_missing, weight->triple_digit_missing
+  )
+  
+  # 2. Simple calculation with clean variables
+  cleaned$weight_clean / (cleaned$height_clean^2)
+}
+
+# Test the clean approach
+result_clean <- calculate_bmi_clean(test_data$height, test_data$weight)
+print("Clean approach result:")
+print(result_clean)
+```
+
+## NEW: Mixed Pattern Auto-Detection Demo
+
+```{r}
+# Create data with different missing patterns
+test_mixed_data <- data.frame(
+  height = c(1.75, 1.60, 996, 997),      # triple_digit_missing (anthropometric)
+  smoking = c(10, 5, 96, 97),            # double_digit_missing (smoking quantity)
+  sex = c(1, 2, 6, 7)                    # single_digit_missing (demographic)
+)
+
+print("Mixed pattern test data:")
+print(test_mixed_data)
+
+# Auto-detect different patterns for each variable!
+mixed_clean_function <- function(HWTGHTM, SMKG040, DHH_SEX, output_format = "tagged_na") {
+  # Each variable gets its own pattern automatically detected
+  cleaned <- clean_variables(
+    continuous_vars = list(height = HWTGHTM, smoking = SMKG040),
+    categorical_vars = list(sex = DHH_SEX),
+    output_format = output_format
+    # height -> triple_digit_missing (from CSV lookup)
+    # smoking -> double_digit_missing (from pattern matching) 
+    # sex -> single_digit_missing (from pattern matching)
+  )
+  
+  return(cleaned)
+}
+
+# Test mixed pattern auto-detection
+mixed_result <- mixed_clean_function(
+  test_mixed_data$height, 
+  test_mixed_data$smoking, 
+  test_mixed_data$sex
+)
+
+print("Mixed pattern auto-detection results:")
+print("Height (should convert 996,997 to tagged_na):")
+print(mixed_result$height_clean)
+print("Smoking (should convert 96,97 to tagged_na):")
+print(mixed_result$smoking_clean)
+print("Sex (should convert 6,7 to tagged_na):")
+print(mixed_result$sex_clean)
+```
+
+## Complex Example: Adjust BMI with Validation
+
+```{r}
+# Before: Complex manual validation
+adjust_bmi_manual <- function(DHH_SEX, HWTGHTM, HWTGWTK, output_format = "tagged_na") {
+  # Massive repetitive code block (25+ lines)
+  if (is.null(DHH_SEX) || is.null(HWTGHTM) || is.null(HWTGWTK)) {
+    stop("Variables cannot be NULL")
+  }
+  
+  if (length(DHH_SEX) == 0 || length(HWTGHTM) == 0 || length(HWTGWTK) == 0) {
+    return(numeric(0))
+  }
+  
+  if (exists("check_vector_compatibility")) {
+    if (!check_vector_compatibility(DHH_SEX, HWTGHTM, HWTGWTK)) {
+      max_len <- max(length(DHH_SEX), length(HWTGHTM), length(HWTGWTK))
+      return(rep(haven::tagged_na("b"), max_len))
+    }
+  }
+  
+  # Individual conversions and type handling
+  height_clean <- convert_missing(HWTGHTM, "triple_digit_missing", output_format)
+  weight_clean <- convert_missing(HWTGWTK, "triple_digit_missing", output_format)
+  sex_clean <- convert_missing(DHH_SEX, "single_digit_missing", output_format)
+  
+  # Complex type coercion for categorical
+  if (any(!haven::is_tagged_na(sex_clean) & !is.na(sex_clean))) {
+    sex_numeric <- suppressWarnings(as.numeric(sex_clean))
+    sex_clean <- dplyr::if_else(
+      haven::is_tagged_na(sex_clean), 
+      sex_clean,
+      dplyr::if_else(
+        is.na(sex_numeric), 
+        haven::tagged_na("b"),
+        sex_numeric
+      )
+    )
+  }
+  
+  # Calculate BMI and apply corrections...
+  raw_bmi <- weight_clean / (height_clean^2)
+  
+  # Apply sex-specific corrections (simplified)
+  dplyr::case_when(
+    is.na(raw_bmi) | haven::is_tagged_na(raw_bmi) ~ raw_bmi,
+    haven::is_tagged_na(sex_clean) | is.na(sex_clean) ~ haven::tagged_na("b"),
+    sex_clean == 1 ~ -1.07575 + 1.07592 * raw_bmi,  # Male correction
+    sex_clean == 2 ~ -0.12374 + 1.05129 * raw_bmi,  # Female correction
+    .default = haven::tagged_na("b")
+  )
+}
+
+# After: Clean approach with validation
+adjust_bmi_clean <- function(DHH_SEX, HWTGHTM, HWTGWTK, output_format = "tagged_na") {
+  # 1. Single call handles ALL validation, conversion, and type safety
+  cleaned <- clean_variables(
+    continuous_vars = list(height = HWTGHTM, weight = HWTGWTK),
+    categorical_vars = list(sex = DHH_SEX),
+    valid_values = list(sex = c(1, 2)),  # Built-in validation!
+    output_format = output_format
+  )
+  
+  # 2. Simple calculation logic
+  raw_bmi <- cleaned$weight_clean / (cleaned$height_clean^2)
+  
+  # 3. Apply corrections
+  dplyr::case_when(
+    is.na(raw_bmi) | haven::is_tagged_na(raw_bmi) ~ raw_bmi,
+    haven::is_tagged_na(cleaned$sex_clean) | is.na(cleaned$sex_clean) ~ haven::tagged_na("b"),
+    cleaned$sex_clean == 1 ~ -1.07575 + 1.07592 * raw_bmi,
+    cleaned$sex_clean == 2 ~ -0.12374 + 1.05129 * raw_bmi,
+    .default = haven::tagged_na("b")
+  )
+}
+
+# Test both approaches
+tryCatch({
+  result_manual_adj <- adjust_bmi_manual(test_data$sex, test_data$height, test_data$weight)
+  print("Manual adjust_bmi result:")
+  print(result_manual_adj)
+}, error = function(e) {
+  print(paste("Manual adjust_bmi error:", e$message))
+})
+
+result_clean_adj <- adjust_bmi_clean(test_data$sex, test_data$height, test_data$weight)
+print("Clean adjust_bmi result:")
+print(result_clean_adj)
+```
+
+## Error Handling Improvements
+
+```{r}
+# Test NULL handling (should throw stop() instead of tagged_na("d"))
+tryCatch({
+  result_null <- clean_variables(
+    continuous_vars = list(height = NULL, weight = c(70, 55))
+  )
+}, error = function(e) {
+  print(paste("Proper error for NULL input:", e$message))
+})
+
+# Test empty vectors
+result_empty <- clean_variables(
+  continuous_vars = list(height = numeric(0), weight = numeric(0))
+)
+print("Empty vector handling:")
+print(result_empty)
+```
+
+## Benefits Summary
+
+```{r}
+info <- get_clean_variables_info()
+print("Clean Variables Benefits:")
+print(info)
+```
+
+## Key Improvements
+
+1. **Code Elimination**: Reduces 15-25 lines of repetitive code to 1-2 lines
+2. **Error Handling**: Proper `stop()` for NULL inputs instead of `tagged_na("d")`
+3. **Integrated Conversion**: `convert_missing()` called internally 
+4. **Type Safety**: Handles categorical type coercion automatically
+5. **Validation**: Optional bounds/valid values checking built-in
+6. **Consistency**: Same validation logic across all derived functions
+7. **Maintainability**: Single source of truth for validation patterns
+
+The `clean_variables()` function transforms complex, error-prone manual validation into simple, reliable function calls.

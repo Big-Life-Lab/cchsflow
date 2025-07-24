@@ -10,8 +10,11 @@ library(testthat)
 library(haven)
 library(dplyr)
 
+# Source internal environment first
+source("helper-env.R")
+
 # Source the core infrastructure
-source("R/flexible-missing-handler.R")
+source("../R/flexible-missing-handler.R")
 
 # =============================================================================
 # Core Infrastructure Tests
@@ -34,10 +37,10 @@ test_that("get_missing_patterns returns available patterns", {
   expect_true("triple_digit_missing" %in% patterns)
 })
 
-test_that("create_missing_handler creates working handler for single_digit_missing", {
+test_that("handle_missing creates working handler for single_digit_missing", {
   test_data <- c(1, 2, 6, 7, 8, 9)
   
-  handler <- create_missing_handler(
+  handler <- handle_missing(
     test_data,
     handle_missing_data = "original",
     pattern_type = "single_digit_missing"
@@ -52,7 +55,7 @@ test_that("create_missing_handler creates working handler for single_digit_missi
 test_that("handler is_missing works correctly", {
   test_data <- c(1, 2, 6, 7)
   
-  handler <- create_missing_handler(
+  handler <- handle_missing(
     test_data,
     handle_missing_data = "original", 
     pattern_type = "single_digit_missing"
@@ -67,7 +70,7 @@ test_that("handler is_missing works correctly", {
 test_that("handler is_tag works correctly", {
   test_data <- c(1, 2, 6, 7, 8, 9)
   
-  handler <- create_missing_handler(
+  handler <- handle_missing(
     test_data,
     handle_missing_data = "original",
     pattern_type = "single_digit_missing"
@@ -83,7 +86,7 @@ test_that("handler is_tag works correctly", {
 test_that("handler propagate prioritizes correctly", {
   test_data <- c(1, 2, 6, 7)
   
-  handler <- create_missing_handler(
+  handler <- handle_missing(
     test_data,
     handle_missing_data = "original",
     pattern_type = "single_digit_missing"
@@ -101,7 +104,7 @@ test_that("handler propagate prioritizes correctly", {
 test_that("handler works with tagged_na data", {
   test_data <- c(1, 2, tagged_na("a"), tagged_na("b"))
   
-  handler <- create_missing_handler(
+  handler <- handle_missing(
     test_data,
     handle_missing_data = "tagged_na",
     pattern_type = "single_digit_missing"
@@ -118,7 +121,7 @@ test_that("handler works with tagged_na data", {
 test_that("triple_digit_missing pattern works", {
   test_data <- c(1.75, 996, 997, 998, 999)
   
-  handler <- create_missing_handler(
+  handler <- handle_missing(
     test_data,
     handle_missing_data = "original",
     pattern_type = "triple_digit_missing" 
@@ -138,7 +141,7 @@ test_that("error handling works for invalid patterns", {
   test_data <- c(1, 2, 3)
   
   expect_error(
-    create_missing_handler(test_data, pattern_type = "invalid_pattern"),
+    handle_missing(test_data, pattern_type = "invalid_pattern"),
     "not found in configuration"
   )
 })
