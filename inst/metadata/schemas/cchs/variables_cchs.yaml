@@ -1,0 +1,221 @@
+schema_version: "3.0.0"
+schema_date: "2025-01-21"
+description: "CCHS-specific metadata for variables schema"
+
+# ============================================================================
+# CCHS-SPECIFIC METADATA FOR VARIABLES
+# ============================================================================
+cchs_metadata:
+  title: "CCHS-specific configuration"
+  description: "Enhanced metadata for Canadian Community Health Survey harmonization"
+  version: "3.0.0"
+  
+  # Source database naming conventions
+  source_databases:
+    pattern: "cchs{YEAR}_{TYPE}"
+    description: "CCHS database naming convention"
+    year_formats:
+      - "YYYY"        # e.g., cchs2001
+      - "YYYY_YYYY"   # e.g., cchs2007_2008
+    type_suffixes:
+      - code: "p"
+        description: "Public Use Microdata File (PUMF)"
+      - code: "m"
+        description: "Master file"
+        
+  # CCHS variable naming conventions (Statistics Canada documentation)
+  cchs_variable_naming:
+    description: "CCHS variable naming follows systematic conventions documented in CCHS User Guides"
+    documentation_sources:
+      - "Canadian Community Health Survey (CCHS) - Annual Component User Guide"
+      - "Statistics Canada CCHS Documentation (SDDS=3226)"
+      - "URL: https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=3226"
+      
+    naming_structure:
+      pattern: "{MODULE}{CYCLE}_{QUESTION}{TYPE}"
+      description: "Standard CCHS variable naming structure"
+      components:
+        module:
+          description: "Survey module identifier (e.g., SMK for smoking, DHH for demographics)"
+          examples: ["SMK", "DHH", "RAC", "ADL", "CCC"]
+        cycle_letter:
+          description: "Third letter indicates survey cycle (pre-2007 naming convention)"
+          mappings:
+            "A": "Cycle 1.1 (2000-2001)"
+            "C": "Cycle 2.1 (2003)"
+            "E": "Cycle 3.1 (2005)"
+            "G": "Later cycles (2007+)"
+          note: "Post-2007, simplified naming without cycle letters became standard"
+        question_number:
+          description: "Question number within the module (e.g., _01, _035)"
+          format: "_XX or _XXX"
+        variable_type:
+          description: "Variable type designation (e.g., C for collected data)"
+          examples: ["C", "A", "B"]
+          
+    naming_examples:
+      - original: "SMKA_01C"
+        interpretation: "Smoking module, Cycle A (2001), Question 01, Collected data"
+        harmonized_to: "SMK_01C (in shared/ICES files)"
+      - original: "SMKC_01C" 
+        interpretation: "Smoking module, Cycle C (2003), Question 01, Collected data"
+        harmonized_to: "SMK_01C (in shared/ICES files)"
+      - original: "DHHA_AGE"
+        interpretation: "Demographics module, Cycle A (2001), Age variable"
+        harmonized_to: "DHH_AGE (in shared/ICES files)"
+        
+  # Enhanced field enumerations based on real data
+  field_enums:
+    subject:
+      description: "CCHS subject areas (extended based on real data)"
+      values:
+        # Core categories
+        - "ADL"
+        - "Age"
+        - "Alcohol"
+        - "BMI"
+        - "Chronic condition"
+        - "Diet"
+        - "Education"
+        - "Ethnicity"
+        - "Exercise"
+        - "Food security"
+        - "Health behaviour"
+        - "Health care use"
+        - "Health status"
+        - "Height"
+        - "Home ownership"
+        - "Household type"
+        - "Immigration"
+        - "Income"
+        - "Indigenous"
+        - "Life satisfaction"
+        - "Marital status"
+        - "Need"
+        - "Number"
+        - "Oral health"
+        - "Province"
+        - "Proxy"
+        - "Race"
+        - "Rec"
+        - "Sample"
+        - "Sex"
+        - "Sleep"
+        - "Smoking"
+        - "Vaccination"
+        - "Weight"
+        # Additional values found in real data
+        - "Marital Status"        # Different capitalization
+        - "Household Characteristics"
+        - "Fruits/vegetables"
+        - "Self-perceived health"
+        - "Satisfaction with life"
+        - "Mental health"
+        - "Health region"
+        - "Medical care"
+        - "Health utility index"
+        - "Migration"
+        - "Occupation"
+        - "Pregnancy"
+        - "Health problems"
+        - "Language"
+        
+    section:
+      description: "CCHS survey sections"
+      values:
+        - "Demographics"
+        - "Health behaviour"
+        - "Health care use"
+        - "Health status"
+        - "N/A"
+        - "Sociodemographics"
+
+  # Missing data handling patterns
+  missing_data_patterns:
+    description: "CCHS missing data patterns using haven::tagged_na()"
+    standard_patterns:
+      - code: "NA::a"
+        description: "Valid skip"
+        haven_equivalent: "haven::tagged_na('a')"
+        usage: "Used when respondent validly skips question due to survey logic"
+      - code: "NA::b" 
+        description: "Don't know, refusal, not stated"
+        haven_equivalent: "haven::tagged_na('b')"
+        usage: "Used for missing responses (don't know, refused, not stated)"
+    extended_patterns:
+      - code: "NA::c"
+        description: "Not applicable (specific conditions)"
+        haven_equivalent: "haven::tagged_na('c')"
+        usage: "Used for responses that don't apply to respondent's situation"
+      - code: "NA::d"
+        description: "Missing (other reasons)"
+        haven_equivalent: "haven::tagged_na('d')"
+        usage: "Used for missing data due to other reasons"
+
+  # Variable pattern analysis from real data (365 variables analyzed)
+  variable_pattern_analysis:
+    total_variables_analyzed: 365
+    pattern_matching_results:
+      simple_reference: 45       # [VAR] pattern
+      database_mapping: 128      # db::VAR pattern
+      derived_variable: 23       # DerivedVar::[...] pattern
+      complex_mixed: 169         # Complex patterns needing manual review
+      
+    common_complex_patterns:
+      - description: "Multiple databases with bracketed reference"
+        example: "cchs2001_p::ALCA_5A1, cchs2003_p::ALCC_5A1, [ALW_2A1]"
+        frequency: "very common"
+        
+      - description: "Multiple DerivedVar patterns in sequence"
+        example: "DerivedVar::[PAC_4A_cont, PAC_4B_cont], DerivedVar::[PAC_7, PAC_7A]"
+        frequency: "common"
+        
+      - description: "Mixed database mappings with derived variables"
+        example: "cchs2001_p::PACADEE, [PACDEE], DerivedVar::[DHHGAGE_cont, PAA_045]"
+        frequency: "occasional"
+
+  # Data quality findings from real validation
+  data_quality_findings:
+    missing_labels: 2               # Variables with empty labels
+    missing_units_continuous: 74    # Continuous variables without units
+    column_order_mismatch: true     # Columns not in expected order
+    additional_columns: 2           # ICES confirmation, Observation (MD)
+    
+  # Universal missing data preprocessing approach
+  preprocessing_patterns:
+    description: "Universal missing data preprocessing for cchsflow derived functions"
+    implementation_approach:
+      - "Apply string-based NA preprocessing before numeric operations"
+      - "Convert character 'NA' values to proper haven::tagged_na() types"
+      - "Handle mixed input types (character/numeric) consistently"
+      - "Preserve original tagged_na() values where present"
+    
+    tidyverse_patterns:
+      description: "Modern tidyverse patterns for missing data handling"
+      case_when_usage: "Use dplyr::case_when() instead of nested ifelse() chains"
+      type_safe_expectations: "Implement type-safe validation using assertthat or checkmate"
+      mixed_input_handling: "Handle both character and numeric inputs in derived functions"
+      
+  # Database suffix deprecation (v3.0.0)
+  deprecated_suffixes:
+    description: "Database suffixes deprecated in v3.0.0 due to identical variable structure"
+    
+    deprecated:
+      _i:
+        status: "DEPRECATED - use _m instead"
+        reason: "Variables determined to have same structure as master file"
+      _s:
+        status: "DEPRECATED - use _m instead"
+        reason: "Variables determined to have same structure as master file"
+        
+    migration:
+      - "All _i references changed to _m"
+      - "All _s references changed to _m"
+      - "Simplified schema: _p (PUMF) and _m (Master)"
+    
+  # ICES-specific temporary fields
+  temporary_fields:
+    - name: "ICES confirmation"
+      values: ["ICES confirmed", "ICES altered", "ICES specific", "Yes", ""]
+      description: "Temporary field for ICES validation compatibility"
+      status: "to be reviewed for removal in future versions"

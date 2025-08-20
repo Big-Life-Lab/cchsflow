@@ -1,0 +1,201 @@
+schema_version: "0.1"
+schema_date: "2025-01-01"
+description: "Template variable system documentation and validation rules"
+
+template_system_schema:
+  title: "Template Variable System"
+  description: "Schema for template variable inheritance and validation in recodeflow development"
+  version: "0.1"
+  
+  # How to identify template definitions
+  template_definitions:
+    marker_field: "templateVariable"
+    marker_values: ["Yes"]
+    required_fields:
+      - "variable"        # Template must have a name (serves as template identifier)
+      - "typeEnd"         # Template must define output type
+      - "recStart"        # Template must define source values  
+      - "recEnd"          # Template must define target values
+    
+  # How template inheritance works
+  template_inheritance:
+    reference_field: "templateVariable"
+    reference_pattern: "template_name"  # References existing template by variable name
+    required_fields:
+      - "variable"        # Using variable must have unique name
+      - "variableStart"   # Using variable must define source mapping
+    inheritance_rules:
+      - "Template recoding rules (recStart/recEnd) are inherited"
+      - "Using variable defines its own source mapping (variableStart)"
+      - "Type information (typeEnd/typeStart) can be inherited or overridden"
+  
+  # Validation rules for template system
+  validation_rules:
+    template_existence:
+      description: "Referenced templates must exist in the same variable_details file"
+      rule: "If templateVariable != 'Yes' and templateVariable != 'No', then variable with that name and templateVariable = 'Yes' must exist"
+    
+    circular_references:
+      description: "Templates cannot reference other templates"
+      rule: "If templateVariable = 'Yes', then variable cannot reference another template"
+    
+    consistent_typing:
+      description: "Template usage should maintain type consistency"
+      rule: "Variables using templates should have compatible typeEnd values"
+
+  # Examples for documentation
+  examples:
+    simple_template:
+      description: "Basic language template example"
+      template_definition:
+        variable: "lang"
+        templateVariable: "Yes"
+        typeEnd: "cat"
+        recStart: ["english", "french"]
+        recEnd: ["1", "2"]
+      
+      template_usage:
+        variable: "primary_lang"
+        templateVariable: "lang"
+        variableStart: "[PL]"
+        # Inherits: typeEnd="cat", recStart/recEnd mappings
+
+# Comprehensive Versioning System
+versioning_system:
+  title: "Comprehensive Metadata Versioning Framework"
+  description: "Unified versioning approach across variables, variable_details, and functions"
+  
+  # Core versioning fields used across all metadata
+  core_versioning_fields:
+    version:
+      description: "Semantic version number (e.g., 3.0.0)"
+      format: "MAJOR.MINOR.PATCH"
+      rules:
+        - "MAJOR: Breaking changes or major functionality additions"
+        - "MINOR: New features, enhanced functionality, backward compatible"
+        - "PATCH: Bug fixes, documentation updates, minor improvements"
+      examples:
+        - "3.0.0: Major infrastructure release with BMI function modernization and validation architecture"
+        - "2.1.1: Patch release with bug fixes"
+        
+    lastUpdated:
+      description: "ISO date when item was last modified (YYYY-MM-DD)"
+      format: "date"
+      usage: "Track when changes were made for collaboration and maintenance"
+      examples:
+        - "2025-06-30: Release date for v3.0.0 changes"
+        - "2024-01-01: Earlier date for stable v2.1.0 items"
+        
+    harmonizationStatus:
+      description: "Current status in harmonization workflow"
+      enum:
+        - "development": "Still being developed or tested"
+        - "active": "Ready for production use"
+        - "deprecated": "No longer recommended, replaced by newer version"
+        - "not_harmonizable": "Cannot be harmonized across sources"
+        - "pending_review": "Needs review before finalization"
+      usage: "Track progress and readiness of harmonization work"
+      
+    reviewNotes:
+      description: "Documentation of changes, decisions, and rationale"
+      format: "string"
+      usage: "Document what changed, why, and any important considerations"
+      examples:
+        - "Enhanced with expanded database support and improved metadata"
+        - "New variable added in v3.0.0 release"
+        - "Major refactoring with tidyverse modernization"
+
+  # Application across different metadata types
+  metadata_applications:
+    variables_csv:
+      location: "inst/extdata/variables.csv"
+      versioning_columns: ["version", "lastUpdated", "harmonizationStatus", "reviewNotes"]
+      usage: "Track variable definition changes and enhancements"
+      
+    variable_details_csv:
+      location: "inst/extdata/variable_details.csv" 
+      versioning_columns: ["version", "lastUpdated", "harmonizationStatus", "reviewNotes"]
+      usage: "Track detailed mapping and processing rule changes"
+      
+    function_metadata:
+      location: "inst/metadata/function_metadata.yaml"
+      versioning_fields: ["version", "lastUpdated", "harmonizationStatus", "reviewNotes"]
+      usage: "Track R function implementations and major refactoring"
+      
+  # Best practices for versioning
+  best_practices:
+    semantic_versioning:
+      - "Use semantic versioning consistently across all metadata"
+      - "Coordinate version numbers across related changes"
+      - "Document rationale for version increments"
+      
+    change_documentation:
+      - "Always update reviewNotes when making changes"
+      - "Include what changed and why in reviewNotes"
+      - "Reference related changes in other metadata files"
+      
+    status_management:
+      - "Use harmonizationStatus to track workflow progress"
+      - "Move items to 'active' only when thoroughly tested"
+      - "Mark deprecated items clearly with replacement guidance"
+      
+    collaboration:
+      - "Update lastUpdated dates consistently"
+      - "Use descriptive reviewNotes for team communication"
+      - "Coordinate metadata updates across team members"
+
+  # Function versioning in roxygen2 documentation
+  function_versioning_roxygen:
+    description: "Structured @note format for function-level version tracking"
+    format: "v{version}, last updated: {date}, status: {status}, Note: {description}"
+    pattern: "^v[0-9]+\\.[0-9]+\\.[0-9]+, last updated: [0-9]{4}-[0-9]{2}-[0-9]{2}, status: (development|active|deprecated|pending_review), Note: .+$"
+    
+    examples:
+      major_change: "v3.0.0, last updated: 2025-06-30, status: active, Note: Major refactoring with tidyverse modernization and enhanced validation"
+      enhancement: "v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced validation for new BMI variables (HWTDBMI, HWTDHTM, HWTDWTK)"
+      bug_fix: "v2.1.1, last updated: 2025-01-15, status: active, Note: Fixed edge case handling in age validation"
+      new_function: "v3.0.0, last updated: 2025-06-30, status: active, Note: New function for 6-item ADL scoring with comprehensive validation"
+    
+    usage_instructions:
+      placement: "Add as @note tag immediately before @export in roxygen2 documentation"
+      human_labels:
+        version: "Use semantic version (v3.0.0 format for clarity)"
+        last_updated: "ISO date format (YYYY-MM-DD)"
+        status: "One of: development, active, deprecated, pending_review"
+        Note: "Human-readable description of changes and rationale"
+      
+    machine_parsing:
+      regex_groups:
+        version: "v([0-9]+\\.[0-9]+\\.[0-9]+)"
+        date: "last updated: ([0-9]{4}-[0-9]{2}-[0-9]{2})"
+        status: "status: (development|active|deprecated|pending_review)"
+        description: "Note: (.+)$"
+
+  # Test versioning adaptation
+  test_versioning_roxygen:
+    description: "Adapted @note format for test file version tracking"
+    format: "Test v{version}, last updated: {date}, status: {status}, Coverage: {description}"
+    pattern: "^Test v[0-9]+\\.[0-9]+\\.[0-9]+, last updated: [0-9]{4}-[0-9]{2}-[0-9]{2}, status: (passing|failing|pending|needs_update), Coverage: .+$"
+    
+    examples:
+      passing_tests: "Test v3.0.0, last updated: 2025-06-30, status: passing, Coverage: Updated for enhanced BMI validation functions"
+      updated_tests: "Test v3.0.0, last updated: 2025-06-30, status: passing, Coverage: New tests for ADL_score_6 function with edge cases"
+      failing_tests: "Test v3.0.0, last updated: 2025-06-30, status: failing, Coverage: Tagged NA handling needs update for smoking functions"
+    
+    placement: "Add as comment at top of test file or in specific test blocks"
+    usage: "Track test compatibility with function versions and coverage scope"
+
+# Schema evolution roadmap
+migration_notes: |
+  Version 0.1: Initial schema focused on git diff improvements and recodeflow coordination
+  - Establishes metadata architecture mirroring final recodeflow structure
+  - Uses established camelCase naming convention throughout
+  - Documents templateVariable system for active development coordination
+  - Permissive validation to support ongoing development
+  - Foundation for seamless migration to recodeflow v1.0
+  
+  Version 0.2: Enhanced versioning and validation system (current)
+  - Comprehensive versioning framework across all metadata types
+  - Unified approach for variables, variable_details, and functions
+  - Professional project management tracking capabilities
+  - Enhanced collaboration and change documentation
