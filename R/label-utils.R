@@ -1,13 +1,13 @@
 #' @title Set data labels
-#' @description Set variable labels for a working CCHS dataframe.  The function 
-#' extracts variables from the provided dataframe and assigns labels according 
+#' @description Set variable labels for a working CCHS dataframe.  The function
+#' extracts variables from the provided dataframe and assigns labels according
 #' the provided variables and variable_details dataframes.
 #' in the passed dataframes
 #'
 #' @param data_to_lab.el A dataframe of CCHS data that lacks labels.
-#' @param variable_details A dataframe containing the details of each variable, 
+#' @param variable_details A dataframe containing the details of each variable,
 #' with category labels in the 'catLabel' column.
-#' @param variables_sheet (Optional) A dataframe containing variable labels in 
+#' @param variables_sheet (Optional) A dataframe containing variable labels in
 #' the 'label' column.
 #'
 #' @return The dataframe with labelled CCHS variables.
@@ -15,9 +15,9 @@
 #' @examples
 #' library(cchsflow)
 #' library(sjlabelled) # used to get labels in the example.
-#' 
+#'
 #' bmi2001 <- rec_with_table(
-#'  cchs2001_p, c(
+#'   cchs2001_p, c(
 #'     "HWTGHTM",
 #'     "HWTGWTK", "HWTGBMI_der"
 #'   )
@@ -34,9 +34,11 @@
 #'
 #' get_label(combined_bmi)
 #'
-#' labeled_combined_data <- set_data_labels(combined_bmi,
-#'  variable_details,
-#'  variables)
+#' labeled_combined_data <- set_data_labels(
+#'   combined_bmi,
+#'   variable_details,
+#'   variables
+#' )
 #'
 #' get_label(labeled_combined_data)
 #' @export
@@ -49,10 +51,11 @@ set_data_labels <-
     # extract only relevant variable info
     if (!is.null(variable_details)) {
       variable_details[[pkg.globals$argument.Variables]] <- sapply(
-        variable_details[[pkg.globals$argument.Variables]], trimws)
+        variable_details[[pkg.globals$argument.Variables]], trimws
+      )
       variable_details <-
         variable_details[variable_details[[pkg.globals$argument.Variables]]
-                         %in% variable_names, ]
+        %in% variable_names, ]
       if (is.null(variables_sheet)) {
         variable_details[[pkg.globals$MSW.Variables.Columns.Label]] <- NA
         variable_details[[pkg.globals$MSW.Variables.Columns.LabelLong]] <-
@@ -61,21 +64,23 @@ set_data_labels <-
     }
     if (!is.null(variables_sheet)) {
       variables_sheet[[pkg.globals$argument.Variables]] <- sapply(
-        variables_sheet[[pkg.globals$argument.Variables]], trimws)
+        variables_sheet[[pkg.globals$argument.Variables]], trimws
+      )
       variables_sheet <-
         variables_sheet[variables_sheet[[pkg.globals$argument.Variables]] %in%
-                          variable_names, ]
+          variable_names, ]
       variable_details <-
         update_variable_details_based_on_variable_sheet(
           variable_sheet = variables_sheet,
           variable_details = variable_details
-          )
+        )
     }
     label_list <- NULL
     for (variable_name in variable_names) {
       rows_to_process <-
         variable_details[variable_details[[
-          pkg.globals$argument.Variables]] == variable_name, ]
+          pkg.globals$argument.Variables
+        ]] == variable_name, ]
       label_list[[variable_name]] <-
         create_label_list_element(rows_to_process)
     }
@@ -106,8 +111,10 @@ create_label_list_element <- function(variable_rows) {
     for (row_index in seq_len(nrow(variable_rows))) {
       single_row <- variable_rows[row_index, ]
       # Verify type stays the same
-      if (!is_equal(ret_list$type,
-                    as.character(single_row[[pkg.globals$argument.ToType]]))) {
+      if (!is_equal(
+        ret_list$type,
+        as.character(single_row[[pkg.globals$argument.ToType]])
+      )) {
         stop(
           paste(
             as.character(single_row[[pkg.globals$argument.Variables]]),
@@ -118,8 +125,10 @@ create_label_list_element <- function(variable_rows) {
         )
       }
       # Verify unit is identical
-      if (!is_equal(ret_list$unit,
-                    as.character(single_row[[pkg.globals$argument.Units]]))) {
+      if (!is_equal(
+        ret_list$unit,
+        as.character(single_row[[pkg.globals$argument.Units]])
+      )) {
         stop(
           paste(
             as.character(single_row[[pkg.globals$argument.Variables]]),
@@ -151,10 +160,12 @@ create_label_list_element <- function(variable_rows) {
       value_being_labeled <-
         recode_variable_NA_formating(value_being_labeled, ret_list$type)
       ret_list$values[[as.character(single_row[[
-        pkg.globals$argument.CatLabel]])]] <-
+        pkg.globals$argument.CatLabel
+      ]])]] <-
         value_being_labeled
       ret_list$values_long[[as.character(single_row[[
-        pkg.globals$argument.CatLabelLong]])]] <-
+        pkg.globals$argument.CatLabelLong
+      ]])]] <-
         value_being_labeled
     }
   }
@@ -175,9 +186,11 @@ create_label_list_element <- function(variable_rows) {
 label_data <- function(label_list, data_to_label) {
   for (variable_name in names(label_list)) {
     if (is.na(label_list[[variable_name]]$type)) {
-      warning(paste(variable_name,
-                    "is missing from variable_details or variables
-                    (if it was also passed) please verify correct spelling"))
+      warning(paste(
+        variable_name,
+        "is missing from variable_details or variables
+                    (if it was also passed) please verify correct spelling"
+      ))
       next()
     }
     if (label_list[[variable_name]]$type == pkg.globals$argument.CatType) {
@@ -188,17 +201,18 @@ label_data <- function(label_list, data_to_label) {
       # List fix
       label_list[[variable_name]]$values <- unlist(label_list[[variable_name]]$values)
       label_list[[variable_name]]$values_long <- unlist(label_list[[variable_name]]$values_long)
-      
+
       data_to_label[, variable_name] <-
         set_labels(data_to_label[, variable_name],
-                   labels = label_list[[variable_name]]$values)
+          labels = label_list[[variable_name]]$values
+        )
       attr(data_to_label[, variable_name], "labels_long") <-
         label_list[[variable_name]]$values_long
     } else {
       if (is.factor(data_to_label[, variable_name])) {
         data_to_label[, variable_name] <-
           as.numeric(levels(data_to_label[, variable_name])
-                     [data_to_label[, variable_name]])
+          [data_to_label[, variable_name]])
       } else {
         data_to_label[, variable_name] <-
           as.numeric(data_to_label[, variable_name])

@@ -73,7 +73,6 @@ age_sex2017_2018 <- rec_with_table(cchs2017_2018_p, c("DHHGAGE_cont", "DHH_SEX")
 
 # Merge harmonized data
 combined_age_sex <- merge_rec_data(age_sex2001, age_sex2003, age_sex2005, age_sex2007_2008, age_sex2009_2010, age_sex2011_2012, age_sex2013_2014, age_sex2015_2016, age_sex2017_2018)
-
 ```
 
 ## How to combine all variables in the variable_details sheet across multiple cycles
@@ -109,8 +108,8 @@ First, you need to load your personalized variable sheets into R. You can create
 ```{r , eval=F, results = "hide"}
 # Load your personalized variable sheets from CSV files
 # You can create these files based on the sample files included with cchsflow
-my_variables <- readr::read_csv('path/to/your/variables.csv')
-my_variable_details <- readr::read_csv('path/to/your/variable_details.csv')
+my_variables <- readr::read_csv("path/to/your/variables.csv")
+my_variable_details <- readr::read_csv("path/to/your/variable_details.csv")
 
 # Alternatively, you can start with the sample files and modify them
 data("sample_variables")

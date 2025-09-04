@@ -35,8 +35,8 @@ When adding variables that already exist across CCHS cycles, there are two works
 This example will show how the existing CCHS BMI variable was developed using `variable_details.csv` and `variables.csv`. **Note** this variable is different from the derived BMI variable that is also included in _cchsflow_. For this article, a sample `variable_details.csv` & `variables.csv` will be loaded to demonstrate how to add variables.
 
 ```{r}
-variables <- read.csv(file.path(getwd(), '../inst/extdata/sample_variables.csv'))
-variable_details <- read.csv(file.path(getwd(),'../inst/extdata/sample_variable_details.csv'))
+variables <- read.csv(file.path(getwd(), "../inst/extdata/sample_variables.csv"))
+variable_details <- read.csv(file.path(getwd(), "../inst/extdata/sample_variable_details.csv"))
 ```
 
 ### Specifying the variable on `variable_details.csv`
@@ -50,7 +50,7 @@ variable_details <- read.csv(file.path(getwd(),'../inst/extdata/sample_variable_
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 library(knitr)
 library(kableExtra)
-kable(variable_details[1:6, 1], col.names = 'variable')
+kable(variable_details[1:6, 1], col.names = "variable")
 ```
 
 2. **dummyVariable:** BMI is a continuous variable, so it does not have dummy variables.
@@ -201,34 +201,56 @@ With complex derived variables, sometimes it is necessary to create functions wi
 Pack_years_fun <-
   function(SMKDSTY, DHHGAGE_cont, SMK_09A_B, SMKG09C, SMKG203_cont, SMKG207_cont,
            SMK_204, SMK_05B, SMK_208, SMK_05C, SMKG01C_cont, SMK_01A) {
-    #Time since quit for former daily smokers
+    # Time since quit for former daily smokers
     tsq_ds_fun <- function(SMK_09A_B, SMKG09C) {
       SMKG09C <-
-        ifelse2(SMKG09C==1, 4,
-        ifelse2(SMKG09C==2, 8,
-        ifelse2(SMKG09C==3, 12, NA)))
+        ifelse2(
+          SMKG09C == 1, 4,
+          ifelse2(
+            SMKG09C == 2, 8,
+            ifelse2(SMKG09C == 3, 12, NA)
+          )
+        )
       tsq_ds <-
-        ifelse2(SMK_09A_B==1, 0.5,
-        ifelse2(SMK_09A_B==2, 1.5,
-        ifelse2(SMK_09A_B==3, 2.5,
-        ifelse2(SMK_09A_B==4, SMKG09C, NA))))
+        ifelse2(
+          SMK_09A_B == 1, 0.5,
+          ifelse2(
+            SMK_09A_B == 2, 1.5,
+            ifelse2(
+              SMK_09A_B == 3, 2.5,
+              ifelse2(SMK_09A_B == 4, SMKG09C, NA)
+            )
+          )
+        )
     }
-    tsq_ds<-tsq_ds_fun(SMK_09A_B, SMKG09C)
+    tsq_ds <- tsq_ds_fun(SMK_09A_B, SMKG09C)
     # PackYears for Daily Smoker
-    ifelse2(SMKDSTY==1, pmax(((DHHGAGE_cont - SMKG203_cont)*(SMK_204/20)), 0.0137),
-    # PackYears for Occasional Smoker (former daily)     
-    ifelse2(SMKDSTY==2, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds)*(SMK_208/20)), 0.0137) 
-            + (pmax((SMK_05B*SMK_05C/30), 1)*tsq_ds),
-    # PackYears for Occasional Smoker (never daily)      
-    ifelse2(SMKDSTY==3, (pmax((SMK_05B*SMK_05C/30), 1)/20)*(DHHGAGE_cont - SMKG01C_cont),
-    # PackYears for former daily smoker (non-smoker now)      
-    ifelse2(SMKDSTY==4, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds)*(SMK_208/20)), 0.0137),
-    # PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime      
-    ifelse2(SMKDSTY==5 & SMK_01A==1, 0.0137,
-    # PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime      
-    ifelse2(SMKDSTY==5 & SMK_01A==2, 0.007,
-    # Non-smoker      
-    ifelse2(SMKDSTY==6, 0, NA)))))))
+    ifelse2(
+      SMKDSTY == 1, pmax(((DHHGAGE_cont - SMKG203_cont) * (SMK_204 / 20)), 0.0137),
+      # PackYears for Occasional Smoker (former daily)
+      ifelse2(
+        SMKDSTY == 2, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds) * (SMK_208 / 20)), 0.0137)
+        + (pmax((SMK_05B * SMK_05C / 30), 1) * tsq_ds),
+        # PackYears for Occasional Smoker (never daily)
+        ifelse2(
+          SMKDSTY == 3, (pmax((SMK_05B * SMK_05C / 30), 1) / 20) * (DHHGAGE_cont - SMKG01C_cont),
+          # PackYears for former daily smoker (non-smoker now)
+          ifelse2(
+            SMKDSTY == 4, pmax(((DHHGAGE_cont - SMKG207_cont - tsq_ds) * (SMK_208 / 20)), 0.0137),
+            # PackYears for former occasional smoker (non-smoker now) who smoked at least 100 cigarettes lifetime
+            ifelse2(
+              SMKDSTY == 5 & SMK_01A == 1, 0.0137,
+              # PackYears for former occasional smoker (non-smoker now) who have not smoked at least 100 cigarettes lifetime
+              ifelse2(
+                SMKDSTY == 5 & SMK_01A == 2, 0.007,
+                # Non-smoker
+                ifelse2(SMKDSTY == 6, 0, NA)
+              )
+            )
+          )
+        )
+      )
+    )
   }
 ```
 
@@ -238,13 +260,13 @@ More information on what each smoking variable means can be found in the [Refere
 
 This is how the `variable_details.csv` sheet would look for the derived pack-years row
 ```{r, echo=FALSE, warning=FALSE}
-kable(variable_details[9,])
+kable(variable_details[9, ])
 ```
 
 And this is how the `variables.csv` sheet would look for the derived pack-years row
 
 ```{r, echo=FALSE, warning=FALSE}
-kable(variables[3,])
+kable(variables[3, ])
 ```
 
 ### Adding labels to a derived variable
@@ -252,7 +274,7 @@ kable(variables[3,])
 For a continuous derived variable like pack-years, the labels specified in `variables.csv` are sufficient for the variable to be properly labelled. For categorical derived variables, extra rows will need to be added on `variable_details.csv` so that labels are generated for each category. The example below shows how binge_drinker, a derived categorical variable flagging respondents who binge drink, is specified in `variable_details.csv`.
 
 ```{r, echo=FALSE, warning=FALSE}
-kable(variable_details[10:12,])
+kable(variable_details[10:12, ])
 ```
 
 As you can see, the first row for binge_drinker specifies the function for the derived variable and the base variables included. The second and third rows specify the categories of the variables, which are then labelled.
@@ -262,8 +284,8 @@ As you can see, the first row for binge_drinker specifies the function for the d
 It is possible to create a derived variable that involves derived variables. When creating the custom function for it, use the derived variable name inside the function. Similarly, when specifying the variable in `variable_details.csv` and `variables.csv`, use the derived variable in the **variableStart** column. The example below shows how number_conditions, a derived categorical variable that counts the number of chronic conditions that uses the derived respiratory condition variable, is specified in `variable_details.csv` and `variables.csv`.
 
 ```{r, echo=FALSE, warning=FALSE}
-kable(variable_details[13:20,])
-kable(variables[4,])
+kable(variable_details[13:20, ])
+kable(variables[4, ])
 ```
 
 ### Creating a derived variable that exists in other CCHS cycles
@@ -271,7 +293,7 @@ kable(variables[4,])
 In order to harmonize a variable across all cycles, you may need to create a derived variable for the years in which the variable is not present. An example of this is RACDPAL, a variable that was derived from 2003 to 2018. To create and specify RACDPAL for 2001, the same derived variable conventions apply with a few slight differences. In `variables.csv`, the DerivedVar is enclosed with the database in which it is derived. 
 
 ```{r, echo=FALSE, warning=FALSE}
-kable(variables[5, 9], col.names = 'variableStart')
+kable(variables[5, 9], col.names = "variableStart")
 ```
 
 This is to specify that for the 2001 CCHS cycle, it is derived from those base variables; while in later cycles it is simply recoded from the database.

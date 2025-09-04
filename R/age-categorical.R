@@ -47,10 +47,10 @@
 #' library(cchsflow)
 #'
 #' cat_age2009_2010 <- rec_with_table(
-#'    cchs2009_2010_p,  c(
-#'      "DHHGAGE_cont", "DHHGAGE_C"
-#'      )
-#'    )
+#'   cchs2009_2010_p, c(
+#'     "DHHGAGE_cont", "DHHGAGE_C"
+#'   )
+#' )
 #'
 #' @export
 age_cat_fun <- function(DHHGAGE_cont) {
@@ -85,8 +85,10 @@ age_cat_fun <- function(DHHGAGE_cont) {
                                 dplyr::between(DHHGAGE_cont, 70, 74), 14,
                                 if_else2(
                                   dplyr::between(DHHGAGE_cont, 75, 79), 15,
-                                  if_else2((DHHGAGE_cont >= 80), 16,
-                                           "NA(b)")
+                                  if_else2(
+                                    (DHHGAGE_cont >= 80), 16,
+                                    "NA(b)"
+                                  )
                                 )
                               )
                             )
