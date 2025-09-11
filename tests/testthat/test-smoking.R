@@ -48,6 +48,11 @@ test_that("pack_years_fun() has expected outputs when
 #                          "NA(b)")
 #           })
 
+test_that("pack_years_fun() has expected outputs for former daily current 
+          occasional smoker", {
+  expect_equal(pack_years_fun(2, 45, 10, NA, 21, NA, 5, 20, 15, NA, NA), 15.25)
+})
+
 test_that("pack_years_fun_cat() has expected outputs when
           pack_years_der is in range", {
             expect_equal(pack_years_fun_cat(1),
