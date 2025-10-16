@@ -12,3 +12,5 @@ website:
   title: cchsflow Enhancement Proposals
   sidebar:
     style: docked
+    contents:
+      - ./cep-001-csv-standardization-tool.qmd
