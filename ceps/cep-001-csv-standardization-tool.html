@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="CCHSflow Team">
+<meta name="dcterms.date" content="2025-10-16">
+
+<title>CEP 1 - CSV Worksheet Standardization Tool</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="cep-001-csv-standardization-tool_files/libs/clipboard/clipboard.min.js"></script>
+<script src="cep-001-csv-standardization-tool_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="cep-001-csv-standardization-tool_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="cep-001-csv-standardization-tool_files/libs/quarto-html/popper.min.js"></script>
+<script src="cep-001-csv-standardization-tool_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="cep-001-csv-standardization-tool_files/libs/quarto-html/anchor.min.js"></script>
+<link href="cep-001-csv-standardization-tool_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="cep-001-csv-standardization-tool_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="cep-001-csv-standardization-tool_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="cep-001-csv-standardization-tool_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="cep-001-csv-standardization-tool_files/libs/bootstrap/bootstrap-6860d7a355c8228df45fd7ccb63c4ba8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract"><span class="header-section-number">1</span> Abstract</a></li>
+  <li><a href="#motivation" id="toc-motivation" class="nav-link" data-scroll-target="#motivation"><span class="header-section-number">2</span> Motivation</a>
+  <ul class="collapse">
+  <li><a href="#current-problems" id="toc-current-problems" class="nav-link" data-scroll-target="#current-problems"><span class="header-section-number">2.1</span> Current Problems</a></li>
+  <li><a href="#goals" id="toc-goals" class="nav-link" data-scroll-target="#goals"><span class="header-section-number">2.2</span> Goals</a></li>
+  </ul></li>
+  <li><a href="#specification" id="toc-specification" class="nav-link" data-scroll-target="#specification"><span class="header-section-number">3</span> Specification</a>
+  <ul class="collapse">
+  <li><a href="#tool-design" id="toc-tool-design" class="nav-link" data-scroll-target="#tool-design"><span class="header-section-number">3.1</span> Tool Design</a></li>
+  <li><a href="#file-specific-standards" id="toc-file-specific-standards" class="nav-link" data-scroll-target="#file-specific-standards"><span class="header-section-number">3.2</span> File-Specific Standards</a></li>
+  <li><a href="#validation-checks" id="toc-validation-checks" class="nav-link" data-scroll-target="#validation-checks"><span class="header-section-number">3.3</span> Validation Checks</a></li>
+  <li><a href="#integration-points" id="toc-integration-points" class="nav-link" data-scroll-target="#integration-points"><span class="header-section-number">3.4</span> Integration Points</a></li>
+  <li><a href="#command-line-interface" id="toc-command-line-interface" class="nav-link" data-scroll-target="#command-line-interface"><span class="header-section-number">3.5</span> Command-Line Interface</a></li>
+  <li><a href="#error-reporting" id="toc-error-reporting" class="nav-link" data-scroll-target="#error-reporting"><span class="header-section-number">3.6</span> Error Reporting</a></li>
+  </ul></li>
+  <li><a href="#rationale" id="toc-rationale" class="nav-link" data-scroll-target="#rationale"><span class="header-section-number">4</span> Rationale</a>
+  <ul class="collapse">
+  <li><a href="#why-r" id="toc-why-r" class="nav-link" data-scroll-target="#why-r"><span class="header-section-number">4.1</span> Why R?</a></li>
+  <li><a href="#why-different-standards-for-each-file" id="toc-why-different-standards-for-each-file" class="nav-link" data-scroll-target="#why-different-standards-for-each-file"><span class="header-section-number">4.2</span> Why Different Standards for Each File?</a></li>
+  <li><a href="#why-sort-by-variable-column" id="toc-why-sort-by-variable-column" class="nav-link" data-scroll-target="#why-sort-by-variable-column"><span class="header-section-number">4.3</span> Why Sort by Variable Column?</a></li>
+  </ul></li>
+  <li><a href="#implementation-plan" id="toc-implementation-plan" class="nav-link" data-scroll-target="#implementation-plan"><span class="header-section-number">5</span> Implementation Plan</a></li>
+  <li><a href="#security-considerations" id="toc-security-considerations" class="nav-link" data-scroll-target="#security-considerations"><span class="header-section-number">6</span> Security Considerations</a></li>
+  <li><a href="#backwards-compatibility" id="toc-backwards-compatibility" class="nav-link" data-scroll-target="#backwards-compatibility"><span class="header-section-number">7</span> Backwards Compatibility</a></li>
+  <li><a href="#testing-strategy" id="toc-testing-strategy" class="nav-link" data-scroll-target="#testing-strategy"><span class="header-section-number">8</span> Testing Strategy</a>
+  <ul class="collapse">
+  <li><a href="#unit-tests" id="toc-unit-tests" class="nav-link" data-scroll-target="#unit-tests"><span class="header-section-number">8.1</span> Unit Tests</a></li>
+  <li><a href="#integration-tests" id="toc-integration-tests" class="nav-link" data-scroll-target="#integration-tests"><span class="header-section-number">8.2</span> Integration Tests</a></li>
+  <li><a href="#regression-tests" id="toc-regression-tests" class="nav-link" data-scroll-target="#regression-tests"><span class="header-section-number">8.3</span> Regression Tests</a></li>
+  </ul></li>
+  <li><a href="#documentation-plan" id="toc-documentation-plan" class="nav-link" data-scroll-target="#documentation-plan"><span class="header-section-number">9</span> Documentation Plan</a></li>
+  <li><a href="#future-enhancements" id="toc-future-enhancements" class="nav-link" data-scroll-target="#future-enhancements"><span class="header-section-number">10</span> Future Enhancements</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">11</span> References</a></li>
+  <li><a href="#copyright" id="toc-copyright" class="nav-link" data-scroll-target="#copyright"><span class="header-section-number">12</span> Copyright</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">CEP 1 - CSV Worksheet Standardization Tool</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>CCHSflow Team </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 16, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+CEP Metadata
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CEP</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>Title</td>
+<td>CSV Worksheet Standardization Tool</td>
+</tr>
+<tr class="odd">
+<td>Author</td>
+<td>CCHSflow Team</td>
+</tr>
+<tr class="even">
+<td>Status</td>
+<td>Draft</td>
+</tr>
+<tr class="odd">
+<td>Type</td>
+<td>Standards Track</td>
+</tr>
+<tr class="even">
+<td>Created</td>
+<td>2025-10-16</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="abstract" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="abstract"><span class="header-section-number">1</span> Abstract</h2>
+<p>This CEP proposes the development of a standardization tool for the repository’s CSV worksheets (<code>inst/extdata/variables.csv</code> and <code>inst/extdata/variable_details.csv</code>). The tool will check and fix formatting inconsistencies that arise from using different editing tools and operating systems, ensuring clean and semantic diffs in version control.</p>
+</section>
+<section id="motivation" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="motivation"><span class="header-section-number">2</span> Motivation</h2>
+<p>The CCHSflow repository maintains two critical CSV worksheets that define variable metadata:</p>
+<ul>
+<li><code>inst/extdata/variables.csv</code> - Variable definitions and metadata</li>
+<li><code>inst/extdata/variable_details.csv</code> - Detailed variable specifications</li>
+</ul>
+<p>These worksheets are frequently modified by contributors using various tools (Microsoft Excel, LibreOffice Calc, Notepad, etc.) across different operating systems. This diversity leads to several problems:</p>
+<section id="current-problems" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="current-problems"><span class="header-section-number">2.1</span> Current Problems</h3>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Issues
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><p><strong>Inconsistent Quoting</strong>: Different CSV editors apply different quoting strategies:</p>
+<ul>
+<li>Some tools quote all fields regardless of content</li>
+<li>Others only quote fields containing special characters (commas, quotes, newlines)</li>
+<li>This makes Git diffs show entire file changes when only content changed</li>
+</ul></li>
+<li><p><strong>Line Ending Variations</strong>: Operating systems use different line ending conventions:</p>
+<ul>
+<li>Unix/Linux/macOS use LF (<code>\n</code>)</li>
+<li>Windows uses CRLF (<code>\r\n</code>)</li>
+<li>Mixed line endings in a single file cause spurious diffs</li>
+</ul></li>
+<li><p><strong>Structural Inconsistencies</strong>: Manual editing can introduce structural problems:</p>
+<ul>
+<li>Unsorted rows when sorting is expected (e.g., by <code>variable</code> column)</li>
+<li>Empty header columns added accidentally</li>
+<li>Trailing delimiters or extra commas</li>
+</ul></li>
+<li><p><strong>Poor Git Diffs</strong>: These formatting differences cause Git to report that entire files have changed when semantically only a single cell was modified (e.g., fixing a spelling mistake). This makes code review difficult and error-prone.</p></li>
+<li><p><strong>Human Error</strong>: Commit messages stating “fixed typo in variable X” are not sufficient to catch errors when the diff shows thousands of lines changed.</p></li>
+</ol>
+</div>
+</div>
+</section>
+<section id="goals" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="goals"><span class="header-section-number">2.2</span> Goals</h3>
+<p>The proposed tool will:</p>
+<ul>
+<li>Enforce consistent formatting standards for each CSV file</li>
+<li>Enable meaningful semantic diffs in pull requests</li>
+<li>Integrate into both CI/CD pipelines and local development workflows</li>
+<li>Prevent formatting issues from being introduced into the repository</li>
+<li>Reduce cognitive load during code review by showing only actual content changes</li>
+</ul>
+</section>
+</section>
+<section id="specification" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="specification"><span class="header-section-number">3</span> Specification</h2>
+<section id="tool-design" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="tool-design"><span class="header-section-number">3.1</span> Tool Design</h3>
+<p>The tool will be implemented in R and provide two operational modes:</p>
+<section id="check-mode" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="check-mode">1. Check Mode</h4>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check Mode
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>Purpose</strong>: Validate CSV files against formatting standards without modifying them</li>
+<li><strong>Use Case</strong>: CI/CD pipeline integration (GitHub Actions)</li>
+<li><strong>Behavior</strong>:
+<ul>
+<li>Reads CSV files</li>
+<li>Checks formatting against defined standards</li>
+<li>Reports all violations found</li>
+<li>Exits with non-zero status code if violations exist</li>
+</ul></li>
+<li><strong>Output</strong>: Detailed report of all formatting issues found</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="fix-mode" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="fix-mode">2. Fix Mode</h4>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Fix Mode
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>Purpose</strong>: Automatically correct formatting violations</li>
+<li><strong>Use Case</strong>: Local development, pre-commit workflow</li>
+<li><strong>Behavior</strong>:
+<ul>
+<li>Reads CSV files</li>
+<li>Applies all formatting corrections</li>
+<li>Writes corrected files back to disk</li>
+<li>Reports all changes made</li>
+</ul></li>
+<li><strong>Output</strong>: Summary of corrections applied</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="file-specific-standards" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="file-specific-standards"><span class="header-section-number">3.2</span> File-Specific Standards</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">variables.csv</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">variable_details.csv</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Standard</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Line Endings</strong></td>
+<td>LF (<code>\n</code>)</td>
+</tr>
+<tr class="even">
+<td><strong>Quoting</strong></td>
+<td>All fields quoted</td>
+</tr>
+<tr class="odd">
+<td><strong>Sorting</strong></td>
+<td>Rows sorted by <code>variable</code> column (ascending,</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>case-sensitive)</td>
+</tr>
+<tr class="odd">
+<td><strong>Structure</strong></td>
+<td>No empty columns, no trailing delimiters</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Standard</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Line Endings</strong></td>
+<td>CRLF (<code>\r\n</code>)</td>
+</tr>
+<tr class="even">
+<td><strong>Quoting</strong></td>
+<td>Minimal (only when required by CSV spec)</td>
+</tr>
+<tr class="odd">
+<td><strong>Sorting</strong></td>
+<td>Rows sorted by <code>variable</code> column (ascending,</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>case-sensitive)</td>
+</tr>
+<tr class="odd">
+<td><strong>Structure</strong></td>
+<td>No empty columns, no trailing delimiters</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note on Different Standards
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The different standards for these files exist for legacy reasons. Future versions should standardize both files to use the same format.</p>
+</div>
+</div>
+</section>
+<section id="validation-checks" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="validation-checks"><span class="header-section-number">3.3</span> Validation Checks</h3>
+<p>The tool will perform the following checks (in order):</p>
+<ol type="1">
+<li><strong>File Existence</strong>: Verify that target CSV files exist</li>
+<li><strong>Valid CSV Structure</strong>: Parse CSV and validate structure</li>
+<li><strong>Line Ending Consistency</strong>: Check all lines use the correct line ending for the file</li>
+<li><strong>Quote Style Compliance</strong>: Verify quoting matches the standard for the file</li>
+<li><strong>Column Sorting</strong>: Verify rows are sorted by the <code>variable</code> column</li>
+<li><strong>Empty Columns</strong>: Detect any header columns with no name or all empty values</li>
+<li><strong>Trailing Delimiters</strong>: Check for extra commas at line ends</li>
+</ol>
+<p>Each check will produce a specific, actionable error message.</p>
+</section>
+<section id="integration-points" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="integration-points"><span class="header-section-number">3.4</span> Integration Points</h3>
+<section id="cicd-integration-github-actions" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="cicd-integration-github-actions">CI/CD Integration (GitHub Actions)</h4>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>.github/workflows/check-csv.yml</strong></pre>
+</div>
+<div class="sourceCode" id="cb1" data-filename=".github/workflows/check-csv.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pseudocode workflow</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Check CSV formatting</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">  run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    Rscript -e "csvtools::check_csv_format(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>      'inst/extdata/variables.csv',</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      'inst/extdata/variable_details.csv'</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    )"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The check will run on all pull requests that modify either CSV file and will fail the CI build if formatting violations are detected.</p>
+</section>
+<section id="local-development" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="local-development">Local Development</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check files</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>csvtools<span class="sc">::</span><span class="fu">check_csv_format</span>(<span class="st">"inst/extdata/variables.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>csvtools<span class="sc">::</span><span class="fu">check_csv_format</span>(<span class="st">"inst/extdata/variable_details.csv"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix files</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>csvtools<span class="sc">::</span><span class="fu">fix_csv_format</span>(<span class="st">"inst/extdata/variables.csv"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>csvtools<span class="sc">::</span><span class="fu">fix_csv_format</span>(<span class="st">"inst/extdata/variable_details.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Developers can run these commands before committing changes to ensure compliance.</p>
+</section>
+</section>
+<section id="command-line-interface" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="command-line-interface"><span class="header-section-number">3.5</span> Command-Line Interface</h3>
+<p>The tool should provide a clean command-line interface:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check mode</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">"csvtools::check_csv_format('path/to/file.csv')"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix mode</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">"csvtools::fix_csv_format('path/to/file.csv')"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check all repository CSV files</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">"csvtools::check_repo_csvs()"</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix all repository CSV files</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">"csvtools::fix_repo_csvs()"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="error-reporting" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="error-reporting"><span class="header-section-number">3.6</span> Error Reporting</h3>
+<p>Error messages should be clear and actionable:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>CSV Formatting Violations Found:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>inst/extdata/variables.csv:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  [ERROR] Line endings: Expected LF (\n), found mixed LF/CRLF</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  [ERROR] Quoting: Expected all fields quoted, found 145 unquoted</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>          fields</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  [ERROR] Sorting: Rows not sorted by 'variable' column (row 89:</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>          'CCC_031' comes after 'ADL_01')</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  [ERROR] Empty columns: Found 1 empty header column at position 17</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>inst/extdata/variable_details.csv:</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  [ERROR] Line endings: Expected CRLF (\r\n), found LF</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  [WARN] Trailing whitespace in 3 fields</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>Summary: 6 errors, 1 warning</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="rationale" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="rationale"><span class="header-section-number">4</span> Rationale</h2>
+<section id="why-r" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="why-r"><span class="header-section-number">4.1</span> Why R?</h3>
+<p>The repository is primarily R-based, and the tool will need to integrate with existing R workflows and packages. Using R ensures:</p>
+<ul>
+<li>Native integration with the existing codebase</li>
+<li>Familiarity for all contributors</li>
+<li>Easy distribution via the package itself</li>
+</ul>
+</section>
+<section id="why-different-standards-for-each-file" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="why-different-standards-for-each-file"><span class="header-section-number">4.2</span> Why Different Standards for Each File?</h3>
+<p>The different formatting standards (particularly line endings and quoting) exist for legacy compatibility reasons. While this is not ideal, changing the standards now would create massive diffs in repository history. Future versions should unify the standards.</p>
+</section>
+<section id="why-sort-by-variable-column" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="why-sort-by-variable-column"><span class="header-section-number">4.3</span> Why Sort by Variable Column?</h3>
+<p>Sorting provides:</p>
+<ul>
+<li>Predictable file structure</li>
+<li>Easier manual navigation</li>
+<li>Consistent merge behavior</li>
+<li>Better diff output (insertions/deletions are localized)</li>
+</ul>
+</section>
+</section>
+<section id="implementation-plan" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="implementation-plan"><span class="header-section-number">5</span> Implementation Plan</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Phase 1: Core Functionality (MVP)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Phase 2: Integration</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">Phase 3: Enhancement</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<ol type="1">
+<li>Implement CSV reading with format detection</li>
+<li>Implement line ending checks and fixes</li>
+<li>Implement quoting checks and fixes</li>
+<li>Implement sorting checks and fixes</li>
+<li>Write comprehensive unit tests</li>
+</ol>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<ol type="1">
+<li>Add command-line interface</li>
+<li>Create GitHub Actions workflow</li>
+<li>Update contributor documentation</li>
+<li>Add pre-commit hook example</li>
+</ol>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<ol type="1">
+<li>Add empty column detection</li>
+<li>Add trailing delimiter detection</li>
+<li>Add verbose logging option</li>
+<li>Add batch processing for multiple files</li>
+<li>Performance optimization for large files</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="security-considerations" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="security-considerations"><span class="header-section-number">6</span> Security Considerations</h2>
+<p>The tool will:</p>
+<ul>
+<li>Only operate on explicitly specified files</li>
+<li>Validate file paths to prevent directory traversal</li>
+<li>Never delete files (only read and write)</li>
+<li>Report all changes made in fix mode</li>
+<li>Require explicit user action (no automatic file modification without fix mode)</li>
+</ul>
+</section>
+<section id="backwards-compatibility" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="backwards-compatibility"><span class="header-section-number">7</span> Backwards Compatibility</h2>
+<p>This tool is purely additive and does not modify existing repository behavior. Files that already conform to the standards will pass all checks. Files that don’t conform will need to be fixed, but this is a one-time migration cost.</p>
+</section>
+<section id="testing-strategy" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="testing-strategy"><span class="header-section-number">8</span> Testing Strategy</h2>
+<section id="unit-tests" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="unit-tests"><span class="header-section-number">8.1</span> Unit Tests</h3>
+<ul>
+<li>Test each validation function independently</li>
+<li>Test fix operations for each rule</li>
+<li>Test error reporting and messages</li>
+<li>Test with malformed CSV files</li>
+<li>Test with edge cases (empty files, single row, special characters)</li>
+</ul>
+</section>
+<section id="integration-tests" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="integration-tests"><span class="header-section-number">8.2</span> Integration Tests</h3>
+<ul>
+<li>Test complete check workflow</li>
+<li>Test complete fix workflow</li>
+<li>Test with actual repository CSV files</li>
+<li>Test GitHub Actions integration</li>
+<li>Test cross-platform behavior (Windows/Linux/macOS)</li>
+</ul>
+</section>
+<section id="regression-tests" class="level3" data-number="8.3">
+<h3 data-number="8.3" class="anchored" data-anchor-id="regression-tests"><span class="header-section-number">8.3</span> Regression Tests</h3>
+<ul>
+<li>Ensure fixed files pass all checks</li>
+<li>Ensure fixes are idempotent (fixing twice produces same result)</li>
+<li>Ensure semantic content is never modified</li>
+</ul>
+</section>
+</section>
+<section id="documentation-plan" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="documentation-plan"><span class="header-section-number">9</span> Documentation Plan</h2>
+<p>Documentation will include:</p>
+<ul>
+<li>Function reference documentation (roxygen2)</li>
+<li>Vignette: “Using the CSV Standardization Tool”</li>
+<li>GitHub Actions integration guide</li>
+<li>Contributor guidelines update</li>
+<li>Troubleshooting guide</li>
+</ul>
+</section>
+<section id="future-enhancements" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="future-enhancements"><span class="header-section-number">10</span> Future Enhancements</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Potential Future Additions
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Potential future additions (out of scope for initial implementation):</p>
+<ol type="1">
+<li><strong>Column validation</strong>: Check for required columns, data type validation</li>
+<li><strong>Duplicate detection</strong>: Find duplicate rows</li>
+<li><strong>Reference validation</strong>: Validate cross-references between the two CSV files</li>
+<li><strong>Format migration</strong>: Provide tools to migrate variable_details.csv to the same format as variables.csv</li>
+<li><strong>Interactive fix mode</strong>: Allow users to review and approve each fix</li>
+<li><strong>Auto-fix on commit</strong>: Git hook that automatically fixes files on commit</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="references" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="references"><span class="header-section-number">11</span> References</h2>
+<ul>
+<li><a href="https://tools.ietf.org/html/rfc4180">RFC 4180: Common Format and MIME Type for CSV Files</a></li>
+<li><a href="https://git-scm.com/docs/git-diff">Git Diff Documentation</a></li>
+<li><a href="https://readr.tidyverse.org/">R readr Package Documentation</a></li>
+</ul>
+</section>
+<section id="copyright" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="copyright"><span class="header-section-number">12</span> Copyright</h2>
+<p>This document is placed in the public domain or under the CC0-1.0-Universal license, whichever is more permissive.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

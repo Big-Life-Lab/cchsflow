@@ -1,0 +1,390 @@
+---
+title: "CEP 1 - CSV Worksheet Standardization Tool"
+author: "CCHSflow Team"
+date: "2025-10-16"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contents"
+    number-sections: true
+    code-fold: true
+    theme: cosmo
+    css: styles.css
+---
+
+::: {.callout-note}
+## CEP Metadata
+
+| Field | Value |
+|-------|-------|
+| CEP | 1 |
+| Title | CSV Worksheet Standardization Tool |
+| Author | CCHSflow Team |
+| Status | Draft |
+| Type | Standards Track |
+| Created | 2025-10-16 |
+:::
+
+## Abstract
+
+This CEP proposes the development of a standardization tool for the
+repository's CSV worksheets (`inst/extdata/variables.csv` and
+`inst/extdata/variable_details.csv`). The tool will check and fix
+formatting inconsistencies that arise from using different editing tools
+and operating systems, ensuring clean and semantic diffs in version
+control.
+
+## Motivation
+
+The CCHSflow repository maintains two critical CSV worksheets that define
+variable metadata:
+
+- `inst/extdata/variables.csv` - Variable definitions and metadata
+- `inst/extdata/variable_details.csv` - Detailed variable specifications
+
+These worksheets are frequently modified by contributors using various
+tools (Microsoft Excel, LibreOffice Calc, Notepad, etc.) across different
+operating systems. This diversity leads to several problems:
+
+### Current Problems
+
+::: {.callout-warning}
+## Key Issues
+
+1. **Inconsistent Quoting**: Different CSV editors apply different quoting
+   strategies:
+   - Some tools quote all fields regardless of content
+   - Others only quote fields containing special characters (commas,
+     quotes, newlines)
+   - This makes Git diffs show entire file changes when only content
+     changed
+
+2. **Line Ending Variations**: Operating systems use different line ending
+   conventions:
+   - Unix/Linux/macOS use LF (`\n`)
+   - Windows uses CRLF (`\r\n`)
+   - Mixed line endings in a single file cause spurious diffs
+
+3. **Structural Inconsistencies**: Manual editing can introduce structural
+   problems:
+   - Unsorted rows when sorting is expected (e.g., by `variable` column)
+   - Empty header columns added accidentally
+   - Trailing delimiters or extra commas
+
+4. **Poor Git Diffs**: These formatting differences cause Git to report
+   that entire files have changed when semantically only a single cell was
+   modified (e.g., fixing a spelling mistake). This makes code review
+   difficult and error-prone.
+
+5. **Human Error**: Commit messages stating "fixed typo in variable X" are
+   not sufficient to catch errors when the diff shows thousands of lines
+   changed.
+:::
+
+### Goals
+
+The proposed tool will:
+
+- Enforce consistent formatting standards for each CSV file
+- Enable meaningful semantic diffs in pull requests
+- Integrate into both CI/CD pipelines and local development workflows
+- Prevent formatting issues from being introduced into the repository
+- Reduce cognitive load during code review by showing only actual content
+  changes
+
+## Specification
+
+### Tool Design
+
+The tool will be implemented in R and provide two operational modes:
+
+#### 1. Check Mode {.unnumbered}
+
+::: {.callout-tip}
+## Check Mode
+
+- **Purpose**: Validate CSV files against formatting standards without
+  modifying them
+- **Use Case**: CI/CD pipeline integration (GitHub Actions)
+- **Behavior**:
+  - Reads CSV files
+  - Checks formatting against defined standards
+  - Reports all violations found
+  - Exits with non-zero status code if violations exist
+- **Output**: Detailed report of all formatting issues found
+:::
+
+#### 2. Fix Mode {.unnumbered}
+
+::: {.callout-tip}
+## Fix Mode
+
+- **Purpose**: Automatically correct formatting violations
+- **Use Case**: Local development, pre-commit workflow
+- **Behavior**:
+  - Reads CSV files
+  - Applies all formatting corrections
+  - Writes corrected files back to disk
+  - Reports all changes made
+- **Output**: Summary of corrections applied
+:::
+
+### File-Specific Standards
+
+::: {.panel-tabset}
+
+## variables.csv
+
+| Standard | Value |
+|----------|-------|
+| **Line Endings** | LF (`\n`) |
+| **Quoting** | All fields quoted |
+| **Sorting** | Rows sorted by `variable` column (ascending, |
+|            | case-sensitive) |
+| **Structure** | No empty columns, no trailing delimiters |
+
+## variable_details.csv
+
+| Standard | Value |
+|----------|-------|
+| **Line Endings** | CRLF (`\r\n`) |
+| **Quoting** | Minimal (only when required by CSV spec) |
+| **Sorting** | Rows sorted by `variable` column (ascending, |
+|            | case-sensitive) |
+| **Structure** | No empty columns, no trailing delimiters |
+
+:::
+
+::: {.callout-important}
+## Note on Different Standards
+
+The different standards for these files exist for legacy reasons. Future
+versions should standardize both files to use the same format.
+:::
+
+### Validation Checks
+
+The tool will perform the following checks (in order):
+
+1. **File Existence**: Verify that target CSV files exist
+2. **Valid CSV Structure**: Parse CSV and validate structure
+3. **Line Ending Consistency**: Check all lines use the correct line
+   ending for the file
+4. **Quote Style Compliance**: Verify quoting matches the standard for the
+   file
+5. **Column Sorting**: Verify rows are sorted by the `variable` column
+6. **Empty Columns**: Detect any header columns with no name or all empty
+   values
+7. **Trailing Delimiters**: Check for extra commas at line ends
+
+Each check will produce a specific, actionable error message.
+
+### Integration Points
+
+#### CI/CD Integration (GitHub Actions) {.unnumbered}
+
+```{.yaml filename=".github/workflows/check-csv.yml"}
+# Pseudocode workflow
+- name: Check CSV formatting
+  run: |
+    Rscript -e "csvtools::check_csv_format(
+      'inst/extdata/variables.csv',
+      'inst/extdata/variable_details.csv'
+    )"
+```
+
+The check will run on all pull requests that modify either CSV file and
+will fail the CI build if formatting violations are detected.
+
+#### Local Development {.unnumbered}
+
+```{.r}
+# Check files
+csvtools::check_csv_format("inst/extdata/variables.csv")
+csvtools::check_csv_format("inst/extdata/variable_details.csv")
+
+# Fix files
+csvtools::fix_csv_format("inst/extdata/variables.csv")
+csvtools::fix_csv_format("inst/extdata/variable_details.csv")
+```
+
+Developers can run these commands before committing changes to ensure
+compliance.
+
+### Command-Line Interface
+
+The tool should provide a clean command-line interface:
+
+```{.bash}
+# Check mode
+Rscript -e "csvtools::check_csv_format('path/to/file.csv')"
+
+# Fix mode
+Rscript -e "csvtools::fix_csv_format('path/to/file.csv')"
+
+# Check all repository CSV files
+Rscript -e "csvtools::check_repo_csvs()"
+
+# Fix all repository CSV files
+Rscript -e "csvtools::fix_repo_csvs()"
+```
+
+### Error Reporting
+
+Error messages should be clear and actionable:
+
+```{.default}
+CSV Formatting Violations Found:
+
+inst/extdata/variables.csv:
+  [ERROR] Line endings: Expected LF (\n), found mixed LF/CRLF
+  [ERROR] Quoting: Expected all fields quoted, found 145 unquoted
+          fields
+  [ERROR] Sorting: Rows not sorted by 'variable' column (row 89:
+          'CCC_031' comes after 'ADL_01')
+  [ERROR] Empty columns: Found 1 empty header column at position 17
+
+inst/extdata/variable_details.csv:
+  [ERROR] Line endings: Expected CRLF (\r\n), found LF
+  [WARN] Trailing whitespace in 3 fields
+
+Summary: 6 errors, 1 warning
+```
+
+## Rationale
+
+### Why R?
+
+The repository is primarily R-based, and the tool will need to integrate
+with existing R workflows and packages. Using R ensures:
+
+- Native integration with the existing codebase
+- Familiarity for all contributors
+- Easy distribution via the package itself
+
+### Why Different Standards for Each File?
+
+The different formatting standards (particularly line endings and quoting)
+exist for legacy compatibility reasons. While this is not ideal, changing
+the standards now would create massive diffs in repository history. Future
+versions should unify the standards.
+
+### Why Sort by Variable Column?
+
+Sorting provides:
+
+- Predictable file structure
+- Easier manual navigation
+- Consistent merge behavior
+- Better diff output (insertions/deletions are localized)
+
+## Implementation Plan
+
+::: {.panel-tabset}
+
+## Phase 1: Core Functionality (MVP)
+
+1. Implement CSV reading with format detection
+2. Implement line ending checks and fixes
+3. Implement quoting checks and fixes
+4. Implement sorting checks and fixes
+5. Write comprehensive unit tests
+
+## Phase 2: Integration
+
+1. Add command-line interface
+2. Create GitHub Actions workflow
+3. Update contributor documentation
+4. Add pre-commit hook example
+
+## Phase 3: Enhancement
+
+1. Add empty column detection
+2. Add trailing delimiter detection
+3. Add verbose logging option
+4. Add batch processing for multiple files
+5. Performance optimization for large files
+
+:::
+
+## Security Considerations
+
+The tool will:
+
+- Only operate on explicitly specified files
+- Validate file paths to prevent directory traversal
+- Never delete files (only read and write)
+- Report all changes made in fix mode
+- Require explicit user action (no automatic file modification without fix
+  mode)
+
+## Backwards Compatibility
+
+This tool is purely additive and does not modify existing repository
+behavior. Files that already conform to the standards will pass all checks.
+Files that don't conform will need to be fixed, but this is a one-time
+migration cost.
+
+## Testing Strategy
+
+### Unit Tests
+
+- Test each validation function independently
+- Test fix operations for each rule
+- Test error reporting and messages
+- Test with malformed CSV files
+- Test with edge cases (empty files, single row, special characters)
+
+### Integration Tests
+
+- Test complete check workflow
+- Test complete fix workflow
+- Test with actual repository CSV files
+- Test GitHub Actions integration
+- Test cross-platform behavior (Windows/Linux/macOS)
+
+### Regression Tests
+
+- Ensure fixed files pass all checks
+- Ensure fixes are idempotent (fixing twice produces same result)
+- Ensure semantic content is never modified
+
+## Documentation Plan
+
+Documentation will include:
+
+- Function reference documentation (roxygen2)
+- Vignette: "Using the CSV Standardization Tool"
+- GitHub Actions integration guide
+- Contributor guidelines update
+- Troubleshooting guide
+
+## Future Enhancements
+
+::: {.callout-note collapse="true"}
+## Potential Future Additions
+
+Potential future additions (out of scope for initial implementation):
+
+1. **Column validation**: Check for required columns, data type validation
+2. **Duplicate detection**: Find duplicate rows
+3. **Reference validation**: Validate cross-references between the two CSV
+   files
+4. **Format migration**: Provide tools to migrate variable_details.csv to
+   the same format as variables.csv
+5. **Interactive fix mode**: Allow users to review and approve each fix
+6. **Auto-fix on commit**: Git hook that automatically fixes files on
+   commit
+:::
+
+## References
+
+- [RFC 4180: Common Format and MIME Type for CSV Files](https://tools.ietf.org/html/rfc4180)
+- [Git Diff Documentation](https://git-scm.com/docs/git-diff)
+- [R readr Package Documentation](https://readr.tidyverse.org/)
+
+## Copyright
+
+This document is placed in the public domain or under the CC0-1.0-Universal
+license, whichever is more permissive.
