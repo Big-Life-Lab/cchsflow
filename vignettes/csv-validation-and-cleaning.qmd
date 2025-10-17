@@ -1,0 +1,396 @@
+---
+title: "CSV Validation and Cleaning"
+author: "cchsflow Development Team"
+date: "`r Sys.Date()`"
+format: html
+vignette: >
+  %\VignetteIndexEntry{CSV Validation and Cleaning}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Overview
+
+The `standardise_csv()` function eliminates git merge conflicts in CSV files by fixing invisible Excel corruption issues. It's designed for Excel-first workflows with zero learning curve, plus optional enhanced validation for research collaboration.
+
+## Quick Start
+
+```{r setup, include=FALSE}
+library(cchsflow)
+```
+
+### Basic Usage
+
+The most common use case is fixing git conflicts in `variables.csv` or `variable_details.csv`:
+
+```{r basic-usage, eval=FALSE}
+# Fix git conflicts immediately
+standardise_csv("inst/extdata/variables.csv")
+
+# Check what would be fixed first (safe exploration)
+result <- standardise_csv("inst/extdata/variables.csv", validate_only = TRUE)
+if (!result$valid) {
+  print(result$issues_remaining)
+}
+```
+
+## Common Issues Fixed
+
+The function automatically fixes:
+
+- **UTF-8 BOM** (invisible bytes that break scripts)
+- **Windows/Mac line endings** causing git conflicts
+- **Inconsistent encoding** between team members
+- **File formatting differences** from different editors
+- **Column order inconsistencies** (reorders to schema-defined standard)
+- **Missing/additional columns** (reports and preserves user extensions)
+
+## Operating Modes
+
+### Basic Mode (Default)
+
+Perfect for Excel users who just want git conflicts to disappear:
+
+```{r basic-mode, eval=FALSE}
+# Basic mode - just fixes issues
+result <- standardise_csv("variables.csv", collaboration = FALSE)
+```
+
+**What it does:**
+- Removes UTF-8 BOM
+- Fixes line endings (CRLF → LF, CR → LF)
+- Standardizes column order
+- Validates required fields are present
+
+**What it doesn't do:**
+- Strict schema validation
+- Enum constraint checking
+- Cross-field dependency validation
+
+### Collaboration Mode
+
+For research-quality validation before sharing with team:
+
+```{r collaboration-mode, eval=FALSE}
+# Collaboration mode - enhanced validation
+result <- standardise_csv("variables.csv", collaboration = TRUE)
+```
+
+**Additional checks:**
+- Schema-based validation
+- Enum constraint validation (e.g., variableType must be "Categorical" or "Continuous")
+- Cross-field dependencies (e.g., continuous variables should have units)
+- Column completeness reporting
+
+## Validation Examples
+
+### Check Before Fixing
+
+Always a good idea to see what would change:
+
+```{r validate-only, eval=FALSE}
+result <- standardise_csv("variables.csv", validate_only = TRUE)
+
+if (result$valid) {
+  cat("✅ File is clean!\n")
+} else {
+  cat("⚠️ Issues found:\n")
+  for (issue in result$issues_remaining) {
+    cat("  -", issue, "\n")
+  }
+}
+```
+
+### Understanding Return Values
+
+```{r return-values, eval=FALSE}
+result <- standardise_csv("variables.csv")
+
+# Check what was done
+str(result)
+# List with components:
+#   $success         - TRUE if standardisation succeeded
+#   $mode            - "basic" or "collaboration"
+#   $issues_fixed    - Character vector of problems resolved
+#   $issues_remaining - Character vector of issues needing attention
+#   $valid           - TRUE if file passes validation
+```
+
+## Working with Project-Specific Files
+
+The function automatically recognizes project naming conventions:
+
+```{r project-files, eval=FALSE}
+# All these work automatically
+standardise_csv("variables_MyProject.csv")
+standardise_csv("ProjectName_variable_details.csv")
+standardise_csv("variables_DemPoRT.csv")
+standardise_csv("MyProject_variables.csv")
+```
+
+## Team Workflow Example
+
+Here's a recommended workflow for teams collaborating on CSV files:
+
+```{r team-workflow, eval=FALSE}
+# Before editing in Excel
+standardise_csv("variables.csv")
+
+# ... edit in Excel ...
+
+# After editing, before committing
+result <- standardise_csv("variables.csv",
+                          collaboration = TRUE,
+                          validate_only = TRUE)
+
+if (result$valid) {
+  # Apply fixes
+  standardise_csv("variables.csv", collaboration = TRUE)
+
+  # Commit
+  system("git add inst/extdata/variables.csv")
+  system('git commit -m "Update variables.csv"')
+} else {
+  cat("⚠️ Please fix these issues before committing:\n")
+  for (issue in result$issues_remaining) {
+    cat("  -", issue, "\n")
+  }
+}
+```
+
+## Handling Specific Issues
+
+### UTF-8 BOM (Excel Corruption)
+
+Excel on Windows often adds an invisible UTF-8 BOM (Byte Order Mark) that breaks R scripts:
+
+```{r bom-example, eval=FALSE}
+# Before: File starts with invisible EF BB BF bytes
+# After: Clean UTF-8 file
+
+result <- standardise_csv("variables.csv")
+# issues_fixed: "Removed UTF-8 BOM"
+```
+
+### Line Ending Issues
+
+Different operating systems use different line endings:
+
+- **Windows**: CRLF (`\r\n`)
+- **Mac/Linux**: LF (`\n`)
+- **Old Mac**: CR (`\r`)
+
+```{r line-endings, eval=FALSE}
+# Automatically converts all to LF
+result <- standardise_csv("variables_from_windows.csv")
+# issues_fixed: "Converted CRLF to LF line endings"
+```
+
+### Column Order
+
+Keeps columns in schema-defined order:
+
+```{r column-order, eval=FALSE}
+# Before: variableType,variable,label,databaseStart
+# After:  variable,label,variableType,databaseStart
+
+result <- standardise_csv("variables.csv")
+# issues_fixed: "Standardised column order"
+```
+
+### Missing Required Fields
+
+```{r missing-fields, eval=FALSE}
+# Validates that required fields are present
+result <- standardise_csv("incomplete_variables.csv",
+                          collaboration = TRUE,
+                          validate_only = TRUE)
+
+if (!result$valid) {
+  # issues_remaining: "Missing required fields: variableType"
+}
+```
+
+## Testing Your Changes
+
+### Manual Testing
+
+Create a test file with issues and verify they're fixed:
+
+```{r manual-test, eval=FALSE}
+# Create test file with CRLF line endings
+test_content <- "variable,label,variableType\ntest1,Test,Categorical\n"
+test_content <- gsub("\n", "\r\n", test_content)
+test_file <- tempfile(fileext = ".csv")
+writeLines(test_content, test_file)
+
+# Fix it
+result <- standardise_csv(test_file)
+
+# Verify
+file_content <- readChar(test_file, file.info(test_file)$size)
+stopifnot(!grepl("\r", file_content))  # No CR characters remain
+cat("✅ Line endings fixed successfully\n")
+```
+
+### Integration Testing with Real Files
+
+Test on your actual CSV files:
+
+```{r integration-test, eval=FALSE}
+# Test on real files
+files_to_test <- c(
+  "inst/extdata/variables.csv",
+  "inst/extdata/variable_details.csv"
+)
+
+for (file in files_to_test) {
+  if (file.exists(file)) {
+    cat("Testing", basename(file), "... ")
+    result <- standardise_csv(file,
+                              collaboration = TRUE,
+                              validate_only = TRUE)
+    if (result$valid) {
+      cat("✅ PASS\n")
+    } else {
+      cat("⚠️ Issues found:\n")
+      print(result$issues_remaining)
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+### Schema Not Found
+
+If you see "Schema file not found" errors:
+
+```{r schema-troubleshooting, eval=FALSE}
+# Check schema files exist
+schema_files <- c(
+  "inst/metadata/schemas/core/variables.yaml",
+  "inst/metadata/schemas/core/variable_details.yaml"
+)
+
+for (schema in schema_files) {
+  cat(schema, ":", ifelse(file.exists(schema), "✅", "❌"), "\n")
+}
+
+# If missing, collaboration mode won't work - use basic mode
+result <- standardise_csv("variables.csv", collaboration = FALSE)
+```
+
+### File Modified But Still Has Issues
+
+If the file was modified but still shows issues:
+
+```{r still-has-issues, eval=FALSE}
+# Run multiple times - some fixes may require multiple passes
+result1 <- standardise_csv("variables.csv")
+result2 <- standardise_csv("variables.csv")
+
+# After second pass, check if any fixes were needed
+if (length(result2$issues_fixed) == 0) {
+  cat("✅ File is fully standardised\n")
+}
+```
+
+### Git Still Showing Large Diffs
+
+After standardization, git may show large diffs the first time:
+
+```{r git-diffs, eval=FALSE}
+# This is normal! The file is being fixed.
+# After this commit, future edits will have clean, small diffs
+
+# To see what changed:
+system("git diff inst/extdata/variables.csv | head -20")
+
+# Commit the standardised file
+system("git add inst/extdata/variables.csv")
+system('git commit -m "Standardise variables.csv formatting"')
+```
+
+## Advanced Usage
+
+### Custom Output Path
+
+Save to a different location:
+
+```{r custom-output, eval=FALSE}
+result <- standardise_csv(
+  file_path = "messy_variables.csv",
+  output_path = "clean_variables.csv"
+)
+```
+
+### Batch Processing
+
+Process multiple files:
+
+```{r batch-process, eval=FALSE}
+csv_files <- list.files("inst/extdata", pattern = "\\.csv$", full.names = TRUE)
+
+results <- lapply(csv_files, function(file) {
+  cat("Processing", basename(file), "... ")
+  result <- standardise_csv(file, collaboration = TRUE)
+  cat(ifelse(result$success, "✅\n", "⚠️\n"))
+  result
+})
+
+# Summary
+success_count <- sum(sapply(results, function(r) r$success))
+cat(sprintf("\n%d/%d files processed successfully\n",
+            success_count, length(results)))
+```
+
+### Pre-commit Hook Integration
+
+Add to `.git/hooks/pre-commit`:
+
+```bash
+#!/bin/bash
+# Automatically standardise CSV files before committing
+
+Rscript -e '
+csv_files <- c(
+  "inst/extdata/variables.csv",
+  "inst/extdata/variable_details.csv"
+)
+
+for (file in csv_files) {
+  if (file.exists(file)) {
+    result <- cchsflow::standardise_csv(file, collaboration = TRUE)
+    if (!result$success) {
+      cat("ERROR: CSV standardisation failed for", file, "\n")
+      quit(status = 1)
+    }
+  }
+}
+'
+```
+
+## Best Practices
+
+1. **Run before editing**: Always standardise before opening in Excel
+2. **Run after editing**: Always standardise before committing
+3. **Use validate_only first**: Check what will change before applying fixes
+4. **Use collaboration mode for PR reviews**: Extra validation catches more issues
+5. **Commit standardisation separately**: First commit fixes formatting, then commit content changes
+6. **Team agreement**: Ensure all team members run standardisation
+
+## See Also
+
+- `?standardise_csv` - Function documentation
+- `vignette("how_to_add_variables")` - Adding new variables
+- `vignette("missing_value_conventions")` - Handling missing data
+- CSV schemas: `inst/metadata/schemas/core/`
+
+## Support
+
+If you encounter issues:
+
+1. Check this vignette's troubleshooting section
+2. Run tests: `testthat::test_file("tests/testthat/test-csv-validate-and-clean.R")`
+3. Report issues: https://github.com/Big-Life-Lab/cchsflow/issues
