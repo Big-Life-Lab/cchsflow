@@ -33,7 +33,7 @@ variables_schema:
     - "version"
     - "lastUpdated"
     - "status"
-    - "reviewNotes"
+    - "versionNotes"
 
   # Field definitions organized by tier
   fields:
@@ -91,12 +91,31 @@ variables_schema:
       description: "Name(s) of the original database(s) containing this variable's source data."
       type: "string"
       tier: "core"
+      constraints:
+        pattern: "^cchs[0-9]{4}(_[0-9]{4})?_[mp](,\\s*cchs[0-9]{4}(_[0-9]{4})?_[mp])*$"
+        custom_validation:
+          - no_duplicates: "Each database should appear only once in the list"
+          - valid_suffix: "Only _m (master) or _p (public) suffixes allowed"
       notes: |
         Identifies which databases contain the source data for this harmonized variable.
-        Examples: 
-        - Single database: "cchs2017_p", "rai_hc_2019"
-        - Multiple databases: "cchs2017_p, cchs2019_p, cchs2021_p"
-        
+
+        Format: cchsYYYY[_YYYY]_[mp]
+        - YYYY: 4-digit year(s)
+        - Suffix: _m (master) or _p (public only)
+
+        Note: _i (ICES) and _s (share) are identical to _m and should not be used.
+        See inst/metadata/documentation/database_metadata.yaml for comprehensive database documentation.
+        Detailed suffix definitions available in recodeflow repo (commit 23d303a).
+
+        Examples:
+        - Single database: "cchs2017_2018_m", "cchs2019_2020_p"
+        - Multiple databases: "cchs2017_2018_m, cchs2019_2020_m, cchs2021_m"
+
+        Validation checks:
+        - No duplicate databases (e.g., cchs2017_2018_m should not appear twice)
+        - Only _m or _p suffixes (not _i or _s)
+        - Consistent format across all entries
+
     - name: "variableStart"
       title: "Source variable specification"
       description: "How to find and combine source data to create this harmonized variable."
@@ -150,22 +169,57 @@ variables_schema:
         Leave blank for categorical variables.
         
     - name: "notes"
-      title: "General notes"
-      description: "Additional comments or important information about this variable."
+      title: "Usage notes"
+      description: "Quick reference information for data users - limitations, caveats, usage guidance, and variable relationships."
       type: "string"
       tier: "optional"
       notes: |
-        Use for any special considerations, limitations, or usage notes.
-        Examples: methodology notes, data quality issues, interpretation guidance.
-        
+        Use for information that affects how users should interpret or apply this variable.
+        Serves general audience and forms basis for data dictionaries and documentation.
+
+        Content should include:
+        - Data limitations or quality issues
+        - Cycle-specific changes or inconsistencies
+        - Usage recommendations or warnings
+        - Known issues or caveats
+        - Related variables (alternatives, see also references)
+        - When to use this variable vs alternatives
+
+        Examples:
+        - "Variable definition changed in 2015: removed 'always occasional', added 'experimental'"
+        - "Missing for cycles prior to 2015."
+        - "Use SMKDSTY_cat5 for imputation models. For simpler analysis, see SMKDSTY_cat3."
+        - "Harmonized variable. For cycle-specific versions, see SMKG203_cont (pre-2015) and SMKG040_cont (2015+)."
+        - "Values may be unreliable for occasional smokers. Consider using smoking_intensity_weekly_der."
+
+        Keep concise - typically 1-3 sentences or brief bulleted list highlighting key considerations.
+
     - name: "description"
-      title: "Detailed description"
-      description: "Comprehensive definition including methodology and operational details."
+      title: "Technical description"
+      description: "Comprehensive documentation of variable construction, methodology, operational definition, and relationships."
       type: "string"
       tier: "optional"
       notes: |
-        Full technical description including how the variable is constructed,
-        any assumptions made, and methodological considerations.
+        Full technical documentation explaining how the variable is constructed.
+        Serves general audience and forms basis for data dictionaries and documentation.
+
+        Content should include:
+        - How the variable is calculated or derived
+        - Source variables and their relationships
+        - Transformation logic or algorithms applied
+        - Operational definition and assumptions
+        - Harmonization approach across cycles
+        - Relationship to parent/child variables in derivation chains
+
+        Examples:
+        - "Number of cigarettes smoked daily by current daily smokers. Used as input for pack-years calculations (see pack_years_daily_der)."
+        - "Derived categorical variable created by applying cut points to pack_years_der. Categories: 0, <5, 5-<10, 10-<20, 20-<30, 30-<40, 40-<50, ≥50 pack-years."
+        - "Calculated as ((current_age - age_started_daily) × cigarettes_per_day) / 20 for current daily smokers. Requires: DHHGAGE_cont, SMKG203_cont, SMK_204. Part of pack-years dependency chain."
+        - "Re-categorizes SMKDSTY into 3 groups: current (daily + occasional), former (former daily + former occasional), never. Used for smoking imputation models."
+        - "Harmonizes pre-2015 SMKG203_cont and post-2015 SMK_040 into unified age started daily variable. Returns SMKG040_I imputed values for 2022-2023."
+
+        Be comprehensive - this is the authoritative technical reference.
+        Assume reader has technical background but may not know project-specific details.
 
     # ============================================================================
     # VERSIONING FIELDS - Best-practice project management
@@ -207,20 +261,34 @@ variables_schema:
         - "active": Ready for production use
         - "deprecated": Still available but use discouraged, will be removed in future version
         - "discontinued": No longer supported, removed from active use
-        - "not_harmonizable": Cannot be harmonized (document why in reviewNotes)
+        - "not_harmonizable": Cannot be harmonized (document why in versionNotes)
         - "pending_review": Needs review before finalization
         
-    - name: "reviewNotes"
-      title: "Review notes"
-      description: "Notes about harmonization decisions and review outcomes."
+    - name: "versionNotes"
+      title: "Version notes"
+      description: "Track changes, harmonization decisions, review outcomes, and human-AI collaboration history."
       type: "string"
       tier: "versioning"
       notes: |
-        Document decisions, rationale, and any issues discovered during review.
-        Useful for team collaboration and future reference.
+        Document the why behind changes and decisions for transparency and collaboration.
+        Serves general audience for understanding variable evolution and decision rationale.
+
+        Content should include:
+        - Version-specific changes and rationale
+        - Harmonization decision justification
+        - Review findings and resolutions
+        - Human-AI collaboration notes
+        - Issues discovered and how addressed
+        - Cross-references to issues, commits, or documentation
+
+        Examples:
+        - "v3.0.0: Changed to SMKG040_der to harmonize pre/post-2015 cycles. Improves coverage at expense of added complexity."
+        - "Variable metadata completed 2025-06-30. Corrected age_started_daily calculation for occasional-who-became-daily smokers."
+        - "Claude Code review identified 11 variables with _i/_s database suffixes. Standardized to _m 2025-01-15."
+        - "v2.2.0 to v3.0.0: Extended to 2023 cycle. Added SPU_25I derivation. Maintains backward compatibility."
 
   # Configuration options (schema-specific)
   allow_additional_columns: true
   extension_schema: null
-  
+
   # Note: Missing data handling, validation modes, and extensions are defined in metadata_registry.yaml

@@ -23,6 +23,7 @@
 #' @param output_path Character. Output path (default: overwrites input file safely)
 #' @param validate_only Logical. TRUE = check only without changes, FALSE = fix issues. Default: FALSE
 #'
+#' @param preserve_column_order Logical. TRUE = keep existing column order (for minimal PR diffs), FALSE = reorder to schema standard. Default: FALSE
 #' @return List with components:
 #'   \item{success}{Logical. TRUE if standardisation succeeded}
 #'   \item{mode}{Character. "basic" (getting started) or "collaboration" (enhanced)}
@@ -58,6 +59,9 @@
 #' # Reports: "Additional columns: myCustomField", "Missing optional: units, notes"
 #'
 #' # Team workflow: validate before sharing
+#' # Preserve column order for minimal PR diffs (targeted row updates)
+#' standardise_csv("variables.csv", preserve_column_order = TRUE)
+#'
 #' result <- standardise_csv("variables.csv", collaboration = TRUE, validate_only = TRUE)
 #' if (result$valid) {
 #'   cat("✅ Ready for team collaboration!\n")
@@ -70,8 +74,8 @@
 #' @seealso
 #' For team setup and workflows: See vignette("csv-validation-and-cleaning", package = "cchsflow")
 standardise_csv <- function(file_path, collaboration = FALSE,
-                            output_path = file_path, validate_only = FALSE) {
-  # Read CSV data
+                            output_path = file_path, validate_only = FALSE,
+                            preserve_column_order = FALSE) {
   data <- read.csv(file_path, stringsAsFactors = FALSE, check.names = FALSE)
 
   # Validate data
@@ -97,7 +101,7 @@ standardise_csv <- function(file_path, collaboration = FALSE,
   }
 
   # Apply standardisation to file
-  issues_fixed <- .apply_standardisation(file_path)
+  issues_fixed <- .apply_standardisation(file_path, preserve_column_order)
 
   return(list(
     success = TRUE,
@@ -157,7 +161,7 @@ standardise_csv <- function(file_path, collaboration = FALSE,
 }
 
 # Apply standardisation fixes to file
-.apply_standardisation <- function(file_path) {
+.apply_standardisation <- function(file_path, preserve_column_order = FALSE) {
   issues_fixed <- character(0)
 
   # Read file as binary to detect and fix encoding issues
@@ -194,9 +198,13 @@ standardise_csv <- function(file_path, collaboration = FALSE,
     issues_fixed <- c(issues_fixed, "Added final newline")
   }
 
-  # Standardize column order if schema is available
+  # Standardize column order if schema is available (unless preserving order)
+  if (!preserve_column_order) {
   column_fixes <- .standardize_column_order(file_path)
   issues_fixed <- c(issues_fixed, column_fixes)
+  } else {
+    column_fixes <- character(0)
+  }
 
   # Write back with standardised encoding (only if no column fixes were applied)
   if (length(column_fixes) == 0) {
@@ -334,6 +342,12 @@ standardise_csv <- function(file_path, collaboration = FALSE,
   column_completeness_issues <- .validate_column_completeness(data, schema_def, file_path)
   issues <- c(issues, column_completeness_issues)
 
+  # Validate databaseStart column (duplicates and invalid suffixes)
+  if ("databaseStart" %in% names(data)) {
+    database_start_issues <- .validate_databaseStart(data)
+    issues <- c(issues, database_start_issues)
+  }
+
   return(issues)
 }
 
@@ -358,6 +372,58 @@ standardise_csv <- function(file_path, collaboration = FALSE,
           ))
         }
       }
+    }
+  }
+
+  return(issues)
+}
+
+# Validate databaseStart column for common issues
+.validate_databaseStart <- function(data) {
+  issues <- character(0)
+
+  for (i in 1:nrow(data)) {
+    var_name <- data$variable[i]
+    db_start <- data$databaseStart[i]
+
+    # Skip if empty or NA
+    if (is.na(db_start) || db_start == "") next
+
+    # Split databases by comma
+    databases <- strsplit(as.character(db_start), ",\\s*")[[1]]
+    databases <- databases[databases != ""]
+    databases <- trimws(databases)
+
+    # Issue 1: Check for invalid suffixes (_i or _s instead of _m or _p)
+    invalid_suffix_dbs <- databases[grepl("_[is]$", databases)]
+    if (length(invalid_suffix_dbs) > 0) {
+      issues <- c(issues, sprintf(
+        "Variable '%s': Invalid database suffix(es) %s. Only _m (master) or _p (public) allowed. Note: _i (ICES) and _s (share) are identical to _m.",
+        var_name,
+        paste(invalid_suffix_dbs, collapse = ", ")
+      ))
+    }
+
+    # Issue 2: Check for duplicates
+    if (any(duplicated(databases))) {
+      duplicated_dbs <- unique(databases[duplicated(databases)])
+      issues <- c(issues, sprintf(
+        "Variable '%s': Duplicate database(es) %s in databaseStart",
+        var_name,
+        paste(duplicated_dbs, collapse = ", ")
+      ))
+    }
+
+    # Issue 3: Check format (optional warning, not error)
+    # Expected pattern: cchsYYYY[_YYYY]_[mp]
+    expected_pattern <- "^cchs[0-9]{4}(_[0-9]{4})?_[mp]$"
+    invalid_format_dbs <- databases[!grepl(expected_pattern, databases)]
+    if (length(invalid_format_dbs) > 0) {
+      issues <- c(issues, sprintf(
+        "Variable '%s': Database(s) with unexpected format: %s. Expected: cchsYYYY[_YYYY]_[mp]",
+        var_name,
+        paste(invalid_format_dbs, collapse = ", ")
+      ))
     }
   }
 
