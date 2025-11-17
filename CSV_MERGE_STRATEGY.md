@@ -23,7 +23,7 @@ quoting style), making it impossible to review the actual content changes.
    - **Line endings**: dev uses CRLF (`\r\n`), feature branch uses LF (`\n`)
      for variables.csv
    - **Quoting style**: dev uses unquoted fields, feature branch uses quoted
-     fields (csv.QUOTE_ALL for variables.csv)
+     fields
 
 3. **Content Changes**
    - 19 new variables added to variables.csv (360→379 rows)
