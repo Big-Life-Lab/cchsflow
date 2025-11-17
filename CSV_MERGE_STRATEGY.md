@@ -218,187 +218,384 @@ EOF
 
 ### Phase 3: Apply Structural Changes
 
-**Objective**: Add new columns and reorder existing columns to match the
-feature branch structure.
+**Objective**: Add new columns in multiple commits, filling values from the
+feature branch for existing dev rows. This approach makes changes reviewable
+and preserves data integrity.
 
-**Steps**:
+**Overview**: Structural changes are broken into 7 separate commits to make
+each change reviewable. Each commit adds specific columns and fills values
+for existing rows from the latest commits in the feature branch.
 
-1. Create a structural changes branch from updated dev:
-   ```bash
-   git checkout dev
-   git checkout -b dev-csv-structure-updates
-   ```
+#### Step 1: Identify Source Commits
 
-2. Extract the structural commit from the feature branch:
+First, identify the latest commits in the feature branch that contain the
+column definitions and values:
 
-   Identify the earliest commit that added the new columns:
-   ```bash
-   git log --reverse feature/v3.0.0-validation-infrastructure --not dev \
-     -- inst/extdata/variables.csv inst/extdata/variable_details.csv | head -20
-   ```
+```bash
+# View recent commits affecting CSV files
+git log feature/v3.0.0-validation-infrastructure --oneline -20 \
+  -- inst/extdata/variables.csv inst/extdata/variable_details.csv
 
-   The structural changes appear to originate from:
-   - `4690c86` - feat: add v2.2.0 variable enhancements
-   - `73223df` - feat: enhance variable metadata for v2.2.0
+# The latest commits contain the most accurate column values
+```
 
-3. Cherry-pick the structural commits:
-   ```bash
-   # First, analyze what these commits do
-   git show 4690c86 --stat
-   git show 73223df --stat
+**Note**: Use the **latest** commits from the feature branch (not the
+earliest) as they contain the most up-to-date and accurate values.
 
-   # Cherry-pick with --no-commit to allow modifications
-   git cherry-pick --no-commit 4690c86
-   ```
+#### Step 2: Create Branch and Prepare
 
-4. **Manual intervention required**: At this point, you'll need to carefully:
-   - Keep ONLY the column additions (new headers)
-   - Keep ONLY the column reordering
-   - REMOVE any content changes (new rows, modified data)
-   - Preserve the dev data but in the new structure
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b dev-csv-structure-updates
+```
 
-5. A Python script approach for structural changes:
+#### Step 3: Add Columns with Values (7 Commits)
 
-   Create `restructure_csvs.py`:
-   ```python
-   import csv
-   import pandas as pd
+**Commit 1: Add version, lastUpdated, status to variables.csv**
 
-   # For variables.csv
-   # Read dev version
-   dev_vars = pd.read_csv('inst/extdata/variables.csv')
+```bash
+# Extract these columns from feature branch for matching rows
+git show feature/v3.0.0-validation-infrastructure:inst/extdata/variables.csv \
+  > /tmp/feature_vars.csv
 
-   # Define new structure with column order from feature branch
-   new_columns_order = [
-       'variable', 'label', 'labelLong', 'variableType',
-       'databaseStart', 'variableStart', 'subject', 'section',
-       'units', 'description', 'version', 'lastUpdated',
-       'reviewNotes', 'ICES.confirmation', 'Observation..MD.', 'status'
-   ]
+# Use R to merge the columns with values:
+Rscript -e "
+library(readr)
+library(dplyr)
 
-   # Add new columns with empty values
-   for col in new_columns_order:
-       if col not in dev_vars.columns:
-           dev_vars[col] = ''
+# Read both versions
+dev <- read_csv('inst/extdata/variables.csv', show_col_types = FALSE)
+feature <- read_csv('/tmp/feature_vars.csv', show_col_types = FALSE)
 
-   # Reorder columns
-   dev_vars_reordered = dev_vars[new_columns_order]
+# Select only the new columns from feature for matching variables
+feature_subset <- feature %>%
+  select(variable, version, lastUpdated, status)
 
-   # Write with proper formatting
-   dev_vars_reordered.to_csv('inst/extdata/variables.csv',
-                              index=False, quoting=csv.QUOTE_ALL,
-                              lineterminator='\n')
+# Left join to add columns with values for existing rows
+result <- dev %>%
+  left_join(feature_subset, by = 'variable') %>%
+  mutate(across(c(version, lastUpdated, status),
+                ~if_else(is.na(.), '', as.character(.))))
 
-   # Similar process for variable_details.csv
-   dev_details = pd.read_csv('inst/extdata/variable_details.csv')
+# Reorder columns (add new ones after description)
+col_order <- c('variable', 'label', 'labelLong', 'variableType',
+               'databaseStart', 'variableStart', 'subject', 'section',
+               'units', 'description', 'version', 'lastUpdated', 'status')
+result <- result %>% select(all_of(col_order))
 
-   new_details_columns_order = [
-       'variable', 'dummyVariable', 'typeEnd', 'databaseStart',
-       'variableStart', 'ICES.confirmation', 'typeStart', 'recEnd',
-       'numValidCat', 'catLabel', 'catLabelLong', 'units',
-       'recStart', 'catStartLabel', 'variableStartShortLabel',
-       'variableStartLabel', 'notes', 'version', 'lastUpdated',
-       'status', 'reviewNotes', 'review'
-   ]
+# Write with standardization
+write_csv(result, 'inst/extdata/variables.csv', quote = 'all', eol = '\n')
+"
 
-   for col in new_details_columns_order:
-       if col not in dev_details.columns:
-           dev_details[col] = ''
+# Run standardization
+Rscript standardize_csvs.R
 
-   dev_details_reordered = dev_details[new_details_columns_order]
+# Commit
+git add inst/extdata/variables.csv
+git commit -m "feat: add version, lastUpdated, and status columns to variables.csv
 
-   dev_details_reordered.to_csv('inst/extdata/variable_details.csv',
-                                 index=False, quoting=csv.QUOTE_MINIMAL,
-                                 lineterminator='\r\n')
-   ```
-
-6. Run the restructuring script:
-   ```bash
-   python3 restructure_csvs.py
-   ```
-
-7. Verify row counts haven't changed:
-   ```bash
-   wc -l inst/extdata/variables.csv inst/extdata/variable_details.csv
-   # Should show 360 and 3464 rows respectively (plus headers)
-   ```
-
-8. Commit the structural changes:
-   ```bash
-   git add inst/extdata/variables.csv inst/extdata/variable_details.csv
-   git commit -m "feat: add new columns and restructure CSV files for v3.0.0
-
-Add new metadata columns to CSV worksheets:
-
-variables.csv:
-- version: Track variable version numbers
-- lastUpdated: Record last modification date
-- reviewNotes: Store review comments
-- ICES.confirmation: ICES confirmation status
-- Observation..MD.: MD observation notes
+Add three metadata columns with values from feature branch:
+- version: Variable version numbers
+- lastUpdated: Last modification dates
 - status: Variable status (active/deprecated)
 
-variable_details.csv:
-- ICES.confirmation: ICES confirmation status
-- version: Track version numbers
-- lastUpdated: Record last modification date
-- status: Variable status
-- reviewNotes: Store review comments
-- review: Review status
+Values filled for all existing rows based on latest feature branch state.
+Row count unchanged: 360 rows."
+```
 
-Also reordered columns for improved logical grouping.
+**Commit 2: Add reviewNotes to variables.csv**
 
-No content changes - all new columns are empty at this stage.
-Row counts remain unchanged:
-- variables.csv: 360 rows
-- variable_details.csv: 3464 rows"
-   ```
+```bash
+# Similar approach - extract and merge reviewNotes
+Rscript -e "
+library(readr)
+library(dplyr)
 
-9. Create PR for structural changes:
-   ```bash
-   gh pr create --base dev --head dev-csv-structure-updates \
-     --title "Add new columns and restructure CSV files for v3.0.0" \
-     --body "$(cat <<'EOF'
+dev <- read_csv('inst/extdata/variables.csv', show_col_types = FALSE)
+feature <- read_csv('/tmp/feature_vars.csv', show_col_types = FALSE)
+
+feature_subset <- feature %>% select(variable, reviewNotes)
+
+result <- dev %>%
+  left_join(feature_subset, by = 'variable') %>%
+  mutate(reviewNotes = if_else(is.na(reviewNotes), '', as.character(reviewNotes)))
+
+# Reorder: insert reviewNotes after status
+col_order <- c('variable', 'label', 'labelLong', 'variableType',
+               'databaseStart', 'variableStart', 'subject', 'section',
+               'units', 'description', 'version', 'lastUpdated', 'status',
+               'reviewNotes')
+result <- result %>% select(all_of(col_order))
+
+write_csv(result, 'inst/extdata/variables.csv', quote = 'all', eol = '\n')
+"
+
+Rscript standardize_csvs.R
+
+git add inst/extdata/variables.csv
+git commit -m "feat: add reviewNotes column to variables.csv
+
+Add reviewNotes column with values from feature branch for storing
+review comments and notes.
+
+Values filled for all existing rows.
+Row count unchanged: 360 rows."
+```
+
+**Commit 3: Add ICES.confirmation to variables.csv**
+
+```bash
+Rscript -e "
+library(readr)
+library(dplyr)
+
+dev <- read_csv('inst/extdata/variables.csv', show_col_types = FALSE)
+feature <- read_csv('/tmp/feature_vars.csv', show_col_types = FALSE)
+
+feature_subset <- feature %>% select(variable, ICES.confirmation)
+
+result <- dev %>%
+  left_join(feature_subset, by = 'variable') %>%
+  mutate(ICES.confirmation = if_else(is.na(ICES.confirmation), '',
+                                     as.character(ICES.confirmation)))
+
+col_order <- c('variable', 'label', 'labelLong', 'variableType',
+               'databaseStart', 'variableStart', 'subject', 'section',
+               'units', 'description', 'version', 'lastUpdated', 'status',
+               'reviewNotes', 'ICES.confirmation')
+result <- result %>% select(all_of(col_order))
+
+write_csv(result, 'inst/extdata/variables.csv', quote = 'all', eol = '\n')
+"
+
+Rscript standardize_csvs.R
+
+git add inst/extdata/variables.csv
+git commit -m "feat: add ICES.confirmation column to variables.csv
+
+Add ICES.confirmation column with values from feature branch for
+tracking ICES confirmation status.
+
+Values filled for all existing rows.
+Row count unchanged: 360 rows."
+```
+
+**Commit 4: Add Observation..MD. to variables.csv**
+
+```bash
+Rscript -e "
+library(readr)
+library(dplyr)
+
+dev <- read_csv('inst/extdata/variables.csv', show_col_types = FALSE)
+feature <- read_csv('/tmp/feature_vars.csv', show_col_types = FALSE)
+
+feature_subset <- feature %>% select(variable, Observation..MD.)
+
+result <- dev %>%
+  left_join(feature_subset, by = 'variable') %>%
+  mutate(Observation..MD. = if_else(is.na(Observation..MD.), '',
+                                    as.character(Observation..MD.)))
+
+col_order <- c('variable', 'label', 'labelLong', 'variableType',
+               'databaseStart', 'variableStart', 'subject', 'section',
+               'units', 'description', 'version', 'lastUpdated', 'status',
+               'reviewNotes', 'ICES.confirmation', 'Observation..MD.')
+result <- result %>% select(all_of(col_order))
+
+write_csv(result, 'inst/extdata/variables.csv', quote = 'all', eol = '\n')
+"
+
+Rscript standardize_csvs.R
+
+git add inst/extdata/variables.csv
+git commit -m "feat: add Observation..MD. column to variables.csv
+
+Add Observation..MD. column with values from feature branch for
+MD observation notes.
+
+Values filled for all existing rows.
+Row count unchanged: 360 rows."
+```
+
+**Commit 5: Add version, lastUpdated, status to variable_details.csv**
+
+```bash
+# Extract from feature branch
+git show feature/v3.0.0-validation-infrastructure:inst/extdata/variable_details.csv \
+  > /tmp/feature_details.csv
+
+Rscript -e "
+library(readr)
+library(dplyr)
+
+dev <- read_csv('inst/extdata/variable_details.csv', show_col_types = FALSE)
+feature <- read_csv('/tmp/feature_details.csv', show_col_types = FALSE)
+
+feature_subset <- feature %>%
+  select(variable, databaseStart, variableStart, version, lastUpdated, status)
+
+result <- dev %>%
+  left_join(feature_subset, by = c('variable', 'databaseStart', 'variableStart')) %>%
+  mutate(across(c(version, lastUpdated, status),
+                ~if_else(is.na(.), '', as.character(.))))
+
+# Reorder columns (add after notes)
+col_order <- c('variable', 'dummyVariable', 'typeEnd', 'databaseStart',
+               'variableStart', 'typeStart', 'recEnd', 'numValidCat',
+               'catLabel', 'catLabelLong', 'units', 'recStart',
+               'catStartLabel', 'variableStartShortLabel',
+               'variableStartLabel', 'notes', 'version', 'lastUpdated',
+               'status')
+result <- result %>% select(all_of(col_order))
+
+write_csv(result, 'inst/extdata/variable_details.csv', quote = 'needed',
+          eol = '\r\n')
+"
+
+Rscript standardize_csvs.R
+
+git add inst/extdata/variable_details.csv
+git commit -m "feat: add version, lastUpdated, status to variable_details.csv
+
+Add three metadata columns with values from feature branch.
+
+Values filled for all existing rows.
+Row count unchanged: 3464 rows."
+```
+
+**Commit 6: Add reviewNotes and review to variable_details.csv**
+
+```bash
+Rscript -e "
+library(readr)
+library(dplyr)
+
+dev <- read_csv('inst/extdata/variable_details.csv', show_col_types = FALSE)
+feature <- read_csv('/tmp/feature_details.csv', show_col_types = FALSE)
+
+feature_subset <- feature %>%
+  select(variable, databaseStart, variableStart, reviewNotes, review)
+
+result <- dev %>%
+  left_join(feature_subset, by = c('variable', 'databaseStart', 'variableStart')) %>%
+  mutate(across(c(reviewNotes, review),
+                ~if_else(is.na(.), '', as.character(.))))
+
+col_order <- c('variable', 'dummyVariable', 'typeEnd', 'databaseStart',
+               'variableStart', 'typeStart', 'recEnd', 'numValidCat',
+               'catLabel', 'catLabelLong', 'units', 'recStart',
+               'catStartLabel', 'variableStartShortLabel',
+               'variableStartLabel', 'notes', 'version', 'lastUpdated',
+               'status', 'reviewNotes', 'review')
+result <- result %>% select(all_of(col_order))
+
+write_csv(result, 'inst/extdata/variable_details.csv', quote = 'needed',
+          eol = '\r\n')
+"
+
+Rscript standardize_csvs.R
+
+git add inst/extdata/variable_details.csv
+git commit -m "feat: add reviewNotes and review to variable_details.csv
+
+Add two review-related columns with values from feature branch.
+
+Values filled for all existing rows.
+Row count unchanged: 3464 rows."
+```
+
+**Commit 7: Add ICES.confirmation to variable_details.csv**
+
+```bash
+Rscript -e "
+library(readr)
+library(dplyr)
+
+dev <- read_csv('inst/extdata/variable_details.csv', show_col_types = FALSE)
+feature <- read_csv('/tmp/feature_details.csv', show_col_types = FALSE)
+
+feature_subset <- feature %>%
+  select(variable, databaseStart, variableStart, ICES.confirmation)
+
+result <- dev %>%
+  left_join(feature_subset, by = c('variable', 'databaseStart', 'variableStart')) %>%
+  mutate(ICES.confirmation = if_else(is.na(ICES.confirmation), '',
+                                     as.character(ICES.confirmation)))
+
+# Insert ICES.confirmation after variableStart (before typeStart)
+col_order <- c('variable', 'dummyVariable', 'typeEnd', 'databaseStart',
+               'variableStart', 'ICES.confirmation', 'typeStart', 'recEnd',
+               'numValidCat', 'catLabel', 'catLabelLong', 'units',
+               'recStart', 'catStartLabel', 'variableStartShortLabel',
+               'variableStartLabel', 'notes', 'version', 'lastUpdated',
+               'status', 'reviewNotes', 'review')
+result <- result %>% select(all_of(col_order))
+
+write_csv(result, 'inst/extdata/variable_details.csv', quote = 'needed',
+          eol = '\r\n')
+"
+
+Rscript standardize_csvs.R
+
+git add inst/extdata/variable_details.csv
+git commit -m "feat: add ICES.confirmation to variable_details.csv
+
+Add ICES.confirmation column with values from feature branch, inserted
+after variableStart for logical grouping.
+
+Values filled for all existing rows.
+Row count unchanged: 3464 rows."
+```
+
+#### Step 4: Create PR
+
+```bash
+gh pr create --base dev --head dev-csv-structure-updates \
+  --title "Add new metadata columns to CSV files (7 commits)" \
+  --body "$(cat <<'EOF'
 ## Summary
 
-Adds new metadata columns to CSV worksheets and reorders columns for better
-logical grouping. This is in preparation for the v3.0.0 validation
-infrastructure.
+Adds new metadata columns to CSV worksheets in 7 separate commits for
+reviewability. Each commit adds specific columns with values filled from
+the latest feature branch state.
 
 ## Changes
 
-### variables.csv (6 new columns)
-- version: Track variable version numbers
-- lastUpdated: Record last modification date
-- reviewNotes: Store review comments
-- ICES.confirmation: ICES confirmation status
-- Observation..MD.: MD observation notes
-- status: Variable status (active/deprecated)
+### variables.csv (6 new columns across 4 commits)
+1. version, lastUpdated, status
+2. reviewNotes
+3. ICES.confirmation
+4. Observation..MD.
 
-### variable_details.csv (6 new columns)
-- ICES.confirmation: ICES confirmation status
-- version, lastUpdated, status, reviewNotes, review
+### variable_details.csv (6 new columns across 3 commits)
+1. version, lastUpdated, status
+2. reviewNotes, review
+3. ICES.confirmation
+
+## Key Points
+
+- All values filled from latest feature branch commits
+- Row counts unchanged: 360 and 3464 rows
+- Each commit is independently reviewable
+- Columns reordered for logical grouping
 
 ## Verification
 
-- No content changes - all new columns are empty
-- Row counts unchanged: 360 and 3464 rows
-- Column ordering improved for logical grouping
-
-## Next Steps
-
-After this PR is merged, content changes from
-feature/v3.0.0-validation-infrastructure will be applied in logical,
-reviewable groups.
+```bash
+wc -l inst/extdata/*.csv  # Should show 361 and 3465 (with headers)
+```
 EOF
 )"
-   ```
+```
 
-10. After approval and merge:
-    ```bash
-    git checkout dev
-    git pull origin dev
-    ```
+#### Step 5: After Merge
+
+```bash
+git checkout dev
+git pull origin dev
+```
 
 ### Phase 4: Apply Content Changes in Logical Groups
 
