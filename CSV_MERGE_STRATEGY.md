@@ -35,9 +35,10 @@ quoting style), making it impossible to review the actual content changes.
 
 - **Branch**: `feature/v3.0.0-validation-infrastructure`
 - **Base**: `dev`
-- **Commits**: 33 commits affecting `inst/extdata/` files
+- **Commits**: 26 commits affecting CSV files in `inst/extdata/`
 - **Standardization script**: `quote-empty-cells.py` available in working
-  directory
+  directory. This script reads in the variables and variable details sheet
+  from the repo and outputs a standardized version.
 
 ## Merge Strategy
 
