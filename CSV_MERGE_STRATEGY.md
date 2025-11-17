@@ -29,7 +29,7 @@ quoting style), making it impossible to review the actual content changes.
    - 19 new variables added to variables.csv (360→379 rows)
    - 257 new rows added to variable_details.csv (3464→3721 rows)
    - Multiple updates to existing variable metadata
-   - 33 commits affecting the CSV files
+   - 26 commits affecting the CSV files
 
 ### Current State
 
