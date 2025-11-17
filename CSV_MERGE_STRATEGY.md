@@ -47,11 +47,95 @@ quoting style), making it impossible to review the actual content changes.
 The strategy uses a **multi-phase, multi-branch approach** with the following
 key principles:
 
-1. Standardize formatting on dev first
-2. Apply structural changes separately from content changes
-3. Group content changes into logical, reviewable commits
-4. Preserve original commit metadata (authors, dates)
-5. Create intermediate branches for review
+1. Convert Python tooling to R for consistency with project language
+2. Standardize formatting on dev first
+3. Apply structural changes separately from content changes
+4. Group content changes into logical, reviewable commits
+5. Preserve original commit metadata (authors, dates)
+6. Create intermediate branches for review
+
+### Phase 0: Convert Python Script to R
+
+**Objective**: Convert the `quote-empty-cells.py` standardization script from
+Python to R to maintain consistency with the project's primary language.
+
+**Steps**:
+
+1. Create an R version of the standardization script (`standardize_csvs.R`):
+   ```r
+   # standardize_csvs.R
+   library(readr)
+   library(dplyr)
+
+   standardize_variables <- function(
+     input_path = "inst/extdata/variables.csv",
+     output_path = "inst/extdata/variables.csv") {
+     # Read CSV
+     df <- read_csv(input_path, show_col_types = FALSE)
+
+     # Remove any empty columns
+     df <- df %>% select(where(~ !all(is.na(.) | . == "")))
+
+     # Write with all fields quoted and LF line endings
+     write_csv(df, output_path, quote = "all", eol = "\n")
+     message("Standardized variables.csv")
+   }
+
+   standardize_variable_details <- function(
+     input_path = "inst/extdata/variable_details.csv",
+     output_path = "inst/extdata/variable_details.csv") {
+     # Read CSV
+     df <- read_csv(input_path, show_col_types = FALSE)
+
+     # Remove any empty columns
+     df <- df %>% select(where(~ !all(is.na(.) | . == "")))
+
+     # Write with minimal quoting and CRLF line endings
+     write_csv(df, output_path, quote = "needed", eol = "\r\n")
+     message("Standardized variable_details.csv")
+   }
+
+   # Main execution
+   standardize_variables()
+   standardize_variable_details()
+   ```
+
+2. Test the R script:
+   ```bash
+   # Create a test branch
+   git checkout -b test-r-standardization
+
+   # Run the R script
+   Rscript standardize_csvs.R
+
+   # Verify the output is correct
+   git diff inst/extdata/
+
+   # Clean up test branch
+   git checkout dev
+   git branch -D test-r-standardization
+   ```
+
+3. Add the R script to the repository:
+   ```bash
+   git add standardize_csvs.R
+   git commit -m "Add R version of CSV standardization script
+
+   Provides native R implementation of CSV standardization to maintain
+   consistency with project language. Replaces quote-empty-cells.py.
+
+   Features:
+   - Standardizes variables.csv with all fields quoted and LF line endings
+   - Standardizes variable_details.csv with minimal quoting and CRLF
+   - Removes empty columns
+   - Uses readr for consistent CSV handling"
+   ```
+
+4. Update documentation to reference `standardize_csvs.R` instead of
+   `quote-empty-cells.py` in all subsequent phases
+
+**Note**: The original Python script (`quote-empty-cells.py`) can be kept for
+reference but all subsequent phases will use `standardize_csvs.R`.
 
 ### Phase 1: Prepare dev Branch (Formatting Standardization)
 
@@ -67,10 +151,10 @@ conventions.
    git checkout -b dev-csv-formatting-prep
    ```
 
-2. Apply the standardization script to dev:
+2. Apply the R standardization script to dev:
    ```bash
    # The script is already configured correctly
-   python3 quote-empty-cells.py
+   Rscript standardize_csvs.R
    ```
 
 3. Verify the changes:
@@ -88,7 +172,7 @@ Apply consistent formatting to CSV files:
 - variables.csv: Use QUOTE_ALL quoting and LF line endings
 - variable_details.csv: Use QUOTE_MINIMAL quoting and CRLF line endings
 
-This standardization is done using quote-empty-cells.py to ensure
+This standardization is done using standardize_csvs.R to ensure
 consistent formatting across contributors using different editors
 and operating systems.
 
@@ -102,7 +186,7 @@ No content changes in this commit."
      --body "$(cat <<'EOF'
 ## Summary
 
-Standardizes CSV file formatting using the quote-empty-cells.py script.
+Standardizes CSV file formatting using the standardize_csvs.R script.
 
 ## Changes
 
@@ -132,7 +216,7 @@ EOF
    git pull origin dev
    ```
 
-### Phase 2: Apply Structural Changes
+### Phase 3: Apply Structural Changes
 
 **Objective**: Add new columns and reorder existing columns to match the
 feature branch structure.
@@ -316,7 +400,7 @@ EOF
     git pull origin dev
     ```
 
-### Phase 3: Apply Content Changes in Logical Groups
+### Phase 4: Apply Content Changes in Logical Groups
 
 **Objective**: Cherry-pick content changes from the feature branch, grouping
 them into logical, reviewable commits.
@@ -370,7 +454,7 @@ For each logical group, follow this process:
 
 5. Run standardization to ensure formatting consistency:
    ```bash
-   python3 quote-empty-cells.py
+   Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
@@ -432,7 +516,7 @@ EOF
 
 3. Standardize and commit:
    ```bash
-   python3 quote-empty-cells.py
+   Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
@@ -489,7 +573,7 @@ EOF
 
 3. Standardize:
    ```bash
-   python3 quote-empty-cells.py
+   Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
@@ -550,7 +634,7 @@ EOF
 
 3. Standardize:
    ```bash
-   python3 quote-empty-cells.py
+   Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
@@ -604,7 +688,7 @@ EOF
 
 3. Standardize:
    ```bash
-   python3 quote-empty-cells.py
+   Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
@@ -661,7 +745,7 @@ EOF
 
 3. Standardize:
    ```bash
-   python3 quote-empty-cells.py
+   Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
@@ -834,7 +918,7 @@ csv_files=$(git diff --cached --name-only --diff-filter=ACM | \
 
 if [ -n "$csv_files" ]; then
     echo "CSV files detected in commit. Running standardization..."
-    python3 quote-empty-cells.py
+    Rscript standardize_csvs.R
 
     # Re-add the files
     for file in $csv_files; do
