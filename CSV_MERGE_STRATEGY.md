@@ -626,15 +626,58 @@ For each logical group, follow this process:
    git checkout -b merge-v3-infrastructure-schema
    ```
 
-2. Cherry-pick relevant commits:
+2. **Analyze and select commits**:
+
+   First, view all 26 commits affecting CSV files to identify relevant ones:
    ```bash
-   # List of commits to cherry-pick (oldest to newest):
-   git cherry-pick 4690c86  # feat: add v2.2.0 variable enhancements
-   git cherry-pick 73223df  # feat: enhance variable metadata for v2.2.0
-   git cherry-pick 786d8a8  # feat: update metadata and test files
-   git cherry-pick 15fc75d  # feat: add comprehensive version validation
-   git cherry-pick 26e719f  # feat: implement v3.0.0 validation
-   git cherry-pick 9fdd927  # feat: enhance schema validation
+   git log feature/v3.0.0-validation-infrastructure --not master --oneline \
+     -- inst/extdata/variables.csv inst/extdata/variable_details.csv
+   ```
+
+   **Relevant commits for Infrastructure/Schema** (6 of 26):
+
+   - **4690c86** - feat: add v2.2.0 variable enhancements
+     - **Why**: Adds foundational metadata structure and new columns
+     - **Files**: variables.csv, variable_details.csv
+     - **Changes**: Adds version, status columns; metadata framework
+
+   - **73223df** - feat: enhance variable metadata for v2.2.0
+     - **Why**: Enhances metadata fields across all variables
+     - **Files**: variables.csv, variable_details.csv
+     - **Changes**: Updates lastUpdated, reviewNotes; fills metadata
+
+   - **786d8a8** - feat: update metadata and test files for function renaming
+     - **Why**: Updates variable names after function renaming
+     - **Files**: variables.csv, variable_details.csv
+     - **Changes**: Renames variables to match new function names
+
+   - **15fc75d** - feat: add comprehensive version validation
+     - **Why**: Adds version validation rules and metadata
+     - **Files**: variables.csv, variable_details.csv
+     - **Changes**: Adds validation metadata, version numbers
+
+   - **26e719f** - feat: implement v3.0.0 validation infrastructure
+     - **Why**: Core infrastructure for v3.0.0 validation system
+     - **Files**: variables.csv, variable_details.csv, R code
+     - **Changes**: Validation framework, modernizes derived variables
+
+   - **9fdd927** - feat: enhance schema validation and data consistency rules
+     - **Why**: Adds schema validation metadata
+     - **Files**: variables.csv, variable_details.csv
+     - **Changes**: Consistency rules, validation metadata
+
+   **Not relevant** (20 commits): BMI-specific (3), Smoking-specific (8),
+   ADL-specific (3), Oral health-specific (5), CCC variable (1)
+
+3. Cherry-pick relevant commits:
+   ```bash
+   # Cherry-pick oldest to newest:
+   git cherry-pick 4690c86
+   git cherry-pick 73223df
+   git cherry-pick 786d8a8
+   git cherry-pick 15fc75d
+   git cherry-pick 26e719f
+   git cherry-pick 9fdd927
    ```
 
 3. Handle conflicts if any (focusing on CSV files):
@@ -704,21 +747,83 @@ EOF
    git checkout -b merge-v3-bmi-variables
    ```
 
-2. Cherry-pick BMI commits:
+2. **Analyze and select commits**:
+
+   First, view all 26 commits affecting CSV files to identify relevant ones:
+   ```bash
+   git log feature/v3.0.0-validation-infrastructure --not master --oneline \
+     -- inst/extdata/variables.csv inst/extdata/variable_details.csv
+   ```
+
+   **All 26 commits** (newest to oldest):
+   - 4a25f8a: updates to the SMKG01C_cont variable
+   - 352fe16: updates to the SMKG01C_B variable
+   - e961c6e: updates to SMKG01C_A variable
+   - 801eb97: updates to the SMK_01B variable details
+   - ae18185: harmonized new variable, frequency of brushing teeth
+   - 9be9b8f: harmonized new variable, has one or more of own teeth
+   - 0220528: harmonized new variable, frequency teeth/gum pain
+   - b3ca31e: harmonzied new variable, self-perceived oral health
+   - a562a2a: new harmonized variable, last time visited dental professional
+   - e724e82: updated CCC_181 variable
+   - 65b417e: updated ADL_score_5 variable
+   - 35007e4: updated ADL_der variable
+   - aeae50e: fixed bug with ADL_01 variable
+   - 9fdd927: feat: enhance schema validation and data consistency rules
+   - 57aba9c: update: variable_details.csv for smoking continuous variable
+   - 82b9c63: feat: added smoking initiation functions
+   - 6220e84: feat: All five smoking status variables completed
+   - f8f0277: feat: variable_details.csv added: 4 X SMK ... _cont
+   - ab206c1: feat: Corrected smoking variable mappings, refactored bmi.R
+   - 9dc3958: feat: restore BMI metadata
+   - 227888e: refactor: modernize BMI function architecture
+   - 26e719f: feat: implement v3.0.0 validation infrastructure
+   - 15fc75d: feat: add comprehensive version validation
+   - 786d8a8: feat: update metadata and test files for function renaming
+   - 73223df: feat: enhance variable metadata for v2.2.0
+   - 4690c86: feat: add v2.2.0 variable enhancements
+
+   **Relevant commits for BMI Variables** (3 of 26):
+
+   - **227888e** - refactor: modernize BMI function architecture
+     - **Why relevant**: Modernizes BMI calculation and validation approach
+     - **Files**: Both variables.csv and variable_details.csv, plus R/bmi.R
+     - **Changes**: Updates BMI metadata, adds new validation rules
+
+   - **9dc3958** - feat: restore BMI metadata
+     - **Why relevant**: Restores and enhances BMI variable metadata
+     - **Files**: Both CSV files
+     - **Changes**: Adds range-based HWTGBMI_cat4, updates BMI descriptions
+
+   - **ab206c1** - feat: Corrected smoking variable mappings, refactored bmi.R
+     - **Why relevant**: Refactors BMI constants and variable mappings
+     - **Files**: Both CSV files and R/bmi.R
+     - **Changes**: Updates BMI variable details, refactors constant definitions
+
+   **Not relevant for this group** (23 commits):
+   - Infrastructure/Schema-specific (6): 4690c86, 73223df, 786d8a8, 15fc75d,
+     26e719f, 9fdd927
+   - Smoking-specific (8): f8f0277, 6220e84, 82b9c63, 57aba9c, 801eb97,
+     e961c6e, 352fe16, 4a25f8a
+   - ADL-specific (3): aeae50e, 35007e4, 65b417e
+   - Oral health-specific (5): a562a2a, b3ca31e, 0220528, 9be9b8f, ae18185
+   - Other (1): e724e82
+
+3. Cherry-pick BMI commits:
    ```bash
    git cherry-pick 227888e  # refactor: modernize BMI function architecture
    git cherry-pick 9dc3958  # feat: restore BMI metadata
    git cherry-pick ab206c1  # feat: Corrected smoking variable mappings
    ```
 
-3. Standardize and commit:
+4. Standardize and commit:
    ```bash
    Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
 
-4. Create PR:
+5. Create PR:
    ```bash
    gh pr create --base dev --head merge-v3-bmi-variables \
      --title "BMI: Modernize BMI variables and validation" \
@@ -756,7 +861,93 @@ EOF
    git checkout -b merge-v3-smoking-variables
    ```
 
-2. Cherry-pick smoking commits (oldest to newest):
+2. **Analyze and select commits**:
+
+   First, view all 26 commits affecting CSV files to identify relevant ones:
+   ```bash
+   git log feature/v3.0.0-validation-infrastructure --not master --oneline \
+     -- inst/extdata/variables.csv inst/extdata/variable_details.csv
+   ```
+
+   **All 26 commits** (newest to oldest):
+   - 4a25f8a: updates to the SMKG01C_cont variable
+   - 352fe16: updates to the SMKG01C_B variable
+   - e961c6e: updates to SMKG01C_A variable
+   - 801eb97: updates to the SMK_01B variable details
+   - ae18185: harmonized new variable, frequency of brushing teeth
+   - 9be9b8f: harmonized new variable, has one or more of own teeth
+   - 0220528: harmonized new variable, frequency teeth/gum pain
+   - b3ca31e: harmonzied new variable, self-perceived oral health
+   - a562a2a: new harmonized variable, last time visited dental professional
+   - e724e82: updated CCC_181 variable
+   - 65b417e: updated ADL_score_5 variable
+   - 35007e4: updated ADL_der variable
+   - aeae50e: fixed bug with ADL_01 variable
+   - 9fdd927: feat: enhance schema validation and data consistency rules
+   - 57aba9c: update: variable_details.csv for smoking continuous variable
+   - 82b9c63: feat: added smoking initiation functions
+   - 6220e84: feat: All five smoking status variables completed
+   - f8f0277: feat: variable_details.csv added: 4 X SMK ... _cont
+   - ab206c1: feat: Corrected smoking variable mappings, refactored bmi.R
+   - 9dc3958: feat: restore BMI metadata
+   - 227888e: refactor: modernize BMI function architecture
+   - 26e719f: feat: implement v3.0.0 validation infrastructure
+   - 15fc75d: feat: add comprehensive version validation
+   - 786d8a8: feat: update metadata and test files for function renaming
+   - 73223df: feat: enhance variable metadata for v2.2.0
+   - 4690c86: feat: add v2.2.0 variable enhancements
+
+   **Relevant commits for Smoking Variables** (8 of 26):
+
+   - **f8f0277** - feat: variable_details.csv added: 4 X SMK ... _cont
+     - **Why relevant**: Adds 4 continuous smoking variables to metadata
+     - **Files**: variable_details.csv
+     - **Changes**: Adds SMK_*_cont variable details
+
+   - **6220e84** - feat: All five smoking status variables completed
+     - **Why relevant**: Completes all five smoking status variables
+     - **Files**: Both variables.csv and variable_details.csv
+     - **Changes**: Adds/updates 5 smoking status variables
+
+   - **82b9c63** - feat: added smoking initiation functions
+     - **Why relevant**: Adds smoking initiation variable functions
+     - **Files**: Both CSV files, plus R/smoking.R
+     - **Changes**: Adds smoking initiation metadata and functions
+
+   - **57aba9c** - update: variable_details.csv for smoking continuous variable
+     - **Why relevant**: Updates continuous smoking variable details
+     - **Files**: variable_details.csv
+     - **Changes**: Updates metadata for continuous smoking variables
+
+   - **801eb97** - updates to the SMK_01B variable details
+     - **Why relevant**: Updates SMK_01B variable metadata
+     - **Files**: Both CSV files
+     - **Changes**: Updates SMK_01B variable row in variables.csv
+
+   - **e961c6e** - updates to SMKG01C_A variable
+     - **Why relevant**: Updates SMKG01C_A smoking variable
+     - **Files**: Both CSV files
+     - **Changes**: Updates SMKG01C_A metadata and details
+
+   - **352fe16** - updates to the SMKG01C_B variable
+     - **Why relevant**: Updates SMKG01C_B smoking variable
+     - **Files**: Both CSV files
+     - **Changes**: Updates SMKG01C_B metadata and details
+
+   - **4a25f8a** - updates to the SMKG01C_cont variable
+     - **Why relevant**: Updates continuous smoking variable
+     - **Files**: Both CSV files
+     - **Changes**: Updates SMKG01C_cont metadata and details
+
+   **Not relevant for this group** (18 commits):
+   - Infrastructure/Schema-specific (6): 4690c86, 73223df, 786d8a8, 15fc75d,
+     26e719f, 9fdd927
+   - BMI-specific (3): 227888e, 9dc3958, ab206c1
+   - ADL-specific (3): aeae50e, 35007e4, 65b417e
+   - Oral health-specific (5): a562a2a, b3ca31e, 0220528, 9be9b8f, ae18185
+   - Other (1): e724e82
+
+3. Cherry-pick smoking commits (oldest to newest):
    ```bash
    git cherry-pick f8f0277  # feat: variable_details.csv added: 4 X SMK
    git cherry-pick 6220e84  # feat: All five smoking status variables
@@ -768,14 +959,14 @@ EOF
    git cherry-pick 4a25f8a  # updates to the SMKG01C_cont variable
    ```
 
-3. Standardize:
+4. Standardize:
    ```bash
    Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
 
-4. Create PR:
+5. Create PR:
    ```bash
    gh pr create --base dev --head merge-v3-smoking-variables \
      --title "Smoking: Add continuous smoking variables and update status" \
@@ -822,21 +1013,83 @@ EOF
    git checkout -b merge-v3-adl-variables
    ```
 
-2. Cherry-pick ADL commits:
+2. **Analyze and select commits**:
+
+   First, view all 26 commits affecting CSV files to identify relevant ones:
+   ```bash
+   git log feature/v3.0.0-validation-infrastructure --not master --oneline \
+     -- inst/extdata/variables.csv inst/extdata/variable_details.csv
+   ```
+
+   **All 26 commits** (newest to oldest):
+   - 4a25f8a: updates to the SMKG01C_cont variable
+   - 352fe16: updates to the SMKG01C_B variable
+   - e961c6e: updates to SMKG01C_A variable
+   - 801eb97: updates to the SMK_01B variable details
+   - ae18185: harmonized new variable, frequency of brushing teeth
+   - 9be9b8f: harmonized new variable, has one or more of own teeth
+   - 0220528: harmonized new variable, frequency teeth/gum pain
+   - b3ca31e: harmonzied new variable, self-perceived oral health
+   - a562a2a: new harmonized variable, last time visited dental professional
+   - e724e82: updated CCC_181 variable
+   - 65b417e: updated ADL_score_5 variable
+   - 35007e4: updated ADL_der variable
+   - aeae50e: fixed bug with ADL_01 variable
+   - 9fdd927: feat: enhance schema validation and data consistency rules
+   - 57aba9c: update: variable_details.csv for smoking continuous variable
+   - 82b9c63: feat: added smoking initiation functions
+   - 6220e84: feat: All five smoking status variables completed
+   - f8f0277: feat: variable_details.csv added: 4 X SMK ... _cont
+   - ab206c1: feat: Corrected smoking variable mappings, refactored bmi.R
+   - 9dc3958: feat: restore BMI metadata
+   - 227888e: refactor: modernize BMI function architecture
+   - 26e719f: feat: implement v3.0.0 validation infrastructure
+   - 15fc75d: feat: add comprehensive version validation
+   - 786d8a8: feat: update metadata and test files for function renaming
+   - 73223df: feat: enhance variable metadata for v2.2.0
+   - 4690c86: feat: add v2.2.0 variable enhancements
+
+   **Relevant commits for ADL Variables** (3 of 26):
+
+   - **aeae50e** - fixed bug with ADL_01 variable
+     - **Why relevant**: Fixes data quality bug in ADL_01 variable
+     - **Files**: Both variables.csv and variable_details.csv
+     - **Changes**: Corrects ADL_01 variable metadata and details
+
+   - **35007e4** - updated ADL_der variable
+     - **Why relevant**: Updates ADL derived variable
+     - **Files**: Both CSV files
+     - **Changes**: Updates ADL_der variable metadata and calculations
+
+   - **65b417e** - updated ADL_score_5 variable
+     - **Why relevant**: Updates ADL score variable
+     - **Files**: Both CSV files
+     - **Changes**: Updates ADL_score_5 variable metadata
+
+   **Not relevant for this group** (23 commits):
+   - Infrastructure/Schema-specific (6): 4690c86, 73223df, 786d8a8, 15fc75d,
+     26e719f, 9fdd927
+   - BMI-specific (3): 227888e, 9dc3958, ab206c1
+   - Smoking-specific (8): f8f0277, 6220e84, 82b9c63, 57aba9c, 801eb97,
+     e961c6e, 352fe16, 4a25f8a
+   - Oral health-specific (5): a562a2a, b3ca31e, 0220528, 9be9b8f, ae18185
+   - Other (1): e724e82
+
+3. Cherry-pick ADL commits:
    ```bash
    git cherry-pick aeae50e  # fixed bug with ADL_01 variable
    git cherry-pick 35007e4  # updated ADL_der variable
    git cherry-pick 65b417e  # updated ADL_score_5 variable
    ```
 
-3. Standardize:
+4. Standardize:
    ```bash
    Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
 
-4. Create PR:
+5. Create PR:
    ```bash
    gh pr create --base dev --head merge-v3-adl-variables \
      --title "ADL: Bug fixes and updates to ADL variables" \
@@ -874,7 +1127,80 @@ EOF
    git checkout -b merge-v3-oral-health-variables
    ```
 
-2. Cherry-pick oral health commits (oldest to newest):
+2. **Analyze and select commits**:
+
+   First, view all 26 commits affecting CSV files to identify relevant ones:
+   ```bash
+   git log feature/v3.0.0-validation-infrastructure --not master --oneline \
+     -- inst/extdata/variables.csv inst/extdata/variable_details.csv
+   ```
+
+   **All 26 commits** (newest to oldest):
+   - 4a25f8a: updates to the SMKG01C_cont variable
+   - 352fe16: updates to the SMKG01C_B variable
+   - e961c6e: updates to SMKG01C_A variable
+   - 801eb97: updates to the SMK_01B variable details
+   - ae18185: harmonized new variable, frequency of brushing teeth
+   - 9be9b8f: harmonized new variable, has one or more of own teeth
+   - 0220528: harmonized new variable, frequency teeth/gum pain
+   - b3ca31e: harmonzied new variable, self-perceived oral health
+   - a562a2a: new harmonized variable, last time visited dental professional
+   - e724e82: updated CCC_181 variable
+   - 65b417e: updated ADL_score_5 variable
+   - 35007e4: updated ADL_der variable
+   - aeae50e: fixed bug with ADL_01 variable
+   - 9fdd927: feat: enhance schema validation and data consistency rules
+   - 57aba9c: update: variable_details.csv for smoking continuous variable
+   - 82b9c63: feat: added smoking initiation functions
+   - 6220e84: feat: All five smoking status variables completed
+   - f8f0277: feat: variable_details.csv added: 4 X SMK ... _cont
+   - ab206c1: feat: Corrected smoking variable mappings, refactored bmi.R
+   - 9dc3958: feat: restore BMI metadata
+   - 227888e: refactor: modernize BMI function architecture
+   - 26e719f: feat: implement v3.0.0 validation infrastructure
+   - 15fc75d: feat: add comprehensive version validation
+   - 786d8a8: feat: update metadata and test files for function renaming
+   - 73223df: feat: enhance variable metadata for v2.2.0
+   - 4690c86: feat: add v2.2.0 variable enhancements
+
+   **Relevant commits for Oral Health Variables** (5 of 26):
+
+   - **a562a2a** - new harmonized variable, last time visited dental
+     professional
+     - **Why relevant**: Adds new oral health variable for dental visits
+     - **Files**: Both variables.csv and variable_details.csv
+     - **Changes**: Adds new variable row and associated metadata
+
+   - **b3ca31e** - harmonzied new variable, self-perceived oral health
+     - **Why relevant**: Adds self-reported oral health status variable
+     - **Files**: Both CSV files
+     - **Changes**: Adds new variable for oral health perception
+
+   - **0220528** - new harmonized variable, frequency teeth/gum pain
+     - **Why relevant**: Adds variable tracking dental pain frequency
+     - **Files**: Both CSV files
+     - **Changes**: Adds new variable for pain frequency tracking
+
+   - **9be9b8f** - new harmonized variable, has one or more of own teeth
+     - **Why relevant**: Adds variable for natural teeth presence
+     - **Files**: Both CSV files
+     - **Changes**: Adds binary variable for tooth retention
+
+   - **ae18185** - new harmonized variable, frequency of brushing teeth
+     - **Why relevant**: Adds oral hygiene behavior variable
+     - **Files**: Both CSV files
+     - **Changes**: Adds new variable for brushing frequency
+
+   **Not relevant for this group** (21 commits):
+   - Infrastructure/Schema-specific (6): 4690c86, 73223df, 786d8a8, 15fc75d,
+     26e719f, 9fdd927
+   - BMI-specific (3): 227888e, 9dc3958, ab206c1
+   - Smoking-specific (8): f8f0277, 6220e84, 82b9c63, 57aba9c, 801eb97,
+     e961c6e, 352fe16, 4a25f8a
+   - ADL-specific (3): aeae50e, 35007e4, 65b417e
+   - Other (1): e724e82
+
+3. Cherry-pick oral health commits (oldest to newest):
    ```bash
    git cherry-pick a562a2a  # new: last time visited dental professional
    git cherry-pick b3ca31e  # new: self-perceived oral health
@@ -883,14 +1209,14 @@ EOF
    git cherry-pick ae18185  # new: frequency of brushing teeth
    ```
 
-3. Standardize:
+4. Standardize:
    ```bash
    Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
 
-4. Create PR:
+5. Create PR:
    ```bash
    gh pr create --base dev --head merge-v3-oral-health-variables \
      --title "Oral Health: Add five new harmonized oral health variables" \
@@ -935,19 +1261,71 @@ EOF
    git checkout -b merge-v3-health-condition-updates
    ```
 
-2. Cherry-pick remaining commits:
+2. **Analyze and select commits**:
+
+   First, view all 26 commits affecting CSV files to identify relevant ones:
+   ```bash
+   git log feature/v3.0.0-validation-infrastructure --not master --oneline \
+     -- inst/extdata/variables.csv inst/extdata/variable_details.csv
+   ```
+
+   **All 26 commits** (newest to oldest):
+   - 4a25f8a: updates to the SMKG01C_cont variable
+   - 352fe16: updates to the SMKG01C_B variable
+   - e961c6e: updates to SMKG01C_A variable
+   - 801eb97: updates to the SMK_01B variable details
+   - ae18185: harmonized new variable, frequency of brushing teeth
+   - 9be9b8f: harmonized new variable, has one or more of own teeth
+   - 0220528: harmonized new variable, frequency teeth/gum pain
+   - b3ca31e: harmonzied new variable, self-perceived oral health
+   - a562a2a: new harmonized variable, last time visited dental professional
+   - e724e82: updated CCC_181 variable
+   - 65b417e: updated ADL_score_5 variable
+   - 35007e4: updated ADL_der variable
+   - aeae50e: fixed bug with ADL_01 variable
+   - 9fdd927: feat: enhance schema validation and data consistency rules
+   - 57aba9c: update: variable_details.csv for smoking continuous variable
+   - 82b9c63: feat: added smoking initiation functions
+   - 6220e84: feat: All five smoking status variables completed
+   - f8f0277: feat: variable_details.csv added: 4 X SMK ... _cont
+   - ab206c1: feat: Corrected smoking variable mappings, refactored bmi.R
+   - 9dc3958: feat: restore BMI metadata
+   - 227888e: refactor: modernize BMI function architecture
+   - 26e719f: feat: implement v3.0.0 validation infrastructure
+   - 15fc75d: feat: add comprehensive version validation
+   - 786d8a8: feat: update metadata and test files for function renaming
+   - 73223df: feat: enhance variable metadata for v2.2.0
+   - 4690c86: feat: add v2.2.0 variable enhancements
+
+   **Relevant commits for Other Health Conditions** (1 of 26):
+
+   - **e724e82** - updated CCC_181 variable
+     - **Why relevant**: Updates chronic condition variable
+     - **Files**: Both variables.csv and variable_details.csv
+     - **Changes**: Updates CCC_181 (chronic condition) metadata
+
+   **Not relevant for this group** (25 commits):
+   - Infrastructure/Schema-specific (6): 4690c86, 73223df, 786d8a8, 15fc75d,
+     26e719f, 9fdd927
+   - BMI-specific (3): 227888e, 9dc3958, ab206c1
+   - Smoking-specific (8): f8f0277, 6220e84, 82b9c63, 57aba9c, 801eb97,
+     e961c6e, 352fe16, 4a25f8a
+   - ADL-specific (3): aeae50e, 35007e4, 65b417e
+   - Oral health-specific (5): a562a2a, b3ca31e, 0220528, 9be9b8f, ae18185
+
+3. Cherry-pick remaining commits:
    ```bash
    git cherry-pick e724e82  # updated CCC_181 variable
    ```
 
-3. Standardize:
+4. Standardize:
    ```bash
    Rscript standardize_csvs.R
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
    git commit --amend --no-edit
    ```
 
-4. Create PR:
+5. Create PR:
    ```bash
    gh pr create --base dev --head merge-v3-health-condition-updates \
      --title "Health Conditions: Update CCC_181 variable" \
