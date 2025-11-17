@@ -82,7 +82,7 @@ conventions.
 4. Commit the formatting changes:
    ```bash
    git add inst/extdata/variables.csv inst/extdata/variable_details.csv
-   git commit -m "chore: standardize CSV formatting for variables and variable_details
+   git commit -m "Refactor: Standardize CSV formatting for variables and variable_details
 
 Apply consistent formatting to CSV files:
 - variables.csv: Use QUOTE_ALL quoting and LF line endings
