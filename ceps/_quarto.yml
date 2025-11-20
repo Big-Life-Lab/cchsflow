@@ -1,0 +1,14 @@
+project:
+  type: website
+  output-dir: _site
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+
+website:
+  title: cchsflow Enhancement Proposals
+  sidebar:
+    style: docked
