@@ -2,6 +2,16 @@
 
 This page outlines how to contribute to the `cchsflow` package. 
 
+## Working with repo
+
+When working with the files within a folder, make sure to follow the
+instructions within the README.md file in that folder and folders above it if
+they exist.
+
+## Naming files
+
+Use kebab case when naming files. For example, `smoking-functions.R`
+
 ## Adding variables to cchsflow
 
 ### Transforming existing CCHS variables
