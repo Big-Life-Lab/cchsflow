@@ -38,7 +38,8 @@ Depends:
   dplyr (>= 0.8.2),
   sjlabelled (>= 1.0.17),
   stringr (>= 1.2.0),
-  magrittr
+  magrittr,
+  yaml
 Description: Supporting the use of the Canadian Community Health Survey 
              (CCHS) by transforming variables from each cycle into harmonized, 
              consistent versions that span survey cycles (currently, 2001 to 
