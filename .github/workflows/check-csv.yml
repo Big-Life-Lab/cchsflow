@@ -1,0 +1,40 @@
+name: Check CSV Formatting
+
+on:
+  pull_request:
+    paths:
+      - 'inst/extdata/variables.csv'
+      - 'inst/extdata/variable_details.csv'
+  push:
+    branches:
+      - main
+    paths:
+      - 'inst/extdata/variables.csv'
+      - 'inst/extdata/variable_details.csv'
+
+jobs:
+  check-csv-formatting:
+    runs-on: ubuntu-latest
+    name: Validate CSV worksheet formatting
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
+        with:
+          r-version: 'release'
+
+      - name: Install package dependencies
+        uses: r-lib/actions/setup-r-dependencies@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
+        with:
+          extra-packages: local::.
+
+      - name: Check CSV formatting
+        run: Rscript exec/check-worksheets.R
+
+      - name: Suggest fix command on failure
+        if: failure()
+        run: |
+          echo "::error::CSV formatting violations detected. Run 'Rscript exec/fix-worksheets.R' locally to fix them."
