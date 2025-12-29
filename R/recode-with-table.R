@@ -928,7 +928,7 @@ recode_derived_variables <-
       }
       
       # Obtain the function for each row
-      row_being_checked <- variable_rows[row_num, ]
+      row_being_checked <- fun_variable_rows[row_num, ]
       func_cell <-
         as.character(row_being_checked[[pkg.globals$argument.CatValue]])
       function_being_used <-
