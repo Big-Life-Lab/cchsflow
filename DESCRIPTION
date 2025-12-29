@@ -40,7 +40,9 @@ Depends:
   stringr (>= 1.2.0),
   magrittr,
   yaml,
-  readr
+  readr,
+  purrr,
+  cli
 Description: Supporting the use of the Canadian Community Health Survey 
              (CCHS) by transforming variables from each cycle into harmonized, 
              consistent versions that span survey cycles (currently, 2001 to 
