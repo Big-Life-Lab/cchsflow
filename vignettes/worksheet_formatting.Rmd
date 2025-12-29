@@ -1,0 +1,231 @@
+---
+title: "Checking and Fixing Worksheet Formatting"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Checking and Fixing Worksheet Formatting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The cchsflow package maintains two critical CSV worksheets that define
+variable metadata:
+
+- `inst/extdata/variables.csv` - Variable definitions and metadata
+- `inst/extdata/variable_details.csv` - Recoding rules for the variables
+
+These worksheets are frequently modified by contributors using various tools
+(Microsoft Excel, LibreOffice Calc, Notepad, etc.) across different operating
+systems. This diversity can lead to formatting inconsistencies that make code
+review difficult and error-prone.
+
+This article explains how to use the `check_worksheet()` and `fix_worksheet()`
+functions to detect and correct formatting issues in these worksheets.
+
+## The Problem
+
+When contributors edit the CSV worksheets with different tools, several
+formatting issues can arise:
+
+1. **Inconsistent Quoting**: Different CSV editors apply different quoting
+   strategies. Some tools quote all fields regardless of content, while others
+   only quote fields containing special characters (commas, quotes, newlines).
+
+2. **Line Ending Variations**: Operating systems use different line ending
+   conventions:
+   - Unix/Linux/macOS use LF (`\n`)
+   - Windows uses CRLF (`\r\n`)
+
+3. **Structural Inconsistencies**: Manual editing can introduce structural
+   problems:
+   - Unsorted rows in the variables sheet
+   - Empty header columns added accidentally
+   - Column order being changed
+
+4. **Poor Git Diffs**: These formatting differences cause Git to report that
+   entire files have changed when semantically only a single cell was modified.
+   This makes code review difficult.
+
+## Formatting Standards
+
+The worksheets are expected to follow these standards:
+
+| Standard | Requirement |
+|----------|-------------|
+| Line Endings | LF (`\n`) only |
+| Quoting | Minimal - only when required by CSV spec |
+| Row Sorting | Rows sorted by `variable` column (variables sheet only) |
+| Structure | No trailing empty columns |
+| Column Order | Columns must follow the defined order |
+
+## Checking for Errors
+
+Use the `check_worksheet()` function to validate a worksheet against the
+formatting standards:
+
+```{r, eval=FALSE}
+library(cchsflow)
+
+# Check the variables sheet
+errors <- check_worksheet(
+  file_path = "inst/extdata/variables.csv",
+  file_type = "variables"
+)
+
+# Check the variable details sheet
+errors <- check_worksheet(
+  file_path = "inst/extdata/variable_details.csv",
+  file_type = "variable_details"
+)
+```
+
+### Understanding the Output
+
+The function returns a list of error objects. Each error object contains:
+
+- `error_type`: The type of error detected
+- `file_type`: Which worksheet type (`variables` or `variable_details`)
+- `file_path`: Path to the file with the error
+- `message`: A human-readable description of the error
+
+Additional fields may be present depending on the error type (e.g., `row_num`,
+`col_num`).
+
+### Error Types
+
+The checker detects the following error types:
+
+| Error Type | Description |
+|------------|-------------|
+| `file_not_found` | The specified file does not exist |
+| `invalid_csv` | The file is not valid CSV |
+| `line_ending_crlf` | A row uses CRLF line endings instead of LF |
+| `excessive_quoting` | A cell is quoted when it doesn't need to be |
+| `column_order` | Columns are not in the expected order |
+| `unsorted_rows` | Rows are not sorted by the `variable` column |
+| `empty_columns` | Trailing empty columns exist |
+
+## Fixing Errors
+
+Use the `fix_worksheet()` function to automatically correct formatting issues:
+
+```{r, eval=FALSE}
+library(cchsflow)
+
+# Fix the variables sheet
+result <- fix_worksheet(
+  file_path = "inst/extdata/variables.csv",
+  file_type = "variables"
+)
+
+# Fix the variable details sheet
+result <- fix_worksheet(
+  file_path = "inst/extdata/variable_details.csv",
+  file_type = "variable_details"
+)
+```
+
+### Understanding the Output
+
+The function returns a list of error objects, each with an added `fixed` field
+indicating whether the error was corrected:
+
+```{r, eval=FALSE}
+result <- fix_worksheet("inst/extdata/variables.csv", "variables")
+
+# Count fixed errors
+fixed_count <- sum(sapply(result, function(e) e$fixed))
+message(sprintf("Fixed %d errors", fixed_count))
+```
+
+### Which Errors Can Be Fixed?
+
+| Error Type | Can Be Fixed? |
+|------------|---------------|
+| `file_not_found` | No |
+| `invalid_csv` | No |
+| `line_ending_crlf` | Yes |
+| `excessive_quoting` | Yes |
+| `column_order` | Yes |
+| `unsorted_rows` | Yes (variables sheet only) |
+| `empty_columns` | Yes |
+
+## Command-Line Scripts
+
+For convenience, the package includes command-line scripts that can be run
+directly:
+
+### Checking Worksheets
+
+```bash
+Rscript exec/check-worksheets.R
+```
+
+This script checks both worksheets and:
+
+- Prints all errors found to the console
+- Exits with a non-zero status code if any errors are found (useful for CI/CD)
+- Exits with status code 0 if no errors are found
+
+### Fixing Worksheets
+
+```bash
+Rscript exec/fix-worksheets.R
+```
+
+This script fixes both worksheets and prints a summary of all corrections
+applied.
+
+## CI/CD Integration
+
+The checker script is designed to integrate with CI/CD pipelines. The
+repository includes a GitHub Actions workflow that automatically checks the
+worksheets on pull requests.
+
+When a pull request modifies either CSV file, the workflow:
+
+1. Runs the checker script
+2. Fails the build if any formatting violations are detected
+3. Reports the specific errors in the build log
+
+This ensures that formatting issues are caught before they are merged into the
+main branch.
+
+## Workflow Recommendations
+
+### Before Committing Changes
+
+After editing either worksheet, run the fixer script to ensure consistent
+formatting:
+
+```bash
+Rscript exec/fix-worksheets.R
+git add inst/extdata/variables.csv inst/extdata/variable_details.csv
+git commit -m "Update worksheet with fixed formatting"
+```
+
+### Reviewing Pull Requests
+
+When reviewing pull requests that modify the worksheets:
+
+1. Check that the CI workflow passed
+2. Review only the semantic changes (the formatting should be consistent)
+3. If the CI fails, ask the contributor to run the fixer script
+
+## Summary
+
+The `check_worksheet()` and `fix_worksheet()` functions help maintain
+consistent formatting in the cchsflow worksheets. Using these tools ensures:
+
+- Clean, semantic Git diffs
+- Easier code review
+- Consistent file formatting regardless of the editing tool used
+- Automated enforcement through CI/CD integration
