@@ -231,10 +231,11 @@ variables_schema:
       type: "string"
       tier: "versioning"
       constraints:
-        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        pattern_reference: "See metadata_registry.yaml version_patterns for validation rules"
       notes: |
-        Track changes using semantic versioning (e.g., 1.0.0).
+        Track changes using semantic versioning (e.g., 1.0.0, 3.0.0-alpha).
         Increment for changes: major.minor.patch
+        Pre-release suffixes supported: -alpha, -beta, -rc1, etc.
         
     - name: "lastUpdated"
       title: "Last updated"

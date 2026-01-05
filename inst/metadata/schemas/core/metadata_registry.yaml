@@ -1,0 +1,422 @@
+# metadata_registry.yaml - Shared patterns for recodeflow schemas
+# =============================================================================
+# Central registry for shared validation patterns and tier definitions.
+# This file consolidates cross-cutting concerns referenced by variables.yaml
+# and variable_details.yaml, while pointing to detailed specifications in
+# CCHS-specific files.
+# =============================================================================
+
+schema_version: "1.0.0"
+schema_date: "2025-01-04"
+description: "Central registry for shared validation patterns and tier definitions used across recodeflow schemas"
+
+# =============================================================================
+# TIER SYSTEM
+# =============================================================================
+# Shared tier definitions used across all schema files.
+# Tiers organize fields by their importance and usage context.
+
+tier_system:
+  description: "Field classification system for recodeflow schemas"
+
+  tiers:
+    core:
+      priority: 1
+      description: "Essential fields for any recodeflow project"
+      required: true
+      usage: "Must be present for basic functionality"
+
+    optional:
+      priority: 2
+      description: "Enhanced documentation and organization fields"
+      required: false
+      usage: "Recommended for comprehensive documentation"
+
+    extension:
+      priority: 3
+      description: "Project-specific fields (e.g., CCHS, ICES, custom)"
+      required: false
+      usage: "Add as needed for specific projects"
+
+    versioning:
+      priority: 4
+      description: "Professional workflow tracking fields"
+      required: false
+      usage: "Recommended for collaborative projects"
+
+# =============================================================================
+# TRANSFORMATION PATTERNS (variableStart validation)
+# =============================================================================
+# Patterns for the variableStart field which specifies how to find and
+# transform source data to create harmonized variables.
+
+transformation_patterns:
+  description: "Validation patterns for variableStart field in variables.csv and variable_details.csv"
+
+  patterns:
+    simple_reference:
+      name: "Simple variable reference"
+      pattern: "^\\[[A-Za-z_][A-Za-z0-9_]*\\]$"
+      description: "Reference to a harmonized variable by name"
+      examples:
+        - "[HEIGHT]"
+        - "[SMK_01A]"
+        - "[SMKDSTY]"
+        - "[height]"
+      notes: "Case-insensitive matching supported"
+
+    database_specific:
+      name: "Database-specific mapping"
+      pattern: "^[a-z0-9_]+::[A-Za-z_][A-Za-z0-9_]*$"
+      description: "Direct reference to a source variable in a specific database"
+      examples:
+        - "cchs2001_p::SMKA_01A"
+        - "cchs2017_2018_m::SMK_020"
+        - "cchs2022_m::CSS_15"
+      notes: "Database name lowercase, variable name preserves case"
+
+    derived_variable:
+      name: "Derived variable specification"
+      pattern: "^DerivedVar::\\[[A-Za-z0-9_,\\s]+\\]$"
+      description: "Variable computed from multiple source variables"
+      examples:
+        - "DerivedVar::[SMK_005, SMK_030, SMK_01A]"
+        - "DerivedVar::[HEIGHT_CM, WEIGHT_KG]"
+        - "DerivedVar::[DHHGAGE_cont, PAA_045]"
+      notes: "Input variables listed in brackets, comma-separated"
+
+    multiple_sources:
+      name: "Multiple source mappings"
+      description: "Comma-separated list of any pattern types"
+      examples:
+        - "cchs2001_p::SMKA_01A, cchs2003_p::SMKC_01A, [SMK_01A]"
+        - "cchs2001_p::VAR1, cchs2019_p::VAR2"
+      notes: "Patterns can be mixed in a single variableStart value"
+
+  # Combined regex for programmatic validation
+  # Single-line versions for use in R grepl() - no whitespace or newlines
+  regex:
+    variableStart: "^(\\[[A-Za-z_][A-Za-z0-9_]*\\]|[a-z0-9_]+::[A-Za-z_][A-Za-z0-9_]*|DerivedVar::\\[[A-Za-z0-9_, ]+\\])(,\\s*(\\[[A-Za-z_][A-Za-z0-9_]*\\]|[a-z0-9_]+::[A-Za-z_][A-Za-z0-9_]*|DerivedVar::\\[[A-Za-z0-9_, ]+\\]))*$"
+    notes: "Single-line regex for R validation - supports comma-separated mixed patterns"
+
+  combined_validation:
+    description: "Master regex for validating any variableStart value"
+    single_pattern: |
+      ^(
+        \[[A-Za-z_][A-Za-z0-9_]*\]|
+        [a-z0-9_]+::[A-Za-z_][A-Za-z0-9_]*|
+        DerivedVar::\[[A-Za-z0-9_,\s]+\]
+      )$
+    multi_pattern: |
+      ^(
+        \[[A-Za-z_][A-Za-z0-9_]*\]|
+        [a-z0-9_]+::[A-Za-z_][A-Za-z0-9_]*|
+        DerivedVar::\[[A-Za-z0-9_,\s]+\]
+      )(,\s*(
+        \[[A-Za-z_][A-Za-z0-9_]*\]|
+        [a-z0-9_]+::[A-Za-z_][A-Za-z0-9_]*|
+        DerivedVar::\[[A-Za-z0-9_,\s]+\]
+      ))*$
+    notes: "Use multi_pattern for full validation including comma-separated lists"
+
+# =============================================================================
+# INTERVAL NOTATION (recStart validation)
+# =============================================================================
+# Mathematical interval patterns for the recStart field which specifies
+# source values or conditions that trigger a transformation.
+
+interval_notation:
+  description: "Validation patterns for recStart field in variable_details.csv"
+
+  patterns:
+    single_value:
+      name: "Single numeric value"
+      pattern: "^-?[0-9]+\\.?[0-9]*$"
+      description: "Matches a single source value"
+      examples:
+        - "1"
+        - "2"
+        - "96"
+        - "1.5"
+        - "-0.359"
+
+    closed_interval:
+      name: "Closed interval [a,b]"
+      pattern: "^\\[-?[0-9]+\\.?[0-9]*,-?[0-9]+\\.?[0-9]*\\]$"
+      description: "Includes both endpoints"
+      examples:
+        - "[18.5,24.9]"
+        - "[1,3]"
+        - "[-0.359,1]"
+        - "[0.0487,0.1846]"
+
+    open_interval:
+      name: "Open interval (a,b)"
+      pattern: "^\\(-?[0-9]+\\.?[0-9]*,-?[0-9]+\\.?[0-9]*\\)$"
+      description: "Excludes both endpoints"
+      examples:
+        - "(0,18.5)"
+        - "(18.5,25)"
+
+    half_open_left:
+      name: "Half-open interval (a,b]"
+      pattern: "^\\(-?[0-9]+\\.?[0-9]*,-?[0-9]+\\.?[0-9]*\\]$"
+      description: "Excludes left endpoint, includes right"
+      examples:
+        - "(18.5,25]"
+        - "(0,1]"
+
+    half_open_right:
+      name: "Half-open interval [a,b)"
+      pattern: "^\\[-?[0-9]+\\.?[0-9]*,-?[0-9]+\\.?[0-9]*\\)$"
+      description: "Includes left endpoint, excludes right"
+      examples:
+        - "[25,30)"
+        - "[0,0.0487)"
+
+    string_value:
+      name: "String/categorical value"
+      pattern: "^[a-zA-Z][a-zA-Z0-9_\\s]*$"
+      description: "Text values for categorical matching"
+      examples:
+        - "male"
+        - "english"
+        - "french"
+
+  special_values:
+    description: "Reserved keywords for recStart"
+    values:
+      else:
+        description: "Default case - matches anything not matched by other rules"
+        usage: "Use as the last recStart value for a variable"
+      N/A:
+        description: "Not applicable - used for derived variables"
+        usage: "Variables with Func:: or DerivedVar:: in recEnd should use N/A"
+      copy:
+        description: "Copy original value unchanged"
+        usage: "For continuous variables preserving original values"
+
+  na_patterns:
+    description: "Missing data notation in recStart"
+    pattern: "^NA::[ab]$"
+    values:
+      "NA::a":
+        description: "Valid skip / not applicable"
+        haven_equivalent: "haven::tagged_na('a')"
+      "NA::b":
+        description: "Don't know / refusal / not stated"
+        haven_equivalent: "haven::tagged_na('b')"
+
+  # Single-line regex for use in R grepl() - no whitespace or newlines
+  # Supports: single values, intervals (all bracket types), NA::a/b, else, N/A, copy
+  regex:
+    recStart: "^(-?[0-9]+\\.?[0-9]*|\\[-?[0-9]+\\.?[0-9]*,-?[0-9]+\\.?[0-9]*\\]|\\(-?[0-9]+\\.?[0-9]*,-?[0-9]+\\.?[0-9]*\\)|\\[-?[0-9]+\\.?[0-9]*,-?[0-9]+\\.?[0-9]*\\)|\\(-?[0-9]+\\.?[0-9]*,-?[0-9]+\\.?[0-9]*\\]|NA::[ab]|else|N/A|copy)$"
+    notes: "Single-line regex for R validation - supports all interval types and special values"
+
+# =============================================================================
+# DUMMY VARIABLE PATTERNS
+# =============================================================================
+# Naming conventions for the dummyVariable field.
+
+dummy_variable_patterns:
+  description: "Naming conventions for dummyVariable field in variable_details.csv"
+
+  core_pattern:
+    rule: "dummyVariable = variable + '_' + recEnd_safe"
+    description: "Simple concatenation of variable name and sanitized recEnd value"
+
+  recEnd_sanitization:
+    description: "How to convert recEnd values to safe dummyVariable suffixes"
+    rules:
+      - source: "NA::a"
+        target: "NAa"
+        example: "SMKDSTY_B_NAa"
+      - source: "NA::b"
+        target: "NAb"
+        example: "SMKDSTY_B_NAb"
+      - source: "numeric (e.g., 1, 2, 3)"
+        target: "same value"
+        example: "SMKDSTY_B_1"
+      - source: "Func::function_name"
+        target: "N/A (no dummyVariable needed)"
+        example: null
+      - source: "copy"
+        target: "copy"
+        example: "BMI_copy"
+
+  continuous_variables:
+    pattern: "N/A"
+    description: "Continuous variables typically don't need dummyVariable values"
+
+  detailed_patterns:
+    reference: "cchs/variable_details_cchs.yaml#dummyVariable_validation"
+    description: "Comprehensive regex patterns for CCHS-specific dummyVariable naming"
+
+  # Single-line regex for use in R grepl() - no whitespace or newlines
+  # Supports: VARNAME_catN_X, VARNAME_contN, NAa/NAb suffixes, N/A placeholder
+  regex:
+    dummyVariable: "^([A-Za-z_][A-Za-z0-9_]*_(cat[0-9]+_([0-9]+|NAa|NAb)|cont[0-9]+(_copy)?)|N/A)$"
+    notes: "Single-line regex for R validation - supports categorical/continuous naming with NA suffixes"
+
+# =============================================================================
+# VERSION PATTERNS
+# =============================================================================
+# Semantic versioning patterns with optional pre-release suffixes.
+
+version_patterns:
+  description: "Semantic versioning patterns for version field"
+
+  patterns:
+    standard:
+      name: "Standard semantic version"
+      pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      description: "Major.minor.patch format"
+      examples:
+        - "1.0.0"
+        - "3.0.0"
+        - "2.1.5"
+
+    prerelease:
+      name: "Pre-release version"
+      pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+-[a-zA-Z0-9]+$"
+      description: "Version with pre-release suffix"
+      examples:
+        - "3.0.0-alpha"
+        - "3.0.0-beta"
+        - "3.0.0-rc1"
+        - "2.0.0-dev"
+
+  # Single-line regex for use in R grepl() - supports optional pre-release suffix
+  regex:
+    version: "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9]+)?$"
+    notes: "Single-line regex for R validation - supports optional pre-release suffixes"
+
+# =============================================================================
+# MISSING DATA HANDLING
+# =============================================================================
+# Core missing data concepts - detailed patterns in CCHS-specific files.
+
+missing_data_handling:
+  description: "Missing data conventions for recodeflow"
+
+  standard_tags:
+    "NA::a":
+      priority: 1
+      label: "Not applicable / Valid skip"
+      semantic_meaning: "Structural non-response - question doesn't apply"
+      haven_equivalent: "haven::tagged_na('a')"
+
+    "NA::b":
+      priority: 2
+      label: "Don't know / Refusal / Not stated"
+      semantic_meaning: "Item non-response - respondent choice"
+      haven_equivalent: "haven::tagged_na('b')"
+
+  priority_rule:
+    description: "When multiple missing values conflict, use priority order"
+    rule: "Lower priority number wins (NA::a beats NA::b)"
+
+  detailed_patterns:
+    reference: "cchs/cchs_missing_data.yaml"
+    description: "Comprehensive CCHS missing data patterns including propagation rules"
+
+# =============================================================================
+# VALIDATION MODES
+# =============================================================================
+# Configuration for schema validation strictness.
+
+validation_modes:
+  description: "Validation strictness levels for schema enforcement"
+
+  modes:
+    strict:
+      description: "All patterns must match exactly"
+      usage: "Production validation, CI/CD pipelines"
+      behaviour:
+        - "Reject any values not matching defined patterns"
+        - "Fail on missing required fields"
+        - "Enforce type constraints"
+
+    permissive:
+      description: "Allow extensions and variations"
+      usage: "Development, exploratory work"
+      behaviour:
+        - "Warn on pattern mismatches but don't reject"
+        - "Allow additional columns not in schema"
+        - "Log but don't fail on type mismatches"
+
+    documentation:
+      description: "Schema used for documentation only"
+      usage: "Reference documentation generation"
+      behaviour:
+        - "No validation performed"
+        - "Patterns used for documentation examples"
+
+# =============================================================================
+# REFERENCES TO DETAILED SPECIFICATIONS
+# =============================================================================
+# Pointers to files containing comprehensive specifications.
+
+detailed_specifications:
+  description: "References to files with comprehensive specifications"
+
+  files:
+    missing_data:
+      path: "cchs/cchs_missing_data.yaml"
+      description: "CCHS missing data patterns, propagation rules, and transformation maps"
+
+    database_config:
+      path: "cchs/cchs_database_config.yaml"
+      description: "CCHS database naming patterns and selection algorithms"
+
+    dummy_variable_regex:
+      path: "cchs/variable_details_cchs.yaml"
+      section: "dummyVariable_validation"
+      description: "Comprehensive regex patterns for CCHS dummyVariable naming"
+
+    variable_naming:
+      path: "cchs/variables_cchs.yaml"
+      section: "cchs_variable_naming"
+      description: "CCHS variable naming conventions and suffix guidelines"
+
+    template_system:
+      path: "core/templates.yaml"
+      description: "Template variable inheritance and versioning framework"
+
+    source_variables:
+      path: "cchs/source_variables_schema.yaml"
+      description: "Schema for DDI-to-concept bridge layer"
+
+# =============================================================================
+# EXTENSION REGISTRY
+# =============================================================================
+# Registry of extension fields used across projects.
+
+extension_registry:
+  description: "Extension fields beyond core schema"
+
+  cchs_extensions:
+    project: "cchsflow"
+    fields:
+      - name: "ICES.confirmation"
+        description: "ICES validation status"
+        values: ["Yes", "ICES confirmed", "ICES altered", "ICES specific", ""]
+
+      - name: "Observation..MD."
+        description: "Manual review observations"
+        type: "free-text"
+
+      - name: "review"
+        description: "Review completion status"
+        type: "free-text"
+
+  templateVariable:
+    description: "Template system marker for reusable transformation patterns"
+    values:
+      "Yes": "This row defines a reusable template"
+      "No": "Normal variable (not using templates)"
+      "<template_name>": "This variable extends the named template"
+    usage: |
+      Template system reduces duplication for multi-database variables.
+      Example: 8 variables × 132 categories = 1,056 rows reduced to 138 rows.
+    detailed_documentation: "core/templates.yaml"

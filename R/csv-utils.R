@@ -263,10 +263,37 @@ standardise_csv <- function(file_path, collaboration = FALSE,
   return(schema)
 }
 
+# Load metadata registry for centralized patterns
+.load_metadata_registry <- function() {
+  registry_path <- "inst/metadata/schemas/core/metadata_registry.yaml"
+  if (!file.exists(registry_path)) {
+    return(NULL)
+  }
+  yaml::read_yaml(registry_path)
+}
+
+# Get pattern from registry based on field name
+.get_registry_pattern <- function(registry, field_name) {
+  if (is.null(registry)) return(NULL)
+
+  # Map field names to registry locations
+  pattern <- switch(field_name,
+    "variableStart" = registry$transformation_patterns$regex$variableStart,
+    "recStart" = registry$interval_notation$regex$recStart,
+    "dummyVariable" = registry$dummy_variable_patterns$regex$dummyVariable,
+    "version" = registry$version_patterns$regex$version,
+    NULL
+  )
+  return(pattern)
+}
+
 # Validate data against YAML schema
 .validate_against_schema <- function(data, schema, file_path) {
   issues <- character(0)
   file_type <- .detect_csv_type(file_path)
+
+  # Load metadata registry for centralized patterns
+  registry <- .load_metadata_registry()
 
   # Get schema section based on file type
   schema_def <- if (file_type == "variables") {
@@ -310,9 +337,18 @@ standardise_csv <- function(file_path, collaboration = FALSE,
       }
 
       # Validate pattern constraints
-      if (!is.null(field$constraints$pattern)) {
+      # Check for pattern_reference first (loads from registry), then direct pattern
+      pattern <- NULL
+      if (!is.null(field$constraints$pattern_reference)) {
+        # Load pattern from metadata registry
+        pattern <- .get_registry_pattern(registry, field_name)
+      } else if (!is.null(field$constraints$pattern)) {
+        pattern <- field$constraints$pattern
+      }
+
+      if (!is.null(pattern)) {
         pattern_violations <- col_data[!is.na(col_data) & col_data != "" &
-          !grepl(field$constraints$pattern, col_data)]
+          !grepl(pattern, col_data)]
         if (length(pattern_violations) > 0) {
           unique_violations <- unique(pattern_violations)
           if (length(unique_violations) > 0) {
