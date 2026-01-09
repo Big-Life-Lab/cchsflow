@@ -1,0 +1,16 @@
+project:
+  type: website
+  output-dir: _site
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+
+website:
+  title: cchsflow Enhancement Proposals
+  sidebar:
+    style: docked
+    contents:
+      - ./cep-001-csv-standardization-tool.qmd

@@ -34,6 +34,8 @@ navbar:
         href: articles/derived_variables.html
       - text: How to add variables
         href: articles/how_to_add_variables.html
+      - text: Checking and fixing worksheet formatting
+        href: articles/worksheet_formatting.html
       - text: How to use tagged_na
         href: articles/tagged_na_usage.html
       - text: CCHS datasets that overlap each other
@@ -139,6 +141,11 @@ reference:
     - rec_with_table
     - set_data_labels
     - merge_rec_data
+  - title: "Worksheet formatting functions"
+    desc: Functions to check and fix the formatting in the worksheets
+    contents:
+      - check_worksheet
+      - fix_worksheet
   - title: "Utility functions"
     desc: Utility functions that are used in other cchsflow functions
     contents:
