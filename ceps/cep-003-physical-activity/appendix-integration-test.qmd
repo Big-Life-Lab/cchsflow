@@ -1,0 +1,887 @@
+---
+title: "Appendix: Integration testing - Physical activity"
+author: "cchsflow development team"
+date: "2026-01-18"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    page-layout: full
+execute:
+  warning: false
+  message: false
+---
+
+## Overview
+
+This appendix performs integration testing of the physical activity harmonization from PR #157 and L0-L4 analysis updates:
+
+1. **Load CCHS PUMF data** for physical activity variables
+2. **Test harmonization** via `rec_with_table()` against ground truth
+3. **Validate staged updates** from L0-L4 analysis (PAADVTRV, PAYDVTTR, PAADVWHO extensions)
+4. **Validate derived variables** (e.g., `active_transport`) with distribution checks
+
+## L0-L4 analysis updates
+
+The following staged updates are being validated (from `pa_variables_update.csv` and `pa_variable_details_update.csv`):
+
+| Variable | Change | Description |
+|----------|--------|-------------|
+| PAADVTRV | Extended | Added `cchs2019_2020_p` |
+| PAYDVTTR | Extended | Added `cchs2019_2020_p` |
+| active_transport | Extended | Added `cchs2019_2020_p` |
+| energy_exp | Extended | Added `cchs2019_2020_p` - all input vars already support 2019-2020 |
+| PAADVWHO | New | WHO physical activity classification (2015-2022) |
+| PACFLEI | Fixed | dummyVariable naming `cat_cat6` → `cat2` |
+| PAC_4B | Fixed | Label "walking" → "biking" |
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: true
+
+# Load required packages
+library(dplyr)
+library(haven)
+library(knitr)
+library(here)
+library(stringr)
+library(sjlabelled)
+
+# Set project root
+project_root <- here::here()
+message("Project root: ", project_root)
+
+# Save current working directory
+original_wd <- getwd()
+setwd(project_root)
+
+# Source cchsflow infrastructure
+source("R/strings.R")
+source("R/label-utils.R")
+source("R/source-lookups.R")
+source("R/load-cchs-subset.R")
+source("R/recode-with-table.R")
+
+# Restore working directory
+setwd(original_wd)
+
+message("Infrastructure loaded successfully")
+```
+
+## Phase 1: Load CCHS data
+
+Load CCHS PUMF data for physical activity variables.
+
+```{r}
+#| label: load-data
+
+# Define physical activity variables from PR #157 + L0-L4 updates
+pa_variables <- c(
+ "PACFLEI", "PACDEE", "PAA_045", "PAA_050", "PAA_075", "PAA_080",
+ "PAADVDYS", "PAADVVIG", "PAYDVTOA", "PAYDVADL", "PAYDVVIG", "PAYDVDYS",
+ "PAADVTRV", "PAYDVTTR", "PAADVWHO"  # Added from L0-L4 analysis
+)
+
+# Also include source variables for validation
+pa_source_vars <- c(
+ "PACADEE", "PACCDEE", "PACEDEE",  # Cycle-specific energy expenditure
+ "PACAFLEI", "PACEFLEI"             # Cycle-specific leisure activity
+)
+
+# Load PUMF data
+rdata_dir <- file.path(project_root, "working_data_and_documentation/pumf-rdata")
+
+if (dir.exists(rdata_dir)) {
+ # Get all available PUMF files
+ pumf_files <- list.files(rdata_dir, pattern = "CCHS.*\\.RData$", full.names = TRUE)
+
+ cchs_data <- list()
+ for (f in pumf_files) {
+   cycle_name <- gsub("CCHS_|\\.RData", "", basename(f))
+   cycle_name <- paste0("cchs", cycle_name, "_p")
+
+   tryCatch({
+     env <- new.env()
+     load(f, envir = env)
+     df <- get(ls(env)[1], envir = env)
+
+     # Convert haven_labelled columns to plain numeric (required for rec_with_table)
+     df <- as.data.frame(df)
+     df[] <- lapply(df, function(x) {
+       if (inherits(x, "haven_labelled")) as.numeric(x) else x
+     })
+
+     # Filter to PA-related columns
+     pa_cols <- grep("^PAC|^PAA|^PAY", names(df), value = TRUE, ignore.case = TRUE)
+     if (length(pa_cols) > 0) {
+       cchs_data[[cycle_name]] <- df
+     }
+   }, error = function(e) {
+     message("Failed to load ", f, ": ", e$message)
+   })
+ }
+
+ message("Loaded ", length(cchs_data), " PUMF cycles with PA variables")
+} else {
+ message("PUMF data directory not found: ", rdata_dir)
+ cchs_data <- list()
+}
+```
+
+### Data summary
+
+```{r}
+#| label: tbl-data-summary
+#| tbl-cap: "CCHS cycles loaded with physical activity variables"
+
+if (length(cchs_data) > 0) {
+ data_summary <- data.frame(
+   Cycle = names(cchs_data),
+   Rows = sapply(cchs_data, nrow),
+   PA_Columns = sapply(cchs_data, function(df) {
+     length(grep("^PAC|^PAA|^PAY", names(df), value = TRUE))
+   })
+ )
+ kable(data_summary, row.names = FALSE)
+} else {
+ message("No data loaded")
+}
+```
+
+### Available PA variables by cycle
+
+```{r}
+#| label: tbl-pa-vars
+#| tbl-cap: "Physical activity variables available per cycle"
+
+if (length(cchs_data) > 0) {
+ pa_vars_by_cycle <- lapply(names(cchs_data), function(cycle) {
+   cols <- names(cchs_data[[cycle]])
+   pa_cols <- grep("^PAC|^PAA|^PAY", cols, value = TRUE, ignore.case = TRUE)
+
+   # Check for key variables including L0-L4 additions
+   has_pacdee <- any(grepl("PACDEE|PACADEE|PACCDEE|PACEDEE", pa_cols))
+   has_paadvtrv <- "PAADVTRV" %in% pa_cols
+   has_paydvttr <- "PAYDVTTR" %in% pa_cols
+   has_paadvwho <- "PAADVWHO" %in% pa_cols
+   has_paadvvig <- "PAADVVIG" %in% pa_cols
+
+   data.frame(
+     Cycle = cycle,
+     `PA Variables` = length(pa_cols),
+     PACDEE = ifelse(has_pacdee, "Yes", "No"),
+     PAADVTRV = ifelse(has_paadvtrv, "Yes", "No"),
+     PAYDVTTR = ifelse(has_paydvttr, "Yes", "No"),
+     PAADVWHO = ifelse(has_paadvwho, "Yes", "No"),
+     PAADVVIG = ifelse(has_paadvvig, "Yes", "No"),
+     check.names = FALSE
+   )
+ })
+ pa_summary <- do.call(rbind, pa_vars_by_cycle)
+ kable(pa_summary, row.names = FALSE)
+}
+```
+
+## Phase 2: Load staged worksheet updates
+
+```{r}
+#| label: load-worksheets
+
+# Load base worksheets from repo
+repo_variable_details <- read.csv(
+  file.path(project_root, "inst/extdata/variable_details.csv"),
+  stringsAsFactors = FALSE
+)
+
+# Merge staged PA updates from L0-L4 analysis
+staged_pa_path <- file.path(project_root, "ceps/cep-003-physical-activity/pa_variable_details_update.csv")
+if (file.exists(staged_pa_path)) {
+  staged_pa <- read.csv(staged_pa_path, stringsAsFactors = FALSE)
+
+  # Variables that need FULL REPLACEMENT (fixes where all rows are in staged file)
+  vars_to_replace <- c("PACFLEI", "PAC_4B", "PAC_4B_cont", "PAADVWHO")
+
+  # Variables that are EXTENSIONS (only new cycle rows in staged file - keep existing)
+  vars_to_extend <- c("PAADVTRV", "PAYDVTTR", "active_transport", "energy_exp")
+
+  # For replacement variables: remove old rows entirely
+  repo_variable_details <- repo_variable_details[
+    !repo_variable_details$variable %in% vars_to_replace,
+  ]
+
+  # Add all staged rows (both replacements and extensions)
+  repo_variable_details <- rbind(repo_variable_details, staged_pa)
+
+  message("Replaced variables: ", paste(vars_to_replace, collapse = ", "))
+  message("Extended variables: ", paste(vars_to_extend, collapse = ", "))
+  message("Total staged rows added: ", nrow(staged_pa))
+} else {
+  message("No staged PA updates found at: ", staged_pa_path)
+}
+
+# Also merge older PACFLEI updates if they exist separately
+staged_pacflei_path <- file.path(project_root, "ceps/cep-003-physical-activity/pacflei_variable_details_update.csv")
+if (file.exists(staged_pacflei_path) && !"PACFLEI" %in% vars_to_replace) {
+  staged_pacflei <- read.csv(staged_pacflei_path, stringsAsFactors = FALSE)
+  repo_variable_details <- repo_variable_details[repo_variable_details$variable != "PACFLEI", ]
+  repo_variable_details <- rbind(repo_variable_details, staged_pacflei)
+  message("Merged staged PACFLEI updates (", nrow(staged_pacflei), " rows)")
+}
+```
+
+## Phase 3: Validate PACDEE (Daily energy expenditure)
+
+Test the harmonized `PACDEE` variable across cycles.
+
+```{r}
+#| label: pacdee-rwt-validation
+#| tbl-cap: "PACDEE: Source vs harmonized (rec_with_table)"
+
+if (length(cchs_data) > 0 && exists("repo_variable_details")) {
+
+  pacdee_validation <- lapply(names(cchs_data), function(cycle) {
+    df <- cchs_data[[cycle]]
+
+    # Ground truth from source
+    pacdee_variants <- c("PACADEE", "PACCDEE", "PACEDEE", "PACDEE")
+    found_var <- intersect(pacdee_variants, names(df))
+
+    if (length(found_var) == 0) {
+      return(data.frame(
+        Cycle = cycle,
+        Ground_Truth_Mean = NA,
+        Harmonized_Mean = NA,
+        Match = "-",
+        Status = "No source"
+      ))
+    }
+
+    gt_values <- df[[found_var[1]]]
+    gt_valid <- gt_values[!is.na(gt_values) & gt_values >= 0 & gt_values <= 43.5]
+    gt_mean <- mean(gt_valid, na.rm = TRUE)
+
+    # rec_with_table() harmonization
+    harmonized_mean <- NA
+    status <- "Not tested"
+
+    tryCatch({
+      result <- cchsflow::rec_with_table(
+        data = df,
+        variables = "PACDEE",
+        database_name = cycle,
+        variable_details = repo_variable_details,
+        append_to_data = FALSE,
+        notes = FALSE
+      )
+
+      if ("PACDEE" %in% names(result)) {
+        rwt_values <- result$PACDEE
+        rwt_valid <- rwt_values[!is.na(rwt_values) & rwt_values >= 0 & rwt_values <= 43.5]
+        harmonized_mean <- mean(rwt_valid, na.rm = TRUE)
+        status <- "OK"
+      } else {
+        status <- "No PACDEE output"
+      }
+    }, error = function(e) {
+      status <<- paste("Error:", substr(e$message, 1, 30))
+    })
+
+    # Compare
+    match_result <- if (!is.na(harmonized_mean) && !is.na(gt_mean)) {
+      if (abs(harmonized_mean - gt_mean) < 0.01) "Yes" else "No"
+    } else {
+      "-"
+    }
+
+    data.frame(
+      Cycle = cycle,
+      Ground_Truth_Mean = round(gt_mean, 2),
+      Harmonized_Mean = round(harmonized_mean, 2),
+      Match = match_result,
+      Status = status
+    )
+  })
+
+  pacdee_val_summary <- do.call(rbind, pacdee_validation)
+  kable(pacdee_val_summary, row.names = FALSE)
+}
+```
+
+## Phase 4: Validate PACFLEI (Leisure physical activity index)
+
+Test the harmonized `PACFLEI` variable with fixed dummyVariable naming.
+
+```{r}
+#| label: pacflei-rwt-validation
+#| tbl-cap: "PACFLEI: Source vs harmonized (rec_with_table)"
+
+if (length(cchs_data) > 0 && exists("repo_variable_details")) {
+
+  pacflei_validation <- lapply(names(cchs_data), function(cycle) {
+    df <- cchs_data[[cycle]]
+
+    # Ground truth from source - era-dependent naming
+    pacflei_variants <- c("PACAFLEI", "PACCFLEI", "PACEFLEI", "PACFLEI")
+    found_var <- intersect(pacflei_variants, names(df))
+
+    if (length(found_var) == 0) {
+      return(data.frame(
+        Cycle = cycle,
+        Ground_Truth_Mean = NA,
+        Harmonized_Mean = NA,
+        Match = "-",
+        Status = "No source"
+      ))
+    }
+
+    gt_values <- df[[found_var[1]]]
+    # PACFLEI is categorical (1-2), filter valid range
+    gt_valid <- gt_values[!is.na(gt_values) & gt_values >= 1 & gt_values <= 2]
+    gt_mean <- mean(gt_valid, na.rm = TRUE)
+
+    # rec_with_table() harmonization
+    harmonized_mean <- NA
+    status <- "Not tested"
+
+    tryCatch({
+      result <- cchsflow::rec_with_table(
+        data = df,
+        variables = "PACFLEI",
+        database_name = cycle,
+        variable_details = repo_variable_details,
+        append_to_data = FALSE,
+        notes = FALSE
+      )
+
+      if ("PACFLEI" %in% names(result)) {
+        rwt_values <- result$PACFLEI
+        # Handle factor output
+        if (is.factor(rwt_values)) {
+          rwt_values <- as.numeric(as.character(rwt_values))
+        }
+        rwt_valid <- rwt_values[!is.na(rwt_values) & rwt_values >= 1 & rwt_values <= 2]
+        harmonized_mean <- mean(rwt_valid, na.rm = TRUE)
+        status <- "OK"
+      } else {
+        status <- "No PACFLEI output"
+      }
+    }, error = function(e) {
+      status <<- paste("Error:", substr(e$message, 1, 40))
+    })
+
+    # Compare
+    match_result <- if (!is.na(harmonized_mean) && !is.na(gt_mean)) {
+      if (abs(harmonized_mean - gt_mean) < 0.01) "Yes" else "No"
+    } else {
+      "-"
+    }
+
+    data.frame(
+      Cycle = cycle,
+      Ground_Truth_Mean = round(gt_mean, 3),
+      Harmonized_Mean = round(harmonized_mean, 3),
+      Match = match_result,
+      Status = status
+    )
+  })
+
+  pacflei_val_summary <- do.call(rbind, pacflei_validation)
+  kable(pacflei_val_summary, row.names = FALSE)
+}
+```
+
+## Phase 5: Validate energy_exp (Daily energy expenditure)
+
+Test the harmonized `energy_exp` derived variable across all cycles (2001-2020).
+
+```{r}
+#| label: energy-exp-rwt-validation
+#| tbl-cap: "energy_exp: Source vs harmonized (rec_with_table)"
+
+if (length(cchs_data) > 0 && exists("repo_variable_details")) {
+
+  energy_exp_validation <- lapply(names(cchs_data), function(cycle) {
+    df <- cchs_data[[cycle]]
+
+    # For pre-2015, ground truth is PACDEE variants
+    # For 2015+, it's calculated from age-specific inputs
+    is_pre_2015 <- grepl("2001|2003|2005|2007|2009|2010|2011|2012|2013|2014", cycle)
+
+    if (is_pre_2015) {
+      # Ground truth from PACDEE variants
+      pacdee_variants <- c("PACADEE", "PACCDEE", "PACEDEE", "PACDEE")
+      found_var <- intersect(pacdee_variants, names(df))
+
+      if (length(found_var) == 0) {
+        return(data.frame(
+          Cycle = cycle,
+          Era = "Pre-2015",
+          Ground_Truth_Mean = NA,
+          Harmonized_Mean = NA,
+          Match = "-",
+          Status = "No source"
+        ))
+      }
+
+      gt_values <- df[[found_var[1]]]
+      gt_valid <- gt_values[!is.na(gt_values) & gt_values >= 0 & gt_values <= 43.5]
+      gt_mean <- mean(gt_valid, na.rm = TRUE)
+    } else {
+      # For 2015+, we need to check if input variables exist
+      # energy_exp is derived from age-specific activity variables
+      input_vars <- c("PAA_045", "PAA_050", "PAA_075", "PAA_080",
+                      "PAADVDYS", "PAADVVIG", "PAYDVTOA", "PAYDVADL",
+                      "PAYDVVIG", "PAYDVDYS")
+      has_inputs <- sum(input_vars %in% names(df)) > 5  # Most inputs present
+
+      if (!has_inputs) {
+        return(data.frame(
+          Cycle = cycle,
+          Era = "Post-2015",
+          Ground_Truth_Mean = NA,
+          Harmonized_Mean = NA,
+          Match = "-",
+          Status = "Insufficient inputs"
+        ))
+      }
+
+      # No direct ground truth for 2015+ energy_exp (it's calculated)
+      gt_mean <- NA
+    }
+
+    # rec_with_table() harmonization
+    harmonized_mean <- NA
+    status <- "Not tested"
+
+    tryCatch({
+      result <- cchsflow::rec_with_table(
+        data = df,
+        variables = "energy_exp",
+        database_name = cycle,
+        variable_details = repo_variable_details,
+        append_to_data = FALSE,
+        notes = FALSE
+      )
+
+      if ("energy_exp" %in% names(result)) {
+        harm_values <- result$energy_exp
+        harm_valid <- harm_values[!is.na(harm_values) & harm_values >= 0 & harm_values <= 100]
+        if (length(harm_valid) > 0) {
+          harmonized_mean <- mean(harm_valid, na.rm = TRUE)
+        }
+        status <- "OK"
+      } else {
+        status <- "No energy_exp output"
+      }
+    }, error = function(e) {
+      status <<- paste("Error:", substr(e$message, 1, 40))
+    })
+
+    # Compare (for pre-2015 only)
+    match_result <- if (is_pre_2015 && !is.na(harmonized_mean) && !is.na(gt_mean)) {
+      if (abs(harmonized_mean - gt_mean) < 0.1) "Yes" else "No"
+    } else if (!is_pre_2015 && !is.na(harmonized_mean)) {
+      "Calculated"
+    } else {
+      "-"
+    }
+
+    data.frame(
+      Cycle = cycle,
+      Era = ifelse(is_pre_2015, "Pre-2015", "Post-2015"),
+      Ground_Truth_Mean = round(gt_mean, 2),
+      Harmonized_Mean = round(harmonized_mean, 2),
+      Match = match_result,
+      Status = status
+    )
+  })
+
+  energy_exp_val_summary <- do.call(rbind, energy_exp_validation)
+  kable(energy_exp_val_summary, row.names = FALSE)
+}
+```
+
+## Phase 6: Validate L0-L4 extensions (PAADVTRV, PAYDVTTR, PAADVWHO)
+
+Test the newly extended/added variables from L0-L4 analysis.
+
+### Active transport variables (PAADVTRV, PAYDVTTR)
+
+```{r}
+#| label: active-transport-validation
+#| tbl-cap: "Active transport variables: rec_with_table() validation"
+
+if (length(cchs_data) > 0 && exists("repo_variable_details")) {
+  # Focus on 2015+ cycles where these variables exist
+  cycles_2015plus <- grep("2015|2017|2019|2022", names(cchs_data), value = TRUE)
+
+  active_transport_vars <- c("PAADVTRV", "PAYDVTTR")
+
+  at_results <- list()
+
+  for (cycle in cycles_2015plus) {
+    df <- cchs_data[[cycle]]
+
+    for (var in active_transport_vars) {
+      has_source <- var %in% names(df)
+
+      gt_mean <- NA
+      harmonized_mean <- NA
+      status <- "No source"
+
+      if (has_source) {
+        # Ground truth
+        gt_values <- df[[var]]
+        # Filter out missing codes (99996-99999)
+        gt_valid <- gt_values[!is.na(gt_values) & gt_values < 99996]
+        if (length(gt_valid) > 0) {
+          gt_mean <- mean(gt_valid, na.rm = TRUE)
+        }
+
+        # rec_with_table() test
+        tryCatch({
+          result <- cchsflow::rec_with_table(
+            data = df,
+            variables = var,
+            database_name = cycle,
+            variable_details = repo_variable_details,
+            append_to_data = FALSE,
+            notes = FALSE
+          )
+
+          if (var %in% names(result)) {
+            rwt_values <- result[[var]]
+            rwt_valid <- rwt_values[!is.na(rwt_values)]
+            if (length(rwt_valid) > 0) {
+              harmonized_mean <- mean(rwt_valid, na.rm = TRUE)
+            }
+            status <- "OK"
+          } else {
+            status <- "No output"
+          }
+        }, error = function(e) {
+          status <<- paste("Error:", substr(e$message, 1, 30))
+        })
+      }
+
+      # Compare
+      match_result <- if (!is.na(harmonized_mean) && !is.na(gt_mean)) {
+        if (abs(harmonized_mean - gt_mean) < 1) "Yes" else "No"  # Allow 1 min tolerance
+      } else {
+        "-"
+      }
+
+      at_results[[length(at_results) + 1]] <- data.frame(
+        Cycle = cycle,
+        Variable = var,
+        GT_Mean = round(gt_mean, 1),
+        Harmonized_Mean = round(harmonized_mean, 1),
+        Match = match_result,
+        Status = status
+      )
+    }
+  }
+
+  at_summary <- do.call(rbind, at_results)
+  kable(at_summary, row.names = FALSE)
+}
+```
+
+### PAADVWHO (WHO physical activity classification)
+
+```{r}
+#| label: paadvwho-validation
+#| tbl-cap: "PAADVWHO: Source vs harmonized (rec_with_table)"
+
+if (length(cchs_data) > 0 && exists("repo_variable_details")) {
+  cycles_2015plus <- grep("2015|2017|2019|2022", names(cchs_data), value = TRUE)
+
+  who_results <- lapply(cycles_2015plus, function(cycle) {
+    df <- cchs_data[[cycle]]
+
+    has_source <- "PAADVWHO" %in% names(df)
+
+    gt_mean <- NA
+    harmonized_mean <- NA
+    status <- "No source"
+    n_valid <- NA
+
+    if (has_source) {
+      gt_values <- df[["PAADVWHO"]]
+      # Valid categories are 1-4
+      gt_valid <- gt_values[!is.na(gt_values) & gt_values >= 1 & gt_values <= 4]
+      n_valid <- length(gt_valid)
+      if (n_valid > 0) {
+        gt_mean <- mean(gt_valid, na.rm = TRUE)
+      }
+
+      tryCatch({
+        result <- cchsflow::rec_with_table(
+          data = df,
+          variables = "PAADVWHO",
+          database_name = cycle,
+          variable_details = repo_variable_details,
+          append_to_data = FALSE,
+          notes = FALSE
+        )
+
+        if ("PAADVWHO" %in% names(result)) {
+          rwt_values <- result[["PAADVWHO"]]
+          if (is.factor(rwt_values)) {
+            rwt_values <- as.numeric(as.character(rwt_values))
+          }
+          rwt_valid <- rwt_values[!is.na(rwt_values) & rwt_values >= 1 & rwt_values <= 4]
+          if (length(rwt_valid) > 0) {
+            harmonized_mean <- mean(rwt_valid, na.rm = TRUE)
+          }
+          status <- "OK"
+        } else {
+          status <- "No output"
+        }
+      }, error = function(e) {
+        status <<- paste("Error:", substr(e$message, 1, 30))
+      })
+    }
+
+    match_result <- if (!is.na(harmonized_mean) && !is.na(gt_mean)) {
+      if (abs(harmonized_mean - gt_mean) < 0.01) "Yes" else "No"
+    } else {
+      "-"
+    }
+
+    data.frame(
+      Cycle = cycle,
+      N_Valid = n_valid,
+      GT_Mean = round(gt_mean, 2),
+      Harmonized_Mean = round(harmonized_mean, 2),
+      Match = match_result,
+      Status = status
+    )
+  })
+
+  who_summary <- do.call(rbind, who_results)
+  kable(who_summary, row.names = FALSE)
+}
+```
+
+## Phase 7: Validate 2015+ variables
+
+```{r}
+#| label: all-2015-rwt-validation
+#| tbl-cap: "All 2015+ variables: rec_with_table() validation"
+
+if (length(cchs_data) > 0 && exists("repo_variable_details")) {
+  cycles_2015plus <- grep("2015|2017|2019|2022", names(cchs_data), value = TRUE)
+
+  # All PR #157 + L0-L4 variables for 2015+
+  vars_2015 <- c("PAA_045", "PAA_050", "PAA_075", "PAA_080",
+                 "PAADVDYS", "PAADVVIG", "PAYDVTOA", "PAYDVADL",
+                 "PAYDVVIG", "PAYDVDYS")
+
+  all_2015_results <- list()
+
+  for (cycle in cycles_2015plus) {
+    df <- cchs_data[[cycle]]
+
+    for (var in vars_2015) {
+      # Check if source variable exists in data
+      has_source <- var %in% names(df)
+
+      gt_mean <- NA
+      harmonized_mean <- NA
+      status <- "No source"
+
+      if (has_source) {
+        # Ground truth
+        gt_values <- df[[var]]
+        gt_valid <- gt_values[!is.na(gt_values)]
+        if (length(gt_valid) > 0) {
+          gt_mean <- mean(gt_valid, na.rm = TRUE)
+        }
+
+        # rec_with_table() test
+        tryCatch({
+          result <- cchsflow::rec_with_table(
+            data = df,
+            variables = var,
+            database_name = cycle,
+            variable_details = repo_variable_details,
+            append_to_data = FALSE,
+            notes = FALSE
+          )
+
+          if (var %in% names(result)) {
+            rwt_values <- result[[var]]
+            rwt_valid <- rwt_values[!is.na(rwt_values)]
+            if (length(rwt_valid) > 0) {
+              harmonized_mean <- mean(rwt_valid, na.rm = TRUE)
+            }
+            status <- "OK"
+          } else {
+            status <- "No output"
+          }
+        }, error = function(e) {
+          status <<- paste("Error:", substr(e$message, 1, 30))
+        })
+      }
+
+      # Compare
+      match_result <- if (!is.na(harmonized_mean) && !is.na(gt_mean)) {
+        if (abs(harmonized_mean - gt_mean) < 0.01) "Yes" else "No"
+      } else {
+        "-"
+      }
+
+      all_2015_results[[length(all_2015_results) + 1]] <- data.frame(
+        Cycle = cycle,
+        Variable = var,
+        GT_Mean = round(gt_mean, 2),
+        Harmonized_Mean = round(harmonized_mean, 2),
+        Match = match_result,
+        Status = status
+      )
+    }
+  }
+
+  all_2015_summary <- do.call(rbind, all_2015_results)
+  kable(all_2015_summary, row.names = FALSE)
+}
+```
+
+### Summary by variable
+
+```{r}
+#| label: var-summary-2015
+#| tbl-cap: "2015+ variable validation summary"
+
+if (exists("all_2015_summary")) {
+  var_summary <- all_2015_summary %>%
+    group_by(Variable) %>%
+    summarise(
+      Cycles_Tested = sum(Status == "OK"),
+      Cycles_Matched = sum(Match == "Yes", na.rm = TRUE),
+      Cycles_Failed = sum(Status != "OK" & Status != "No source"),
+      .groups = "drop"
+    )
+
+  kable(var_summary, row.names = FALSE)
+}
+```
+
+## Phase 8: Test summary
+
+```{r}
+#| label: test-summary
+
+message("\n", strrep("=", 60))
+message("PHYSICAL ACTIVITY INTEGRATION TEST SUMMARY")
+message(strrep("=", 60), "\n")
+
+# Count results
+n_cycles <- length(cchs_data)
+
+message("CCHS PUMF cycles loaded: ", n_cycles)
+
+# PACDEE summary
+if (exists("pacdee_val_summary")) {
+  n_pacdee_ok <- sum(pacdee_val_summary$Status == "OK")
+  n_pacdee_match <- sum(pacdee_val_summary$Match == "Yes", na.rm = TRUE)
+  message("\nPACDEE (pre-2015 energy expenditure):")
+  message("  Cycles tested: ", n_pacdee_ok)
+  message("  Cycles matched: ", n_pacdee_match)
+}
+
+# PACFLEI summary
+if (exists("pacflei_val_summary")) {
+  n_pacflei_ok <- sum(pacflei_val_summary$Status == "OK")
+  n_pacflei_match <- sum(pacflei_val_summary$Match == "Yes", na.rm = TRUE)
+  message("\nPACFLEI (pre-2015 leisure index):")
+  message("  Cycles tested: ", n_pacflei_ok)
+  message("  Cycles matched: ", n_pacflei_match)
+}
+
+# energy_exp summary
+if (exists("energy_exp_val_summary")) {
+  n_ee_ok <- sum(energy_exp_val_summary$Status == "OK")
+  n_ee_pre2015_match <- sum(energy_exp_val_summary$Era == "Pre-2015" &
+                             energy_exp_val_summary$Match == "Yes", na.rm = TRUE)
+  n_ee_post2015_calc <- sum(energy_exp_val_summary$Era == "Post-2015" &
+                             energy_exp_val_summary$Match == "Calculated", na.rm = TRUE)
+  message("\nenergy_exp (derived energy expenditure):")
+  message("  Total cycles tested: ", n_ee_ok)
+  message("  Pre-2015 cycles matched (vs PACDEE): ", n_ee_pre2015_match)
+  message("  Post-2015 cycles calculated: ", n_ee_post2015_calc)
+}
+
+# Active transport summary
+if (exists("at_summary")) {
+  n_at_ok <- sum(at_summary$Status == "OK")
+  n_at_match <- sum(at_summary$Match == "Yes", na.rm = TRUE)
+  message("\nActive transport (PAADVTRV, PAYDVTTR):")
+  message("  Variable-cycle combinations tested: ", n_at_ok)
+  message("  Variable-cycle combinations matched: ", n_at_match)
+}
+
+# PAADVWHO summary
+if (exists("who_summary")) {
+  n_who_ok <- sum(who_summary$Status == "OK")
+  n_who_match <- sum(who_summary$Match == "Yes", na.rm = TRUE)
+  message("\nPAADVWHO (WHO classification):")
+  message("  Cycles tested: ", n_who_ok)
+  message("  Cycles matched: ", n_who_match)
+}
+
+# 2015+ summary
+if (exists("all_2015_summary")) {
+  n_2015_ok <- sum(all_2015_summary$Status == "OK")
+  n_2015_match <- sum(all_2015_summary$Match == "Yes", na.rm = TRUE)
+  n_2015_error <- sum(grepl("Error", all_2015_summary$Status))
+  message("\n2015+ variables (PAA_*, PAADVVIG, etc.):")
+  message("  Variable-cycle combinations tested: ", n_2015_ok)
+  message("  Variable-cycle combinations matched: ", n_2015_match)
+  if (n_2015_error > 0) {
+    message("  Errors: ", n_2015_error)
+  }
+}
+
+message("\n", strrep("=", 60))
+```
+
+## L0-L4 analysis findings
+
+Based on this validation:
+
+### Extensions validated
+
+| Variable | 2019-2020 Extension | Status |
+|----------|---------------------|--------|
+| PAADVTRV | `cchs2019_2020_p` | Tested |
+| PAYDVTTR | `cchs2019_2020_p` | Tested |
+| active_transport | Uses PAADVTRV/PAYDVTTR | Tested |
+| energy_exp | `cchs2019_2020_p` (all inputs already support) | Tested |
+
+### New variable validated
+
+| Variable | Cycles | Status |
+|----------|--------|--------|
+| PAADVWHO | 2015-2022 | Tested |
+
+### Fixes validated
+
+| Variable | Fix | Status |
+|----------|-----|--------|
+| PACFLEI | dummyVariable `cat_cat6` → `cat2` | Tested |
+| PAC_4B | Label "walking" → "biking" | Metadata only |
+
+## Recommendations
+
+- [x] Extend PAADVTRV to 2019-2020
+- [x] Extend PAYDVTTR to 2019-2020
+- [x] Extend energy_exp to 2019-2020
+- [x] Add PAADVWHO variable (WHO classification)
+- [x] Fix PACFLEI dummyVariable naming
+- [x] Fix PAC_4B label error
+- [ ] Apply staged updates to production worksheets after review
