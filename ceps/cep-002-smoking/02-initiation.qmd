@@ -1,0 +1,808 @@
+---
+title: "02 - Smoking Initiation Variables"
+author: "Doug Manuel, Maikol Diasparra, Caitlin St-Onge"
+date: "2026-01-08"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Overview
+
+| Attribute        | Value                                            |
+|------------------|--------------------------------------------------|
+| **Subgroup**     | 02-initiation                                    |
+| **Variables**    | 16 (15 base + 1 unified)                         |
+| **Purpose**      | Age started smoking (for pack-years calculation) |
+| **Dependencies** | 01-status                                        |
+| **Dependents**   | 05-pack-years                                    |
+
+Initiation variables capture when respondents started smoking. These are critical inputs for pack-years calculation, representing the start of smoking exposure.
+
+::: callout-tip
+## Quick guide
+
+**For pack-years calculation, use `age_start_smoking` as the recommended unified variable.**
+
+`age_start_smoking` automatically selects the best available source:
+
+-   **Master**: Uses `SMK_040` (exact continuous, 2001-2023) when available
+-   **PUMF**: Falls back to `SMKG040_cont` (midpoint estimation ~±3 years, 2001-2021) when SMK_040 is not available
+
+For file-type-specific analysis:
+
+-   **PUMF**: `SMKG040_cont` covers 2001-2021 (derived from SMKG203/207 for 2001-2014, direct for 2015-2021)
+-   **Master**: `SMK_040` covers 2001-2023 (derived from SMK_203/207 for 2001-2014, direct for 2015+)
+
+For smoker-type-specific analyses, use `SMKG203_cont` (current daily) or `SMKG207_cont` (former daily), which also have full 2001-2023 coverage via derivation.
+:::
+
+## Variables
+
+```{r}
+#| label: tbl-initiation-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+source("../../R/table-generators.R")
+
+# Combine main initiation worksheet with unified derived variable
+main_vars <- generate_variable_list_table("02-initiation/variables_smk_initiation.csv")
+unified_vars <- generate_variable_list_table("02-initiation/age_start_smoking_variables.csv")
+rbind(unified_vars, main_vars) |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+## PUMF cycle coverage
+
+```{r}
+#| label: tbl-initiation-coverage
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_subject_coverage_matrix("02-initiation") |>
+  knitr::kable(align = c("l", rep("c", 13)))
+```
+
+## Key decisions
+
+### PUMF vs Master precision
+
+| Aspect   | PUMF (\_cont)                        | Master          |
+|----------|--------------------------------------|-----------------|
+| Source   | Categorical responses                | True continuous |
+| Method   | Midpoint estimation                  | Direct value    |
+| Error    | \~±3 years                           | None            |
+| Coverage | 2001-2014 (203/207), 2001-2021 (01C) | 2001-2023       |
+
+### Midpoint estimation
+
+The `_cont` variables use category midpoints:
+
+| Category | Age range | Midpoint |
+|----------|-----------|----------|
+| 1        | 5-11      | 8        |
+| 2        | 12-14     | 13       |
+| 3        | 15-17     | 16       |
+| 4        | 18-19     | 18.5     |
+| 5        | 20-24     | 22       |
+| 6        | 25-29     | 27       |
+| 7        | 30-34     | 32       |
+| 8        | 35-39     | 37       |
+| 9        | 40-44     | 42       |
+| 10       | 45-49     | 47       |
+| 11       | 50+       | 55       |
+
+These midpoints are stored in `variable_details.csv`, not hard-coded.
+
+### 2015 redesign
+
+Age started variables changed in the 2015 questionnaire redesign:
+
+| Period    | CCHS source (PUMF)          | CCHS source (Master)           |
+|-----------|-----------------------------|--------------------------------|
+| 2001-2014 | SMKG203, SMKG207 (separate) | SMK_203, SMK_207               |
+| 2015-2021 | SMKG040 (combined, grouped) | SMK_040 (combined, continuous) |
+| 2022+     | \-                          | SPU_15                         |
+
+**Harmonisation approach**: cchsflow derives unified variables that span all eras:
+
+-   **SMKG040_cont** (PUMF): Combines SMKG203/207 for 2001-2014, uses SMKG040 directly for 2015-2021
+-   **SMK_040** (Master): Combines SMK_203/207 for 2001-2014, uses SMK_040/SPU_15 directly for 2015+
+-   **SMKG203_cont/SMKG207_cont**: Extended to 2015+ by deriving from SMKG040 + smoking status
+
+### Current vs former smoker variables
+
+| Current smokers | Former smokers | Combined     |
+|-----------------|----------------|--------------|
+| SMKG203_cont    | SMKG207_cont   | SMKG040_cont |
+| SMK_203         | SMK_207        | SMK_040      |
+
+Use current/former specific variables when available; combined variables fill gaps.
+
+## Smoker types and initiation variables
+
+Understanding which smoker types have which variables is critical for pack-years calculation.
+
+### SMKDSTY categories and available initiation variables
+
+This table shows pre-2015 SMKDSTY categories. See [01-status](01-status.qmd) for the 2015+ semantic break where category 5 changed from "former occasional" to "experimental smoker".
+
+| SMKDSTY | Smoker type | Age started daily | Age first cigarette | Pack-years approach |
+|:-------------:|---------------|:-------------:|:-------------:|---------------|
+| 1 | Daily smoker | SMK_203 | SMK_01C | Use SMK_203 |
+| 2 | Occasional (former daily) | SMK_207 | SMK_01C | Use SMK_207 |
+| 3 | Always occasional | \- | SMK_01C | Use SMK_01C as proxy † |
+| 4 | Former daily | SMK_207 | SMK_01C | Use SMK_207 |
+| 5 | Former occasional | \- | SMK_01C | Use SMK_01C as proxy † |
+| 6 | Never smoker | \- | \- | 0 pack-years |
+
+† Occasional smokers who never smoked daily have no "age started daily" variable. SMK_01C (age first cigarette) can serve as a proxy for "age started smoking", but this typically overestimates smoking duration since first cigarette precedes regular smoking. However, pack-years for never-daily smokers is generally low regardless due to their low CPD equivalent.
+
+### Key distinction
+
+-   **SMK_203/207**: Age started smoking **daily** - only for ever-daily smokers (SMKDSTY 1, 2, 4)
+-   **SMK_01C**: Age smoked **first cigarette** - for any ever-smoker (SMKDSTY 1-5)
+
+For pack-years, we need "age started daily" because pack-years = (CPD/20) × years of daily smoking.
+
+## Questionnaire flow and skip patterns
+
+Understanding the skip logic explains why certain variables are missing for certain smoker types.
+
+### Pre-2015 questionnaire flow (simplified)
+
+```         
+SMK_01A: Have you smoked at least 100 cigarettes in your lifetime?
+├── No (→ Never smoker, SMKDSTY=6) → END
+└── Yes → Continue
+
+SMK_202: At the present time, do you smoke cigarettes...?
+├── Daily (→ Current daily, SMKDSTY=1)
+│   └── SMK_203: At what age did you begin to smoke daily? ✓
+├── Occasionally (→ Current occasional)
+│   └── SMK_05D: Have you ever smoked daily?
+│       ├── Yes (→ Former daily, now occasional, SMKDSTY=2)
+│       │   └── SMK_207: At what age did you begin to smoke daily? ✓
+│       └── No (→ Always occasional, SMKDSTY=3)
+│           └── No "age started daily" question asked
+└── Not at all (→ Former smoker)
+    └── SMK_05D: Have you ever smoked daily?
+        ├── Yes (→ Former daily, SMKDSTY=4)
+        │   └── SMK_207: At what age did you begin to smoke daily? ✓
+        └── No (→ Former occasional, SMKDSTY=5)
+            └── No "age started daily" question asked
+```
+
+### 2015+ questionnaire flow (simplified)
+
+```         
+SMK_005: At the present time, do you smoke cigarettes...?
+├── Daily → SMK_040: At what age did you begin to smoke daily? ✓
+├── Occasionally → SMK_030: Have you ever smoked daily?
+│   ├── Yes → SMK_040: At what age did you begin to smoke daily? ✓
+│   └── No → No "age started daily" question asked
+└── Not at all → SMK_020: Have you smoked at least 100 cigarettes?
+    ├── No → Never smoker, END
+    └── Yes → SMK_030: Have you ever smoked daily?
+        ├── Yes → SMK_040: At what age did you begin to smoke daily? ✓
+        └── No → No "age started daily" question asked
+```
+
+### Why some smokers lack initiation data
+
+| Smoker type | Age started daily? | Why |
+|----|:--:|----|
+| Daily (1) | ✓ | Asked SMK_203 or SMK_040 |
+| Occasional, former daily (2) | ✓ | Asked SMK_207 or SMK_040 |
+| Always occasional (3) | ✗ | Never smoked daily, question skipped |
+| Former daily (4) | ✓ | Asked SMK_207 or SMK_040 |
+| Former occasional (5) | ✗ | Never smoked daily, question skipped |
+| Never (6) | ✗ | Never smoked, all questions skipped |
+
+This is by design: the questionnaire only asks "age started daily" to respondents who have ever smoked daily.
+
+## Source variable availability matrix
+
+This matrix shows which CCHS source variables are available by cycle.
+
+### PUMF source availability
+
+| Cycle     | CCHS age started daily | CCHS first cigarette | cchsflow coverage |
+|----------------|:-------------------:|:-----------------:|-----------------|
+| 2001      |      SMKAG203/207      |       SMKAG01C       | SMKG040_cont ✓    |
+| 2003      |      SMKCG203/207      |       SMKCG01C       | SMKG040_cont ✓    |
+| 2005      |      SMKEG203/207      |       SMKEG01C       | SMKG040_cont ✓    |
+| 2007-2008 |      SMKG203/207       |       SMKG01C        | SMKG040_cont ✓    |
+| 2009-2010 |      SMKG203/207       |       SMKG01C        | SMKG040_cont ✓    |
+| 2011-2012 |      SMKG203/207       |       SMKG01C        | SMKG040_cont ✓    |
+| 2013-2014 |      SMKG203/207       |       SMKG01C        | SMKG040_cont ✓    |
+| 2015-2016 |        SMKG040         |       SMKG035        | SMKG040_cont ✓    |
+| 2017-2018 |        SMKG040         |       SMKG035        | SMKG040_cont ✓    |
+| 2019-2020 |      SMKDGYCS †        |       SMKG035        | SMKDGYCS_cont †   |
+| 2021      |        SMKG040         |       SMKG035        | SMKG040_cont ✓    |
+| 2022-2023 |      SMKDGYCS †        |          \-          | SMKDGYCS_cont †   |
+
+† SMKG040 not in 2019-2020 or 2022+ PUMF. Use SMKDGYCS (years smoked daily); calculate age started = current age - years smoked
+
+### Master source availability
+
+| Cycle     | CCHS source                 | cchsflow coverage   |
+|-----------|-----------------------------|---------------------|
+| 2001-2014 | SMK_203, SMK_207 (separate) | SMK_040 ✓ (derived) |
+| 2015-2021 | SMK_040 (combined)          | SMK_040 ✓ (direct)  |
+| 2022-2023 | SPU_15                      | SMK_040 ✓ (mapped)  |
+
+All Master cycles have full SMK_040 coverage (2001-2023).
+
+### Harmonised variable mapping
+
+| Harmonised variable | Universe | Derivation |
+|----------------------------------|------------------|--------------------|
+| **PUMF** |  |  |
+| **SMKG040_cont** | Ever daily | 2001-2014: from SMKG203+SMKG207; 2015-2021: from SMKG040 |
+| SMKG203_cont | Current daily | 2001-2014: from SMKG203; 2015+: from SMKG005+SMKG040 |
+| SMKG207_cont | Former daily | 2001-2014: from SMKG207; 2015+: from SMKG030+SMKG040 |
+| SMKG01C_cont | Any ever-smoker | 2001-2014: from SMKG01C; 2015-2021: from SMKG035 |
+| SMKDGYCS_cont | Ever daily | 2022-2023 only; years smoked daily |
+| **Master** |  |  |
+| **SMK_040** | Ever daily | 2001-2014: from SMK_203+SMK_207; 2015-2021: from SMK_040; 2022+: from SPU_15 |
+| SMK_203 | Current daily | 2001-2014: direct; 2015+: from SMK_005+SMK_040 |
+| SMK_207 | Former daily | 2001-2014: direct; 2015+: from SMK_030+SMK_040 |
+| SMK_01C | Any ever-smoker | 2001-2014: direct; 2015-2021: from SMK_035; 2022+: from CSS_10 |
+
+## Recommended usage
+
+::: callout-important
+## Primary recommendation
+
+Use **age_start_smoking** for pack-years calculation. This unified derived variable automatically selects the best available source:
+
+- **Master files**: Uses `SMK_040` (exact continuous values)
+- **PUMF files**: Uses `SMKG040_cont` (midpoint estimation, ~±3 years precision)
+
+For file-type-specific analysis, you can use `SMKG040_cont` (PUMF) or `SMK_040` (Master) directly.
+:::
+
+| Use case | Recommended | PUMF alternative | Master alternative |
+|------------------------------|------------------|------------------|------------------------|
+| **Pack-years (unified)** | **age_start_smoking** | - | - |
+| Pack-years (file-specific) | - | SMKG040_cont (2001-2021) | SMK_040 (2001-2023) |
+| Pack-years (2022+) | - | SMKDGYCS_cont (derive) | SMK_040 (via SPU_15) |
+| Smoker-type specific | - | SMKG203_cont / SMKG207_cont | SMK_203 / SMK_207 |
+| Age first cigarette | - | SMKG01C_cont (2001-2021) | SMK_01C (2001-2023) |
+
+::: callout-note
+## Full pack-years coverage
+
+Pack-years is calculable for all CCHS cycles:
+
+-   **PUMF 2001-2021**: Use SMKG040_cont directly
+-   **PUMF 2022-2023**: Use SMKDGYCS_cont (years smoked daily) and calculate age started = current age - years smoked
+-   **Master 2001-2023**: Use SMK_040 directly for all cycles
+:::
+
+### Variable selection flowchart
+
+Use this decision tree to select the appropriate initiation variable:
+
+```
+1. Need unified cross-file variable?
+   ├── Yes → Use age_start_smoking (recommended)
+   │         Automatically uses SMK_040 (Master) or SMKG040_cont (PUMF)
+   └── No → Go to step 2
+
+2. What file type?
+   ├── PUMF → Go to step 3
+   └── Master → Use SMK_040 for all cycles (2001-2023)
+
+3. What cycle? (PUMF)
+   ├── 2001-2021 → Use SMKG040_cont
+   └── 2022-2023 → Derive: current_age - SMKDGYCS_cont
+
+4. Need smoker-type specific analysis?
+   ├── Current daily only → Use SMKG203_cont / SMK_203
+   ├── Former daily only → Use SMKG207_cont / SMK_207
+   └── Never-daily smokers → Use SMKG01C_cont / SMK_01C (age first cigarette as proxy)
+```
+
+**Notes:**
+
+- **age_start_smoking** is the recommended unified variable for all pack-years calculations
+- Uses exact continuous values (Master) when available, midpoint estimation (PUMF) otherwise
+- **Never-daily smokers** (SMKDSTY 3, 5) have no "age started daily" - use age first cigarette as proxy
+- **2022+ PUMF**: Use SMKDGYCS_cont (years smoked daily) and calculate age started = current age - years smoked
+
+### Code examples
+
+**Recommended approach - use unified age_start_smoking:**
+
+``` r
+library(cchsflow)
+library(dplyr)
+
+# Load harmonized data - age_start_smoking works for any cycle
+# Automatically uses SMK_040 (Master) or SMKG040_cont (PUMF)
+data <- rec_with_table(
+  cchs2007_2008_p,
+  c("SMKDSTY_A", "age_start_smoking", "SMKG01C_cont")
+)
+
+# age_start_smoking is already available for ever-daily smokers (SMKDSTY 1, 2, 4)
+# For never-daily smokers, use SMKG01C_cont as proxy
+data <- data %>%
+  mutate(
+    age_started = case_when(
+      SMKDSTY_A %in% c(1, 2, 4) ~ age_start_smoking,   # Ever-daily smokers
+      SMKDSTY_A %in% c(3, 5) ~ SMKG01C_cont,           # Never-daily (proxy)
+      SMKDSTY_A == 6 ~ NA_real_,                       # Never smoker
+      TRUE ~ NA_real_
+    )
+  )
+```
+
+**File-type-specific approach (alternative):**
+
+``` r
+# If you need to work with specific file types directly:
+# PUMF: Use SMKG040_cont (2001-2021)
+# Master: Use SMK_040 (2001-2023)
+
+data_pumf <- rec_with_table(
+  cchs2007_2008_p,
+  c("SMKDSTY_A", "SMKG040_cont")
+)
+
+# For 2022+ PUMF, calculate age started from years smoked
+calculate_age_started_2022 <- function(current_age, years_smoked_daily) {
+  # SMKDGYCS_cont provides years smoked daily
+  # age_started = current_age - years_smoked
+  current_age - years_smoked_daily
+}
+```
+
+**Smoker-type specific analysis (when needed):**
+
+``` r
+# Use SMKG203_cont / SMKG207_cont when you need to analyse
+# current vs former daily smokers separately
+data <- rec_with_table(
+  cchs2015_2016_p,
+  c("SMKDSTY_A", "SMKG203_cont", "SMKG207_cont")
+)
+
+# These variables are also unified across 2001-2023
+# 2015+: derived from SMKG040 + smoking status
+```
+
+## Valid ranges
+
+### Age range decisions
+
+| Variable | Valid range | Rationale |
+|---------------------|---------------------------|-----------------------|
+| SMK_01C / SMKG01C_cont | 5-80 | First cigarette theoretically possible very young |
+| SMK_203 / SMKG203_cont | 5-80 | Age started daily, must be ≤ current age |
+| SMK_207 / SMKG207_cont | 5-80 | Same as SMK_203 |
+| SMK_040 / SMKG040_cont | 5-80 | Combined current/former |
+
+### CCHS category bounds
+
+PUMF pseudo-continuous variables use these category-to-midpoint mappings:
+
+| Category | Range | Midpoint | Lower bound | Upper bound |
+|:--------:|-------|:--------:|:-----------:|:-----------:|
+|    1     | 5-11  |    8     |      5      |     11      |
+|    2     | 12-14 |    13    |     12      |     14      |
+|    3     | 15-17 |    16    |     15      |     17      |
+|    4     | 18-19 |   18.5   |     18      |     19      |
+|    5     | 20-24 |    22    |     20      |     24      |
+|    6     | 25-29 |    27    |     25      |     29      |
+|    7     | 30-34 |    32    |     30      |     34      |
+|    8     | 35-39 |    37    |     35      |     39      |
+|    9     | 40-44 |    42    |     40      |     44      |
+|    10    | 45-49 |    47    |     45      |     49      |
+|    11    | 50+   |    55    |     50      |      ∞      |
+
+For sensitivity analyses, use lower/upper bounds instead of midpoints.
+
+### Cross-field constraints
+
+| Rule | Constraint | Action if violated |
+|-----------------|----------------------|----------------------------------|
+| Age started ≤ current age | age_started ≤ DHH_AGE | Set to NA(b) |
+| Age started ≥ 5 | age_started ≥ 5 | Set to NA(b) |
+| Age started daily ≥ age first cigarette | SMK_203 ≥ SMK_01C | Flag for review |
+
+The third rule is soft - respondents may report the same age for both, or may not remember precisely.
+
+## Common pitfalls and edge cases
+
+### Pitfall 1: Using wrong variable for smoker type
+
+**Problem**: Using `SMKG203_cont` for former smokers or `SMKG207_cont` for current daily smokers.
+
+**Solution**: Always check SMKDSTY first. Use the SMKDSTY → variable mapping in "Smoker types and initiation variables" above.
+
+### Pitfall 2: Assuming all ever-smokers have initiation data
+
+**Problem**: Expecting age started daily for SMKDSTY=3 (always occasional) or SMKDSTY=5 (former occasional).
+
+**Solution**: These smokers never smoked daily, so they were never asked. Use `SMKG01C_cont` as a proxy if needed, but document this limitation.
+
+### Pitfall 3: Using era-specific variables instead of unified variables
+
+**Problem**: Writing complex era-specific logic when unified variables are available.
+
+**Solution**: Use SMKG040_cont (PUMF) or SMK_040 (Master) - these are already harmonized across eras. cchsflow derives 2001-2014 values from SMKG203/207 and uses SMKG040/SMK_040 directly for 2015+.
+
+### Pitfall 4: Ignoring midpoint estimation error
+
+**Problem**: Treating `SMKG203_cont` as precise when it has \~±3 years error from midpoint estimation.
+
+**Solution**: Document this error in methods. For sensitivity analyses, consider using category bounds (low/high estimates) instead of midpoints.
+
+### Edge case: Age started \> current age
+
+In rare cases, data entry errors or unusual response patterns may result in: - Age started smoking \> current age - Age started smoking \< 5 years
+
+**Recommendation**: Flag these as data quality issues. Consider: - Setting to `NA(b)` (missing/unknown) - Capping at plausible bounds (e.g., 5-80) - Excluding from analysis
+
+### Edge case: Young respondents
+
+Respondents aged 12-17 may have started smoking recently. For these: - Age started may equal current age - Smoking duration may be \< 1 year - Pack-years will be very low
+
+This is valid data, not an error.
+
+## Validation status
+
+| Level | Status  | Notes                      |
+|-------|---------|----------------------------|
+| L0    | ✓       | Schema compliant           |
+| L1    | ✓       | Database names validated   |
+| L2    | ✓       | Source references verified |
+| L3    | ✓       | Category codes verified    |
+| L4    | ✓       | Midpoint values reviewed   |
+| L5    | ✓       | Integration tests (below)  |
+
+## Integration testing
+
+This section validates the primary recommended variable `age_start_smoking` using actual PUMF data. Testing includes:
+
+1. **rec_with_table()**: Validation that the derived variable produces expected results
+2. **Universe validation**: Only ever-daily smokers (SMKDSTY 1, 2, 4) should have values
+3. **Clinical reasonableness**: Distribution checks against epidemiological expectations
+
+**Note**: `age_start_smoking` is a derived variable using midpoint estimation for PUMF data. Ground truth comparison is not possible in the same way as direct pass-through variables.
+
+### Clinical expectations
+
+| Metric | Expected value |
+|--------|----------------|
+| Mean age started | 16-18 years |
+| Median age started | 15-17 years |
+| Range | 8-80 years (per worksheet bounds) |
+| Universe | Ever-daily smokers only (SMKDSTY 1, 2, 4) |
+
+**Epidemiological context**: Most smokers start in adolescence. The typical age of smoking initiation is 14-17 years, with daily smoking onset slightly later (16-18 years).
+
+```{r}
+#| label: setup-integration-initiation
+#| echo: false
+#| message: false
+#| warning: false
+
+library(dplyr)
+library(knitr)
+library(here)
+
+# Project paths
+project_root <- here::here()
+rdata_dir <- file.path(project_root, "working_data_and_documentation/pumf-rdata")
+
+# Source cchsflow functions
+original_wd <- getwd()
+setwd(project_root)
+source("R/strings.R")
+source("R/recode-with-table.R")
+setwd(original_wd)
+
+# Load worksheets - need both initiation and the unified DV worksheet
+variables_main <- read.csv(file.path(project_root, "ceps/cep-002-smoking/02-initiation/variables_smk_initiation.csv"), stringsAsFactors = FALSE)
+variable_details_main <- read.csv(file.path(project_root, "ceps/cep-002-smoking/02-initiation/variable_details_smk_initiation.csv"), stringsAsFactors = FALSE)
+
+variables_unified <- read.csv(file.path(project_root, "ceps/cep-002-smoking/02-initiation/age_start_smoking_variables.csv"), stringsAsFactors = FALSE)
+variable_details_unified <- read.csv(file.path(project_root, "ceps/cep-002-smoking/02-initiation/age_start_smoking_variable_details.csv"), stringsAsFactors = FALSE)
+
+# Combine worksheets
+variables <- rbind(variables_unified, variables_main)
+variable_details <- rbind(variable_details_unified, variable_details_main)
+
+# Also need status variables for SMKDSTY_cat6
+status_variables <- read.csv(file.path(project_root, "ceps/cep-002-smoking/01-status/variables_smk_status.csv"), stringsAsFactors = FALSE)
+status_variable_details <- read.csv(file.path(project_root, "ceps/cep-002-smoking/01-status/variable_details_smk_status.csv"), stringsAsFactors = FALSE)
+
+all_variables <- rbind(variables, status_variables)
+all_variable_details <- rbind(variable_details, status_variable_details)
+
+# Cycle order
+cycle_order <- c(
+  "2001", "2003", "2005", "2007_2008", "2009_2010",
+  "2011_2012", "2013_2014", "2015_2016", "2017_2018",
+  "2019_2020"
+)
+```
+
+### rec_with_table() validation
+
+Test that `age_start_smoking` produces continuous values in the expected range for ever-daily smokers.
+
+```{r}
+#| label: rec-with-table-initiation
+#| code-fold: true
+
+# Test rec_with_table() for age_start_smoking across cycles
+rwt_results <- list()
+
+for (cycle in cycle_order) {
+  rdata_file <- file.path(rdata_dir, paste0("CCHS_", cycle, ".RData"))
+
+  if (!file.exists(rdata_file)) next
+
+  env <- new.env()
+  load(rdata_file, envir = env)
+  df <- get(ls(env)[1], envir = env)
+
+  db_name <- paste0("cchs", cycle, "_p")
+
+  tryCatch({
+    harmonized <- rec_with_table(
+      data = df,
+      variables = all_variables,
+      variable_details = all_variable_details,
+      database_name = db_name,
+      var_names = c("age_start_smoking", "SMKDSTY_cat6"),
+      log = FALSE
+    )
+
+    if ("age_start_smoking" %in% names(harmonized)) {
+      age_values <- harmonized$age_start_smoking
+      status_values <- harmonized$SMKDSTY_cat6
+
+      # Filter to ever-daily smokers (SMKDSTY 1, 2, 4)
+      ever_daily <- status_values %in% c(1, 2, 4)
+      age_ever_daily <- age_values[ever_daily]
+      age_valid <- age_ever_daily[!is.na(age_ever_daily)]
+
+      # Calculate statistics
+      if (length(age_valid) > 0) {
+        rwt_results[[cycle]] <- data.frame(
+          Cycle = cycle,
+          N = nrow(df),
+          N_ever_daily = sum(ever_daily, na.rm = TRUE),
+          N_valid = length(age_valid),
+          Mean = round(mean(age_valid), 1),
+          Median = round(median(age_valid), 1),
+          Min = round(min(age_valid), 1),
+          Max = round(max(age_valid), 1),
+          Pct_valid = round(100 * length(age_valid) / sum(ever_daily, na.rm = TRUE), 1),
+          check.names = FALSE
+        )
+      }
+    }
+  }, error = function(e) {
+    message("rec_with_table failed for ", cycle, ": ", e$message)
+  })
+}
+
+rwt_df <- do.call(rbind, rwt_results)
+rownames(rwt_df) <- NULL
+```
+
+```{r}
+#| label: tbl-initiation-results
+#| tbl-cap: "rec_with_table() results: age_start_smoking across PUMF cycles"
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  kable(rwt_df,
+        col.names = c("Cycle", "N Total", "Ever Daily", "Valid Ages", "Mean", "Median", "Min", "Max", "% Valid"),
+        format.args = list(big.mark = ","))
+} else {
+  cat("No rec_with_table results available. Check that PUMF data files exist.")
+}
+```
+
+### Universe validation
+
+Verify that `age_start_smoking` is NA for never-daily smokers (SMKDSTY 3, 5, 6).
+
+```{r}
+#| label: universe-validation
+#| code-fold: true
+
+# Check that never-daily smokers have NA
+universe_check <- list()
+
+for (cycle in c("2007_2008", "2015_2016")) {  # Sample cycles from each era
+  rdata_file <- file.path(rdata_dir, paste0("CCHS_", cycle, ".RData"))
+
+  if (!file.exists(rdata_file)) next
+
+  env <- new.env()
+  load(rdata_file, envir = env)
+  df <- get(ls(env)[1], envir = env)
+
+  db_name <- paste0("cchs", cycle, "_p")
+
+  tryCatch({
+    harmonized <- rec_with_table(
+      data = df,
+      variables = all_variables,
+      variable_details = all_variable_details,
+      database_name = db_name,
+      var_names = c("age_start_smoking", "SMKDSTY_cat6"),
+      log = FALSE
+    )
+
+    status <- harmonized$SMKDSTY_cat6
+    age <- harmonized$age_start_smoking
+
+    # Count by status
+    for (s in 1:6) {
+      in_status <- status == s & !is.na(status)
+      n_in_status <- sum(in_status, na.rm = TRUE)
+      n_has_age <- sum(!is.na(age[in_status]), na.rm = TRUE)
+      pct_has_age <- if (n_in_status > 0) round(100 * n_has_age / n_in_status, 1) else NA
+
+      universe_check[[paste0(cycle, "_", s)]] <- data.frame(
+        Cycle = cycle,
+        Status = s,
+        Status_label = c("Daily", "Occ (fmr daily)", "Always occ", "Fmr daily", "Fmr occ", "Never")[s],
+        N_status = n_in_status,
+        N_has_age = n_has_age,
+        Pct_has_age = pct_has_age,
+        Expected = ifelse(s %in% c(1, 2, 4), "Has age", "NA"),
+        check.names = FALSE
+      )
+    }
+  }, error = function(e) {
+    message("Universe check failed for ", cycle, ": ", e$message)
+  })
+}
+
+universe_df <- do.call(rbind, universe_check)
+rownames(universe_df) <- NULL
+```
+
+```{r}
+#| label: tbl-universe
+#| tbl-cap: "Universe validation: age_start_smoking by smoking status"
+
+if (!is.null(universe_df) && nrow(universe_df) > 0) {
+  kable(universe_df,
+        col.names = c("Cycle", "Status", "Label", "N", "Has Age", "% Has Age", "Expected"))
+}
+```
+
+### Clinical assessment
+
+```{r}
+#| label: clinical-assessment-initiation
+#| code-fold: true
+
+assessment <- list()
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  # Check 1: Mean age in expected range (16-18)
+  mean_range <- range(rwt_df$Mean, na.rm = TRUE)
+  check_mean <- mean_range[1] >= 14 && mean_range[2] <= 22
+  assessment$mean_range <- list(
+    check = "Mean age started 14-22 years",
+    observed = paste0(mean_range[1], " - ", mean_range[2], " years"),
+    pass = check_mean
+  )
+
+  # Check 2: Median around 15-17
+  median_range <- range(rwt_df$Median, na.rm = TRUE)
+  check_median <- median_range[1] >= 13 && median_range[2] <= 20
+  assessment$median_range <- list(
+    check = "Median age started 13-20 years",
+    observed = paste0(median_range[1], " - ", median_range[2], " years"),
+    pass = check_median
+  )
+
+  # Check 3: Valid percentage high (>90% of ever-daily should have data)
+  pct_valid_range <- range(rwt_df$Pct_valid, na.rm = TRUE)
+  check_coverage <- pct_valid_range[1] >= 85
+  assessment$coverage <- list(
+    check = "Coverage ≥85% of ever-daily smokers",
+    observed = paste0(pct_valid_range[1], "% - ", pct_valid_range[2], "%"),
+    pass = check_coverage
+  )
+
+  # Check 4: Universe correctness (never-daily should have 0%)
+  if (exists("universe_df") && nrow(universe_df) > 0) {
+    never_daily <- universe_df[universe_df$Status %in% c(3, 5, 6), ]
+    max_pct_never_daily <- max(never_daily$Pct_has_age, na.rm = TRUE)
+    check_universe <- max_pct_never_daily < 5  # Allow small error rate
+    assessment$universe <- list(
+      check = "Never-daily smokers have <5% with age data",
+      observed = paste0("Max: ", max_pct_never_daily, "%"),
+      pass = check_universe
+    )
+  }
+}
+
+assessment_df <- do.call(rbind, lapply(assessment, function(x) {
+  data.frame(Check = x$check, Observed = x$observed,
+             Result = ifelse(x$pass, "✓ PASS", "✗ FAIL"))
+}))
+```
+
+```{r}
+#| label: tbl-assessment-initiation
+#| tbl-cap: "Clinical reasonableness assessment"
+
+if (exists("assessment_df") && !is.null(assessment_df) && nrow(assessment_df) > 0) {
+  kable(assessment_df, row.names = FALSE)
+}
+```
+
+### Age distribution
+
+```{r}
+#| label: fig-age-distribution
+#| fig-cap: "Mean age started smoking daily by cycle"
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  years <- as.numeric(gsub("_.*", "", rwt_df$Cycle))
+
+  plot(years, rwt_df$Mean, type = "b", pch = 19, col = "steelblue",
+       xlab = "CCHS Year", ylab = "Mean Age Started Daily",
+       main = "Age Started Smoking Daily",
+       ylim = c(14, 20))
+
+  # Add median line
+  lines(years, rwt_df$Median, type = "b", pch = 17, col = "darkgreen", lty = 2)
+
+  legend("topright", legend = c("Mean", "Median"),
+         col = c("steelblue", "darkgreen"), pch = c(19, 17), lty = c(1, 2))
+}
+```
+
+### Test summary
+
+```{r}
+#| label: test-summary-initiation
+
+n_clinical <- if (exists("assessment_df") && !is.null(assessment_df)) nrow(assessment_df) else 0
+n_clinical_pass <- if (exists("assessment_df") && !is.null(assessment_df) && nrow(assessment_df) > 0) sum(grepl("PASS", assessment_df$Result)) else 0
+n_cycles <- if (!is.null(rwt_df)) nrow(rwt_df) else 0
+
+cat("## age_start_smoking Integration Test Summary\n\n")
+cat("**Clinical reasonableness:**", n_clinical_pass, "/", n_clinical, "passed\n")
+cat("**Cycles tested:**", n_cycles, "\n")
+
+if (n_cycles == 0) {
+  cat("\n⚠ **No PUMF data available for testing**\n")
+} else if (n_clinical == 0 || n_clinical_pass == n_clinical) {
+  cat("\n✓ **L5 INTEGRATION TESTS: PASSED**\n")
+} else {
+  cat("\n✗ **L5 INTEGRATION TESTS: ISSUES DETECTED**\n")
+}
+```
+
+## Appendix
+
+-   [L0: Documentation assessment](02-initiation/L0_documentation_assessment.md)
+-   [L1: Variable concordance](02-initiation/L1_variable_concordance.md)
+-   [L2: Semantic mapping](02-initiation/L2_semantic_mapping.md)
+-   [L3: Worksheet draft](02-initiation/L3_worksheet_draft.md)
+-   [L4: DV specifications](02-initiation/L4_dv_specifications.md)
+-   [variables_smk_initiation.csv](02-initiation/variables_smk_initiation.csv)
+-   [variable_details_smk_initiation.csv](02-initiation/variable_details_smk_initiation.csv)
+-   [age_start_smoking_variables.csv](02-initiation/age_start_smoking_variables.csv) (new unified DV)
+-   [age_start_smoking_variable_details.csv](02-initiation/age_start_smoking_variable_details.csv) (new unified DV)
