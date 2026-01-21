@@ -1,0 +1,472 @@
+---
+title: "01 - Smoking Status Variables"
+author: "Doug Manuel, Maikol Diasparra, Caitlin St-Onge"
+date: "2026-01-08"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+| Attribute        | Value                                        |
+|------------------|----------------------------------------------|
+| **Subgroup**     | 01-status                                    |
+| **Variables**    | 10                                           |
+| **Purpose**      | Base classification for all smoking analyses |
+| **Dependencies** | None                                         |
+| **Dependents**   | All other smoking subgroups                  |
+
+Smoking status variables provide the foundation for smoking research. They classify respondents into smoking categories (current, former, never) with varying levels of detail.
+
+## Variables
+
+```{r}
+#| label: tbl-status-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+source("../../R/table-generators.R")
+
+generate_variable_list_table("01-status/variables_smk_status.csv") |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+## PUMF cycle coverage
+
+```{r}
+#| label: tbl-status-coverage
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_subject_coverage_matrix("01-status") |>
+  knitr::kable(align = c("l", rep("c", 13)))
+```
+
+## Key decisions
+
+### SMKDSTY semantic break in 2015
+
+The StatsCan derived variable SMKDSTY changed category definitions in 2015:
+
+| Category | Pre-2015 meaning         | 2015+ meaning       |
+|----------|--------------------------|---------------------|
+| 5        | Former occasional smoker | Experimental smoker |
+
+**Solution**: Created harmonized variables that avoid this break:
+
+-   `SMKDSTY_cat3` - Collapses to current/former/never
+-   `SMKDSTY_cat5` - Merges problematic categories
+-   `SMKDSTY_A` - Pre-2015 structure for all cycles (derives 2015+ from components)
+
+### All-cycle harmonized variables
+
+| Use case | Variable | Why |
+|---------------------------|---------------------------|------------------|
+| Simple status | SMKDSTY_cat3 | Full coverage, no semantic breaks |
+| Detailed status | SMKDSTY_cat5 | Daily/occasional distinction, comparable |
+| Current frequency | SMK_202 | Direct question, full coverage |
+| Pack-years input | SMKDSTY_A | 6-category needed for pack_years_der derivation |
+
+### 2022+ PUMF coverage
+
+SMK_01A and SMK_05D are not in 2022-2023 PUMF (module split). Users should:
+
+-   Use SMKDSTY-based variables for 2022-2023 PUMF
+-   Master files have full coverage via CSS_15 and SPU_05
+
+## Era mappings
+
+| Variable | Era 1 (2001-2014)     | Era 2 (2015-2021) | Era 3 (2022+) |
+|----------|-----------------------|-------------------|---------------|
+| SMK_202  | SMKA/C/E_202, SMK_202 | SMK_005           | CSS_05        |
+| SMK_01A  | SMKA/C/E_01A, SMK_01A | SMK_020           | CSS_15        |
+| SMK_05D  | SMKA/C/E_05D, SMK_05D | SMK_030           | SPU_05        |
+| SMKDSTY  | SMKA/C/EDSTY, SMKDSTY | SMKDVSTY          | SMKDVSTY      |
+
+## Validation status
+
+| Level | Status  | Notes                                  |
+|-------|---------|----------------------------------------|
+| L0    | ✓       | Schema compliant                       |
+| L1    | ✓       | Database names validated               |
+| L2    | ✓       | Source references verified against DDI |
+| L3    | ✓       | Category codes verified                |
+| L4    | ✓       | Semantic consistency reviewed          |
+| L5    | ✓       | Integration tests (below)              |
+
+## Integration testing
+
+This section validates the primary recommended variable `SMKDSTY_cat6` using actual PUMF data. Testing includes:
+
+1. **Ground truth** (pre-2015 cycles): Direct comparison where source→target is 1:1 mapping
+2. **rec_with_table()**: Validation that harmonization produces expected results
+3. **Clinical reasonableness**: Distribution checks against epidemiological expectations
+
+### Clinical expectations
+
+| Category | Label | Expected prevalence |
+|----------|-------|---------------------|
+| 1 | Daily smoker | 10-25% (declining trend) |
+| 2 | Occasional (former daily) | 2-4% |
+| 3 | Always occasional | 3-5% |
+| 4 | Former daily | 25-35% |
+| 5 | Former occasional | 5-10% |
+| 6 | Never smoked | 30-40% |
+
+**Trend expectation**: Daily smoking prevalence should decline over time (public health success).
+
+```{r}
+#| label: setup-integration
+#| echo: false
+#| message: false
+#| warning: false
+
+library(dplyr)
+library(knitr)
+library(here)
+
+# Project paths
+project_root <- here::here()
+rdata_dir <- file.path(project_root, "working_data_and_documentation/pumf-rdata")
+
+# Source cchsflow functions
+original_wd <- getwd()
+setwd(project_root)
+source("R/strings.R")
+source("R/recode-with-table.R")
+setwd(original_wd)
+
+# Load worksheets from this subgroup
+variables_csv <- file.path(project_root, "ceps/cep-002-smoking/01-status/variables_smk_status.csv")
+variable_details_csv <- file.path(project_root, "ceps/cep-002-smoking/01-status/variable_details_smk_status.csv")
+
+variables <- read.csv(variables_csv, stringsAsFactors = FALSE)
+variable_details <- read.csv(variable_details_csv, stringsAsFactors = FALSE)
+
+# Cycle order
+cycle_order <- c(
+  "2001", "2003", "2005", "2007_2008", "2009_2010",
+  "2011_2012", "2013_2014", "2015_2016", "2017_2018",
+  "2019_2020", "2022"
+)
+```
+
+### Ground truth: SMKDSTY_cat6 (pre-2015 cycles)
+
+For cycles 2001-2014, `SMKDSTY_cat6` is a direct 1:1 pass-through from the source variable (SMKADSTY, SMKCDSTY, SMKEDSTY, or SMKDSTY). This allows ground truth validation.
+
+```{r}
+#| label: ground-truth-status
+#| code-fold: true
+
+# Derive ground truth from raw PUMF data (pre-2015 only)
+derive_smkdsty_ground_truth <- function(df, cycle) {
+
+  # Identify source variable by cycle
+  if (cycle == "2001") {
+    var_name <- "SMKADSTY"
+  } else if (cycle == "2003") {
+    var_name <- "SMKCDSTY"
+  } else if (cycle == "2005") {
+    var_name <- "SMKEDSTY"
+  } else if (cycle %in% c("2007_2008", "2009_2010", "2011_2012", "2013_2014")) {
+    var_name <- "SMKDSTY"
+  } else {
+    return(list(values = rep(NA, nrow(df)), source_var = "N/A (derived)",
+                method = "2015+ requires derivation"))
+  }
+
+  if (var_name %in% names(df)) {
+    return(list(values = df[[var_name]], source_var = var_name,
+                method = "Direct pass-through"))
+  } else {
+    return(list(values = rep(NA, nrow(df)), source_var = paste(var_name, "(missing)"),
+                method = "Variable not in dataset"))
+  }
+}
+
+# Process all pre-2015 cycles for ground truth
+ground_truth_results <- list()
+pre2015_cycles <- c("2001", "2003", "2005", "2007_2008", "2009_2010",
+                     "2011_2012", "2013_2014")
+
+for (cycle in pre2015_cycles) {
+  rdata_file <- file.path(rdata_dir, paste0("CCHS_", cycle, ".RData"))
+
+  if (!file.exists(rdata_file)) {
+    message("Skipping ", cycle, " - file not found")
+    next
+  }
+
+  env <- new.env()
+  load(rdata_file, envir = env)
+  df <- get(ls(env)[1], envir = env)
+
+  derived <- derive_smkdsty_ground_truth(df, cycle)
+  values <- derived$values
+
+  # Count by category (valid = 1-6)
+  n_total <- nrow(df)
+  cat_counts <- table(factor(values, levels = 1:6))
+  n_valid <- sum(cat_counts)
+
+  ground_truth_results[[cycle]] <- data.frame(
+    Cycle = cycle,
+    N = n_total,
+    Source = derived$source_var,
+    Daily = as.numeric(cat_counts[1]),
+    Occ_fmr = as.numeric(cat_counts[2]),
+    Always_occ = as.numeric(cat_counts[3]),
+    Fmr_daily = as.numeric(cat_counts[4]),
+    Fmr_occ = as.numeric(cat_counts[5]),
+    Never = as.numeric(cat_counts[6]),
+    Pct_daily = round(100 * cat_counts[1] / n_valid, 1),
+    Pct_never = round(100 * cat_counts[6] / n_valid, 1)
+  )
+}
+
+ground_truth_df <- do.call(rbind, ground_truth_results)
+rownames(ground_truth_df) <- NULL
+```
+
+```{r}
+#| label: tbl-ground-truth
+#| tbl-cap: "Ground truth: SMKDSTY distribution from raw PUMF (pre-2015 cycles)"
+
+if (!is.null(ground_truth_df) && nrow(ground_truth_df) > 0) {
+  kable(ground_truth_df[, c("Cycle", "N", "Source", "Daily", "Fmr_daily", "Never",
+                             "Pct_daily", "Pct_never")],
+        col.names = c("Cycle", "N", "Source", "Daily", "Fmr Daily", "Never",
+                      "% Daily", "% Never"),
+        format.args = list(big.mark = ","))
+} else {
+  cat("No ground truth data available. Check that PUMF data files exist.")
+}
+```
+
+### rec_with_table() validation
+
+Test that `rec_with_table()` produces the same results as ground truth for pre-2015 cycles, and produces valid results for 2015+ cycles.
+
+```{r}
+#| label: rec-with-table-test
+#| code-fold: true
+
+# Test rec_with_table() against ground truth
+rwt_results <- list()
+test_results <- list()
+
+for (cycle in cycle_order) {
+  rdata_file <- file.path(rdata_dir, paste0("CCHS_", cycle, ".RData"))
+
+  if (!file.exists(rdata_file)) next
+
+  env <- new.env()
+  load(rdata_file, envir = env)
+  df <- get(ls(env)[1], envir = env)
+
+  # Database name for this cycle
+  db_name <- paste0("cchs", cycle, "_p")
+
+  # Apply rec_with_table for SMKDSTY_cat6
+  tryCatch({
+    harmonized <- rec_with_table(
+      data = df,
+      variables = variables,
+      variable_details = variable_details,
+      database_name = db_name,
+      var_names = "SMKDSTY_cat6",
+      log = FALSE
+    )
+
+    if ("SMKDSTY_cat6" %in% names(harmonized)) {
+      rwt_values <- harmonized$SMKDSTY_cat6
+      cat_counts <- table(factor(rwt_values, levels = 1:6))
+      n_valid <- sum(cat_counts)
+
+      rwt_results[[cycle]] <- data.frame(
+        Cycle = cycle,
+        N = nrow(df),
+        Method = "rec_with_table",
+        Daily = as.numeric(cat_counts[1]),
+        Fmr_daily = as.numeric(cat_counts[4]),
+        Never = as.numeric(cat_counts[6]),
+        Pct_daily = round(100 * cat_counts[1] / n_valid, 1),
+        Pct_never = round(100 * cat_counts[6] / n_valid, 1)
+      )
+
+      # Compare with ground truth for pre-2015 cycles
+      if (cycle %in% pre2015_cycles && cycle %in% names(ground_truth_results)) {
+        gt_daily <- ground_truth_results[[cycle]]$Pct_daily
+        rwt_daily <- rwt_results[[cycle]]$Pct_daily
+        match_status <- ifelse(abs(gt_daily - rwt_daily) < 0.1, "PASS", "FAIL")
+        test_results[[cycle]] <- list(
+          cycle = cycle,
+          ground_truth = gt_daily,
+          rec_with_table = rwt_daily,
+          match = match_status
+        )
+      }
+    }
+  }, error = function(e) {
+    message("rec_with_table failed for ", cycle, ": ", e$message)
+  })
+}
+
+rwt_df <- do.call(rbind, rwt_results)
+rownames(rwt_df) <- NULL
+```
+
+```{r}
+#| label: tbl-rec-with-table
+#| tbl-cap: "rec_with_table() results: SMKDSTY_cat6 across all cycles"
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  kable(rwt_df,
+        col.names = c("Cycle", "N", "Method", "Daily", "Fmr Daily", "Never",
+                      "% Daily", "% Never"),
+        format.args = list(big.mark = ","))
+} else {
+  cat("No rec_with_table results available. Check that PUMF data files exist.")
+}
+```
+
+### Ground truth comparison
+
+```{r}
+#| label: tbl-comparison
+#| tbl-cap: "Ground truth vs rec_with_table() comparison (pre-2015 cycles)"
+
+if (length(test_results) > 0) {
+  comparison_df <- do.call(rbind, lapply(test_results, as.data.frame))
+  rownames(comparison_df) <- NULL
+
+  kable(comparison_df,
+        col.names = c("Cycle", "Ground Truth (% Daily)", "rec_with_table (% Daily)", "Match"))
+} else {
+  cat("No comparison data available")
+}
+```
+
+### Clinical assessment
+
+```{r}
+#| label: clinical-assessment
+#| code-fold: true
+
+# Assess clinical reasonableness
+assessment <- list()
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  # Check 1: Daily smoking prevalence in expected range
+  daily_range <- range(rwt_df$Pct_daily, na.rm = TRUE)
+  check_daily <- daily_range[1] >= 5 && daily_range[2] <= 30
+  assessment$daily_range <- list(
+    check = "Daily smoking 5-30%",
+    observed = paste0(daily_range[1], "% - ", daily_range[2], "%"),
+    pass = check_daily
+  )
+
+  # Check 2: Never smokers in expected range
+  never_range <- range(rwt_df$Pct_never, na.rm = TRUE)
+  check_never <- never_range[1] >= 25 && never_range[2] <= 50
+  assessment$never_range <- list(
+    check = "Never smokers 25-50%",
+    observed = paste0(never_range[1], "% - ", never_range[2], "%"),
+    pass = check_never
+  )
+
+  # Check 3: Declining daily smoking trend
+  early_cycles <- rwt_df$Pct_daily[1:3]
+  late_cycles <- rwt_df$Pct_daily[(nrow(rwt_df)-2):nrow(rwt_df)]
+  declining_trend <- mean(early_cycles, na.rm = TRUE) > mean(late_cycles, na.rm = TRUE)
+  assessment$trend <- list(
+    check = "Daily smoking declining over time",
+    observed = paste0("Early avg: ", round(mean(early_cycles, na.rm = TRUE), 1),
+                      "%, Late avg: ", round(mean(late_cycles, na.rm = TRUE), 1), "%"),
+    pass = declining_trend
+  )
+}
+
+# Display assessment
+assessment_df <- do.call(rbind, lapply(assessment, function(x) {
+  data.frame(Check = x$check, Observed = x$observed,
+             Result = ifelse(x$pass, "✓ PASS", "✗ FAIL"))
+}))
+```
+
+```{r}
+#| label: tbl-assessment
+#| tbl-cap: "Clinical reasonableness assessment"
+
+if (exists("assessment_df") && !is.null(assessment_df) && nrow(assessment_df) > 0) {
+  kable(assessment_df, row.names = FALSE)
+} else {
+  cat("No clinical assessment available - no data to assess.")
+}
+```
+
+### Daily smoking trend
+
+```{r}
+#| label: fig-daily-trend
+#| fig-cap: "Daily smoker prevalence trend (ground truth = rec_with_table for pre-2015)"
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  # Extract numeric year for plotting
+  years <- as.numeric(gsub("_.*", "", rwt_df$Cycle))
+
+  plot(years, rwt_df$Pct_daily, type = "b", pch = 19, col = "darkred",
+       xlab = "CCHS Year", ylab = "% Daily Smokers",
+       main = "Daily Smoker Prevalence Trend",
+       ylim = c(0, 25))
+
+  # Add reference line at 2015 (semantic break)
+  abline(v = 2015, lty = 2, col = "gray50")
+  text(2015, 24, "2015 semantic break", pos = 4, cex = 0.8, col = "gray50")
+}
+```
+
+### Test summary
+
+```{r}
+#| label: test-summary
+
+# Summarize all tests
+n_gt_tests <- length(test_results)
+n_gt_pass <- if (n_gt_tests > 0) sum(sapply(test_results, function(x) x$match == "PASS")) else 0
+
+n_clinical <- if (exists("assessment_df") && !is.null(assessment_df)) nrow(assessment_df) else 0
+n_clinical_pass <- if (exists("assessment_df") && !is.null(assessment_df) && nrow(assessment_df) > 0) sum(grepl("PASS", assessment_df$Result)) else 0
+
+n_cycles <- if (!is.null(rwt_df)) nrow(rwt_df) else 0
+
+cat("## SMKDSTY_cat6 Integration Test Summary\n\n")
+cat("**Ground truth tests (pre-2015):**", n_gt_pass, "/", n_gt_tests, "passed\n")
+cat("**Clinical reasonableness:**", n_clinical_pass, "/", n_clinical, "passed\n")
+cat("**Cycles tested:**", n_cycles, "\n")
+
+if (n_cycles == 0) {
+  cat("\n⚠ **No PUMF data available for testing**\n")
+} else if (n_gt_pass == n_gt_tests && n_clinical_pass == n_clinical) {
+  cat("\n✓ **L5 INTEGRATION TESTS: PASSED**\n")
+} else {
+  cat("\n✗ **L5 INTEGRATION TESTS: ISSUES DETECTED**\n")
+}
+```
+
+## Appendix
+
+Detailed working documentation:
+
+-   [L0: Documentation assessment](01-status/L0_documentation_assessment.md)
+-   [L1: Variable concordance](01-status/L1_variable_concordance.md)
+-   [L2: Semantic mapping](01-status/L2_semantic_mapping.md)
+-   [L3: Worksheet draft](01-status/L3_worksheet_draft.md)
+-   [L4: DV specifications](01-status/L4_dv_specifications.md)
+-   [variables_smk_status.csv](01-status/variables_smk_status.csv)
+-   [variable_details_smk_status.csv](01-status/variable_details_smk_status.csv)

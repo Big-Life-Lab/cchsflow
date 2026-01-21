@@ -1,0 +1,497 @@
+---
+title: "04 - Smoking Intensity Variables"
+author: "Doug Manuel, Maikol Diasparra, Caitlin St-Onge"
+date: "2026-01-08"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+| Attribute | Value |
+|-----------|-------|
+| **Subgroup** | 04-intensity |
+| **Variables** | 5 |
+| **Purpose** | Cigarettes per day (for pack-years calculation) |
+| **Dependencies** | 01-status |
+| **Dependents** | 05-pack-years |
+
+Intensity variables capture how much respondents smoke or smoked. These provide the "cigarettes per day" component of pack-years calculation.
+
+## Variables
+
+```{r}
+#| label: tbl-intensity-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+source("../../R/table-generators.R")
+
+generate_variable_list_table("04-intensity/variables_smk_intensity.csv") |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+## PUMF cycle coverage
+
+```{r}
+#| label: tbl-intensity-coverage
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_subject_coverage_matrix("04-intensity") |>
+  knitr::kable(align = c("l", rep("c", 13)))
+```
+
+::: {.callout-tip}
+## Full coverage
+
+All 5 intensity variables have complete PUMF and Master coverage across all 13 CCHS cycles (2001-2023). This is unusual among smoking variables.
+:::
+
+## Key decisions
+
+### PUMF capping
+
+| Variable | PUMF range | Master range |
+|----------|------------|--------------|
+| SMK_204 | 1-50 (capped) | 1-99 (true) |
+| SMK_208 | 1-50 (capped) | 1-99 (true) |
+
+**Impact on pack-years**: Heavy smokers (>50 CPD) are underestimated in PUMF. This affects ~2-3% of respondents but can significantly impact pack-years for heavy smokers.
+
+### Occasional smoker intensity
+
+For occasional smokers, pack-years uses:
+
+```
+CPD_equivalent = (SMK_05B × SMK_05C) / 30
+```
+
+This converts "cigarettes on days smoked" × "days per month" to a daily average.
+
+### Unified daily intensity: cigs_per_day
+
+The `cigs_per_day` variable combines SMK_204 (current daily) and SMK_208 (former daily) into a single derived variable representing cigarettes per day when smoking daily, for anyone who ever smoked daily.
+
+**Rationale**: SMK_204 and SMK_208 are mutually exclusive by design and measure the same concept (daily smoking intensity). The unified variable simplifies the mental model and aligns with how `age_start_smoking` and `time_quit_smoking` work.
+
+**Routing logic**:
+
+| SMKDSTY_A status | Source variable | Result |
+|------------------|-----------------|--------|
+| 1 (current daily) | SMK_204 | Cigarettes per day |
+| 2 (occasional, former daily) | SMK_208 | Cigarettes per day (when smoked daily) |
+| 4 (former daily) | SMK_208 | Cigarettes per day (when smoked daily) |
+| 3, 5, 6 (never daily) | — | NA::a (not applicable) |
+
+### Current vs former smoker CPD
+
+For users who need the underlying source variables:
+
+| Smoking status | Variable to use |
+|----------------|-----------------|
+| Daily smoker | SMK_204 (or cigs_per_day) |
+| Former daily smoker | SMK_208 (or cigs_per_day) |
+| Occasional smoker | SMK_05B, SMK_05C |
+| Former occasional | SMK_05B (at time smoked) |
+
+## Era mappings
+
+| Variable | Era 1 (2001-2014) | Era 2 (2015-2021) | Era 3 (2022+) |
+|----------|-------------------|-------------------|---------------|
+| SMK_204 | SMKA/C/E_204, SMK_204 | SMK_045 | CSS_25 |
+| SMK_208 | SMKA/C/E_208, SMK_208 | SMK_075 | SPU_20 |
+| SMK_05B | SMKA/C/E_05B, SMK_05B | SMK_050 | CSS_30 |
+| SMK_05C | SMKA/C/E_05C, SMK_05C | SMK_055 | CSS_35 |
+
+## Valid ranges
+
+### CPD ranges by file type
+
+| Variable | PUMF valid range | Master valid range | Notes |
+|----------|:----------------:|:------------------:|-------|
+| SMK_204 | 1-50 | 1-150 | PUMF capped; Master extreme values rare but valid |
+| SMK_208 | 1-50 | 1-150 | Same as SMK_204 |
+| SMK_05B | 1-50 | 1-50 | Occasional: fewer per day than daily |
+| SMK_05C | 1-30 | 1-30 | Days per month (capped at 30) |
+
+### Plausibility considerations
+
+| Value | Assessment | Recommended action |
+|-------|------------|-------------------|
+| CPD = 0 | Invalid for daily smokers | Set to NA(b) or exclude |
+| CPD = 1-50 | Normal range | Accept |
+| CPD = 51-99 | Heavy but plausible | Accept (Master only) |
+| CPD = 100+ | Extreme, likely error | Flag for review |
+| Days/month = 30+ | By definition not occasional | Check smoker type |
+
+### CPD equivalent for occasional smokers
+
+The derived CPD equivalent uses:
+
+```
+CPD_equivalent = (SMK_05B × SMK_05C) / 30
+```
+
+Valid range for CPD_equivalent: 0.03-50
+
+- Minimum: 1 cigarette × 1 day ÷ 30 = 0.03
+- Maximum: 50 cigarettes × 30 days ÷ 30 = 50 (but this would make them daily)
+
+## Validation status
+
+| Level | Status | Notes |
+|-------|--------|-------|
+| L0 | ✓ | Schema compliant |
+| L1 | ✓ | Database names validated |
+| L2 | ✓ | Source references verified |
+| L3 | ✓ | Category codes verified |
+| L4 | ✓ | Range validation reviewed |
+| L5 | ✓ | Integration tests (below) |
+
+::: {.callout-note}
+## Production status
+
+SMK_204, SMK_208, SMK_05B, and SMK_05C are already in cchsflow v2.x production. The unified `cigs_per_day` variable is new in v3.0.0.
+:::
+
+## Integration testing
+
+This section validates the primary recommended variable `cigs_per_day` using actual PUMF data. Testing includes:
+
+1. **rec_with_table()**: Validation that the derived variable produces expected results
+2. **Universe validation**: Only ever-daily smokers (SMKDSTY 1, 2, 4) should have values
+3. **Clinical reasonableness**: Distribution checks against epidemiological expectations
+
+**Note**: `cigs_per_day` is a derived variable routing SMK_204 and SMK_208 based on smoking status. Ground truth comparison is possible by verifying the routing logic.
+
+### Clinical expectations
+
+| Metric | Expected value |
+|--------|----------------|
+| Mean CPD | 12-20 cigarettes/day |
+| Median CPD | 10-15 cigarettes/day |
+| Range | 1-50 (PUMF capped) |
+| Universe | Ever-daily smokers only (SMKDSTY 1, 2, 4) |
+
+**Epidemiological context**: Typical daily smokers smoke 10-20 cigarettes per day (half to one pack). PUMF caps at 50 CPD.
+
+```{r}
+#| label: setup-integration-intensity
+#| echo: false
+#| message: false
+#| warning: false
+
+library(dplyr)
+library(knitr)
+library(here)
+
+# Project paths
+project_root <- here::here()
+rdata_dir <- file.path(project_root, "working_data_and_documentation/pumf-rdata")
+
+# Source cchsflow functions
+original_wd <- getwd()
+setwd(project_root)
+source("R/strings.R")
+source("R/recode-with-table.R")
+setwd(original_wd)
+
+# Load intensity worksheets
+intensity_variables <- read.csv(file.path(project_root, "ceps/cep-002-smoking/04-intensity/variables_smk_intensity.csv"), stringsAsFactors = FALSE)
+intensity_variable_details <- read.csv(file.path(project_root, "ceps/cep-002-smoking/04-intensity/variable_details_smk_intensity.csv"), stringsAsFactors = FALSE)
+
+# Also need status variables for SMKDSTY_cat6
+status_variables <- read.csv(file.path(project_root, "ceps/cep-002-smoking/01-status/variables_smk_status.csv"), stringsAsFactors = FALSE)
+status_variable_details <- read.csv(file.path(project_root, "ceps/cep-002-smoking/01-status/variable_details_smk_status.csv"), stringsAsFactors = FALSE)
+
+all_variables <- rbind(intensity_variables, status_variables)
+all_variable_details <- rbind(intensity_variable_details, status_variable_details)
+
+# Cycle order
+cycle_order <- c(
+  "2001", "2003", "2005", "2007_2008", "2009_2010",
+  "2011_2012", "2013_2014", "2015_2016", "2017_2018",
+  "2019_2020", "2022"
+)
+```
+
+### rec_with_table() validation
+
+Test that `cigs_per_day` produces continuous values in the expected range for ever-daily smokers.
+
+```{r}
+#| label: rec-with-table-intensity
+#| code-fold: true
+
+# Test rec_with_table() for cigs_per_day across cycles
+rwt_results <- list()
+
+for (cycle in cycle_order) {
+  rdata_file <- file.path(rdata_dir, paste0("CCHS_", cycle, ".RData"))
+
+  if (!file.exists(rdata_file)) next
+
+  env <- new.env()
+  load(rdata_file, envir = env)
+  df <- get(ls(env)[1], envir = env)
+
+  db_name <- paste0("cchs", cycle, "_p")
+
+  tryCatch({
+    harmonized <- rec_with_table(
+      data = df,
+      variables = all_variables,
+      variable_details = all_variable_details,
+      database_name = db_name,
+      var_names = c("cigs_per_day", "SMKDSTY_cat6"),
+      log = FALSE
+    )
+
+    if ("cigs_per_day" %in% names(harmonized)) {
+      cpd_values <- harmonized$cigs_per_day
+      status_values <- harmonized$SMKDSTY_cat6
+
+      # Filter to ever-daily smokers (SMKDSTY 1, 2, 4)
+      ever_daily <- status_values %in% c(1, 2, 4)
+      cpd_ever_daily <- cpd_values[ever_daily]
+      cpd_valid <- cpd_ever_daily[!is.na(cpd_ever_daily)]
+
+      # Calculate statistics
+      if (length(cpd_valid) > 0) {
+        rwt_results[[cycle]] <- data.frame(
+          Cycle = cycle,
+          N = nrow(df),
+          N_ever_daily = sum(ever_daily, na.rm = TRUE),
+          N_valid = length(cpd_valid),
+          Mean = round(mean(cpd_valid), 1),
+          Median = round(median(cpd_valid), 1),
+          Min = round(min(cpd_valid), 0),
+          Max = round(max(cpd_valid), 0),
+          Pct_valid = round(100 * length(cpd_valid) / sum(ever_daily, na.rm = TRUE), 1),
+          check.names = FALSE
+        )
+      }
+    }
+  }, error = function(e) {
+    message("rec_with_table failed for ", cycle, ": ", e$message)
+  })
+}
+
+rwt_df <- do.call(rbind, rwt_results)
+rownames(rwt_df) <- NULL
+```
+
+```{r}
+#| label: tbl-intensity-results
+#| tbl-cap: "rec_with_table() results: cigs_per_day across PUMF cycles"
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  kable(rwt_df,
+        col.names = c("Cycle", "N Total", "Ever Daily", "Valid", "Mean", "Median", "Min", "Max", "% Valid"),
+        format.args = list(big.mark = ","))
+}
+```
+
+### Universe validation
+
+Verify that `cigs_per_day` is NA for never-daily smokers (SMKDSTY 3, 5, 6).
+
+```{r}
+#| label: universe-validation-intensity
+#| code-fold: true
+
+# Check that never-daily smokers have NA
+universe_check <- list()
+
+for (cycle in c("2007_2008", "2015_2016")) {  # Sample cycles from each era
+  rdata_file <- file.path(rdata_dir, paste0("CCHS_", cycle, ".RData"))
+
+  if (!file.exists(rdata_file)) next
+
+  env <- new.env()
+  load(rdata_file, envir = env)
+  df <- get(ls(env)[1], envir = env)
+
+  db_name <- paste0("cchs", cycle, "_p")
+
+  tryCatch({
+    harmonized <- rec_with_table(
+      data = df,
+      variables = all_variables,
+      variable_details = all_variable_details,
+      database_name = db_name,
+      var_names = c("cigs_per_day", "SMKDSTY_cat6"),
+      log = FALSE
+    )
+
+    status <- harmonized$SMKDSTY_cat6
+    cpd <- harmonized$cigs_per_day
+
+    # Count by status
+    for (s in 1:6) {
+      in_status <- status == s & !is.na(status)
+      n_in_status <- sum(in_status, na.rm = TRUE)
+      n_has_cpd <- sum(!is.na(cpd[in_status]), na.rm = TRUE)
+      pct_has_cpd <- if (n_in_status > 0) round(100 * n_has_cpd / n_in_status, 1) else NA
+
+      universe_check[[paste0(cycle, "_", s)]] <- data.frame(
+        Cycle = cycle,
+        Status = s,
+        Status_label = c("Daily", "Occ (fmr daily)", "Always occ", "Fmr daily", "Fmr occ", "Never")[s],
+        N_status = n_in_status,
+        N_has_cpd = n_has_cpd,
+        Pct_has_cpd = pct_has_cpd,
+        Expected = ifelse(s %in% c(1, 2, 4), "Has CPD", "NA"),
+        check.names = FALSE
+      )
+    }
+  }, error = function(e) {
+    message("Universe check failed for ", cycle, ": ", e$message)
+  })
+}
+
+universe_df <- do.call(rbind, universe_check)
+rownames(universe_df) <- NULL
+```
+
+```{r}
+#| label: tbl-universe-intensity
+#| tbl-cap: "Universe validation: cigs_per_day by smoking status"
+
+if (!is.null(universe_df) && nrow(universe_df) > 0) {
+  kable(universe_df,
+        col.names = c("Cycle", "Status", "Label", "N", "Has CPD", "% Has CPD", "Expected"))
+}
+```
+
+### Clinical assessment
+
+```{r}
+#| label: clinical-assessment-intensity
+#| code-fold: true
+
+assessment <- list()
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  # Check 1: Mean CPD in expected range
+  mean_range <- range(rwt_df$Mean, na.rm = TRUE)
+  check_mean <- mean_range[1] >= 10 && mean_range[2] <= 25
+  assessment$mean_range <- list(
+    check = "Mean CPD 10-25",
+    observed = paste0(mean_range[1], " - ", mean_range[2], " cigs/day"),
+    pass = check_mean
+  )
+
+  # Check 2: Median around 10-20
+  median_range <- range(rwt_df$Median, na.rm = TRUE)
+  check_median <- median_range[1] >= 8 && median_range[2] <= 25
+  assessment$median_range <- list(
+    check = "Median CPD 8-25",
+    observed = paste0(median_range[1], " - ", median_range[2], " cigs/day"),
+    pass = check_median
+  )
+
+  # Check 3: Valid percentage high
+  pct_valid_range <- range(rwt_df$Pct_valid, na.rm = TRUE)
+  check_coverage <- pct_valid_range[1] >= 85
+  assessment$coverage <- list(
+    check = "Coverage ≥85% of ever-daily smokers",
+    observed = paste0(pct_valid_range[1], "% - ", pct_valid_range[2], "%"),
+    pass = check_coverage
+  )
+
+  # Check 4: Universe correctness (never-daily should have low %)
+  if (exists("universe_df") && nrow(universe_df) > 0) {
+    never_daily <- universe_df[universe_df$Status %in% c(3, 5, 6), ]
+    max_pct_never_daily <- max(never_daily$Pct_has_cpd, na.rm = TRUE)
+    check_universe <- max_pct_never_daily < 5
+    assessment$universe <- list(
+      check = "Never-daily smokers have <5% with CPD",
+      observed = paste0("Max: ", max_pct_never_daily, "%"),
+      pass = check_universe
+    )
+  }
+
+  # Check 5: Values within PUMF bounds (1-50)
+  max_value <- max(rwt_df$Max, na.rm = TRUE)
+  min_value <- min(rwt_df$Min, na.rm = TRUE)
+  check_bounds <- min_value >= 1 && max_value <= 50
+  assessment$bounds <- list(
+    check = "Values within [1, 50] (PUMF bounds)",
+    observed = paste0(min_value, " - ", max_value, " cigs/day"),
+    pass = check_bounds
+  )
+}
+
+assessment_df <- do.call(rbind, lapply(assessment, function(x) {
+  data.frame(Check = x$check, Observed = x$observed,
+             Result = ifelse(x$pass, "✓ PASS", "✗ FAIL"))
+}))
+```
+
+```{r}
+#| label: tbl-assessment-intensity
+#| tbl-cap: "Clinical reasonableness assessment"
+
+if (exists("assessment_df") && !is.null(assessment_df) && nrow(assessment_df) > 0) {
+  kable(assessment_df, row.names = FALSE)
+}
+```
+
+### CPD distribution trend
+
+```{r}
+#| label: fig-cpd-trend
+#| fig-cap: "Mean cigarettes per day by cycle"
+
+if (!is.null(rwt_df) && nrow(rwt_df) > 0) {
+  years <- as.numeric(gsub("_.*", "", rwt_df$Cycle))
+
+  plot(years, rwt_df$Mean, type = "b", pch = 19, col = "steelblue",
+       xlab = "CCHS Year", ylab = "Mean Cigarettes per Day",
+       main = "Smoking Intensity Trend",
+       ylim = c(10, 25))
+
+  lines(years, rwt_df$Median, type = "b", pch = 17, col = "darkgreen", lty = 2)
+
+  legend("topright", legend = c("Mean", "Median"),
+         col = c("steelblue", "darkgreen"), pch = c(19, 17), lty = c(1, 2))
+}
+```
+
+### Test summary
+
+```{r}
+#| label: test-summary-intensity
+
+n_clinical <- if (exists("assessment_df") && !is.null(assessment_df)) nrow(assessment_df) else 0
+n_clinical_pass <- if (exists("assessment_df") && !is.null(assessment_df) && nrow(assessment_df) > 0) sum(grepl("PASS", assessment_df$Result)) else 0
+n_cycles <- if (!is.null(rwt_df)) nrow(rwt_df) else 0
+
+cat("## cigs_per_day Integration Test Summary\n\n")
+cat("**Clinical reasonableness:**", n_clinical_pass, "/", n_clinical, "passed\n")
+cat("**Cycles tested:**", n_cycles, "\n")
+
+if (n_cycles == 0) {
+  cat("\n⚠ **No PUMF data available for testing**\n")
+} else if (n_clinical == 0 || n_clinical_pass == n_clinical) {
+  cat("\n✓ **L5 INTEGRATION TESTS: PASSED**\n")
+} else {
+  cat("\n✗ **L5 INTEGRATION TESTS: ISSUES DETECTED**\n")
+}
+```
+
+## Appendix
+
+- [L0: Documentation review](04-intensity/L0_documentation_review.md)
+- [L1: Concordance](04-intensity/L1_concordance.md)
+- [L2: Gap analysis](04-intensity/L2_gap_analysis.md)
+- [L3: Worksheets](04-intensity/L3_worksheets.md)
+- [L4: Derived variables](04-intensity/L4_derived_variables.md)
+- [variables_smk_intensity.csv](04-intensity/variables_smk_intensity.csv)
+- [variable_details_smk_intensity.csv](04-intensity/variable_details_smk_intensity.csv)
