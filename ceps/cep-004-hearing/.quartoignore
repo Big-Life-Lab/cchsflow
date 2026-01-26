@@ -1,0 +1,12 @@
+# Ignore markdown files that have QMD versions
+L0_documentation_assessment.md
+L1_variable_concordance.md
+L2_semantic_mapping.md
+PR_NOTES.md
+
+# Ignore workflow state and domain overview
+_workflow_state.yaml
+_domain_overview.md
+
+# Ignore CSV artifacts
+*.csv
