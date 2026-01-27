@@ -1,0 +1,252 @@
+# Workflow state for CEP-005 Sleep
+# Last updated: 2026-01-26
+
+domain: health-behaviour
+subgroup: sleep
+status: L6_complete
+description: Sleep duration, quality, and difficulty variables
+priority: medium
+branch: sleep
+pr_number: 161
+
+# Variables in scope
+variables:
+  # Sleep duration
+  - SLPG01       # Hours sleep (categorical, 2011+)
+  - SLPG01_A     # Hours sleep (categorical, 2001, 2007-2008)
+  - SLPG01_B     # Hours sleep (categorical, Master 2011-2014)
+  - SLPG01_C     # Hours sleep (categorical, Master 2001, 2015-2016)
+  - SLPG01_cont  # Hours sleep (continuous)
+  # Sleep quality
+  - SLP_02       # Trouble sleeping (2007+)
+  - SLP_02_A     # Trouble sleeping (2001)
+  - SLP_03       # Sleep refreshing (2007+)
+  - SLP_03_A     # Sleep refreshing (2001)
+  - SLP_04       # Difficulty awake (2007+)
+  - SLP_04_A     # Difficulty awake (2001)
+
+# Source variable mapping by era
+source_variables:
+  2001_pumf:
+    - GENA_03     # Hours sleep
+    - GENA_04     # Trouble sleeping
+    - GENA_05     # Sleep refreshing
+    - GENA_06     # Difficulty awake
+  2007_2008_pumf:
+    - SLP_01      # Hours sleep (continuous)
+    - SLP_02      # Trouble sleeping
+    - SLP_03      # Sleep refreshing
+    - SLP_04      # Difficulty awake
+  2011_2014_pumf:
+    - SLPG01      # Hours sleep (categorical)
+    - SLP_02      # Trouble sleeping
+    - SLP_03      # Sleep refreshing
+    - SLP_04      # Difficulty awake
+  2015_2016_pumf:
+    - SLPG005     # Hours sleep
+    - SLP_010     # Trouble sleeping
+    - SLP_015     # Sleep refreshing
+    - SLP_020     # Difficulty awake
+  2017_2018_pumf:
+    - SLPG005     # Hours sleep
+    - SLP_010     # Trouble sleeping
+    - SLP_015     # Sleep refreshing
+    - SLP_020     # Difficulty awake
+
+# Key observations from DDI review
+ddi_findings:
+  - finding: "2001 uses GENA_03-06 in General Health module"
+    cycles: ["2001"]
+  - finding: "2003 and 2005 do NOT have sleep variables in PUMF"
+    cycles: ["2003", "2005"]
+    critical: true
+  - finding: "2007-2008 introduces SLP_01-04 naming"
+    cycles: ["2007-2008"]
+  - finding: "2011-2014 uses SLPG01 (categorical grouped) and SLP_02-04"
+    cycles: ["2011-2012", "2013-2014"]
+  - finding: "2015-2018 renames to SLPG005, SLP_010, SLP_015, SLP_020"
+    cycles: ["2015-2016", "2017-2018"]
+  - finding: "Scale changes: 2001 uses 3-point (most/sometimes/never), 2007+ uses 5-point"
+    critical: true
+
+# Stage completion status
+stages:
+  L0_documentation:
+    status: complete
+    date_completed: "2026-01-26"
+    output: L0_documentation_assessment.md
+    sources_reviewed:
+      - ddi_xmls: complete
+      - cchs_available_variables_list: complete
+      - existing_pr_worksheets: complete
+      - cchsflow_docs: complete
+    critical_findings:
+      - "Sleep variables NOT available in 2003, 2005, 2009-2010 PUMF"
+      - "2001 uses 3-point scale; 2007+ uses 5-point scale (incompatible)"
+      - "Variable naming evolution verified across all eras"
+
+  L1_concordance:
+    status: complete
+    date_completed: "2026-01-26"
+    summary: |
+      Mapped all era-specific variable names.
+      Documented scale incompatibility between 2001 and 2007+.
+      Verified missing cycles correctly excluded from worksheets.
+
+  L2_semantic:
+    status: complete
+    date_completed: "2026-01-26"
+    summary: |
+      2001 sleep quality variables (3-point) harmonized to _A suffix variables.
+      2007+ sleep quality variables (5-point) share common harmonized names.
+      Hours sleep available as both categorical and continuous.
+
+  L3_worksheets:
+    status: complete
+    date_completed: "2026-01-26"
+    notes: |
+      Existing worksheets correctly configured.
+      PR #161 adds Master file cycles appropriately.
+      No critical errors found requiring fixes.
+
+  L4_dv_specification:
+    status: not_applicable
+    notes: |
+      Sleep variables are direct recodes, not derived.
+      No DV functions required.
+
+  L5_testing:
+    status: deferred
+    notes: |
+      Unit tests for sleep variables not required for this iteration.
+      Integration test created in QMD document.
+
+  L6_integration:
+    status: complete
+    date_completed: "2026-01-26"
+    output:
+      - integration-test.qmd
+    notes: |
+      Integration test validates rec_with_table() for sleep variables.
+      Confirms 2003/2005/2009-2010 correctly excluded.
+
+# PR #161 review findings
+existing_pr_issues:
+  - id: I1
+    severity: info
+    location: "PR description"
+    issue: "PR adds Master file cycles - correctly targets variable_details.csv"
+    status: verified_ok
+
+  - id: I2
+    severity: info
+    location: "SLPG01_C variableStart"
+    issue: "Uses cchs2015_2016_m::SLP_009 - consistent with ICES naming convention"
+    status: verified_ok
+
+# Key validation results
+validation:
+  missing_cycles_correctly_excluded:
+    - "cchs2003_p"
+    - "cchs2005_p"
+    - "cchs2009_2010_p"
+  scale_incompatibility_handled:
+    - "2001 3-point scale -> _A suffix variables"
+    - "2007+ 5-point scale -> standard variable names"
+  scale_inversion_documented:
+    - "2001: lower = worse (1=Most of the time)"
+    - "2007+: higher = worse (5=All of the time)"
+  worksheets_verified: true
+  no_critical_errors: true
+
+# Ontario-specific findings (CRITICAL)
+ontario_availability:
+  confirmed_by:
+    - "PUMF direct analysis (.RData files)"
+    - "GoogleLM NotebookLM cross-check"
+    - "ICES Dictionary v1.0.0 (14,005 variables)"
+
+  pumf_availability:
+    - cycle: "2001"
+      available: true
+      ontario_50plus_n: 9930
+      valid_responses: 9393
+      scale: "3-point"
+    - cycle: "2007-2008"
+      available: false
+      ontario_50plus_n: 17861
+      valid_responses: 0
+      reason: "Ontario did not select optional Sleep module"
+    - cycle: "2011-2012"
+      available: false
+      ontario_50plus_n: 19730
+      valid_responses: 0
+      reason: "Ontario did not select optional Sleep module"
+    - cycle: "2013-2014"
+      available: false
+      ontario_50plus_n: 21031
+      valid_responses: 0
+      doslp_flag: 2
+      reason: "Ontario did not select optional Sleep module"
+    - cycle: "2015-2016"
+      available: true
+      ontario_50plus_n: 15139
+      valid_responses: 14366
+      doslp_flag: 1
+      scale: "5-point"
+    - cycle: "2017-2018"
+      available: false
+      ontario_50plus_n: 15905
+      valid_responses: 0
+      doslp_flag: 2
+      reason: "Ontario did not select optional Sleep module"
+
+  linked_file_availability:
+    - period: "2001"
+      available: true
+      dataset: "CCHS2001_ONT_LINK_11"
+      variables: ["GENA_03", "GENA_04", "GENA_05", "GENA_06"]
+    - period: "2002"
+      available: true
+      dataset: "CCHS2002_ONT_LINK_12"
+      variables: ["GENB_03", "GENB_04", "GENB_05"]
+      note: "GENB_06 (Difficulty awake) not found"
+    - period: "2003"
+      available: partial
+      dataset: "CCHS2003_ONT_LINK_21"
+      variables: ["DPSC_09"]
+      note: "Only Depression module trouble sleeping (measures change, not status)"
+    - period: "2005"
+      available: false
+    - period: "2007-2014"
+      available: false
+      note: "SLP variables not in Ontario Linked/Share files"
+    - period: "2015-2016"
+      available: true
+      dataset: "CCHS201516_ONT_SHARE"
+      variables: ["SLP_005", "SLP_010", "SLP_015", "SLP_020"]
+    - period: "2017-2018"
+      available: true
+      dataset: "CCHS201718_ONT_SHARE"
+      variables: ["SLP_005", "SLP_010", "SLP_015", "SLP_020"]
+
+  critical_finding: |
+    Ontario sleep data has a 13-year gap (2003-2014) in both PUMF and Linked files.
+    Sleep was Optional Content from 2007-2018.
+    Ontario only selected Sleep module for 2015-2016.
+    ICES Linked/Share files add 2002 and 2017-2018 not available in PUMF.
+
+# Dependencies
+depends_on: []  # Base module - no dependencies
+
+# Completion summary
+completion:
+  all_tasks_complete: true
+  pr_ready_for_merge: true
+  artifacts_created:
+    - L0_documentation_assessment.md
+    - integration-test.qmd
+    - _workflow_state.yaml
+    - ontario-sleep-availability-confirmed.md
+    - availability-matrix.qmd
+    - index.qmd
