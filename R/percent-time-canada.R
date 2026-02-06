@@ -75,6 +75,48 @@ pct_time_fun <-
     if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont * 100), tagged_na("b"))
   }
 
+#' @title Percent time in Canada (Master files)
+#'
+#' @description This function creates a derived variable (pct_time_der_A) that
+#'  provides an estimated percentage of the time a person's life was spent in
+#'  Canada. This variant is for Master file data where SDCDRES is continuous
+#'  (actual years) rather than categorical.
+#'
+#' @param DHH_AGE continuous age variable.
+#'
+#' @param SDCGCB whether or not someone was born in Canada (1 - born in Canada,
+#'  2 - born outside Canada)
+#'
+#' @param SDCDRES continuous variable for how long someone has lived in Canada
+#'  (in years).
+#'
+#' @return Numeric value between 0 and 100 that represents
+#'  percentage of a respondent's time in Canada
+#'
+#' @examples
+#' # Using pct_time_fun_A() to generate a value for percent time spent in Canada
+#' # with user inputted values. Let's say you are 27 years old who was born
+#' # outside of Canada and have been living in Canada for 10 years.
+#' # Your estimated percent time spent in Canada can be calculated as follows:
+#'
+#' library(cchsflow)
+#' pct_time <- pct_time_fun_A(DHH_AGE = 27, SDCGCB = 2, SDCDRES = 10)
+#'
+#' print(pct_time)
+#'
+#' @export
+pct_time_fun_A <-
+  function(DHH_AGE, SDCGCB, SDCDRES) {
+    if (is_equal(SDCGCB, 1)) {
+      return(100)
+    }
+    DHH_AGE <- if_else2(DHH_AGE > 0, DHH_AGE,
+                        return(tagged_na("b")))
+    SDCDRES <- if_else2(SDCDRES >= 0, SDCDRES, return(tagged_na("b")))
+
+    if_else2(SDCGCB == 2, (SDCDRES / DHH_AGE * 100), tagged_na("b"))
+  }
+
 #' @title Categorical percent time in Canada
 #'
 #' @description This function creates a categorical derived variable 
