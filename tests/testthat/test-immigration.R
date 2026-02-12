@@ -14,6 +14,10 @@ test_that("pct_time_fun has expected output when
   expect_equal(pct_time_fun(20, 2, 3), tagged_na("b"))
 })
 
+test_that("pct_time_fun has expected output when born in Canada", {
+  expect_equal(pct_time_fun(20, 1, 1), 100)
+})
+
 test_that("pct_time_fun has expected output when all arguments are in range", {
   expect_equal(pct_time_fun(20, 2, 1), 22.5)
 })
@@ -50,6 +54,10 @@ test_that("pct_time_fun_A has expected output when
   expect_equal(pct_time_fun_A(20, 2, -1), tagged_na("b"))
 })
 
+test_that("pct_time_fun_A has expected output when born in Canada", {
+  expect_equal(pct_time_fun_A(20, 1, 10), 100)
+})
+
 test_that("pct_time_fun_A has expected output when all arguments are in range", {
   expect_equal(pct_time_fun_A(20, 2, 10), 50)
 })
@@ -75,8 +83,16 @@ test_that("pct_time_fun_cat has expected output when input is out of range", {
   expect_equal(pct_time_fun_cat(-1), "NA(b)")
 })
 
+test_that("pct_time_fun_cat has expected output when input is 100", {
+  expect_equal(pct_time_fun_cat(100), 10)
+})
+
 test_that("pct_time_fun_cat has expected output when input is in range", {
   expect_equal(pct_time_fun_cat(1), 1)
+})
+
+test_that("pct_time_fun_cat has expected output when input is tagged_na a", {
+  expect_equal(pct_time_fun_cat(tagged_na("a")), "NA(a)")
 })
 
 # immigration_fun
