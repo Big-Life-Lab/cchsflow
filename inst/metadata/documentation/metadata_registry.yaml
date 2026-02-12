@@ -86,12 +86,21 @@ shared_specifications:
         
     # dummyVariable naming patterns
     dummy_variable_patterns:
-      recommended_pattern: "^[a-zA-Z0-9_]+_(cat|cont)[0-9]+(_[0-9]+|_NA::[a-z])?$"
-      description: "Systematic naming for generated variables providing natural grouping."
+      categorical_pattern: "^[a-zA-Z0-9_]+_cat[0-9]+(_[0-9]+|_NA[a-z])$"
+      continuous_and_func: "N/A"
+      description: |
+        Categorical variables use systematic naming for natural grouping and stable CSV ordering.
+        Continuous variables and Func (derived variable) rows use N/A.
       examples:
         categorical: ["age_cat4_1", "age_cat4_2", "smoking_cat3_1"]
-        continuous: ["bmi_cont1", "height_cont1"]
-      benefits: "Provides natural grouping and stable ordering for CSV files and git diffs."
+        missing_categories: ["smoking_cat3_NAa", "smoking_cat3_NAb"]
+        continuous: ["N/A"]
+        func: ["N/A"]
+      notes: |
+        - The suffix after _cat must match numValidCat
+        - The trailing number must match recEnd for valid categories
+        - Missing categories use _NAa (not applicable) and _NAb (don't know/refusal)
+        - No colons in dummy names — _NAa not _NA::a
       
   missing_data_standards:
     description: "Standardized missing data handling across recodeflow system."

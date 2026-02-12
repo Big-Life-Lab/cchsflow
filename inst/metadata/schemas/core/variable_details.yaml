@@ -67,13 +67,17 @@ variable_details_schema:
         pattern_reference: "See metadata_registry.yaml dummy_variable_patterns for naming guidelines"
       notes: |
         Primary identifier for variable detail rows. Provides stable ordering for CSV files and git diffs.
-        
-        Recommended pattern: {variable}_{cat|cont}{number}_{category}
+
+        Categorical variables: {variable}_cat{N}_{recEnd} or {variable}_cat{N}_NA{letter}
+        Pattern: ^[a-zA-Z0-9_]+_cat[0-9]+(_[0-9]+|_NA[a-z])$
         Examples:
-        - Categorical: age_cat4_1, age_cat4_2, smoking_cat3_1
-        - Continuous: bmi_cont1, height_cont1, weight_cont1
-        
-        Benefits: Natural grouping, stable CSV ordering, meaningful git diffs.
+        - Valid categories: age_cat4_1, age_cat4_2, smoking_cat3_1
+        - Missing (not applicable): smoking_cat3_NAa
+        - Missing (don't know/refusal): smoking_cat3_NAb
+
+        Continuous variables and Func rows: N/A
+
+        No colons in dummy names — use _NAa not _NA::a.
         For complete patterns and examples, see metadata_registry.yaml dummy_variable_patterns.
         
     - name: "typeEnd"
