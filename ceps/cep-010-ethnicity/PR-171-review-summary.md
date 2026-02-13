@@ -7,10 +7,10 @@
 
 ## Scope
 
-**In-scope variables**: SDCDCGT_A, SDCDCGT_B, SDCGLNG
+**In-scope variables**: SDCDCGT_cat13, SDCDCGT_cat7, SDCGLNG, SDCFIMM, SDCDVABT
 **Database types**: Master (`_m`), PUMF (`_p`), Share (`_s`)
 **Cycles**: 2001 through 2017-2018 (existing); 2019-2023 (extension)
-**PR purpose**: Replace `_i` (ICES internal) database suffixes with `_m` (masterfile) suffixes for SDCDCGT_A and SDCDCGT_B; add `_m` databases for SDCGLNG
+**PR purpose**: (1) Rename SDCDCGT_A/B to SDCDCGT_cat13/cat7 with typo fix; (2) Extend SDCGLNG to 2019-2023; (3) Extend SDCFIMM to 2019-2023 with recoding for 2022+ category restructuring; (4) Add SDCDVABT (Aboriginal/Indigenous identity) as new variable covering 2005-2023
 
 ## L0: Triage
 
@@ -265,12 +265,48 @@ Statistics Canada lists CCHS 2024 as an active reference period, but no extracte
 
 7. The ADL and DHHGAGE_E changes in this PR appear to be from the base branch merge or parallel work. These should be reviewed separately.
 
+## 2019+ extension (added 2026-02-13)
+
+### SDCFIMM — extended to 2019-2023
+
+Added 7 databases: `cchs2019_2020_p`, `cchs2019_m`, `cchs2020_m`, `cchs2021_m`, `cchs2022_p`, `cchs2022_m`, `cchs2023_m`.
+
+**2019-2021**: Same 2-category structure (1=immigrant, 2=non-immigrant). Source variable: `SDCDVIMM`.
+
+**2022-2023 master**: Categories restructured — values swapped and 3rd category (non-permanent resident) added. Recoding: `[2,3]→1` (immigrant), `1→2` (non-immigrant), `9→NA::b`.
+
+**2022 PUMF**: Different variable name (`SDCDGIMM`), values swapped. Recoding: `2→1` (immigrant), `1→2` (non-immigrant).
+
+### SDCDVABT — new variable (Aboriginal/Indigenous identity)
+
+Added as new harmonized variable covering 19 databases from 2005-2023.
+
+- **2005 master**: Source `SDCEFABT` (1=Aboriginal, 2=Not Aboriginal)
+- **2007-2014 master**: Source `SDCDABT` (1=Aboriginal, 2=Not Aboriginal, 6=NA)
+- **2015-2023 master**: Source `SDCDVABT` (default `[SDCDVABT]`)
+- **2015-2020 PUMF**: Source `SDC_015` (Yes/No Aboriginal identity)
+- **2022 PUMF**: Source `SDCDVABT`
+
+Note: 2001-2003 have `SDCA_7L`/`SDCC_7L` (cultural/racial origin — Aboriginal), which is a different concept (racial origin vs identity). Excluded from harmonization.
+
+Note: Label terminology shifted from "Aboriginal" to "Indigenous" in 2022-2023 DDIs, but categories remain structurally identical.
+
+### SDCGCGT — discontinued in 2019+
+
+`SDCGCGT` (Cultural/racial origin, grouped) and related variables (`SDCDGCGT`, `SDCDVCGT`) were discontinued after the 2017-2018 cycle. No 2019+ extension is possible.
+
+**Replacement variables in 2019+**:
+- `SDCDVFLA` (Visible minority flag — binary, available in both PUMF and master)
+- `SDCDVVM` (Visible minority group — 13 categories, master only)
+
+These replacement variables have different category structures and cannot be directly mapped to the existing SDCGCGT harmonized variable.
+
 ## Artifacts
 
 | File | Description |
 |------|-------------|
-| `temp-variables.csv` | 3 rows — SDCDCGT_A, SDCDCGT_B, SDCGLNG with all fixes applied |
-| `temp-variable_details.csv` | 77 rows — all detail rows for the 3 variables (33+14+30) |
-| `l6-integration-test.csv` | Full `rec_with_table()` results across all PUMF/share cycles |
-| R scripts | `/tmp/cep010_changes.R`, `/tmp/cep010_l6_test.R` |
-| Source documentation | `cchsflow-docs/cchs-extracted/` (2019-2023 data dictionaries and derived variable specs) |
+| `temp-variables.csv` | 5 rows — SDCDCGT_cat13, SDCDCGT_cat7, SDCGLNG, SDCFIMM, SDCDVABT |
+| `temp-variable_details.csv` | 115 rows — all detail rows for the 5 variables |
+| `l6-integration-test.csv` | `rec_with_table()` results for SDCGLNG across PUMF/share cycles |
+| R scripts | `/tmp/cep010_changes.R`, `/tmp/cep010_l6_test.R`, `/tmp/cep010_sdcfimm_sdcdvabt.R` |
+| Source documentation | `cchsflow-docs/cchs-extracted/` (2001-2023 data dictionaries) |
