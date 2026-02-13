@@ -1,0 +1,299 @@
+---
+title: "CEP-008: Derived variable verification"
+author: "cchsflow review (PR #165)"
+date: "2026-02-12"
+format:
+  html:
+    toc: true
+    code-fold: true
+---
+
+## Overview
+
+This document verifies the refactored `calculate_pct_time()` and `categorize_pct_time()`
+derived variable functions from PR #165. The functions were refactored from
+legacy `if_else2()` to `dplyr::case_when()`, and `calculate_pct_time_A()` was removed
+in favour of a single unified function.
+
+**Key design change:** PUMF midpoints (4.5 and 15 years) were moved from
+hardcoded R logic to the worksheet via the `SDCGRES_cont` intermediate variable.
+Both PUMF and master paths now feed continuous years into the same function.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+devtools::load_all(here::here())
+library(haven)
+library(dplyr)
+```
+
+## calculate_pct_time: scalar tests
+
+### Born in Canada
+
+Respondents born in Canada (born_in_canada = 1) should always return 100,
+regardless of age or years_in_canada.
+
+```{r}
+#| label: test-born-in-canada
+
+stopifnot(calculate_pct_time(27, 1, 4.5) == 100)
+stopifnot(calculate_pct_time(80, 1, 0) == 100)
+stopifnot(calculate_pct_time(1, 1, NA) == 100)
+cat("PASS: born in Canada always returns 100\n")
+```
+
+### Continuous years calculation
+
+For immigrants (born_in_canada = 2), percent time = years_in_canada / age * 100.
+
+```{r}
+#| label: test-continuous-calculation
+
+# PUMF midpoint: 0-9 years category (midpoint 4.5)
+result <- calculate_pct_time(20, 2, 4.5)
+stopifnot(result == 22.5)
+
+# PUMF midpoint: 10+ years category (midpoint 15)
+result <- calculate_pct_time(20, 2, 15)
+stopifnot(result == 75)
+
+# Master continuous: exact years
+result <- calculate_pct_time(20, 2, 10)
+stopifnot(result == 50)
+
+result <- calculate_pct_time(40, 2, 30)
+stopifnot(result == 75)
+
+cat("PASS: continuous calculation correct for PUMF midpoints and master years\n")
+```
+
+### Missing data handling
+
+Invalid or missing inputs should return `tagged_na("b")`.
+
+```{r}
+#| label: test-missing-data
+
+# Age out of range
+stopifnot(is_tagged_na(calculate_pct_time(-1, 2, 4.5), "b"))
+stopifnot(is_tagged_na(calculate_pct_time(0, 2, 4.5), "b"))
+
+# Invalid immigrant status
+stopifnot(is_tagged_na(calculate_pct_time(20, 3, 4.5), "b"))
+stopifnot(is_tagged_na(calculate_pct_time(20, 0, 4.5), "b"))
+
+# NA inputs
+stopifnot(is_tagged_na(calculate_pct_time(NA, 2, 4.5), "b"))
+stopifnot(is_tagged_na(calculate_pct_time(20, NA, 4.5), "b"))
+stopifnot(is_tagged_na(calculate_pct_time(20, 2, NA), "b"))
+stopifnot(is_tagged_na(calculate_pct_time(NA, NA, NA), "b"))
+
+cat("PASS: all invalid/missing inputs return tagged_na('b')\n")
+```
+
+### Output bounds validation
+
+Values outside [0, 100] indicate inconsistent inputs (e.g., years_in_canada > age).
+These are treated as data quality errors and return `tagged_na("b")`.
+
+```{r}
+#| label: test-output-bounds
+
+# years_in_canada > age → impossible percentage (>100)
+stopifnot(is_tagged_na(calculate_pct_time(20, 2, 25), "b"))
+
+# Exact boundary: years_in_canada == age → 100% (valid)
+stopifnot(calculate_pct_time(20, 2, 20) == 100)
+
+# Just under boundary
+result <- calculate_pct_time(20, 2, 19)
+stopifnot(result == 95)
+
+# Vector with out-of-bounds element
+result <- calculate_pct_time(
+  age = c(20, 30, 10),
+  born_in_canada = c(2, 2, 2),
+  years_in_canada = c(10, 35, 5)
+)
+stopifnot(result[1] == 50)
+stopifnot(is_tagged_na(result[2], "b"))  # 35/30 = 116.7% → invalid
+stopifnot(result[3] == 50)
+
+cat("PASS: output bounds validation catches impossible percentages\n")
+```
+
+## calculate_pct_time: vectorised tests
+
+The refactored function must work with vector inputs (not just row-by-row via
+`rec_with_table()`). The original `if()`/`return()` pattern broke vectorisation.
+
+```{r}
+#| label: test-vectorised
+
+result <- calculate_pct_time(
+  age = c(20, 40, 30, 25, NA),
+  born_in_canada = c(2, 1, 2, 2, 2),
+  years_in_canada = c(4.5, 4.5, 15, 10, 5)
+)
+
+stopifnot(length(result) == 5)
+stopifnot(result[1] == 22.5)           # immigrant, 4.5/20 * 100
+stopifnot(result[2] == 100)            # born in Canada
+stopifnot(result[3] == 50)             # immigrant, 15/30 * 100
+stopifnot(result[4] == 40)             # immigrant, 10/25 * 100
+stopifnot(is_tagged_na(result[5], "b")) # NA age
+
+cat("PASS: vectorised input produces correct element-wise results\n")
+```
+
+### Mixed vector with all pathways
+
+```{r}
+#| label: test-mixed-vector
+
+result <- calculate_pct_time(
+  age = c(30, 50, -1, 20, 40),
+  born_in_canada = c(1, 2, 2, 3, 2),
+  years_in_canada = c(10, 25, 5, 10, NA)
+)
+
+stopifnot(result[1] == 100)              # born in Canada
+stopifnot(result[2] == 50)               # 25/50 * 100
+stopifnot(is_tagged_na(result[3], "b"))   # negative age
+stopifnot(is_tagged_na(result[4], "b"))   # invalid born_in_canada = 3
+stopifnot(is_tagged_na(result[5], "b"))   # NA years_in_canada
+
+cat("PASS: mixed vector with all pathways\n")
+```
+
+## categorize_pct_time: categorical binning
+
+The categorical function bins continuous percent time into deciles ("1" through
+"10"), with "NA(a)" for not applicable and "NA(b)" for missing/invalid.
+
+```{r}
+#| label: test-cat-boundaries
+
+# Boundary values for each bin
+boundaries <- data.frame(
+  input = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50,
+            55, 60, 65, 70, 75, 80, 85, 90, 95, 100),
+  expected = c("1", "1", "1", "2", "2", "3", "3", "4", "4", "5", "5",
+               "6", "6", "7", "7", "8", "8", "9", "9", "10", "10")
+)
+
+results <- categorize_pct_time(boundaries$input)
+mismatches <- boundaries[results != boundaries$expected, ]
+
+if (nrow(mismatches) > 0) {
+  cat("FAIL: mismatches found\n")
+  print(mismatches)
+  stop("Boundary test failed")
+} else {
+  cat("PASS: all", nrow(boundaries), "boundary values correctly binned\n")
+}
+```
+
+### Special values
+
+```{r}
+#| label: test-cat-special
+
+# tagged_na("a") -> "NA(a)"
+stopifnot(categorize_pct_time(tagged_na("a")) == "NA(a)")
+
+# tagged_na("b") -> "NA(b)"
+stopifnot(categorize_pct_time(tagged_na("b")) == "NA(b)")
+
+# Out of range -> "NA(b)"
+stopifnot(categorize_pct_time(-1) == "NA(b)")
+stopifnot(categorize_pct_time(101) == "NA(b)")
+
+# Vector
+result <- categorize_pct_time(c(5, 25, 55, 85, 100))
+stopifnot(identical(result, c("1", "3", "6", "9", "10")))
+
+cat("PASS: special values and vector input handled correctly\n")
+```
+
+## Return type verification
+
+The refactored functions must return consistent types — `calculate_pct_time` returns
+numeric (with `tagged_na` for missing), `categorize_pct_time` returns character.
+
+```{r}
+#| label: test-return-types
+
+# calculate_pct_time returns numeric
+r1 <- calculate_pct_time(20, 2, 10)
+stopifnot(is.numeric(r1))
+
+r2 <- calculate_pct_time(20, 1, 10)
+stopifnot(is.numeric(r2))
+
+r3 <- calculate_pct_time(NA, 2, 10)
+stopifnot(is.numeric(r3))
+stopifnot(is.na(r3))
+
+# categorize_pct_time returns character
+r4 <- categorize_pct_time(50)
+stopifnot(is.character(r4))
+
+r5 <- categorize_pct_time(-1)
+stopifnot(is.character(r5))
+
+r6 <- categorize_pct_time(tagged_na("a"))
+stopifnot(is.character(r6))
+
+cat("PASS: return types are consistent (numeric and character)\n")
+```
+
+## haven tagged_na verification
+
+Confirm that `tagged_na("b")` is correctly produced and detectable. This
+validates the haven integration — `tagged_na` values are NA to `is.na()` but
+carry a tag accessible via `is_tagged_na()`.
+
+```{r}
+#| label: test-tagged-na
+
+missing_result <- calculate_pct_time(NA, 2, 4.5)
+
+# It is NA
+stopifnot(is.na(missing_result))
+
+# It is specifically tagged_na("b")
+stopifnot(haven::is_tagged_na(missing_result, "b"))
+
+# It is not tagged_na("a")
+stopifnot(!haven::is_tagged_na(missing_result, "a"))
+
+# Numeric comparison with tagged_na works
+stopifnot(identical(missing_result, tagged_na("b")))
+
+cat("PASS: haven tagged_na correctly produced and detectable\n")
+```
+
+## Summary
+
+```{r}
+#| label: summary
+
+cat("\n=== ALL VERIFICATION TESTS PASSED ===\n\n")
+cat("Functions verified:\n")
+cat("  calculate_pct_time(age, born_in_canada, years_in_canada)\n")
+cat("  categorize_pct_time(pct_time_der)\n\n")
+cat("Test categories:\n")
+cat("  - Born-in-Canada pathway (returns 100)\n")
+cat("  - Continuous calculation (PUMF midpoints and master years)\n")
+cat("  - Missing data handling (tagged_na('b'))\n")
+cat("  - Output bounds validation (>100% → tagged_na('b'))\n")
+cat("  - Vectorised operation (all pathways in single call)\n")
+cat("  - Categorical binning (21 boundary values)\n")
+cat("  - Special values (tagged_na('a'), out of range)\n")
+cat("  - Return type consistency (numeric, character)\n")
+cat("  - haven tagged_na integration\n")
+```

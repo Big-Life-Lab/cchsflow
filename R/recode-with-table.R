@@ -147,7 +147,7 @@ is_equal <- function(v1, v2) {
 #' tail(combined_bmi)
 #' @importFrom haven tagged_na
 #' @importFrom stringr str_match
-#' @importFrom dplyr rowwise select do
+#' @importFrom dplyr rowwise select do case_when
 #' @importFrom magrittr %>%
 #' @export
 
