@@ -1,0 +1,15 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "CEP-007: Diet variables"
+  navbar:
+    left:
+      - text: "Cross-cycle prevalence"
+        href: cep-007-diet.qmd
+
+format:
+  html:
+    toc: true
+    code-fold: true

@@ -1,0 +1,206 @@
+---
+title: "CEP-007: Diet variable cross-cycle prevalence"
+author: "cchsflow review (PR #148)"
+date: "2026-02-11"
+format:
+  html:
+    toc: true
+    code-fold: true
+---
+
+## Overview
+
+PR #148 adds master (`_m`) database support and 2017-2018 coverage for 9 diet
+variables: FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI (continuous
+inputs), diet_score (derived), and diet_score_cat3 (categorical derived).
+
+This document visualises the L6 integration test results from
+`rec_with_table()` run against all PUMF cycles. The purpose is to detect
+era boundary harmonization errors — sudden shifts in exposure distributions
+at the 2007 or 2015 transitions that would signal a mapping or naming problem.
+
+**Known data patterns:**
+
+- **2005**: FVC was optional content (BC, ON, AB, PE only) — expect ~56% valid
+- **2017-2018**: FVC was optional content — expect ~1% valid
+- **2015 variable rename**: FVCDFRU → FVCDVFRU, FVCDSAL → FVCDVGRN, etc.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+results <- read.csv("diet-pumf-integration-test.csv", stringsAsFactors = FALSE)
+
+# Extract start year from cycle name for x-axis
+results$year <- as.numeric(gsub("cchs(\\d{4}).*", "\\1", results$cycle))
+
+# Keep only the main biennial cycles (drop annual: 2010, 2012, 2014)
+main_cycles <- c("cchs2001_p", "cchs2003_p", "cchs2005_p",
+                 "cchs2007_2008_p", "cchs2009_2010_p",
+                 "cchs2011_2012_p", "cchs2013_2014_p",
+                 "cchs2015_2016_p", "cchs2017_2018_p")
+main <- results[results$cycle %in% main_cycles, ]
+```
+
+## FVC input variables: valid % across cycles
+
+Each FVC input variable should track closely. A divergence between variables
+within the same cycle would indicate a variable-specific mapping error.
+
+```{r}
+#| label: fig-fvc-valid-pct
+#| fig-cap: "Valid % for FVC input variables across CCHS PUMF cycles"
+#| fig-width: 9
+#| fig-height: 5
+
+fvc_vars <- c("FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI")
+fvc_colours <- c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#a65628")
+
+plot(NULL, xlim = c(2001, 2018), ylim = c(0, 105),
+     xlab = "CCHS cycle start year", ylab = "Valid %",
+     main = "FVC input variables: cross-cycle valid %",
+     xaxt = "n")
+axis(1, at = unique(main$year), labels = unique(main$year), las = 2)
+
+# Era boundary reference lines
+abline(v = 2007, lty = 2, col = "grey60")
+abline(v = 2015, lty = 2, col = "grey60")
+text(2007, 103, "pre-2007 era", pos = 4, cex = 0.7, col = "grey40")
+text(2015, 103, "2015+ era", pos = 4, cex = 0.7, col = "grey40")
+
+for (i in seq_along(fvc_vars)) {
+  v <- fvc_vars[i]
+  d <- main[main$variable == v, ]
+  d <- d[order(d$year), ]
+  lines(d$year, d$valid_pct, type = "b", pch = 19, col = fvc_colours[i], lwd = 1.5)
+}
+
+legend("bottomleft", legend = fvc_vars, col = fvc_colours,
+       lwd = 1.5, pch = 19, cex = 0.7, bg = "white")
+```
+
+**Interpretation:** All six FVC variables track together across cycles, which is
+expected since they come from the same survey module. The 2005 dip (~57-60%) and
+2017-2018 dip (~1%) reflect optional content — not harmonization errors. The
+2014 → 2015 transition is clean with no step change, confirming the 2015+
+variable renames (FVCDVFRU, FVCDVGRN, etc.) are correctly mapped.
+
+## diet_score: cross-cycle valid %
+
+The derived `diet_score` should have lower valid % than individual FVC inputs
+(since all inputs must be non-missing for the score to compute), but should
+follow the same cross-cycle pattern.
+
+```{r}
+#| label: fig-diet-score-valid
+#| fig-cap: "diet_score valid % compared to FVCDFRU input"
+#| fig-width: 9
+#| fig-height: 5
+
+ds <- main[main$variable == "diet_score", ]
+ds <- ds[order(ds$year), ]
+fru <- main[main$variable == "FVCDFRU", ]
+fru <- fru[order(fru$year), ]
+
+plot(ds$year, ds$valid_pct, type = "b", pch = 19, col = "#e41a1c", lwd = 2,
+     xlim = c(2001, 2018), ylim = c(0, 105),
+     xlab = "CCHS cycle start year", ylab = "Valid %",
+     main = "diet_score vs FVCDFRU: cross-cycle valid %",
+     xaxt = "n")
+axis(1, at = unique(ds$year), labels = unique(ds$year), las = 2)
+lines(fru$year, fru$valid_pct, type = "b", pch = 17, col = "#377eb8", lwd = 1.5)
+
+abline(v = c(2007, 2015), lty = 2, col = "grey60")
+
+legend("bottomleft", legend = c("diet_score", "FVCDFRU (input)"),
+       col = c("#e41a1c", "#377eb8"), pch = c(19, 17), lwd = c(2, 1.5),
+       cex = 0.8, bg = "white")
+```
+
+**Interpretation:** diet_score tracks slightly below its FVC inputs (as expected
+— all 6 inputs must be valid). The gap is small (1-6 percentage points),
+confirming the DV function is not excessively dropping valid cases.
+
+## diet_score_cat3: category distribution across cycles
+
+The most important harmonization check for the categorical derived variable.
+A sudden shift in the poor/fair/adequate distribution at an era boundary would
+signal a recoding or mapping error.
+
+```{r}
+#| label: fig-diet-cat-distribution
+#| fig-cap: "diet_score_cat3 distribution across cycles (excluding NA)"
+#| fig-width: 9
+#| fig-height: 6
+
+# Load the full integration test data to get category distributions
+# We need to rerun rec_with_table to get actual categories, since the CSV
+# only has valid counts. Use the stored diet_score valid % to label cycles.
+
+# For this visualisation, we use the diet_score valid % and the known
+# category distribution from the PR-148 review summary:
+# Poor (1): 0-2, Fair (2): 2-8, Adequate (3): 8-10
+
+cat_data <- data.frame(
+  cycle = c("2001", "2003", "2005", "2007", "2009", "2011", "2013", "2015", "2017"),
+  poor = c(43, 24, 11, 26, 21, 15, 14, 7, 0),
+  fair = c(145, 139, 92, 137, 142, 128, 136, 161, 2),
+  adequate = c(11, 25, 9, 26, 24, 34, 32, 23, 0),
+  stringsAsFactors = FALSE
+)
+
+# Calculate proportions (among valid respondents only)
+cat_data$total <- cat_data$poor + cat_data$fair + cat_data$adequate
+cat_data$pct_poor <- round(100 * cat_data$poor / cat_data$total, 1)
+cat_data$pct_fair <- round(100 * cat_data$fair / cat_data$total, 1)
+cat_data$pct_adequate <- round(100 * cat_data$adequate / cat_data$total, 1)
+
+# Exclude 2017-2018 from the bar chart (only 2 valid respondents)
+cat_plot <- cat_data[cat_data$cycle != "2017", ]
+
+# Stacked bar chart
+bar_matrix <- rbind(cat_plot$pct_poor, cat_plot$pct_fair, cat_plot$pct_adequate)
+colnames(bar_matrix) <- cat_plot$cycle
+
+barplot(bar_matrix,
+        col = c("#d73027", "#fee08b", "#1a9850"),
+        border = NA,
+        main = "diet_score_cat3: exposure distribution across cycles\n(% of valid respondents, N=200 per cycle)",
+        ylab = "Percentage",
+        xlab = "CCHS cycle start year",
+        ylim = c(0, 110),
+        las = 1)
+
+# Add era boundary markers
+abline(v = 3.7, lty = 2, col = "grey40")   # Between 2005 and 2007
+abline(v = 8.5, lty = 2, col = "grey40")   # Between 2013 and 2015
+
+legend("topright",
+       legend = c("Adequate (8-10)", "Fair (2-8)", "Poor (0-2)"),
+       fill = c("#1a9850", "#fee08b", "#d73027"),
+       border = NA, cex = 0.8, bg = "white")
+```
+
+**Interpretation:** The distribution is stable across cycles — fair diet (score
+2-8) dominates at ~70-80%, consistent with the population distribution. There is
+no step change at the 2015 era boundary. The gradual increase in "adequate"
+from 2001 (5.5%) to 2013 (17.6%) may reflect real dietary trends.
+The 2005 cycle is excluded from trend interpretation due to optional content
+(only 112 valid respondents from 4 provinces). The 2017-2018 cycle is excluded
+entirely (only 2 valid respondents).
+
+## Summary
+
+| Check | Result |
+|-------|--------|
+| Era boundary (2015) | **Clean** — no step change in valid % or distributions |
+| Era boundary (2007) | **Clean** — pre-2007 cycle letter mappings correct |
+| FVC input consistency | **PASS** — all 6 inputs track together |
+| DV completeness gap | **Acceptable** — diet_score 1-6% below inputs |
+| Category stability | **Stable** — gradual trends, no abrupt shifts |
+| Optional content | **Expected** — 2005 and 2017-2018 dips documented |
+
+**Issue found:** 30 raw FVC variables (FVC_1A through FVC_6E) have `chs2011_2012_m`
+and `chs2013_2014_m` typos (missing leading `c`). See
+[PR-148-review-summary.md](PR-148-review-summary.md) for details.
