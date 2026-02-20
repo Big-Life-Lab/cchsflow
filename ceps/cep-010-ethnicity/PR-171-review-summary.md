@@ -301,6 +301,32 @@ Note: Label terminology shifted from "Aboriginal" to "Indigenous" in 2022-2023 D
 
 These replacement variables have different category structures and cannot be directly mapped to the existing SDCGCGT harmonized variable.
 
+## Review update (2026-02-20)
+
+### Fixes applied
+
+1. **`_NA::a` → `_NAa` / `_NA::b` → `_NAb` in dummyVariable** (76 rows across all SDC-prefixed variables): Colons are invalid in identifiers.
+2. **Trailing empty columns removed** (19 extra columns in variable_details.csv header).
+
+### L6 integration results (post-fix)
+
+| Variable | PUMF cycles OK | PUMF cycles MISS | Notes |
+|---|---|---|---|
+| SDCDCGT_cat13 | 0 | 9 | Master-only (correct) |
+| SDCDCGT_cat7 | 0 | 9 | Master-only (correct) |
+| SDCGLNG | 5 (2001-2010) | 4 (2011+) | Dropped from PUMF after 2010 |
+| SDCFIMM | 9 | 0 | All cycles pass |
+| SDCDVABT | 2 (2015+) | 7 (2001-2014) | PUMF only from 2015 |
+| SDCGCGT | 9 | 0 | All cycles pass |
+| SDCGLHM | 6 (2007+) | 3 (2001-2005) | Not in PUMF before 2007 |
+| SDC_5A_1 | 4 (2011+) | 5 (2001-2010) | Not in PUMF before 2011 |
+
+Zero non-scope content changes confirmed.
+
+### Pre-existing issues (not introduced by this PR)
+
+- SDC_5A_1: 48 rows with `_s` databases (pre-existing)
+
 ## Artifacts
 
 | File | Description |
