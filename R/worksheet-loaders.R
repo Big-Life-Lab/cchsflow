@@ -17,9 +17,8 @@
 # LOCATION: development/flexible-missing-data-mvp/R/worksheet-metadata-loaders.R
 # VERSION: v2.0.0, updated 2025-08-02
 
-library(dplyr)
-library(yaml)  # For YAML schema loading
-library(here)  # For reliable path handling
+# Dependencies loaded via DESCRIPTION Depends (dplyr, yaml)
+# Path handling uses system.file() instead of here::here()
 
 #' Load worksheet metadata from CSV files
 #' 
@@ -33,8 +32,12 @@ library(here)  # For reliable path handling
 load_worksheet_metadata <- function(metadata_type = c("variables", "variable_details"), use_rdata = TRUE) {
   metadata_type <- match.arg(metadata_type)
   
-  rdata_file <- here::here("inst", "extdata", paste0(metadata_type, ".RData"))
-  csv_file <- here::here("inst", "extdata", paste0(metadata_type, ".csv"))
+  rdata_file <- system.file("extdata", paste0(metadata_type, ".RData"), package = "cchsflow")
+  csv_file <- system.file("extdata", paste0(metadata_type, ".csv"), package = "cchsflow")
+
+  # system.file returns "" if not found; fall back to inst/ path for dev context
+  if (!nzchar(rdata_file)) rdata_file <- file.path("inst", "extdata", paste0(metadata_type, ".RData"))
+  if (!nzchar(csv_file)) csv_file <- file.path("inst", "extdata", paste0(metadata_type, ".csv"))
   
   # Try loading from RData first if requested (performance optimization)
   if (use_rdata && file.exists(rdata_file) && file.size(rdata_file) > 0) {
@@ -81,7 +84,8 @@ load_worksheet_metadata <- function(metadata_type = c("variables", "variable_det
 #' @return List with parsed YAML schema content
 #' @export
 load_worksheet_schemas <- function(schema_name, schema_path = "core") {
-  yaml_file <- here::here("inst", "metadata", "schemas", schema_path, paste0(schema_name, ".yaml"))
+  yaml_file <- system.file("metadata", "schemas", schema_path, paste0(schema_name, ".yaml"), package = "cchsflow")
+  if (!nzchar(yaml_file)) yaml_file <- file.path("inst", "metadata", "schemas", schema_path, paste0(schema_name, ".yaml"))
   
   if (!file.exists(yaml_file)) {
     stop("YAML schema file not found: ", yaml_file)

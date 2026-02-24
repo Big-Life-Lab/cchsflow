@@ -481,16 +481,25 @@ calculate_SMKDSTY_cat6 <- function(SMK_005 = NULL, SMK_030 = NULL, SMK_01A = NUL
   )
 
   # === STEP 3: Clean output using derived variable bounds ===
-  output_clean <- clean_variables(vars = list(SMKDSTY_cat6 = SMKDSTY_cat6_result),
+  # Use worksheet variable name SMKDSTY_A for metadata lookup (valid range 1-6)
+  output_clean <- clean_variables(vars = list(SMKDSTY_A = SMKDSTY_cat6_result),
                                  output_format = output_format)
 
-  return(output_clean$SMKDSTY_cat6)
+  return(output_clean$SMKDSTY_A)
 }
 
 #' @title Type of Smoker - SMKDSTY_A (deprecated alias)
-#' @description Deprecated alias for calculate_SMKDSTY_cat6(). Use calculate_SMKDSTY_cat6() instead.
-#' @param ... Arguments passed to calculate_SMKDSTY_cat6()
+#' @description Deprecated alias for [calculate_SMKDSTY_cat6()]. Use
+#'   `calculate_SMKDSTY_cat6()` directly for new code.
+#' @param ... Arguments passed to [calculate_SMKDSTY_cat6()]
 #' @return Vector of smoking type classifications (1-6, plus missing value codes)
+#'
+#' @examples
+#' \dontrun{
+#' # Deprecated: use calculate_SMKDSTY_cat6() instead
+#' calculate_SMKDSTY_A(SMK_005 = 1, SMK_030 = 2, SMK_01A = 1)
+#' }
+#'
 #' @export
 calculate_SMKDSTY_A <- function(...) {
   .Deprecated("calculate_SMKDSTY_cat6")

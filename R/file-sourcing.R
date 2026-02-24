@@ -13,20 +13,12 @@
 # DEVELOPMENT STATUS: Robust sourcing with centralized configuration
 # LOCATION: development/flexible-missing-data-mvp/R/file-sourcing.R
 
-library(here)
-
-# ==============================================================================
-# CONFIGURATION - Change this single line to switch modes
-# ==============================================================================
-
-# Development mode: files in development/flexible-missing-data-mvp/R/
-DEVELOPMENT_R_DIR <- here("development", "flexible-missing-data-mvp", "R")
-
-# Production mode (when moved to main R folder): 
-# DEVELOPMENT_R_DIR <- here("R")
-
-# Testing mode (from tests/testthat/):
-# DEVELOPMENT_R_DIR <- here("..", "..", "R")
+# In package context, all R/ files are loaded automatically.
+# The here package is not needed; DEVELOPMENT_R_DIR is only used outside package context.
+DEVELOPMENT_R_DIR <- tryCatch(
+  here::here("development", "flexible-missing-data-mvp", "R"),
+  error = function(e) ""
+)
 
 # ==============================================================================
 # ROBUST SOURCING FUNCTIONS
@@ -52,12 +44,14 @@ source_r_robust <- function(filename, check_function = NULL, verbose = FALSE) {
   # Construct path using centralized configuration
   source_path <- file.path(DEVELOPMENT_R_DIR, filename)
   
-  if (file.exists(source_path)) {
+  if (nzchar(source_path) && file.exists(source_path)) {
     if (verbose) cat("Loading", filename, "from", source_path, "\n")
     source(source_path)
     return(TRUE)
   } else {
-    stop("Could not find ", filename, " at ", source_path)
+    # In package context, all functions are already available via R/ loading
+    if (verbose) cat("Skipping", filename, "(package context)\n")
+    return(TRUE)
   }
 }
 

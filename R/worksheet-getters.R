@@ -23,31 +23,8 @@ if (!exists(".variable_warnings_cache")) {
   .variable_warnings_cache <- new.env(parent = emptyenv())
 }
 
-# Source Level 1 and Level 2B dependencies using production-safe paths
-if (exists("source_r_robust")) {
-  source_r_robust("file-sourcing.R", "source_r_robust")
-  source_r_robust("worksheet-metadata-loaders.R", "load_worksheet_metadata")
-} else {
-  # Fallback for production environment
-  if (file.exists("file-sourcing.R")) {
-    source("file-sourcing.R")
-  } else if (file.exists(system.file("R", "file-sourcing.R", package = "cchsflow"))) {
-    source(system.file("R", "file-sourcing.R", package = "cchsflow"))
-  }
-  
-  if (file.exists("worksheet-metadata-loaders.R")) {
-    source("worksheet-metadata-loaders.R")
-  } else if (file.exists(system.file("R", "worksheet-metadata-loaders.R", package = "cchsflow"))) {
-    source(system.file("R", "worksheet-metadata-loaders.R", package = "cchsflow"))
-  }
-}
-
-# Load required libraries for tidyselect support
-library(dplyr)
-library(tidyselect)
-
-# Source parse-range-notation.R for validation limits functionality
-source_r_robust("parse-range-notation.R", "parse_range_notation")
+# In package context, all R/ files are loaded automatically.
+# Dependencies (dplyr) come via DESCRIPTION Depends.
 
 #' Get variable metadata from variables.csv
 #' 
@@ -289,8 +266,14 @@ get_variable_details <- function(variable_name, ...,
   }
   
   # Apply filters if specified
+  # databaseStart is a comma-separated list (e.g., "cchs2001_p, cchs2003_p").
+  # Match rows where database_filter appears as any entry in the list.
   if (!is.null(database_filter)) {
-    rows <- rows[rows$databaseStart == database_filter, ]
+    db_match <- vapply(rows$databaseStart, function(db_list) {
+      databases <- trimws(unlist(strsplit(db_list, ",", fixed = TRUE)))
+      database_filter %in% databases
+    }, logical(1))
+    rows <- rows[db_match, ]
   }
   
   if (!is.null(type_filter)) {

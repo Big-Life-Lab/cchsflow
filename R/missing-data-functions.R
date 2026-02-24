@@ -26,43 +26,8 @@
 #
 # REPLACES: universal-missing-helpers.R (now archived)
 
-# Source Level 1-4 dependencies
-
-# Load Level 1-4 dependencies with existence checks
-tryCatch({
-  # Check if source_r_robust is available
-  if (exists("source_r_robust")) {
-    source_r_robust("file-sourcing.R", "source_r_robust")
-    source_r_robust("worksheet-metadata-loaders.R", "load_worksheet_metadata")
-    source_r_robust("worksheet-getters.R", "get_variable_details")
-    source_r_robust("database-config-loader.R", "load_database_config")
-    source_r_robust("missing-pattern-cache.R", "get_missing_pattern")
-  } else {
-    # Fallback - source dependencies directly
-    required_files <- c(
-      "file-sourcing.R", 
-      "worksheet-metadata-loaders.R", 
-      "worksheet-getters.R", 
-      "database-config-loader.R", 
-      "missing-pattern-cache.R"
-    )
-    
-    for (file in required_files) {
-      if (file.exists(file)) {
-        source(file)
-      } else {
-        warning("Could not find dependency: ", file, " - some functionality may be limited")
-      }
-    }
-  }
-}, error = function(e) {
-  warning("Error loading dependencies: ", e$message, " - some Level 5 functionality may be limited")
-})
-
-# Load required libraries
-library(dplyr)
-library(haven)
-library(yaml)
+# In package context, all R/ files are loaded automatically.
+# Dependencies (dplyr, haven, yaml) come via DESCRIPTION Depends.
 
 # ==============================================================================
 # CORE API FUNCTIONS (Universal, Level 1-4 Integrated)
@@ -196,8 +161,11 @@ load_priority_rules <- function() {
   }
   
   # Try CCHS-specific rules first
-  cchs_path <- here::here("inst", "metadata", "schemas", "cchs", "missing_priority_rules.yaml")
-  core_path <- here::here("inst", "metadata", "schemas", "core", "missing_priority_rules.yaml")
+  cchs_path <- system.file("metadata", "schemas", "cchs", "missing_priority_rules.yaml", package = "cchsflow")
+  core_path <- system.file("metadata", "schemas", "core", "missing_priority_rules.yaml", package = "cchsflow")
+  # Fall back to inst/ paths for dev context
+  if (!nzchar(cchs_path)) cchs_path <- file.path("inst", "metadata", "schemas", "cchs", "missing_priority_rules.yaml")
+  if (!nzchar(core_path)) core_path <- file.path("inst", "metadata", "schemas", "core", "missing_priority_rules.yaml")
   
   rules <- NULL
   

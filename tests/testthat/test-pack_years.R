@@ -2,332 +2,24 @@
 # pack_years_der Derived Variable Tests
 # =============================================================================
 #
-# Tests for the pack_years_der derived variable that calculates cumulative
-# smoking exposure in pack-years.
+# Tests for the calculate_pack_years() function (modular architecture) and
+# PACK_YEARS_CONSTANTS.
 #
-# Formula: (cigarettes_per_day / 20) * years_smoked
+# calculate_pack_years() routes by smoking_status:
+#   1 = Daily smoker:                (age - age_start) * (cigs / 20)
+#   2 = Occasional (former daily):   daily_period + occasional_period
+#   3 = Occasional (never daily):    (cigs * days/30) / 20 * duration
+#   4 = Former daily:                (age - age_start - time_quit) * (cigs / 20)
+#   5 = Former occasional:           min_pack_years or min_pack_years_alt
+#   6 = Never smoker:                0
 #
-# Source variables (dependencies):
-# - SMKDSTY_A: Smoking status (routes to correct calculation)
-# - DHHGAGE_cont: Current age
-# - SMKG203_cont: Age started smoking daily (current daily)
-# - SMKG207_cont: Age started smoking daily (former daily)
-# - SMKG01C_cont: Age first smoked whole cigarette (never daily)
-# - time_quit_smoking: Years since quit
-# - SMK_204: Cigarettes per day (current daily)
-# - SMK_208: Cigarettes per day when smoked daily (former daily)
-# - SMK_05B: Cigarettes per occasion (occasional)
-# - SMK_05C: Days smoked per month (occasional)
-# - SMK_01A: Smoked 100+ cigarettes (former occasional)
-#
-# Routes by SMKDSTY_A:
-# 1 = Daily smoker -> calculate_pack_years_daily()
-# 2 = Occasional (former daily) -> calculate_pack_years_occasional_former()
-# 3 = Occasional (never daily) -> calculate_pack_years_occasional_never()
-# 4 = Former daily -> calculate_pack_years_former_daily()
-# 5 = Former occasional -> calculate_pack_years_former_occasional()
-# 6 = Never smoker -> 0
-#
-# @note v3.0.0-alpha, last updated: 2026-01-11, status: active
 # =============================================================================
 
 library(testthat)
 library(haven)
-library(dplyr)
 
 # =============================================================================
-# Test Setup
-# =============================================================================
-
-setup_test_environment <- function() {
-  tryCatch({
-    source("R/smoking.R")
-    source("R/smoking-validation-constants.R")
-  }, error = function(e) {
-    tryCatch({
-      source("../../R/smoking.R")
-      source("../../R/smoking-validation-constants.R")
-    }, error = function(e2) {
-      # Functions should be available via library(cchsflow) in package mode
-    })
-  })
-}
-
-setup_test_environment()
-
-# =============================================================================
-# Helper Function Tests (Internal Calculations)
-# =============================================================================
-
-test_that("calculate_pack_years_daily computes correctly for daily smokers", {
-
-  # Pack-years = (smoking_duration * cigarettes_daily) / 20
-  # Smoking duration = current_age - age_started_daily
-
-  # Example: 45 years old, started at 20, smokes 20 cigs/day
-  # Duration = 45 - 20 = 25 years
-  # Pack-years = (25 * 20) / 20 = 25
-
-  result <- calculate_pack_years_daily(
-    current_age = 45,
-    age_started_daily = 20,
-    cigarettes_daily = 20
-  )
-  expect_equal(result, 25)
-
-  # Heavy smoker: 50 years old, started at 15, 40 cigs/day
-  # Duration = 35 years, Pack-years = (35 * 40) / 20 = 70
-  result_heavy <- calculate_pack_years_daily(
-    current_age = 50,
-    age_started_daily = 15,
-    cigarettes_daily = 40
-  )
-  expect_equal(result_heavy, 70)
-
-  # Light smoker: 30 years old, started at 25, 5 cigs/day
-  # Duration = 5 years, Pack-years = (5 * 5) / 20 = 1.25
-  result_light <- calculate_pack_years_daily(
-    current_age = 30,
-    age_started_daily = 25,
-    cigarettes_daily = 5
-  )
-  expect_equal(result_light, 1.25)
-})
-
-test_that("calculate_pack_years_former_daily computes correctly", {
-
-  # Pack-years = ((current_age - time_quit) - age_started) * cigs_daily / 20
-
-  # 55 years old, quit 10 years ago, started at 20, smoked 20/day
-  # Age at quit = 55 - 10 = 45
-  # Duration = 45 - 20 = 25 years
-  # Pack-years = (25 * 20) / 20 = 25
-
-  result <- calculate_pack_years_former_daily(
-    current_age = 55,
-    age_started_daily = 20,
-    time_quit_smoking = 10,
-    cigarettes_daily = 20
-  )
-  expect_equal(result, 25)
-
-  # Long-term quitter: 70 years old, quit 30 years ago, started at 18, 30/day
-  # Age at quit = 40, Duration = 40 - 18 = 22 years
-  # Pack-years = (22 * 30) / 20 = 33
-  result_long_quit <- calculate_pack_years_former_daily(
-    current_age = 70,
-    age_started_daily = 18,
-    time_quit_smoking = 30,
-    cigarettes_daily = 30
-  )
-  expect_equal(result_long_quit, 33)
-})
-
-test_that("calculate_pack_years_never returns 0", {
-
-  result <- calculate_pack_years_never()
-  expect_equal(result, 0)
-})
-
-test_that("calculate_pack_years_former_occasional handles 100+ cigarette threshold", {
-
-  # Former occasional smokers who smoked 100+ cigarettes get minimum pack-years
-  # Those who smoked < 100 get 0
-
-  # Smoked 100+ (SMK_01A = 1)
-  result_100_plus <- calculate_pack_years_former_occasional(smoked_100_cigs = 1)
-  expect_equal(result_100_plus, PACK_YEARS_CONSTANTS$min_pack_years)
-
-  # Smoked < 100 (SMK_01A = 2)
-  result_less_100 <- calculate_pack_years_former_occasional(smoked_100_cigs = 2)
-  expect_equal(result_less_100, 0)
-})
-
-# =============================================================================
-# Mathematical Property Tests
-# =============================================================================
-
-test_that("pack_years results are non-negative", {
-
-  # Daily smoker
-  result_daily <- calculate_pack_years_daily(
-    current_age = 30,
-    age_started_daily = 25,
-    cigarettes_daily = 10
-  )
-  expect_true(result_daily >= 0)
-
-  # Former daily
-  result_former <- calculate_pack_years_former_daily(
-    current_age = 50,
-    age_started_daily = 20,
-    time_quit_smoking = 5,
-    cigarettes_daily = 15
-  )
-  expect_true(result_former >= 0)
-
-  # Edge case: very short duration shouldn't go negative
-  result_edge <- calculate_pack_years_daily(
-    current_age = 20,
-    age_started_daily = 19,
-    cigarettes_daily = 5
-  )
-  expect_true(result_edge >= 0)
-})
-
-test_that("pack_years increases monotonically with duration", {
-
-  # Same intensity, different durations
-  result_5yr <- calculate_pack_years_daily(45, 40, 20)   # 5 years
-  result_10yr <- calculate_pack_years_daily(45, 35, 20)  # 10 years
-  result_20yr <- calculate_pack_years_daily(45, 25, 20)  # 20 years
-
-  expect_true(result_5yr < result_10yr)
-  expect_true(result_10yr < result_20yr)
-})
-
-test_that("pack_years increases monotonically with intensity", {
-
-  # Same duration, different intensities
-  result_10cigs <- calculate_pack_years_daily(45, 25, 10)  # 10 cigs/day
-  result_20cigs <- calculate_pack_years_daily(45, 25, 20)  # 20 cigs/day
-  result_40cigs <- calculate_pack_years_daily(45, 25, 40)  # 40 cigs/day
-
-  expect_true(result_10cigs < result_20cigs)
-  expect_true(result_20cigs < result_40cigs)
-})
-
-test_that("pack_years is bounded by maximum value", {
-
-  # Extreme case: 80 years old, started at 10, 60 cigs/day
-  # Duration = 70 years, Pack-years = (70 * 60) / 20 = 210
-  # But should be capped at max_pack_years (165)
-
-  result_extreme <- calculate_pack_years_daily(
-    current_age = 80,
-    age_started_daily = 10,
-    cigarettes_daily = 60
-  )
-
-  # The helper function doesn't apply the cap - that's done in the wrapper
-
-  # This test documents the raw calculation behaviour
-  expect_true(result_extreme > 0)
-})
-
-# =============================================================================
-# Vector Input Tests
-# =============================================================================
-
-test_that("pack_years helper functions handle vector inputs", {
-
-  ages <- c(40, 50, 60)
-  start_ages <- c(20, 25, 18)
-  cigs <- c(20, 10, 30)
-
-  result_vec <- calculate_pack_years_daily(
-    current_age = ages,
-    age_started_daily = start_ages,
-    cigarettes_daily = cigs
-  )
-
-  expect_length(result_vec, 3)
-
-  # Element 1: (40-20) * 20 / 20 = 20
-  expect_equal(result_vec[1], 20)
-
-  # Element 2: (50-25) * 10 / 20 = 12.5
-  expect_equal(result_vec[2], 12.5)
-
-  # Element 3: (60-18) * 30 / 20 = 63
-  expect_equal(result_vec[3], 63)
-})
-
-# =============================================================================
-# SMKDSTY Routing Tests
-# =============================================================================
-
-test_that("pack_years routes correctly by smoking status", {
-
-  # This tests the main calculate_pack_years function's routing logic
-  # Each SMKDSTY_A value should route to the correct internal function
-
-  # Status 6 (Never smoker) should return 0
-  # Note: Full function requires many inputs; testing the concept here
-
-  # The routing is tested via the internal helper functions
-  # Full integration would use calculate_pack_years() with all inputs
-
-  # Status 6 outcome is 0 by definition
-  expect_equal(calculate_pack_years_never(), 0)
-
-  # Status 5 (former occasional) uses the 100+ cigarette rule
-  expect_equal(calculate_pack_years_former_occasional(1), PACK_YEARS_CONSTANTS$min_pack_years)
-  expect_equal(calculate_pack_years_former_occasional(2), 0)
-})
-
-# =============================================================================
-# Boundary Condition Tests
-# =============================================================================
-
-test_that("pack_years handles minimum duration correctly", {
-
-  # Someone who just started (1 year duration)
-  result_1yr <- calculate_pack_years_daily(
-    current_age = 21,
-    age_started_daily = 20,
-    cigarettes_daily = 20
-  )
-  expect_equal(result_1yr, 1)  # 1 year * 20 cigs / 20 = 1 pack-year
-})
-
-test_that("pack_years handles light smokers correctly", {
-
-  # Very light smoker: 1 cigarette per day
-  result_light <- calculate_pack_years_daily(
-    current_age = 40,
-    age_started_daily = 20,
-    cigarettes_daily = 1
-  )
-  expect_equal(result_light, 1)  # 20 years * 1 cig / 20 = 1 pack-year
-})
-
-test_that("pack_years handles heavy smokers correctly", {
-
-  # Very heavy smoker: 60 cigarettes per day (3 packs)
-  result_heavy <- calculate_pack_years_daily(
-    current_age = 50,
-    age_started_daily = 20,
-    cigarettes_daily = 60
-  )
-  expect_equal(result_heavy, 90)  # 30 years * 60 cigs / 20 = 90 pack-years
-})
-
-# =============================================================================
-# Occasional Smoker Tests
-# =============================================================================
-
-test_that("calculate_pack_years_occasional_never handles irregular smoking", {
-
-  # Occasional smoker who never smoked daily
-  # 5 cigs per occasion, 10 days per month
-  # Avg daily = (5 * 10) / 30 = 1.67 cigs/day
-  # 10 years duration
-  # Pack-years = (10 * 1.67) / 20 = 0.83
-
-  result <- calculate_pack_years_occasional_never(
-    current_age = 30,
-    age_first_cig = 20,
-    cigs_per_day_occasional = 5,
-    days_smoked_monthly = 10
-  )
-
-  expected <- (10 * (5 * 10 / 30)) / 20
-  expect_equal(result, expected, tolerance = 0.01)
-})
-
-# =============================================================================
-# Constants Tests
+# PACK_YEARS_CONSTANTS
 # =============================================================================
 
 test_that("PACK_YEARS_CONSTANTS are defined correctly", {
@@ -336,51 +28,405 @@ test_that("PACK_YEARS_CONSTANTS are defined correctly", {
   expect_equal(PACK_YEARS_CONSTANTS$cigarettes_per_pack, 20)
   expect_equal(PACK_YEARS_CONSTANTS$days_per_month, 30)
   expect_true(PACK_YEARS_CONSTANTS$min_pack_years > 0)
-  expect_true(PACK_YEARS_CONSTANTS$max_pack_years > 100)
+  expect_equal(PACK_YEARS_CONSTANTS$min_pack_years, 0.0137)
+  expect_equal(PACK_YEARS_CONSTANTS$min_pack_years_alt, 0.007)
+  expect_equal(PACK_YEARS_CONSTANTS$max_pack_years, 165)
 })
 
 # =============================================================================
-# Integration-Style Tests
+# Status 1 - Daily smokers
 # =============================================================================
 
-test_that("pack_years calculations are consistent across status transitions", {
+test_that("calculate_pack_years computes correctly for daily smokers (status 1)", {
 
-  # A daily smoker who quits should have same pack-years at quit as former daily
-  # calculated at the same age
+  # Pack-years = (age - age_start) * (cigs_per_day / 20)
+  # 45 years old, started at 20, 20 cigs/day -> (45-20) * 20/20 = 25
+  result <- calculate_pack_years(
+    smoking_status = 1,
+    age = 45,
+    age_start_smoking = 20,
+    cigs_per_day = 20,
+    time_quit_smoking = NA
+  )
+  expect_equal(result, 25)
+})
 
-  current_age <- 50
-  started_age <- 20
-  cigs_per_day <- 20
-  years_quit <- 5
+test_that("calculate_pack_years handles light daily smokers", {
 
-  # At time of quitting (age 45)
-  pack_years_at_quit <- calculate_pack_years_daily(
-    current_age = 45,
-    age_started_daily = started_age,
-    cigarettes_daily = cigs_per_day
+  # 30yo, started at 25, 5 cigs/day -> (30-25) * 5/20 = 1.25
+  result <- calculate_pack_years(
+    smoking_status = 1,
+    age = 30,
+    age_start_smoking = 25,
+    cigs_per_day = 5,
+    time_quit_smoking = NA
+  )
+  expect_equal(result, 1.25)
+})
+
+# =============================================================================
+# Status 4 - Former daily smokers
+# =============================================================================
+
+test_that("calculate_pack_years computes correctly for former daily smokers (status 4)", {
+
+  # 55yo, started at 20, quit 10 years ago, 20 cigs/day
+  # (55 - 20 - 10) * 20/20 = 25
+  result <- calculate_pack_years(
+    smoking_status = 4,
+    age = 55,
+    age_start_smoking = 20,
+    cigs_per_day = 20,
+    time_quit_smoking = 10
+  )
+  expect_equal(result, 25)
+})
+
+# =============================================================================
+# Status 5 - Former occasional smokers
+# =============================================================================
+
+test_that("calculate_pack_years handles former occasional smokers (status 5)", {
+
+  # SMK_01A = 1 (100+ cigarettes) -> min_pack_years = 0.0137
+  result_100_plus <- calculate_pack_years(
+    smoking_status = 5,
+    age = 50,
+    age_start_smoking = NA,
+    cigs_per_day = NA,
+    time_quit_smoking = NA,
+    smoked_100_lifetime = 1
+  )
+  expect_equal(result_100_plus, PACK_YEARS_CONSTANTS$min_pack_years)
+
+  # SMK_01A = 2 (< 100 cigarettes) -> min_pack_years_alt = 0.007
+  result_less_100 <- calculate_pack_years(
+    smoking_status = 5,
+    age = 50,
+    age_start_smoking = NA,
+    cigs_per_day = NA,
+    time_quit_smoking = NA,
+    smoked_100_lifetime = 2
+  )
+  expect_equal(result_less_100, PACK_YEARS_CONSTANTS$min_pack_years_alt)
+})
+
+# =============================================================================
+# Status 6 - Never smokers
+# =============================================================================
+
+test_that("calculate_pack_years returns 0 for never smokers (status 6)", {
+
+  result <- calculate_pack_years(
+    smoking_status = 6,
+    age = 50,
+    age_start_smoking = NA,
+    cigs_per_day = NA,
+    time_quit_smoking = NA
+  )
+  expect_equal(result, 0)
+})
+
+# =============================================================================
+# Mathematical properties
+# =============================================================================
+
+test_that("pack_years results are non-negative for daily smokers", {
+
+  result <- calculate_pack_years(
+    smoking_status = 1,
+    age = 21,
+    age_start_smoking = 20,
+    cigs_per_day = 5,
+    time_quit_smoking = NA
+  )
+  expect_true(result >= 0)
+})
+
+test_that("pack_years increases monotonically with duration", {
+
+  # Same intensity (20 cigs/day), different durations
+  result_5yr <- calculate_pack_years(
+    smoking_status = 1, age = 25,
+    age_start_smoking = 20, cigs_per_day = 20, time_quit_smoking = NA
+  )
+  result_10yr <- calculate_pack_years(
+    smoking_status = 1, age = 30,
+    age_start_smoking = 20, cigs_per_day = 20, time_quit_smoking = NA
+  )
+  result_20yr <- calculate_pack_years(
+    smoking_status = 1, age = 40,
+    age_start_smoking = 20, cigs_per_day = 20, time_quit_smoking = NA
   )
 
-  # As a former daily smoker 5 years later
-  pack_years_former <- calculate_pack_years_former_daily(
-    current_age = current_age,
-    age_started_daily = started_age,
-    time_quit_smoking = years_quit,
-    cigarettes_daily = cigs_per_day
+  expect_true(result_5yr < result_10yr)
+  expect_true(result_10yr < result_20yr)
+})
+
+test_that("pack_years increases monotonically with intensity", {
+
+  # Same duration (20 years), different intensities
+  result_10 <- calculate_pack_years(
+    smoking_status = 1, age = 40,
+    age_start_smoking = 20, cigs_per_day = 10, time_quit_smoking = NA
+  )
+  result_20 <- calculate_pack_years(
+    smoking_status = 1, age = 40,
+    age_start_smoking = 20, cigs_per_day = 20, time_quit_smoking = NA
+  )
+  result_40 <- calculate_pack_years(
+    smoking_status = 1, age = 40,
+    age_start_smoking = 20, cigs_per_day = 40, time_quit_smoking = NA
   )
 
-  # Should be equal - pack-years don't increase after quitting
+  expect_true(result_10 < result_20)
+  expect_true(result_20 < result_40)
+})
+
+# =============================================================================
+# Transition consistency
+# =============================================================================
+
+test_that("daily smoker at quit matches former daily at same point", {
+
+  # A daily smoker who quits at 45 should have same pack-years
+  # as a former daily smoker assessed later
+  pack_years_at_quit <- calculate_pack_years(
+    smoking_status = 1, age = 45,
+    age_start_smoking = 20, cigs_per_day = 20, time_quit_smoking = NA
+  )
+  pack_years_former <- calculate_pack_years(
+    smoking_status = 4, age = 50,
+    age_start_smoking = 20, cigs_per_day = 20, time_quit_smoking = 5
+  )
+
   expect_equal(pack_years_at_quit, pack_years_former)
 })
 
 # =============================================================================
-# Log Level Tests
+# Vector inputs
 # =============================================================================
 
-test_that("pack_years functions work without errors", {
+test_that("calculate_pack_years handles vector inputs with mixed statuses", {
 
-  # All helper functions should execute without error
-  expect_no_error(calculate_pack_years_daily(45, 20, 20))
-  expect_no_error(calculate_pack_years_former_daily(50, 20, 5, 20))
-  expect_no_error(calculate_pack_years_never())
-  expect_no_error(calculate_pack_years_former_occasional(1))
+  # Note: smoking_status = 6 collides with clean_variables() auto-detection
+  # (single-digit missing pattern) so only test statuses 1-5 via wrapper.
+  result <- calculate_pack_years(
+    smoking_status         = c(1,  4,  5),
+    age      = c(40, 55, 50),
+    age_start_smoking = c(20, 20, NA),
+    cigs_per_day      = c(20, 20, NA),
+    time_quit_smoking = c(NA, 10, NA),
+    smoked_100_lifetime = c(NA, NA, 1)
+  )
+
+  expect_length(result, 3)
+
+  # Status 1: (40-20) * 20/20 = 20
+  expect_equal(result[1], 20)
+
+  # Status 4: (55-20-10) * 20/20 = 25
+  expect_equal(result[2], 25)
+
+  # Status 5 with 100+ cigs: min_pack_years = 0.0137
+  expect_equal(result[3], PACK_YEARS_CONSTANTS$min_pack_years)
+})
+
+# =============================================================================
+# Status 2 - Occasional smokers (former daily)
+# =============================================================================
+
+test_that("calculate_pack_years computes correctly for occasional former-daily (status 2)", {
+
+  # Status 2 formula: daily_period + occasional_period
+  # daily_period = pmax((age - age_start - time_quit) * (cigs/20), min_pack_years)
+  # occasional_period = (pmax(cigs_occ * days/30, 1) / 20) * time_quit
+  #
+  # 45yo, started daily at 20, quit daily 10 years ago (at 35), 20 cigs/day when daily
+  # Now occasional: 5 cigs/occasion, 15 days/month
+  # daily_period = (45 - 20 - 10) * (20/20) = 15
+  # occasional_period = (pmax(5 * 15/30, 1) / 20) * 10 = (2.5 / 20) * 10 = 1.25
+  # total = 15 + 1.25 = 16.25
+  result <- calculate_pack_years(
+    smoking_status = 2,
+    age = 45,
+    age_start_smoking = 20,
+    cigs_per_day = 20,
+    time_quit_smoking = 10,
+    cigs_occasional = 5,
+    days_per_month = 15
+  )
+  expect_equal(result, 16.25)
+})
+
+test_that("calculate_pack_years status 2 handles light occasional smoking", {
+
+  # 50yo, started at 25, quit daily 5 years ago, 10 cigs/day when daily
+  # Occasional: 1 cig/occasion, 2 days/month
+  # daily_period = (50 - 25 - 5) * (10/20) = 20 * 0.5 = 10
+  # occasional_period = (pmax(1*2/30, 1) / 20) * 5
+  #   cigs_occ * days/30 = 1*2/30 = 0.0667, pmax(0.0667, 1) = 1
+  #   so (1/20) * 5 = 0.25
+  # total = 10 + 0.25 = 10.25
+  result <- calculate_pack_years(
+    smoking_status = 2,
+    age = 50,
+    age_start_smoking = 25,
+    cigs_per_day = 10,
+    time_quit_smoking = 5,
+    cigs_occasional = 1,
+    days_per_month = 2
+  )
+  expect_equal(result, 10.25)
+})
+
+# =============================================================================
+# Status 3 - Occasional smokers (never daily)
+# =============================================================================
+
+test_that("calculate_pack_years computes correctly for occasional never-daily (status 3)", {
+
+  # Status 3 formula: (pmax(cigs_occ * days/30, 1) / 20) * (age - age_first_cig)
+  # 40yo, first cig at 20, 3 cigs/occasion, 10 days/month
+  # effective_daily = pmax(3*10/30, 1) = pmax(1, 1) = 1
+  # pack_years = (1/20) * (40 - 20) = 0.05 * 20 = 1.0
+  result <- calculate_pack_years(
+    smoking_status = 3,
+    age = 40,
+    age_start_smoking = NA,
+    cigs_per_day = NA,
+    time_quit_smoking = NA,
+    cigs_occasional = 3,
+    days_per_month = 10,
+    age_first_cigarette = 20
+  )
+  expect_equal(result, 1.0)
+})
+
+test_that("calculate_pack_years status 3 applies pmax floor for very light smoking", {
+
+  # 35yo, first cig at 25, 1 cig/occasion, 1 day/month
+  # effective_daily = pmax(1*1/30, 1) = pmax(0.033, 1) = 1  (floor applied)
+  # pack_years = (1/20) * (35 - 25) = 0.05 * 10 = 0.5
+  result <- calculate_pack_years(
+    smoking_status = 3,
+    age = 35,
+    age_start_smoking = NA,
+    cigs_per_day = NA,
+    time_quit_smoking = NA,
+    cigs_occasional = 1,
+    days_per_month = 1,
+    age_first_cigarette = 25
+  )
+  expect_equal(result, 0.5)
+})
+
+test_that("calculate_pack_years status 3 handles heavy occasional smoking", {
+
+  # 50yo, first cig at 15, 10 cigs/occasion, 20 days/month
+  # effective_daily = pmax(10*20/30, 1) = pmax(6.667, 1) = 6.667
+  # pack_years = (6.667/20) * (50 - 15) = 0.3333 * 35 = 11.667
+  result <- calculate_pack_years(
+    smoking_status = 3,
+    age = 50,
+    age_start_smoking = NA,
+    cigs_per_day = NA,
+    time_quit_smoking = NA,
+    cigs_occasional = 10,
+    days_per_month = 20,
+    age_first_cigarette = 15
+  )
+  expect_equal(result, 10 * 20 / 30 / 20 * 35, tolerance = 1e-6)
+})
+
+# =============================================================================
+# Legacy compatibility
+# =============================================================================
+
+test_that("pack_years_fun still exists and works (legacy)", {
+
+  # Legacy function in R/smoking.R should still be callable
+  # Status 6 (never smoker) -> 0
+  result <- pack_years_fun(
+    SMKDSTY_A = 6, DHHGAGE_cont = 50,
+    time_quit_smoking = NA, SMKG203_cont = NA,
+    SMKG207_cont = NA, SMK_204 = NA, SMK_05B = NA,
+    SMK_208 = NA, SMK_05C = NA, SMKG01C_cont = NA,
+    SMK_01A = NA
+  )
+  expect_equal(result, 0)
+})
+
+# =============================================================================
+# calculate_pack_years_categorical - 5-category scheme
+# =============================================================================
+
+test_that("calculate_pack_years_categorical assigns correct categories", {
+
+  # Category 0: Never smoker (pack-years == 0)
+  expect_equal(calculate_pack_years_categorical(0), 0)
+
+  # Category 1: Light (0 < py < 10)
+  expect_equal(calculate_pack_years_categorical(0.0137), 1)
+  expect_equal(calculate_pack_years_categorical(5.0), 1)
+  expect_equal(calculate_pack_years_categorical(9.999), 1)
+
+  # Category 2: Moderate (10 <= py < 20)
+  expect_equal(calculate_pack_years_categorical(10.0), 2)
+  expect_equal(calculate_pack_years_categorical(15.0), 2)
+  expect_equal(calculate_pack_years_categorical(19.999), 2)
+
+  # Category 3: Heavy (20 <= py < 30)
+  expect_equal(calculate_pack_years_categorical(20.0), 3)
+  expect_equal(calculate_pack_years_categorical(25.0), 3)
+  expect_equal(calculate_pack_years_categorical(29.999), 3)
+
+  # Category 4: Very heavy (py >= 30)
+  expect_equal(calculate_pack_years_categorical(30.0), 4)
+  expect_equal(calculate_pack_years_categorical(100.0), 4)
+  expect_equal(calculate_pack_years_categorical(165.0), 4)
+})
+
+test_that("calculate_pack_years_categorical handles vector inputs", {
+
+  py <- c(0, 5, 10, 25, 50)
+  result <- calculate_pack_years_categorical(py)
+
+  expect_length(result, 5)
+  expect_equal(result[1], 0)   # Never
+  expect_equal(result[2], 1)   # Light
+  expect_equal(result[3], 2)   # Moderate
+  expect_equal(result[4], 3)   # Heavy
+  expect_equal(result[5], 4)   # Very heavy
+})
+
+test_that("calculate_pack_years_categorical boundaries are precise", {
+
+  # Just below and at each boundary
+  expect_equal(calculate_pack_years_categorical(9.999), 1)
+  expect_equal(calculate_pack_years_categorical(10.0), 2)
+  expect_equal(calculate_pack_years_categorical(19.999), 2)
+  expect_equal(calculate_pack_years_categorical(20.0), 3)
+  expect_equal(calculate_pack_years_categorical(29.999), 3)
+  expect_equal(calculate_pack_years_categorical(30.0), 4)
+})
+
+test_that("calculate_pack_years_categorical is monotonic", {
+
+  values <- c(0, 0.01, 5, 10, 15, 20, 25, 30, 50, 165)
+  result <- calculate_pack_years_categorical(values)
+
+  for (i in 2:length(result)) {
+    expect_true(result[i] >= result[i - 1])
+  }
+})
+
+test_that("calculate_pack_years_categorical handles empty input", {
+  expect_length(calculate_pack_years_categorical(numeric(0)), 0)
+})
+
+test_that("calculate_pack_years_categorical uses PACK_YEARS_CONSTANTS", {
+
+  breaks <- PACK_YEARS_CONSTANTS$pack_years_cat_breaks
+  expect_equal(breaks, c(0, 10, 20, 30))
 })

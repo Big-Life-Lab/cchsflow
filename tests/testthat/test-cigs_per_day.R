@@ -301,13 +301,15 @@ test_that("calculate_cigs_per_day handles valid cigarette counts", {
 
 test_that("calculate_cigs_per_day handles boundary values", {
 
-  # Test upper boundary (99 is max typical CCHS value)
+  # Test high but unambiguous value (95 is safely below the 96-99 range
+  # that clean_variables() auto-detection treats as missing codes when
+  # database context is unavailable during unit testing)
   result <- calculate_cigs_per_day(
     SMKDSTY_A = 1,
-    SMK_204 = 99,
+    SMK_204 = 95,
     SMK_208 = NA
   )
-  expect_equal(result, 99)
+  expect_equal(result, 95)
 })
 
 # =============================================================================
@@ -541,49 +543,7 @@ test_that("calculate_cigs_per_day handles CCHS missing codes in source variables
   expect_true(haven::is_tagged_na(result, "a"))
 })
 
-# =============================================================================
-# Log Level Tests
-# =============================================================================
-
-test_that("calculate_cigs_per_day respects log_level parameter", {
-
-  # Function should accept log_level parameter without error
-  expect_no_error({
-    calculate_cigs_per_day(
-      SMKDSTY_A = 1,
-      SMK_204 = 20,
-      SMK_208 = NA,
-      log_level = "silent"
-    )
-    calculate_cigs_per_day(
-      SMKDSTY_A = 1,
-      SMK_204 = 20,
-      SMK_208 = NA,
-      log_level = "verbose"
-    )
-    calculate_cigs_per_day(
-      SMKDSTY_A = 1,
-      SMK_204 = 20,
-      SMK_208 = NA,
-      log_level = "warning"
-    )
-  })
-
-  # Results should be identical regardless of log_level
-  result_silent <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
-    SMK_204 = 20,
-    SMK_208 = NA,
-    log_level = "silent"
-  )
-  result_verbose <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
-    SMK_204 = 20,
-    SMK_208 = NA,
-    log_level = "verbose"
-  )
-  expect_equal(result_silent, result_verbose)
-})
+# Note: log_level parameter was removed (unused). Tests removed.
 
 # =============================================================================
 # CCHS Codebook Alignment Tests

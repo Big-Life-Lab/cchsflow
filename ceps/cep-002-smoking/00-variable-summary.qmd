@@ -15,7 +15,7 @@ format:
 | Field | Value |
 |-------|-------|
 | CEP | 2 |
-| Title | Smoking Variables and Derived Variable Methodology |
+| Title | Smoking variable harmonisation |
 | Authors | Caitlin Kral, Maikol Diasparra, Doug Manuel |
 | Created | 2026-01-08 |
 | Status | Draft |
@@ -24,23 +24,14 @@ format:
 
 ## Background
 
-This cchsflow Enhancement Proposal (CEP) updates the original 35 smoking variables in v2.1 to 54 variables in preparation for v3.0.0. Updates include:
+This CEP updates smoking variables in cchsflow from 35 (v2.1) to 56 variables. Updates include:
 
-1. Updating coverage from 2015 to 2023, spanning three eras of CCHS revisions
-2. Organizing smoking variables into 5 subgroups: status, initiation, cessation, intensity, and pack-years
-3. Supporting both PUMF and Master file versions
-4. Updating derived variable methodology using a tidyverse approach:
-   - Standardized data cleaning
-   - Missing data provenance with support for both `tagged_NA` and original missing data codes (6, 7, 8, 9, etc.)
-   - Output validation
-   - Worksheet-driven conversion of categorical to continuous measures
+1. Extending coverage from 2015 to 2023, spanning three eras of CCHS revisions
+2. Organising smoking variables into 5 subgroups: status, initiation, cessation, intensity, and pack-years
+3. Adding Master file support (2001-2023)
+4. Adding unified derived variables that route to the best available source across PUMF and Master
 
-See [Methodology and rationale](cep-002-smoking.qmd) for details on:
-
-- Why smoking harmonization is complex (three CCHS eras, 2015 redesign, 2022 module split)
-- Era-specific variable mappings
-- PUMF vs Master differences
-- Validation approach (L0-L5 levels)
+See [Harmonisation decisions](cep-002-smoking.qmd) for details on three CCHS eras, era-specific variable mappings, and PUMF vs Master differences.
 
 ## Variable count by subgroup
 
@@ -258,7 +249,7 @@ These variables require RDC or ICES Master file access:
 
 ## Related documentation
 
--   [Methodology and rationale](cep-002-smoking.qmd) - harmonization approach, derived variable methodology, validation
+-   [Harmonisation decisions](cep-002-smoking.qmd) - three CCHS eras, naming conventions, PUMF vs Master
 -   [01-status](01-status.qmd) - Smoking status classification
 -   [02-initiation](02-initiation.qmd) - Age started smoking
 -   [03-cessation](03-cessation.qmd) - Quit timing and duration

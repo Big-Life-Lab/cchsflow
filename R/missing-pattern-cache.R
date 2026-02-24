@@ -282,7 +282,8 @@ should_skip_term <- function(term) {
     "^Func::",           # Function calls
     "^DerivedVar::",     # Derived variable references
     "^min$",             # Runtime-dependent minimum
-    "^max$"              # Runtime-dependent maximum
+    "^max$",             # Runtime-dependent maximum
+    "^N/A$"              # Not applicable (documentation-only rows)
   )
   
   return(any(sapply(skip_patterns, function(p) grepl(p, term))))
@@ -299,9 +300,18 @@ parse_recStart_values <- function(rec_start) {
   if (is.null(rec_start) || is.na(rec_start) || nchar(trimws(rec_start)) == 0) {
     return(numeric(0))
   }
-  
+
   rec_start <- trimws(rec_start)
-  
+
+  # Reject expressions containing alphabetic characters.
+  # Valid numeric recStart values are: single numbers ("96"), ranges ("[1,99]"),
+  # or comma-separated numbers ("6,7,8"). Cross-variable conditions like
+  # "SMKDSTY_A in (3,5,6)" or "is.na(SMK_204)" contain letters and must not
+  # be parsed as numeric codes.
+  if (grepl("[a-zA-Z]", rec_start)) {
+    return(numeric(0))
+  }
+
   # Use existing parse_range_notation if available
   if (exists("parse_range_notation")) {
     parsed <- parse_range_notation(rec_start)
@@ -916,9 +926,8 @@ get_complete_pattern <- function(variable_name, database = NULL) {
   
   # If not cached, extract using existing infrastructure
   tryCatch({
-    # Use existing Level 3 functions to get metadata
     variable_rows <- get_variable_details(variable_name, database_filter = database)
-    
+
     if (nrow(variable_rows) == 0) {
       stop("No metadata found for variable: ", variable_name)
     }

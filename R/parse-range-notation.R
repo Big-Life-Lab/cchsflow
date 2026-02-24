@@ -13,8 +13,7 @@
 # LOCATION: development/flexible-missing-data-mvp/R/parse_range_notation.R
 # VERSION: v3.0.0, copied 2025-07-30
 
-# REQUIRED DEPENDENCIES:
-library(haven) # for haven::tagged_na() and haven::is_tagged_na()
+# Dependencies (haven) come via DESCRIPTION Depends.
 
 #' Range notation parser for variable_details.csv
 #'

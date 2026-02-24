@@ -168,3 +168,4 @@ Before marking L3 complete:
 | 2026-01-03 | Added Phase 2 DV entries: quit_pathway, SMK_06A_cont, SMK_10A_cont, time_quit_smoking | claude-code |
 | 2026-01-03 | Merged all draft files into variables_merged.csv (8 vars) and variable_details_merged.csv (157 rows) | claude-code |
 | 2026-01-26 | PR163 fix: Added explicit SMK_090/SMK_070 mappings for 2015+ cycles in SMK_09C and SMK_06C. The `[SMK_09C]` and `[SMK_06C]` bracket fallback doesn't work for 2015+ where variables were renamed. | claude-code |
+| 2026-02-22 | v3.0 naming rationalisation: SMK_06A_A/SMK_06A_B → SMK_06A_cat4, SMK_09A_A/SMK_09A_B → SMK_09A_cat4, SMK_10A_B → SMK_10A. See `smoking-dv-refactoring-plan.md` for rationale. | claude-code |

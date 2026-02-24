@@ -55,7 +55,12 @@ PACK_YEARS_CONSTANTS <- list(
   # Output validation bounds
 
   # Values outside [0, max_pack_years] are set to NA::b
-  max_pack_years = 165
+  max_pack_years = 165,
+
+  # Categorical cut-points for pack_years_cat (5-category scheme)
+  # Status: pending_review — boundaries require epidemiological validation
+  # Categories: 0=never, 1=light(<10), 2=moderate(10-20), 3=heavy(20-30), 4=very heavy(30+)
+  pack_years_cat_breaks = c(0, 10, 20, 30)
 )
 
 # ==============================================================================

@@ -1,14 +1,14 @@
 ---
-title: "Methodology and Rationale"
+title: "CEP-002: Smoking variable harmonisation"
 author: "Caitlin Kral, Maikol Diasparra, and Doug Manuel for the cchsflow development team"
 date: "2026-01-08"
+date-modified: "2026-02-23"
 format:
   html:
     toc: true
     toc-depth: 3
     toc-title: "Contents"
     number-sections: true
-    code-fold: true
 ---
 
 ::: {.callout-note}
@@ -17,26 +17,24 @@ format:
 | Field | Value |
 |-------|-------|
 | CEP | 2 |
-| Title | Smoking Variables and Derived Variable Methodology |
+| Title | Smoking variable harmonisation |
 | Authors | Caitlin Kral, Maikol Diasparra, Doug Manuel |
 | Created | 2026-01-08 |
 | Status | Draft |
-| Requires | CEP-001 (CSV standardization tool) |
+| PR | [#163](https://github.com/Big-Life-Lab/cchsflow/pull/163) |
 :::
 
 ## Abstract
 
-This CEP proposes:
+This CEP updates smoking variables in cchsflow from 35 (v2.1) to 56 variables, extending coverage from 2015 to 2023 across all three CCHS eras. Changes include:
 
-1. Adding 51 smoking variables across 5 subgroups, spanning all CCHS eras (2001-2023)
-2. Supporting both PUMF and Master file versions of smoking variables
-3. A standardized methodology for derived variables addressing current limitations
+- **25 new variables** across 5 subgroups (status, initiation, cessation, intensity, pack-years)
+- **31 updated variables** with extended cycle coverage and Master file support
+- **4 renamed variables** (SMK_06A_A/B → SMK_06A_cat4/cont, SMK_09A_A/B → SMK_09A_cat4/cont)
 
-Smoking variables are critical for chronic disease research but have been challenging to harmonize due to questionnaire redesigns in 2015 and 2022. This CEP documents the harmonization approach and introduces improvements to derived variable methodology that will benefit other variable domains.
+Key additions include unified derived variables (`age_start_smoking`, `age_first_cigarette`, `cigs_per_day`, `time_quit_smoking`) that route to the best available source across PUMF and Master files, and improvements to the existing `pack_years_der` calculation.
 
 ## Motivation
-
-### Why smoking variables?
 
 Smoking is the leading preventable cause of death in Canada. Researchers need:
 
@@ -45,82 +43,23 @@ Smoking is the leading preventable cause of death in Canada. Researchers need:
 - **Cessation timing** for intervention studies
 - **Cross-cycle consistency** for trend analysis
 
-Current cchsflow has only 4 smoking intensity variables. This CEP adds 47 new variables including the critical `pack_years_der` derived variable.
+cchsflow v2.1 has 35 smoking variables with coverage through 2015. This CEP extends coverage to 2023 and adds Master file support.
 
 ### Why is smoking harmonisation complex?
-
-::: {.callout-warning}
-## Key challenges
 
 1. **Three CCHS eras** with different variable naming conventions
 2. **2015 questionnaire redesign** changed variable numbering and some skip patterns
 3. **2022 modular split** separated smoking into CSS (current) and SPU (stopped) modules
-4. **PUMF vs Master differences** - continuous values grouped or capped in PUMF
-5. **Interdependent variables** - pack-years requires status, initiation, cessation, and intensity
-:::
+4. **PUMF vs Master differences** — continuous values are grouped or capped in PUMF
+5. **Interdependent variables** — pack-years requires status, initiation, cessation, and intensity
 
-### Current limitations in derived variable methodology
-
-| Issue | Impact | Example |
-|-------|--------|---------|
-| No standard input cleaning | Inconsistent NA handling | Some DVs check for NA, others don't |
-| Hard-coded midpoints | Not maintainable, not auditable | `case_when(x == 1 ~ 7, x == 2 ~ 12, ...)` in R code |
-| No output validation | DVs can return invalid values | Age calculations returning negative numbers |
-| Missing data provenance lost | Can't distinguish NA types | `NA` could be "not asked" vs "refused" |
-
-## Variable overview
-
-### Subgroup structure
-
-Smoking variables are organized into 5 subgroups with dependencies:
-
-```
-01-status ─────────────────────┐
-    │                          │
-    ├──► 02-initiation         │
-    │                          │
-    ├──► 03-cessation ─────────┤
-    │        │                 │
-    │        └──► 05-pack-years◄
-    │              ▲           │
-    └──► 04-intensity ─────────┘
-```
-
-**01-status** is the foundation. Pack-years depends on all other subgroups.
-
-### Variable count by subgroup
-
-| Subgroup | Total | PUMF+Master | Master-only | Description |
-|----------|-------|-------------|-------------|-------------|
-| 01-status | 10 | 9 | 1 | Smoking status classification |
-| 02-initiation | 16 | 12 | 4 | Age started smoking |
-| 03-cessation | 19 | 16 | 3 | Quit timing and duration |
-| 04-intensity | 4 | 4 | 0 | Cigarettes per day |
-| 05-pack-years | 2 | 2 | 0 | Derived cumulative exposure |
-| **Total** | **51** | **43** | **8** | |
-
-### Cycle coverage summary
-
-Variables with full PUMF coverage (all 13 cycles, 2001-2023):
-
-| Variable | Subgroup | Description |
-|----------|----------|-------------|
-| SMK_202 | status | Current smoking (daily/occasional/not at all) |
-| SMKDSTY_cat3 | status | 3-category (current/former/never) |
-| SMK_204 | intensity | CPD - current daily smokers |
-| pack_years_der | pack-years | Derived pack-years |
-
-Most initiation and cessation variables have gaps due to questionnaire changes. See [Variable summary](00-variable-summary.qmd) for complete coverage matrix.
-
-## Key harmonisation decisions
-
-### Three CCHS eras
+## Three CCHS eras
 
 | Era | Cycles | Naming pattern | Key changes |
 |-----|--------|----------------|-------------|
-| Era 1 | 2001-2014 | `SMK_*`, `SMKA_*`, `SMKC_*`, `SMKE_*` | Original design, letter prefixes for early cycles |
-| Era 2 | 2015-2021 | `SMK_*` (renumbered) | 2015 redesign, variable renumbering |
-| Era 3 | 2022+ | `CSS_*`, `SPU_*`, `SMKDV*` | Module split (current vs stopped smoking) |
+| Era 1 | 2001-2014 | `SMK_*`, `SMKA_*`, `SMKC_*`, `SMKE_*` | Original design; letter prefixes for 2001 (`A`), 2003 (`C`), 2005 (`E`) |
+| Era 2 | 2015-2021 | `SMK_*` (renumbered) | 2015 redesign renumbered most variables (e.g., SMK_204 → SMK_045) |
+| Era 3 | 2022+ | `CSS_*`, `SPU_*`, `SMKDV*` | Module split: CSS = current smoking, SPU = stopped use |
 
 ### Era-specific variable mappings
 
@@ -128,59 +67,48 @@ Most initiation and cessation variables have gaps due to questionnaire changes. 
 |---------|-------------------|-------------------|---------------|
 | Current smoking | SMK_202 | SMK_005 | CSS_05 |
 | 100+ lifetime cigs | SMK_01A | SMK_020 | CSS_15 |
-| Age started daily | SMK_203 / SMK_207 | SMK_040 | CSS_15 / SPU_15 |
+| Age started daily | SMK_203 / SMK_207 | SMK_040 | SPU_15 |
 | CPD (current daily) | SMK_204 | SMK_045 | CSS_25 |
 | CPD (former daily) | SMK_208 | SMK_075 | SPU_20 |
 | Time since quit | SMK_10A | SMK_080 | SPU_35 |
 
-### File type conventions
+These mappings are encoded in the `variableStart` column of `variables.csv` using the `database::variable` notation.
 
-::: {.callout-important}
-## Database suffix conventions
-
-| Suffix | Meaning | Status |
-|--------|---------|--------|
-| `_p` | **PUMF** (Public Use Microdata File) | Current standard |
-| `_m` | **Master** file (RDC/ICES access) | Current standard |
-| `_s` | Share file | **Deprecated** → use `_m` |
-| `_i` | ICES file | **Deprecated** → use `_i` |
-
-Existing worksheets using `_s` or `_i` should be migrated to `_m`.
-:::
-
-### PUMF vs Master differences
+## PUMF vs Master differences
 
 | Aspect | PUMF | Master |
 |--------|------|--------|
 | Access | Public download | RDC/ICES only |
-| Continuous values | Grouped/capped | True continuous |
+| Continuous values | Grouped into categories or capped | True continuous |
 | Variable names | May have `G` prefix (grouped) | Original names |
-| Example: Age started | `SMKG203` (categories) | `SMK_203` (actual age) |
+| Example: Age started | `SMKG203` (6 categories) | `SMK_203` (actual age) |
 | Example: CPD | Capped at 50 | Full range |
 
-### The `_cont` suffix convention
+### Database suffix conventions
 
-The `_cont` suffix indicates a **pseudo-continuous** variable derived from categorical PUMF data using midpoint estimation.
-
-| Suffix | Meaning | Source |
+| Suffix | Meaning | Status |
 |--------|---------|--------|
-| (none) | Original CCHS variable | Direct from data |
-| `_cont` | Pseudo-continuous | Derived via midpoints |
-| `_cat{n}` | Re-derived categorical with n categories | Collapsed/combined categories |
+| `_p` | PUMF (Public Use Microdata File) | Current standard |
+| `_m` | Master file (RDC/ICES access) | Current standard |
+| `_s` | Share file | Deprecated — use `_m` |
 
-::: {.callout-important}
-## Categorical variable naming
+## Variable naming conventions
 
-- **Original CCHS categorical variables** keep their original names (e.g., `SMK_06A`, `SMKDSTY`)
-- **Re-derived categorical variables** use `_cat{n}` suffix indicating the number of categories:
-  - `SMKDSTY_cat3` = 3-category (current/former/never)
-  - `SMKDSTY_cat5` = 5-category (daily/occasional/former daily/former occasional/never)
-  - `pack_years_cat5` = 5-category pack-years
+| Suffix | Meaning | Example |
+|--------|---------|---------|
+| (none) | Original CCHS variable | SMK_204 |
+| `_cont` | Pseudo-continuous derived from PUMF categories via midpoint estimation | SMKG203_cont |
+| `_cat{n}` | Re-derived categorical with *n* categories | SMKDSTY_cat3, SMKDSTY_cat5 |
+| `_A`, `_B` | Era-specific category sets | SMKG01C_A, SMKG01C_B |
+| `_der` | Derived variable | pack_years_der |
 
-Do **not** use vanilla `_cat` suffix without a number. The number indicates the category count and distinguishes re-derived variables from originals.
-:::
+Original CCHS categorical variables keep their original names. The `_cat{n}` suffix is only for re-derived variables with collapsed or combined categories. Always include the category count (`_cat3`, not `_cat`).
 
-**Example - SMKG203_cont derivation**:
+### The `_cont` suffix — midpoint estimation
+
+The `_cont` suffix indicates a pseudo-continuous variable derived from categorical PUMF data using midpoint estimation. Midpoint values are stored in `variable_details.csv`, not hard-coded in R functions.
+
+**Example — SMKG203_cont derivation**:
 
 | PUMF category (SMKG203) | Midpoint (SMKG203_cont) |
 |-------------------------|-------------------------|
@@ -189,410 +117,98 @@ Do **not** use vanilla `_cat` suffix without a number. The number indicates the 
 | 3 = "15-17 years" | 16 |
 | 4 = "18-19 years" | 18.5 |
 
-Midpoint values are stored in `variable_details.csv`, not hard-coded in R functions.
+## Subgroup structure
 
-### Variable harmonisation status
-
-Smoking variables have varying degrees of harmonisability. Variables are classified by how comparable they are across cycles:
-
-| Status | Meaning | Usage guidance |
-|--------|---------|----------------|
-| **Full** | Identical concept and categories across all cycles | Safe for trend analysis |
-| **Good** | Minor wording differences, semantically equivalent | Safe with documentation |
-| **Caution** | Category structure changed, requires mapping | Check era-specific notes |
-| **Limited** | Available only in subset of cycles | Restrict analysis to available cycles |
-
-#### Harmonisation by subgroup
-
-| Subgroup | Full | Good | Caution | Limited | Notes |
-|----------|:----:|:----:|:-------:|:-------:|-------|
-| 01-status | 3 | 4 | 2 | 1 | SMKDSTY semantic break in 2015 |
-| 02-initiation | 0 | 4 | 3 | 8 | Era 2+ dropped from PUMF |
-| 03-cessation | 2 | 8 | 4 | 7 | Complex universe changes |
-| 04-intensity | 4 | 0 | 0 | 0 | Most stable subgroup |
-| 05-pack-years | 2 | 0 | 0 | 0 | Depends on all above |
-
-#### Dependency chain for pack_years_der
-
-If `pack_years_der` is harmonisable, all its input variables must also be harmonisable:
+Smoking variables are organised into 5 subgroups with dependencies:
 
 ```
-pack_years_der (Full: 2001-2023)
-├── SMKDSTY_cat3 (Full) ─── 01-status
-│   └── Collapses to current/former/never, avoiding semantic breaks
-├── age_started ─────────── 02-initiation
-│   ├── SMKG203_cont (Good: 2001-2014 PUMF)
-│   ├── SMKG207_cont (Good: 2001-2014 PUMF)
-│   └── SMK_040 (Full: 2001-2023 Master)
-├── time_quit ───────────── 03-cessation
-│   ├── SMK_06A_cont (Good: 2001-2018 PUMF)
-│   └── time_quit_smoking (Full: derived)
-├── cpd ─────────────────── 04-intensity
-│   ├── SMK_204 (Full: 2001-2023)
-│   └── SMK_208 (Full: 2001-2023)
-└── age ─────────────────── Demographics
-    ├── DHHGAGE (Full: grouped)
-    └── DHH_AGE (Full: Master continuous)
+01-status ─────────────────────┐
+    │                          │
+    ├──► 02-initiation         │
+    │                          │
+    ├──► 03-cessation ─────────┤
+    │                          │
+    └──► 04-intensity ─────────┤
+                               │
+                  05-pack-years◄
+```
+
+**01-status** is the foundation. Pack-years depends on all other subgroups.
+
+See [Variable summary](00-variable-summary.qmd) for complete variable lists by subgroup and cycle coverage.
+
+## Unified derived variables
+
+This PR adds four unified derived variables that route to the best available source:
+
+| Variable | Sources | Priority | Coverage |
+|----------|---------|----------|----------|
+| `age_start_smoking` | SMK_040 (Master), SMKG040_cont (PUMF) | Master exact > PUMF midpoint | PUMF 2001-2021, Master 2001-2023 |
+| `age_first_cigarette` | SMK_01C (Master), SMKG01C_cont (PUMF) | Master exact > PUMF midpoint | PUMF 2001-2021, Master 2001-2023 |
+| `cigs_per_day` | SMK_204, SMK_208 | Routes by SMKDSTY_A status | PUMF + Master 2001-2023 |
+| `time_quit_smoking` | SMK_09A_cont, SMK_06A_cont, SMKDVSTP | Former daily > former occasional | PUMF 2001-2021, Master 2001-2023 |
+
+Additionally, `smoked_100_lifetime` provides a self-documenting wrapper for SMK_01A (1=yes, 2=no).
+
+### Pack-years dependency chain
+
+`pack_years_der` requires inputs from all subgroups:
+
+```
+pack_years_der (2001-2023)
+├── SMKDSTY_A ───────────────── 01-status (6-category)
+├── age_start_smoking ────────── 02-initiation
+│   ├── SMKG040_cont (PUMF midpoint, 2001-2021)
+│   └── SMK_040 (Master exact, 2001-2023)
+├── time_quit_smoking ────────── 03-cessation
+│   ├── SMK_09A_cont / SMK_06A_cont (PUMF)
+│   └── SMKDVSTP (Master, 2003-2023)
+├── cigs_per_day ─────────────── 04-intensity
+│   ├── SMK_204 (current daily)
+│   └── SMK_208 (former daily)
+└── age ──────────────────────── Demographics
+    ├── DHHGAGE (PUMF grouped)
+    └── DHH_AGE (Master continuous)
 ```
 
 ::: {.callout-note}
-## Pack-years harmonisation
+## PUMF pack-years precision
 
-`pack_years_der` achieves full 2001-2023 coverage by:
-
-1. Using `SMKDSTY_cat3` which avoids the 2015 semantic break
-2. Falling back to `time_quit_smoking` (derived) when direct quit variables unavailable
-3. Using intensity variables that have consistent coverage
-4. Accepting reduced precision in PUMF (~15-20% error) vs Master
-
-The harmonisation is **valid but precision varies by file type and era**.
+PUMF pack-years estimates have ~15-20% relative error due to grouped age (DHHGAGE), midpoint estimation for age started (~+/-3 years), CPD capped at 50, and midpoint estimation for time quit (~+/-1.5 years). This is acceptable for most epidemiological analyses but should be documented in study methods.
 :::
 
-#### Variables with caveats
+## Variables with caveats
 
 | Variable | Cycles | Caveat |
 |----------|--------|--------|
-| SMKDSTY_A | 2001-2023 | 2015+ values are derived, not direct |
-| SMKG203_cont | 2001-2014 | Dropped from PUMF in 2015 |
-| SMK_06A_cat | 2001-2018 | Not in 2019+ PUMF |
-| pack_years_der | 2001-2023 | PUMF precision ~15-20% error |
-
-## Derived variable methodology
-
-### Current implementation (v2.x)
-
-Production DVs use direct R functions with nested `if_else2()` logic. For example, `bmi_fun()` calculates BMI from height and weight inputs:
-
-```r
-# Simple DV: bmi_fun() from R/bmi.R
-bmi_fun <- function(HWTGHTM, HWTGWTK) {
-  if_else2(!is.na(HWTGHTM) & !is.na(HWTGWTK),
-           HWTGWTK / HWTGHTM^2,
-           NA)
-}
-```
-
-Complex DVs embed missing data handling within nested conditionals - see `binge_drinker_fun()` for a production example.
-
-### Proposed pattern (v3.0 target)
-
-The three-step pattern separates concerns:
-
-```r
-derived_variable <- function(data, ...) {
-
-  # Step 1: Clean inputs
-  # - Apply recStart/recEnd boundary validation
-  # - Handle universe restrictions
-  # - Convert pseudo-continuous if needed
-
-  # Step 2: Domain logic
-  # - The actual calculation
-  # - No NA handling here (done in step 1)
-
-  # Step 3: Clean outputs
-  # - Validate output against expected range
-  # - Apply missing data tags if enabled
-}
-```
-
-This proposal is under development in the `flexible-missing-data-mvp` branch.
-
-### Missing data handling
-
-cchsflow supports two approaches to missing data, controlled by function parameters:
-
-#### Option 1: Original codes (default)
-
-Preserve CCHS missing data codes as-is. Simple and transparent.
-
-```r
-# Returns original codes: 6, 7, 8, 9, 96, 97, 98, 99, etc.
-pack_years_der(data, missing_format = "original")
-```
-
-#### Option 2: Tagged NA
-
-Convert to R's tagged_na for type-aware missing data:
-
-```r
-# Returns tagged NA values: NA(a), NA(b), NA(c), NA(d)
-pack_years_der(data, missing_format = "tagged_na")
-```
-
-| Tag | Meaning | When used |
-|-----|---------|-----------|
-| NA(a) | Not applicable | Universe restriction (e.g., never smoker for pack-years) |
-| NA(b) | Missing/unknown | Don't know, refusal, not stated, or unspecified missing |
-| NA(c) | Question not asked | Variable not collected in this cycle |
-| NA(d) | Variable missing | Variable exists but value not in data |
-
-::: {.callout-warning}
-## Tagged NA vs CCHS codes
-
-cchsflow's tagged_na tags (a, b, c, d) are **not** direct mappings to CCHS missing codes (6, 7, 8, 9). They represent cchsflow's simplified 4-category missing data taxonomy:
-
-- CCHS codes 6/96/996 (valid skip/not applicable) → NA(a)
-- CCHS codes 7/97/997 (don't know), 8/98/998 (refusal), 9/99/999 (not stated) → NA(b)
-- Variable not in cycle → NA(c)
-- Variable in cycle but missing from record → NA(d)
-
-This simplification trades granularity for consistency across cycles.
-:::
-
-#### Missing data provenance for derived variables
-
-When a derived variable depends on multiple inputs, each input may have different missing data types. The DV must assign a consistent output missing value.
-
-**Example: pack_years_der**
-
-| Input | Missing type | Tagged NA | Priority |
-|-------|--------------|-----------|----------|
-| SMKDSTY | Not applicable (never smoker) | NA(a) | 1 (highest) |
-| SMKG203_cont | Missing/unknown (DK/refused/not stated) | NA(b) | 2 |
-| SMK_204 | Missing/unknown | NA(b) | 2 |
-| time_quit | Question not asked (cycle gap) | NA(c) | 3 (lowest) |
-
-**Provenance rule**: Use the highest-priority missing reason from inputs.
-
-```r
-pack_years_der <- function(data, missing_format = "original") {
-
- # Step 1: Identify missing inputs and their reasons
- missing_reasons <- identify_missing_sources(
-   data,
-   vars = c("SMKDSTY", "SMKG203_cont", "SMK_204", "time_quit")
- )
-
- # Step 2: Calculate for non-missing cases
- result <- calculate_pack_years(data)
-
- # Step 3: Assign provenance-aware missing values
- result <- assign_missing_provenance(
-   result,
-   missing_reasons,
-   priority = c("not_applicable", "missing_unknown", "not_asked"),
-   format = missing_format
- )
-
- return(result)
-}
-```
-
-**Output example**:
-
-| Respondent | SMKDSTY | SMKG203 | SMK_204 | pack_years_der | Missing reason |
-|------------|---------|---------|---------|----------------|----------------|
-| A | 1 (daily) | 16 | 20 | 15.2 | - |
-| B | 6 (never) | - | - | 6 or NA(a) | Not applicable (never smoker) |
-| C | 3 (former) | 7 (DK) | 25 | 7 or NA(b) | Missing/unknown age started |
-| D | 3 (former) | 18 | 20 | NA(c) | time_quit not asked in cycle |
-
-This approach ensures:
-
-- Consistent missing values across derived variables
-- Traceable provenance (which input caused the missing)
-- User choice between original codes and tagged_na
-
-Missing data definitions are derived from `inst/metadata/schemas/` rather than hard-coded.
-
-### Pseudo-continuous values in worksheets
-
-**Current approach** (v2.x production):
-
-Production derived variables use nested `if_else2()` statements:
-
-```r
-# From bmi.R - categorical BMI classification
-bmi_fun_cat <- function(HWTGBMI_der) {
-  if_else2(HWTGBMI_der < 18.5, 1,                    # Underweight
-  if_else2(HWTGBMI_der >= 18.5 & HWTGBMI_der < 25, 2, # Normal
-  if_else2(HWTGBMI_der >= 25 & HWTGBMI_der < 30, 3,   # Overweight
-  if_else2(HWTGBMI_der >= 30, 4,                      # Obese
-  if_else2(haven::is_tagged_na(HWTGBMI_der, "a"),
-           "NA(a)", "NA(b)")))))
-}
-```
-
-This pattern is verbose but explicit. Complex DVs like `binge_drinker_fun()` have deeply nested `if_else2()` chains.
-
-**Worksheet-driven approach** (v3.0 target):
-
-| variable | recStart | recEnd |
-|----------|----------|--------|
-| SMKG203_cont | 1 | 7 |
-| SMKG203_cont | 2 | 12 |
-| SMKG203_cont | 3 | 17 |
-
-Benefits:
-
-- Transparent and auditable
-- Can be updated without code changes
-- Aligns with existing recStart/recEnd pattern
-- Reduces deeply nested if-else chains
-
-### Output validation
-
-Derived variables validate outputs against expected ranges defined in schemas:
-
-```yaml
-pack_years_der:
-  type: continuous
-  valid_range: [0, 165]
-  na_allowed: true
-```
-
-Functions return warnings if outputs violate expected ranges.
-
-### Range validation decisions
-
-Valid ranges for smoking variables are based on biological plausibility, CCHS questionnaire design, and data quality considerations.
-
-#### Age-related ranges
-
-| Variable type | Valid range | Rationale |
-|---------------|-------------|-----------|
-| Age first cigarette | 5-80 | CCHS asks 12+ respondents; youngest plausible ~5 |
-| Age started daily | 5-80 | Must be ≤ current age; minimum 5 for data quality |
-| Age quit smoking | 5-100 | Must be > age started; maximum extends for elderly |
-| Years since quit | 0-80 | Cannot exceed age minus minimum smoking age |
-| Years smoked | 0-80 | Total duration, capped by plausible lifespan |
-
-#### Intensity ranges
-
-| Variable | Valid range | Notes |
-|----------|-------------|-------|
-| CPD (current daily) | 1-150 | PUMF capped at 50; Master allows full range |
-| CPD (former daily) | 1-150 | Same as current daily |
-| Days smoked/month (occasional) | 1-30 | By definition < daily |
-| Cigarettes on days smoked | 1-50 | Lower than daily; PUMF may cap |
-
-#### Derived variable ranges
-
-| Variable | Valid range | Derivation |
-|----------|-------------|------------|
-| pack_years_der | 0-165 | ~3 packs/day × 55 years maximum |
-| smoking_years_der | 0-80 | Age minus minimum age started |
-
-#### Cross-field consistency rules
-
-Beyond individual ranges, these cross-field rules apply:
-
-| Rule | Fields | Constraint |
-|------|--------|------------|
-| Age started ≤ current age | age_started, age | age_started ≤ age |
-| Age quit ≥ age started | age_quit, age_started | age_quit ≥ age_started |
-| Age quit ≤ current age | age_quit, age | age_quit ≤ age |
-| Years smoked ≤ age - 5 | smoking_years, age | smoking_years ≤ age - 5 |
-| Pack-years plausible | pack_years, smoking_years | pack_years ≤ smoking_years × 7.5 |
-
-The final rule assumes maximum ~3 packs/day (150 CPD ÷ 20 = 7.5 packs).
-
-#### Handling out-of-range values
-
-| Situation | Recommended action | Code |
-|-----------|-------------------|------|
-| Value impossible (age started > current age) | Set to NA(b) | Data error |
-| Value implausible but possible (CPD = 120) | Keep with flag | Extreme but valid |
-| Value at boundary (age started = 5) | Keep | Edge of range |
-| Value below minimum (age started = 3) | Set to NA(b) | Likely data error |
-
-::: {.callout-note}
-## Range decisions by subgroup
-
-Specific valid ranges for each variable are documented in the subgroup QMDs:
-
-- [02-initiation](02-initiation.qmd) - Age ranges for initiation variables
-- [03-cessation](03-cessation.qmd) - Quit timing ranges
-- [04-intensity](04-intensity.qmd) - CPD ranges and PUMF caps
-- [05-pack-years](05-pack-years.qmd) - Pack-years range and cross-field rules
-:::
-
-## Validation approach
-
-### L0-L5 validation levels
-
-| Level | Purpose | Tool/Method |
-|-------|---------|-------------|
-| L0 | Schema compliance | `standardise_csv()` |
-| L1 | Database name validation | `get_valid_databases()` |
-| L2 | Source reference validation | `validate_source_references()` |
-| L3 | Category code validation | DDI cross-reference |
-| L4 | Semantic consistency | Manual + automated review |
-| L5 | Integration testing | `validate_integration_pumf()` |
-
-Each subgroup folder contains L0-L4 documentation (e.g., [01-status/](01-status/), [02-initiation/](02-initiation/)).
-
-### Integration testing with PUMF data
-
-L5 validation tests that recoding works on actual CCHS PUMF data:
-
-```r
-source("R/validate-integration.R")
-
-result <- validate_integration_pumf(
-  "ceps/cep-002-smoking/01-status/variable_details_smk_status.csv",
-  databases = c("cchs2015_2016_p", "cchs2017_2018_p"),
-  sample_size = 1000
-)
-print_integration_result(result)
-```
-
-**What PUMF integration catches that DDI validation misses:**
-
-| Issue type | Example |
-|------------|---------|
-| Variable name mismatch | Variable in DDI but different name in data |
-| Category code mismatch | DDI says 1-5, data has 1-6 |
-| Recoding logic errors | `recStart`/`recEnd` ranges don't match actual values |
-| Missing data codes | Unexpected codes not in DDI (e.g., 99 vs 999) |
-
-PUMF data location: `~/github/cchsflow-data/data/archive/cchs_odessi_archive/`
-
-## Implementation plan
-
-| Phase | Content | Dependencies |
-|-------|---------|--------------|
-| 1 | 01-status variables | PR #154 merged |
-| 2 | 02-initiation, 03-cessation | Phase 1 merged |
-| 3 | 04-intensity (Master support) | Phase 2 merged |
-| 4 | 05-pack-years | Phase 3 merged |
-| 5 | DV methodology documentation | Phase 4 merged |
-
-## Backwards compatibility
-
-- Existing smoking variables (`SMK_204`, `SMK_208`, etc.) continue to work unchanged
-- New `_cont` variables are additions, not replacements
-- `pack_years_der` is a new derived variable
-- Three-step DV pattern is opt-in for new derived variables
+| SMKDSTY_A | 2001-2023 | 2015+ values are derived from component variables, not a direct survey item |
+| SMKG203_cont | 2001-2014 | Dropped from PUMF in 2015 redesign |
+| SMK_06A_cat4 | 2001-2018 | Not available in 2019+ PUMF |
+| pack_years_der | 2001-2023 | PUMF precision ~15-20% error vs Master |
+| age_start_smoking | PUMF 2001-2021 | No PUMF source for 2022-2023 (use Master) |
 
 ## Master-only variables
 
-These variables require RDC or ICES access:
+These variables require RDC or ICES Master file access:
 
-| Variable | Description | Why Master-only |
-|----------|-------------|-----------------|
-| SMK_01B | Lifetime cigarettes (continuous) | True continuous, PUMF suppressed |
-| SMK_203 | Age started daily - current smokers | True age, PUMF grouped |
-| SMK_207 | Age started daily - former smokers | True age, PUMF grouped |
-| SMK_040 | Age started daily - combined | True age, PUMF grouped |
-| SMK_01C | Age first whole cigarette | True age, PUMF grouped |
-| SMK_06C | Year quit - occasional smokers | Year, PUMF categorical |
-| SMK_09A | Month quit - daily to occasional | Month, PUMF categorical |
-| SMK_09C | Year quit - daily to occasional | Year, PUMF categorical |
+| Variable | Description | Why Master-only | PUMF alternative |
+|----------|-------------|-----------------|------------------|
+| SMK_203 | Age started daily — current smokers | True continuous age | SMKG203_cont (midpoint) |
+| SMK_207 | Age started daily — former smokers | True continuous age | SMKG207_cont (midpoint) |
+| SMK_040 | Age started daily — combined | True continuous age | SMKG040_cont (midpoint) |
+| SMK_01C | Age first whole cigarette | True continuous age | SMKG01C_cont (midpoint) |
+| SMK_06C | Year quit — occasional smokers | Year value | SMKG06C (categorical) |
+| SMK_09A | Month quit — daily to occasional | Month value | SMK_09A_cont (midpoint) |
+| SMK_09C | Year quit — daily to occasional | Year value | SMKG09C_cont (midpoint) |
+
+## Backwards compatibility
+
+- Existing smoking variables (`SMK_204`, `SMK_208`, `smoke_simple`, etc.) continue to work unchanged
+- New `_cont` variables are additions, not replacements
+- `pack_years_der` is updated with improvements, not a new variable
+- 4 variables were renamed for consistency: `SMK_06A_A/B` → `SMK_06A_cat4/cont`, `SMK_09A_A/B` → `SMK_09A_cat4/cont`
 
 ## References
 
-- [Variable summary](00-variable-summary.qmd)
+- [Variable summary](00-variable-summary.qmd) — complete variable lists with cycle coverage
 - CCHS data dictionaries (Statistics Canada)
-- cchsflow-docs DDI extractions
-
-## Appendix
-
-Detailed working documentation for each subgroup:
-
-- [01-status/](01-status/) - Smoking status variables (L0-L4 + worksheets)
-- [02-initiation/](02-initiation/) - Age started smoking (L0-L4 + worksheets)
-- [03-cessation/](03-cessation/) - Quit timing and duration (L0-L4 + worksheets)
-- [04-intensity/](04-intensity/) - Cigarettes per day (L0-L4 + worksheets)
-- [05-pack-years/](05-pack-years/) - Pack-years derivation (L0-L4 + worksheets)

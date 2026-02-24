@@ -7,15 +7,19 @@
 #
 # FUNCTION HIERARCHY:
 #
-# Tier 1 - Foundational (categorical → continuous conversion):
+# Foundational (categorical → continuous conversion):
 # ├── calculate_SMK_06A_cont()  → time since quit (former occasional)
 # ├── calculate_SMK_09A_cont()  → time since stopped daily (former daily)
 # └── calculate_SMK_10A_cont()  → time since quit completely (former daily who continued occasional)
 #
-# Tier 2 - Combining function:
-# └── calculate_time_quit_smoking()  → combines Tier 1 outputs with priority logic
+# Note: rec_with_table() is the primary mechanism for passthrough midpoint
+# conversion. These DV functions exist as alternative entry points for use
+# by combining functions below.
 #
-# Tier 3 - Pathway-aware functions:
+# Combining function:
+# └── calculate_time_quit_smoking()  → combines foundational outputs with priority logic
+#
+# Pathway-aware functions:
 # ├── assess_quit_pathway()  → categorical indicator of how they quit
 # └── calculate_time_quit_complete()  → unified quit time using pathway + gate
 #
@@ -55,12 +59,13 @@ tryCatch(
 )
 
 # ==============================================================================
-# TIER 1: FOUNDATIONAL FUNCTIONS (Categorical → Continuous Conversion)
+# FOUNDATIONAL FUNCTIONS (Categorical → Continuous Conversion)
 # ==============================================================================
 #
 # These functions convert categorical quit timing variables to continuous years
-# using midpoint imputation. They are the building blocks for higher-level
-# cessation analysis.
+# using midpoint imputation. rec_with_table() handles this conversion via
+# worksheet rows (Pattern 1). These DV functions exist as alternative entry
+# points for combining functions that call them in R code (Pattern 2).
 #
 # Variable series:
 # - SMK_06: Former occasional smokers (never smoked daily)
@@ -80,9 +85,13 @@ tryCatch(
 #'
 #' @details
 #' **Implementation method**: 3-step architecture
-#' - **Step 1**: clean_variables() - Clean SMK_06A_cat and SMKG06C inputs
+#' - **Step 1**: clean_variables() - Clean SMK_06A_cat4 and SMKG06C inputs
 #' - **Step 2**: Domain logic with midpoint conversion
 #' - **Step 3**: Output cleaning
+#'
+#' **Note**: rec_with_table() is the primary mechanism for passthrough midpoint
+#' conversion. This DV function exists as an alternative entry point for use by
+#' combining functions like calculate_time_quit_smoking().
 #'
 #' **Category mappings** (midpoint imputation):
 #' \itemize{
@@ -92,12 +101,7 @@ tryCatch(
 #'   \item 4 = 3 or more years ago → use SMKG06C if available, else 5.0 years
 #' }
 #'
-#' **Source variables by era**:
-#' - 2001-2014: SMKA_06A, SMKC_06A, SMKE_06A, SMK_06A
-#' - 2015-2021: SMK_060
-#' - 2023: SPU_10
-#'
-#' @param SMK_06A_cat Numeric vector. Categorical time since quit (1-4)
+#' @param SMK_06A_cat4 Numeric vector. Categorical time since quit (1-4)
 #' @param SMKG06C Numeric vector. Continuous years for category 4 (3+ years)
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
@@ -108,46 +112,47 @@ tryCatch(
 #' @examples
 #' \dontrun{
 #' # Category 2 (1-2 years) → 1.5 years
-#' calculate_SMK_06A_cont(SMK_06A_cat = 2, SMKG06C = NA)
+#' calculate_SMK_06A_cont(SMK_06A_cat4 = 2, SMKG06C = NA)
 #' # Returns: 1.5
 #'
 #' # Category 4 with continuous follow-up
-#' calculate_SMK_06A_cont(SMK_06A_cat = 4, SMKG06C = 7.5)
+#' calculate_SMK_06A_cont(SMK_06A_cat4 = 4, SMKG06C = 7.5)
 #' # Returns: 7.5
 #'
 #' # Category 4 without follow-up (fallback)
-#' calculate_SMK_06A_cont(SMK_06A_cat = 4, SMKG06C = NA)
+#' calculate_SMK_06A_cont(SMK_06A_cat4 = 4, SMKG06C = NA)
 #' # Returns: 5.0
 #' }
 #'
 #' @export
-calculate_SMK_06A_cont <- function(SMK_06A_cat, SMKG06C = NULL, output_format = "tagged_na") {
+calculate_SMK_06A_cont <- function(SMK_06A_cat4, SMKG06C = NULL, output_format = "tagged_na") {
 
+  # Handle empty input vectors
+  if (length(SMK_06A_cat4) == 0) return(numeric(0))
 
   # Handle NULL SMKG06C
-
-if (is.null(SMKG06C)) {
-    SMKG06C <- rep(NA_real_, length(SMK_06A_cat))
+  if (is.null(SMKG06C)) {
+    SMKG06C <- rep(NA_real_, length(SMK_06A_cat4))
   }
 
   # === STEP 1: DATA CLEANING AND VALIDATION ===
   cleaned <- clean_variables(vars = list(
-    SMK_06A_cat = SMK_06A_cat,
+    SMK_06A_cat4 = SMK_06A_cat4,
     SMKG06C = SMKG06C
   ), output_format = output_format)
 
   # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
   result <- dplyr::case_when(
     # Missing data detection and priority processing
-    any_missing(cleaned$SMK_06A_cat) ~
-      get_priority_missing(cleaned$SMK_06A_cat, cleaned$SMKG06C, output_format = output_format),
+    any_missing(cleaned$SMK_06A_cat4) ~
+      get_priority_missing(cleaned$SMK_06A_cat4, cleaned$SMKG06C, output_format = output_format),
 
     # Domain logic: Convert categories to continuous years
-    cleaned$SMK_06A_cat == 1 ~ 0.5,    # <1 year ago → 0.5 years
-    cleaned$SMK_06A_cat == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
-    cleaned$SMK_06A_cat == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
-    cleaned$SMK_06A_cat == 4 & !any_missing(cleaned$SMKG06C) ~ cleaned$SMKG06C,  # 3+ years → use continuous
-    cleaned$SMK_06A_cat == 4 & any_missing(cleaned$SMKG06C) ~ 5.0,  # 3+ years fallback → 5.0 years
+    cleaned$SMK_06A_cat4 == 1 ~ 0.5,    # <1 year ago → 0.5 years
+    cleaned$SMK_06A_cat4 == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
+    cleaned$SMK_06A_cat4 == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
+    cleaned$SMK_06A_cat4 == 4 & !any_missing(cleaned$SMKG06C) ~ cleaned$SMKG06C,  # 3+ years → use continuous
+    cleaned$SMK_06A_cat4 == 4 & any_missing(cleaned$SMKG06C) ~ 5.0,  # 3+ years fallback → 5.0 years
 
     # Invalid categories get missing value
     .default = assign_missing("not_applicable", "SMK_06A_cont", output_format)
@@ -172,9 +177,13 @@ if (is.null(SMKG06C)) {
 #'
 #' @details
 #' **Implementation method**: 3-step architecture
-#' - **Step 1**: clean_variables() - Clean SMK_09A_B and SMKG09C inputs
+#' - **Step 1**: clean_variables() - Clean SMK_09A_cat4 and SMKG09C inputs
 #' - **Step 2**: Domain logic with midpoint conversion
 #' - **Step 3**: Output cleaning
+#'
+#' **Note**: rec_with_table() is the primary mechanism for passthrough midpoint
+#' conversion. This DV function exists as an alternative entry point for use by
+#' combining functions like calculate_time_quit_smoking().
 #'
 #' **Category mappings** (midpoint imputation):
 #' \itemize{
@@ -188,12 +197,7 @@ if (is.null(SMKG06C)) {
 #' quit completely. Former daily smokers may have continued as occasional smokers.
 #' Use SMK_10_gate to determine if they quit completely when stopping daily.
 #'
-#' **Source variables by era**:
-#' - 2001-2014: SMKA_09A, SMKC_09A, SMKE_09A, SMK_09A
-#' - 2015-2021: SMK_080
-#' - 2023: SPU_25
-#'
-#' @param SMK_09A_B Numeric vector. Categorical time since stopped daily (1-4)
+#' @param SMK_09A_cat4 Numeric vector. Categorical time since stopped daily (1-4)
 #' @param SMKG09C Numeric vector. Continuous years for category 4 (3+ years)
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
@@ -204,7 +208,7 @@ if (is.null(SMKG06C)) {
 #' @examples
 #' \dontrun{
 #' # Scalar inputs - single respondent
-#' result_scalar <- calculate_SMK_09A_cont(SMK_09A_B = 2, SMKG09C = NA)
+#' result_scalar <- calculate_SMK_09A_cont(SMK_09A_cat4 = 2, SMKG09C = NA)
 #' # Returns: 1.5 (category 2 = 1-2 years, midpoint used)
 #'
 #' # Vector inputs - multiple respondents
@@ -215,31 +219,34 @@ if (is.null(SMKG06C)) {
 #' }
 #'
 #' @export
-calculate_SMK_09A_cont <- function(SMK_09A_B, SMKG09C = NULL, output_format = "tagged_na") {
+calculate_SMK_09A_cont <- function(SMK_09A_cat4, SMKG09C = NULL, output_format = "tagged_na") {
+
+  # Handle empty input vectors
+  if (length(SMK_09A_cat4) == 0) return(numeric(0))
 
   # Handle NULL SMKG09C
   if (is.null(SMKG09C)) {
-    SMKG09C <- rep(NA_real_, length(SMK_09A_B))
+    SMKG09C <- rep(NA_real_, length(SMK_09A_cat4))
   }
 
   # === STEP 1: DATA CLEANING AND VALIDATION ===
   cleaned <- clean_variables(vars = list(
-    SMK_09A_B = SMK_09A_B,
+    SMK_09A_cat4 = SMK_09A_cat4,
     SMKG09C = SMKG09C
   ), output_format = output_format)
 
   # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
   result <- dplyr::case_when(
     # Missing data detection and priority processing
-    any_missing(cleaned$SMK_09A_B) ~
-      get_priority_missing(cleaned$SMK_09A_B, cleaned$SMKG09C, output_format = output_format),
+    any_missing(cleaned$SMK_09A_cat4) ~
+      get_priority_missing(cleaned$SMK_09A_cat4, cleaned$SMKG09C, output_format = output_format),
 
     # Domain logic: Convert categories to continuous years
-    cleaned$SMK_09A_B == 1 ~ 0.5,    # <1 year ago → 0.5 years
-    cleaned$SMK_09A_B == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
-    cleaned$SMK_09A_B == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
-    cleaned$SMK_09A_B == 4 & !any_missing(cleaned$SMKG09C) ~ cleaned$SMKG09C,  # 3+ years → use continuous
-    cleaned$SMK_09A_B == 4 & any_missing(cleaned$SMKG09C) ~ 5.0,  # 3+ years fallback → 5.0 years
+    cleaned$SMK_09A_cat4 == 1 ~ 0.5,    # <1 year ago → 0.5 years
+    cleaned$SMK_09A_cat4 == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
+    cleaned$SMK_09A_cat4 == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
+    cleaned$SMK_09A_cat4 == 4 & !any_missing(cleaned$SMKG09C) ~ cleaned$SMKG09C,  # 3+ years → use continuous
+    cleaned$SMK_09A_cat4 == 4 & any_missing(cleaned$SMKG09C) ~ 5.0,  # 3+ years fallback → 5.0 years
 
     # Invalid categories get missing value
     .default = assign_missing("not_applicable", "SMK_09A_cont", output_format)
@@ -264,9 +271,13 @@ calculate_SMK_09A_cont <- function(SMK_09A_B, SMKG09C = NULL, output_format = "t
 #'
 #' @details
 #' **Implementation method**: 3-step architecture
-#' - **Step 1**: clean_variables() - Clean SMK_10A_cat and SMKG10C inputs
+#' - **Step 1**: clean_variables() - Clean SMK_10A and SMKG10C inputs
 #' - **Step 2**: Domain logic with midpoint conversion
 #' - **Step 3**: Output cleaning
+#'
+#' **Note**: rec_with_table() is the primary mechanism for passthrough midpoint
+#' conversion. This DV function exists as an alternative entry point for use by
+#' combining functions like calculate_time_quit_complete().
 #'
 #' **Category mappings** (midpoint imputation):
 #' \itemize{
@@ -279,13 +290,7 @@ calculate_SMK_09A_cont <- function(SMK_09A_B, SMKG09C = NULL, output_format = "t
 #' **Important**: This variable is ONLY asked when SMK_10_gate = 2 (did not quit
 #' completely when stopped daily smoking). If SMK_10_gate = 1, use SMK_09A_cont instead.
 #'
-#' **Availability**:
-#' - NOT available in 2001 (SMK_10 series introduced in 2003)
-#' - 2003-2014: SMKC_10A, SMKE_10A, SMK_10A
-#' - 2015-2021: SMK_090
-#' - 2023: Derived from SPU series
-#'
-#' @param SMK_10A_cat Numeric vector. Categorical time since quit completely (1-4)
+#' @param SMK_10A Numeric vector. Categorical time since quit completely (1-4)
 #' @param SMKG10C Numeric vector. Continuous years for category 4 (3+ years)
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
@@ -296,40 +301,43 @@ calculate_SMK_09A_cont <- function(SMK_09A_B, SMKG09C = NULL, output_format = "t
 #' @examples
 #' \dontrun{
 #' # Category 2 (1-2 years) → 1.5 years
-#' calculate_SMK_10A_cont(SMK_10A_cat = 2, SMKG10C = NA)
+#' calculate_SMK_10A_cont(SMK_10A = 2, SMKG10C = NA)
 #' # Returns: 1.5
 #'
 #' # Category 4 with continuous follow-up
-#' calculate_SMK_10A_cont(SMK_10A_cat = 4, SMKG10C = 8.0)
+#' calculate_SMK_10A_cont(SMK_10A = 4, SMKG10C = 8.0)
 #' # Returns: 8.0
 #' }
 #'
 #' @export
-calculate_SMK_10A_cont <- function(SMK_10A_cat, SMKG10C = NULL, output_format = "tagged_na") {
+calculate_SMK_10A_cont <- function(SMK_10A, SMKG10C = NULL, output_format = "tagged_na") {
+
+  # Handle empty input vectors
+  if (length(SMK_10A) == 0) return(numeric(0))
 
   # Handle NULL SMKG10C
   if (is.null(SMKG10C)) {
-    SMKG10C <- rep(NA_real_, length(SMK_10A_cat))
+    SMKG10C <- rep(NA_real_, length(SMK_10A))
   }
 
   # === STEP 1: DATA CLEANING AND VALIDATION ===
   cleaned <- clean_variables(vars = list(
-    SMK_10A_cat = SMK_10A_cat,
+    SMK_10A = SMK_10A,
     SMKG10C = SMKG10C
   ), output_format = output_format)
 
   # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
   result <- dplyr::case_when(
     # Missing data detection and priority processing
-    any_missing(cleaned$SMK_10A_cat) ~
-      get_priority_missing(cleaned$SMK_10A_cat, cleaned$SMKG10C, output_format = output_format),
+    any_missing(cleaned$SMK_10A) ~
+      get_priority_missing(cleaned$SMK_10A, cleaned$SMKG10C, output_format = output_format),
 
     # Domain logic: Convert categories to continuous years
-    cleaned$SMK_10A_cat == 1 ~ 0.5,    # <1 year ago → 0.5 years
-    cleaned$SMK_10A_cat == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
-    cleaned$SMK_10A_cat == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
-    cleaned$SMK_10A_cat == 4 & !any_missing(cleaned$SMKG10C) ~ cleaned$SMKG10C,  # 3+ years → use continuous
-    cleaned$SMK_10A_cat == 4 & any_missing(cleaned$SMKG10C) ~ 5.0,  # 3+ years fallback → 5.0 years
+    cleaned$SMK_10A == 1 ~ 0.5,    # <1 year ago → 0.5 years
+    cleaned$SMK_10A == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
+    cleaned$SMK_10A == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
+    cleaned$SMK_10A == 4 & !any_missing(cleaned$SMKG10C) ~ cleaned$SMKG10C,  # 3+ years → use continuous
+    cleaned$SMK_10A == 4 & any_missing(cleaned$SMKG10C) ~ 5.0,  # 3+ years fallback → 5.0 years
 
     # Invalid categories get missing value
     .default = assign_missing("not_applicable", "SMK_10A_cont", output_format)
@@ -344,10 +352,10 @@ calculate_SMK_10A_cont <- function(SMK_10A_cat, SMKG10C = NULL, output_format = 
 }
 
 # ==============================================================================
-# TIER 2: COMBINING FUNCTION
+# COMBINING FUNCTION
 # ==============================================================================
 #
-# This function combines the Tier 1 continuous outputs with priority logic
+# This function combines the foundational continuous outputs with priority logic
 # to provide a single "time since quit smoking" value.
 #
 # ==============================================================================
@@ -369,16 +377,14 @@ calculate_SMK_10A_cont <- function(SMK_10A_cat, SMKG10C = NULL, output_format = 
 #' - **Step 3**: Output cleaning
 #'
 #' **Priority order** (highest to lowest):
-#' 1. SPU_25I (2022 only) - Most precise, derived from month/year
-#' 2. SMK_09A_cont - Former daily smokers (stopped daily timing)
-#' 3. SMK_06A_cont - Former occasional smokers (quit timing)
+#' 1. SMK_09A_cont - Former daily smokers (stopped daily timing)
+#' 2. SMK_06A_cont - Former occasional smokers (quit timing)
 #'
 #' **Note**: This is a simpler combining function that doesn't use pathway
 #' logic. For pathway-aware quit timing, use calculate_time_quit_complete().
 #'
 #' @param SMK_09A_cont Numeric vector. Years since stopped daily (from calculate_SMK_09A_cont)
 #' @param SMK_06A_cont Numeric vector. Years since quit occasional (from calculate_SMK_06A_cont)
-#' @param SPU_25I Numeric vector. 2022 precise timing (optional)
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
 #' @return Numeric vector of continuous years since quit (0-80+), with:
@@ -388,54 +394,38 @@ calculate_SMK_10A_cont <- function(SMK_10A_cat, SMKG10C = NULL, output_format = 
 #' @examples
 #' \dontrun{
 #' # Former daily smoker - uses SMK_09A_cont
-#' calculate_time_quit_smoking(
-#'   SMK_09A_cont = 3.5, SMK_06A_cont = NA, SPU_25I = NA
-#' )
+#' calculate_time_quit_smoking(SMK_09A_cont = 3.5, SMK_06A_cont = NA)
 #' # Returns: 3.5
 #'
 #' # Former occasional - uses SMK_06A_cont
-#' calculate_time_quit_smoking(
-#'   SMK_09A_cont = NA, SMK_06A_cont = 5.0, SPU_25I = NA
-#' )
+#' calculate_time_quit_smoking(SMK_09A_cont = NA, SMK_06A_cont = 5.0)
 #' # Returns: 5.0
-#'
-#' # 2022 data with precise timing - SPU_25I takes priority
-#' calculate_time_quit_smoking(
-#'   SMK_09A_cont = 3.5, SMK_06A_cont = NA, SPU_25I = 3.7
-#' )
-#' # Returns: 3.7
 #' }
 #'
 #' @export
-calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont, SPU_25I = NULL,
+calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont,
                                         output_format = "tagged_na") {
 
-  # Handle NULL SPU_25I (not available for most cycles)
-  if (is.null(SPU_25I)) {
-    SPU_25I <- rep(NA_real_, length(SMK_09A_cont))
-  }
+  # Handle empty input vectors
+  if (length(SMK_09A_cont) == 0) return(numeric(0))
 
   # === STEP 1: DATA CLEANING AND VALIDATION ===
   cleaned <- clean_variables(vars = list(
     SMK_09A_cont = SMK_09A_cont,
-    SMK_06A_cont = SMK_06A_cont,
-    SPU_25I = SPU_25I
+    SMK_06A_cont = SMK_06A_cont
   ), output_format = output_format)
 
   # === STEP 2: DOMAIN LOGIC WITH PRIORITY SELECTION ===
   result <- dplyr::case_when(
-    # Highest priority: SPU_25I (2022 precise calculation)
-    !any_missing(cleaned$SPU_25I) ~ cleaned$SPU_25I,
-
-    # Second priority: SMK_09A_cont (former daily smokers)
+    # First priority: SMK_09A_cont (former daily smokers)
     !any_missing(cleaned$SMK_09A_cont) ~ cleaned$SMK_09A_cont,
 
-    # Third priority: SMK_06A_cont (former occasional smokers)
+    # Second priority: SMK_06A_cont (former occasional smokers)
     !any_missing(cleaned$SMK_06A_cont) ~ cleaned$SMK_06A_cont,
 
     # If all inputs are missing, get priority missing value
-    any_missing(cleaned$SMK_09A_cont) & any_missing(cleaned$SMK_06A_cont) & any_missing(cleaned$SPU_25I) ~
-      get_priority_missing(cleaned$SMK_09A_cont, cleaned$SMK_06A_cont, cleaned$SPU_25I, output_format = output_format),
+    any_missing(cleaned$SMK_09A_cont) & any_missing(cleaned$SMK_06A_cont) ~
+      get_priority_missing(cleaned$SMK_09A_cont, cleaned$SMK_06A_cont, output_format = output_format),
 
     # Fallback: not applicable
     .default = assign_missing("not_applicable", "time_quit_smoking", output_format)
@@ -450,7 +440,7 @@ calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont, SPU_25I = NU
 }
 
 # ==============================================================================
-# TIER 3: PATHWAY-AWARE FUNCTIONS
+# PATHWAY-AWARE FUNCTIONS
 # ==============================================================================
 #
 # These functions use SMK_10_gate and SMKDSTY_cat5 to apply pathway-specific
@@ -524,6 +514,9 @@ calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont, SPU_25I = NU
 #' @export
 assess_quit_pathway <- function(SMKDSTY_cat5, SMK_10_gate, output_format = "tagged_na") {
 
+  # Handle empty input vectors
+  if (length(SMKDSTY_cat5) == 0) return(numeric(0))
+
   # === STEP 1: DATA CLEANING AND VALIDATION ===
   cleaned <- clean_variables(vars = list(
     SMKDSTY_cat5 = SMKDSTY_cat5,
@@ -588,8 +581,7 @@ assess_quit_pathway <- function(SMKDSTY_cat5, SMK_10_gate, output_format = "tagg
 #' - 2001: No SMK_10 gate, uses time_quit_daily as proxy
 #' - 2003-2014: Full pathway logic with gate variable
 #' - 2015-2021: Same logic, different source variable names
-#' - 2022: Derived from SPU_25_A_I (year) + SPU_25_B_I (month)
-#' - 2023: Grouped only, midpoint imputation from categorical
+#' - 2022-2023: Same logic, uses SPU_25 categorical with midpoint imputation
 #'
 #' @param SMKDSTY_cat5 Numeric vector. 5-category smoking status
 #' @param SMK_10_gate Numeric vector. Quit timing gate (1 or 2)
@@ -638,6 +630,9 @@ calculate_time_quit_complete <- function(SMKDSTY_cat5, SMK_10_gate,
                                          time_quit_occ, time_quit_daily,
                                          time_quit_complete_daily,
                                          output_format = "tagged_na") {
+
+  # Handle empty input vectors
+  if (length(SMKDSTY_cat5) == 0) return(numeric(0))
 
   # === STEP 1: DATA CLEANING AND VALIDATION ===
   cleaned <- clean_variables(vars = list(

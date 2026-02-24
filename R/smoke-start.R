@@ -104,44 +104,9 @@ calculate_SMKG040_cat <- function(data, output_format = "tagged_na") {
 
 # ================================================================================
 
-# SMKG040_cont - Age started smoking daily (continuous) - DOCUMENTATION ONLY
-# ================================================================================
-
-#' @title Age Started Smoking Daily - SMKG040_cont (continuous)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
-#' 
-#' Creates harmonized SMKG040_cont variable across CCHS cycles 2015-2023.
-#' This variable provides the continuous age when daily and former daily smokers
-#' started smoking daily.
-#' 
-#' @details 
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**: 
-#'   - 2015-2021: SMK_040 (direct variable)
-#'   - 2022-2023: SPU_15 (different underlying source, same harmonized structure)
-#' - **Harmonization**: Simple 1:1 mapping with source variable transition
-#' 
-#' **Values**: Continuous age values (numeric)
-#' - Range typically 5-80+ years
-#' - Actual age when respondent started smoking daily
-#' - More precise than categorical version (SMKG040_cat)
-#' 
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values ("tagged_na" or "standard")
-#' 
-#' @return Vector of continuous age values (numeric, plus missing value codes)
-#' 
-#' @examples
-#' \dontrun{
-#' # Use rec_with_table() for actual implementation
-#' harmonized_data <- rec_with_table(cchs_data, "SMKG040_cont")
-#' age_started_daily_cont <- harmonized_data$SMKG040_cont
-#' }
-#' 
-#' @export
-calculate_SMKG040_cont <- function(data, output_format = "tagged_na") {
-  stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMKG040_cont') for implementation")
-}
+# NOTE: calculate_SMKG040_cont() implementation is below (~line 506).
+# It combines SMKG203_cont + SMKG207_cont. Doc stub removed to avoid
+# name collision with the real implementation.
 
 # ================================================================================
 
@@ -628,129 +593,165 @@ calculate_SMK_203 <- function(data, output_format = "tagged_na") {
 # ================================================================================
 
 #' @title Unified Age Started Smoking Daily - age_start_smoking
-#' @description Creates unified age_start_smoking derived variable across CCHS cycles.
+#' @description Creates unified age_start_smoking derived variable across
+#'   CCHS cycles.
 #'
-#' This function wraps SMK_040 (Master, exact continuous) and SMKG040_cont
-#' (PUMF, midpoint estimation ~±3 years) to provide a single harmonised variable
-#' for age started smoking daily.
-#'
-#' Follows the pattern of `calculate_time_quit_smoking()` from cessation domain.
+#' Receives a single continuous age input — the worksheet routes the
+#' appropriate source variable depending on database type:
+#' - **PUMF**: SMKG040_cont (midpoint estimation from grouped categories)
+#' - **Master**: SMK_040 (exact continuous age)
 #'
 #' @details
-#' **Implementation Method**: 3-step architecture with priority-based source selection
-#' - **Step 1**: clean_variables() - Clean SMK_040 and SMKG040_cont inputs
-#' - **Step 2**: Priority logic - SMK_040 (Master) > SMKG040_cont (PUMF)
-#' - **Step 3**: Output cleaning with proper missing value handling
-#'
-#' **Priority Hierarchy**:
-#' - SMK_040 (Master): Exact continuous values from individual reporting
-#' - SMKG040_cont (PUMF): Category midpoint estimation (~±3 years precision)
+#' **Implementation method**: 3-step architecture (single-source pass-through)
+#' - **Step 1**: clean_variables() - Clean continuous age input
+#' - **Step 2**: Direct pass-through (source routing handled by worksheet)
+#' - **Step 3**: Output cleaning with age_start_smoking metadata
 #'
 #' **Coverage**:
-#' - PUMF (via SMKG040_cont): 2001-2021
-#' - Master (via SMK_040): 2001-2023
+#' - PUMF: 2001-2021 via SMKG040_cont (midpoint imputation)
+#' - Master: 2001-2023 via SMK_040 (exact continuous)
 #'
 #' **Universe**: Ever-daily smokers (SMKDSTY 1, 2, 4)
 #' - Returns NA::a for never-daily smokers (SMKDSTY 3, 5, 6)
 #' - Returns NA::b for missing input data
 #'
-#' @param SMK_040 Numeric vector. Age started smoking daily - Master exact continuous (5-79)
-#' @param SMKG040_cont Numeric vector. Age started smoking daily - PUMF midpoint estimation
-#' @param log_level Character. Logging level: "silent", "warning", or "verbose"
+#' @param age_start_smoking Numeric. Age started smoking daily (continuous).
+#'   The worksheet routes the appropriate source variable:
+#'   PUMF provides SMKG040_cont, Master provides SMK_040.
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
 #' @return Numeric vector of age started smoking daily (continuous, plus missing codes)
 #'
 #' @examples
 #' \dontrun{
-#' # Scalar inputs - Master data (exact value)
-#' result_master <- calculate_age_start_smoking(SMK_040 = 18)
-#' # Returns: 18 (exact continuous from Master)
+#' # Single value
+#' calculate_age_start_smoking(18)
+#' # Returns: 18
 #'
-#' # Scalar inputs - PUMF data only (midpoint estimation)
-#' result_pumf <- calculate_age_start_smoking(SMKG040_cont = 16)
-#' # Returns: 16 (midpoint estimate, ~±3 years precision)
+#' # Vector with missing values
+#' calculate_age_start_smoking(c(18, 25, NA, 16))
 #'
-#' # Priority: Master takes precedence over PUMF
-#' result_priority <- calculate_age_start_smoking(SMK_040 = 20, SMKG040_cont = 22)
-#' # Returns: 20 (uses Master exact value)
+#' # Tagged NA pass-through (never-daily smoker)
+#' calculate_age_start_smoking(haven::tagged_na("a"))
+#' # Returns: NA::a (not applicable)
 #'
-#' # Fallback: Use PUMF when Master is NA
-#' result_fallback <- calculate_age_start_smoking(
-#'   SMK_040 = haven::tagged_na("a"), SMKG040_cont = 16
-#' )
-#' # Returns: 16 (falls back to PUMF)
-#'
-#' # Vector inputs - mixed Master and PUMF availability
-#' smk_040_vec <- c(18, haven::tagged_na("a"), 25, haven::tagged_na("b"), NA)
-#' smkg040_cont_vec <- c(haven::tagged_na("b"), 16, haven::tagged_na("a"), 22, 30)
-#' result_vector <- calculate_age_start_smoking(smk_040_vec, smkg040_cont_vec)
-#' # Returns: c(18, 16, 25, 22, 30) - uses best available for each respondent
-#'
-#' # Never-daily smokers (NA::a propagation)
-#' result_na <- calculate_age_start_smoking(
-#'   SMK_040 = haven::tagged_na("a"),
-#'   SMKG040_cont = haven::tagged_na("a")
-#' )
-#' # Returns: NA::a (not applicable - never smoked daily)
-#'
-#' # Integration with rec_with_table()
-#' harmonized_data <- rec_with_table(cchs_data, "age_start_smoking",
-#'                                   custom_function = calculate_age_start_smoking)
+#' # NULL input returns NA::b (missing)
+#' calculate_age_start_smoking(NULL)
 #' }
 #'
 #' @export
-calculate_age_start_smoking <- function(SMK_040 = NULL, SMKG040_cont = NULL,
-                                        log_level = "silent",
+calculate_age_start_smoking <- function(age_start_smoking = NULL,
                                         output_format = "tagged_na") {
+  derive_passthrough(age_start_smoking, "age_start_smoking", output_format)
+}
 
-  # Handle NULL inputs - convert to NA vectors of appropriate length
-  if (is.null(SMK_040) && is.null(SMKG040_cont)) {
-    # No inputs provided - return single NA::b (missing)
-    return(assign_missing("not_stated", "age_start_smoking", output_format))
-  }
+# ================================================================================
+# age_first_cigarette - Unified Age Smoked First Cigarette (Derived Variable)
+# ================================================================================
 
-  # Determine vector length from non-NULL input
-  n <- if (!is.null(SMK_040)) length(SMK_040) else length(SMKG040_cont)
+#' @title Unified Age Smoked First Whole Cigarette - age_first_cigarette
+#' @description Creates unified age_first_cigarette derived variable across
+#'   CCHS cycles.
+#'
+#' Receives a single continuous age input — the worksheet routes the
+#' appropriate source variable depending on database type:
+#' - **PUMF**: SMKG01C_cont (midpoint estimation from grouped categories)
+#' - **Master**: SMK_01C (exact continuous age)
+#'
+#' @details
+#' **Implementation method**: 3-step architecture (single-source pass-through)
+#' - **Step 1**: clean_variables() - Clean continuous age input
+#' - **Step 2**: Direct pass-through (source routing handled by worksheet)
+#' - **Step 3**: Output cleaning with age_first_cigarette metadata
+#'
+#' **Coverage**:
+#' - PUMF: 2001-2021 via SMKG01C_cont (midpoint imputation)
+#' - Master: 2001-2023 via SMK_01C (exact continuous)
+#'
+#' **Universe**: Ever smoked 100+ cigarettes in lifetime (SMK_01A == 1).
+#'
+#' @param age_first_cigarette Numeric vector. Continuous age first smoked a
+#'   whole cigarette. Source depends on database type: SMK_01C (Master) or
+#'   SMKG01C_cont (PUMF). NULL if not available.
+#' @param output_format Character. Output format ("tagged_na" or "original")
+#'
+#' @return Numeric vector of continuous age values (8-95), with:
+#' - NA::a for never-smokers / not applicable
+#' - NA::b for missing/refused
+#'
+#' @examples
+#' \dontrun{
+#' # Single value
+#' calculate_age_first_cigarette(14)    # Returns: 14
+#'
+#' # Vector input with missing values
+#' calculate_age_first_cigarette(c(14, 16, NA, 12))
+#' # Returns: c(14, 16, NA::b, 12)
+#'
+#' # Tagged NA pass-through
+#' calculate_age_first_cigarette(tagged_na("a"))  # NA::a (not applicable)
+#'
+#' # NULL input (variable not in dataset)
+#' calculate_age_first_cigarette(NULL)  # NA::b (not stated)
+#' }
+#'
+#' @export
+calculate_age_first_cigarette <- function(age_first_cigarette = NULL,
+                                          output_format = "tagged_na") {
+  derive_passthrough(age_first_cigarette, "age_first_cigarette", output_format)
+}
 
-  # Convert NULL to NA vector of appropriate length
-  if (is.null(SMK_040)) {
-    SMK_040 <- rep(NA_real_, n)
-  }
-  if (is.null(SMKG040_cont)) {
-    SMKG040_cont <- rep(NA_real_, n)
-  }
+# ================================================================================
+# smoked_100_lifetime - Ever Smoked 100+ Cigarettes (Derived Variable)
+# ================================================================================
 
-  # === STEP 1: DATA CLEANING and VALIDATION ===
-  # Clean input variables (includes automatic length validation)
-  cleaned <- clean_variables(vars = list(
-    SMK_040 = SMK_040,
-    SMKG040_cont = SMKG040_cont
-  ), output_format = output_format)
-
-  # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
-  # Prioritize data sources: SMK_040 (Master exact) > SMKG040_cont (PUMF midpoint)
-  result <- dplyr::case_when(
-    # Highest priority: SMK_040 (Master exact continuous)
-    !any_missing(cleaned$SMK_040) ~ cleaned$SMK_040,
-
-    # Second priority: SMKG040_cont (PUMF midpoint estimation)
-    !any_missing(cleaned$SMKG040_cont) ~ cleaned$SMKG040_cont,
-
-    # If all inputs are missing, get priority missing value
-    # NA::a (not applicable) takes precedence over NA::b (missing)
-    any_missing(cleaned$SMK_040) & any_missing(cleaned$SMKG040_cont) ~
-      get_priority_missing(cleaned$SMK_040, cleaned$SMKG040_cont, output_format = output_format),
-
-    # Fallback: not applicable (shouldn't reach here with proper inputs)
-    .default = assign_missing("not_applicable", "age_start_smoking", output_format)
-  )
-
-  # === STEP 3: OUTPUT CLEANING ===
-  # Apply validation bounds and constraints
-  output_cleaned <- clean_variables(vars = list(
-    age_start_smoking = result
-  ), output_format = output_format)
-
-  return(output_cleaned$age_start_smoking)
+#' @title Ever Smoked 100 or More Cigarettes in Lifetime - smoked_100_lifetime
+#' @description Creates unified smoked_100_lifetime derived variable across CCHS cycles.
+#'
+#' This is a pass-through wrapper for SMK_01A, providing a self-documenting
+#' variable name for standalone research use. The underlying source (SMK_01A)
+#' is already harmonised across cycles in the worksheets.
+#'
+#' @details
+#' **Implementation method**: 3-step architecture (single-source pass-through)
+#' - **Step 1**: clean_variables() - Clean categorical input
+#' - **Step 2**: Direct pass-through (1=yes, 2=no)
+#' - **Step 3**: Output cleaning with smoked_100_lifetime metadata
+#'
+#' **Source**: SMK_01A across all cycles (already harmonised via worksheets).
+#'
+#' **Coverage**:
+#' - PUMF: 2001-2021
+#' - Master: 2001-2023
+#'
+#' **Universe**: Respondents who have smoked at least one whole cigarette.
+#'
+#' @param smoked_100_lifetime Numeric. 1=Yes (100+), 2=No, with missing codes.
+#'   The worksheet routes SMK_01A from the appropriate database.
+#' @param output_format Character. Output format ("tagged_na" or "original")
+#'
+#' @return Numeric vector: 1=Yes, 2=No, with:
+#' - NA::a for not applicable (never tried a cigarette)
+#' - NA::b for missing/refused
+#'
+#' @examples
+#' \dontrun{
+#' # Single value
+#' calculate_smoked_100_lifetime(1)  # Returns: 1 (yes, 100+ cigarettes)
+#' calculate_smoked_100_lifetime(2)  # Returns: 2 (no)
+#'
+#' # Vector input with missing values
+#' calculate_smoked_100_lifetime(c(1, 2, 1, NA))
+#'
+#' # Tagged NA pass-through
+#' calculate_smoked_100_lifetime(haven::tagged_na("a"))  # NA::a (not applicable)
+#'
+#' # NULL input (no data available)
+#' calculate_smoked_100_lifetime(NULL)  # NA::b (not stated)
+#' }
+#'
+#' @export
+calculate_smoked_100_lifetime <- function(smoked_100_lifetime = NULL,
+                                          output_format = "tagged_na") {
+  derive_passthrough(smoked_100_lifetime, "smoked_100_lifetime", output_format)
 }

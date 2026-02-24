@@ -27,26 +27,8 @@
 #
 # ================================================================================
 
-# REQUIRED DEPENDENCIES:
-library(haven) # for haven::tagged_na() and haven::is_tagged_na()
-library(dplyr) # for dplyr::case_when()
-
-# Source required helper functions (conditional loading for package context)
-tryCatch(
-  {
-    # Try from same directory first (development context)
-    if (file.exists("clean-variables.R")) {
-      source("clean-variables.R", local = FALSE)
-      source("missing-data-functions.R", local = FALSE)
-    } else if (file.exists("R/clean-variables.R")) {
-      source("R/clean-variables.R", local = FALSE)
-      source("R/missing-data-functions.R", local = FALSE)
-    }
-  },
-  error = function(e) {
-    # Functions will be loaded via package imports during package build
-  }
-)
+# Dependencies (haven, dplyr) come via DESCRIPTION Depends.
+# Helper functions (clean_variables, missing-data-functions) loaded automatically in package context.
 
 # ================================================================================
 # cigs_per_day - Unified Daily Smoking Intensity
@@ -89,8 +71,6 @@ tryCatch(
 #'   Valid range: 1-99 cigarettes.
 #' @param output_format Character. Output format for missing values.
 #'   Options: "tagged_na" (default) or "original".
-#' @param log_level Character. Logging level for diagnostics.
-#'   Options: "silent" (default), "info", "debug".
 #'
 #' @return Numeric vector with unified cigarettes per day values.
 #'   - Valid values: 1-99 cigarettes
@@ -141,8 +121,10 @@ tryCatch(
 calculate_cigs_per_day <- function(SMKDSTY_A,
                                    SMK_204,
                                    SMK_208,
-                                   output_format = "tagged_na",
-                                   log_level = "silent") {
+                                   output_format = "tagged_na") {
+
+  # Handle empty input vectors
+  if (length(SMKDSTY_A) == 0) return(numeric(0))
 
   # === STEP 1: DATA CLEANING ===
   # Clean input variables (includes automatic length validation)
@@ -178,8 +160,12 @@ calculate_cigs_per_day <- function(SMKDSTY_A,
     .default = assign_missing("not_stated", "cigs_per_day", output_format)
   )
 
-  # === STEP 3: OUTPUT ===
-  return(result)
+  # === STEP 3: OUTPUT CLEANING ===
+  output_cleaned <- clean_variables(vars = list(
+    cigs_per_day = result
+  ), output_format = output_format)
+
+  return(output_cleaned$cigs_per_day)
 }
 
 
