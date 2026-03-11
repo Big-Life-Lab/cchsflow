@@ -27,7 +27,7 @@
 #' weight per hour of activity (kcal/kg per hour)
 #'  
 #'
-#' @param DHHGAGE_cont continuous age variable.
+#' @param age continuous age variable.
 #' 
 #' @param PAA_045 number of hours of sports, fitness, or recreational activity 
 #' that make you sweat or breathe harder for CCHS 2015-2018 for 18+ years old.
@@ -99,11 +99,11 @@
 #' @export
 
 energy_exp_fun <-
-  function(DHHGAGE_cont, PAA_045, PAA_050, PAA_075, PAA_080, PAADVDYS, 
+  function(age, PAA_045, PAA_050, PAA_075, PAA_080, PAADVDYS, 
            PAADVVIG, PAYDVTOA, PAYDVADL, PAYDVVIG, PAYDVDYS){
     # Leisure activity for adults
     leisure_adult <- 
-      if_else2(DHHGAGE_cont >= 18 & !is.na(PAA_045) & !is.na(PAA_050) & 
+      if_else2(age >= 18 & !is.na(PAA_045) & !is.na(PAA_050) & 
                !is.na(PAA_075) & !is.na(PAA_080),
                 ((PAA_045)*60 +(PAA_050) +(PAA_075)*60 +(PAA_080)), 
                if_else2(PAA_045 == "NA(a)"|PAA_050 == "NA(a)"|
@@ -112,7 +112,7 @@ energy_exp_fun <-
     
     # Leisure activity for youth
     leisure_youth <- 
-      if_else2(DHHGAGE_cont < 18 & !is.na(PAYDVTOA) & !is.na(PAYDVADL), 
+      if_else2(age < 18 & !is.na(PAYDVTOA) & !is.na(PAYDVADL), 
                ((PAYDVTOA) + (PAYDVADL)),
                if_else2(PAYDVTOA == "NA(a)"|PAYDVADL == "NA(a)", 
                         tagged_na("a"), tagged_na("b")))
