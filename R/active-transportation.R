@@ -146,11 +146,11 @@ active_transport2_fun <-
                       
   }
 
-#' @title Daily active transportation (2015-2018)
+#' @title Daily active transportation (2015-2020)
 #' 
 #' @description This function creates a derived variable for daily time spent 
 #' traveling in active ways. This includes walking and biking. This function is 
-#' used for CCHS 2015-2018.
+#' used for CCHS 2015-2020.
 #' 
 #' @param PAYDVTTR number of minutes of active transportation in a week 
 #' for 12-17 years old.
@@ -162,7 +162,7 @@ active_transport2_fun <-
 #' 
 #' @examples
 #' # Using active_transport3_fun() to determine daily time spent 
-#' # traveling in active ways values across CCHS 2015-2018.
+#' # traveling in active ways values across CCHS 2015-2020.
 #' 
 #' # active_transport3_fun() is specified in variable_details.csv along with the CCHS
 #' # variables and cycles included.
