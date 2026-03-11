@@ -35,9 +35,6 @@
 #
 # ==============================================================================
 
-# REQUIRED DEPENDENCIES
-library(haven)
-library(dplyr)
 
 # Source required helper functions (conditional loading for package context)
 tryCatch(

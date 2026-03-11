@@ -16,7 +16,13 @@
 # In package context, all R/ files are loaded automatically.
 # The here package is not needed; DEVELOPMENT_R_DIR is only used outside package context.
 DEVELOPMENT_R_DIR <- tryCatch(
-  here::here("development", "flexible-missing-data-mvp", "R"),
+  {
+    if (requireNamespace("here", quietly = TRUE)) {
+      here::here("development", "flexible-missing-data-mvp", "R")
+    } else {
+      ""
+    }
+  },
   error = function(e) ""
 )
 
