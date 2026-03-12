@@ -290,6 +290,7 @@ For each in-scope variable:
 - Variable listed in `variableStart` but not found in documentation for that cycle → **P0** (wrong variable name)
 - Variable not checked (no documentation available for that cycle) → note as untested
 - Variable exists in additional cycles not included in `databaseStart` → informational (expansion opportunity)
+- **Pre-2007 databases in `databaseStart` without explicit `db::VAR` mappings in `variableStart`** → **P1** (wrong source variable at runtime via `[VAR]` default). Pre-2007 variable names require a cycle letter in position 4 (A=2001, C=2003, E=2005) — the `[VAR]` default will look up the 2007-2014 name, which does not exist in pre-2007 datasets. Always verify every pre-2007 database has an explicit mapping.
 
 #### L1: Variable concordance
 
@@ -314,22 +315,34 @@ Run these checks in parallel for the in-scope variables. Read `.claude/skills/cc
 
 #### Check 1: Era boundary defaults
 
-The most dangerous class of bug. For each variable:
+The most dangerous class of bug. The `[VAR]` default in `variableStart` resolves to the base variable name at runtime for any database not explicitly mapped. This is only correct for databases in the **same naming era** as the base name. Whenever `databaseStart` spans an era boundary, all databases in the **other** era must have explicit `db::VAR` mappings.
 
-1. Parse the `databaseStart` field — does it span both 2007-2014 and 2015+ cycles?
-2. Parse the `variableStart` field — do 2015+ databases have explicit `db::VAR` mappings?
-3. If a `[VAR]` default exists and 2015+ databases lack explicit mappings, the default will apply the wrong variable name at runtime
+The general rule: **for every era boundary crossed by `databaseStart`, verify that all databases on the far side have explicit mappings.**
 
-**Key 2015 renames to check:**
+For each variable:
+1. Parse the `databaseStart` field and identify which era boundaries it crosses
+2. Parse the `variableStart` field — do databases on the far side of each boundary have explicit `db::VAR` mappings?
+3. If a `[VAR]` default exists and cross-era databases lack explicit mappings, the default will silently apply the wrong variable name at runtime
+
+**CCHS naming era boundaries:**
+
+| Boundary | Direction | Pattern | Example |
+|----------|-----------|---------|---------|
+| Pre-2007 → 2007 | Pre-2007 needs cycle letter | `SMK_204` → `SMKA_204` (2001), `SMKC_204` (2003), `SMKE_204` (2005) | Any variable with 2001/2003/2005 in databaseStart |
+| 2007–2014 → 2015 | 3-digit rename | `SMK_06A` → `SMK_060`, `SMK_06C` → `SMK_070` | Smoking, FVC, ADL |
+| 2021 → 2022 | CSS/SPU module restructure | Smoking cessation/history split into new modules | SPU_25A/B replace SMK_09A/C for cessation timing |
+| 2021 → 2023 | ADL digit reduction | `ADL_005` → `ADL_05` | ADL variables only |
+
+The pre-2007 and 2015+ boundaries are the most common sources of bugs — they affect almost all smoking, FVC, and ADL variables. Always use `get_variable_history()` from the cchs-metadata MCP to confirm the exact boundary for the variable under review.
+
+**Key 2015+ renames (most common):**
 - Smoking categorical: SMK_06A → SMK_060, SMK_09A → SMK_080, SMK_10A → SMK_100
-- Smoking continuous: SMK_06C → SMK_070, SMK_09C → SMK_090, SMK_10C → SMK_110
+- Smoking continuous (Master): SMK_06C → SMK_070, SMK_09C → SMK_090, SMK_10C → SMK_110
+- Smoking continuous (PUMF): SMKG06C → SMKG070, SMKG09C → SMKG090, SMKG10C → SMKG110
 - Smoking derived: SMKDSTY → SMKDVSTY, SMKDSTP → SMKDVSTP
-- PUMF grouped: SMKG06C → SMKG070, SMKG09C → SMKG090, SMKG10C → SMKG110
+- Smoking intensity (daily smoker): SMK_204 / SMK_208 → SMK_045 (PUMF) / SMK_040 (Master daily), SMK_075 (both, former daily)
 - FVC: FVCDFRU → FVCDVFRU, FVCDSAL → FVCDVGRN, FVCDCAR → FVCDVORA, FVCDPOT → FVCDVPOT, FVCDVEG → FVCDVVEG, FVCDJUI → FVCDVJUI
 - ADL: ADL_01-06 → ADL_005-030 (3-digit, 2015-2021), then → ADL_05-30 (2-digit, 2023+)
-
-**Key 2023 renames to check:**
-- ADL: ADL_005 → ADL_05, ADL_010 → ADL_10, ADL_015 → ADL_15, ADL_020 → ADL_20, ADL_025 → ADL_25, ADL_030 → ADL_30. This is a new era boundary — `[ADL_005]` defaults will not work for 2023 databases.
 
 #### Check 2: databaseStart consistency
 
@@ -666,6 +679,28 @@ If the in-scope variables include derived variables (functions in `R/`):
 3. Run `rec_with_table()` with the derived variable to verify the full pipeline
 4. Compare the derived variable's valid % against its input variables — the DV should not have materially higher valid % than its least-available input
 5. For categorical derived variables and key continuous inputs, examine the **exposure distribution** across cycles — not just valid counts. The central harmonization question is whether typical exposures (e.g., proportion with 0 fruit/veg, or >5 servings/day) remain stable across cycles. A sudden shift in the distribution at an era boundary signals a recoding or mapping error even when valid % is unchanged. Include these distributions in both the integration test output and the QMD visualisation
+
+#### DerivedVar feeder check (PUMF/Master split)
+
+For any derived variable that uses age, sex, or any other variable that differs between PUMF and Master, run a cross-database feeder check:
+
+```r
+devtools::load_all()
+# Compare feeders with _p vs _m filter
+resolve_dependencies("pack_years_der", databases = "cchs2015_2016_p")
+resolve_dependencies("pack_years_der", databases = "cchs2015_2016_m")
+```
+
+If both calls return the same combined feeder list, DerivedVar rows are mixing `_p` and `_m` databases and need splitting. The correct state: the `_p` call should return PUMF-specific feeders (e.g., `DHHGAGE_cont`), the `_m` call should return Master-specific feeders (e.g., `DHH_AGE`).
+
+**Key age feeder split:**
+
+| Feeder | Database type | Note |
+|--------|---------------|-------|
+| `DHHGAGE_cont` | PUMF (`_p`) only | Midpoint-imputed from grouped PUMF age bands |
+| `DHH_AGE` | Master (`_m`) all cycles including 2001 | True continuous age |
+
+A DerivedVar row that lists both `_p` and `_m` databases when feeders differ is a **P1** error — `rec_with_table()` will silently use the wrong age variable for at least one database type. See `pumf-master-harmonization.md` for the correct row-splitting pattern.
 
 #### What to report from L6
 
