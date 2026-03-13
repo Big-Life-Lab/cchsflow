@@ -346,6 +346,33 @@ For each mismatch found, classify it:
 
 All mismatches must be explicitly listed in the review summary, even pre-existing ones. Do not silently omit consistency results.
 
+#### Check 2b: Multi-block databaseStart overlap
+
+Variables with multiple recode blocks (i.e., more than one distinct `variableStart` value in variable_details) must have non-overlapping `databaseStart` lists. Each database should appear in exactly one block — if a database appears in two or more blocks, `rec_with_table()` will match duplicate rows for the same `recStart` code and produce incorrect or ambiguous output.
+
+For each variable with multiple distinct `variableStart` values:
+1. Split variable_details rows into blocks by `variableStart` value
+2. For each block, parse the `databaseStart` list into a set of database names
+3. Check for intersection between any two blocks' sets
+4. Flag any database that appears in more than one block as **P0**
+
+```r
+vd_var <- variable_details[variable_details$variable == "VAR", ]
+blocks <- split(vd_var, vd_var$variableStart)
+db_sets <- lapply(blocks, function(b) {
+  trimws(unlist(strsplit(b$databaseStart[1], ",")))
+})
+# Check all pairwise intersections
+pairs <- combn(length(db_sets), 2)
+for (i in seq_len(ncol(pairs))) {
+  overlap <- intersect(db_sets[[pairs[1,i]]], db_sets[[pairs[2,i]]])
+  if (length(overlap) > 0)
+    cat("P0 OVERLAP:", paste(overlap, collapse=", "), "\n")
+}
+```
+
+This check is especially important for continuous variables with era-specific midpoint recodes (e.g., SMK_09A_cont, SMK_06A_cont) where different cycles have different category boundaries and require separate recode blocks.
+
 #### Check 3: PUMF vs Master naming
 
 For `_m` (master) databases:
@@ -477,6 +504,18 @@ If the PR lacks tests for new derived variables, flag this.
 ### Step 6: L6 implementation validation
 
 **This is the highest-priority check.** Run `rec_with_table()` against actual PUMF data. This is not just a pass/fail test — the output is an analytical tool. By examining prevalence and distributions across cycles and categories, reviewers can identify harmonization problems that worksheet checks alone cannot catch, such as a sudden step change in prevalence at an era boundary (e.g., 2014 → 2015) that signals a naming mismatch or category recode error.
+
+#### Multi-era recode validation
+
+For variables with multiple recode blocks (identified in Check 2b), standard L6 prevalence checks are insufficient — `rec_with_table()` may silently apply the wrong block or blend blocks without error. For these variables, perform era-specific output validation:
+
+1. **Identify one representative PUMF cycle per block** — e.g., for SMK_09A_cont: `cchs2001_p` (Block 1 era), `cchs2007_2008_p` (Block 3 era)
+2. **Run `rec_with_table()` for each representative cycle**
+3. **Verify the recEnd values match the expected midpoints for that era** — not just that they are non-missing
+
+For continuous variables, check a known respondent's output value against the expected midpoint for their source category. If the era boundary is at 2003 (different category boundaries in 2001 vs 2003+), a respondent with source code 3 should produce recEnd=4 in 2001 but recEnd=2.5 in 2003+. If both cycles produce the same value, the wrong block is being applied to one of them.
+
+Flag any era boundary where observed output values do not match expected midpoints as **P0**.
 
 #### Scope and limitations
 

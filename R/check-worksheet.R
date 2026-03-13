@@ -416,6 +416,138 @@ check_worksheet <- function(
   ))
 }
 
+#' Check variable_details.csv for recode block recStart collisions
+#'
+#' For variables with multiple recode blocks (distinct variableStart values),
+#' checks whether the same recStart value appears in rows from more than one
+#' block for the same database. This directly detects the condition that causes
+#' rec_with_table() to match duplicate rows and produce incorrect output.
+#'
+#' Note: databaseStart overlap alone is not sufficient to flag an error because
+#' cchsflow legitimately uses parallel PUMF and Master blocks with shared
+#' databases but non-overlapping recStart ranges.
+#'
+#' @param file_path Path to variable_details.csv
+#'
+#' @return A list of errors found. Each error is a named list containing
+#' information about the error.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' check_recode_blocks("inst/extdata/variable_details.csv")
+#' }
+check_recode_blocks <- function(file_path) {
+  if (!file.exists(file_path)) {
+    return(list(.create_file_not_found_error("variable_details", file_path)))
+  }
+
+  vd <- tryCatch(
+    read.csv(file_path, stringsAsFactors = FALSE, check.names = FALSE),
+    error = function(e) NULL
+  )
+  if (is.null(vd)) {
+    return(list())
+  }
+
+  required_cols <- c("variable", "variableStart", "databaseStart", "recStart")
+  if (!all(required_cols %in% names(vd))) {
+    return(list())
+  }
+
+  errors <- list()
+  all_vars <- unique(vd$variable)
+
+  for (var in all_vars) {
+    rows <- vd[vd$variable == var, ]
+
+    # Exclude Func:: rows — derived variable routers that legitimately span all
+    # databases. Only check actual recode rows.
+    recode_rows <- rows[!grepl("^Func::", rows$recEnd), ]
+    blocks <- unique(recode_rows$variableStart)
+
+    if (length(blocks) < 2) next
+
+    # For each recode row, expand databaseStart into individual databases and
+    # build a lookup: (database, recStart) -> character vector of blocks
+    db_recstart_blocks <- list()
+
+    for (vs in blocks) {
+      block_rows <- recode_rows[recode_rows$variableStart == vs, ]
+      dbs <- trimws(unlist(strsplit(block_rows$databaseStart[1], ",")))
+
+      for (rec in block_rows$recStart) {
+        for (db in dbs) {
+          key <- paste0(db, "|||", rec)
+          db_recstart_blocks[[key]] <- unique(c(db_recstart_blocks[[key]], vs))
+        }
+      }
+    }
+
+    # Flag any (database, recStart) key present in more than one block
+    collision_keys <- names(db_recstart_blocks)[
+      vapply(db_recstart_blocks, length, integer(1)) > 1
+    ]
+
+    if (length(collision_keys) > 0) {
+      errors <- c(errors, list(.create_recode_block_collision_error(
+        file_path, var, collision_keys, db_recstart_blocks
+      )))
+    }
+  }
+
+  return(errors)
+}
+
+#' Create an error for recStart collisions across recode blocks
+#'
+#' @param file_path Path to the worksheet
+#' @param variable_name Name of the variable with the collision
+#' @param collision_keys Character vector of "database|||recStart" keys with collisions
+#' @param db_recstart_blocks Named list mapping keys to block vectors
+#'
+#' @return A named list
+.create_recode_block_collision_error <- function(
+  file_path, variable_name, collision_keys, db_recstart_blocks) {
+  # Summarize by block pair: collect distinct recStart values per pair
+  pair_recs <- list()
+  for (k in collision_keys) {
+    blks <- sort(db_recstart_blocks[[k]])
+    pair_key <- paste(blks, collapse = " vs ")
+    rec <- strsplit(k, "|||", fixed = TRUE)[[1]][2]
+    pair_recs[[pair_key]] <- unique(c(pair_recs[[pair_key]], rec))
+  }
+
+  pair_summaries <- vapply(names(pair_recs), function(pk) {
+    recs <- pair_recs[[pk]]
+    n_recs <- length(recs)
+    rec_str <- if (n_recs <= 4) {
+      paste(recs, collapse = ", ")
+    } else {
+      paste0(paste(head(recs, 4), collapse = ", "), " ... (", n_recs, " total)")
+    }
+    paste0(pk, " share recStart: ", rec_str)
+  }, character(1))
+
+  detail_str <- paste(pair_summaries, collapse = "; ")
+  n_pairs <- length(pair_recs)
+  n_collisions <- length(collision_keys)
+
+  return(list(
+    error_type = "recode_block_collision",
+    file_type = "variable_details",
+    file_path = file_path,
+    variable = variable_name,
+    collision_keys = collision_keys,
+    message = glue::glue(
+      "Error in Variable details sheet at {file_path}. ",
+      "Variable \"{variable_name}\" has {n_collisions} recStart collision(s) ",
+      "across {n_pairs} block pair(s): {detail_str}."
+    )
+  ))
+}
+
 #' Parse the worksheet contents
 #'
 #' @param csv_text String containing the contents of the worksheet
