@@ -290,7 +290,6 @@ For each in-scope variable:
 - Variable listed in `variableStart` but not found in documentation for that cycle → **P0** (wrong variable name)
 - Variable not checked (no documentation available for that cycle) → note as untested
 - Variable exists in additional cycles not included in `databaseStart` → informational (expansion opportunity)
-- **Pre-2007 databases in `databaseStart` without explicit `db::VAR` mappings in `variableStart`** → **P1** (wrong source variable at runtime via `[VAR]` default). Pre-2007 variable names require a cycle letter in position 4 (A=2001, C=2003, E=2005) — the `[VAR]` default will look up the 2007-2014 name, which does not exist in pre-2007 datasets. Always verify every pre-2007 database has an explicit mapping.
 
 #### L1: Variable concordance
 
@@ -315,34 +314,22 @@ Run these checks in parallel for the in-scope variables. Read `.claude/skills/cc
 
 #### Check 1: Era boundary defaults
 
-The most dangerous class of bug. The `[VAR]` default in `variableStart` resolves to the base variable name at runtime for any database not explicitly mapped. This is only correct for databases in the **same naming era** as the base name. Whenever `databaseStart` spans an era boundary, all databases in the **other** era must have explicit `db::VAR` mappings.
+The most dangerous class of bug. For each variable:
 
-The general rule: **for every era boundary crossed by `databaseStart`, verify that all databases on the far side have explicit mappings.**
+1. Parse the `databaseStart` field — does it span both 2007-2014 and 2015+ cycles?
+2. Parse the `variableStart` field — do 2015+ databases have explicit `db::VAR` mappings?
+3. If a `[VAR]` default exists and 2015+ databases lack explicit mappings, the default will apply the wrong variable name at runtime
 
-For each variable:
-1. Parse the `databaseStart` field and identify which era boundaries it crosses
-2. Parse the `variableStart` field — do databases on the far side of each boundary have explicit `db::VAR` mappings?
-3. If a `[VAR]` default exists and cross-era databases lack explicit mappings, the default will silently apply the wrong variable name at runtime
-
-**CCHS naming era boundaries:**
-
-| Boundary | Direction | Pattern | Example |
-|----------|-----------|---------|---------|
-| Pre-2007 → 2007 | Pre-2007 needs cycle letter | `SMK_204` → `SMKA_204` (2001), `SMKC_204` (2003), `SMKE_204` (2005) | Any variable with 2001/2003/2005 in databaseStart |
-| 2007–2014 → 2015 | 3-digit rename | `SMK_06A` → `SMK_060`, `SMK_06C` → `SMK_070` | Smoking, FVC, ADL |
-| 2021 → 2022 | CSS/SPU module restructure | Smoking cessation/history split into new modules | SPU_25A/B replace SMK_09A/C for cessation timing |
-| 2021 → 2023 | ADL digit reduction | `ADL_005` → `ADL_05` | ADL variables only |
-
-The pre-2007 and 2015+ boundaries are the most common sources of bugs — they affect almost all smoking, FVC, and ADL variables. Always use `get_variable_history()` from the cchs-metadata MCP to confirm the exact boundary for the variable under review.
-
-**Key 2015+ renames (most common):**
+**Key 2015 renames to check:**
 - Smoking categorical: SMK_06A → SMK_060, SMK_09A → SMK_080, SMK_10A → SMK_100
-- Smoking continuous (Master): SMK_06C → SMK_070, SMK_09C → SMK_090, SMK_10C → SMK_110
-- Smoking continuous (PUMF): SMKG06C → SMKG070, SMKG09C → SMKG090, SMKG10C → SMKG110
+- Smoking continuous: SMK_06C → SMK_070, SMK_09C → SMK_090, SMK_10C → SMK_110
 - Smoking derived: SMKDSTY → SMKDVSTY, SMKDSTP → SMKDVSTP
-- Smoking intensity (daily smoker): SMK_204 / SMK_208 → SMK_045 (PUMF) / SMK_040 (Master daily), SMK_075 (both, former daily)
+- PUMF grouped: SMKG06C → SMKG070, SMKG09C → SMKG090, SMKG10C → SMKG110
 - FVC: FVCDFRU → FVCDVFRU, FVCDSAL → FVCDVGRN, FVCDCAR → FVCDVORA, FVCDPOT → FVCDVPOT, FVCDVEG → FVCDVVEG, FVCDJUI → FVCDVJUI
 - ADL: ADL_01-06 → ADL_005-030 (3-digit, 2015-2021), then → ADL_05-30 (2-digit, 2023+)
+
+**Key 2023 renames to check:**
+- ADL: ADL_005 → ADL_05, ADL_010 → ADL_10, ADL_015 → ADL_15, ADL_020 → ADL_20, ADL_025 → ADL_25, ADL_030 → ADL_30. This is a new era boundary — `[ADL_005]` defaults will not work for 2023 databases.
 
 #### Check 2: databaseStart consistency
 
@@ -358,6 +345,35 @@ For each mismatch found, classify it:
 - **`_p` in vd only**: PUMF databases in variable_details but not variables.csv is a known pattern for variables that span both pre-2015 and 2015+ eras (the pre-2015 block includes `_p` databases that the 2015+ block in variables.csv doesn't list). Note but do not flag as a bug.
 
 All mismatches must be explicitly listed in the review summary, even pre-existing ones. Do not silently omit consistency results.
+
+#### Check 2b: Multi-block recStart collisions
+
+**Terminology:** A **recode block** is a set of rows in variable_details.csv sharing the same `variableStart` value. A recode block defines how one source variable maps to the harmonized output. Variables that changed source variable names or response category definitions across CCHS cycles require multiple blocks — one per distinct source structure. A single block can span multiple eras when the source variable name and category boundaries were stable across them.
+
+Variables with multiple recode blocks must not have the same `recStart` value appearing in more than one block for the same database. If a `(database, recStart)` pair matches rows from two blocks, `rec_with_table()` will find duplicate rows and produce incorrect output.
+
+Note: `databaseStart` overlap alone (a database appearing in two blocks' lists) is not sufficient to flag an error — cchsflow legitimately uses parallel PUMF and Master blocks that share databases but have non-overlapping `recStart` ranges. The collision must be at the `(database, recStart)` level.
+
+**Automated check:** `exec/check-worksheets.R` runs `check_recode_blocks()` automatically. For manual inspection of a specific variable:
+
+```r
+vd_var <- variable_details[variable_details$variable == "VAR", ]
+blocks <- split(vd_var, vd_var$variableStart)
+db_sets <- lapply(blocks, function(b) {
+  trimws(unlist(strsplit(b$databaseStart[1], ",")))
+})
+# Check all pairwise intersections (overlap is a necessary but not sufficient condition)
+pairs <- combn(length(db_sets), 2)
+for (i in seq_len(ncol(pairs))) {
+  overlap <- intersect(db_sets[[pairs[1,i]]], db_sets[[pairs[2,i]]])
+  if (length(overlap) > 0)
+    cat("OVERLAP (check recStart too):", paste(overlap, collapse=", "), "\n")
+}
+```
+
+Flag any confirmed `(database, recStart)` collision as **P0**.
+
+This check is especially important for continuous variables with era-specific midpoint recodes (e.g., SMK_09A_cont, SMK_06A_cont) where different cycles have different category boundaries and require separate recode blocks.
 
 #### Check 3: PUMF vs Master naming
 
@@ -384,11 +400,14 @@ The letter position varies by variable domain but follows a consistent pattern w
 
 #### Check 5: Known error patterns
 
+**Automated check:** `exec/check-worksheets.R` runs `check_invalid_databases()` on both worksheets. Review its output before manual scanning — it catches the first four patterns below automatically.
+
 Scan for:
 - `cchs20013_` — extra zero typo (should be `cchs2013_`)
 - `chs20` without leading `c` — missing `c` typo (should be `cchs20`). This pattern has been found in ADL and FVC variables (e.g., `chs2011_2012_m` instead of `cchs2011_2012_m`). Check all database names match the `cchs` prefix.
 - `_i` suffix databases — deprecated, should be `_m`
 - `_s` suffix databases — deprecated, **always convert to `_m`** when found in reviewed variables. Check that a corresponding `_m` entry doesn't already exist (if it does, delete the `_s` row; if not, rename `_s` → `_m`). This applies even if the `_s` is pre-existing on the target branch — if the PR touches these rows, fix the suffix. **Naming convention**: `_s` share files are single-year extracts, so map to the single-year master form: `cchs2009_s` → `cchs2009_m` (not `cchs2009_2010_m`), `cchs2010_s` → `cchs2010_m`, `cchs2012_s` → `cchs2012_m`. Check `variables.csv` to confirm which `_m` form is expected.
+- `cchs2021_p`, `cchs2022_p`, `cchs2023_p` — **invalid PUMF databases**. The 2021 CCHS was not released as a standalone PUMF — it was combined with 2022 data into a 2021-2022 PUMF (not yet in cchsflow). The 2022+ smoking variables were restructured into CSS/SPU modules; no standalone PUMF equivalent exists for variables like SMK_09A in those cycles. Remove these from `databaseStart` for PUMF-only or mixed blocks when encountered in reviewed variables.
 - `[[VAR]]` — double brackets (invalid notation)
 - `[VAR1, VAR2]` without `DerivedVar::` prefix — ambiguous multi-variable input
 
@@ -490,6 +509,18 @@ If the PR lacks tests for new derived variables, flag this.
 ### Step 6: L6 implementation validation
 
 **This is the highest-priority check.** Run `rec_with_table()` against actual PUMF data. This is not just a pass/fail test — the output is an analytical tool. By examining prevalence and distributions across cycles and categories, reviewers can identify harmonization problems that worksheet checks alone cannot catch, such as a sudden step change in prevalence at an era boundary (e.g., 2014 → 2015) that signals a naming mismatch or category recode error.
+
+#### Multi-era recode validation
+
+For variables with multiple recode blocks (identified in Check 2b), standard L6 prevalence checks are insufficient — `rec_with_table()` may silently apply the wrong block or blend blocks without error. For these variables, perform era-specific output validation:
+
+1. **Identify one representative PUMF cycle per block** — e.g., for SMK_09A_cont: `cchs2001_p` (Block 1 era), `cchs2007_2008_p` (Block 3 era)
+2. **Run `rec_with_table()` for each representative cycle**
+3. **Verify the recEnd values match the expected midpoints for that era** — not just that they are non-missing
+
+For continuous variables, check a known respondent's output value against the expected midpoint for their source category. If the era boundary is at 2003 (different category boundaries in 2001 vs 2003+), a respondent with source code 3 should produce recEnd=4 in 2001 but recEnd=2.5 in 2003+. If both cycles produce the same value, the wrong block is being applied to one of them.
+
+Flag any era boundary where observed output values do not match expected midpoints as **P0**.
 
 #### Scope and limitations
 
@@ -679,28 +710,6 @@ If the in-scope variables include derived variables (functions in `R/`):
 3. Run `rec_with_table()` with the derived variable to verify the full pipeline
 4. Compare the derived variable's valid % against its input variables — the DV should not have materially higher valid % than its least-available input
 5. For categorical derived variables and key continuous inputs, examine the **exposure distribution** across cycles — not just valid counts. The central harmonization question is whether typical exposures (e.g., proportion with 0 fruit/veg, or >5 servings/day) remain stable across cycles. A sudden shift in the distribution at an era boundary signals a recoding or mapping error even when valid % is unchanged. Include these distributions in both the integration test output and the QMD visualisation
-
-#### DerivedVar feeder check (PUMF/Master split)
-
-For any derived variable that uses age, sex, or any other variable that differs between PUMF and Master, run a cross-database feeder check:
-
-```r
-devtools::load_all()
-# Compare feeders with _p vs _m filter
-resolve_dependencies("pack_years_der", databases = "cchs2015_2016_p")
-resolve_dependencies("pack_years_der", databases = "cchs2015_2016_m")
-```
-
-If both calls return the same combined feeder list, DerivedVar rows are mixing `_p` and `_m` databases and need splitting. The correct state: the `_p` call should return PUMF-specific feeders (e.g., `DHHGAGE_cont`), the `_m` call should return Master-specific feeders (e.g., `DHH_AGE`).
-
-**Key age feeder split:**
-
-| Feeder | Database type | Note |
-|--------|---------------|-------|
-| `DHHGAGE_cont` | PUMF (`_p`) only | Midpoint-imputed from grouped PUMF age bands |
-| `DHH_AGE` | Master (`_m`) all cycles including 2001 | True continuous age |
-
-A DerivedVar row that lists both `_p` and `_m` databases when feeders differ is a **P1** error — `rec_with_table()` will silently use the wrong age variable for at least one database type. See `pumf-master-harmonization.md` for the correct row-splitting pattern.
 
 #### What to report from L6
 
@@ -908,6 +917,20 @@ If the review identified worksheet errors (typos, missing mappings, incorrect da
      vd$databaseStart[i] <- gsub("cchs2009_s", "cchs2009_m", vd$databaseStart[i])
    }
    ```
+
+   **Multi-block databaseStart fix rule:** When `check_recode_blocks()` flags a recStart collision, the fix is to narrow each block's `databaseStart` to only the databases where that block's source variable actually exists. The key mental model:
+
+   > Each block's `databaseStart` should contain only the databases where that block's `variableStart` is the correct source variable.
+
+   **Critical anti-pattern — do not replace the entire databaseStart.** A block's `databaseStart` may include databases covered by a `[SHORTHAND]` entry in `variableStart` (e.g., `[SMK_09A]` covers cchs2007_2008_p through cchs2013_2014_p implicitly). If you replace the full `databaseStart` with only the databases visible in the explicit `db::VAR` prefixes, you will drop the shorthand-covered databases and create new gaps. Instead:
+
+   1. Identify which database(s) are causing the collision (appear in two blocks)
+   2. Determine which block those databases actually belong to (based on which era's source variable they use)
+   3. Remove those databases from the block they do *not* belong to — leave everything else intact
+
+   **Example:** If `cchs2001_p` appears in both Block 1 (2001 source variable) and Block 2 (2003+ source variable), remove `cchs2001_p` from Block 2's `databaseStart` only. Do not rewrite Block 2's full `databaseStart`.
+
+   Always open Beyond Compare to verify the proposed fix before applying it to `inst/extdata/`.
 
 4. **Save fixes to a temporary file** — per project conventions (CLAUDE.local.md), write proposed changes to `/tmp/` for user review before editing the main worksheet files directly. The user or PR author integrates the changes.
 
