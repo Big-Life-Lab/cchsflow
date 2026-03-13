@@ -346,15 +346,15 @@ For each mismatch found, classify it:
 
 All mismatches must be explicitly listed in the review summary, even pre-existing ones. Do not silently omit consistency results.
 
-#### Check 2b: Multi-block databaseStart overlap
+#### Check 2b: Multi-block recStart collisions
 
-Variables with multiple recode blocks (i.e., more than one distinct `variableStart` value in variable_details) must have non-overlapping `databaseStart` lists. Each database should appear in exactly one block — if a database appears in two or more blocks, `rec_with_table()` will match duplicate rows for the same `recStart` code and produce incorrect or ambiguous output.
+**Terminology:** A **recode block** is a set of rows in variable_details.csv sharing the same `variableStart` value. A recode block defines how one source variable maps to the harmonized output. Variables that changed source variable names or response category definitions across CCHS cycles require multiple blocks — one per distinct source structure. A single block can span multiple eras when the source variable name and category boundaries were stable across them.
 
-For each variable with multiple distinct `variableStart` values:
-1. Split variable_details rows into blocks by `variableStart` value
-2. For each block, parse the `databaseStart` list into a set of database names
-3. Check for intersection between any two blocks' sets
-4. Flag any database that appears in more than one block as **P0**
+Variables with multiple recode blocks must not have the same `recStart` value appearing in more than one block for the same database. If a `(database, recStart)` pair matches rows from two blocks, `rec_with_table()` will find duplicate rows and produce incorrect output.
+
+Note: `databaseStart` overlap alone (a database appearing in two blocks' lists) is not sufficient to flag an error — cchsflow legitimately uses parallel PUMF and Master blocks that share databases but have non-overlapping `recStart` ranges. The collision must be at the `(database, recStart)` level.
+
+**Automated check:** `exec/check-worksheets.R` runs `check_recode_blocks()` automatically. For manual inspection of a specific variable:
 
 ```r
 vd_var <- variable_details[variable_details$variable == "VAR", ]
@@ -362,14 +362,16 @@ blocks <- split(vd_var, vd_var$variableStart)
 db_sets <- lapply(blocks, function(b) {
   trimws(unlist(strsplit(b$databaseStart[1], ",")))
 })
-# Check all pairwise intersections
+# Check all pairwise intersections (overlap is a necessary but not sufficient condition)
 pairs <- combn(length(db_sets), 2)
 for (i in seq_len(ncol(pairs))) {
   overlap <- intersect(db_sets[[pairs[1,i]]], db_sets[[pairs[2,i]]])
   if (length(overlap) > 0)
-    cat("P0 OVERLAP:", paste(overlap, collapse=", "), "\n")
+    cat("OVERLAP (check recStart too):", paste(overlap, collapse=", "), "\n")
 }
 ```
+
+Flag any confirmed `(database, recStart)` collision as **P0**.
 
 This check is especially important for continuous variables with era-specific midpoint recodes (e.g., SMK_09A_cont, SMK_06A_cont) where different cycles have different category boundaries and require separate recode blocks.
 
@@ -398,11 +400,14 @@ The letter position varies by variable domain but follows a consistent pattern w
 
 #### Check 5: Known error patterns
 
+**Automated check:** `exec/check-worksheets.R` runs `check_invalid_databases()` on both worksheets. Review its output before manual scanning — it catches the first four patterns below automatically.
+
 Scan for:
 - `cchs20013_` — extra zero typo (should be `cchs2013_`)
 - `chs20` without leading `c` — missing `c` typo (should be `cchs20`). This pattern has been found in ADL and FVC variables (e.g., `chs2011_2012_m` instead of `cchs2011_2012_m`). Check all database names match the `cchs` prefix.
 - `_i` suffix databases — deprecated, should be `_m`
 - `_s` suffix databases — deprecated, **always convert to `_m`** when found in reviewed variables. Check that a corresponding `_m` entry doesn't already exist (if it does, delete the `_s` row; if not, rename `_s` → `_m`). This applies even if the `_s` is pre-existing on the target branch — if the PR touches these rows, fix the suffix. **Naming convention**: `_s` share files are single-year extracts, so map to the single-year master form: `cchs2009_s` → `cchs2009_m` (not `cchs2009_2010_m`), `cchs2010_s` → `cchs2010_m`, `cchs2012_s` → `cchs2012_m`. Check `variables.csv` to confirm which `_m` form is expected.
+- `cchs2021_p`, `cchs2022_p`, `cchs2023_p` — **invalid PUMF databases**. The 2021 CCHS was not released as a standalone PUMF — it was combined with 2022 data into a 2021-2022 PUMF (not yet in cchsflow). The 2022+ smoking variables were restructured into CSS/SPU modules; no standalone PUMF equivalent exists for variables like SMK_09A in those cycles. Remove these from `databaseStart` for PUMF-only or mixed blocks when encountered in reviewed variables.
 - `[[VAR]]` — double brackets (invalid notation)
 - `[VAR1, VAR2]` without `DerivedVar::` prefix — ambiguous multi-variable input
 
@@ -912,6 +917,20 @@ If the review identified worksheet errors (typos, missing mappings, incorrect da
      vd$databaseStart[i] <- gsub("cchs2009_s", "cchs2009_m", vd$databaseStart[i])
    }
    ```
+
+   **Multi-block databaseStart fix rule:** When `check_recode_blocks()` flags a recStart collision, the fix is to narrow each block's `databaseStart` to only the databases where that block's source variable actually exists. The key mental model:
+
+   > Each block's `databaseStart` should contain only the databases where that block's `variableStart` is the correct source variable.
+
+   **Critical anti-pattern — do not replace the entire databaseStart.** A block's `databaseStart` may include databases covered by a `[SHORTHAND]` entry in `variableStart` (e.g., `[SMK_09A]` covers cchs2007_2008_p through cchs2013_2014_p implicitly). If you replace the full `databaseStart` with only the databases visible in the explicit `db::VAR` prefixes, you will drop the shorthand-covered databases and create new gaps. Instead:
+
+   1. Identify which database(s) are causing the collision (appear in two blocks)
+   2. Determine which block those databases actually belong to (based on which era's source variable they use)
+   3. Remove those databases from the block they do *not* belong to — leave everything else intact
+
+   **Example:** If `cchs2001_p` appears in both Block 1 (2001 source variable) and Block 2 (2003+ source variable), remove `cchs2001_p` from Block 2's `databaseStart` only. Do not rewrite Block 2's full `databaseStart`.
+
+   Always open Beyond Compare to verify the proposed fix before applying it to `inst/extdata/`.
 
 4. **Save fixes to a temporary file** — per project conventions (CLAUDE.local.md), write proposed changes to `/tmp/` for user review before editing the main worksheet files directly. The user or PR author integrates the changes.
 
