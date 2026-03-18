@@ -24,7 +24,7 @@
 #'  respiratory condition (1 = respondent is over the age of 35 and has
 #'  a respiratory condition, 2 = respondent is under the age of 35 and has a
 #'  respiratory conditions, 3 = respondent does not have a respiratory
-#'  condition). See \code{\link{resp_condition_fun1}} for
+#'  condition). See \code{\link{resp_condition_fun}} for
 #'  documentation on how variable was derived.
 #'
 #' @param CCC_051 variable indicating if respondent has arthritis or
@@ -146,7 +146,7 @@ multiple_conditions_fun1 <-
 #'  respiratory condition. (1 = respondent is over the age of 35 and has
 #'  a respiratory condition, 2 = respondent is under the age of 35 and has a
 #'  respiratory conditions, 3 = respondent does not have a respiratory
-#'  condition). See \code{\link{resp_condition_fun1}} for
+#'  condition). See \code{\link{resp_condition_fun}} for
 #'  documentation on how variable was derived.
 #'
 #' @param CCC_051 variable indicating if respondent has arthritis or

@@ -60,160 +60,41 @@ test_that("CCC_091_fun2 warns and returns NA(b) when all args are out of range",
   expect_equal(out, "NA(b)")
 })
 
-# resp_condition_fun1-------------------------------
+# resp_condition_fun-------------------------------
 
-test_that("resp_condition_fun1 has expected output when age is out of range", {
-  expect_equal(resp_condition_fun1(-1, 1, 1), "NA(b)")
+test_that("resp_condition_fun has expected output when age is out of range", {
+  expect_equal(resp_condition_fun(-1, 1, 1), "NA(b)")
 })
 
-test_that("resp_condition_fun1 has expected output when
+test_that("resp_condition_fun has expected output when
           COPD/Emphs is out of range", {
-  expect_equal(resp_condition_fun1(40, 0, 1), 1)
+  expect_equal(resp_condition_fun(40, 0, 1), 1)
 })
 
-test_that("resp_condition_fun1 has expected output when
+test_that("resp_condition_fun has expected output when
           Asthma is out of range", {
-  expect_equal(resp_condition_fun1(40, 1, 0), 1)
+  expect_equal(resp_condition_fun(40, 1, 0), 1)
 })
 
-test_that("resp_condition_fun1 has expected output when age is NA", {
-  expect_equal(resp_condition_fun1(NA, 1, 1), "NA(b)")
+test_that("resp_condition_fun has expected output when age is NA", {
+  expect_equal(resp_condition_fun(NA, 1, 1), "NA(b)")
 })
 
-test_that("resp_condition_fun1 has expected output when COPD/Emphs is NA", {
-  expect_equal(resp_condition_fun1(40, NA, 1), 1)
+test_that("resp_condition_fun has expected output when COPD/Emphs is NA", {
+  expect_equal(resp_condition_fun(40, NA, 1), 1)
 })
 
-test_that("resp_condition_fun1 has expected output when Asthma is NA", {
-  expect_equal(resp_condition_fun1(40, 1, NA), 1)
+test_that("resp_condition_fun has expected output when Asthma is NA", {
+  expect_equal(resp_condition_fun(40, 1, NA), 1)
 })
 
-test_that("resp_condition_fun1 has expected output when all arguments are NA", {
-  expect_equal(resp_condition_fun1(NA, NA, NA), "NA(b)")
+test_that("resp_condition_fun has expected output when all arguments are NA", {
+  expect_equal(resp_condition_fun(NA, NA, NA), "NA(b)")
 })
 
-test_that("resp_condition_fun1 has expected output when
+test_that("resp_condition_fun has expected output when
           all arguments are in range", {
-  expect_equal(resp_condition_fun1(40, 1, 1), 1)
-})
-
-# resp_condition_fun2-----------------------
-
-test_that("resp_condition_fun2 has expected output when age is out of range", {
-  expect_equal(resp_condition_fun2(-1, 1, 1, 1, 1), "NA(b)")
-})
-
-test_that("resp_condition_fun2 has expected output when
-          emphysema is out of range", {
-  expect_warning(out <- resp_condition_fun2(40, 3, 1, 1, 1))
-  expect_equal(out, 1)
-})
-
-test_that("resp_condition_fun2 has expected output when COPD is out of range", {
-  expect_warning(out <- resp_condition_fun2(40, 1, 3, 1, 1))
-  expect_equal(out, 1)
-})
-
-test_that("resp_condition_fun2 has expected output when
-          chronic bronchitis is out of range", {
-  expect_warning(out <- resp_condition_fun2(40, 1, 1, 3, 1))
-  expect_equal(out, 1)
-})
-
-test_that("resp_condition_fun2 has expected output when Age is out of range", {
-  expect_warning(out <- resp_condition_fun2(40, 1, 3, 1, -1))
-  expect_equal(out, 1)
-})
-
-test_that("resp_condition_fun2 has expected output when
-          all parameters are in range", {
-  expect_equal(resp_condition_fun2(40, 1, 1, 1, 1), 1)
-})
-
-test_that("resp_condition_fun2 has expected output when
-          COPD, bronchitis, and asthma are negative but emphysema is
-          positive", {
-  expect_equal(resp_condition_fun2(40, 1, 2, 2, 2), 1)
-})
-
-test_that("resp_condition_fun2 has expected output when
-          emphysema, bronchitis, and asthma are negative but COPD is positive", {
-  expect_equal(resp_condition_fun2(40, 2, 1, 2, 2), 1)
-})
-
-test_that("resp_condition_fun2 has expected output when
-          emphysema, COPD, and asthma are negative but bronchitis is positive", {
-  expect_equal(resp_condition_fun2(40, 2, 2, 1, 2), 1)
-})
-
-test_that("resp_condition_fun2 has expected output when
-          emphysema, COPD, and bronchitis are negative but asthma is positive", {
-  expect_equal(resp_condition_fun2(40, 2, 2, 2, 1), 1)
-})
-
-test_that("resp_condition_fun2 has expected output when
-          all parameters are negative", {
-  expect_equal(resp_condition_fun2(40, 2, 2, 2, 2), 3)
-})
-
-test_that("resp_condition_fun2 has expected output when
-          age is less than 35 and condition positive", {
-  expect_equal(resp_condition_fun2(34, 1, 2, 2, 2), 2)
-})
-
-# resp_condition_fun3--------------------------------
-
-test_that("resp_condition_fun3 has expected output when
-          age is out of range", {
-  expect_equal(resp_condition_fun3(-1, 1, 1, 1), "NA(b)")
-})
-
-test_that("resp_condition_fun3 has expected output when
-          COPD/Emphys is out of range", {
-  expect_warning(out <- resp_condition_fun3(35, 4, 1, 1))
-  expect_equal(out, 1)
-})
-
-test_that("resp_condition_fun3 has expected output when
-          bronchitis is out of range", {
-  expect_warning(out <- resp_condition_fun3(35, 1, 4, 1))
-  expect_equal(out, 1)
-})
-
-test_that("resp_condition_fun3 has expected output when
-          age is out of range", {
-  expect_warning(out <- resp_condition_fun3(35, 1, 1, 4))
-  expect_equal(out, 1)
-})
-
-test_that("resp_condition_fun3 has expected output when
-          all parameters are in range", {
-  expect_equal(resp_condition_fun3(35, 1, 1, 1), 1)
-})
-
-test_that("resp_condition_fun3 has expected output when
-          COPD/Emphys & asthma are negative but bronchitis is positive", {
-  expect_equal(resp_condition_fun3(40, 2, 1, 2), 1)
-})
-
-test_that("resp_condition_fun3 has expected output when
-          bronchitis & asthma are negative but COPD/Emphys is positive", {
-  expect_equal(resp_condition_fun3(40, 1, 2, 2), 1)
-})
-
-test_that("resp_condition_fun3 has expected output when
-          bronchitis & COPD/Emphys are negative but asthma is positive", {
-  expect_equal(resp_condition_fun3(40, 2, 2, 1), 1)
-})
-
-test_that("resp_condition_fun3 has expected output when
-          all parameters are negative", {
-  expect_equal(resp_condition_fun3(40, 2, 2, 2), 3)
-})
-
-test_that("resp_condition_fun3 has expected output when
-          age is less than 35 and condition positive", {
-  expect_equal(resp_condition_fun3(34, 1, 2, 1), 2)
+  expect_equal(resp_condition_fun(40, 1, 1), 1)
 })
 
 # COPD_Emph_der_fun1--------------------------------
