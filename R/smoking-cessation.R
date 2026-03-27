@@ -174,7 +174,7 @@ calculate_SMK_06A_cont <- function(SMK_06A_cat4, SMKG06C = NULL, output_format =
 #'
 #' @details
 #' **Implementation method**: 3-step architecture
-#' - **Step 1**: clean_variables() - Clean SMK_09A_cat4 and SMKG09C inputs
+#' - **Step 1**: clean_variables() - Clean SMK_09A_2003plus and SMKG09C inputs
 #' - **Step 2**: Domain logic with midpoint conversion
 #' - **Step 3**: Output cleaning
 #'
@@ -194,7 +194,7 @@ calculate_SMK_06A_cont <- function(SMK_06A_cat4, SMKG06C = NULL, output_format =
 #' quit completely. Former daily smokers may have continued as occasional smokers.
 #' Use SMK_10_gate to determine if they quit completely when stopping daily.
 #'
-#' @param SMK_09A_cat4 Numeric vector. Categorical time since stopped daily (1-4)
+#' @param SMK_09A_2003plus Numeric vector. Categorical time since stopped daily (1-4)
 #' @param SMKG09C Numeric vector. Continuous years for category 4 (3+ years)
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
@@ -205,7 +205,7 @@ calculate_SMK_06A_cont <- function(SMK_06A_cat4, SMKG06C = NULL, output_format =
 #' @examples
 #' \dontrun{
 #' # Scalar inputs - single respondent
-#' result_scalar <- calculate_SMK_09A_cont(SMK_09A_cat4 = 2, SMKG09C = NA)
+#' result_scalar <- calculate_SMK_09A_cont(SMK_09A_2003plus = 2, SMKG09C = NA)
 #' # Returns: 1.5 (category 2 = 1-2 years, midpoint used)
 #'
 #' # Vector inputs - multiple respondents
@@ -216,34 +216,34 @@ calculate_SMK_06A_cont <- function(SMK_06A_cat4, SMKG06C = NULL, output_format =
 #' }
 #'
 #' @export
-calculate_SMK_09A_cont <- function(SMK_09A_cat4, SMKG09C = NULL, output_format = "tagged_na") {
+calculate_SMK_09A_cont <- function(SMK_09A_2003plus, SMKG09C = NULL, output_format = "tagged_na") {
 
   # Handle empty input vectors
-  if (length(SMK_09A_cat4) == 0) return(numeric(0))
+  if (length(SMK_09A_2003plus) == 0) return(numeric(0))
 
   # Handle NULL SMKG09C
   if (is.null(SMKG09C)) {
-    SMKG09C <- rep(NA_real_, length(SMK_09A_cat4))
+    SMKG09C <- rep(NA_real_, length(SMK_09A_2003plus))
   }
 
   # === STEP 1: DATA CLEANING AND VALIDATION ===
   cleaned <- clean_variables(vars = list(
-    SMK_09A_cat4 = SMK_09A_cat4,
+    SMK_09A_2003plus = SMK_09A_2003plus,
     SMKG09C = SMKG09C
   ), output_format = output_format)
 
   # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
   result <- dplyr::case_when(
     # Missing data detection and priority processing
-    any_missing(cleaned$SMK_09A_cat4) ~
-      get_priority_missing(cleaned$SMK_09A_cat4, cleaned$SMKG09C, output_format = output_format),
+    any_missing(cleaned$SMK_09A_2003plus) ~
+      get_priority_missing(cleaned$SMK_09A_2003plus, cleaned$SMKG09C, output_format = output_format),
 
     # Domain logic: Convert categories to continuous years
-    cleaned$SMK_09A_cat4 == 1 ~ 0.5,    # <1 year ago → 0.5 years
-    cleaned$SMK_09A_cat4 == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
-    cleaned$SMK_09A_cat4 == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
-    cleaned$SMK_09A_cat4 == 4 & !any_missing(cleaned$SMKG09C) ~ cleaned$SMKG09C,  # 3+ years → use continuous
-    cleaned$SMK_09A_cat4 == 4 & any_missing(cleaned$SMKG09C) ~ 5.0,  # 3+ years fallback → 5.0 years
+    cleaned$SMK_09A_2003plus == 1 ~ 0.5,    # <1 year ago → 0.5 years
+    cleaned$SMK_09A_2003plus == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
+    cleaned$SMK_09A_2003plus == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
+    cleaned$SMK_09A_2003plus == 4 & !any_missing(cleaned$SMKG09C) ~ cleaned$SMKG09C,  # 3+ years → use continuous
+    cleaned$SMK_09A_2003plus == 4 & any_missing(cleaned$SMKG09C) ~ 5.0,  # 3+ years fallback → 5.0 years
 
     # Invalid categories get missing value
     .default = assign_missing("not_applicable", "SMK_09A_cont", output_format)
@@ -400,8 +400,8 @@ calculate_SMK_10A_cont <- function(SMK_10A, SMKG10C = NULL, output_format = "tag
 #' }
 #'
 #' @export
-calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont,
-                                        output_format = "tagged_na") {
+calculate_time_quit_smoking_complete <- function(SMK_09A_cont, SMK_06A_cont,
+                                                  output_format = "tagged_na") {
 
   # Handle empty input vectors
   if (length(SMK_09A_cont) == 0) return(numeric(0))
@@ -425,15 +425,40 @@ calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont,
       get_priority_missing(cleaned$SMK_09A_cont, cleaned$SMK_06A_cont, output_format = output_format),
 
     # Fallback: not applicable
-    .default = assign_missing("not_applicable", "time_quit_smoking", output_format)
+    .default = assign_missing("not_applicable", "time_quit_smoking_complete", output_format)
   )
 
   # === STEP 3: OUTPUT CLEANING ===
   output_cleaned <- clean_variables(vars = list(
-    time_quit_smoking = result
+    time_quit_smoking_complete = result
   ), output_format = output_format)
 
-  return(output_cleaned$time_quit_smoking)
+  return(output_cleaned$time_quit_smoking_complete)
+}
+
+# ------------------------------------------------------------------------------
+# calculate_time_quit_smoking_daily - Years since stopped smoking daily
+# ------------------------------------------------------------------------------
+
+#' Calculate Time Since Quit Smoking Daily (Former Daily Smokers)
+#'
+#' Provides continuous years since the respondent stopped smoking daily.
+#' Uses exact-year source variables on Master files where available, falling
+#' back to midpoint imputation from SMK_09A_2003plus for 2023 Master.
+#'
+#' @param SMK_09A_cont Numeric vector. PUMF midpoint-imputed years since stopped
+#'   daily (from rec_with_table or calculate_SMK_09A_cont)
+#' @param SMK_09C Numeric vector. Master exact years since stopped daily
+#'   (2001-2021 Master; NA on PUMF)
+#' @param output_format Character. Output format ("tagged_na" or "original")
+#'
+#' @return Numeric vector of continuous years since stopped smoking daily
+#'
+#' @export
+calculate_time_quit_smoking_daily <- function(SMK_09A_cont, SMK_09C = NULL,
+                                               output_format = "tagged_na") {
+  stop("calculate_time_quit_smoking_daily() is not yet implemented. ",
+       "See ceps/cep-002-smoking/gn-smk09a-refactor-plan.md for the planned logic.")
 }
 
 # ==============================================================================
