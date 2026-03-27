@@ -15,7 +15,7 @@ These files are preserved for reference and comparison purposes only. They are *
 
 - **`alcohol-legacy.R`** - Legacy alcohol consumption and risk assessment functions  
   - `binge_drinker_fun()`, `low_drink_short_fun()`, `low_drink_long_fun()`, etc.
-  - Replaced by: `assess_binge_drinking()`, `assess_drinking_risk_short()`, `assess_drinking_risk_long()`
+  - Replaced by: `calculate_binge_drinking()`, `calculate_drinking_risk_short()`, `calculate_drinking_risk_long()`
 
 - **`bmi-legacy.R`** - Legacy BMI calculation and categorization functions
   - `bmi_fun()`, `adjusted_bmi_fun()`, `bmi_fun_cat()`, etc.  
