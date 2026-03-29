@@ -4,5 +4,5 @@
 .Ruserdata
 *.DS_Store
 docs/
+!.claude/skills/**/docs/
 ..Rcheck/
-/.claude
