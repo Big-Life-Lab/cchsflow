@@ -714,7 +714,7 @@ SMKG207_fun <- function(SMK_030, SMKG040){
                                       SMKG207 == 10, 47,
                                       if_else2(
                                           SMKG207 == 11, 55,
-                                            if_else2(SMKG207 == "NA(a)", 
+                                            if_else2(SMKG207 == "NA(a)",
                                                 tagged_na("a"), tagged_na("b")
                                                 )
                                           )
@@ -728,7 +728,139 @@ SMKG207_fun <- function(SMK_030, SMKG040){
             )
         )
     )
-                    
+
   return(SMKG207_cont)
-  
+
+}
+
+# ==============================================================================
+# v3 FUNCTION ALIASES
+# ==============================================================================
+#
+# These functions match the Func:: references in variable_details.csv.
+# The calculate_ prefix follows v3 tidyverse naming conventions.
+#
+# Legacy _fun functions are preserved above for backward compatibility with
+# earlier cchsflow versions (pre-3.0).
+# ==============================================================================
+
+# Midpoint mapping shared by SMKG203/SMKG207 age-started-daily variables.
+# Categories 1-11 map to age midpoints; NA(a)/NA(b) for missing.
+smkg_age_midpoint <- function(category_value) {
+  if_else2(
+    category_value == 1, 8,
+    if_else2(category_value == 2, 13,
+    if_else2(category_value == 3, 16,
+    if_else2(category_value == 4, 18.5,
+    if_else2(category_value == 5, 22,
+    if_else2(category_value == 6, 27,
+    if_else2(category_value == 7, 32,
+    if_else2(category_value == 8, 37,
+    if_else2(category_value == 9, 42,
+    if_else2(category_value == 10, 47,
+    if_else2(category_value == 11, 55,
+    if_else2(category_value == "NA(a)", tagged_na("a"), tagged_na("b")
+    ))))))))))))
+}
+
+#' @title Combine SMKG203_cont and SMKG207_cont into SMKG040
+#' @description v3 alias for \code{\link{SMKG040_fun}}. Combines age-started-daily
+#'   from daily smokers (SMKG203_cont) and former daily smokers (SMKG207_cont).
+#' @param SMKG203_cont Continuous age started daily (current daily smokers)
+#' @param SMKG207_cont Continuous age started daily (former daily smokers)
+#' @return Combined age started daily value
+#' @export
+calculate_SMKG040 <- function(SMKG203_cont, SMKG207_cont) {
+  SMKG040_fun(SMKG203_cont, SMKG207_cont)
+}
+
+#' @title Derive SMKG203 from combined SMKG040 — grouped PUMF inputs
+#' @description For CCHS 2015+ PUMF, SMKG203 no longer exists as a separate
+#'   variable. This function filters SMKG040 (combined daily/former daily) to
+#'   extract the current-daily-smoker portion using SMKG005 (smoking status).
+#' @param SMKG005 Grouped smoking status (1 = current daily smoker)
+#' @param SMKG040 Age started smoking daily (combined daily/former daily)
+#' @return Continuous age started daily for current daily smokers; NA otherwise
+#' @export
+calculate_SMKG203_continuous <- function(SMKG005, SMKG040) {
+  SMKG203 <- if_else2(
+    SMKG005 == 1, SMKG040,
+    if_else2(
+      SMKG005 == "NA(a)" | SMKG040 == "NA(a)", tagged_na("a"), tagged_na("b")))
+  smkg_age_midpoint(SMKG203)
+}
+
+#' @title Derive SMKG203 from combined SMK_040 — raw Master inputs
+#' @description For CCHS 2015+ Master, derives SMKG203 from SMK_005 (smoking
+#'   status) and SMK_040 (combined age started daily). Filters for current daily
+#'   smokers (SMK_005 == 1).
+#' @param SMK_005 Smoking status (1 = current daily smoker)
+#' @param SMK_040 Age started smoking daily (combined, Master continuous)
+#' @return Continuous age started daily for current daily smokers; NA otherwise
+#' @export
+calculate_SMKG203_from_combined <- function(SMK_005, SMK_040) {
+  SMKG203_fun(SMK_005, SMK_040)
+}
+
+#' @title Derive SMKG207 from combined SMKG040 — grouped PUMF inputs
+#' @description For CCHS 2015+ PUMF, SMKG207 no longer exists separately.
+#'   Filters SMKG040 to extract the former-daily-smoker portion: person must
+#'   not be a current daily smoker (SMKG005 != 1) AND must have smoked daily
+#'   in lifetime (SMKG030 == 1).
+#' @param SMKG005 Grouped smoking status (1 = current daily)
+#' @param SMKG030 Smoked daily in lifetime (1 = yes)
+#' @param SMKG040 Age started smoking daily (combined)
+#' @return Continuous age started daily for former daily smokers; NA otherwise
+#' @export
+calculate_SMKG207_continuous <- function(SMKG005, SMKG030, SMKG040) {
+  SMKG207 <- if_else2(
+    SMKG005 != 1 & SMKG030 == 1, SMKG040,
+    if_else2(
+      SMKG030 == "NA(a)" | SMKG040 == "NA(a)", tagged_na("a"), tagged_na("b")))
+  smkg_age_midpoint(SMKG207)
+}
+
+#' @title Derive SMKG207 from combined SMK_040 — raw Master inputs
+#' @description For CCHS 2015+ Master, derives SMKG207 from raw variables.
+#'   Filters for former daily smokers: not current daily (SMK_005 != 1) AND
+#'   smoked daily in lifetime (SMK_030 == 1).
+#' @param SMK_005 Smoking status (1 = current daily)
+#' @param SMK_030 Smoked daily in lifetime (1 = yes)
+#' @param SMK_040 Age started smoking daily (combined, Master continuous)
+#' @return Continuous age started daily for former daily smokers; NA otherwise
+#' @export
+calculate_SMKG207_from_combined <- function(SMK_005, SMK_030, SMK_040) {
+  SMKG207 <- if_else2(
+    SMK_005 != 1 & SMK_030 == 1, SMK_040,
+    if_else2(
+      SMK_030 == "NA(a)" | SMK_040 == "NA(a)", tagged_na("a"), tagged_na("b")))
+  smkg_age_midpoint(SMKG207)
+}
+
+#' @title Combined time since quit smoking
+#' @description Combines cessation timing from multiple sources with priority
+#'   logic. Provides a single continuous "years since quit" value regardless
+#'   of smoking history pathway. Uses SMKDVSTP (derived smoking status) to
+#'   confirm former-smoker status.
+#' @param SMK_09A_cont Years since stopped daily (from worksheet midpoint recode)
+#' @param SMK_06A_cont Years since quit occasional (from worksheet midpoint recode)
+#' @param SMKDVSTP Derived smoking status (for context; primary routing uses
+#'   availability of SMK_09A_cont and SMK_06A_cont)
+#' @return Continuous years since quit; NA::a for current/never smokers,
+#'   NA::b for missing
+#' @export
+calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont, SMKDVSTP) {
+  if_else2(
+    !is.na(SMK_09A_cont) & SMK_09A_cont != "NA(a)" & SMK_09A_cont != "NA(b)",
+    SMK_09A_cont,
+    if_else2(
+      !is.na(SMK_06A_cont) & SMK_06A_cont != "NA(a)" & SMK_06A_cont != "NA(b)",
+      SMK_06A_cont,
+      if_else2(
+        SMKDVSTP == "NA(a)" | SMK_09A_cont == "NA(a)" | SMK_06A_cont == "NA(a)",
+        tagged_na("a"),
+        tagged_na("b")
+      )
+    )
+  )
 }

@@ -187,6 +187,15 @@ process_missing_codes <- function(var_data, pattern, output_format) {
     stop("output_format must be 'tagged_na' or 'original'")
   }
   
+  # Coerce character/factor inputs to numeric (rec_with_table passes factor
+
+  # levels as character strings; gold-tier functions expect numeric)
+  if (is.factor(var_data)) {
+    var_data <- as.numeric(levels(var_data))[var_data]
+  } else if (is.character(var_data)) {
+    var_data <- suppressWarnings(as.numeric(var_data))
+  }
+
   # Step 1: Convert input codes to tagged_na (for processing)
   tagged_data <- convert_input_to_tagged_na(var_data, pattern)
   

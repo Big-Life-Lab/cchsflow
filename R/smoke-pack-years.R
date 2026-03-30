@@ -149,7 +149,7 @@ calculate_pack_years <- function(smoking_status,
     days_per_month = days_per_month,
     age_first_cigarette = age_first_cigarette,
     smoked_100_lifetime = smoked_100_lifetime
-  ), output_format = output_format)
+  ), output_format = "tagged_na")
 
   # Map worksheet names to semantic names for core logic
   cleaned <- cleaned_raw
@@ -226,7 +226,7 @@ calculate_pack_years_categorical <- function(pack_years_der,
   # === STEP 1: DATA CLEANING ===
   cleaned <- clean_variables(vars = list(
     pack_years_der = pack_years_der
-  ), output_format = output_format)
+  ), output_format = "tagged_na")
 
   py <- cleaned$pack_years_der
 
@@ -311,10 +311,6 @@ calculate_pack_years_categorical <- function(pack_years_der,
 
     # 6 - Never smokers
     status == 6 ~ 0.0,
-
-    # Handle missing status values
-    haven::is_tagged_na(status, "a") ~
-      assign_missing("not_applicable", "pack_years_der", output_format),
 
     # Default
     .default = assign_missing("not_stated", "pack_years_der", output_format)

@@ -141,34 +141,6 @@ calculate_SMK_09A_2003plus <- function(data, output_format = "tagged_na") {
 }
 
 # ================================================================================
-# SMK_09A_cont - When stopped smoking daily - former daily (continuous) - DOCUMENTATION ONLY
-# ================================================================================
-
-#' @title When Stopped Smoking Daily - Former Daily Smoker - SMK_09A_cont (continuous, PUMF only)
-#' @description DOCUMENTATION ONLY - canonical implementation is in smoking-cessation.R.
-#'
-#' Continuous years since stopped daily smoking for former daily smokers (PUMF only).
-#' Midpoint-imputed from SMK_09A_2001 (2001) and SMK_09A_2003plus (2003+).
-#' Used as a building block for time_quit_smoking_daily.
-#'
-#' @param SMK_09A_2003plus Numeric vector. Categorical time stopped smoking daily, 2003+ (1-4)
-#' @param SMK_09C Numeric vector. Continuous years for category 4 (3+ years), Master 2001-2021
-#' @param output_format Character. Output format ("tagged_na" or "original")
-#'
-#' @return Vector of continuous years values
-#'
-#' @examples
-#' \dontrun{
-#' harmonized_data <- rec_with_table(cchs_data, "SMK_09A_cont")
-#' }
-#'
-#' @export
-calculate_SMK_09A_cont_stub <- function(SMK_09A_2003plus, SMK_09C = NULL, output_format = "tagged_na") {
-  stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMK_09A_cont') for passthrough, ",
-       "or calculate_SMK_09A_cont() from smoking-cessation.R for DV function use")
-}
-
-# ================================================================================
 
 # TIME_QUIT_SMOKING_COMPLETE - Combined cessation timeframe (complete quit) - DOCUMENTATION ONLY
 # ================================================================================
@@ -176,11 +148,15 @@ calculate_SMK_09A_cont_stub <- function(SMK_09A_2003plus, SMK_09C = NULL, output
 #' @title Years Since Stopped Smoking Completely - TIME_QUIT_SMOKING_COMPLETE (continuous)
 #' @description DOCUMENTATION ONLY - canonical implementation is in smoking-cessation.R.
 #'
-#' Combines cessation timing for all former smokers (daily + occasional).
-#' Uses StatCan DV SMKDVSTP on Master 2003–2022; midpoint imputation for PUMF and 2023.
+#' Pathway-aware years since completely quit smoking. Uses SMKDVSTP (Master)
+#' when available, then routes by quit pathway on PUMF.
 #'
-#' @param SMK_09A_cont Numeric vector. Years since stopped daily smoking (PUMF)
-#' @param SMK_06A_cont Numeric vector. Years since stopped smoking, occasional smokers (PUMF)
+#' @param SMKDSTY_cat5 Numeric vector. 5-category smoking status
+#' @param SMK_10_gate Numeric vector. Quit timing gate (1 or 2)
+#' @param SMK_06A_cont Numeric vector. Years since quit (former occasional)
+#' @param SMK_09A_cont Numeric vector. Years since stopped daily
+#' @param SMK_10A_cont Numeric vector. Years since quit completely (gradual)
+#' @param SMKDVSTP Numeric vector. Master continuous years since quit completely
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
 #' @return Vector of continuous years since cessation
@@ -191,7 +167,9 @@ calculate_SMK_09A_cont_stub <- function(SMK_09A_2003plus, SMK_09C = NULL, output
 #' }
 #'
 #' @export
-calculate_time_quit_smoking_complete_stub <- function(SMK_09A_cont, SMK_06A_cont,
+calculate_time_quit_smoking_complete_stub <- function(SMKDSTY_cat5, SMK_10_gate,
+                                                       SMK_06A_cont, SMK_09A_cont,
+                                                       SMK_10A_cont, SMKDVSTP,
                                                        output_format = "tagged_na") {
   stop("DOCUMENTATION ONLY: Use calculate_time_quit_smoking_complete() from smoking-cessation.R")
 }
@@ -204,12 +182,12 @@ calculate_time_quit_smoking_complete_stub <- function(SMK_09A_cont, SMK_06A_cont
 #' @title Years Since Stopped Smoking Daily - TIME_QUIT_SMOKING_DAILY (continuous)
 #' @description DOCUMENTATION ONLY - canonical implementation is in smoking-cessation.R.
 #'
-#' Years since former daily smokers stopped smoking daily.
-#' Uses exact-year variables on Master (SMK_09C 2001-2014, SMK_090 2015-2021,
-#' ADM_YOI-SPU_25B 2022); midpoint imputation on PUMF and 2023 Master.
+#' Years since former daily smokers stopped smoking daily. Uses SMK_09C
+#' (Master exact years) when available, falls back to SMK_09A_cont (PUMF midpoint).
 #'
+#' @param SMKDSTY_cat5 Numeric vector. 5-category smoking status
 #' @param SMK_09A_cont Numeric vector. Midpoint-imputed years (PUMF building block)
-#' @param SMK_09C Numeric vector. Exact years since stopped daily (Master 2001-2021)
+#' @param SMK_09C Numeric vector. Exact years since stopped daily (Master)
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
 #' @return Vector of continuous years since stopped daily smoking
@@ -220,7 +198,8 @@ calculate_time_quit_smoking_complete_stub <- function(SMK_09A_cont, SMK_06A_cont
 #' }
 #'
 #' @export
-calculate_time_quit_smoking_daily_stub <- function(SMK_09A_cont, SMK_09C = NULL,
+calculate_time_quit_smoking_daily_stub <- function(SMKDSTY_cat5, SMK_09A_cont,
+                                                    SMK_09C = NULL,
                                                     output_format = "tagged_na") {
   stop("DOCUMENTATION ONLY: Use calculate_time_quit_smoking_daily() from smoking-cessation.R")
 }

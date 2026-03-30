@@ -447,14 +447,15 @@ calculate_SMKDSTY_cat6 <- function(SMK_005 = NULL, SMK_030 = NULL, SMK_01A = NUL
     SMK_01A = SMK_01A   # Maps to SMK_01A (100+ cigarettes)
   )
 
-  cleaned <- clean_variables(vars = clean_vars_list, output_format = output_format)
+  cleaned <- clean_variables(vars = clean_vars_list, output_format = "tagged_na")
 
   # === STEP 2: Apply legacy SMKDSTY logic matching smoking-caitlin-maikol-original.R ===
   # Based on lines 913-922: SMKDSTY_fun function with corrected logic for missing data
   SMKDSTY_cat6_result <- dplyr::case_when(
     # Handle missing SMK_005 first (primary decision variable)
     any_missing(cleaned$SMK_005) ~
-      get_priority_missing(cleaned$SMK_005, output_format = output_format),
+      get_priority_missing(cleaned$SMK_005, cleaned$SMK_030, cleaned$SMK_01A,
+                           output_format = output_format),
 
     # Category 1: Daily smoker
     cleaned$SMK_005 == 1 ~ 1L,
@@ -614,8 +615,8 @@ calculate_smoke_simple <- function(SMKDSTY_cat5 = NULL, time_quit_smoking = NULL
     time_quit_smoking = time_quit_smoking   # Years since quitting
   )
   
-  cleaned <- clean_variables(vars = clean_vars_list, output_format = output_format)
-  
+  cleaned <- clean_variables(vars = clean_vars_list, output_format = "tagged_na")
+
   # === STEP 2: Apply legacy smoke_simple logic from smoking-legacy-v2-1-0.R:161-175 ===
   
   # Nested helper: derive current smoker status (0/1 from SMKDSTY_cat5)

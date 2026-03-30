@@ -228,18 +228,20 @@ calculate_SMKG203_cont <- function(SMK_005, SMKG040_cont, output_format = "tagge
   cleaned <- clean_variables(vars = list(
     SMK_005 = SMK_005,
     SMKG040_cont = SMKG040_cont
-  ), output_format = output_format)
+  ), output_format = "tagged_na")
   
   # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
   # Apply SMK_005 filtering logic from variable_details.csv dependency pattern
   result <- dplyr::case_when(
-    # Mssing data detection and priority processing
-    any_missing(cleaned$SMK_005, cleaned$SMKG040_cont) ~ 
-      get_priority_missing(cleaned$SMK_005, cleaned$SMKG040_cont, output_format = output_format),
-    
+    # Missing gate variable — propagate
+    any_missing(cleaned$SMK_005) ~
+      get_priority_missing(cleaned$SMK_005, output_format = output_format),
+
     # Domain logic: Filter by SMK_005 = 1 (daily smokers)
-    cleaned$SMK_005 == 1 ~ cleaned$SMKG040_cont,
-    
+    cleaned$SMK_005 == 1 & !any_missing(cleaned$SMKG040_cont) ~ cleaned$SMKG040_cont,
+    cleaned$SMK_005 == 1 & any_missing(cleaned$SMKG040_cont) ~
+      get_priority_missing(cleaned$SMKG040_cont, output_format = output_format),
+
     # Non-daily smokers get missing value (not applicable)
     .default = assign_missing("not_applicable", "SMKG203_cont", output_format)
   )
@@ -373,18 +375,20 @@ calculate_SMKG207_cont <- function(SMK_030, SMKG040_cont, output_format = "tagge
   cleaned <- clean_variables(vars = list(
     SMK_030 = SMK_030,
     SMKG040_cont = SMKG040_cont
-  ), output_format = output_format)
+  ), output_format = "tagged_na")
   
   # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
   # Apply SMK_030 filtering logic from SMK function diagrams
   result <- dplyr::case_when(
-    # Missing data detection and priority processing
-    any_missing(cleaned$SMK_030, cleaned$SMKG040_cont) ~ 
-      get_priority_missing(cleaned$SMK_030, cleaned$SMKG040_cont, output_format = output_format),
-    
+    # Missing gate variable — propagate
+    any_missing(cleaned$SMK_030) ~
+      get_priority_missing(cleaned$SMK_030, output_format = output_format),
+
     # Domain logic: Filter by SMK_030 = 1 (former daily smokers)
-    cleaned$SMK_030 == 1 ~ cleaned$SMKG040_cont,
-    
+    cleaned$SMK_030 == 1 & !any_missing(cleaned$SMKG040_cont) ~ cleaned$SMKG040_cont,
+    cleaned$SMK_030 == 1 & any_missing(cleaned$SMKG040_cont) ~
+      get_priority_missing(cleaned$SMKG040_cont, output_format = output_format),
+
     # Non-former daily smokers get missing value (not applicable)
     .default = assign_missing("not_applicable", "SMKG207_cont", output_format)
   )
@@ -475,7 +479,7 @@ calculate_SMKG040_cont <- function(SMKG203_cont, SMKG207_cont, output_format = "
   cleaned <- clean_variables(vars = list(
     SMKG203_cont = SMKG203_cont,
     SMKG207_cont = SMKG207_cont
-  ), output_format = output_format)
+  ), output_format = "tagged_na")
   
   # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
   # Combine daily and former daily smoker ages using priority hierarchy

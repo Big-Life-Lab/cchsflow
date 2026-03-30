@@ -134,7 +134,7 @@ calculate_cigs_per_day <- function(SMKDSTY_A,
       SMK_204 = SMK_204,
       SMK_208 = SMK_208
     ),
-    output_format = output_format
+    output_format = "tagged_na"
   )
 
   # === STEP 2: DOMAIN LOGIC - Route based on smoking status ===
