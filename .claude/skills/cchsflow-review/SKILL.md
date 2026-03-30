@@ -11,9 +11,14 @@ CEP-driven review for cchsflow worksheet changes. Reviews follow the L0-L6 harmo
 ## Usage
 
 ```
-/cchsflow-review <PR-number>
-/cchsflow-review              # review unstaged changes
+/cchsflow-review <PR-number>              # PR review mode
+/cchsflow-review                          # self-review (unstaged changes)
+/cchsflow-review --dev <variable-list>    # development/authoring mode
 ```
+
+**Review mode** (default): Validates existing worksheet entries. Checks 1-8 focus on correctness of what's present. Check 8 (completeness) runs but flags omissions as informational rather than blocking.
+
+**Development mode** (`--dev`): Runs all review checks plus full completeness audit with MCP verification. Omissions are flagged as P1. Useful when authoring new variables or expanding existing ones to additional cycles. The completeness audit actively searches for missing cycle coverage, missing variable family members (`_cont` bridges, categorical companions), and missing-code row gaps.
 
 ## Workflow
 

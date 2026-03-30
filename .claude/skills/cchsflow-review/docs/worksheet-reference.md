@@ -30,6 +30,31 @@ Statistics Canada releases CCHS data in several file types:
 
 **Key difference for harmonisation:** PUMF files often group continuous variables into categories (e.g., exact age → age groups) and may suppress rare values. Master files retain exact values. This means the same conceptual variable may need different recode rules for PUMF and Master — which is why cchsflow worksheets use separate blocks for `_p` and `_m` databases.
 
+#### The PUMF-Master variable family pattern
+
+**Key rule: If a continuous measure exists on Master, always expect only a categorical (grouped) version on PUMF.** This is not occasional — it is systematic across CCHS. Every continuous demographic, health behaviour, and health outcome variable on PUMF is grouped into categories for privacy protection.
+
+A single health concept (e.g., "respondent age") therefore typically requires a **family** of harmonized variables in cchsflow:
+
+| Variable | Type | File type | Worksheet pattern |
+|----------|------|-----------|-------------------|
+| `DHH_AGE` | Continuous passthrough | Master only | `[12,102]→copy` |
+| `DHHGAGE_B`\* | Categorical (grouped bins) | PUMF only | `1→1, 2→2, ...16→16` |
+| `DHHGAGE_cont` | Midpoint imputation | PUMF (+ Master passthrough) | `1→13, 2→16, ...` |
+
+\* `DHHGAGE_B` is a **StatCan-assigned name** — the `_B` denotes the 2005+ category structure (16 age groups), not the cchsflow era-split convention. `DHHGAGE_A` (15 age groups, 2001-2003) is similarly a StatCan name. These are candidates for year-based renaming (e.g., `DHHGAGE_pre2005`, `DHHGAGE_2005plus`) but are out of scope unless being refactored.
+
+The `_cont` suffix convention bridges PUMF categorical data to pseudo-continuous values via midpoint imputation. For Master data, the `_cont` variable typically passes through the true continuous value unchanged. This pattern applies broadly — smoking duration, consumption frequency, BMI, income, and most other continuous measures follow it.
+
+**Common errors from not understanding this pattern:**
+
+- Adding PUMF databases to a Master-only continuous variable (e.g., putting `_p` databases on `DHH_AGE`'s copy row — PUMF has no single-year age)
+- Missing the `_cont` bridging variable when adding a new continuous measure
+- Assuming a DerivedVar feeder (e.g., `DHH_AGE` in `pack_years_der`) works on PUMF when it's Master-only — the PUMF pipeline needs to use `DHHGAGE_cont` instead
+- Creating a continuous Master variable without a corresponding PUMF categorical variable, leaving PUMF users with no access to the measure
+
+**When reviewing or authoring:** For any continuous variable, check that the worksheet has the full family: Master continuous, PUMF categorical, and `_cont` bridge. Missing any piece means incomplete coverage for that file type.
+
 ### Cycle naming
 
 | Era | Naming | Examples |
