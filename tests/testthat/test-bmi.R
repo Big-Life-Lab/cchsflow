@@ -167,3 +167,69 @@ test_that("categorize_bmi() works with vectors", {
   expect_equal(result[4], 4L)
   expect_true(is.na(result[5]))
 })
+
+# ===========================================================================
+# Master file functions — calculate_bmi_master, adjust_bmi_master, categorize_bmi_master
+# ===========================================================================
+
+test_that("calculate_bmi_master() computes BMI for valid inputs", {
+  result <- calculate_bmi_master(HWTDHTM = 1.75, HWTDWTK = 70)
+  expect_equal(result, 70 / (1.75^2), tolerance = 1e-6)
+})
+
+test_that("calculate_bmi_master() handles missing inputs", {
+  result_na <- calculate_bmi_master(HWTDHTM = NA, HWTDWTK = 70)
+  expect_true(is.na(result_na))
+
+  result_tagged <- calculate_bmi_master(HWTDHTM = tagged_na("a"), HWTDWTK = 70)
+  expect_true(is.na(result_tagged))
+})
+
+test_that("calculate_bmi_master() handles CCHS decimal missing codes", {
+  result <- calculate_bmi_master(HWTDHTM = 9.996, HWTDWTK = 70)
+  expect_true(is.na(result))
+})
+
+test_that("adjust_bmi_master() applies sex-specific corrections", {
+  raw_bmi <- 70 / (1.75^2)
+  male_expected <- -1.07575 + 1.07592 * raw_bmi
+  result_m <- adjust_bmi_master(DHH_SEX = 1, HWTDHTM = 1.75, HWTDWTK = 70)
+  expect_equal(result_m, male_expected, tolerance = 1e-4)
+
+  raw_bmi_f <- 60 / (1.65^2)
+  female_expected <- -0.12374 + 1.05129 * raw_bmi_f
+  result_f <- adjust_bmi_master(DHH_SEX = 2, HWTDHTM = 1.65, HWTDWTK = 60)
+  expect_equal(result_f, female_expected, tolerance = 1e-4)
+})
+
+test_that("adjust_bmi_master() handles missing sex", {
+  result <- adjust_bmi_master(DHH_SEX = 9, HWTDHTM = 1.75, HWTDWTK = 70)
+  expect_true(is.na(result))
+})
+
+test_that("categorize_bmi_master() maps WHO categories correctly", {
+  expect_equal(categorize_bmi_master(HWTDBMI_der = 16.0), 1L)
+  expect_equal(categorize_bmi_master(HWTDBMI_der = 22.0), 2L)
+  expect_equal(categorize_bmi_master(HWTDBMI_der = 27.0), 3L)
+  expect_equal(categorize_bmi_master(HWTDBMI_der = 35.0), 4L)
+})
+
+test_that("categorize_bmi_master() handles boundary values", {
+  expect_equal(categorize_bmi_master(HWTDBMI_der = 18.5), 2L)
+  expect_equal(categorize_bmi_master(HWTDBMI_der = 25.0), 3L)
+  expect_equal(categorize_bmi_master(HWTDBMI_der = 30.0), 4L)
+})
+
+test_that("categorize_bmi_master() handles missing inputs", {
+  expect_true(is.na(categorize_bmi_master(HWTDBMI_der = NA)))
+  expect_true(is.na(categorize_bmi_master(HWTDBMI_der = tagged_na("b"))))
+})
+
+test_that("Master functions work with vectors", {
+  heights <- c(1.75, 1.65, NA)
+  weights <- c(70, 60, 50)
+  result <- calculate_bmi_master(HWTDHTM = heights, HWTDWTK = weights)
+  expect_false(is.na(result[1]))
+  expect_false(is.na(result[2]))
+  expect_true(is.na(result[3]))
+})
