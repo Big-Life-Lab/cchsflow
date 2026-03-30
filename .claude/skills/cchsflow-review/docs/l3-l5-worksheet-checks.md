@@ -77,7 +77,7 @@ For `_p` (PUMF) databases:
 
 Verify that `_m` databases don't reference PUMF-only grouped variables, and vice versa.
 
-For variables where PUMF and Master use fundamentally different source types (categorical vs continuous), the required pattern is to split into separate recode blocks — one for PUMF, one for Master — each with its own `databaseStart` and `variableStart`.
+For variables where PUMF and Master use fundamentally different source types (categorical vs continuous), see "The PUMF-Master variable family pattern" in `docs/worksheet-reference.md`. Continuous measures on Master are systematically grouped on PUMF, requiring separate worksheet rows. The required pattern is to split into separate recode blocks — one for PUMF, one for Master — each with its own `databaseStart` and `variableStart`.
 
 For harmonized variable **naming** decisions (when to use `_cont`, `_catN`, era suffixes, etc.), see `docs/variable-naming-conventions.md`.
 
@@ -236,3 +236,52 @@ If the PR includes or modifies test files in `tests/testthat/`:
 - Verify cross-cycle consistency
 
 If the PR lacks tests for new derived variables, flag this.
+
+## Check 8: Completeness audit (omissions)
+
+Checks 1-7 validate what's present. This check detects what's absent — missing rows, missing cycles, and missing variable family members. In **review mode**, flag omissions as informational. In **development mode** (`--dev`), flag as P1.
+
+Use MCP `get_variable_history` and `get_value_codes` as the authoritative reference for what should exist.
+
+### 8a: Missing-code row completeness
+
+Every variable that recodes source values must handle missing codes. The standard CCHS missing code pattern is:
+
+| recStart | recEnd | Meaning |
+|----------|--------|---------|
+| `96` (or `996`, `9996`) | `NA::a` | Not applicable |
+| `[97,99]` (or `[997,999]`) | `NA::b` | Don't know / Refusal / Not stated |
+| `else` | `NA::b` | Catch-all for unmapped values |
+
+For each in-scope variable:
+
+1. Check that `NA::a` and `NA::b` rows exist
+2. Verify the missing code values match the source variable's scale (2-digit variables use 96/97-99; 3-digit use 996/997-999; 4-digit use 9996/9997-9999)
+3. Check that an `else→NA::b` catch-all exists
+4. Use `mcp__cchs-metadata__get_value_codes` to confirm the actual not-applicable code for the source variable — some variables use non-standard codes
+
+**Flag:** Missing `NA::a` row → P1 (data that should be NA will fall through to `else→NA::b` — functionally correct but loses the a/b distinction). Missing `else` row → P0 (unmapped values will cause runtime errors or silent data loss).
+
+### 8b: Cycle coverage completeness
+
+For each in-scope variable:
+
+1. Run `mcp__cchs-metadata__get_variable_history` for the source variable
+2. Compare the cycles where the source exists against the worksheet's `databaseStart`
+3. Flag cycles where the source variable exists but the worksheet has no coverage
+
+This catches the pattern where a contributor added a variable for 2007-2014 but didn't realise it also exists on 2001-2005 (with cycle-letter prefix) or 2015+ (with renamed form).
+
+**Flag:** Missing cycle coverage → informational in review mode, P1 in development mode.
+
+### 8c: Variable family completeness
+
+When a continuous measure is added for Master, verify the PUMF side exists (see "The PUMF-Master variable family pattern" in `docs/worksheet-reference.md`):
+
+1. Does a categorical version exist for PUMF? (e.g., `SMKG09C` for `SMK_09C`)
+2. Does a `_cont` midpoint bridging variable exist?
+3. For derived variables: do all feeder variables have coverage on all databases listed in the DV's `databaseStart`?
+
+A continuous Master variable without a PUMF categorical companion means PUMF users have no access to that measure. A missing `_cont` bridge means no pseudo-continuous approximation for PUMF.
+
+**Flag:** Missing `_cont` bridge → P1 (PUMF users get no continuous approximation). Feeder coverage gap → P0 (DV will fail at runtime for those cycles).
