@@ -233,3 +233,52 @@ test_that("Master functions work with vectors", {
   expect_false(is.na(result[2]))
   expect_true(is.na(result[3]))
 })
+
+# ===========================================================================
+# Deprecated aliases — backwards compatibility
+# ===========================================================================
+
+test_that("bmi_fun() delegates to calculate_bmi()", {
+  expect_warning(result <- bmi_fun(1.75, 70), "deprecated")
+  expect_equal(result, calculate_bmi(HWTGHTM = 1.75, HWTGWTK = 70),
+               tolerance = 1e-6)
+})
+
+test_that("adjusted_bmi_fun() delegates to adjust_bmi()", {
+  expect_warning(result <- adjusted_bmi_fun(1, 1.75, 70), "deprecated")
+  expect_equal(result, adjust_bmi(DHH_SEX = 1, HWTGHTM = 1.75, HWTGWTK = 70),
+               tolerance = 1e-6)
+})
+
+test_that("bmi_fun_cat() delegates to categorize_bmi()", {
+  expect_warning(result <- bmi_fun_cat(25), "deprecated")
+  expect_equal(result, categorize_bmi(HWTGBMI_der = 25))
+})
+
+test_that("calculate_bmi_D() delegates to calculate_bmi_master()", {
+  expect_warning(
+    result <- calculate_bmi_D(HWTDHTM = 1.75, HWTDWTK = 70),
+    "deprecated"
+  )
+  expect_equal(result,
+    calculate_bmi_master(HWTDHTM = 1.75, HWTDWTK = 70),
+    tolerance = 1e-6)
+})
+
+test_that("adjust_bmi_D() delegates to adjust_bmi_master()", {
+  expect_warning(
+    result <- adjust_bmi_D(DHH_SEX = 1, HWTDHTM = 1.75, HWTDWTK = 70),
+    "deprecated"
+  )
+  expect_equal(result,
+    adjust_bmi_master(DHH_SEX = 1, HWTDHTM = 1.75, HWTDWTK = 70),
+    tolerance = 1e-4)
+})
+
+test_that("categorize_bmi_D() delegates to categorize_bmi_master()", {
+  expect_warning(
+    result <- categorize_bmi_D(HWTDBMI_der = 27),
+    "deprecated"
+  )
+  expect_equal(result, categorize_bmi_master(HWTDBMI_der = 27))
+})

@@ -46,6 +46,31 @@ bmi_fun_cat <- function(...) {
   categorize_bmi(...)
 }
 
+# Legacy _D suffix aliases (renamed to _master in v3)
+#' @rdname calculate_bmi_master
+#' @export
+calculate_bmi_D <- function(...) {
+  .Deprecated("calculate_bmi_master",
+    msg = "calculate_bmi_D() is deprecated. Use calculate_bmi_master() instead.")
+  calculate_bmi_master(...)
+}
+
+#' @rdname adjust_bmi_master
+#' @export
+adjust_bmi_D <- function(...) {
+  .Deprecated("adjust_bmi_master",
+    msg = "adjust_bmi_D() is deprecated. Use adjust_bmi_master() instead.")
+  adjust_bmi_master(...)
+}
+
+#' @rdname categorize_bmi_master
+#' @export
+categorize_bmi_D <- function(...) {
+  .Deprecated("categorize_bmi_master",
+    msg = "categorize_bmi_D() is deprecated. Use categorize_bmi_master() instead.")
+  categorize_bmi_master(...)
+}
+
 # ==============================================================================
 # ADL FUNCTION ALIASES
 # ==============================================================================
@@ -131,6 +156,9 @@ energy_exp_fun <- function(...) {
 #   bmi_fun(           → calculate_bmi(
 #   adjusted_bmi_fun(  → adjust_bmi(
 #   bmi_fun_cat(       → categorize_bmi(
+#   calculate_bmi_D(   → calculate_bmi_master(
+#   adjust_bmi_D(      → adjust_bmi_master(
+#   categorize_bmi_D(  → categorize_bmi_master(
 #
 # ADL Functions:
 #   adl_fun(           → assess_adl(
