@@ -70,3 +70,67 @@ calculate_bmi <- function(HWTGHTM, HWTGWTK, output_format = "tagged_na") {
   )
   output_cleaned$HWTGBMI_der
 }
+
+#' Calculate bias-corrected BMI — PUMF
+#'
+#' Applies sex-specific correction from Connor Gorber et al. (2008) to
+#' account for self-reporting bias in height and weight.
+#'
+#' @param DHH_SEX Sex (1 = male, 2 = female). CCHS single-digit missing
+#'   codes (6-9) are handled automatically.
+#' @param HWTGHTM Height in metres (CCHS PUMF grouped variable).
+#' @param HWTGWTK Weight in kilograms (CCHS PUMF grouped variable).
+#' @param output_format Output missing data format: "tagged_na" (default) or
+#'   "original".
+#'
+#' @return Numeric vector of bias-corrected BMI values.
+#'
+#' @examples
+#' adjust_bmi(DHH_SEX = 1, HWTGHTM = 1.75, HWTGWTK = 70)
+#' adjust_bmi(DHH_SEX = 2, HWTGHTM = 1.65, HWTGWTK = 60)
+#'
+#' @references
+#' Connor Gorber, S., et al. (2008). The accuracy of self-reported height
+#' and weight in a nationally representative sample of Canadian adults.
+#' *Obesity*, 16(10), 2326-2332.
+#'
+#' @seealso [calculate_bmi()] for standard BMI.
+#' @export
+adjust_bmi <- function(DHH_SEX, HWTGHTM, HWTGWTK,
+                       output_format = "tagged_na") {
+  # Step 1: Clean inputs
+  cleaned <- clean_variables(
+    vars = list(DHH_SEX = DHH_SEX, HWTGHTM = HWTGHTM, HWTGWTK = HWTGWTK),
+    output_format = "tagged_na"
+  )
+
+  # Calculate raw BMI for valid height/weight (internal, no output cleaning)
+  raw_bmi <- dplyr::case_when(
+    any_missing(cleaned$HWTGHTM, cleaned$HWTGWTK) ~
+      get_priority_missing(cleaned$HWTGHTM, cleaned$HWTGWTK,
+                           output_format = "tagged_na"),
+    cleaned$HWTGHTM <= 0 ~ haven::tagged_na("b"),
+    .default = cleaned$HWTGWTK / (cleaned$HWTGHTM^2)
+  )
+
+  # Step 2: Apply sex-specific correction
+  result <- dplyr::case_when(
+    any_missing(raw_bmi) ~
+      get_priority_missing(raw_bmi, cleaned$DHH_SEX,
+                           output_format = output_format),
+    any_missing(cleaned$DHH_SEX) ~
+      get_priority_missing(cleaned$DHH_SEX, output_format = output_format),
+    cleaned$DHH_SEX == 1 ~
+      BMI_CORRECTION_MALE$intercept + BMI_CORRECTION_MALE$slope * raw_bmi,
+    cleaned$DHH_SEX == 2 ~
+      BMI_CORRECTION_FEMALE$intercept + BMI_CORRECTION_FEMALE$slope * raw_bmi,
+    .default = assign_missing("not_stated", "HWTGCOR_der", output_format)
+  )
+
+  # Step 3: Clean output
+  output_cleaned <- clean_variables(
+    vars = list(HWTGCOR_der = result),
+    output_format = output_format
+  )
+  output_cleaned$HWTGCOR_der
+}
