@@ -129,3 +129,41 @@ test_that("adjust_bmi() works in dataframe context via mutate", {
   expect_false(is.na(result$cor_bmi[1]))
   expect_false(is.na(result$cor_bmi[2]))
 })
+
+# ===========================================================================
+# categorize_bmi() — PUMF 4-category WHO classification
+# ===========================================================================
+
+test_that("categorize_bmi() maps to correct WHO categories", {
+  expect_equal(categorize_bmi(HWTGBMI_der = 16.0), 1L)
+  expect_equal(categorize_bmi(HWTGBMI_der = 22.0), 2L)
+  expect_equal(categorize_bmi(HWTGBMI_der = 27.0), 3L)
+  expect_equal(categorize_bmi(HWTGBMI_der = 35.0), 4L)
+})
+
+test_that("categorize_bmi() handles WHO boundary values", {
+  expect_equal(categorize_bmi(HWTGBMI_der = 18.4), 1L)
+  expect_equal(categorize_bmi(HWTGBMI_der = 18.5), 2L)
+  expect_equal(categorize_bmi(HWTGBMI_der = 24.9), 2L)
+  expect_equal(categorize_bmi(HWTGBMI_der = 25.0), 3L)
+  expect_equal(categorize_bmi(HWTGBMI_der = 29.9), 3L)
+  expect_equal(categorize_bmi(HWTGBMI_der = 30.0), 4L)
+})
+
+test_that("categorize_bmi() handles missing inputs", {
+  result_na <- categorize_bmi(HWTGBMI_der = NA)
+  expect_true(is.na(result_na))
+
+  result_tagged <- categorize_bmi(HWTGBMI_der = tagged_na("b"))
+  expect_true(is.na(result_tagged))
+})
+
+test_that("categorize_bmi() works with vectors", {
+  bmi_vals <- c(16, 22, 27, 35, NA)
+  result <- categorize_bmi(HWTGBMI_der = bmi_vals)
+  expect_equal(result[1], 1L)
+  expect_equal(result[2], 2L)
+  expect_equal(result[3], 3L)
+  expect_equal(result[4], 4L)
+  expect_true(is.na(result[5]))
+})

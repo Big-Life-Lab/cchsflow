@@ -134,3 +134,46 @@ adjust_bmi <- function(DHH_SEX, HWTGHTM, HWTGWTK,
   )
   output_cleaned$HWTGCOR_der
 }
+
+#' Categorize BMI into WHO categories — PUMF
+#'
+#' Maps continuous BMI to the standard 4-category WHO classification.
+#'
+#' @param HWTGBMI_der Continuous BMI value (from [calculate_bmi()]).
+#' @param output_format Output missing data format: "tagged_na" (default) or
+#'   "original".
+#'
+#' @return Integer vector: 1 = underweight (< 18.5), 2 = normal (18.5-24.9),
+#'   3 = overweight (25.0-29.9), 4 = obese (>= 30.0).
+#'
+#' @examples
+#' categorize_bmi(HWTGBMI_der = 27.3)
+#' categorize_bmi(HWTGBMI_der = c(16, 22, 27, 35))
+#'
+#' @seealso [calculate_bmi()], [categorize_bmi_master()] for Master equivalent.
+#' @export
+categorize_bmi <- function(HWTGBMI_der, output_format = "tagged_na") {
+  # Step 1: Clean input
+  cleaned <- clean_variables(
+    vars = list(HWTGBMI_der = HWTGBMI_der),
+    output_format = "tagged_na"
+  )
+
+  # Step 2: WHO category boundaries
+  result <- dplyr::case_when(
+    any_missing(cleaned$HWTGBMI_der) ~
+      get_priority_missing(cleaned$HWTGBMI_der, output_format = output_format),
+    cleaned$HWTGBMI_der < 18.5 ~ 1L,
+    cleaned$HWTGBMI_der < 25.0 ~ 2L,
+    cleaned$HWTGBMI_der < 30.0 ~ 3L,
+    cleaned$HWTGBMI_der >= 30.0 ~ 4L,
+    .default = assign_missing("not_stated", "HWTGBMI_der_cat4", output_format)
+  )
+
+  # Step 3: Clean output
+  output_cleaned <- clean_variables(
+    vars = list(HWTGBMI_der_cat4 = result),
+    output_format = output_format
+  )
+  output_cleaned$HWTGBMI_der_cat4
+}
