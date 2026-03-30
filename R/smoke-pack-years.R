@@ -138,7 +138,9 @@ calculate_pack_years <- function(smoking_status,
   if (is.null(smoked_100_lifetime)) smoked_100_lifetime <- rep(NA_real_, n)
 
   # === STEP 1: DATA CLEANING ===
-  # List names must match variable_details.csv for pattern lookup
+  # List names must match variable_details.csv for pattern lookup.
+  # Age uses DHHGAGE_cont for PUMF and DHH_AGE for Master — both have
+  # identical missing codes (96=NA::a) so DHHGAGE_cont works for either.
   cleaned_raw <- clean_variables(vars = list(
     SMKDSTY_A = smoking_status,
     DHHGAGE_cont = age,

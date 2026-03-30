@@ -487,6 +487,26 @@ New or refactored DV functions should use tidyverse-style verb-first names. The 
 
 Legacy functions (e.g., `bmi_fun()`, `pack_years_fun()`) retain old names until refactored. Worksheets reference functions via `Func::` prefix (e.g., `Func::calculate_pct_time`).
 
+#### Era-split variable naming convention
+
+When a variable has different category structures across CCHS eras, it is split into separate harmonized variables — one per era. The naming convention uses **year-based suffixes** that describe the era boundary.
+
+**Required format:** `{VARIABLE}_{era}` where `{era}` is a descriptive year range:
+
+| Suffix | Meaning | Example |
+|--------|---------|---------|
+| `_2001` | 2001 cycle only | `SMK_06A_2001` |
+| `_pre2015` | Pre-2015 era (2001/2003-2014) | `SMK_10A_pre2015` |
+| `_2003plus` | 2003 onward | `SMK_06A_2003plus` |
+| `_2015plus` | 2015 onward | `SMK_10A_2015plus` |
+
+**Deprecated: `_A`/`_B` suffixes.** Older variables used `_A` (pre-2015) and `_B` (2015+) as era markers (e.g., `SMKDSTY_A`, `SMKDSTY_B`). This convention is deprecated because:
+1. It is ambiguous when the base variable already ends in a letter (e.g., `SMK_10A_A` — is the second "A" an era marker or part of the StatCan name?)
+2. It doesn't convey the actual era boundary (which year does the split occur?)
+3. It doesn't generalise to three-way splits (2001 / 2003-2014 / 2015+)
+
+**When reviewing or refactoring**, rename `_A`/`_B` variables to year-based names. When creating new era-split variables, always use year-based suffixes. Do not introduce new `_A`/`_B` names.
+
 #### Check 6: L4 — derived variable specification review
 
 If the in-scope variables include derived variables (functions in `R/`):

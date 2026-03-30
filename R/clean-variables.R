@@ -352,25 +352,46 @@ apply_else_logic <- function(tagged_data, original_data, complete_pattern) {
 #' @return Logical indicating if value is in range
 #' @noRd
 is_value_in_range <- function(value, range_spec) {
-  
+
   if (is.null(range_spec) || is.null(value) || is.na(value)) {
     return(FALSE)
   }
-  
+
   # Handle different range specification formats
   if (!is.null(range_spec$min) && !is.null(range_spec$max)) {
     # Continuous range: min to max
     return(value >= range_spec$min && value <= range_spec$max)
-    
+
+  } else if (!is.null(range_spec$recStart) && is.character(range_spec$recStart)) {
+    # copy_mapping format from map_recStart_to_recEnd: parse recStart notation
+    parsed <- parse_range_notation(range_spec$recStart)
+    if (!is.null(parsed) && parsed$type == "continuous") {
+      lower_ok <- if (parsed$min_inclusive) value >= parsed$min else value > parsed$min
+      upper_ok <- if (parsed$max_inclusive) value <= parsed$max else value < parsed$max
+      return(lower_ok && upper_ok)
+    }
+    if (!is.null(parsed) && parsed$type == "integer") {
+      # Integer range: use min/max as inclusive boundaries
+      return(value >= parsed$min && value <= parsed$max)
+    }
+    if (!is.null(parsed) && parsed$type == "single_value") {
+      return(value == parsed$value)
+    }
+    # Fallback: use recStart_values if available
+    if (!is.null(range_spec$recStart_values) && length(range_spec$recStart_values) > 0) {
+      return(value >= min(range_spec$recStart_values) && value <= max(range_spec$recStart_values))
+    }
+    return(FALSE)
+
   } else if (!is.null(range_spec$values)) {
     # Discrete values: specific allowed values
     return(value %in% range_spec$values)
-    
+
   } else if (!is.null(range_spec$pattern)) {
     # Pattern-based range (could be implemented for complex patterns)
     # For now, return FALSE as this would require pattern matching
     return(FALSE)
-    
+
   } else {
     # Unknown range format
     return(FALSE)
@@ -393,27 +414,33 @@ apply_else_rule <- function(value, else_mappings) {
   
   # Apply first matching else rule
   for (else_rule in else_mappings) {
-    
-    if (is.null(else_rule$action)) {
+
+    # Support both $action (expected) and $recEnd (from map_recStart_to_recEnd)
+    action <- else_rule$action
+    if (is.null(action)) {
+      action <- else_rule$recEnd
+    }
+
+    if (is.null(action)) {
       next
     }
-    
+
     # Handle different else actions
-    if (else_rule$action == "NA::a") {
+    if (action == "NA::a") {
       return(haven::tagged_na("a"))
-      
-    } else if (else_rule$action == "NA::b") {
+
+    } else if (action == "NA::b") {
       return(haven::tagged_na("b"))
-      
-    } else if (else_rule$action == "skip" || else_rule$action == "SKIP") {
+
+    } else if (action == "skip" || action == "SKIP") {
       # Keep original value unchanged
       return(NULL)
-      
-    } else if (grepl("^[0-9]+$", else_rule$action)) {
+
+    } else if (grepl("^[0-9]+$", action)) {
       # Numeric replacement value
-      replacement_value <- as.numeric(else_rule$action)
+      replacement_value <- as.numeric(action)
       return(replacement_value)
-      
+
     } else {
       # Unknown action, skip
       next
