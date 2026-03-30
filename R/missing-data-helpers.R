@@ -313,7 +313,10 @@ validate_missing_code_preprocessing <- function(original_var,
 #'
 #' @note Internal v3.0.0, last updated: 2025-07-04, status: active
 #' @keywords internal
-clean_variables <- function(continuous_vars = NULL,
+# DEPRECATED: Renamed to clean_variables_legacy(). The new clean_variables()
+# in R/clean-variables.R uses the vars/output_format API. Callers using the
+# old API (smoking.R, alcohol.R) will be updated when v3-smoking merges.
+clean_variables_legacy <- function(continuous_vars = NULL,
                             categorical_vars = NULL,
                             min_values = NULL,
                             max_values = NULL,
