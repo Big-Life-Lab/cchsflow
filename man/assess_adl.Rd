@@ -5,7 +5,25 @@
 \alias{adl_fun}
 \title{Enhanced Activities of Daily Living (ADL) help indicator}
 \usage{
-assess_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
+assess_adl(
+  ADL_01,
+  ADL_02,
+  ADL_03,
+  ADL_04,
+  ADL_05,
+  min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
+  validate_params = NULL,
+  log_level = "silent"
+)
 
 adl_fun(...)
 }
@@ -19,10 +37,16 @@ adl_fun(...)
 \item{ADL_04}{Help needed doing personal care (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
 
 \item{ADL_05}{Help needed moving inside house (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+
+\item{min_ADL_01, max_ADL_01, min_ADL_02, max_ADL_02, min_ADL_03, max_ADL_03, min_ADL_04, max_ADL_04, min_ADL_05, max_ADL_05}{Validation parameters (defaults from variable_details.csv)}
+
+\item{validate_params}{Auto-detect validation mode (default NULL for auto-detection)}
+
+\item{log_level}{Logging level: "silent" (default), "warning", "verbose"}
 }
 \value{
 **Data Type**: Numeric binary indicator
-**Missing Data Handling**: 
+**Missing Data Handling**:
 - Returns `haven::tagged_na("a")` for not applicable cases
 - Returns `haven::tagged_na("b")` for missing/invalid responses
 **Values**: 1 = needs help with ≥1 task, 2 = no help needed with any task
@@ -34,11 +58,11 @@ adl_fun(...)
 }
 \details{
 **Transformation Warnings**:
-⚠️ **CAUTION - Temporal Changes**: Original CCHS derived variable ADLF6R uses 
-different ADL components across cycles. This function uses consistent 5-item 
+⚠️ **CAUTION - Temporal Changes**: Original CCHS derived variable ADLF6R uses
+different ADL components across cycles. This function uses consistent 5-item
 subset for cross-cycle comparability.
 
-⚠️ **CAUTION - Population Restrictions**: ADL questions typically restricted 
+⚠️ **CAUTION - Population Restrictions**: ADL questions typically restricted
 to respondents with activity limitations. Not applicable responses preserved.
 
 **Calculation Details**:
@@ -52,24 +76,41 @@ to respondents with activity limitations. Not applicable responses preserved.
 v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
 }
 \examples{
-# Basic usage - needs help with one task
-assess_adl(1, 2, 2, 2, 2)  # Returns: 1
+# Standard cchsflow workflow (primary usage)
+library(cchsflow)
+result <- rec_with_table(
+  cchs2013_2014_p,
+  c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADLF6R_der")
+)
 
-# No help needed with any task
-assess_adl(2, 2, 2, 2, 2)  # Returns: 2
+# Scalar usage examples
+# assess_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
+#           (meals, appts,  house,  care,   move)
+assess_adl(1, 2, 2, 2, 2) # Returns: 1 (needs help with meals only)
+assess_adl(2, 2, 2, 2, 2) # Returns: 2 (no help needed with any task)
+assess_adl(1, 1, 1, 1, 1) # Returns: 1 (needs help with all tasks)
 
-# Vector processing with missing data
-assess_adl(c(1, 2, 6), c(2, 2, 7), c(2, 2, 2), c(2, 2, 2), c(2, 2, 2))
+# Vector processing with missing data and edge cases
+assess_adl(
+  c(1, 2, 6, 7, 8, 9), # Mixed valid/CCHS codes
+  c(2, 2, 2, 2, 2, 2),
+  c(2, 2, 2, 2, 2, 2),
+  c(2, 2, 2, 2, 2, 2),
+  c(2, 2, 2, 2, 2, 2)
+) # Returns: c(1, 2, tagged_na("a"), tagged_na("b"), tagged_na("b"), tagged_na("b"))
 
-# Integration with rec_with_table()
-\dontrun{
-result <- rec_with_table(cchs2010_p, 
-                        variables = c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der"))
-}
+# Vector with string missing values
+assess_adl(
+  c(1, 2, "Not applicable"),
+  c(2, 2, 2),
+  c(2, 2, 2),
+  c(2, 2, 2),
+  c(2, 2, 2)
+) # Returns: c(1, 2, tagged_na("a"))
 
 }
 \references{
-Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL. 
+Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
 JAMA, 185(12), 914-919.
 }
 \seealso{

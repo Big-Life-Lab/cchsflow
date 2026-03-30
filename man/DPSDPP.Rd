@@ -24,7 +24,7 @@ probability.}
 While this variable was considered to be categorical in CCHS
  documentation, the values range from 0 to 0.90 with no distinct names or
  metadata for each category. As such, this variable was specified as a
- continuous variable in cchsflow. This has no bearing on the final output 
+ continuous variable in cchsflow. This has no bearing on the final output
  of the variable as there are no recode changes. This means that a respondent
  who was coded with a probability of 0.50 will still have a probability value
  of 0.50 when the variable goes through harmonization.
@@ -34,7 +34,7 @@ While this variable was considered to be categorical in CCHS
 }
 \examples{
 library(cchsflow)
- ?DPSDPP
+?DPSDPP
 
 }
 \seealso{

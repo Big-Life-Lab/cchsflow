@@ -2,30 +2,34 @@
 % Please edit documentation in R/label-utils.R
 \name{set_data_labels}
 \alias{set_data_labels}
-\title{Set Data Labels}
+\title{Set data labels}
 \usage{
 set_data_labels(data_to_label, variable_details, variables_sheet = NULL)
 }
 \arguments{
-\item{data_to_label}{newly transformed dataset}
+\item{variable_details}{A dataframe containing the details of each variable,
+with category labels in the 'catLabel' column.}
 
-\item{variable_details}{variable_details.csv}
+\item{variables_sheet}{(Optional) A dataframe containing variable labels in
+the 'label' column.}
 
-\item{variables_sheet}{variables.csv}
+\item{data_to_lab.el}{A dataframe of CCHS data that lacks labels.}
 }
 \value{
-labeled data_to_label
+The dataframe with labelled CCHS variables.
 }
 \description{
-sets labels for passed database, Uses the names of final
-variables in variable_details/variables_sheet as well as the labels contained
+Set variable labels for a working CCHS dataframe.  The function
+extracts variables from the provided dataframe and assigns labels according
+the provided variables and variable_details dataframes.
 in the passed dataframes
 }
 \examples{
 library(cchsflow)
-library(sjlabelled)
+library(sjlabelled) # used to get labels in the example.
+
 bmi2001 <- rec_with_table(
- cchs2001_p, c(
+  cchs2001_p, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )
@@ -42,9 +46,11 @@ combined_bmi <- bind_rows(bmi2001, bmi2003)
 
 get_label(combined_bmi)
 
-labeled_combined_data <- set_data_labels(combined_bmi,
- variable_details,
- variables)
+labeled_combined_data <- set_data_labels(
+  combined_bmi,
+  variable_details,
+  variables
+)
 
 get_label(labeled_combined_data)
 }

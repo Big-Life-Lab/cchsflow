@@ -19,8 +19,8 @@ Utility function to detect if a variable contains original CCHS missing
 codes that should be preprocessed.
 }
 \examples{
-has_cchs_missing_codes(c(1, 2, 3, 6, 7))  # TRUE
-has_cchs_missing_codes(c(1, 2, 3, NA))    # FALSE
-has_cchs_missing_codes(c(1, 5, 96, 97), "categorical_age")  # TRUE
+has_cchs_missing_codes(c(1, 2, 3, 6, 7)) # TRUE
+has_cchs_missing_codes(c(1, 2, 3, NA)) # FALSE
+has_cchs_missing_codes(c(1, 5, 96, 97), "double_digit_missing") # TRUE
 
 }

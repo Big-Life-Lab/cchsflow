@@ -36,10 +36,10 @@ This derived variable is generated in CCHS cycles 2003-2014. The
  cycles.
 }
 \examples{
-# Using RACDPAL_fun() to transform RACDPAL in 2001. 
+# Using RACDPAL_fun() to transform RACDPAL in 2001.
 # RACDPAL_fun() is specified in variable_details.csv along with the
 # CCHS variables and cycles included.
- 
+
 # To transform RACDPAL, use rec_with_table() for each the 2001 cycle
 # and specify RACDPAL, along with the various ADL variables.
 

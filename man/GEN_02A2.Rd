@@ -25,7 +25,7 @@ and derived for 2003-2007}
   \item Dissatisfied
   \item Very dissatisfied
  }
- 
+
  The GEN_02A2 is a continuous variable from 0 to 10, where 0 represents very
  dissatisfied and 10 represents very satisfied.
 }
@@ -39,8 +39,8 @@ GEN_02A was asked to respondents in the 2003, 2005, and 2007-2008
  the neither satisfied nor unsatisfied category was converted to a score
  of 5; the dissatisfied category was converted to a score of 2; and the very
  dissatisfied category was converted to a score of 0.
- 
- When using earlier CCHS cycles (2003-2007), it is appropriate to use 
+
+ When using earlier CCHS cycles (2003-2007), it is appropriate to use
  GEN_02A. When using multiple CCHS cycles that include cycles from 2009-2014,
  GEN_02A2 is recommended.
 }

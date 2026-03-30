@@ -18,7 +18,7 @@ preprocess_smoking_variable(
 If NULL, uses pattern_type parameter.}
 
 \item{pattern_type}{Character. Manual pattern specification if variable_name not provided.
-One of: "standard_response", "categorical_age", "continuous_standard"}
+One of: "single_digit_missing", "double_digit_missing", "triple_digit_missing"}
 
 \item{preserve_numeric}{Logical. Preserve valid numeric responses (default TRUE)}
 }
@@ -32,20 +32,20 @@ pattern based on variable name or allows manual specification.
 }
 \details{
 **Automatic Pattern Detection:**
-- Standard response (6,7,8,9): SMK_005, SMK_030, SMK_01A, SMK_09A_B
-- Categorical age (96,97,98,99): SMKG203, SMKG207, SMKG209  
-- Continuous (996,997,998,999): SMK_204, SMK_208, SMK_05B, SMK_05C
+- Single digit missing (6,7,8,9): SMK_005, SMK_030, SMK_01A, SMK_09A_B
+- Double digit missing (96,97,98,99): SMKG203, SMKG207, SMKG209
+- Triple digit missing (996,997,998,999): SMK_204, SMK_208, SMK_05B, SMK_05C
 
 **Manual Pattern Override:**
 Use pattern_type parameter to override automatic detection.
 }
 \examples{
 # Automatic pattern detection
-preprocess_smoking_variable(c(1,2,3,6,7), variable_name = "SMK_005")
-preprocess_smoking_variable(c(1,5,8,96,97), variable_name = "SMKG203") 
-preprocess_smoking_variable(c(15,20,996,997), variable_name = "SMK_204")
+preprocess_smoking_variable(c(1, 2, 3, 6, 7), variable_name = "SMK_005")
+preprocess_smoking_variable(c(1, 5, 8, 96, 97), variable_name = "SMKG203")
+preprocess_smoking_variable(c(15, 20, 996, 997), variable_name = "SMK_204")
 
 # Manual pattern specification
-preprocess_smoking_variable(c(1,2,6,7), pattern_type = "standard_response")
+preprocess_smoking_variable(c(1, 2, 6, 7), pattern_type = "single_digit_missing")
 
 }

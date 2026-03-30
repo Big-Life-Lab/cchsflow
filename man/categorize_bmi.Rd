@@ -3,58 +3,76 @@
 \name{categorize_bmi}
 \alias{categorize_bmi}
 \alias{bmi_fun_cat}
-\title{Categorize BMI values using WHO standard categories}
+\alias{categorize_bmi_D}
+\title{Categorize BMI into WHO categories}
 \usage{
-categorize_bmi(bmi_value, categorical_labels = TRUE)
+categorize_bmi(bmi, output_format = "tagged_na")
 
 bmi_fun_cat(...)
+
+categorize_bmi_D(...)
 }
 \arguments{
-\item{bmi_value}{BMI values (from calculate_bmi or adjust_bmi). Accepts raw values or preprocessed.}
+\item{bmi}{Continuous BMI value (from [calculate_bmi()] or any source).}
 
-\item{categorical_labels}{Return factor labels instead of numeric codes (default TRUE)}
+\item{output_format}{Output missing data format: "tagged_na" (default) or
+"original".}
+
+\item{...}{Arguments passed from deprecated aliases.}
 }
 \value{
-Factor with BMI category labels or numeric codes. Missing data handled as:
-  \itemize{
-    \item Preserves \code{haven::tagged_na("a")} for not applicable cases
-    \item Returns \code{haven::tagged_na("b")} for missing/invalid BMI values
-  }
-  Categories: Underweight, Normal weight, Overweight, Obese.
+Integer vector: 1 = underweight (< 18.5), 2 = normal (18.5-24.9),
+  3 = overweight (25.0-29.9), 4 = obese (>= 30.0).
 }
 \description{
-Categorize BMI values into WHO standard obesity categories with comprehensive missing data handling.
-Uses international BMI categories: Underweight (<18.5), Normal (18.5-24.9), Overweight (25.0-29.9), 
-Obese (≥30.0) for standard population health assessment.
+Maps continuous BMI to the standard 4-category WHO classification.
+Source-agnostic — works with BMI from any source (PUMF, Master, or
+external data).
 }
 \details{
-BMI categories are not appropriate for children, pregnant women, or certain medical conditions.
-WHO standards are used consistently, but interpretation may vary across health guidelines and time periods.
+## WHO BMI classification
 
-Categorization thresholds: Underweight (BMI < 18.5), Normal weight (18.5 ≤ BMI < 25.0), 
-Overweight (25.0 ≤ BMI < 30.0), Obese (BMI ≥ 30.0). Comprehensive preprocessing is applied 
-if raw BMI values are provided.
-}
-\note{
-v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced categorization with comprehensive missing data handling
+Uses the standard WHO adult BMI classification (WHO, 2000):
+
+| Category | BMI range | Code |
+|----------|-----------|------|
+| Underweight | < 18.5 | 1 |
+| Normal weight | 18.5-24.9 | 2 |
+| Overweight | 25.0-29.9 | 3 |
+| Obese | >= 30.0 | 4 |
+
+This function accepts BMI from any source — the `bmi` parameter is
+fully semantic. The worksheet routes HWTGBMI_der (PUMF) or
+HWTDBMI_der (Master) to the same function.
 }
 \examples{
-# Standard cchsflow workflow (primary usage)
-library(cchsflow)
-result <- rec_with_table(cchs2013_2014_p, 
-                        c("HWTGHTM", "HWTGWTK", "HWTGBMI_cat_der"))
+# Scalar
+categorize_bmi(bmi = 27.3)
 
-# Basic categorization
-categorize_bmi(c(17, 22, 27, 32))
+# Vector
+categorize_bmi(bmi = c(16, 22, 27, 35))
 
-# With missing data
-categorize_bmi(c(22, haven::tagged_na("a"), 27, 997))
+# Dataframe
+library(dplyr)
+data.frame(bmi = c(16.5, 22.0, 27.3, 35.0)) \%>\%
+  mutate(bmi_cat = categorize_bmi(bmi))
 
-# Numeric codes instead of labels
-categorize_bmi(c(17, 22, 27, 32), categorical_labels = FALSE)
+# Standalone with rec_with_table
+\dontrun{
+result <- rec_with_table(
+  cchs2015_2016_p,
+  variables = variables,
+  variable_details = variable_details,
+  log = TRUE
+)
+result$HWTGBMI_der_cat4
+}
 
 }
 \references{
-World Health Organization. (2000). Obesity: preventing and managing the global epidemic. 
-WHO Technical Report Series, 894.
+World Health Organization. (2000). Obesity: preventing and managing the
+global epidemic. WHO Technical Report Series, 894.
+}
+\seealso{
+[calculate_bmi()], [adjust_bmi()]
 }

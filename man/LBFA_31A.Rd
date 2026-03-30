@@ -37,7 +37,7 @@ While occupation group is asked in many survey cycles, the 2001
 }
 \examples{
 library(cchsflow)
- ?LBFA_31A
+?LBFA_31A
 
 }
 \seealso{

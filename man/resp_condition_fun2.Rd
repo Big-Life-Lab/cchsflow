@@ -56,7 +56,7 @@ resp2005 <- suppressWarnings(rec_with_table(
 head(resp2005)
 
 resp2007_2008 <- suppressWarnings(rec_with_table(
-  cchs2007_2008_p,  c(
+  cchs2007_2008_p, c(
     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )

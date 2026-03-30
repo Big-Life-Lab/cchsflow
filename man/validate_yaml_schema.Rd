@@ -3,7 +3,7 @@
 \name{validate_yaml_schema}
 \alias{validate_yaml_schema}
 \title{============================================================================
-RECODEFLOW YAML SCHEMA VALIDATION 
+RECODEFLOW YAML SCHEMA VALIDATION
 ============================================================================
 Validate YAML Schema Files}
 \usage{
@@ -27,7 +27,7 @@ List with detailed validation results containing:
     \item{schema_version}{Schema version if detected (e.g., "1.0.0")}
     \item{message}{Human-readable validation summary message}
   }
-  This comprehensive result object enables detailed inspection of validation 
+  This comprehensive result object enables detailed inspection of validation
   outcomes and provides all necessary information for debugging schema issues.
 }
 \description{
@@ -65,7 +65,7 @@ Critical for preventing runtime errors in data harmonization workflows.
 \dontrun{
 # Validate core harmonization schema
 result <- validate_yaml_schema("inst/metadata/schemas/core/variables.yaml")
-print(result$message)  # "PASS variables.yaml - YAML syntax valid"
+print(result$message) # "PASS variables.yaml - YAML syntax valid"
 cat("Patterns tested:", result$patterns_tested, "Valid:", result$patterns_valid)
 
 # Check for validation errors

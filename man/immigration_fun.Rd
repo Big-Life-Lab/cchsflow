@@ -13,7 +13,7 @@ immigration_fun(SDCFIMM, SDCGCBG, SDCGCGT, SDCGRES)
 
 \item{SDCGCGT}{Cultural or racial origin (1-white, 2-visible minority)}
 
-\item{SDCGRES}{Length/time in Canada since immigration (1- 0-9 years, 2- 10+ 
+\item{SDCGRES}{Length/time in Canada since immigration (1- 0-9 years, 2- 10+
 years)}
 }
 \value{
@@ -29,13 +29,13 @@ Categorical variable (immigration_der) with six categories:
 }
 }
 \description{
-This function creates a categorical variable based on 
-immigrant status (SDCFIMM), country of birth (SDCGCBG), ethnicity (SDCGCGT), 
+This function creates a categorical variable based on
+immigrant status (SDCFIMM), country of birth (SDCGCBG), ethnicity (SDCGCGT),
 and time in Canada (SDCGRES).
 }
 \details{
-immigration_der uses the CCHS variables that have been transformed by 
-cchsflow. In order to generate a value for BMI across CCHS cycles, 
+immigration_der uses the CCHS variables that have been transformed by
+cchsflow. In order to generate a value for BMI across CCHS cycles,
 the following SDC variables must be transformed and harmonized.
 }
 \examples{

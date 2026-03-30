@@ -17,9 +17,9 @@ if_else2(x, a, b)
 a or b based on the evaluation of x
 }
 \description{
-**DEPRECATED**: This function is deprecated and will be removed 
+**DEPRECATED**: This function is deprecated and will be removed
  in a future version. Please use \code{dplyr::if_else()} instead.
- 
+
  Custom ifelse function that evaluates missing (NA) values. If
  the logical argument (x) compares to a value that is `NA`, it is set to
  `FALSE`

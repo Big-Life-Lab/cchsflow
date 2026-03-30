@@ -46,29 +46,29 @@ bmi_fun_cat <- function(...) {
   categorize_bmi(...)
 }
 
-# Legacy _D suffix aliases (renamed to _master in v3)
-#' @rdname calculate_bmi_master
+# Legacy _D suffix aliases — unified functions replaced separate Master variants
+#' @rdname calculate_bmi
 #' @export
 calculate_bmi_D <- function(...) {
-  .Deprecated("calculate_bmi_master",
-    msg = "calculate_bmi_D() is deprecated. Use calculate_bmi_master() instead.")
-  calculate_bmi_master(...)
+  .Deprecated("calculate_bmi",
+    msg = "calculate_bmi_D() is deprecated. Use calculate_bmi() instead.")
+  calculate_bmi(...)
 }
 
-#' @rdname adjust_bmi_master
+#' @rdname adjust_bmi
 #' @export
 adjust_bmi_D <- function(...) {
-  .Deprecated("adjust_bmi_master",
-    msg = "adjust_bmi_D() is deprecated. Use adjust_bmi_master() instead.")
-  adjust_bmi_master(...)
+  .Deprecated("adjust_bmi",
+    msg = "adjust_bmi_D() is deprecated. Use adjust_bmi() instead.")
+  adjust_bmi(...)
 }
 
-#' @rdname categorize_bmi_master
+#' @rdname categorize_bmi
 #' @export
 categorize_bmi_D <- function(...) {
-  .Deprecated("categorize_bmi_master",
-    msg = "categorize_bmi_D() is deprecated. Use categorize_bmi_master() instead.")
-  categorize_bmi_master(...)
+  .Deprecated("categorize_bmi",
+    msg = "categorize_bmi_D() is deprecated. Use categorize_bmi() instead.")
+  categorize_bmi(...)
 }
 
 # ==============================================================================
@@ -156,9 +156,9 @@ energy_exp_fun <- function(...) {
 #   bmi_fun(           → calculate_bmi(
 #   adjusted_bmi_fun(  → adjust_bmi(
 #   bmi_fun_cat(       → categorize_bmi(
-#   calculate_bmi_D(   → calculate_bmi_master(
-#   adjust_bmi_D(      → adjust_bmi_master(
-#   categorize_bmi_D(  → categorize_bmi_master(
+#   calculate_bmi_D(   → calculate_bmi(    (unified, no separate Master)
+#   adjust_bmi_D(      → adjust_bmi(       (unified, no separate Master)
+#   categorize_bmi_D(  → categorize_bmi(   (unified, no separate Master)
 #
 # ADL Functions:
 #   adl_fun(           → assess_adl(

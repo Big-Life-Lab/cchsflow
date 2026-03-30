@@ -7,7 +7,7 @@
 \usage{
 preprocess_cchs_missing_codes(
   input_var,
-  pattern_type = "standard_response",
+  pattern_type = "single_digit_missing",
   preserve_numeric = TRUE
 )
 }
@@ -16,11 +16,11 @@ preprocess_cchs_missing_codes(
 or haven::tagged_na() values}
 
 \item{pattern_type}{Character string specifying CCHS missing code pattern:
-- "standard_response": codes 6,7,8,9 (default)
-- "categorical_age": codes 96,97,98,99  
-- "continuous_standard": codes 996,997,998,999}
+- "single_digit_missing": codes 6,7,8,9 (for binary/ternary variables) [default]
+- "double_digit_missing": codes 96,97,98,99 (for multi-category scales)
+- "triple_digit_missing": codes 996,997,998,999 (for continuous variables)}
 
-\item{preserve_numeric}{Logical. If TRUE, valid numeric values are preserved 
+\item{preserve_numeric}{Logical. If TRUE, valid numeric values are preserved
 as numeric. If FALSE, all values are converted through the preprocessing.
 Default TRUE.}
 }
@@ -31,7 +31,7 @@ Vector with original CCHS codes converted to haven::tagged_na(),
 \description{
 Universal helper functions for preprocessing original CCHS missing data codes
 and converting them to standardized haven::tagged_na() format. Based on the
-comprehensive CCHS missing data specification in 
+comprehensive CCHS missing data specification in
 inst/metadata/schemas/cchs/cchs_missing_data.yaml
 }
 \details{
@@ -39,14 +39,14 @@ inst/metadata/schemas/cchs/cchs_missing_data.yaml
 
 **Standard Response Variables (SMK_005, SMK_030, SMK_01A):**
 - 6 → haven::tagged_na("a") - Not applicable
-- 7 → haven::tagged_na("b") - Don't know  
+- 7 → haven::tagged_na("b") - Don't know
 - 8 → haven::tagged_na("b") - Refusal
 - 9 → haven::tagged_na("b") - Not stated
 
 **Categorical Age Variables (SMKG203, SMKG207):**
 - 96 → haven::tagged_na("a") - Not applicable
 - 97 → haven::tagged_na("b") - Don't know
-- 98 → haven::tagged_na("b") - Refusal  
+- 98 → haven::tagged_na("b") - Refusal
 - 99 → haven::tagged_na("b") - Not stated
 
 **Continuous Variables (SMK_204, HWTDGWTK, etc.):**
@@ -57,61 +57,103 @@ inst/metadata/schemas/cchs/cchs_missing_data.yaml
 
 **Existing NA Handling:**
 - "NA(a)" → haven::tagged_na("a") - String-based NA(a)
-- "NA(b)" → haven::tagged_na("b") - String-based NA(b)  
+- "NA(b)" → haven::tagged_na("b") - String-based NA(b)
+- "Not applicable" → haven::tagged_na("a") - Domain-specific string (case-insensitive)
+- "Missing", "Don't know", "Refusal" → haven::tagged_na("b") - Domain-specific strings (case-insensitive)
 - haven::tagged_na("a") → preserved as-is
 - haven::tagged_na("b") → preserved as-is
 }
 \examples{
-# Standard response pattern (SMK_005, SMK_030, SMK_01A)
+# Single digit missing pattern (SMK_005, SMK_030, SMK_01A)
 smk_data <- c(1, 2, 3, 6, 7, 8, 9, "NA(a)", NA)
-preprocess_cchs_missing_codes(smk_data, "standard_response")
+preprocess_cchs_missing_codes(smk_data, "single_digit_missing")
 
-# Categorical age pattern (SMKG203, SMKG207)  
+# Double digit missing pattern (SMKG203, SMKG207, smoking status)
 age_data <- c(1, 5, 8, 96, 97, 98, 99, "NA(b)")
-preprocess_cchs_missing_codes(age_data, "categorical_age")
+preprocess_cchs_missing_codes(age_data, "double_digit_missing")
 
-# Continuous pattern (SMK_204, HWTDGWTK)
+# Triple digit missing pattern (SMK_204, HWTDGWTK)
 cont_data <- c(15, 25, 996, 997, 998, 999)
-preprocess_cchs_missing_codes(cont_data, "continuous_standard")
+preprocess_cchs_missing_codes(cont_data, "triple_digit_missing")
 
 }
 \seealso{
-- [preprocess_standard_response()] for SMK_005-type variables
-- [preprocess_categorical_age()] for SMKG203-type variables  
-- [preprocess_continuous_standard()] for SMK_204-type variables
 - inst/metadata/schemas/cchs/cchs_missing_data.yaml for complete specification
+- vignettes/missing_value_conventions.qmd for user guidance
+- R/validation-constants.R for CCHS_MISSING_CODES constants
 }
+\keyword{"string")`}
 \keyword{(6,7,8,9}
+\keyword{**IMPORTANT}
 \keyword{CCHS}
+\keyword{Due}
+\keyword{For}
+\keyword{LIMITATION**:}
 \keyword{NA}
 \keyword{Preprocess}
+\keyword{R's}
 \keyword{Supports}
 \keyword{Universal}
+\keyword{Use}
+\keyword{`c(1,}
 \keyword{all}
 \keyword{and}
+\keyword{avoid}
+\keyword{be}
+\keyword{character}
+\keyword{character,}
 \keyword{codes}
+\keyword{coercion}
 \keyword{converts}
 \keyword{data}
+\keyword{everything}
+\keyword{example:}
 \keyword{existing}
 \keyword{extended}
+\keyword{for}
 \keyword{format.}
 \keyword{function}
 \keyword{handles}
 \keyword{haven}
 \keyword{haven::tagged_na}
+\keyword{haven::tagged_na("a"),}
 \keyword{haven::tagged_na()}
+\keyword{if}
+\keyword{in}
+\keyword{information.}
 \keyword{internal}
+\keyword{losing}
+\keyword{lost.}
 \keyword{missing}
+\keyword{mix}
+\keyword{mixed-type}
+\keyword{mixing}
+\keyword{or}
 \keyword{original}
 \keyword{patterns}
 \keyword{preprocessing}
 \keyword{preserving}
+\keyword{processing}
+\keyword{properties}
+\keyword{same}
+\keyword{separate}
 \keyword{standardized}
 \keyword{string}
+\keyword{strings}
+\keyword{strings.}
+\keyword{system,}
+\keyword{tagged_na}
 \keyword{that}
+\keyword{the}
 \keyword{them}
 \keyword{to}
+\keyword{type}
+\keyword{values}
 \keyword{values.}
 \keyword{variable}
 \keyword{variants)}
+\keyword{vector,}
 \keyword{while}
+\keyword{will}
+\keyword{with}
+\keyword{you}

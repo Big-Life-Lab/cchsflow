@@ -44,7 +44,7 @@ This is one of 3 functions used to create a derived variable
 library(cchsflow)
 
 resp2009_2010 <- suppressWarnings(rec_with_table(
-  cchs2009_2010_p,  c(
+  cchs2009_2010_p, c(
     "DHHGAGE_cont", "CCC_091", "CCC_031",
     "resp_condition_der"
   )
@@ -62,7 +62,7 @@ resp2011_2012 <- suppressWarnings(rec_with_table(
 tail(resp2011_2012)
 
 combined_resp <-
- suppressWarnings(merge_rec_data(resp2009_2010, resp2011_2012))
+  suppressWarnings(merge_rec_data(resp2009_2010, resp2011_2012))
 
 head(combined_resp)
 tail(combined_resp)

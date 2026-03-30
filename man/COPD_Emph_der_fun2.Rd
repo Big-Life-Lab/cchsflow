@@ -22,7 +22,7 @@ a categorical variable (COPD_Emph_der) with 3 levels:
 }
 \description{
 This is one of 2 functions used to create a derived variable
- (COPD_Emph_der) that determines if a respondents has either COPD or 
+ (COPD_Emph_der) that determines if a respondents has either COPD or
  Emphysema. 2 different functions have been created to account for the fact
  that different respiratory variables are used across CCHS cycles. This
  function is for CCHS cycles (2001-2003, 2009-2014) that use COPD and
@@ -41,7 +41,7 @@ This is one of 2 functions used to create a derived variable
 library(cchsflow)
 
 COPD2001 <- suppressWarnings(rec_with_table(
-  cchs2001_p,  c(
+  cchs2001_p, c(
     "DHHGAGE_cont", "CCC_091",
     "COPD_Emph_der"
   )
@@ -51,7 +51,7 @@ head(COPD2001)
 
 COPD2014 <- suppressWarnings(rec_with_table(
   cchs2007_2008_p, c(
-    "DHHGAGE_cont", "CCC_091", 
+    "DHHGAGE_cont", "CCC_091",
     "COPD_Emph_der"
   )
 ))

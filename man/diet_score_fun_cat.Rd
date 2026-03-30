@@ -8,37 +8,37 @@ diet_score_fun_cat(diet_score)
 }
 \arguments{
 \item{diet_score}{derived variable that calculates diet score.
-See \code{\link{diet_score_fun}} for documentation on how variable 
+See \code{\link{diet_score_fun}} for documentation on how variable
 was derived.}
 }
 \value{
 value for diet score categories using diet_score_cat3 variable.
 }
 \description{
-This function creates a categorical derived diet variable 
+This function creates a categorical derived diet variable
 (diet_score_cat3) that categorizes derived diet score (diet_score).
 }
 \details{
-The diet score is based on consumption of fruit, salad, potatoes, 
-carrots, other vegetables and juice. 2 baseline points plus summation of 
-total points for diet attributes. Negative overall scores are recoded to 0, 
-resulting in a range from 0 to 10.The categories were based on the 
-Mortality Population Risk Tool (Douglas Manuel et al. 2016). 
+The diet score is based on consumption of fruit, salad, potatoes,
+carrots, other vegetables and juice. 2 baseline points plus summation of
+total points for diet attributes. Negative overall scores are recoded to 0,
+resulting in a range from 0 to 10.The categories were based on the
+Mortality Population Risk Tool (Douglas Manuel et al. 2016).
 
-diet_score_cat3 uses the derived variable diet_score. diet_score uses 
-sex, and fruit and vegetable variables that have been transformed by 
-cchsflow (see documentation on diet_score). In order to categorize diet 
-across CCHS cycles, sex, and fruit and vegetable variables must be 
+diet_score_cat3 uses the derived variable diet_score. diet_score uses
+sex, and fruit and vegetable variables that have been transformed by
+cchsflow (see documentation on diet_score). In order to categorize diet
+across CCHS cycles, sex, and fruit and vegetable variables must be
 transformed and harmonized.
 }
 \examples{
-# Using the diet_score_fun_cat function to categorize the derived diet 
+# Using the diet_score_fun_cat function to categorize the derived diet
 # variable across CCHS cycles.
 # diet_score_fun_cat() is specified in the variable_details.csv.
 
-# To create a harmonized diet_score_cat3 variable across CCHS cycles, use 
+# To create a harmonized diet_score_cat3 variable across CCHS cycles, use
 # rec_with_table() for each CCHS cycle.
-# Since diet_score is also a derived variable, you will have to specify 
+# Since diet_score is also a derived variable, you will have to specify
 # the variables that are derived from it.
 # Using merge_rec_data(), you can combine diet_score_cat3 across cycles.
 
@@ -46,7 +46,7 @@ library(cchsflow)
 
 diet_score_cat2009_2010 <- rec_with_table(
   cchs2009_2010_p, c(
-    "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
+    "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI",
     "DHH_SEX", "diet_score", "diet_score_cat3"
   )
 )
@@ -54,8 +54,8 @@ diet_score_cat2009_2010 <- rec_with_table(
 head(diet_score_cat2009_2010)
 
 diet_score_cat2011_2012 <- rec_with_table(
-  cchs2011_2012_p,c(
-    "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
+  cchs2011_2012_p, c(
+    "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI",
     "DHH_SEX", "diet_score", "diet_score_cat3"
   )
 )
@@ -63,7 +63,8 @@ diet_score_cat2011_2012 <- rec_with_table(
 tail(diet_score_cat2011_2012)
 
 combined_diet_score_cat <- suppressWarnings(merge_rec_data(
-diet_score_cat2009_2010, diet_score_cat2011_2012))
+  diet_score_cat2009_2010, diet_score_cat2011_2012
+))
 
 head(combined_diet_score_cat)
 tail(combined_diet_score_cat)

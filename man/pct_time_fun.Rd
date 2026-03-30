@@ -52,7 +52,7 @@ pct_time2009_2010 <- rec_with_table(
 head(pct_time2009_2010)
 
 pct_time2011_2012 <- rec_with_table(
-  cchs2011_2012_p,  c(
+  cchs2011_2012_p, c(
     "DHHGAGE_cont", "SDCGCBG",
     "SDCGRES", "pct_time_der"
   )

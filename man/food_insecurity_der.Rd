@@ -18,14 +18,14 @@ food insecurity in the last 12 months}
 }
 \description{
 \strong{NOTE:} this is not a function.
- 
+
  This is a derived variable that uses the different food insecurity
  variables from all CCHS cycles to generate food_insecurity_der that is
  harmonized across all cycles. food_insecurity_der is a categorical variable
  with two categories:
- 
+
  \enumerate{
-  \item no food insecurity in the last 12 months 
+  \item no food insecurity in the last 12 months
   \item food insecurity in the last 12 months
  }
 }
@@ -34,8 +34,8 @@ Food insecurity is measured differently across CCHS cycles. In 2001
  and 2003, FINF1 is used; in 2005, FSCDHFS is used; and in 2007
  to 2014, FSCDHFS2 is used. Each variable examines food insecurity in the
  household over the past 12 months, but use different base variables to
- derive food insecurity.  
- 
+ derive food insecurity.
+
  If you are using cchsflow for CCHS survey years that use consistent food
  insecurity variables, it is appropriate to use FINF1, FSCDHFS, or FSCDHFS2
  that are available on cchsflow. If you are using cchsflow for only the 2001

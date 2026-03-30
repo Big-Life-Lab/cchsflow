@@ -3,73 +3,93 @@
 \name{adjust_bmi}
 \alias{adjust_bmi}
 \alias{adjusted_bmi_fun}
-\title{Calculate bias-corrected BMI for self-reported data}
+\alias{adjust_bmi_D}
+\title{Calculate bias-corrected BMI}
 \usage{
-adjust_bmi(
-  DHH_SEX,
-  HWTGHTM,
-  HWTGWTK,
-  min_HWTGHTM = BMI_VALIDATION_BOUNDS$height$min,
-  max_HWTGHTM = BMI_VALIDATION_BOUNDS$height$max,
-  min_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$min,
-  max_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$max,
-  BMI_min = BMI_VALIDATION_BOUNDS$bmi$min,
-  BMI_max = BMI_VALIDATION_BOUNDS$bmi$max,
-  validate_params = NULL
-)
+adjust_bmi(sex, height_m, weight_kg, output_format = "tagged_na")
 
 adjusted_bmi_fun(...)
+
+adjust_bmi_D(...)
 }
 \arguments{
-\item{DHH_SEX}{CCHS variable for sex (1=male, 2=female). Accepts raw CCHS codes or preprocessed values.}
+\item{sex}{Sex (1 = male, 2 = female). CCHS missing codes (6-9) are
+handled automatically.}
 
-\item{HWTGHTM}{CCHS variable for height (in meters). Accepts raw CCHS codes or preprocessed values.}
+\item{height_m}{Height in metres.}
 
-\item{HWTGWTK}{CCHS variable for weight (in kilograms). Accepts raw CCHS codes or preprocessed values.}
+\item{weight_kg}{Weight in kilograms.}
 
-\item{min_HWTGHTM, max_HWTGHTM, min_HWTGWTK, max_HWTGWTK, BMI_min, BMI_max}{Validation parameters}
+\item{output_format}{Output missing data format: "tagged_na" (default) or
+"original".}
 
-\item{validate_params}{Auto-detect validation mode (default NULL for auto-detection)}
+\item{...}{Arguments passed from deprecated aliases.}
 }
 \value{
-Numeric vector of bias-corrected BMI values. Missing data handled as:
-  \itemize{
-    \item \code{haven::tagged_na("a")} for not applicable cases
-    \item \code{haven::tagged_na("b")} for missing sex or invalid measurements
-  }
-  Valid range typically 10-100 for corrected measurements.
+Numeric vector of bias-corrected BMI values.
 }
 \description{
-Calculate bias-corrected BMI accounting for self-reporting errors in height and weight measurements.
-Applies sex-specific correction coefficients from Connor Gorber et al. 2008 for more accurate 
-BMI estimates in population health research using self-reported data.
+Applies sex-specific correction from Connor Gorber et al. (2008) to
+account for self-reporting bias in height and weight. Source-agnostic —
+works with both PUMF and Master data via worksheet routing.
 }
 \details{
-Correction coefficients are based on Canadian data and may not be appropriate for other populations.
-Enhanced validation may produce different results than legacy adjusted BMI functions.
+## Correction formulas
 
-Calculation formulas: Males: Adjusted BMI = -1.07575 + 1.07592 × Raw BMI; 
-Females: Adjusted BMI = -0.12374 + 1.05129 × Raw BMI. Original CCHS codes (6,7,8,9) are 
-comprehensively preprocessed. Validation uses same bounds as basic BMI with post-correction validation.
-}
-\note{
-v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and sex-specific bias correction
+Connor Gorber et al. (2008) derived sex-specific linear corrections
+from measured vs self-reported anthropometrics:
+
+- Male: -1.07575 + 1.07592 * BMI
+- Female: -0.12374 + 1.05129 * BMI
+
+## PUMF vs Master
+
+This function is source-agnostic. The worksheet routes different source
+variables to the same parameters depending on database type:
+
+| Parameter | PUMF source | Master source |
+|-----------|-------------|---------------|
+| sex       | DHH_SEX     | DHH_SEX       |
+| height_m  | HWTGHTM (grouped) | HWTDHTM (continuous) |
+| weight_kg | HWTGWTK (grouped) | HWTDWTK (continuous) |
 }
 \examples{
-# Standard cchsflow workflow (primary usage)
-library(cchsflow)
-result <- rec_with_table(cchs2013_2014_p, 
-                        c("DHH_SEX", "HWTGHTM", "HWTGWTK", "HWTGBMI_adjusted_der"))
+# Scalar — male
+adjust_bmi(sex = 1, height_m = 1.75, weight_kg = 70)
 
-# Basic usage
-adjust_bmi(1, 1.75, 70)  # Male
-adjust_bmi(2, 1.65, 60)  # Female
+# Scalar — female
+adjust_bmi(sex = 2, height_m = 1.65, weight_kg = 60)
 
-# Vector processing with missing data
-adjust_bmi(c(1, 2, 6), c(1.75, 1.65, 1.80), c(70, 60, 7))
+# Vector
+adjust_bmi(
+  sex = c(1, 2, 1),
+  height_m = c(1.75, 1.65, 1.80),
+  weight_kg = c(70, 60, 80)
+)
+
+# Dataframe
+library(dplyr)
+data.frame(sex = c(1, 2), ht = c(1.75, 1.65), wt = c(70, 60)) \%>\%
+  mutate(adj_bmi = adjust_bmi(sex, ht, wt))
+
+# Standalone with rec_with_table
+\dontrun{
+result <- rec_with_table(
+  cchs2015_2016_p,
+  variables = variables,
+  variable_details = variable_details,
+  log = TRUE
+)
+result$HWTGCOR_der
+}
 
 }
 \references{
-Connor Gorber, S., et al. (2008). The accuracy of self-reported height and weight 
-in a nationally representative sample of Canadian adults. Obesity, 16(10), 2326-2332.
+Connor Gorber, S., et al. (2008). The accuracy of self-reported height
+and weight in a nationally representative sample of Canadian adults.
+*Obesity*, 16(10), 2326-2332.
+}
+\seealso{
+[calculate_bmi()] for standard BMI, [categorize_bmi()] for
+  WHO categories.
 }

@@ -11,35 +11,35 @@ pct_time_fun_cat(pct_time_der)
 See \code{\link{pct_time_fun}} for documentation on how variable was derived.}
 }
 \value{
-value for categorical percent time in Canada  using pct_time_der 
+value for categorical percent time in Canada  using pct_time_der
 variable.
 }
 \description{
-This function creates a categorical derived variable 
-(pct_time_der_cat10) that categorizes the derived percent time in Canada 
+This function creates a categorical derived variable
+(pct_time_der_cat10) that categorizes the derived percent time in Canada
 variable (pct_time_der).
 }
 \details{
-The percent time in Canada provides an estimated percentage of the 
-time a person's life was spent in Canada.The categorical percent time in 
+The percent time in Canada provides an estimated percentage of the
+time a person's life was spent in Canada.The categorical percent time in
 Canada divides the continuous value into 10 percent intervals.
- 
-pct_time_der_cat10 uses the derived variable pct_time_der. pct_time_der uses 
-various variables that have been transformed by cchsflow (see documentation 
-on pct_time_der). In order to categorize percent time in Canada across CCHS 
+
+pct_time_der_cat10 uses the derived variable pct_time_der. pct_time_der uses
+various variables that have been transformed by cchsflow (see documentation
+on pct_time_der). In order to categorize percent time in Canada across CCHS
 cycles, the variables must be transformed and harmonized.
 }
 \examples{
-# Using pct_time_fun_cat() to create categorical percent time values 
+# Using pct_time_fun_cat() to create categorical percent time values
 # between CCHS cycles.
 # pct_time_fun_cat() is specified in variable_details.csv along with the CCHS
 # variables and cycles included.
 
-# To transform pct_time_der_cat10 across cycles, use rec_with_table() for 
+# To transform pct_time_der_cat10 across cycles, use rec_with_table() for
 # each CCHS cycle.
-# Since pct_time_der is a derived variable, you will have to specify the 
+# Since pct_time_der is a derived variable, you will have to specify the
 # variables that are derived from it.
-# Then by using merge_rec_data(), you can combine pct_time_der_cat10 across 
+# Then by using merge_rec_data(), you can combine pct_time_der_cat10 across
 # cycles.
 
 library(cchsflow)
@@ -52,15 +52,17 @@ pct_time_cat2009_2010 <- rec_with_table(
 head(pct_time_cat2009_2010)
 
 pct_time_cat2011_2012 <- rec_with_table(
-  cchs2011_2012_p,  c(
+  cchs2011_2012_p, c(
     "DHHGAGE_cont", "SDCGCBG",
     "SDCGRES", "pct_time_der", "pct_time_der_cat10"
   )
 )
 tail(pct_time_cat2011_2012)
 
-combined_pct_time_cat <- merge_rec_data(pct_time_cat2009_2010, 
-pct_time_cat2011_2012)
+combined_pct_time_cat <- merge_rec_data(
+  pct_time_cat2009_2010,
+  pct_time_cat2011_2012
+)
 head(combined_pct_time_cat)
 tail(combined_pct_time_cat)
 

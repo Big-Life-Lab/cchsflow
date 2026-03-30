@@ -21,21 +21,21 @@ and false everywhere else.
 }
 \examples{
 library(cchsflow)
-is_equal(1,2)
+is_equal(1, 2)
 # FALSE
 
-is_equal(1,1)
+is_equal(1, 1)
 # TRUE
 
-1==NA
+1 == NA
 # NA
 
-is_equal(1,NA)
+is_equal(1, NA)
 # FALSE
 
-NA==NA
+NA == NA
 # NA
 
-is_equal(NA,NA)
+is_equal(NA, NA)
 # TRUE
 }

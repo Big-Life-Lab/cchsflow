@@ -37,7 +37,7 @@ has been applied correctly and consistently.
 }
 \examples{
 original <- c(1, 2, 3, 6, 7, 8, 9)
-processed <- preprocess_standard_response(original)
-validate_missing_code_preprocessing(original, processed, "standard_response")
+processed <- preprocess_cchs_missing_codes(original, "single_digit_missing")
+validate_missing_code_preprocessing(original, processed, "single_digit_missing")
 
 }

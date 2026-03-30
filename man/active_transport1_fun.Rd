@@ -7,22 +7,22 @@
 active_transport1_fun(PAC_4A_cont, PAC_4B_cont)
 }
 \arguments{
-\item{PAC_4A_cont}{number of hours walk work/school in week in the past 
+\item{PAC_4A_cont}{number of hours walk work/school in week in the past
 3 months.}
 
-\item{PAC_4B_cont}{number of hours bike work/school in week in the past 
+\item{PAC_4B_cont}{number of hours bike work/school in week in the past
 3 months.}
 }
 \value{
 Continuous variable for active transportation (active_transport)
 }
 \description{
-This function creates a derived variable for daily time spent 
-traveling in active ways. This includes walking and biking. This function is 
+This function creates a derived variable for daily time spent
+traveling in active ways. This includes walking and biking. This function is
 used for CCHS 2001-2005.
 }
 \examples{
-# Using active_transport1_fun() to determine daily time spent 
+# Using active_transport1_fun() to determine daily time spent
 # traveling in active ways values across CCHS 2001-2005.
 
 # active_transport1_fun() is specified in variable_details.csv along with the CCHS
@@ -50,8 +50,10 @@ active_transport2005 <- rec_with_table(
 
 tail(active_transport2005)
 
-combined_active_transport <- suppressWarnings(merge_rec_data(active_transport2001,
- active_transport2005))
+combined_active_transport <- suppressWarnings(merge_rec_data(
+  active_transport2001,
+  active_transport2005
+))
 
 head(combined_active_transport)
 tail(combined_active_transport)

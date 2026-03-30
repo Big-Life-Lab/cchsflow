@@ -21,8 +21,8 @@ subset. Please see the "CCHS datasets that overlap each other" article to see
 how the two datasets contain overlap.
 
 See \href{https://www.statcan.gc.ca/en/reference/licence}{here} for the open
-license. Source from Statistics Canada, Canadian Community Health Survey 
-PUMF, accessed May 2022. Reproduced and distributed on an "as is" basis with 
+license. Source from Statistics Canada, Canadian Community Health Survey
+PUMF, accessed May 2022. Reproduced and distributed on an "as is" basis with
 the permission of Statistics Canada.
 
 Long name: synthetic-CCHS-E-2012-AnnualComponent_F1

@@ -7,12 +7,12 @@
 validate_registry_schemas()
 }
 \value{
-Named list with validation results for registry schemas plus summary 
+Named list with validation results for registry schemas plus summary
   statistics for monitoring supporting infrastructure health
 }
 \description{
-Tests metadata registry and supporting documentation schemas that provide 
-shared specifications and database configurations (metadata_registry.yaml 
+Tests metadata registry and supporting documentation schemas that provide
+shared specifications and database configurations (metadata_registry.yaml
 and database_metadata.yaml). Validates central transformation patterns and Dublin Core metadata.
 }
 \keyword{internal}

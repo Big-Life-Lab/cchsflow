@@ -29,7 +29,7 @@ List with components:
   \item{valid}{Logical. TRUE if file passes validation for the selected mode}
 }
 \description{
-Eliminates git merge conflicts in CSV files by fixing invisible Excel 
+Eliminates git merge conflicts in CSV files by fixing invisible Excel
 corruption issues. Designed for Excel-first workflows with zero learning
 curve, plus optional enhanced validation for research collaboration.
 }
@@ -44,7 +44,7 @@ curve, plus optional enhanced validation for research collaboration.
 \section{Common Issues Fixed}{
 
 * UTF-8 BOM (invisible bytes that break scripts)
-* Windows/Mac line endings causing git conflicts  
+* Windows/Mac line endings causing git conflicts
 * Inconsistent encoding between team members
 * File formatting differences from different editors
 * Column order inconsistencies (reorders to schema-defined standard)

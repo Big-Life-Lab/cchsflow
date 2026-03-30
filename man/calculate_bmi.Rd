@@ -3,90 +3,81 @@
 \name{calculate_bmi}
 \alias{calculate_bmi}
 \alias{bmi_fun}
-\title{Calculate Body Mass Index (BMI) with comprehensive validation}
+\alias{calculate_bmi_D}
+\title{Calculate Body Mass Index (BMI)}
 \usage{
-calculate_bmi(
-  HWTGHTM,
-  HWTGWTK,
-  min_HWTGHTM = BMI_VALIDATION_BOUNDS$height$min,
-  max_HWTGHTM = BMI_VALIDATION_BOUNDS$height$max,
-  min_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$min,
-  max_HWTGWTK = BMI_VALIDATION_BOUNDS$weight$max,
-  BMI_min = BMI_VALIDATION_BOUNDS$bmi$min,
-  BMI_max = BMI_VALIDATION_BOUNDS$bmi$max,
-  validate_params = NULL
-)
+calculate_bmi(height_m, weight_kg, output_format = "tagged_na")
 
 bmi_fun(...)
+
+calculate_bmi_D(...)
 }
 \arguments{
-\item{HWTGHTM}{CCHS variable for height (in meters). Accepts raw CCHS codes or preprocessed values.}
+\item{height_m}{Height in metres.}
 
-\item{HWTGWTK}{CCHS variable for weight (in kilograms). Accepts raw CCHS codes or preprocessed values.}
+\item{weight_kg}{Weight in kilograms.}
 
-\item{min_HWTGHTM}{Minimum valid height in meters (default 0.82)}
+\item{output_format}{Output missing data format: "tagged_na" (default) or
+"original".}
 
-\item{max_HWTGHTM}{Maximum valid height in meters (default 2.50)}
-
-\item{min_HWTGWTK}{Minimum valid weight in kilograms (default 22.7)}
-
-\item{max_HWTGWTK}{Maximum valid weight in kilograms (default 209.1)}
-
-\item{BMI_min}{Minimum valid BMI (default 10)}
-
-\item{BMI_max}{Maximum valid BMI (default 100)}
-
-\item{validate_params}{Auto-detect validation mode (default NULL for auto-detection)}
+\item{...}{Arguments passed from deprecated aliases.}
 }
 \value{
-Numeric vector of BMI values. Missing data handled as:
-  \itemize{
-    \item \code{haven::tagged_na("a")} for not applicable cases (age restrictions)
-    \item \code{haven::tagged_na("b")} for missing/invalid measurements
-  }
-  Valid range typically 10-100 for realistic measurements.
+Numeric vector of BMI values (kg/m^2). Missing inputs produce
+  tagged NAs with priority: NA::b (not stated) over NA::a (not applicable).
 }
 \description{
-Calculate harmonized BMI across CCHS cycles using the standard formula BMI = weight(kg) / height(m)^2.
-Includes comprehensive validation, outlier detection, and missing data preprocessing following WHO guidelines.
+Calculates BMI from height and weight using the standard formula:
+weight (kg) / height (m)^2. Source-agnostic — works with both PUMF
+and Master data via worksheet routing.
 }
 \details{
-This function uses harmonized height/weight variables and may produce different results 
-than original CCHS derived BMI variables which had cycle-specific validation rules.
-Enhanced validation bounds are optimized for master file data and may be more restrictive 
-than PUMF versions.
+## PUMF vs Master
 
-Calculation method: BMI = weight(kg) / height(m)^2. Original CCHS codes (6,7,8,9) are 
-automatically converted to haven::tagged_na(). Validation bounds: Height [0.82-2.50m], 
-Weight [22.7-209.1kg], BMI [10-100]. Extreme values are marked as haven::tagged_na("b").
-}
-\note{
-v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and validation following development guide
+This function is source-agnostic. The worksheet routes different source
+variables to the same parameters depending on database type:
+
+| Parameter | PUMF source | Master source |
+|-----------|-------------|---------------|
+| height_m  | HWTGHTM (grouped) | HWTDHTM (continuous) |
+| weight_kg | HWTGWTK (grouped) | HWTDWTK (continuous) |
+
+PUMF values are midpoint-imputed from grouped categories; Master values
+are true continuous measurements. The BMI formula is identical — the
+precision difference comes from the input variables.
 }
 \examples{
-# Standard cchsflow workflow (primary usage)
-library(cchsflow)
-result <- rec_with_table(cchs2013_2014_p, 
-                        c("HWTGHTM", "HWTGWTK", "HWTGBMI_der"))
+# Scalar
+calculate_bmi(height_m = 1.75, weight_kg = 70)
 
-# Basic usage
-calculate_bmi(1.75, 70)
+# Vector
+calculate_bmi(
+  height_m = c(1.75, 1.60, NA),
+  weight_kg = c(70, 55, 70)
+)
 
-# Vector processing with missing data
-calculate_bmi(c(1.75, 1.80, 6), c(70, 75, 7))
+# Dataframe
+library(dplyr)
+data.frame(ht = c(1.75, 1.60), wt = c(70, 55)) \%>\%
+  mutate(bmi = calculate_bmi(ht, wt))
 
-# Research mode with custom validation
-calculate_bmi(1.75, 70, min_HWTGHTM = 1.0, max_HWTGHTM = 2.0)
+# Standalone with rec_with_table
+\dontrun{
+result <- rec_with_table(
+  cchs2015_2016_p,
+  variables = variables,
+  variable_details = variable_details,
+  log = TRUE
+)
+result$HWTGBMI_der
+}
 
 }
 \references{
-World Health Organization. (2000). Obesity: preventing and managing the global epidemic. 
-Report of a WHO consultation. World Health Organization technical report series, 894, i-xii.
-
-Connor Gorber, S., et al. (2008). The accuracy of self-reported height and weight 
-in a nationally representative sample of Canadian adults. Obesity, 16(10), 2326-2332.
+World Health Organization. (2000). Obesity: preventing and managing the
+global epidemic. WHO Technical Report Series, 894.
 }
 \seealso{
-\code{\link{adjust_bmi}} for bias-corrected BMI calculations
-\code{\link{categorize_bmi}} for BMI category classification
+[adjust_bmi()] for bias-corrected BMI, [categorize_bmi()] for
+  WHO categories.
 }

@@ -7,12 +7,12 @@
 get_schema_paths()
 }
 \value{
-List with organized schema paths (core_schemas, registry_schemas) 
+List with organized schema paths (core_schemas, registry_schemas)
   enabling dynamic file location management across the package
 }
 \description{
-Reads schema file locations from metadata_registry.yaml configuration to enable 
-flexible file organization and centralized path management. Uses registry 
+Reads schema file locations from metadata_registry.yaml configuration to enable
+flexible file organization and centralized path management. Uses registry
 full_path specifications with fallback to default locations.
 }
 \keyword{internal}

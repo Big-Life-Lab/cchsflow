@@ -22,13 +22,13 @@ DPSDSF(DPSDSF)
 The derivation of this variable is based on the work of Kessler &
  Mroczek from the University of Michigan. For more details on the items used
  and how the variable was derived click \href{https://osf.io/auqwh/}{here}.
- 
+
  This variable is present in every CCHS cycle used in cchsflow, and
  how it was derived remains consistent.
 }
 \examples{
 library(cchsflow)
- ?DPSDSF
+?DPSDSF
 
 }
 \seealso{

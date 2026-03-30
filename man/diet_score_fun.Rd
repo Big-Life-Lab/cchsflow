@@ -29,12 +29,12 @@ This function creates a derived diet variable (diet_score)
  from 0 to 10.
 
 \itemize{
-  \item 1 point per daily fruit and vegetable consumption, excluding fruit 
+  \item 1 point per daily fruit and vegetable consumption, excluding fruit
   juice (maximum 8 points).
   \item -2 points for high potato intake (>=7 (males),
    >=5 (females) times/week)
   \item -2 points for no carrot intake
-  \item -2 points per daily frequency of fruit juice consumption greater than 
+  \item -2 points per daily frequency of fruit juice consumption greater than
   once/day (maximum -10 points)
  }
 }
@@ -44,15 +44,15 @@ While diet score can be calculated for all survey respondents, in
  section in which certain provinces had opted in to be asked to respondents.
  In this survey cycle, fruit and vegetable consumption was asked to
  respondents in British Columbia, Ontario, Alberta, and Prince Edward Island.
- As such, diet score has a large number of missing respondents for this 
+ As such, diet score has a large number of missing respondents for this
  cycle.
 }
 \examples{
-# Using the diet_score_fun function to create the derived diet variable  
+# Using the diet_score_fun function to create the derived diet variable
 # across CCHS cycles.
 # diet_score_fun() is specified in the variable_details.csv.
 
-# To create a harmonized diet_score variable across CCHS cycles, use 
+# To create a harmonized diet_score variable across CCHS cycles, use
 # rec_with_table() for each CCHS cycle and specify diet_score_fun and the
 # required base variables.
 # Using merge_rec_data(), you can combine diet_score across cycles.
@@ -61,7 +61,7 @@ library(cchsflow)
 
 diet_score2009_2010 <- rec_with_table(
   cchs2009_2010_p, c(
-    "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
+    "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI",
     "DHH_SEX", "diet_score"
   )
 )
@@ -69,16 +69,18 @@ diet_score2009_2010 <- rec_with_table(
 head(diet_score2009_2010)
 
 diet_score2011_2012 <- rec_with_table(
-  cchs2011_2012_p,c(
-    "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
+  cchs2011_2012_p, c(
+    "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI",
     "DHH_SEX", "diet_score"
   )
 )
 
 tail(diet_score2011_2012)
 
-combined_diet_score <- suppressWarnings(merge_rec_data(diet_score2009_2010,
- diet_score2011_2012))
+combined_diet_score <- suppressWarnings(merge_rec_data(
+  diet_score2009_2010,
+  diet_score2011_2012
+))
 
 head(combined_diet_score)
 tail(combined_diet_score)

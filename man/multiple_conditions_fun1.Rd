@@ -14,7 +14,7 @@ multiple_conditions_fun1(
 )
 }
 \arguments{
-\item{CCC_121}{variable indicating if respondent has heart disease (1 = 
+\item{CCC_121}{variable indicating if respondent has heart disease (1 =
 respondent has heart disease, 2 = respondent does not have heart disease)}
 
 \item{CCC_131}{variable indicating if respondent has active cancer (1 =
@@ -59,36 +59,42 @@ mood disorder (CCC_280) was not asked to respondents in the 2001
  from 2003 to 2014.
 }
 \examples{
- # Using rec_with_table() to generate multiple_conditions in a CCHS
- # cycle.
- 
- # multiple_conditions_fun1() is specified in variable_details.csv along with
- # the CCHS variables and cycles included.
- 
- # To generate multiple_conditions, use rec_with_table() and specify the
- # multiple_conditions, along with the variables that are derived from it.
- # Since resp_condition_der is also a derived variable, you will have to
- # specify the variables that are derived from it. In this example, data
- # from the 2001 CCHS will be used, so DHHGAGE_cont, CCC_091, and CCC_91A,
- # and CCC_031 will be specified along with resp_condition_der.
- 
+# Using rec_with_table() to generate multiple_conditions in a CCHS
+# cycle.
+
+# multiple_conditions_fun1() is specified in variable_details.csv along with
+# the CCHS variables and cycles included.
+
+# To generate multiple_conditions, use rec_with_table() and specify the
+# multiple_conditions, along with the variables that are derived from it.
+# Since resp_condition_der is also a derived variable, you will have to
+# specify the variables that are derived from it. In this example, data
+# from the 2001 CCHS will be used, so DHHGAGE_cont, CCC_091, and CCC_91A,
+# and CCC_031 will be specified along with resp_condition_der.
+
 library(cchsflow)
- conditions_2001 <- suppressWarnings(rec_with_table(cchs2001_p,
- c("DHHGAGE_cont", "CCC_091",
- "CCC_91A", "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
- "resp_condition_der","CCC_051", "number_conditions")))
- 
- head(conditions_2001)
- 
- # Generating multiple_conditions with user inputted values
- # Let's say you are an individual that has heart disease, bowel disorder,
- # and arthritis. multiple_conditions_fun1() can be used to count the number
- # of chronic conditions you have
- 
+conditions_2001 <- suppressWarnings(rec_with_table(
+  cchs2001_p,
+  c(
+    "DHHGAGE_cont", "CCC_091",
+    "CCC_91A", "CCC_031", "CCC_121", "CCC_131", "CCC_151", "CCC_171", "CCC_280",
+    "resp_condition_der", "CCC_051", "number_conditions"
+  )
+))
+
+head(conditions_2001)
+
+# Generating multiple_conditions with user inputted values
+# Let's say you are an individual that has heart disease, bowel disorder,
+# and arthritis. multiple_conditions_fun1() can be used to count the number
+# of chronic conditions you have
+
 library(cchsflow)
- num_conditions <- multiple_conditions_fun1(CCC_121 = 1, CCC_131 = 2, 
- CCC_151 = 2, CCC_171 = 1, resp_condition_der = 3, CCC_051 = 1) 
- 
+num_conditions <- multiple_conditions_fun1(
+  CCC_121 = 1, CCC_131 = 2,
+  CCC_151 = 2, CCC_171 = 1, resp_condition_der = 3, CCC_051 = 1
+)
+
 print(num_conditions)
 
 }

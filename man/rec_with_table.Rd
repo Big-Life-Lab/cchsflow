@@ -125,7 +125,7 @@ bmi2001 <- rec_with_table(
 head(bmi2001)
 
 bmi2011_2012 <- rec_with_table(
-  data = cchs2011_2012_p,  c(
+  data = cchs2011_2012_p, c(
     "HWTGHTM",
     "HWTGWTK", "HWTGBMI_der"
   )

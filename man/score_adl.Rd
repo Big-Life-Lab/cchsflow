@@ -5,16 +5,40 @@
 \alias{adl_score_5_fun}
 \title{Enhanced ADL help score (count of tasks requiring help)}
 \usage{
-score_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
+score_adl(
+  ADL_01,
+  ADL_02,
+  ADL_03,
+  ADL_04,
+  ADL_05,
+  min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
+  validate_params = NULL,
+  log_level = "silent"
+)
 
 adl_score_5_fun(...)
 }
 \arguments{
 \item{ADL_01, ADL_02, ADL_03, ADL_04, ADL_05}{ADL variables as in assess_adl()}
+
+\item{min_ADL_01, max_ADL_01, min_ADL_02, max_ADL_02, min_ADL_03, max_ADL_03, min_ADL_04, max_ADL_04, min_ADL_05, max_ADL_05}{Validation parameters (defaults from variable_details.csv)}
+
+\item{validate_params}{Auto-detect validation mode (default NULL for auto-detection)}
+
+\item{log_level}{Logging level: "silent" (default), "warning", "verbose"}
 }
 \value{
 **Data Type**: Numeric count (0-5)
-**Missing Data Handling**: 
+**Missing Data Handling**:
 - Returns `haven::tagged_na("a")` if any input is not applicable
 - Returns `haven::tagged_na("b")` if any input is missing/invalid
 **Values**: 0-5 representing count of tasks requiring help
@@ -26,7 +50,7 @@ adl_score_5_fun(...)
 }
 \details{
 **Transformation Warnings**:
-⚠️ **CAUTION - Methodological Changes**: Count-based scoring provides more 
+⚠️ **CAUTION - Methodological Changes**: Count-based scoring provides more
 granular assessment than binary indicator but requires complete data for valid interpretation.
 
 **Calculation Details**:
@@ -39,32 +63,37 @@ granular assessment than binary indicator but requires complete data for valid i
 v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced scoring with comprehensive missing data validation
 }
 \examples{
-# Scalar usage - No help needed (score = 0)
-score_adl(2, 2, 2, 2, 2)
-
-# Scalar usage - Help needed with 2 tasks (score = 2)
-score_adl(1, 2, 1, 2, 2)
-
-# Scalar usage - Complete dependence (score = 5)
-score_adl(1, 1, 1, 1, 1)
-
-# Vector processing with missing data and outliers
-adl_01 <- c(1, 2, 2, 6, "NA(a)")  # Includes not applicable and missing
-adl_02 <- c(2, 2, 1, 2, 7)        # Includes don't know
-adl_03 <- c(2, 2, 2, 2, 2)
-adl_04 <- c(2, 2, 2, 2, 2)
-adl_05 <- c(2, 2, 2, 2, 2)
-score_adl(adl_01, adl_02, adl_03, adl_04, adl_05)
-
-# rec_with_table() integration for production use
-\dontrun{
+# Standard cchsflow workflow (primary usage)
 library(cchsflow)
 result <- rec_with_table(
-  data = cchs2015_2016_p,
-  variables = "ADL_score_5",
-  database_name = "cchs2015_2016_p"
+  cchs2013_2014_p,
+  c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADLSCORE_der")
 )
-head(result$ADL_score_5)
-}
+
+# Scalar usage examples
+# score_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
+#          (meals, appts,  house,  care,   move)
+score_adl(2, 2, 2, 2, 2) # Returns: 0 (no help needed)
+score_adl(1, 2, 1, 2, 2) # Returns: 2 (help with 2 tasks: meals and housework)
+score_adl(1, 1, 1, 1, 1) # Returns: 5 (complete dependence)
+score_adl(1, 2, 2, 2, 2) # Returns: 1 (help with 1 task: meals only)
+
+# Vector processing with missing data
+score_adl(
+  c(1, 2, 6, 7), # Mixed valid/missing codes
+  c(1, 2, 2, 2),
+  c(2, 1, 2, 2),
+  c(2, 2, 2, 2),
+  c(2, 2, 2, 2)
+) # Returns: c(2, 1, tagged_na("a"), tagged_na("b"))
+
+# Vector with mixed missing types
+score_adl(
+  c(1, 2, "Missing", haven::tagged_na("a")),
+  c(1, 2, 2, 2),
+  c(2, 2, 2, 2),
+  c(2, 2, 2, 2),
+  c(2, 2, 2, 2)
+) # Returns: c(2, 1, tagged_na("b"), tagged_na("a"))
 
 }

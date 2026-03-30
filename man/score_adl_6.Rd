@@ -5,7 +5,28 @@
 \alias{adl_score_6_fun}
 \title{Enhanced 6-item ADL help score with comprehensive validation}
 \usage{
-score_adl_6(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06)
+score_adl_6(
+  ADL_01,
+  ADL_02,
+  ADL_03,
+  ADL_04,
+  ADL_05,
+  ADL_06,
+  min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
+  min_ADL_06 = ADL_VALIDATION_BOUNDS$response$min,
+  max_ADL_06 = ADL_VALIDATION_BOUNDS$response$max,
+  validate_params = NULL,
+  log_level = "silent"
+)
 
 adl_score_6_fun(...)
 }
@@ -13,6 +34,12 @@ adl_score_6_fun(...)
 \item{ADL_01, ADL_02, ADL_03, ADL_04, ADL_05}{Core ADL variables as in other functions}
 
 \item{ADL_06}{Help needed doing finances (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+
+\item{min_ADL_01, max_ADL_01, min_ADL_02, max_ADL_02, min_ADL_03, max_ADL_03, min_ADL_04, max_ADL_04, min_ADL_05, max_ADL_05, min_ADL_06, max_ADL_06}{Validation parameters (defaults from variable_details.csv)}
+
+\item{validate_params}{Auto-detect validation mode (default NULL for auto-detection)}
+
+\item{log_level}{Logging level: "silent" (default), "warning", "verbose"}
 }
 \value{
 **Data Type**: Numeric count (0-6)
@@ -26,10 +53,10 @@ adl_score_6_fun(...)
 }
 \details{
 **Transformation Warnings**:
-⚠️ **CAUTION - Temporal Changes**: ADL_06 (finances) available only in CCHS 
+⚠️ **CAUTION - Temporal Changes**: ADL_06 (finances) available only in CCHS
 2003-2014 cycles. Use 5-item version for 2001 or 2015+ analyses.
 
-⚠️ **CAUTION - Population Restrictions**: Financial management questions may 
+⚠️ **CAUTION - Population Restrictions**: Financial management questions may
 have different age restrictions or applicability rules across cycles.
 
 **Calculation Details**:
@@ -42,30 +69,39 @@ have different age restrictions or applicability rules across cycles.
 v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced 6-item scoring for comprehensive functional assessment
 }
 \examples{
-# Scalar usage - Independent across all 6 tasks
-score_adl_6(2, 2, 2, 2, 2, 2)
-
-# Scalar usage - Help needed with 3 tasks including finances
-score_adl_6(1, 2, 1, 2, 2, 1)
-
-# Vector processing with missing data
-adl_01 <- c(1, 2, 2, "NA(a)")  # Mixed responses with not applicable
-adl_02 <- c(2, 2, 1, 7)        # Includes don't know
-adl_03 <- c(2, 2, 2, 2)
-adl_04 <- c(2, 2, 2, 2)
-adl_05 <- c(2, 2, 2, 2)
-adl_06 <- c(1, 2, 1, 8)        # Finances task with refusal
-score_adl_6(adl_01, adl_02, adl_03, adl_04, adl_05, adl_06)
-
-# rec_with_table() integration for DemPoRT analysis
-\dontrun{
+# Standard cchsflow workflow (primary usage)
 library(cchsflow)
 result <- rec_with_table(
-  data = cchs2015_2016_p,
-  variables = "ADL_score_6",
-  database_name = "cchs2015_2016_p"
+  cchs2007_2008_p,
+  c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06", "ADLSCORE6_der")
 )
-summary(result$ADL_score_6)
-}
+
+# Scalar usage examples
+# score_adl_6(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06)
+#            (meals, appts,  house,  care,   move,   finances)
+score_adl_6(2, 2, 2, 2, 2, 2) # Returns: 0 (independent with all tasks)
+score_adl_6(1, 2, 1, 2, 2, 1) # Returns: 3 (help with 3 tasks: meals, housework, finances)
+score_adl_6(1, 1, 1, 1, 1, 1) # Returns: 6 (complete dependence)
+score_adl_6(2, 2, 2, 2, 2, 1) # Returns: 1 (help only with finances)
+
+# Vector processing with missing data and edge cases
+score_adl_6(
+  c(1, 2, 6, 96), # Mixed valid/categorical age codes
+  c(1, 2, 2, 2),
+  c(2, 1, 2, 2),
+  c(2, 2, 2, 2),
+  c(2, 2, 2, 2),
+  c(2, 2, 2, 97) # "Don't know" for finances
+) # Returns: c(2, 1, tagged_na("a"), tagged_na("b"))
+
+# Vector demonstrating financial component (ADL_06)
+score_adl_6(
+  c(2, 2, 2), # No help with basic ADLs
+  c(2, 2, 2),
+  c(2, 2, 2),
+  c(2, 2, 2),
+  c(2, 2, 2),
+  c(1, "Refusal", 2) # Different financial help needs
+) # Returns: c(1, tagged_na("b"), 0)
 
 }

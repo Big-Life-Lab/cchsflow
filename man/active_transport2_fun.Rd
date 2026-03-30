@@ -23,12 +23,12 @@ active_transport2_fun(PAC_7, PAC_7A, PAC_7B_cont, PAC_8, PAC_8A, PAC_8B_cont)
 Continuous variable for active transportation (active_transport)
 }
 \description{
-This function creates a derived variable for daily time spent 
-traveling in active ways. This includes walking and biking. This function is 
+This function creates a derived variable for daily time spent
+traveling in active ways. This includes walking and biking. This function is
 used for CCHS 2007-2014.
 }
 \examples{
-# Using active_transport2_fun() to determine daily time spent 
+# Using active_transport2_fun() to determine daily time spent
 # traveling in active ways values across CCHS 2007-2014.
 
 # active_transport2_fun() is specified in variable_details.csv along with the CCHS
@@ -42,7 +42,7 @@ used for CCHS 2007-2014.
 library(cchsflow)
 active_transport2007_2008 <- rec_with_table(
   cchs2007_2008_p, c(
-    "PAC_7", "PAC_7A", "PAC_7B_cont", "PAC_8", "PAC_8A", "PAC_8B_cont", 
+    "PAC_7", "PAC_7A", "PAC_7B_cont", "PAC_8", "PAC_8A", "PAC_8B_cont",
     "active_transport"
   )
 )
@@ -51,7 +51,7 @@ head(active_transport2007_2008)
 
 active_transport2013_2014 <- rec_with_table(
   cchs2013_2014_p, c(
-    "PAC_7", "PAC_7A", "PAC_7B_cont", "PAC_8", "PAC_8A", "PAC_8B_cont", 
+    "PAC_7", "PAC_7A", "PAC_7B_cont", "PAC_8", "PAC_8A", "PAC_8B_cont",
     "active_transport"
   )
 )
@@ -59,7 +59,8 @@ active_transport2013_2014 <- rec_with_table(
 tail(active_transport2013_2014)
 
 combined_active_transport <- suppressWarnings(merge_rec_data(
- active_transport2007_2008, active_transport2013_2014))
+  active_transport2007_2008, active_transport2013_2014
+))
 
 head(combined_active_transport)
 tail(combined_active_transport)

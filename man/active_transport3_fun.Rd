@@ -7,22 +7,22 @@
 active_transport3_fun(PAYDVTTR, PAADVTRV)
 }
 \arguments{
-\item{PAYDVTTR}{number of minutes of active transportation in a week 
+\item{PAYDVTTR}{number of minutes of active transportation in a week
 for 12-17 years old.}
 
-\item{PAADVTRV}{number of minutes of active transportation in a week 
+\item{PAADVTRV}{number of minutes of active transportation in a week
 for 18+ years old.}
 }
 \value{
 Continuous variable for active transportation (active_transport)
 }
 \description{
-This function creates a derived variable for daily time spent 
-traveling in active ways. This includes walking and biking. This function is 
+This function creates a derived variable for daily time spent
+traveling in active ways. This includes walking and biking. This function is
 used for CCHS 2015-2018.
 }
 \examples{
-# Using active_transport3_fun() to determine daily time spent 
+# Using active_transport3_fun() to determine daily time spent
 # traveling in active ways values across CCHS 2015-2018.
 
 # active_transport3_fun() is specified in variable_details.csv along with the CCHS
@@ -36,7 +36,7 @@ used for CCHS 2015-2018.
 library(cchsflow)
 active_transport2015_2016 <- rec_with_table(
   cchs2015_2016_p, c(
-    "PAYDVTTR", "PAADVTRV","active_transport"
+    "PAYDVTTR", "PAADVTRV", "active_transport"
   )
 )
 
@@ -44,14 +44,15 @@ head(active_transport2015_2016)
 
 active_transport2017_2018 <- rec_with_table(
   cchs2017_2018_p, c(
-    "PAYDVTTR", "PAADVTRV","active_transport"
+    "PAYDVTTR", "PAADVTRV", "active_transport"
   )
 )
 
 tail(active_transport2017_2018)
 
 combined_active_transport <- suppressWarnings(merge_rec_data(
- active_transport2015_2016, active_transport2017_2018))
+  active_transport2015_2016, active_transport2017_2018
+))
 
 head(combined_active_transport)
 tail(combined_active_transport)

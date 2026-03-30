@@ -17,3 +17,4 @@ an appropriately coded tagged NA
 \description{
 Recodes the NA depending on the var type
 }
+\keyword{internal}

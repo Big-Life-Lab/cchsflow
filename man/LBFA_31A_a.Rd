@@ -26,17 +26,17 @@ In the 2007-2014 CCHS survey cycles, occupation group has 5
  \item Trades, Transport or Equipment Operator
  \item Unique to Primary Industry/Processing/Manufacturing
  }
- 
+
  In this variable, categories from the 2001 CCHS survey cycle were collapsed
  to harmonize with the other survey cycles. "Management, Professional
  (including accountants), Technologist, Technician or Tech Occupation" were
  combined into one category "Management, Health, Education, Art, Culture".
  "Farming, Forestry, Fishing, Mining" and "Processing, Manufacturing,
  Utilities", were combined into one category "Farming, Forestry, Fishing,
- Mining, Processing, Manufacturing, Utilities".  
- 
+ Mining, Processing, Manufacturing, Utilities".
+
  The "other" category in the 2001 CCHS survey cycle was assigned to missing
- (NA(b)). This is consistent with other studies 
+ (NA(b)). This is consistent with other studies
  (\doi{10.4103/IJCIIS.IJCIIS_43_18})
  that group the "other" category as "missing". \code{\link{LBFA_31A_b}}
  is a 6 category variable that keeps the "other" category in the 2001 survey
@@ -44,7 +44,7 @@ In the 2007-2014 CCHS survey cycles, occupation group has 5
 }
 \examples{
 library(cchsflow)
-?LBFA_31A_a  
+?LBFA_31A_a
 
 }
 \seealso{

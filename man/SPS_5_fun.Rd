@@ -7,7 +7,7 @@
 SPS_5_fun(SPS_03, SPS_04, SPS_05, SPS_07, SPS_10)
 }
 \arguments{
-\item{SPS_03}{close relationships that provide sense of emotional 
+\item{SPS_03}{close relationships that provide sense of emotional
 security and well-being}
 
 \item{SPS_04}{talk to about important decisions with someone}
@@ -19,28 +19,28 @@ security and well-being}
 \item{SPS_10}{strong emotional bond with a least one person}
 }
 \description{
-This function creates a derived variable for the five-item social 
+This function creates a derived variable for the five-item social
 provision scale (SPS_5_fun). The range is 0-20, where a higher score
 reflects a higher level of perceived social support.
 }
 \details{
-The Social Provisions Scale (SPS) is commonly used to measure 
-social support. The ten-item social provisions scale (SPS-10) has been 
-reduced to a five-item scale (SPS-5).Reducing the SPS-10 items by half 
-decreases the respondent burden on surveys. SPS-5 is a valid measure of 
-social support while maintaining adequate measurement properties 
-(Orpana et al., 2019). Validation of SDS-5 using Canadian national survey 
-data can be found  
-\href{https://www.canada.ca/en/public-health/services/reports-publications/health-promotion-chronic-disease-prevention-canada-research-policy-practice/vol-39-no-12-2019/original-quantitative-research-social-provisions-scale.html}{here}. 
+The Social Provisions Scale (SPS) is commonly used to measure
+social support. The ten-item social provisions scale (SPS-10) has been
+reduced to a five-item scale (SPS-5).Reducing the SPS-10 items by half
+decreases the respondent burden on surveys. SPS-5 is a valid measure of
+social support while maintaining adequate measurement properties
+(Orpana et al., 2019). Validation of SDS-5 using Canadian national survey
+data can be found
+\href{https://www.canada.ca/en/public-health/services/reports-publications/health-promotion-chronic-disease-prevention-canada-research-policy-practice/vol-39-no-12-2019/original-quantitative-research-social-provisions-scale.html}{here}.
 
 SPS-10 and their items were available in CCHS from 2011-2018.
 }
 \examples{
-# Using the SPS_5_fun function to create the derived SPS5_der variable  
+# Using the SPS_5_fun function to create the derived SPS5_der variable
 # across CCHS cycles.
 # SPS_5_fun() is specified in the variable_details.csv.
 
-# To create a harmonized SPS5_der variable across CCHS cycles, use 
+# To create a harmonized SPS5_der variable across CCHS cycles, use
 # rec_with_table() for each CCHS cycle and specify SPS_5_fun and the
 # required base variables.
 # Using merge_rec_data(), you can combine SPS5_der across cycles.
@@ -56,15 +56,17 @@ SPS5_2011_2012 <- rec_with_table(
 head(SPS5_2011_2012)
 
 SPS5_2017_2018 <- rec_with_table(
-  cchs2017_2018_p,c(
+  cchs2017_2018_p, c(
     "SPS_03", "SPS_04", "SPS_05", "SPS_07", "SPS_10", "SPS5_der"
   )
 )
 
 tail(SPS5_2017_2018)
 
-combined_SPS5 <- suppressWarnings(merge_rec_data(SPS5_2011_2012,
- SPS5_2017_2018))
+combined_SPS5 <- suppressWarnings(merge_rec_data(
+  SPS5_2011_2012,
+  SPS5_2017_2018
+))
 
 head(combined_SPS5)
 tail(combined_SPS5)

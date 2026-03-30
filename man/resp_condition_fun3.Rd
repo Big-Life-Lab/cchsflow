@@ -53,7 +53,7 @@ resp2001 <- suppressWarnings(rec_with_table(
 head(resp2001)
 
 resp2003 <- suppressWarnings(rec_with_table(
-  cchs2003_p,c(
+  cchs2003_p, c(
     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
     "resp_condition_der"
   )

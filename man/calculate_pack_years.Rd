@@ -2,21 +2,43 @@
 % Please edit documentation in R/smoking.R
 \name{calculate_pack_years}
 \alias{calculate_pack_years}
-\title{Pack-years calculation helper}
+\title{Calculate pack-years (simplified version)}
 \usage{
-calculate_pack_years(cigarettes_per_day, years_smoked, min_pack_years = 0.0137)
+calculate_pack_years(
+  SMKDSTY_A,
+  DHHGAGE_cont,
+  time_quit_smoking,
+  SMKG203_cont,
+  SMKG207_cont,
+  SMK_204,
+  SMK_05B,
+  SMK_208,
+  SMK_05C,
+  SMKG01C_cont,
+  SMK_01A,
+  log_level = "silent"
+)
 }
 \arguments{
-\item{cigarettes_per_day}{Number of cigarettes smoked per day}
+\item{log_level}{Logging level: "silent" (default), "warning", "verbose"}
 
-\item{years_smoked}{Number of years smoking}
+\item{smoking_status}{Smoking status (from calculate_smoking_status). Accepts raw or processed values.}
 
-\item{min_pack_years}{Minimum pack-years value (default 0.0137)}
+\item{current_age}{Current age in years. Accepts raw CCHS codes.}
+
+\item{time_quit}{Time since quit smoking (from calculate_time_quit_smoking). Optional.}
+
+\item{age_started}{Age started smoking daily. Optional.}
+
+\item{cigarettes_daily}{Number of cigarettes smoked per day. Optional.}
 }
 \value{
-Pack-years calculation with minimum threshold
+Numeric pack-years value or tagged_na for missing/invalid data
 }
 \description{
-Pack-years calculation helper
+Calculate pack-years of smoking exposure. This is a simplified version for demonstration.
+The full implementation would require multiple smoking variables for comprehensive calculation.
 }
-\keyword{internal}
+\note{
+v3.0.0, last updated: 2025-07-10, status: active - Simplified pack-years calculation
+}

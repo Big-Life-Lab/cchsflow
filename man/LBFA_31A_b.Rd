@@ -29,7 +29,7 @@ In the 2007-2014 CCHS survey cycles, occupation group has 5
  \item Unique to Primary Industry/Processing/Manufacturing
  \item Other
  }
- 
+
  In this variable, categories from the 2001 CCHS survey cycle were collapsed
  to harmonize with the other survey cycles. "Management, Professional
  (including accountants), Technologist, Technician or Tech Occupation" were
@@ -40,7 +40,7 @@ In the 2007-2014 CCHS survey cycles, occupation group has 5
 }
 \examples{
 library(cchsflow)
-?LBFA_31A_b  
+?LBFA_31A_b
 
 }
 \seealso{

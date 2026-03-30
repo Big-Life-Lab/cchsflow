@@ -7,11 +7,11 @@
 validate_core_schemas()
 }
 \value{
-Named list containing validation results for both core schemas with 
+Named list containing validation results for both core schemas with
   summary statistics and console output for immediate feedback
 }
 \description{
-Tests the two critical schemas required for data harmonization workflows 
+Tests the two critical schemas required for data harmonization workflows
 (variables.yaml and variable_details.yaml) using cross-platform regex validation.
 Validates master variable definitions and detailed transformation rules.
 }
