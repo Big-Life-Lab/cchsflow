@@ -53,8 +53,9 @@ For PR reviews, run triage first:
 
 1. **Get the diff** and identify which variables were modified in `variable_details.csv` and `variables.csv`
 2. **Check `variables.csv` diff size** — if the entire file was rewritten (line count matches total rows), flag as potential formatting/schema change vs targeted edits
-3. **Check GHA status** — have CI checks run? Are they passing?
+3. **Check GHA status** — have CI checks run? Are they passing? If GHA ran and **failed**, treat this as blocking — diagnose the failure before proceeding with worksheet review. Common GHA failures (CSV formatting, R CMD check) indicate package-level issues that should be resolved first.
 4. **Count modified variables** and group by domain
+5. **Check for R/ and tests/ changes** — if `git diff origin/<target>...HEAD --name-only` shows files under `R/` or `tests/testthat/`, the PR touches code, not just worksheets. Flag this in the triage output and note that **Step 7b (package health check)** will run. If R functions are new or substantially modified, the **cchsflow-derive** skill's done criteria (unit tests, R CMD check, roxygen, test coverage) also apply — see `.claude/skills/cchsflow-derive/SKILL.md` § "Done criteria".
 
 **Important:** `gh pr diff --stat` does not exist and `gh pr diff` does not support path filtering. Instead, check out the PR branch and use git directly:
 
@@ -99,6 +100,8 @@ Print the proposed scope and triage summary clearly to the console, then proceed
 ```
 Triage:
   Files changed: variables.csv (379+/379-), variable_details.csv (186+/186-)
+  R/ files changed: R/immigration.R (whitespace only)
+  Tests changed: tests/testthat/test-immigration.R (whitespace only)
   Variables modified: 302 total (8 in-scope, 294 out-of-scope)
   GHA checks: not run
   Full-file rewrite detected in variables.csv (likely formatting change)
@@ -108,6 +111,7 @@ Proposed review scope:
   Database types: PUMF (_p) and Master (_m)
   Cycles: 2001 through 2017-2018
   Out-of-scope: 294 other variables, column reordering
+  Package health: Step 7b will run (R/ files in diff)
 
 Proceeding with review. Interrupt to adjust scope.
 ```
