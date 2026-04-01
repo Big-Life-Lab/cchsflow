@@ -53,6 +53,25 @@ Detailed documentation is in the `docs/` subdirectory:
 | `_s` | Share file | Synthetic datasets |
 | `_i` | ICES-linked (deprecated) | Replace with `_m` |
 
+### Harmonized variable naming conventions
+
+Suffixes applied to the **harmonized** variable name in variables.csv (not source variable names):
+
+| Suffix | Meaning | Examples |
+|--------|---------|---------|
+| `_catN` | Grouped categorical with N categories | `DHHGAGE_cat5`, `DHHGAGE_cat8`, `ADL_01_cat4` |
+| `_pre{year}` | Era-specific: cycles before year | `DHHGAGE_pre2005`, `SMK_10A_pre2015` |
+| `_{year}plus` | Era-specific: cycles from year onward | `DHHGAGE_2005plus`, `SMK_10A_2015plus` |
+| `_cont` | Continuous (midpoint-imputed or pass-through) | `DHHGAGE_cont`, `SMK_10A_cont` |
+| `_der` | Derived via `Func::` function across all cycles | `DHHGAGE_der`, `ADL_der` |
+| `_{scheme}` | Project/cohort-specific categorization | `DHH_MS_DemPoRT` |
+
+**Rules:**
+- When two variables share the same base name and category count, use a scheme suffix to distinguish (e.g. `DHH_MS` vs `DHH_MS_DemPoRT`, both cat4).
+- Era suffixes take precedence over `_catN` when the variable is cycle-restricted (e.g. `DHHGAGE_pre2005` not `DHHGAGE_cat15_pre2005`).
+- `_der` is used without `_catN` even when the derived variable has a fixed number of categories.
+- `dummyVariable` follows `{variable}_cat{N}_{value}` — the `_catN` in dummyVariable is independent of whether the variable name itself carries `_catN`.
+
 ### PUMF vs Master row splitting
 
 When PUMF has grouped categorical and Master has true continuous source variables, rows must be split by database type. See [pumf-master-harmonization.md](docs/pumf-master-harmonization.md) for the full pattern.
