@@ -156,8 +156,8 @@ multiple_conditions_fun1 <-
 #' @details mood disorder (CCC_280) was not asked to respondents in the 2001
 #'  CCHS survey cycle. This mean respondents in this cycle will only be able to
 #'  have a maximum of 6 chronic conditions as opposed to 7 for respondents in
-#'  other cycles. \code{\link{multiple_conditions_fun1}} is used for CCHS cycles
-#'  from 2003 to 2014.
+#'  other cycles. \code{\link{multiple_conditions_fun1}} is used for the 2001
+#'  CCHS cycle.
 #'
 #' @return A categorical variable indicating the number of chronic conditions
 #'  a respondent has. Respondents with 5 or more conditions are grouped in the
