@@ -78,29 +78,9 @@ calculate_SMK_06A_cat4 <- function(data, output_format = "tagged_na") {
 
 # SMK_06A_cont - When stopped smoking - occasional/never daily (continuous) - DOCUMENTATION ONLY
 # ================================================================================
-
-#' @title When Stopped Smoking - Occasional/Never Daily - SMK_06A_cont (continuous)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation.
-#'
-#' Continuous years since quit for former occasional/never daily smokers.
-#' rec_with_table() converts categorical codes to midpoints via worksheet recEnd values.
-#' The canonical DV function is in smoking-cessation.R (used by combining functions).
-#'
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values
-#'
-#' @return Vector of continuous years values (numeric, plus missing value codes)
-#'
-#' @examples
-#' \dontrun{
-#' harmonized_data <- rec_with_table(cchs_data, "SMK_06A_cont")
-#' }
-#'
-#' @export
-calculate_SMK_06A_cont_stub <- function(data, output_format = "tagged_na") {
-  stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMK_06A_cont') for implementation. ",
-       "Canonical DV function is calculate_SMK_06A_cont() in smoking-cessation.R")
-}
+# REMOVED: calculate_SMK_06A_cont_stub() deleted — worksheet-first principle.
+# SMK_06A_cont uses direct recode rows (recStart → recEnd midpoints) like
+# DHHGAGE_cont. No R function needed. Use rec_with_table(data, "SMK_06A_cont").
 
 # ================================================================================
 

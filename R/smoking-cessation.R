@@ -8,13 +8,10 @@
 # FUNCTION HIERARCHY:
 #
 # Foundational (categorical → continuous conversion):
-# └── calculate_SMK_06A_cont()  → time since quit (former occasional)
-#     (SMK_10A_cont uses worksheet-only direct recode — no R function needed)
-#
-# Note: rec_with_table() is the primary mechanism for passthrough midpoint
-# conversion. These DV functions exist as alternative entry points for use
-# by combining functions below. SMK_09A_cont uses worksheet-only direct
-# recode (DHHGAGE_cont pattern) — no R function needed.
+#   All _cont variables (SMK_06A_cont, SMK_09A_cont, SMK_10A_cont) use
+#   worksheet-only direct recode (DHHGAGE_cont pattern) — no R functions.
+#   Midpoint values live in variable_details.csv recEnd, the single source
+#   of truth. See worksheet-reference.md § "Worksheet-first principle".
 #
 # Combining functions (pathway-aware):
 # ├── calculate_time_quit_smoking_complete()  → years since completely quit (SMKDVSTP priority + pathway logic)
@@ -40,121 +37,18 @@
 # Functions used: haven::tagged_na(), haven::is_tagged_na(), dplyr::case_when()
 # Internal functions: clean_variables(), any_missing(), get_priority_missing(), assign_missing()
 
-# ==============================================================================
-# FOUNDATIONAL FUNCTIONS (Categorical → Continuous Conversion)
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Foundational _cont variables — worksheet-only (no R functions)
+# ------------------------------------------------------------------------------
+# REMOVED: calculate_SMK_06A_cont(), calculate_SMK_09A_cont(), and
+# calculate_SMK_10A_cont() were deleted. All three used hard-coded midpoints
+# that duplicated (and in some cases contradicted) variable_details.csv recEnd
+# values. The worksheet handles midpoint conversion directly via recStart →
+# recEnd rows — the DHHGAGE_cont pattern. No R function is needed.
 #
-# These functions convert categorical quit timing variables to continuous years
-# using midpoint imputation. rec_with_table() handles this conversion via
-# worksheet rows (Pattern 1). These DV functions exist as alternative entry
-# points for combining functions that call them in R code (Pattern 2).
-#
-# Variable series:
-# - SMK_06: Former occasional smokers (never smoked daily)
-# - SMK_09: Worksheet-only (DHHGAGE_cont pattern) — no R function
-# - SMK_10: Worksheet-only — no R function (SMKG10C companion does not exist)
-#
-# ==============================================================================
-
-# ------------------------------------------------------------------------------
-# calculate_SMK_06A_cont - Former occasional quit timing (continuous)
-# ------------------------------------------------------------------------------
-
-#' Calculate Years Since Quit - Former Occasional Smokers (SMK_06A_cont)
-#'
-#' Converts categorical SMK_06A (when stopped smoking for former occasional/never
-#' daily smokers) to continuous years using midpoint imputation.
-#'
-#' @details
-#' **Implementation method**: 3-step architecture
-#' - **Step 1**: clean_variables() - Clean SMK_06A_2003plus and SMKG06C inputs
-#' - **Step 2**: Domain logic with midpoint conversion
-#' - **Step 3**: Output cleaning
-#'
-#' **Note**: rec_with_table() is the primary mechanism for passthrough midpoint
-#' conversion. This DV function exists as an alternative entry point for use by
-#' combining functions like calculate_time_quit_smoking().
-#'
-#' **Category mappings** (midpoint imputation):
-#' \itemize{
-#'   \item 1 = Less than 1 year ago → 0.5 years
-#'   \item 2 = 1 to less than 2 years ago → 1.5 years
-#'   \item 3 = 2 to less than 3 years ago → 2.5 years
-#'   \item 4 = 3 or more years ago → use SMKG06C if available, else 5.0 years
-#' }
-#'
-#' @param SMK_06A_2003plus Numeric vector. Categorical time since quit (1-4)
-#' @param SMKG06C Numeric vector. Continuous years for category 4 (3+ years)
-#' @param output_format Character. Output format ("tagged_na" or "original")
-#'
-#' @return Numeric vector of continuous years since quit (0-80+), with:
-#' - NA::a for never smokers or current smokers (not applicable)
-#' - NA::b for missing/refused
-#'
-#' @examples
-#' \dontrun{
-#' # Category 2 (1-2 years) → 1.5 years
-#' calculate_SMK_06A_cont(SMK_06A_2003plus = 2, SMKG06C = NA)
-#' # Returns: 1.5
-#'
-#' # Category 4 with continuous follow-up
-#' calculate_SMK_06A_cont(SMK_06A_2003plus = 4, SMKG06C = 7.5)
-#' # Returns: 7.5
-#'
-#' # Category 4 without follow-up (fallback)
-#' calculate_SMK_06A_cont(SMK_06A_2003plus = 4, SMKG06C = NA)
-#' # Returns: 5.0
-#' }
-#'
-#' @export
-calculate_SMK_06A_cont <- function(SMK_06A_2003plus, SMKG06C = NULL, output_format = "tagged_na") {
-
-  # Handle empty input vectors
-  if (length(SMK_06A_2003plus) == 0) return(numeric(0))
-
-  # Handle NULL SMKG06C
-  if (is.null(SMKG06C)) {
-    SMKG06C <- rep(NA_real_, length(SMK_06A_2003plus))
-  }
-
-  # === STEP 1: DATA CLEANING AND VALIDATION ===
-  cleaned <- clean_variables(vars = list(
-    SMK_06A_2003plus = SMK_06A_2003plus,
-    SMKG06C = SMKG06C
-  ), output_format = "tagged_na")
-
-  # === STEP 2: DOMAIN LOGIC WITH MISSING DATA FUNCTIONS ===
-  result <- dplyr::case_when(
-    # Missing data detection and priority processing
-    any_missing(cleaned$SMK_06A_2003plus) ~
-      get_priority_missing(cleaned$SMK_06A_2003plus, cleaned$SMKG06C, output_format = output_format),
-
-    # Domain logic: Convert categories to continuous years
-    cleaned$SMK_06A_2003plus == 1 ~ 0.5,    # <1 year ago → 0.5 years
-    cleaned$SMK_06A_2003plus == 2 ~ 1.5,    # 1-2 years ago → 1.5 years
-    cleaned$SMK_06A_2003plus == 3 ~ 2.5,    # 2-3 years ago → 2.5 years
-    cleaned$SMK_06A_2003plus == 4 & !any_missing(cleaned$SMKG06C) ~ cleaned$SMKG06C,  # 3+ years → use continuous
-    cleaned$SMK_06A_2003plus == 4 & any_missing(cleaned$SMKG06C) ~ 5.0,  # 3+ years fallback → 5.0 years
-
-    # Invalid categories get missing value
-    .default = assign_missing("not_applicable", "SMK_06A_cont", output_format)
-  )
-
-  # === STEP 3: OUTPUT CLEANING ===
-  output_cleaned <- clean_variables(vars = list(
-    SMK_06A_cont = result
-  ), output_format = output_format)
-
-  return(output_cleaned$SMK_06A_cont)
-}
-
-# ------------------------------------------------------------------------------
-# SMK_10A_cont - Former daily quit completely timing (continuous)
-# ------------------------------------------------------------------------------
-# REMOVED: calculate_SMK_10A_cont() was deleted because SMKG10C (the companion
-# continuous variable) does not exist. The worksheet handles midpoint conversion
-# directly: cat 1→0.5, cat 2→1.5, cat 3→2.5, cat 4→5.0.
-# Use rec_with_table(data, "SMK_10A_cont") for implementation.
+# Use rec_with_table(data, "SMK_06A_cont") (or SMK_09A_cont, SMK_10A_cont)
+# for implementation. The combining functions below take pre-computed _cont
+# values as parameters.
 
 # ==============================================================================
 # COMBINING FUNCTIONS

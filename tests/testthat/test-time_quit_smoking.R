@@ -4,10 +4,8 @@
 #
 # Tests for the smoking cessation DV function hierarchy:
 #
-# Foundational functions (categorical -> continuous midpoint conversion):
-#   calculate_SMK_06A_cont(SMK_06A_2003plus, SMKG06C) - former occasional smokers
-#   SMK_10A_cont: worksheet-only (no R function, SMKG10C does not exist)
-#   SMK_09A_cont: worksheet-only direct recode
+# Foundational _cont variables (SMK_06A_cont, SMK_09A_cont, SMK_10A_cont):
+#   All worksheet-only direct recode — no R functions (DHHGAGE_cont pattern)
 #
 # Combining functions (pathway-aware):
 #   calculate_time_quit_smoking_complete(SMKDSTY_cat5, SMK_10_gate, ...)
@@ -19,38 +17,9 @@ library(testthat)
 library(haven)
 
 # =============================================================================
-# calculate_SMK_06A_cont - Former occasional smoker midpoint conversion
+# SMK_06A_cont — worksheet-only (no R function, DHHGAGE_cont pattern)
+# Midpoint values are in variable_details.csv recEnd. Tested via rec_with_table().
 # =============================================================================
-
-test_that("calculate_SMK_06A_cont maps categories 1-3 to midpoints", {
-
-  expect_equal(
-    calculate_SMK_06A_cont(SMK_06A_2003plus = 1, SMKG06C = NA),
-    0.5
-  )
-  expect_equal(
-    calculate_SMK_06A_cont(SMK_06A_2003plus = 2, SMKG06C = NA),
-    1.5
-  )
-  expect_equal(
-    calculate_SMK_06A_cont(SMK_06A_2003plus = 3, SMKG06C = NA),
-    2.5
-  )
-})
-
-test_that("calculate_SMK_06A_cont uses SMKG06C for category 4", {
-
-  expect_equal(
-    calculate_SMK_06A_cont(SMK_06A_2003plus = 4, SMKG06C = 7.5),
-    7.5
-  )
-
-  # Fallback without companion
-  expect_equal(
-    calculate_SMK_06A_cont(SMK_06A_2003plus = 4, SMKG06C = NA),
-    5.0
-  )
-})
 
 # =============================================================================
 # calculate_time_quit_smoking_complete - Pathway-aware combining function
