@@ -17,6 +17,30 @@ Run programmatic validation checks on cchsflow worksheets. This skill runs the s
 
 When invoked without arguments, validates the production worksheets at `inst/extdata/`.
 
+### Scoped validation
+
+For development workflow, scope validation to in-scope variables instead of the full file:
+
+```bash
+# By subject (matches the subject column in variables.csv)
+Rscript exec/check-worksheets.R --subject "Ethnicity,Language,Migration"
+Rscript exec/fix-worksheets.R --subject "Smoking"
+
+# By variable name
+Rscript exec/check-worksheets.R --variables "SDCGCGT,SDCFIMM,SDCGLNG"
+
+# Combined (union of both filters)
+Rscript exec/fix-worksheets.R --subject "Ethnicity" --variables "COPD_Emph_der"
+```
+
+Scoped mode extracts matching rows to temp files, runs checks/fixes on those, then (for fix) merges corrected rows back into the full worksheets. This reduces check time from ~2s (full file) to ~0.2s (scoped).
+
+**When to use scoped vs full:**
+- **Scoped**: During development, PR review, iterative worksheet authoring
+- **Full**: CI/GHA, pre-merge final check, after bulk edits
+
+The R functions `scope_worksheets()` and `parse_scope_args()` in `R/scope-worksheets.R` can also be called programmatically.
+
 ## Validation checks
 
 ### Check 1: CSV formatting

@@ -338,6 +338,13 @@ Read and follow `docs/csv-validation-and-fixes.md` for the full procedure. This 
 - Visual diff review with Beyond Compare
 - Scope expansion during review
 
+**Scoped validation (recommended):** Use `--subject` or `--variables` to limit checks to in-scope rows:
+```bash
+Rscript exec/check-worksheets.R --subject "Ethnicity,Language,Migration"
+Rscript exec/fix-worksheets.R --variables "SDCGCGT,SDCFIMM"
+```
+Scoped mode is faster (~0.2s vs ~2s) and filters out pre-existing issues in unrelated variables. Use full-file mode for final pre-merge checks.
+
 ### Step 10: Scope expansion during review
 
 If the review identifies expansion opportunities and the user requests adding them, follow the scope expansion procedure in `docs/csv-validation-and-fixes.md`.
@@ -372,7 +379,8 @@ Summarise the retrospective to the user. If skill updates are warranted, propose
 - Era mapping tables: `.claude/skills/cchsflow-worksheets/docs/variableStart-databaseStart-authoring.md`
 - Schema definitions: `inst/metadata/schemas/core/variables.yaml`, `inst/metadata/schemas/core/variable_details.yaml`
 - Regex patterns and naming conventions: `inst/metadata/documentation/metadata_registry.yaml`
-- CSV formatting check/fix: `exec/check-worksheets.R`, `exec/fix-worksheets.R` (uses `R/check-worksheet.R`, `R/fix-worksheet.R`)
+- CSV formatting check/fix: `exec/check-worksheets.R`, `exec/fix-worksheets.R` (uses `R/check-worksheet.R`, `R/fix-worksheet.R`). Supports `--subject` and `--variables` for scoped validation.
+- Scope filtering: `R/scope-worksheets.R` (`scope_worksheets()`, `parse_scope_args()`)
 - CSV standardisation with schema validation: `R/csv-utils.R` (`standardise_csv()`), `R/schema-validation.R` (`validate_csv_against_schema()`)
 - Validation constants: `R/validation-constants.R`
 - GHA workflow for CSV checks: `.github/workflows/check-csv.yml`
