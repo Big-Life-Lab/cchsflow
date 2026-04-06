@@ -363,6 +363,10 @@ is_value_in_range <- function(value, range_spec) {
     return(value >= range_spec$min && value <= range_spec$max)
 
   } else if (!is.null(range_spec$recStart) && is.character(range_spec$recStart)) {
+    # "copy" means pass-through: any numeric value is valid (continuous source)
+    if (range_spec$recStart == "copy") {
+      return(TRUE)
+    }
     # copy_mapping format from map_recStart_to_recEnd: parse recStart notation
     parsed <- parse_range_notation(range_spec$recStart)
     if (!is.null(parsed) && parsed$type == "continuous") {
