@@ -229,7 +229,7 @@ Read and follow `docs/l6-implementation-validation.md` for the full procedure. T
 
 #### Re-confirm findings before scoring
 
-Before finalising the review summary, **re-confirm each P0/P1 finding** by reading the specific cell directly from the current branch's `inst/extdata/` file using Python csv. Do not rely on earlier script output or cached copies (e.g., `/tmp/vd_pr.csv`). A finding that cannot be reproduced on a fresh read of the branch should be downgraded to 0. This step catches false positives caused by stale data in intermediate files.
+Before finalising the review summary, **re-confirm every finding** (P0/P1 and informational) by reading the specific cell directly from the current branch's `inst/extdata/` file using Python csv. Do not rely on earlier script output or cached copies (e.g., `/tmp/vd_pr.csv`). A finding that cannot be reproduced on a fresh read of the branch should be downgraded to 0 or removed. This step catches false positives caused by stale data in intermediate files — for example, `_s` databases that appear in cached data but have already been cleaned up on the branch.
 
 #### Scoring scale
 
@@ -268,6 +268,14 @@ ceps/cep-NNN-<domain>/
 
 After saving artifacts, **commit and push them to the PR branch** so other reviewers can access them. CEP artifacts referenced in PR comments must exist on the branch — local-only files create dead references.
 
+**Branch verification**: Before committing, verify you are on the PR branch:
+
+```bash
+git branch --show-current  # Must match the PR branch, not skills/review-validation
+```
+
+If you switched branches during the review (e.g., to access skill docs or extract templates), switch back to the PR branch before committing. Use `git stash` / `git stash pop` to carry uncommitted CEP files across branch switches.
+
 ```bash
 git add ceps/cep-NNN-<domain>/
 # Exclude rendered output (.html, *_files/, .quarto/) — only commit source files
@@ -275,7 +283,13 @@ git commit -m "Add CEP-NNN review artifacts for PR #XXX"
 git push origin <branch>
 ```
 
-If working on a different branch than the PR, push to the PR branch or note in the PR comment where the artifacts live.
+#### Fix-then-report ordering
+
+If the review identifies fixable issues (e.g., label typos, `_s` → `_m` conversions) and the user requests applying them, **apply fixes and commit before posting the PR comment**. This avoids posting a comment that says "no issues" and then immediately pushing a fix commit, or having to edit the comment after the fact.
+
+The workflow becomes: Step 7 (score) → Step 9 (fix) → Step 8 (report). The PR comment should reference the fix commit SHA and describe what was found and fixed.
+
+If no fixes are needed, post the PR comment immediately after scoring.
 
 #### Post PR comment (PR reviews)
 
@@ -371,7 +385,7 @@ Summarise the retrospective to the user. If skill updates are warranted, propose
 - **L6 implementation validation**: `docs/l6-implementation-validation.md` — rec_with_table() testing, prevalence analysis
 - **CSV validation and fixes**: `docs/csv-validation-and-fixes.md` — check/fix tools, fix workflow, visual diff
 - **Variable naming conventions**: `docs/variable-naming-conventions.md` — harmonized variable naming rules
-- **Gem verification workflow**: `docs/review/` — NotebookLM Gem system prompt, notebook manifest, coverage summary
+- **Gem verification workflow**: `docs/review/` — NotebookLM Gem system prompt, notebook manifest, coverage summary. The Gem prompt template lives in `ceps/cep-002-smoking/gn-all-smoking-variables-prompt.md` on the `skills/review-validation` branch. If not available on the current branch, extract with `git show skills/review-validation:ceps/cep-002-smoking/gn-all-smoking-variables-prompt.md`.
 
 ### External references
 
