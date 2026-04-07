@@ -18,10 +18,20 @@ Flag any era boundary where observed output values do not match expected midpoin
 
 **PUMF data only.** L6 can currently test only `_p` databases. The `data/` directory contains PUMF RData files (`cchs2001_p.RData` through `cchs2017_2018_p.RData`). Master (`_m`) data is in a secure environment where LLMs cannot run.
 
-For master-only changes (e.g., a PR that only adds `_m` cycles), L6 cannot validate at runtime. In this case:
-- Rely on L3-L5 worksheet checks (especially era boundary and naming checks)
-- Generate the integration test R script anyway and save it to the CEP — the user or a colleague can run it in the secure environment
-- Note the limitation explicitly in the review output
+### Master-only variables
+
+Some variables exist only in Master files (e.g., raw HUI hearing questions HUI_06-HUI_09, which are not on PUMF — PUMF has only the derived HUIGHER attribute). For these variables, **L6 runtime testing is not possible**. Identify this early in triage (Step 1) and adjust the review accordingly:
+
+- **Skip L6 runtime testing** — do not attempt `rec_with_table()` or cross-cycle prevalence analysis
+- **Rely on L3-L5 worksheet checks** — era boundary defaults, naming conventions, recStart collision checks are all still applicable and are the primary validation mechanism
+- **Use Gem verification** — three-way triangulation (Gem + MCP/metadata DB + Claude) is especially important for Master-only variables since there is no runtime data to catch errors
+- **Use `exec/query-metadata.R`** to generate a coverage matrix (`meta_coverage()`) confirming which cycles contain the variable
+- **Generate the integration test R script anyway** and save it to the CEP — the user or a colleague can run it in the secure environment
+- **Note the limitation explicitly** in the PR comment: "Master-only mappings validated by worksheet checks and Gem verification — no runtime data available for L6 testing."
+
+### General PUMF limitations
+
+For master-only changes in PRs that also have PUMF variables (e.g., a PR that adds `_m` cycles to variables that also have `_p` cycles), L6 testing can still validate the PUMF side. Run L6 for the `_p` cycles and note the `_m` limitation.
 
 **Future:** Mock data from the `mockdata` repo will enable L6 testing for all database types.
 

@@ -40,20 +40,54 @@ Collaboration mode validates fields against naming convention regex patterns (se
 
 | Tool | Branches |
 |------|----------|
-| `check_worksheet()` / `fix_worksheet()` | `v3-smoking`, `feature/v3.0.0-validation-infrastructure`, and later |
+| `check_worksheet()` / `fix_worksheet()` | `skills/review-validation`, `v3-smoking`, `feature/v3.0.0-validation-infrastructure`, and later |
 | `standardise_csv()` with collaboration mode | `feature/csv-standardisation-updates` and later |
 | `check-csv.yml` GHA | `v3-smoking` and later |
+| `diff-worksheets.R` | `skills/review-validation` and later |
+| `rebuild-rows.R` | `skills/review-validation` and later |
+| `query-metadata.R` | `skills/review-validation` and later |
 
-If the PR's branch doesn't have these tools, run validation from a branch that does by checking out only the worksheet files:
+**Known gap:** PR branches forked before validation tools were added will not have `exec/check-worksheets.R` or `exec/fix-worksheets.R`. If the PR branch lacks these tools, cherry-pick them from `skills/review-validation` or check out only the needed files:
 
 ```bash
 # Validate worksheets from a branch that has the tools
 git stash
-git checkout v3-smoking -- exec/check-worksheets.R R/check-worksheet.R R/fix-worksheet.R
+git checkout skills/review-validation -- exec/check-worksheets.R exec/fix-worksheets.R R/check-worksheet.R R/fix-worksheet.R
 Rscript exec/check-worksheets.R
 git checkout -- exec/ R/check-worksheet.R R/fix-worksheet.R
 git stash pop
 ```
+
+### Content-based diff
+
+For PRs with large diffs dominated by formatting changes (quoting, whitespace), line-based diffs are unreliable. Use the content-based diff tool:
+
+```bash
+Rscript exec/diff-worksheets.R --ref origin/main
+Rscript exec/diff-worksheets.R --ref origin/main --variables "HUI06,HUI07,HUI08"
+```
+
+This groups rows by variable and compares only key fields, ignoring formatting differences.
+
+### Programmatic row rebuild
+
+For bulk coverage expansion (adding many cycles to a variable group), use the template-based row builder rather than manual CSV editing:
+
+```r
+source("exec/rebuild-rows.R")
+vd <- read_vd()
+template <- vd[vd$variable == "HUI06", ][1, ]
+
+# Generate rows
+rows <- rbind(
+  binary_block(template, "HUI06", "cchs2001_m, cchs2003_m", "[HUI_06]"),
+  wdm_block(template, "HUI07A", "cchs2017_2018_m", "[WDM_010]")
+)
+preview_rows(rows)
+rebuild_variable(rows, "HUI06", dry_run = FALSE)
+```
+
+Available block generators: `binary_block()`, `wdm_block()`, `likert4_block()`. See `exec/rebuild-rows.R --help` for details.
 
 ## Proposing worksheet fixes
 

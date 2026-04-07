@@ -406,10 +406,14 @@ Summarise the retrospective to the user. If skill updates are warranted, propose
 - Schema definitions: `inst/metadata/schemas/core/variables.yaml`, `inst/metadata/schemas/core/variable_details.yaml`
 - Naming conventions: `docs/variable-naming-conventions.md` (in this skill's `docs/` folder)
 - CSV formatting check/fix: `exec/check-worksheets.R`, `exec/fix-worksheets.R` (uses `R/check-worksheet.R`, `R/fix-worksheet.R`). Supports `--subject` and `--variables` for scoped validation.
+- Content-based worksheet diff: `exec/diff-worksheets.R` — variable-grouped comparison between git refs, ignoring formatting changes
+- Programmatic row rebuild: `exec/rebuild-rows.R` — template-based row generation with `binary_block()`, `wdm_block()`, `likert4_block()` helpers
+- Metadata query wrapper: `exec/query-metadata.R` — R wrapper for cchs-metadata queries (Python CLI + DuckDB fallback). Includes `meta_coverage()` for variable-by-cycle matrices.
 - Scope filtering: `R/scope-worksheets.R` (`scope_worksheets()`, `parse_scope_args()`)
 - CSV standardisation with schema validation (on `feature/csv-standardisation-updates` branch): `R/csv-utils.R` (`standardise_csv()`), `R/schema-validation.R` (`validate_csv_against_schema()`)
 - Validation constants (on `feature/csv-standardisation-updates` branch): `R/validation-constants.R`
 - GHA workflow for CSV checks (on `v3-smoking` and later branches): `.github/workflows/check-csv.yml`
 - Example CEP (full): `ceps/cep-002-smoking/` (smoking harmonization)
 - Example CEP (review): `ceps/cep-006-oral-health/` (DEN_132 PR review — on `ethnicity` and later branches)
+- Example CEP (review with coverage expansion): `ceps/cep-004-hearing/` (HUI hearing PR review with Gem verification and programmatic rebuild)
 - PUMF data: `data/cchs*_p.RData`

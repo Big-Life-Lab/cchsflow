@@ -62,9 +62,29 @@ claude mcp add cchs-metadata -- python3 /Users/dmanuel/github/cchsflow-docs/mcp-
    ```
 5. Restart Claude Code for the MCP tools to appear in the tool list
 
-### CLI fallback
+### CLI fallback (recommended when MCP fails)
 
-If the MCP server cannot be started but the database exists, use the standalone CLI (no FastMCP dependency — only `duckdb` required):
+If the MCP server cannot be started, use the **R wrapper** or the **Python CLI** directly. The R wrapper (`exec/query-metadata.R`) automatically locates the database and falls back between Python CLI and direct DuckDB queries:
+
+```bash
+# R wrapper (auto-finds DB, falls back to DuckDB if Python unavailable)
+Rscript exec/query-metadata.R search smoking
+Rscript exec/query-metadata.R history SMKDSTY
+Rscript exec/query-metadata.R detail SMK_204
+Rscript exec/query-metadata.R codes SMK_204
+Rscript exec/query-metadata.R coverage HUI06 HUI07 HUI08 HUI09  # variable-by-cycle matrix
+```
+
+When sourced interactively (e.g., during a review session), the R functions provide structured output:
+
+```r
+source("exec/query-metadata.R")
+meta_search("smoking")            # search by name or label
+meta_history("SMKDSTY")           # which cycles contain it
+meta_coverage(c("HUI06", "HUI07", "HUI08"), file_type = "master")  # coverage matrix
+```
+
+The **Python CLI** is also available standalone (no FastMCP dependency — only `duckdb` required):
 ```bash
 python3 ../cchsflow-docs/mcp-server/cli.py search smoking
 python3 ../cchsflow-docs/mcp-server/cli.py detail SMKDSTY
