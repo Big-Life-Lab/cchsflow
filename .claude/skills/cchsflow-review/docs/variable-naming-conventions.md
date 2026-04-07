@@ -41,16 +41,36 @@ is still just the source name — it does not become `_cat4`.
 
 ### Era/cycle suffixes — use descriptive names, not letters
 
-When a variable has a genuine structural break across cycles (different question
-wording, different category boundaries, or a different source variable with
-incompatible categories), use an **era-based suffix** rather than an abstract
-letter.
+When a variable has a **harmonization break** across cycles, use an **era-based
+suffix** rather than an abstract letter. A harmonization break is a point where
+a variable can no longer consistently measure the same exposure across cycles
+due to:
+
+- **Category changes**: response categories added, removed, or restructured
+  (e.g., a 10-category age grouping split into 11 categories at 2005)
+- **Wording changes**: question text changed enough to alter measurement
+  (e.g., "Did you ever smoke daily?" vs "Have you smoked at least 100
+  cigarettes in your lifetime?")
+- **Measurement breaks**: the underlying construct changed (e.g., self-reported
+  vs derived, or a different routing/skip pattern)
+
+Not every change warrants a break. Minor wording adjustments or label
+refinements that do not materially affect measurement can be harmonized under
+one name, with a note in the worksheet documenting the concern. Whether a change
+constitutes a break is a **team judgment call** informed by domain expertise.
+
+**The suffix year should reflect where harmonization fails** — the cycle
+boundary at which consistent measurement can no longer be maintained. This may
+differ from when StatCan renamed the variable. For example, if StatCan
+introduced SMKDVSTY in 2015 but cchsflow can reconstruct the new scheme from
+SMKDSTY data back to 2009, the harmonization boundary is 2009 (where
+reconstruction becomes possible), not 2015 (where the name changed).
 
 | Avoid | Use instead | When |
 |-------|-------------|------|
-| `_A`  | `_2001`, `_pre2003` | 2001-only variant (cycle 1.1) |
-| `_B`  | `_2003plus` | 2003+ variant |
-| `_A`, `_B` | `_pre2007`, `_2007plus` | Pre/post 2007 restructuring |
+| `_A`  | `_2001`, `_pre2005` | Earlier variant with different categories |
+| `_B`  | `_2005plus` | Later variant after category restructure |
+| `_A`, `_B` | `_pre2009`, `_2009plus` | Pre/post harmonization boundary |
 
 Existing `_A`/`_B` suffixes are deprecated. Replace them with era-based names
 when a variable is refactored or reviewed, unless the refactor is out of scope.
