@@ -44,7 +44,7 @@ if (file.exists("derived_functions_registry.csv")) {
       "calculate_time_quit_smoking",
       "calculate_age_start_smoking",
       "calculate_cigs_per_day",
-      "calculate_SMKDSTY_A",
+      "calculate_SMKDSTY_original",
       "calculate_SMKDSTY_cat3",
       "calculate_SMKDSTY_cat5",
       "calculate_SMKG040_cont",
@@ -57,7 +57,7 @@ if (file.exists("derived_functions_registry.csv")) {
       "time_quit_smoking",
       "age_start_smoking",
       "cigs_per_day",
-      "SMKDSTY_A",
+      "SMKDSTY_original",
       "SMKDSTY_cat3",
       "SMKDSTY_cat5",
       "SMKG040_cont",
@@ -116,11 +116,11 @@ knitr::kable(
 
 ## Smoking status functions
 
-### calculate_SMKDSTY_A
+### calculate_SMKDSTY_original
 
 Derives 6-category smoking status consistent with pre-2015 SMKDSTY definition.
 
-**Output**: `SMKDSTY_A` (Categorical, 1-6)
+**Output**: `SMKDSTY_original` (Categorical, 1-6)
 
 **Inputs**:
 
@@ -149,7 +149,7 @@ Derives 3-category smoking status (current/former/never).
 
 **Output**: `SMKDSTY_cat3` (Categorical, 1-3)
 
-**Inputs**: Same as `calculate_SMKDSTY_A`
+**Inputs**: Same as `calculate_SMKDSTY_original`
 
 **Categories**:
 
@@ -167,7 +167,7 @@ Derives 5-category smoking status with daily/occasional distinction.
 
 **Output**: `SMKDSTY_cat5` (Categorical, 1-5)
 
-**Inputs**: Same as `calculate_SMKDSTY_A`
+**Inputs**: Same as `calculate_SMKDSTY_original`
 
 **Categories**:
 
@@ -275,7 +275,7 @@ Unified function for cigarettes per day. Routes to appropriate source based on s
 
 | Variable | Description | Used for |
 |----------|-------------|----------|
-| SMKDSTY_A | 6-category smoking status | Routing |
+| SMKDSTY_original | 6-category smoking status | Routing |
 | SMK_204 | CPD - current daily smokers | SMKDSTY 1 |
 | SMK_208 | CPD when daily - former daily | SMKDSTY 2, 4 |
 
@@ -295,7 +295,7 @@ Calculates pack-years using PUMF data with category-derived continuous variables
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| SMKDSTY_A | 6-category smoking status | Yes |
+| SMKDSTY_original | 6-category smoking status | Yes |
 | DHHGAGE_cont | Current age (continuous) | Yes |
 | time_quit_smoking | Years since quit | Yes |
 | SMKG203_cont | Age started daily - current daily | Yes |
@@ -426,7 +426,7 @@ library(dplyr)
 
 # Load PUMF data
 data <- rec_with_table(cchs2017_2018_p, c(
-  "SMKDSTY_A", "DHHGAGE_cont", "time_quit_smoking",
+  "SMKDSTY_original", "DHHGAGE_cont", "time_quit_smoking",
   "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B",
   "SMK_208", "SMK_05C", "SMKG01C_cont", "SMK_01A"
 ))
@@ -435,7 +435,7 @@ data <- rec_with_table(cchs2017_2018_p, c(
 data <- data |>
   mutate(
     pack_years = calculate_pack_years_pumf(
-      SMKDSTY_A, DHHGAGE_cont, time_quit_smoking,
+      SMKDSTY_original, DHHGAGE_cont, time_quit_smoking,
       SMKG203_cont, SMKG207_cont, SMK_204, SMK_05B,
       SMK_208, SMK_05C, SMKG01C_cont, SMK_01A
     )

@@ -26,11 +26,11 @@ format:
 
 ## Abstract
 
-This CEP updates smoking variables in cchsflow from 35 (v2.1) to 56 variables, extending coverage from 2015 to 2023 across all three CCHS eras. Changes include:
+This CEP updates smoking variables in cchsflow from 35 (v2.1) to 60 variables, extending coverage from 2015 to 2023 across all three CCHS eras. Changes include:
 
 - **25 new variables** across 5 subgroups (status, initiation, cessation, intensity, pack-years)
 - **31 updated variables** with extended cycle coverage and Master file support
-- **4 renamed variables** (SMK_06A_A/B → SMK_06A_cat4/cont, SMK_09A_A/B → SMK_09A_cat4/cont)
+- **12 renamed variables** for consistency (e.g., SMK_06A_A/B → SMK_06A_2001/2003plus, SMKDSTY_A/B → SMKDSTY_original/2009plus, SMKG01C_A/B → SMKG01C_pre2005/2005plus)
 
 Key additions include unified derived variables (`age_start_smoking`, `age_first_cigarette`, `cigs_per_day`, `time_quit_smoking`) that route to the best available source across PUMF and Master files, and improvements to the existing `pack_years_der` calculation.
 
@@ -99,7 +99,7 @@ These mappings are encoded in the `variableStart` column of `variables.csv` usin
 | (none) | Original CCHS variable | SMK_204 |
 | `_cont` | Pseudo-continuous derived from PUMF categories via midpoint estimation | SMKG203_cont |
 | `_cat{n}` | Re-derived categorical with *n* categories | SMKDSTY_cat3, SMKDSTY_cat5 |
-| `_A`, `_B` | Era-specific category sets | SMKG01C_A, SMKG01C_B |
+| `_pre{year}`, `_{year}plus` | Era-specific category sets | SMKG01C_pre2005, SMKG01C_2005plus |
 | `_der` | Derived variable | pack_years_der |
 
 Original CCHS categorical variables keep their original names. The `_cat{n}` suffix is only for re-derived variables with collapsed or combined categories. Always include the category count (`_cat3`, not `_cat`).
@@ -141,12 +141,12 @@ See [Variable summary](00-variable-summary.qmd) for complete variable lists by s
 
 This PR adds four unified derived variables that route to the best available source:
 
-| Variable | Sources | Priority | Coverage |
-|----------|---------|----------|----------|
-| `age_start_smoking` | SMK_040 (Master), SMKG040_cont (PUMF) | Master exact > PUMF midpoint | PUMF 2001-2021, Master 2001-2023 |
-| `age_first_cigarette` | SMK_01C (Master), SMKG01C_cont (PUMF) | Master exact > PUMF midpoint | PUMF 2001-2021, Master 2001-2023 |
-| `cigs_per_day` | SMK_204, SMK_208 | Routes by SMKDSTY_A status | PUMF + Master 2001-2023 |
-| `time_quit_smoking` | SMK_09A_cont, SMK_06A_cont, SMKDVSTP | Former daily > former occasional | PUMF 2001-2021, Master 2001-2023 |
+| Variable | Sources | Routing logic | Coverage |
+|----------|---------|---------------|----------|
+| `age_start_smoking` | SMK_040 (Master), SMKG040_cont (PUMF) | Master exact preferred; PUMF midpoint fallback | PUMF 2001-2021, Master 2001-2023 |
+| `age_first_cigarette` | SMK_01C (Master), SMKG01C_cont (PUMF) | Master exact preferred; PUMF midpoint fallback | PUMF 2001-2021, Master 2001-2023 |
+| `cigs_per_day` | SMK_204, SMK_208 | Routes by SMKDSTY_original status category | PUMF + Master 2001-2023 |
+| `time_quit_smoking` | SMK_09A_cont, SMK_06A_cont, SMKDVSTP | Former daily source first; former occasional fallback | PUMF 2001-2021, Master 2001-2023 |
 
 Additionally, `smoked_100_lifetime` provides a self-documenting wrapper for SMK_01A (1=yes, 2=no).
 
@@ -156,7 +156,7 @@ Additionally, `smoked_100_lifetime` provides a self-documenting wrapper for SMK_
 
 ```
 pack_years_der (2001-2023)
-├── SMKDSTY_A ───────────────── 01-status (6-category)
+├── SMKDSTY_original ────────── 01-status (6-category)
 ├── age_start_smoking ────────── 02-initiation
 │   ├── SMKG040_cont (PUMF midpoint, 2001-2021)
 │   └── SMK_040 (Master exact, 2001-2023)
@@ -181,7 +181,7 @@ PUMF pack-years estimates have ~15-20% relative error due to grouped age (DHHGAG
 
 | Variable | Cycles | Caveat |
 |----------|--------|--------|
-| SMKDSTY_A | 2001-2023 | 2015+ values are derived from component variables, not a direct survey item |
+| SMKDSTY_original | 2001-2023 | 2015+ values are derived from component variables, not a direct survey item |
 | SMKG203_cont | 2001-2014 | Dropped from PUMF in 2015 redesign |
 | SMK_06A_cat4 | 2001-2018 | Not available in 2019+ PUMF |
 | pack_years_der | 2001-2023 | PUMF precision ~15-20% error vs Master |
@@ -206,7 +206,7 @@ These variables require RDC or ICES Master file access:
 - Existing smoking variables (`SMK_204`, `SMK_208`, `smoke_simple`, etc.) continue to work unchanged
 - New `_cont` variables are additions, not replacements
 - `pack_years_der` is updated with improvements, not a new variable
-- 4 variables were renamed for consistency: `SMK_06A_A/B` → `SMK_06A_cat4/cont`, `SMK_09A_A/B` → `SMK_09A_cat4/cont`
+- 12 variables were renamed from `_A`/`_B` suffixes to year-based era names (e.g., `SMKDSTY_A` → `SMKDSTY_original`, `SMKG01C_A` → `SMKG01C_pre2005`)
 
 ## References
 
