@@ -179,4 +179,4 @@ Verify manually against the template in Step 3 above:
 
 - R CMD check guidance: `~/github/ai-infrastructure/context/domains/r_packages.md` § "Local verification before committing"
 - V3 coding standards: project memory `project_derive_function_standards.md`
-- Reference implementations: `calculate_bmi()` in `R/bmi.R` (formula), `calculate_pack_years()` in `R/smoke-pack-years.R` (complex)
+- Reference implementations: `bmi_fun()` in `R/bmi.R` (formula), `pack_years_fun()` in `R/smoking.R` (complex)

@@ -126,6 +126,8 @@ write.csv(results, "ceps/cep-NNN-domain/vars-pumf-integration-test.csv",
 
 After generating the integration test CSV, create a Quarto document (`.qmd`) that visualises the cross-cycle results. This is a standard CEP artifact — visual inspection of prevalence trends is the most effective way to detect era boundary problems.
 
+**When to skip**: If the cross-cycle summary shows no anomalies (no step changes, no unexpected zeros, distributions consistent within eras), the QMD is optional. Note in the CEP review summary that no QMD was generated because no anomalies were detected. The QMD is most valuable when there are ambiguous patterns that benefit from visual inspection.
+
 The QMD should include:
 1. **Cross-cycle valid % line plot** for each key variable (or a representative subset), with cycles on the x-axis and valid % on the y-axis. Add vertical reference lines at era boundaries (2007, 2015).
 2. **Category distribution plot** for categorical derived variables (e.g., stacked bar chart of diet_score_cat3 across cycles).
@@ -195,11 +197,21 @@ Example of a step change indicating a problem:
 
 ## Derived variable testing
 
+**DV feeder resolution**: `rec_with_table()` does **not** auto-resolve DerivedVar feeders. You must include all feeder variables in the `variables` argument. For multi-era DVs (e.g., `active_transport` with 3 era-specific functions), each era needs different feeders — build the variables list per era from the `DerivedVar::[]` field in variable_details.csv. If feeders are omitted, the DV will silently return NA for all respondents in that era.
+
+Example for a 3-era DV:
+```r
+# Era 1 (2001-2005): needs PAC_4A_cont, PAC_4B_cont
+# Era 2 (2007-2014): needs PAC_7, PAC_7A, PAC_7B_cont, PAC_8, PAC_8A, PAC_8B_cont
+# Era 3 (2015+):     needs PAYDVTTR, PAADVTRV
+# Test each era with its own feeder set + the DV name
+```
+
 If the in-scope variables include derived variables (functions in `R/`):
 
 1. Identify the DV function (e.g., `diet_score_fun()` in `R/diet.R`)
-2. Check that all input variables are available in the test cycles
-3. Run `rec_with_table()` with the derived variable to verify the full pipeline
+2. Check that all input variables are available in the test cycles — and include them in the `variables` argument
+3. Run `rec_with_table()` with the derived variable and its feeders to verify the full pipeline
 4. Compare the derived variable's valid % against its input variables — the DV should not have materially higher valid % than its least-available input
 5. For categorical derived variables and key continuous inputs, examine the **exposure distribution** across cycles — not just valid counts. The central harmonization question is whether typical exposures (e.g., proportion with 0 fruit/veg, or >5 servings/day) remain stable across cycles. A sudden shift in the distribution at an era boundary signals a recoding or mapping error even when valid % is unchanged. Include these distributions in both the integration test output and the QMD visualisation
 

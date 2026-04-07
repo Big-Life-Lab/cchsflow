@@ -99,7 +99,8 @@ Scan for:
 - `chs20` without leading `c` — missing `c` typo (should be `cchs20`). This pattern has been found in ADL and FVC variables (e.g., `chs2011_2012_m` instead of `cchs2011_2012_m`). Check all database names match the `cchs` prefix.
 - `_i` suffix databases — deprecated, should be `_m`
 - `_s` suffix databases — deprecated, **always convert to `_m`** when found in reviewed variables. Check that a corresponding `_m` entry doesn't already exist (if it does, delete the `_s` row; if not, rename `_s` → `_m`). This applies even if the `_s` is pre-existing on the target branch — if the PR touches these rows, fix the suffix. **Naming convention**: `_s` share files are single-year extracts, so map to the single-year master form: `cchs2009_s` → `cchs2009_m` (not `cchs2009_2010_m`), `cchs2010_s` → `cchs2010_m`, `cchs2012_s` → `cchs2012_m`. Check `variables.csv` to confirm which `_m` form is expected.
-- `cchs2021_p`, `cchs2022_p`, `cchs2023_p` — **invalid PUMF databases**. The 2021 CCHS was not released as a standalone PUMF — it was combined with 2022 data into a 2021-2022 PUMF (not yet in cchsflow). The 2022+ smoking variables were restructured into CSS/SPU modules; no standalone PUMF equivalent exists for variables like SMK_09A in those cycles. Remove these from `databaseStart` for PUMF-only or mixed blocks when encountered in reviewed variables.
+- `cchs2021_p` — **invalid PUMF database**. The 2021 CCHS was not released as a standalone PUMF — it was combined with 2022 data into a 2021-2022 PUMF (not yet in cchsflow). Remove from `databaseStart` when encountered in reviewed variables.
+- Note: `cchs2022_p` and `cchs2023_p` **are valid** standalone PUMF databases. Do not flag these as errors.
 - `[[VAR]]` — double brackets (invalid notation)
 - `[VAR1, VAR2]` without `DerivedVar::` prefix — ambiguous multi-variable input
 
@@ -107,7 +108,7 @@ Scan for:
 
 ## Check 5b: dummyVariable naming conventions
 
-Verify that `dummyVariable` values follow the naming convention below. (Note: `inst/metadata/documentation/metadata_registry.yaml` is referenced as the authoritative source for these patterns but does not yet exist — this skill section is the current reference.)
+Verify that `dummyVariable` values follow the naming convention below. (See also `docs/variable-naming-conventions.md` in this skill's folder for the full naming rules.)
 
 **Categorical variables** — regex: `^[a-zA-Z0-9_]+_cat[0-9]+(_[0-9]+|_NA[a-z])$`
 
@@ -220,7 +221,7 @@ Simple categorical-to-midpoint conversions belong in the worksheet as direct rec
 
 If the in-scope variables include derived variables (functions in `R/`):
 
-1. **Input consistency**: Read the DV function (e.g., `calculate_pct_time()` in `R/percent-time-canada.R`) and verify that the input variable names it expects match those listed in `variable_details.csv` for the derived variable
+1. **Input consistency**: Read the DV function (e.g., `pct_time_fun()` in `R/percent-time-canada.R`) and verify that the input variable names it expects match those listed in `variable_details.csv` for the derived variable
 2. **Category coverage**: Verify the function handles all category values that the worksheet's `recFrom` maps to — no unhandled cases that would silently produce NA
 3. **Output consistency**: Verify the function's return values match the `recTo` values in the worksheet
 4. **No hard-coded worksheet values**: Check that the DV function does not contain literal midpoints or category values (e.g., `~ 0.5`, `~ 1.5`, `~ 4`) that duplicate or should duplicate `recEnd` values in `variable_details.csv`. If a function hard-codes values that the worksheet already expresses (or could express) as `recStart → recEnd` rows, flag as **P1** — the function should be refactored to read from the worksheet or eliminated entirely. Reference: the `DHHGAGE_cont` pattern.

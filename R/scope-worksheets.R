@@ -29,10 +29,30 @@ scope_worksheets <- function(
     ))
   }
 
-  vars_df <- read.csv(variables_path, stringsAsFactors = FALSE,
-                       check.names = FALSE)
-  details_df <- read.csv(variable_details_path, stringsAsFactors = FALSE,
-                          check.names = FALSE)
+  if (!file.exists(variables_path)) {
+    stop("Variables worksheet not found at ", variables_path)
+  }
+  if (!file.exists(variable_details_path)) {
+    stop("Variable details worksheet not found at ", variable_details_path)
+  }
+
+  vars_df <- tryCatch(
+    read.csv(variables_path, stringsAsFactors = FALSE, check.names = FALSE),
+    error = function(e) stop("Failed to read ", variables_path, ": ", e$message)
+  )
+  details_df <- tryCatch(
+    read.csv(variable_details_path, stringsAsFactors = FALSE,
+             check.names = FALSE),
+    error = function(e) stop("Failed to read ", variable_details_path, ": ",
+                             e$message)
+  )
+
+  if (!"variable" %in% colnames(vars_df)) {
+    stop("variables.csv is missing the 'variable' column")
+  }
+  if (!"variable" %in% colnames(details_df)) {
+    stop("variable_details.csv is missing the 'variable' column")
+  }
 
   # Build the set of in-scope variable names
   in_scope <- character()
@@ -83,6 +103,9 @@ scope_worksheets <- function(
 
 #' Parse --variables and --subject CLI arguments
 #'
+#' Note: The CLI flag `--subject` (singular) maps to the `subjects` parameter
+#' (plural) in `scope_worksheets()`.
+#'
 #' @param args Character vector from commandArgs(trailingOnly = TRUE)
 #'
 #' @return Named list with `variables` (character vector or NULL) and
@@ -94,13 +117,21 @@ parse_scope_args <- function(args) {
   subjects <- NULL
 
   var_idx <- which(args == "--variables")
-  if (length(var_idx) > 0 && var_idx[1] < length(args)) {
-    variables <- trimws(unlist(strsplit(args[var_idx[1] + 1], ",")))
+  if (length(var_idx) > 0) {
+    if (var_idx[1] >= length(args)) {
+      warning("--variables flag provided without a value; ignoring.")
+    } else {
+      variables <- trimws(unlist(strsplit(args[var_idx[1] + 1], ",")))
+    }
   }
 
   subj_idx <- which(args == "--subject")
-  if (length(subj_idx) > 0 && subj_idx[1] < length(args)) {
-    subjects <- trimws(unlist(strsplit(args[subj_idx[1] + 1], ",")))
+  if (length(subj_idx) > 0) {
+    if (subj_idx[1] >= length(args)) {
+      warning("--subject flag provided without a value; ignoring.")
+    } else {
+      subjects <- trimws(unlist(strsplit(args[subj_idx[1] + 1], ",")))
+    }
   }
 
   list(variables = variables, subjects = subjects)

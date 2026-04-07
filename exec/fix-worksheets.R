@@ -15,7 +15,11 @@
 #   1 - Unable to fix (e.g., file not found, invalid CSV)
 
 suppressPackageStartupMessages({
-  library(cchsflow)
+  if (file.exists("DESCRIPTION")) {
+    devtools::load_all(quiet = TRUE)
+  } else {
+    library(cchsflow)
+  }
   library(cli)
 })
 
@@ -95,32 +99,39 @@ cli_text("")
 
 # If scoped, copy fixed temp files back to originals
 if (scope$scoped) {
-  # Read originals and scoped-fixed data
-  orig_vars <- read.csv(variables_path, stringsAsFactors = FALSE,
-                         check.names = FALSE)
-  orig_details <- read.csv(variable_details_path, stringsAsFactors = FALSE,
+  tryCatch({
+    # Read originals and scoped-fixed data
+    orig_vars <- read.csv(variables_path, stringsAsFactors = FALSE,
+                           check.names = FALSE)
+    orig_details <- read.csv(variable_details_path, stringsAsFactors = FALSE,
+                              check.names = FALSE)
+    fixed_vars <- read.csv(scope$variables_path, stringsAsFactors = FALSE,
                             check.names = FALSE)
-  fixed_vars <- read.csv(scope$variables_path, stringsAsFactors = FALSE,
-                          check.names = FALSE)
-  fixed_details <- read.csv(scope$variable_details_path,
-                             stringsAsFactors = FALSE, check.names = FALSE)
+    fixed_details <- read.csv(scope$variable_details_path,
+                               stringsAsFactors = FALSE, check.names = FALSE)
 
-  # Replace in-scope rows in originals with fixed versions
-  in_scope_var_names <- unique(fixed_vars$variable)
-  orig_vars <- orig_vars[!orig_vars$variable %in% in_scope_var_names, ]
-  orig_vars <- rbind(orig_vars, fixed_vars)
-  orig_vars <- orig_vars[order(orig_vars$variable), ]
+    # Replace in-scope rows in originals with fixed versions
+    in_scope_var_names <- unique(fixed_vars$variable)
+    orig_vars <- orig_vars[!orig_vars$variable %in% in_scope_var_names, ]
+    orig_vars <- rbind(orig_vars, fixed_vars)
+    orig_vars <- orig_vars[order(orig_vars$variable), ]
 
-  orig_details <- orig_details[
-    !orig_details$variable %in% in_scope_var_names, ]
-  orig_details <- rbind(orig_details, fixed_details)
-  orig_details <- orig_details[order(orig_details$variable), ]
+    orig_details <- orig_details[
+      !orig_details$variable %in% in_scope_var_names, ]
+    orig_details <- rbind(orig_details, fixed_details)
+    orig_details <- orig_details[order(orig_details$variable), ]
 
-  readr::write_csv(orig_vars, variables_path, na = "", quote = "needed",
-                    escape = "double", eol = "\n")
-  readr::write_csv(orig_details, variable_details_path, na = "",
-                    quote = "needed", escape = "double", eol = "\n")
-  cli_alert_info("Merged scoped fixes back into full worksheets")
+    readr::write_csv(orig_vars, variables_path, na = "", quote = "needed",
+                      escape = "double", eol = "\n")
+    readr::write_csv(orig_details, variable_details_path, na = "",
+                      quote = "needed", escape = "double", eol = "\n")
+    cli_alert_info("Merged scoped fixes back into full worksheets")
+  }, error = function(e) {
+    cli_alert_danger("Failed to merge scoped fixes back: {e$message}")
+    cli_alert_info("Scoped temp files are at: {scope$variables_path}")
+    cli_alert_info("and: {scope$variable_details_path}")
+    success <<- FALSE
+  })
 }
 
 # Final report

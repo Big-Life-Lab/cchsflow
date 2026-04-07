@@ -4,8 +4,13 @@
 #' @param file_type Type of file being checked. Either "variables" or
 #' "variable_details".
 #'
-#' @return A list of errors found. Each error is a named list containing
-#' information about the error.
+#' @return A list of error objects. Each is a named list with at minimum:
+#' \itemize{
+#'   \item error_type: Character string identifying the error class
+#'   \item file_type: "variables" or "variable_details"
+#'   \item file_path: Path to the checked file
+#'   \item message: Human-readable description
+#' }
 #'
 #' @export
 #'
@@ -73,7 +78,46 @@ check_worksheet <- function(
     csv_result$data, list(file_path = file_path, file_type = file_type)
   )
 
-  raw_lines <- readr::read_lines(file_path)
+  # Check for extra columns beyond expected schema
+  extra_column_errors <- if (length(colnames(csv_result$data)) >
+                             length(expected_columns)) {
+    extra_cols <- colnames(csv_result$data)[
+      seq(length(expected_columns) + 1, length(colnames(csv_result$data)))
+    ]
+    non_empty_extras <- extra_cols[extra_cols != "" & !is.na(extra_cols)]
+    if (length(non_empty_extras) > 0) {
+      purrr::map(seq_along(non_empty_extras), function(i) {
+        list(
+          error_type = "extra_column",
+          file_type = file_type,
+          file_path = file_path,
+          col_num = length(expected_columns) + i,
+          column_name = non_empty_extras[i],
+          message = glue::glue(
+            "Error in {.pretty_print_file_type(file_type)} at {file_path}. ",
+            "Unexpected extra column \"{non_empty_extras[i]}\" at position ",
+            "{length(expected_columns) + i} (expected {length(expected_columns)} columns)."
+          )
+        )
+      })
+    } else {
+      list()
+    }
+  } else {
+    list()
+  }
+
+  raw_lines <- tryCatch(
+    readr::read_lines(file_path),
+    error = function(e) NULL
+  )
+  if (is.null(raw_lines)) {
+    return(c(column_order_errors, row_sorting_errors, empty_column_errors,
+             extra_column_errors,
+             list(.create_invalid_csv_error(
+               file_type, file_path, "Unable to read file lines"))))
+  }
+
   line_ending_errors <- .check_line_endings(
     raw_lines, list(file_path = file_path, file_type = file_type))
 
@@ -85,7 +129,8 @@ check_worksheet <- function(
     excessive_quote_errors,
     column_order_errors,
     row_sorting_errors,
-    empty_column_errors
+    empty_column_errors,
+    extra_column_errors
   ))
 
   return(all_errors)
@@ -113,7 +158,7 @@ check_worksheet <- function(
   })
 }
 
-#' Check the columns order in a worksheet
+#' Check that columns appear in their expected positions
 #'
 #' @param csv_data A data.frame containing the worksheet rows
 #' @param expected_columns The worksheet column in their expected order
@@ -268,7 +313,7 @@ check_worksheet <- function(
 
 #' Create the error object for when the worksheet could not be found
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path The invalid path
 #'
@@ -284,7 +329,7 @@ check_worksheet <- function(
 
 #' Create the error for when the worksheet is not valid CSV
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param error_message Reason(s) for why the worksheet is invalid CSV
@@ -301,7 +346,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet has invalid line endings
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param row_num Index of the row with the invalid line ending
@@ -317,13 +362,13 @@ check_worksheet <- function(
     row_num = row_num,
     expected_line_ending = expected_line_ending,
     actual_line_ending = actual_line_ending,
-    message <- glue::glue("Error in {.pretty_print_file_type(file_type)} at {file_path}. Row {row_num} has an invalid line ending. Expected {expected_line_ending} but found {actual_line_ending}.")
+    message = glue::glue("Error in {.pretty_print_file_type(file_type)} at {file_path}. Row {row_num} has an invalid line ending. Expected {expected_line_ending} but found {actual_line_ending}.")
   ))
 }
 
 #' Create an error for when the worksheet has excessive quoting
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param row_num Row number with excessive quotes
@@ -346,7 +391,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet columns are in the wrong order
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param expected_column The column expected at the offending position
@@ -369,7 +414,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet is missing the ID column
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param id_column_name Name of the expected ID column
@@ -388,7 +433,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet rows are unsorted
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param id_column_name Name of the column that should be sorted
@@ -406,7 +451,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet has trailing empty columns
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param col_num Position of the trailing empty column
@@ -452,15 +497,28 @@ check_recode_blocks <- function(file_path) {
 
   vd <- tryCatch(
     read.csv(file_path, stringsAsFactors = FALSE, check.names = FALSE),
-    error = function(e) NULL
+    error = function(e) {
+      list(error = e$message)
+    }
   )
-  if (is.null(vd)) {
-    return(list())
+  if (is.list(vd) && !is.null(vd$error)) {
+    return(list(.create_invalid_csv_error("variable_details", file_path,
+                                          vd$error)))
   }
 
   required_cols <- c("variable", "variableStart", "databaseStart", "recStart")
-  if (!all(required_cols %in% names(vd))) {
-    return(list())
+  missing_cols <- required_cols[!required_cols %in% names(vd)]
+  if (length(missing_cols) > 0) {
+    return(list(list(
+      error_type = "missing_required_columns",
+      file_type = "variable_details",
+      file_path = file_path,
+      missing_columns = missing_cols,
+      message = glue::glue(
+        "Cannot check recode blocks in {file_path}: missing required ",
+        "column(s): {paste(missing_cols, collapse = ', ')}"
+      )
+    )))
   }
 
   errors <- list()
@@ -469,22 +527,26 @@ check_recode_blocks <- function(file_path) {
   for (var in all_vars) {
     rows <- vd[vd$variable == var, ]
 
-    # Exclude Func:: rows — derived variable routers that legitimately span all
-    # databases. Only check actual recode rows.
+    # Exclude Func:: rows (identified by recEnd column containing "Func::") —
+    # these are derived variable routers that legitimately span all databases.
+    # Only check actual recode rows.
     recode_rows <- rows[!grepl("^Func::", rows$recEnd), ]
     blocks <- unique(recode_rows$variableStart)
 
     if (length(blocks) < 2) next
 
     # For each recode row, expand databaseStart into individual databases and
-    # build a lookup: (database, recStart) -> character vector of blocks
+    # build a lookup: (database, recStart) -> character vector of blocks.
+    # Each row's own databaseStart is used (not just the first row's) to handle
+    # blocks where different rows cover different databases.
     db_recstart_blocks <- list()
 
     for (vs in blocks) {
       block_rows <- recode_rows[recode_rows$variableStart == vs, ]
-      dbs <- trimws(unlist(strsplit(block_rows$databaseStart[1], ",")))
 
-      for (rec in block_rows$recStart) {
+      for (row_i in seq_len(nrow(block_rows))) {
+        dbs <- trimws(unlist(strsplit(block_rows$databaseStart[row_i], ",")))
+        rec <- block_rows$recStart[row_i]
         for (db in dbs) {
           key <- paste0(db, "|||", rec)
           db_recstart_blocks[[key]] <- unique(c(db_recstart_blocks[[key]], vs))

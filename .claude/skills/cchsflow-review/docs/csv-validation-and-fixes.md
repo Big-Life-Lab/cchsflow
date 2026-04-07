@@ -16,7 +16,7 @@ Rscript exec/check-worksheets.R
 Rscript exec/fix-worksheets.R
 ```
 
-These are enforced by the `check-csv.yml` GitHub Action on PRs that modify `inst/extdata/variables.csv` or `variable_details.csv`. The GHA runs `check-worksheets.R` and fails if violations are found.
+On branches that have it (see branch availability table below), these are enforced by the `check-csv.yml` GitHub Action on PRs that modify `inst/extdata/variables.csv` or `variable_details.csv`. The GHA runs `check-worksheets.R` and fails if violations are found.
 
 **`standardise_csv()`** (on `feature/csv-standardisation-updates` branch):
 
@@ -28,7 +28,7 @@ standardise_csv("inst/extdata/variables.csv")
 standardise_csv("inst/extdata/variable_details.csv", collaboration = TRUE, validate_only = TRUE)
 ```
 
-Collaboration mode validates fields against `metadata_registry.yaml` regex patterns including `dummyVariable`, `variableStart`, `recStart`, and `recEnd`. It also checks for missing categorical dummy variables and cross-field rules.
+Collaboration mode validates fields against naming convention regex patterns (see `docs/variable-naming-conventions.md`) including `dummyVariable`, `variableStart`, `recStart`, and `recEnd`. It also checks for missing categorical dummy variables and cross-field rules.
 
 ### When to run
 

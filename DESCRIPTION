@@ -41,6 +41,12 @@ Depends:
   sjlabelled (>= 1.0.17),
   stringr (>= 1.2.0),
   magrittr
+Imports:
+  cli,
+  glue,
+  purrr,
+  readr,
+  yaml
 Description: Supporting the use of the Canadian Community Health Survey 
              (CCHS) by transforming variables from each cycle into harmonized, 
              consistent versions that span survey cycles (currently, 2001 to 
@@ -56,7 +62,8 @@ LazyData: true
 URL: https://big-life-lab.github.io/cchsflow/, https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
 RoxygenNote: 7.3.2
-Suggests: 
+Suggests:
+    devtools,
     testthat (>= 3.0.0),
     kableExtra,
     DT,

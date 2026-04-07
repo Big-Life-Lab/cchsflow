@@ -79,25 +79,21 @@ See the cchsflow-docs `CLAUDE.md` and `.claude/skills/cchs-database/SKILL.md` fo
 
 ### Fallback: file-based lookups
 
-If the MCP is unavailable and cannot be restored, use these file-based sources in the cchsflow-docs repo (typically `../cchsflow-docs/`):
+If the MCP is unavailable and cannot be restored, use the DDI YAML files in the cchsflow-docs repo (typically `../cchsflow-docs/`):
 
-1. **Extracted YAML data dictionaries** — structured variable definitions by cycle:
+1. **DDI YAML files** — parsed variable definitions by cycle:
    ```
-   ../cchsflow-docs/cchs-extracted/data-dictionary/{year}/
-   ```
-   Coverage: 2000-2001 through 2023.
-
-2. **DDI XML files** — authoritative StatsCan PUMF documentation:
-   ```
-   ../cchsflow-docs/cchs-pumf-docs/CCHS_DDI/
+   ../cchsflow-docs/ddi/
    ```
 
-3. **CCHS variable dictionary CSV** — flat file for quick lookups:
+2. **Processed CSVs** — tabular variable metadata:
    ```
-   ../cchsflow-docs/data/cchs_variable_dictionary.csv
+   ../cchsflow-docs/data/
    ```
 
-These are the raw sources that feed the MCP database. The MCP is strongly preferred because it cross-references all sources, deduplicates, and provides structured query tools rather than requiring manual grep/search across hundreds of files.
+**Note:** Raw source files (`cchs-extracted/`, `cchs-pumf-docs/`) are not in the git repo — they are stored externally per the cchsflow-docs storage guide. Use the MCP database or the processed files above instead.
+
+The MCP is strongly preferred because it cross-references all sources, deduplicates, and provides structured query tools rather than requiring manual grep/search across hundreds of files.
 
 ### What to verify
 
