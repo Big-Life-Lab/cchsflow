@@ -9,7 +9,7 @@ find_variable_in_data(df, variable, cycle = NULL, source = "main")
 \arguments{
 \item{df}{Data frame. The loaded CCHS data.}
 
-\item{variable}{Character. Harmonized variable name (e.g., "SMKDSTY_A")}
+\item{variable}{Character. Harmonized variable name (e.g., "SMKDSTY_original")}
 
 \item{cycle}{Character. Optional cycle name (e.g., "cchs2001_p") for
 more efficient lookup. If NULL, checks all known variants.}

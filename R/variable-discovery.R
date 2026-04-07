@@ -20,10 +20,10 @@
 #   get_harmonized_variables(subject = "Smoking", recommended = "primary")
 #
 #   # Get era-specific source mappings
-#   get_source_mappings("SMKDSTY_A")
+#   get_source_mappings("SMKDSTY_original")
 #
 #   # Find variable in loaded data (handles era variants)
-#   find_variable_in_data(df, "SMKDSTY_A", cycle = "cchs2001_p")
+#   find_variable_in_data(df, "SMKDSTY_original", cycle = "cchs2001_p")
 #
 # VERSION: 1.0.0
 # ==============================================================================
@@ -122,14 +122,14 @@ get_harmonized_variables <- function(subject = NULL,
 #' Parses the variableStart field to extract source variable names
 #' for each database/cycle. Returns a named list for easy lookup.
 #'
-#' @param variable Character. Harmonized variable name (e.g., "SMKDSTY_A")
+#' @param variable Character. Harmonized variable name (e.g., "SMKDSTY_original")
 #' @param source Character. "main" or "cep". Default "main".
 #' @param cep_path Character. Path to CEP directory if source = "cep".
 #' @return Named list with database names as keys and source variable names
 #'   as values. Also includes `default` key for `[VAR]` pattern.
 #' @export
 #' @examples
-#' mappings <- get_source_mappings("SMKDSTY_A")
+#' mappings <- get_source_mappings("SMKDSTY_original")
 #' # Returns: list(
 #' #   cchs2001_p = "SMKADSTY",
 #' #   cchs2003_p = "SMKCDSTY",
@@ -174,19 +174,19 @@ get_source_mappings <- function(variable,
 #' handling era-specific naming conventions automatically.
 #'
 #' @param df Data frame. The loaded CCHS data.
-#' @param variable Character. Harmonized variable name (e.g., "SMKDSTY_A")
+#' @param variable Character. Harmonized variable name (e.g., "SMKDSTY_original")
 #' @param cycle Character. Optional cycle name (e.g., "cchs2001_p") for
 #'   more efficient lookup. If NULL, checks all known variants.
 #' @param source Character. "main" or "cep". Default "main".
 #' @return Character. The source variable name found in df, or NULL if not found.
 #' @export
 #' @examples
-#' # Find SMKDSTY_A in 2001 data
-#' var_name <- find_variable_in_data(cchs_2001, "SMKDSTY_A", "cchs2001_p
+#' # Find SMKDSTY_original in 2001 data
+#' var_name <- find_variable_in_data(cchs_2001, "SMKDSTY_original", "cchs2001_p
 #' # Returns: "SMKADSTY"
 #'
 #' # Without cycle hint, checks all variants
-#' var_name <- find_variable_in_data(df, "SMKDSTY_A")
+#' var_name <- find_variable_in_data(df, "SMKDSTY_original")
 find_variable_in_data <- function(df, variable, cycle = NULL, source = "main") {
 
   # Get source mappings
@@ -240,7 +240,7 @@ find_variable_in_data <- function(df, variable, cycle = NULL, source = "main") {
 #' @return Character vector of all source variable names
 #' @export
 #' @examples
-#' get_source_variants("SMKDSTY_A")
+#' get_source_variants("SMKDSTY_original")
 #' # Returns: c("SMKADSTY", "SMKCDSTY", "SMKEDSTY", "SMKDSTY", "SMKDVSTY")
 get_source_variants <- function(variable, source = "main") {
   mappings <- get_source_mappings(variable, source = source)

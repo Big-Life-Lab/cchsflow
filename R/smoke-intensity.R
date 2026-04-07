@@ -6,16 +6,16 @@
 #
 # 1. cigs_per_day - Unified daily smoking intensity (cigarettes per day)
 #    CCHS cycles: 2001 - 2023 (continuous values)
-#    Universe: Ever-daily smokers (SMKDSTY_A 1, 2, 4)
+#    Universe: Ever-daily smokers (SMKDSTY_original 1, 2, 4)
 #    Routes SMK_204 (current daily) or SMK_208 (former daily) based on status
 #
 # 2. SMK_204 - Cigarettes per day (current daily smokers)
 #    CCHS cycles: 2001 - 2023 (continuous values)
-#    Universe: Current daily smokers (SMKDSTY_A == 1)
+#    Universe: Current daily smokers (SMKDSTY_original == 1)
 #
 # 3. SMK_208 - Cigarettes per day (former daily smokers)
 #    CCHS cycles: 2001 - 2023 (continuous values)
-#    Universe: Former daily smokers (SMKDSTY_A 2, 4)
+#    Universe: Former daily smokers (SMKDSTY_original 2, 4)
 #
 # 4. SMK_05B - Cigarettes per day (occasional smokers)
 #    CCHS cycles: 2001 - 2023 (continuous values)
@@ -53,16 +53,16 @@
 #'
 #' **Routing Logic**:
 #' \itemize{
-#'   \item SMKDSTY_A == 1 (current daily) -> uses SMK_204
-#'   \item SMKDSTY_A == 2 (occasional, former daily) -> uses SMK_208
-#'   \item SMKDSTY_A == 4 (former daily, non-smoker now) -> uses SMK_208
-#'   \item SMKDSTY_A %in% c(3, 5, 6) (never daily) -> NA::a (not applicable)
-#'   \item Missing SMKDSTY_A -> NA::b (missing)
+#'   \item SMKDSTY_original == 1 (current daily) -> uses SMK_204
+#'   \item SMKDSTY_original == 2 (occasional, former daily) -> uses SMK_208
+#'   \item SMKDSTY_original == 4 (former daily, non-smoker now) -> uses SMK_208
+#'   \item SMKDSTY_original %in% c(3, 5, 6) (never daily) -> NA::a (not applicable)
+#'   \item Missing SMKDSTY_original -> NA::b (missing)
 #' }
 #'
 #' **Coverage**: Full PUMF 2001-2023, Full Master 2001-2023.
 #'
-#' @param SMKDSTY_A Numeric vector. Smoking status (6-category, pre-2015 definitions).
+#' @param SMKDSTY_original Numeric vector. Smoking status (6-category, pre-2015 definitions).
 #'   1=Daily, 2=Occasional (former daily), 3=Occasional (never daily),
 #'   4=Former daily, 5=Former occasional, 6=Never smoked.
 #' @param SMK_204 Numeric vector. Cigarettes per day for current daily smokers.
@@ -81,7 +81,7 @@
 #' \dontrun{
 #' # Current daily smoker (status 1) - uses SMK_204
 #' cigs <- calculate_cigs_per_day(
-#'   SMKDSTY_A = 1,
+#'   SMKDSTY_original = 1,
 #'   SMK_204 = 20,
 #'   SMK_208 = NA
 #' )
@@ -89,7 +89,7 @@
 #'
 #' # Former daily smoker (status 4) - uses SMK_208
 #' cigs <- calculate_cigs_per_day(
-#'   SMKDSTY_A = 4,
+#'   SMKDSTY_original = 4,
 #'   SMK_204 = NA,
 #'   SMK_208 = 15
 #' )
@@ -97,7 +97,7 @@
 #'
 #' # Never-daily smoker (status 3) - not applicable
 #' cigs <- calculate_cigs_per_day(
-#'   SMKDSTY_A = 3,
+#'   SMKDSTY_original = 3,
 #'   SMK_204 = NA,
 #'   SMK_208 = NA
 #' )
@@ -118,19 +118,19 @@
 #'
 #' @note v3.0.0-alpha, last updated: 2026-01-09, status: active - Unified daily intensity
 #' @export
-calculate_cigs_per_day <- function(SMKDSTY_A,
+calculate_cigs_per_day <- function(SMKDSTY_original,
                                    SMK_204,
                                    SMK_208,
                                    output_format = "tagged_na") {
 
   # Handle empty input vectors
-  if (length(SMKDSTY_A) == 0) return(numeric(0))
+  if (length(SMKDSTY_original) == 0) return(numeric(0))
 
   # === STEP 1: DATA CLEANING ===
   # Clean input variables (includes automatic length validation)
   cleaned <- clean_variables(
     vars = list(
-      SMKDSTY_A = SMKDSTY_A,
+      SMKDSTY_original = SMKDSTY_original,
       SMK_204 = SMK_204,
       SMK_208 = SMK_208
     ),
@@ -140,20 +140,20 @@ calculate_cigs_per_day <- function(SMKDSTY_A,
   # === STEP 2: DOMAIN LOGIC - Route based on smoking status ===
   result <- dplyr::case_when(
     # Handle missing status first
-    any_missing(cleaned$SMKDSTY_A) ~
-      get_priority_missing(cleaned$SMKDSTY_A, output_format = output_format),
+    any_missing(cleaned$SMKDSTY_original) ~
+      get_priority_missing(cleaned$SMKDSTY_original, output_format = output_format),
 
     # Status 1: Current daily smoker - use SMK_204
-    cleaned$SMKDSTY_A == 1 ~ cleaned$SMK_204,
+    cleaned$SMKDSTY_original == 1 ~ cleaned$SMK_204,
 
     # Status 2: Occasional smoker (former daily) - use SMK_208
-    cleaned$SMKDSTY_A == 2 ~ cleaned$SMK_208,
+    cleaned$SMKDSTY_original == 2 ~ cleaned$SMK_208,
 
     # Status 4: Former daily smoker - use SMK_208
-    cleaned$SMKDSTY_A == 4 ~ cleaned$SMK_208,
+    cleaned$SMKDSTY_original == 4 ~ cleaned$SMK_208,
 
     # Status 3, 5, 6: Never-daily smokers - not applicable
-    cleaned$SMKDSTY_A %in% c(3, 5, 6) ~
+    cleaned$SMKDSTY_original %in% c(3, 5, 6) ~
       assign_missing("not_applicable", "cigs_per_day", output_format),
 
     # Default: missing
@@ -191,7 +191,7 @@ calculate_cigs_per_day <- function(SMKDSTY_A,
 #'
 #' **Values**: Continuous (1-99 cigarettes per day)
 #'
-#' **Universe**: Current daily smokers (SMKDSTY_A == 1)
+#' **Universe**: Current daily smokers (SMKDSTY_original == 1)
 #'
 #' **Recommendation**: Use `cigs_per_day` for unified daily intensity analysis.
 #' SMK_204 is available as a secondary variable for specific use cases requiring
@@ -232,7 +232,7 @@ calculate_SMK_204 <- function(data, output_format = "tagged_na") {
 #'
 #' **Values**: Continuous (1-99 cigarettes per day when they smoked daily)
 #'
-#' **Universe**: Former daily smokers (SMKDSTY_A %in% c(2, 4))
+#' **Universe**: Former daily smokers (SMKDSTY_original %in% c(2, 4))
 #'
 #' **Recommendation**: Use `cigs_per_day` for unified daily intensity analysis.
 #' SMK_208 is available as a secondary variable for specific use cases requiring
@@ -274,7 +274,7 @@ calculate_SMK_208 <- function(data, output_format = "tagged_na") {
 #'
 #' **Values**: Continuous (1-99 cigarettes per day when smoking)
 #'
-#' **Universe**: Current occasional smokers (SMKDSTY_A %in% c(2, 3))
+#' **Universe**: Current occasional smokers (SMKDSTY_original %in% c(2, 3))
 #'
 #' @param data Data frame containing CCHS data
 #' @param output_format Character. Output format for missing values
@@ -310,7 +310,7 @@ calculate_SMK_05B <- function(data, output_format = "tagged_na") {
 #'
 #' **Values**: Continuous (0-31 days)
 #'
-#' **Universe**: Current occasional smokers (SMKDSTY_A %in% c(2, 3))
+#' **Universe**: Current occasional smokers (SMKDSTY_original %in% c(2, 3))
 #'
 #' @param data Data frame containing CCHS data
 #' @param output_format Character. Output format for missing values

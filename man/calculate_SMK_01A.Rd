@@ -19,7 +19,7 @@ DOCUMENTATION ONLY - Use rec_with_table() for implementation
 
 Creates harmonized SMK_01A variable across CCHS cycles 2001-2023.
 This variable asks about lifetime cigarette consumption threshold (100+ cigarettes)
-and serves as the final component for SMKDSTY_A reconstruction and smoking classification.
+and serves as the final component for SMKDSTY_original reconstruction and smoking classification.
 }
 \details{
 **Implementation Method**: Direct harmonization via rec_with_table()
@@ -43,7 +43,7 @@ and serves as the final component for SMKDSTY_A reconstruction and smoking class
   - Critical for "former occasional" vs "never smoker" classification
 
 **Usage**: 
-- Third input for SMKDSTY_A complex reconstruction function
+- Third input for SMKDSTY_original complex reconstruction function
 - Distinguishes experimental/former occasional smokers from never smokers
 - Used with SMK_005 and SMK_030 to determine final smoking status categories
 - Longest-running harmonized smoking variable (2001-2023 coverage)

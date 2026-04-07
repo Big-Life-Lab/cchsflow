@@ -19,6 +19,6 @@ Returns all known source variable names across all eras.
 Useful for checking if ANY variant exists in data.
 }
 \examples{
-get_source_variants("SMKDSTY_A")
+get_source_variants("SMKDSTY_original")
 # Returns: c("SMKADSTY", "SMKCDSTY", "SMKEDSTY", "SMKDSTY", "SMKDVSTY")
 }

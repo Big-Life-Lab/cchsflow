@@ -5,15 +5,27 @@
 \title{Years Since Stopped Smoking Completely - TIME_QUIT_SMOKING_COMPLETE (continuous)}
 \usage{
 calculate_time_quit_smoking_complete_stub(
-  SMK_09A_cont,
+  SMKDSTY_cat5,
+  SMK_10_gate,
   SMK_06A_cont,
+  SMK_09A_cont,
+  SMK_10A_cont,
+  SMKDVSTP,
   output_format = "tagged_na"
 )
 }
 \arguments{
-\item{SMK_09A_cont}{Numeric vector. Years since stopped daily smoking (PUMF)}
+\item{SMKDSTY_cat5}{Numeric vector. 5-category smoking status}
 
-\item{SMK_06A_cont}{Numeric vector. Years since stopped smoking, occasional smokers (PUMF)}
+\item{SMK_10_gate}{Numeric vector. Quit timing gate (1 or 2)}
+
+\item{SMK_06A_cont}{Numeric vector. Years since quit (former occasional)}
+
+\item{SMK_09A_cont}{Numeric vector. Years since stopped daily}
+
+\item{SMK_10A_cont}{Numeric vector. Years since quit completely (gradual)}
+
+\item{SMKDVSTP}{Numeric vector. Master continuous years since quit completely}
 
 \item{output_format}{Character. Output format ("tagged_na" or "original")}
 }
@@ -23,8 +35,8 @@ Vector of continuous years since cessation
 \description{
 DOCUMENTATION ONLY - canonical implementation is in smoking-cessation.R.
 
-Combines cessation timing for all former smokers (daily + occasional).
-Uses StatCan DV SMKDVSTP on Master 2003–2022; midpoint imputation for PUMF and 2023.
+Pathway-aware years since completely quit smoking. Uses SMKDVSTP (Master)
+when available, then routes by quit pathway on PUMF.
 }
 \examples{
 \dontrun{

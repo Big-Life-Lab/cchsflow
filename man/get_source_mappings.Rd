@@ -7,7 +7,7 @@
 get_source_mappings(variable, source = "main", cep_path = NULL)
 }
 \arguments{
-\item{variable}{Character. Harmonized variable name (e.g., "SMKDSTY_A")}
+\item{variable}{Character. Harmonized variable name (e.g., "SMKDSTY_original")}
 
 \item{source}{Character. "main" or "cep". Default "main".}
 
@@ -22,7 +22,7 @@ Parses the variableStart field to extract source variable names
 for each database/cycle. Returns a named list for easy lookup.
 }
 \examples{
-mappings <- get_source_mappings("SMKDSTY_A")
+mappings <- get_source_mappings("SMKDSTY_original")
 # Returns: list(
 #   cchs2001_p = "SMKADSTY",
 #   cchs2003_p = "SMKCDSTY",

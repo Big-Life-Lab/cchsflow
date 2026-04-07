@@ -21,14 +21,14 @@ Creates harmonized SMKG207 categorical variables across CCHS cycles 2001-2014.
 This variable asks former daily smokers when they started smoking daily, with categorical age groups.
 
 **Note**: Categorical versions have temporal variants:
-- **SMKG207_A** (2001-2003): 10 categories with broader age bins
-- **SMKG207_B** (2005-2014): 11 categories with finer age bins
+- **SMKG207_pre2005** (2001-2003): 10 categories with broader age bins
+- **SMKG207_2005plus** (2005-2014): 11 categories with finer age bins
 Most applications should use continuous **SMKG207_cont** instead.
 }
 \details{
 **Implementation Method**: Direct harmonization via rec_with_table()
 - **Source variables**: 
-  - 2001-2014: Cycle-specific variables (SMKG207_A/B direct)
+  - 2001-2014: Cycle-specific variables (SMKG207_pre2005/B direct)
 - **Harmonization**: Simple 1:1 mapping across early cycles
 - **Availability**: 2001-2014 only (replaced by complex derivation in 2015+)
 
@@ -45,8 +45,8 @@ Most applications should use continuous **SMKG207_cont** instead.
 \examples{
 \dontrun{
 # Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMKG207_A")  # or SMKG207_B 
-age_started_former_daily_pre2015 <- harmonized_data$SMKG207_A
+harmonized_data <- rec_with_table(cchs_data, "SMKG207_pre2005")  # or SMKG207_2005plus 
+age_started_former_daily_pre2015 <- harmonized_data$SMKG207_pre2005
 }
 
 }

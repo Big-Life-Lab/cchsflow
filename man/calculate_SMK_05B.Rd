@@ -33,5 +33,5 @@ smokers do smoke.
 
 **Values**: Continuous (1-99 cigarettes per day when smoking)
 
-**Universe**: Current occasional smokers (SMKDSTY_A %in% c(2, 3))
+**Universe**: Current occasional smokers (SMKDSTY_original %in% c(2, 3))
 }

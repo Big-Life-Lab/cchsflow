@@ -32,7 +32,7 @@ This variable captures daily cigarette consumption for current daily smokers.
 
 **Values**: Continuous (1-99 cigarettes per day)
 
-**Universe**: Current daily smokers (SMKDSTY_A == 1)
+**Universe**: Current daily smokers (SMKDSTY_original == 1)
 
 **Recommendation**: Use `cigs_per_day` for unified daily intensity analysis.
 SMK_204 is available as a secondary variable for specific use cases requiring

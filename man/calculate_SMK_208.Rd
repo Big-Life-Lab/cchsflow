@@ -32,7 +32,7 @@ This variable captures recalled daily cigarette consumption for former daily smo
 
 **Values**: Continuous (1-99 cigarettes per day when they smoked daily)
 
-**Universe**: Former daily smokers (SMKDSTY_A %in% c(2, 4))
+**Universe**: Former daily smokers (SMKDSTY_original %in% c(2, 4))
 
 **Recommendation**: Use `cigs_per_day` for unified daily intensity analysis.
 SMK_208 is available as a secondary variable for specific use cases requiring

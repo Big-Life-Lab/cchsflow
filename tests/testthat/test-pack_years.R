@@ -348,7 +348,7 @@ test_that("pack_years_fun still exists and works (legacy)", {
   # Legacy function in R/smoking.R should still be callable
   # Status 6 (never smoker) -> 0
   result <- pack_years_fun(
-    SMKDSTY_A = 6, DHHGAGE_cont = 50,
+    SMKDSTY_original = 6, DHHGAGE_cont = 50,
     time_quit_smoking = NA, SMKG203_cont = NA,
     SMKG207_cont = NA, SMK_204 = NA, SMK_05B = NA,
     SMK_208 = NA, SMK_05C = NA, SMKG01C_cont = NA,

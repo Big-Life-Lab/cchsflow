@@ -3,15 +3,15 @@
 # =============================================================================
 #
 # Tests for the unified cigs_per_day derived variable that wraps:
-# - SMK_204 (current daily smokers, SMKDSTY_A = 1) - "How many cigarettes do you
+# - SMK_204 (current daily smokers, SMKDSTY_original = 1) - "How many cigarettes do you
 #   currently smoke per day?"
-# - SMK_208 (former daily smokers, SMKDSTY_A = 2, 4) - "When you smoked daily,
+# - SMK_208 (former daily smokers, SMKDSTY_original = 2, 4) - "When you smoked daily,
 #   how many cigarettes did you usually smoke per day?"
 #
-# The variable routes to the correct source based on SMKDSTY_A status.
+# The variable routes to the correct source based on SMKDSTY_original status.
 #
-# Universe: Ever-daily smokers (SMKDSTY_A 1, 2, 4)
-# NA for: Never-daily smokers (SMKDSTY_A 3, 5, 6)
+# Universe: Ever-daily smokers (SMKDSTY_original 1, 2, 4)
+# NA for: Never-daily smokers (SMKDSTY_original 3, 5, 6)
 #
 # @note v3.0.0-alpha, last updated: 2026-01-09, status: active
 # =============================================================================
@@ -116,7 +116,7 @@ test_that("calculate_cigs_per_day uses SMK_204 for status 1 (current daily)", {
 
   # Test Case 1: Single value
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 20,
     SMK_208 = NA
   )
@@ -124,7 +124,7 @@ test_that("calculate_cigs_per_day uses SMK_204 for status 1 (current daily)", {
 
   # Test Case 2: Different values
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 15,
     SMK_208 = NA
   )
@@ -132,7 +132,7 @@ test_that("calculate_cigs_per_day uses SMK_204 for status 1 (current daily)", {
 
   # Test Case 3: Even when SMK_208 has a value (should be ignored for status 1)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 25,
     SMK_208 = 10
   )
@@ -145,7 +145,7 @@ test_that("calculate_cigs_per_day uses SMK_208 for status 2 (occasional, former 
 
   # Test Case 1: Single value
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 2,
+    SMKDSTY_original = 2,
     SMK_204 = NA,
     SMK_208 = 18
   )
@@ -153,7 +153,7 @@ test_that("calculate_cigs_per_day uses SMK_208 for status 2 (occasional, former 
 
   # Test Case 2: Even when SMK_204 has a value (should be ignored for status 2)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 2,
+    SMKDSTY_original = 2,
     SMK_204 = 30,
     SMK_208 = 12
   )
@@ -166,7 +166,7 @@ test_that("calculate_cigs_per_day uses SMK_208 for status 4 (former daily)", {
 
   # Test Case 1: Single value
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 4,
+    SMKDSTY_original = 4,
     SMK_204 = NA,
     SMK_208 = 22
   )
@@ -174,7 +174,7 @@ test_that("calculate_cigs_per_day uses SMK_208 for status 4 (former daily)", {
 
   # Test Case 2: Even when SMK_204 has a value (should be ignored for status 4)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 4,
+    SMKDSTY_original = 4,
     SMK_204 = 40,
     SMK_208 = 17
   )
@@ -187,7 +187,7 @@ test_that("calculate_cigs_per_day returns NA::a for never-daily smokers (status 
 
   # Status 3: Occasional smoker (never daily)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 3,
+    SMKDSTY_original = 3,
     SMK_204 = NA,
     SMK_208 = NA
   )
@@ -195,7 +195,7 @@ test_that("calculate_cigs_per_day returns NA::a for never-daily smokers (status 
 
   # Status 5: Former occasional smoker
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 5,
+    SMKDSTY_original = 5,
     SMK_204 = NA,
     SMK_208 = NA
   )
@@ -203,7 +203,7 @@ test_that("calculate_cigs_per_day returns NA::a for never-daily smokers (status 
 
   # Status 6: Never smoker
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 6,
+    SMKDSTY_original = 6,
     SMK_204 = NA,
     SMK_208 = NA
   )
@@ -212,11 +212,11 @@ test_that("calculate_cigs_per_day returns NA::a for never-daily smokers (status 
 
 test_that("calculate_cigs_per_day returns NA::b for missing status", {
 
-  # Missing SMKDSTY_A should return tagged_na("b")
+  # Missing SMKDSTY_original should return tagged_na("b")
 
   # Test Case 1: NA status
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = NA,
+    SMKDSTY_original = NA,
     SMK_204 = 20,
     SMK_208 = 15
   )
@@ -224,7 +224,7 @@ test_that("calculate_cigs_per_day returns NA::b for missing status", {
 
   # Test Case 2: tagged_na("b") status
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = haven::tagged_na("b"),
+    SMKDSTY_original = haven::tagged_na("b"),
     SMK_204 = 20,
     SMK_208 = 15
   )
@@ -243,7 +243,7 @@ test_that("routing is status-based, not value-based when both have values", {
 
   # Status 1 always uses SMK_204
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 10,
     SMK_208 = 50
   )
@@ -251,7 +251,7 @@ test_that("routing is status-based, not value-based when both have values", {
 
   # Status 2 always uses SMK_208
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 2,
+    SMKDSTY_original = 2,
     SMK_204 = 10,
     SMK_208 = 50
   )
@@ -259,7 +259,7 @@ test_that("routing is status-based, not value-based when both have values", {
 
   # Status 4 always uses SMK_208
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 4,
+    SMKDSTY_original = 4,
     SMK_204 = 10,
     SMK_208 = 50
   )
@@ -276,7 +276,7 @@ test_that("calculate_cigs_per_day handles valid cigarette counts", {
 
   # Minimum plausible value
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 1,
     SMK_208 = NA
   )
@@ -284,7 +284,7 @@ test_that("calculate_cigs_per_day handles valid cigarette counts", {
 
   # Typical value
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 20,
     SMK_208 = NA
   )
@@ -292,7 +292,7 @@ test_that("calculate_cigs_per_day handles valid cigarette counts", {
 
   # Higher value
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 4,
+    SMKDSTY_original = 4,
     SMK_204 = NA,
     SMK_208 = 60
   )
@@ -305,7 +305,7 @@ test_that("calculate_cigs_per_day handles boundary values", {
   # that clean_variables() auto-detection treats as missing codes when
   # database context is unavailable during unit testing)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 95,
     SMK_208 = NA
   )
@@ -322,7 +322,7 @@ test_that("calculate_cigs_per_day propagates missing SMK_204 for status 1", {
 
   # Test Case 1: SMK_204 is NA
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = NA,
     SMK_208 = 20
   )
@@ -330,7 +330,7 @@ test_that("calculate_cigs_per_day propagates missing SMK_204 for status 1", {
 
   # Test Case 2: SMK_204 is tagged_na("b")
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = haven::tagged_na("b"),
     SMK_208 = 20
   )
@@ -338,7 +338,7 @@ test_that("calculate_cigs_per_day propagates missing SMK_204 for status 1", {
 
   # Test Case 3: SMK_204 is tagged_na("a") (not applicable in source)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = haven::tagged_na("a"),
     SMK_208 = 20
   )
@@ -351,7 +351,7 @@ test_that("calculate_cigs_per_day propagates missing SMK_208 for status 2 and 4"
 
   # Test Case 1: SMK_208 is NA for status 2
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 2,
+    SMKDSTY_original = 2,
     SMK_204 = 20,
     SMK_208 = NA
   )
@@ -359,7 +359,7 @@ test_that("calculate_cigs_per_day propagates missing SMK_208 for status 2 and 4"
 
   # Test Case 2: SMK_208 is tagged_na("b") for status 4
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 4,
+    SMKDSTY_original = 4,
     SMK_204 = 20,
     SMK_208 = haven::tagged_na("b")
   )
@@ -372,7 +372,7 @@ test_that("calculate_cigs_per_day handles both sources missing", {
 
   # Status 1 with both missing
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = NA,
     SMK_208 = NA
   )
@@ -380,7 +380,7 @@ test_that("calculate_cigs_per_day handles both sources missing", {
 
   # Status 4 with both missing
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 4,
+    SMKDSTY_original = 4,
     SMK_204 = NA,
     SMK_208 = NA
   )
@@ -399,7 +399,7 @@ test_that("calculate_cigs_per_day handles vector inputs correctly", {
   smk_208_vec <- c(NA, 15, NA, 25, NA, NA)
 
   result_vec <- calculate_cigs_per_day(
-    SMKDSTY_A = smkdsty_vec,
+    SMKDSTY_original = smkdsty_vec,
     SMK_204 = smk_204_vec,
     SMK_208 = smk_208_vec
   )
@@ -433,7 +433,7 @@ test_that("calculate_cigs_per_day handles mixed valid/missing in vectors", {
   smk_208_vec <- c(NA, NA, 15, NA)
 
   result_vec <- calculate_cigs_per_day(
-    SMKDSTY_A = smkdsty_vec,
+    SMKDSTY_original = smkdsty_vec,
     SMK_204 = smk_204_vec,
     SMK_208 = smk_208_vec
   )
@@ -460,7 +460,7 @@ test_that("calculate_cigs_per_day handles mixed valid/missing in vectors", {
 test_that("calculate_cigs_per_day handles empty input vectors", {
 
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = numeric(0),
+    SMKDSTY_original = numeric(0),
     SMK_204 = numeric(0),
     SMK_208 = numeric(0)
   )
@@ -472,7 +472,7 @@ test_that("calculate_cigs_per_day handles single-element vectors", {
 
   # Single current daily smoker
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 20,
     SMK_208 = NA
   )
@@ -485,7 +485,7 @@ test_that("calculate_cigs_per_day handles zero cigarettes appropriately", {
   # Zero is an edge case - theoretically implausible for daily smokers
   # Function should pass through the value (validation is external concern)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 0,
     SMK_208 = NA
   )
@@ -500,7 +500,7 @@ test_that("calculate_cigs_per_day handles CCHS missing codes in status", {
 
   # CCHS code 6 -> tagged_na("a") (not applicable)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 6,
+    SMKDSTY_original = 6,
     SMK_204 = 20,
     SMK_208 = 15
   )
@@ -509,7 +509,7 @@ test_that("calculate_cigs_per_day handles CCHS missing codes in status", {
 
   # CCHS codes 7, 8, 9 -> tagged_na("b") (missing/don't know/refused)
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 7,
+    SMKDSTY_original = 7,
     SMK_204 = 20,
     SMK_208 = 15
   )
@@ -520,7 +520,7 @@ test_that("calculate_cigs_per_day handles CCHS missing codes in source variables
 
   # SMK_204 code 996 -> tagged_na("a")
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 996,
     SMK_208 = NA
   )
@@ -528,7 +528,7 @@ test_that("calculate_cigs_per_day handles CCHS missing codes in source variables
 
   # SMK_204 codes 997, 998, 999 -> tagged_na("b")
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 1,
+    SMKDSTY_original = 1,
     SMK_204 = 999,
     SMK_208 = NA
   )
@@ -536,7 +536,7 @@ test_that("calculate_cigs_per_day handles CCHS missing codes in source variables
 
   # SMK_208 code 996 -> tagged_na("a")
   result <- calculate_cigs_per_day(
-    SMKDSTY_A = 4,
+    SMKDSTY_original = 4,
     SMK_204 = NA,
     SMK_208 = 996
   )
@@ -549,10 +549,10 @@ test_that("calculate_cigs_per_day handles CCHS missing codes in source variables
 # CCHS Codebook Alignment Tests
 # =============================================================================
 
-test_that("cigs_per_day aligns with SMKDSTY_A category definitions", {
+test_that("cigs_per_day aligns with SMKDSTY_original category definitions", {
 
   # Based on CCHS documentation:
-  # SMKDSTY_A categories:
+  # SMKDSTY_original categories:
   # 1 = Daily smoker -> asks SMK_204
 
   # 2 = Occasional smoker (former daily) -> asks SMK_208
@@ -567,7 +567,7 @@ test_that("cigs_per_day aligns with SMKDSTY_A category definitions", {
   smk_208 <- c(NA, 15, NA, 25, NA, NA)
 
   results <- calculate_cigs_per_day(
-    SMKDSTY_A = categories,
+    SMKDSTY_original = categories,
     SMK_204 = smk_204,
     SMK_208 = smk_208
   )

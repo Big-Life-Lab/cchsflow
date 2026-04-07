@@ -306,7 +306,7 @@ parse_recStart_values <- function(rec_start) {
   # Reject expressions containing alphabetic characters.
   # Valid numeric recStart values are: single numbers ("96"), ranges ("[1,99]"),
   # or comma-separated numbers ("6,7,8"). Cross-variable conditions like
-  # "SMKDSTY_A in (3,5,6)" or "is.na(SMK_204)" contain letters and must not
+  # "SMKDSTY_original in (3,5,6)" or "is.na(SMK_204)" contain letters and must not
   # be parsed as numeric codes.
   if (grepl("[a-zA-Z]", rec_start)) {
     return(numeric(0))

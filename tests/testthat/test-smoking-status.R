@@ -153,10 +153,10 @@ test_that("calculate_SMKDSTY_cat6 requires all three inputs", {
 # Legacy alias compatibility
 # =============================================================================
 
-test_that("calculate_SMKDSTY_A is a deprecated alias for calculate_SMKDSTY_cat6", {
+test_that("calculate_SMKDSTY_original is a deprecated alias for calculate_SMKDSTY_cat6", {
 
   expect_warning(
-    result <- calculate_SMKDSTY_A(SMK_005 = 1, SMK_030 = 1, SMK_01A = 1),
+    result <- calculate_SMKDSTY_original(SMK_005 = 1, SMK_030 = 1, SMK_01A = 1),
     "deprecated"
   )
   expect_equal(result, 1L)

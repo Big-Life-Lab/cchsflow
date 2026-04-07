@@ -120,8 +120,8 @@ calculate_SMKG040_cat <- function(data, output_format = "tagged_na") {
 #' This variable asks daily smokers when they started smoking daily, with categorical age groups.
 #' 
 #' **Note**: Categorical versions have temporal variants:
-#' - **SMKG203_A** (2001-2003): 10 categories with broader age bins
-#' - **SMKG203_B** (2005-2014): 11 categories with finer age bins  
+#' - **SMKG203_pre2005** (2001-2003): 10 categories with broader age bins
+#' - **SMKG203_2005plus** (2005-2014): 11 categories with finer age bins  
 #' Most applications should use continuous **SMKG203_cont** instead.
 #' 
 #' @details 
@@ -154,13 +154,13 @@ calculate_SMKG040_cat <- function(data, output_format = "tagged_na") {
 #' \dontrun{
 #' # Use rec_with_table() for actual implementation (2001-2014)
 #' # or complex derivation function for 2015-2023
-#' harmonized_data <- rec_with_table(cchs_data, "SMKG203_A")  # or SMKG203_B
-#' age_started_daily_cat <- harmonized_data$SMKG203_A
+#' harmonized_data <- rec_with_table(cchs_data, "SMKG203_pre2005")  # or SMKG203_2005plus
+#' age_started_daily_cat <- harmonized_data$SMKG203_pre2005
 #' }
 #' 
 #' @export
 calculate_SMKG203_cat <- function(data, output_format = "tagged_na") {
-  stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMKG203_A' or 'SMKG203_B') for implementation")
+  stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMKG203_pre2005' or 'SMKG203_2005plus') for implementation")
 }
 
 # ================================================================================
@@ -266,14 +266,14 @@ calculate_SMKG203_cont <- function(SMK_005, SMKG040_cont, output_format = "tagge
 #' This variable asks former daily smokers when they started smoking daily, with categorical age groups.
 #' 
 #' **Note**: Categorical versions have temporal variants:
-#' - **SMKG207_A** (2001-2003): 10 categories with broader age bins
-#' - **SMKG207_B** (2005-2014): 11 categories with finer age bins
+#' - **SMKG207_pre2005** (2001-2003): 10 categories with broader age bins
+#' - **SMKG207_2005plus** (2005-2014): 11 categories with finer age bins
 #' Most applications should use continuous **SMKG207_cont** instead.
 #' 
 #' @details 
 #' **Implementation Method**: Direct harmonization via rec_with_table()
 #' - **Source variables**: 
-#'   - 2001-2014: Cycle-specific variables (SMKG207_A/B direct)
+#'   - 2001-2014: Cycle-specific variables (SMKG207_pre2005/B direct)
 #' - **Harmonization**: Simple 1:1 mapping across early cycles
 #' - **Availability**: 2001-2014 only (replaced by complex derivation in 2015+)
 #' 
@@ -295,13 +295,13 @@ calculate_SMKG203_cont <- function(SMK_005, SMKG040_cont, output_format = "tagge
 #' @examples
 #' \dontrun{
 #' # Use rec_with_table() for actual implementation
-#' harmonized_data <- rec_with_table(cchs_data, "SMKG207_A")  # or SMKG207_B 
-#' age_started_former_daily_pre2015 <- harmonized_data$SMKG207_A
+#' harmonized_data <- rec_with_table(cchs_data, "SMKG207_pre2005")  # or SMKG207_2005plus 
+#' age_started_former_daily_pre2015 <- harmonized_data$SMKG207_pre2005
 #' }
 #' 
 #' @export
 calculate_SMKG207_cat <- function(data, output_format = "tagged_na") {
-  stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMKG207_A' or 'SMKG207_B') for implementation")
+  stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMKG207_pre2005' or 'SMKG207_2005plus') for implementation")
 }
 
 # ================================================================================

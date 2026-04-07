@@ -33,5 +33,5 @@ smokers smoked at least one cigarette.
 
 **Values**: Continuous (0-31 days)
 
-**Universe**: Current occasional smokers (SMKDSTY_A %in% c(2, 3))
+**Universe**: Current occasional smokers (SMKDSTY_original %in% c(2, 3))
 }

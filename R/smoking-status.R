@@ -155,7 +155,7 @@ calculate_SMKDSTY_cat3 <- function(data, output_format = "tagged_na") {
 #' 
 #' Creates harmonized SMK_005 variable across CCHS cycles 2015-2023.
 #' This variable asks about current smoking behavior and serves as a key
-#' component for SMKDSTY_A reconstruction in the 2015-2023 period.
+#' component for SMKDSTY_original reconstruction in the 2015-2023 period.
 #' 
 #' @details 
 #' **Implementation Method**: Direct harmonization via rec_with_table()
@@ -178,7 +178,7 @@ calculate_SMKDSTY_cat3 <- function(data, output_format = "tagged_na") {
 #'   - SMKDVSTY 2 (Occasional) → SMK_005 2 (Occasionally)
 #'   - SMKDVSTY 3-6 (All non-smokers) → SMK_005 3 (Not at all)
 #' 
-#' **Usage**: Primary input for SMKDSTY_A complex reconstruction function
+#' **Usage**: Primary input for SMKDSTY_original complex reconstruction function
 #' 
 #' @param data Data frame containing CCHS data
 #' @param output_format Character. Output format for missing values ("tagged_na" or "standard")
@@ -207,7 +207,7 @@ calculate_SMK_005 <- function(data, output_format = "tagged_na") {
 #' 
 #' Creates harmonized SMK_030 variable across CCHS cycles 2015-2023.
 #' This variable asks whether occasional/former smokers ever smoked daily
-#' and serves as a key component for SMKDSTY_A reconstruction.
+#' and serves as a key component for SMKDSTY_original reconstruction.
 #' 
 #' @details 
 #' **Implementation Method**: Direct harmonization via rec_with_table()
@@ -229,7 +229,7 @@ calculate_SMK_005 <- function(data, output_format = "tagged_na") {
 #'   - Critical for distinguishing "former daily" vs "never daily" categories
 #' 
 #' **Usage**: 
-#' - Second input for SMKDSTY_A complex reconstruction function
+#' - Second input for SMKDSTY_original complex reconstruction function
 #' - Determines occasional smoker subcategories (former daily vs never daily)
 #' - Used in conjunction with SMK_005 to classify smoking patterns
 #' 
@@ -260,7 +260,7 @@ calculate_SMK_030 <- function(data, output_format = "tagged_na") {
 #' 
 #' Creates harmonized SMK_01A variable across CCHS cycles 2001-2023.
 #' This variable asks about lifetime cigarette consumption threshold (100+ cigarettes)
-#' and serves as the final component for SMKDSTY_A reconstruction and smoking classification.
+#' and serves as the final component for SMKDSTY_original reconstruction and smoking classification.
 #' 
 #' @details 
 #' **Implementation Method**: Direct harmonization via rec_with_table()
@@ -284,7 +284,7 @@ calculate_SMK_030 <- function(data, output_format = "tagged_na") {
 #'   - Critical for "former occasional" vs "never smoker" classification
 #' 
 #' **Usage**: 
-#' - Third input for SMKDSTY_A complex reconstruction function
+#' - Third input for SMKDSTY_original complex reconstruction function
 #' - Distinguishes experimental/former occasional smokers from never smokers
 #' - Used with SMK_005 and SMK_030 to determine final smoking status categories
 #' - Longest-running harmonized smoking variable (2001-2023 coverage)
@@ -482,14 +482,14 @@ calculate_SMKDSTY_cat6 <- function(SMK_005 = NULL, SMK_030 = NULL, SMK_01A = NUL
   )
 
   # === STEP 3: Clean output using derived variable bounds ===
-  # Use worksheet variable name SMKDSTY_A for metadata lookup (valid range 1-6)
-  output_clean <- clean_variables(vars = list(SMKDSTY_A = SMKDSTY_cat6_result),
+  # Use worksheet variable name SMKDSTY_original for metadata lookup (valid range 1-6)
+  output_clean <- clean_variables(vars = list(SMKDSTY_original = SMKDSTY_cat6_result),
                                  output_format = output_format)
 
-  return(output_clean$SMKDSTY_A)
+  return(output_clean$SMKDSTY_original)
 }
 
-#' @title Type of Smoker - SMKDSTY_A (deprecated alias)
+#' @title Type of Smoker - SMKDSTY_original (deprecated alias)
 #' @description Deprecated alias for [calculate_SMKDSTY_cat6()]. Use
 #'   `calculate_SMKDSTY_cat6()` directly for new code.
 #' @param ... Arguments passed to [calculate_SMKDSTY_cat6()]
@@ -498,11 +498,11 @@ calculate_SMKDSTY_cat6 <- function(SMK_005 = NULL, SMK_030 = NULL, SMK_01A = NUL
 #' @examples
 #' \dontrun{
 #' # Deprecated: use calculate_SMKDSTY_cat6() instead
-#' calculate_SMKDSTY_A(SMK_005 = 1, SMK_030 = 2, SMK_01A = 1)
+#' calculate_SMKDSTY_original(SMK_005 = 1, SMK_030 = 2, SMK_01A = 1)
 #' }
 #'
 #' @export
-calculate_SMKDSTY_A <- function(...) {
+calculate_SMKDSTY_original <- function(...) {
   .Deprecated("calculate_SMKDSTY_cat6")
   calculate_SMKDSTY_cat6(...)
 }

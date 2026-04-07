@@ -21,8 +21,8 @@ Creates harmonized SMKG203 categorical variables for CCHS cycles 2001-2014.
 This variable asks daily smokers when they started smoking daily, with categorical age groups.
 
 **Note**: Categorical versions have temporal variants:
-- **SMKG203_A** (2001-2003): 10 categories with broader age bins
-- **SMKG203_B** (2005-2014): 11 categories with finer age bins  
+- **SMKG203_pre2005** (2001-2003): 10 categories with broader age bins
+- **SMKG203_2005plus** (2005-2014): 11 categories with finer age bins  
 Most applications should use continuous **SMKG203_cont** instead.
 }
 \details{
@@ -50,8 +50,8 @@ Most applications should use continuous **SMKG203_cont** instead.
 \dontrun{
 # Use rec_with_table() for actual implementation (2001-2014)
 # or complex derivation function for 2015-2023
-harmonized_data <- rec_with_table(cchs_data, "SMKG203_A")  # or SMKG203_B
-age_started_daily_cat <- harmonized_data$SMKG203_A
+harmonized_data <- rec_with_table(cchs_data, "SMKG203_pre2005")  # or SMKG203_2005plus
+age_started_daily_cat <- harmonized_data$SMKG203_pre2005
 }
 
 }

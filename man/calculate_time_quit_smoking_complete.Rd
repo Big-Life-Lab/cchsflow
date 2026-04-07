@@ -2,53 +2,81 @@
 % Please edit documentation in R/smoking-cessation.R
 \name{calculate_time_quit_smoking_complete}
 \alias{calculate_time_quit_smoking_complete}
-\title{Calculate Time Since Quit Smoking (Combined)}
+\title{Calculate Years Since Completely Quit Smoking}
 \usage{
 calculate_time_quit_smoking_complete(
-  SMK_09A_cont,
+  SMKDSTY_cat5,
+  SMK_10_gate,
   SMK_06A_cont,
+  SMK_09A_cont,
+  SMK_10A_cont,
+  SMKDVSTP,
   output_format = "tagged_na"
 )
 }
 \arguments{
-\item{SMK_09A_cont}{Numeric vector. Years since stopped daily (from rec_with_table)}
+\item{SMKDSTY_cat5}{Numeric vector. 5-category smoking status}
 
-\item{SMK_06A_cont}{Numeric vector. Years since quit occasional (from calculate_SMK_06A_cont)}
+\item{SMK_10_gate}{Numeric vector. Quit timing gate (1 or 2)}
+
+\item{SMK_06A_cont}{Numeric vector. Years since quit (former occasional)}
+
+\item{SMK_09A_cont}{Numeric vector. Years since stopped daily}
+
+\item{SMK_10A_cont}{Numeric vector. Years since quit completely (gradual)}
+
+\item{SMKDVSTP}{Numeric vector. Master continuous years since quit completely}
 
 \item{output_format}{Character. Output format ("tagged_na" or "original")}
 }
 \value{
-Numeric vector of continuous years since quit (0-80+), with:
+Numeric vector of continuous years since completely quit (0-80+), with:
 - NA::a for current smokers and never smokers
 - NA::b for missing/refused
 }
 \description{
-Combines cessation timing from multiple sources with priority logic.
-Provides a single continuous "years since quit" value regardless of
-smoking history pathway.
+Pathway-aware years since the respondent completely quit smoking. Uses
+SMKDVSTP (StatCan derived continuous) on Master when available, falling
+back to pathway-aware PUMF midpoint logic.
 }
 \details{
 **Implementation method**: 3-step architecture
-- **Step 1**: clean_variables() - Clean all continuous time inputs
-- **Step 2**: Priority logic to select best available source
+- **Step 1**: clean_variables() - Clean all inputs
+- **Step 2**: Master priority + PUMF pathway-aware logic
 - **Step 3**: Output cleaning
 
-**Priority order** (highest to lowest):
-1. SMK_09A_cont - Former daily smokers (stopped daily timing)
-2. SMK_06A_cont - Former occasional smokers (quit timing)
-
-**Note**: This is a simpler combining function that doesn't use pathway
-logic. For pathway-aware quit timing, use calculate_time_quit_complete().
+**Routing logic**:
+1. SMKDVSTP available (Master 2003+): use directly
+2. Former occasional (SMKDSTY_cat5 == 4): use SMK_06A_cont
+3. Former daily, direct quit (cat5 == 3, gate == 1): use SMK_09A_cont
+4. Former daily, gradual reducer (cat5 == 3, gate == 2): use SMK_10A_cont
+5. Former daily, 2001 fallback (no gate): use SMK_09A_cont as proxy
 }
 \examples{
 \dontrun{
-# Former daily smoker - uses SMK_09A_cont
-calculate_time_quit_smoking(SMK_09A_cont = 3.5, SMK_06A_cont = NA)
-# Returns: 3.5
+# Master path - SMKDVSTP available
+calculate_time_quit_smoking_complete(
+  SMKDSTY_cat5 = 3, SMK_10_gate = 1,
+  SMK_06A_cont = NA, SMK_09A_cont = NA, SMK_10A_cont = NA,
+  SMKDVSTP = 7.0
+)
+# Returns: 7.0
 
-# Former occasional - uses SMK_06A_cont
-calculate_time_quit_smoking(SMK_09A_cont = NA, SMK_06A_cont = 5.0)
+# PUMF - former occasional
+calculate_time_quit_smoking_complete(
+  SMKDSTY_cat5 = 4, SMK_10_gate = NA,
+  SMK_06A_cont = 5.0, SMK_09A_cont = NA, SMK_10A_cont = NA,
+  SMKDVSTP = NA
+)
 # Returns: 5.0
+
+# PUMF - former daily, gradual reducer
+calculate_time_quit_smoking_complete(
+  SMKDSTY_cat5 = 3, SMK_10_gate = 2,
+  SMK_06A_cont = NA, SMK_09A_cont = 5.0, SMK_10A_cont = 2.0,
+  SMKDVSTP = NA
+)
+# Returns: 2.0 (when they quit completely, not when they stopped daily)
 }
 
 }

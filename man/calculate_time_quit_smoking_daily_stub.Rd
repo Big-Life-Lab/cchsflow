@@ -5,15 +5,18 @@
 \title{Years Since Stopped Smoking Daily - TIME_QUIT_SMOKING_DAILY (continuous)}
 \usage{
 calculate_time_quit_smoking_daily_stub(
+  SMKDSTY_cat5,
   SMK_09A_cont,
   SMK_09C = NULL,
   output_format = "tagged_na"
 )
 }
 \arguments{
+\item{SMKDSTY_cat5}{Numeric vector. 5-category smoking status}
+
 \item{SMK_09A_cont}{Numeric vector. Midpoint-imputed years (PUMF building block)}
 
-\item{SMK_09C}{Numeric vector. Exact years since stopped daily (Master 2001-2021)}
+\item{SMK_09C}{Numeric vector. Exact years since stopped daily (Master)}
 
 \item{output_format}{Character. Output format ("tagged_na" or "original")}
 }
@@ -23,9 +26,8 @@ Vector of continuous years since stopped daily smoking
 \description{
 DOCUMENTATION ONLY - canonical implementation is in smoking-cessation.R.
 
-Years since former daily smokers stopped smoking daily.
-Uses exact-year variables on Master (SMK_09C 2001-2014, SMK_090 2015-2021,
-ADM_YOI-SPU_25B 2022); midpoint imputation on PUMF and 2023 Master.
+Years since former daily smokers stopped smoking daily. Uses SMK_09C
+(Master exact years) when available, falls back to SMK_09A_cont (PUMF midpoint).
 }
 \examples{
 \dontrun{

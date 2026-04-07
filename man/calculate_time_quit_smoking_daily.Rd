@@ -2,28 +2,67 @@
 % Please edit documentation in R/smoking-cessation.R
 \name{calculate_time_quit_smoking_daily}
 \alias{calculate_time_quit_smoking_daily}
-\title{Calculate Time Since Quit Smoking Daily (Former Daily Smokers)}
+\title{Calculate Years Since Stopped Smoking Daily}
 \usage{
 calculate_time_quit_smoking_daily(
+  SMKDSTY_cat5,
   SMK_09A_cont,
   SMK_09C = NULL,
   output_format = "tagged_na"
 )
 }
 \arguments{
-\item{SMK_09A_cont}{Numeric vector. PUMF midpoint-imputed years since stopped
-daily (from rec_with_table)}
+\item{SMKDSTY_cat5}{Numeric vector. 5-category smoking status}
 
-\item{SMK_09C}{Numeric vector. Master exact years since stopped daily
-(2001-2021 Master; NA on PUMF)}
+\item{SMK_09A_cont}{Numeric vector. PUMF midpoint-imputed years since stopped daily}
+
+\item{SMK_09C}{Numeric vector. Master exact years since stopped daily}
 
 \item{output_format}{Character. Output format ("tagged_na" or "original")}
 }
 \value{
-Numeric vector of continuous years since stopped smoking daily
+Numeric vector of continuous years since stopped smoking daily (0-80+), with:
+- NA::a for current smokers, never smokers, and former occasional-only smokers
+- NA::b for missing/refused
 }
 \description{
-Provides continuous years since the respondent stopped smoking daily.
-Uses exact-year source variables on Master files where available, falling
-back to midpoint imputation from SMK_09A_2003plus for 2023 Master.
+Continuous years since the respondent stopped smoking daily. Uses
+SMK_09C (Master exact years) when available, falling back to
+SMK_09A_cont (PUMF midpoint imputation).
+}
+\details{
+**Implementation method**: 3-step architecture
+- **Step 1**: clean_variables() - Clean all inputs
+- **Step 2**: Master priority + PUMF fallback
+- **Step 3**: Output cleaning
+
+**Routing logic**:
+1. SMK_09C available (Master 2001-2021): use directly (exact years)
+2. SMK_09A_cont available (PUMF, or Master fallback): use midpoint value
+3. Current/never/occasional-only smokers: NA::a (not applicable)
+
+**Universe**: Former daily smokers only. Former occasional smokers who
+never smoked daily receive NA::a.
+}
+\examples{
+\dontrun{
+# Master - exact years available
+calculate_time_quit_smoking_daily(
+  SMKDSTY_cat5 = 3, SMK_09A_cont = NA, SMK_09C = 7.0
+)
+# Returns: 7.0
+
+# PUMF - midpoint imputation
+calculate_time_quit_smoking_daily(
+  SMKDSTY_cat5 = 3, SMK_09A_cont = 2.5, SMK_09C = NA
+)
+# Returns: 2.5
+
+# Former occasional (never daily) - not applicable
+calculate_time_quit_smoking_daily(
+  SMKDSTY_cat5 = 4, SMK_09A_cont = NA, SMK_09C = NA
+)
+# Returns: NA::a
+}
+
 }

@@ -19,7 +19,7 @@ DOCUMENTATION ONLY - Use rec_with_table() for implementation
 
 Creates harmonized SMK_030 variable across CCHS cycles 2015-2023.
 This variable asks whether occasional/former smokers ever smoked daily
-and serves as a key component for SMKDSTY_A reconstruction.
+and serves as a key component for SMKDSTY_original reconstruction.
 }
 \details{
 **Implementation Method**: Direct harmonization via rec_with_table()
@@ -41,7 +41,7 @@ and serves as a key component for SMKDSTY_A reconstruction.
   - Critical for distinguishing "former daily" vs "never daily" categories
 
 **Usage**: 
-- Second input for SMKDSTY_A complex reconstruction function
+- Second input for SMKDSTY_original complex reconstruction function
 - Determines occasional smoker subcategories (former daily vs never daily)
 - Used in conjunction with SMK_005 to classify smoking patterns
 }

@@ -5,14 +5,14 @@
 \title{Unified Daily Smoking Intensity - cigs_per_day}
 \usage{
 calculate_cigs_per_day(
-  SMKDSTY_A,
+  SMKDSTY_original,
   SMK_204,
   SMK_208,
   output_format = "tagged_na"
 )
 }
 \arguments{
-\item{SMKDSTY_A}{Numeric vector. Smoking status (6-category, pre-2015 definitions).
+\item{SMKDSTY_original}{Numeric vector. Smoking status (6-category, pre-2015 definitions).
 1=Daily, 2=Occasional (former daily), 3=Occasional (never daily),
 4=Former daily, 5=Former occasional, 6=Never smoked.}
 
@@ -50,11 +50,11 @@ aligns with how `age_start_smoking` and `time_quit_smoking` work.
 
 **Routing Logic**:
 \itemize{
-  \item SMKDSTY_A == 1 (current daily) -> uses SMK_204
-  \item SMKDSTY_A == 2 (occasional, former daily) -> uses SMK_208
-  \item SMKDSTY_A == 4 (former daily, non-smoker now) -> uses SMK_208
-  \item SMKDSTY_A %in% c(3, 5, 6) (never daily) -> NA::a (not applicable)
-  \item Missing SMKDSTY_A -> NA::b (missing)
+  \item SMKDSTY_original == 1 (current daily) -> uses SMK_204
+  \item SMKDSTY_original == 2 (occasional, former daily) -> uses SMK_208
+  \item SMKDSTY_original == 4 (former daily, non-smoker now) -> uses SMK_208
+  \item SMKDSTY_original %in% c(3, 5, 6) (never daily) -> NA::a (not applicable)
+  \item Missing SMKDSTY_original -> NA::b (missing)
 }
 
 **Coverage**: Full PUMF 2001-2023, Full Master 2001-2023.
@@ -66,7 +66,7 @@ v3.0.0-alpha, last updated: 2026-01-09, status: active - Unified daily intensity
 \dontrun{
 # Current daily smoker (status 1) - uses SMK_204
 cigs <- calculate_cigs_per_day(
-  SMKDSTY_A = 1,
+  SMKDSTY_original = 1,
   SMK_204 = 20,
   SMK_208 = NA
 )
@@ -74,7 +74,7 @@ cigs <- calculate_cigs_per_day(
 
 # Former daily smoker (status 4) - uses SMK_208
 cigs <- calculate_cigs_per_day(
-  SMKDSTY_A = 4,
+  SMKDSTY_original = 4,
   SMK_204 = NA,
   SMK_208 = 15
 )
@@ -82,7 +82,7 @@ cigs <- calculate_cigs_per_day(
 
 # Never-daily smoker (status 3) - not applicable
 cigs <- calculate_cigs_per_day(
-  SMKDSTY_A = 3,
+  SMKDSTY_original = 3,
   SMK_204 = NA,
   SMK_208 = NA
 )

@@ -19,7 +19,7 @@ DOCUMENTATION ONLY - Use rec_with_table() for implementation
 
 Creates harmonized SMK_005 variable across CCHS cycles 2015-2023.
 This variable asks about current smoking behavior and serves as a key
-component for SMKDSTY_A reconstruction in the 2015-2023 period.
+component for SMKDSTY_original reconstruction in the 2015-2023 period.
 }
 \details{
 **Implementation Method**: Direct harmonization via rec_with_table()
@@ -42,7 +42,7 @@ component for SMKDSTY_A reconstruction in the 2015-2023 period.
   - SMKDVSTY 2 (Occasional) → SMK_005 2 (Occasionally)
   - SMKDVSTY 3-6 (All non-smokers) → SMK_005 3 (Not at all)
 
-**Usage**: Primary input for SMKDSTY_A complex reconstruction function
+**Usage**: Primary input for SMKDSTY_original complex reconstruction function
 }
 \examples{
 \dontrun{

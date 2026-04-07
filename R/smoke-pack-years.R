@@ -142,7 +142,7 @@ calculate_pack_years <- function(smoking_status,
   # Age uses DHHGAGE_cont for PUMF and DHH_AGE for Master — both have
   # identical missing codes (96=NA::a) so DHHGAGE_cont works for either.
   cleaned_raw <- clean_variables(vars = list(
-    SMKDSTY_A = smoking_status,
+    SMKDSTY_original = smoking_status,
     DHHGAGE_cont = age,
     age_start_smoking = age_start_smoking,
     cigs_per_day = cigs_per_day,
@@ -155,7 +155,7 @@ calculate_pack_years <- function(smoking_status,
 
   # Map worksheet names to semantic names for core logic
   cleaned <- cleaned_raw
-  cleaned$smoking_status <- cleaned_raw$SMKDSTY_A
+  cleaned$smoking_status <- cleaned_raw$SMKDSTY_original
   cleaned$age <- cleaned_raw$DHHGAGE_cont
 
   # === STEP 2: CORE CALCULATION ===
