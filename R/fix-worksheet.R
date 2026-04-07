@@ -63,7 +63,7 @@ fix_worksheet <- function(
 
   # Write CSV content and also fix excessive quotting and line ending errors
   readr::write_csv(
-    row_order_fixed_data, ,
+    row_order_fixed_data,
     file = file_path,
     na = "",
     quote = "needed",

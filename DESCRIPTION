@@ -41,6 +41,11 @@ Depends:
   sjlabelled (>= 1.0.17),
   stringr (>= 1.2.0),
   magrittr
+Imports:
+  glue,
+  purrr,
+  readr,
+  yaml
 Description: Supporting the use of the Canadian Community Health Survey 
              (CCHS) by transforming variables from each cycle into harmonized, 
              consistent versions that span survey cycles (currently, 2001 to 

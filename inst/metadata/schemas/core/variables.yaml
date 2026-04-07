@@ -1,0 +1,13 @@
+expected_column_order:
+  - "variable"
+  - "label"
+  - "labelLong"
+  - "section"
+  - "subject"
+  - "variableType"
+  - "units"
+  - "databaseStart"
+  - "variableStart"
+  - "description"
+
+id_column_name: "variable"

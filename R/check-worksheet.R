@@ -317,7 +317,7 @@ check_worksheet <- function(
     row_num = row_num,
     expected_line_ending = expected_line_ending,
     actual_line_ending = actual_line_ending,
-    message <- glue::glue("Error in {.pretty_print_file_type(file_type)} at {file_path}. Row {row_num} has an invalid line ending. Expected {expected_line_ending} but found {actual_line_ending}.")
+    message = glue::glue("Error in {.pretty_print_file_type(file_type)} at {file_path}. Row {row_num} has an invalid line ending. Expected {expected_line_ending} but found {actual_line_ending}.")
   ))
 }
 

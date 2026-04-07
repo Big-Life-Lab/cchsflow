@@ -15,7 +15,11 @@
 #   1 - Unable to fix (e.g., file not found, invalid CSV)
 
 suppressPackageStartupMessages({
-  library(cchsflow)
+  if (file.exists("DESCRIPTION")) {
+    devtools::load_all(quiet = TRUE)
+  } else {
+    library(cchsflow)
+  }
   library(cli)
 })
 

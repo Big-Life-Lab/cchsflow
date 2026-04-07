@@ -15,7 +15,11 @@
 #   1 - Formatting violations detected
 
 suppressPackageStartupMessages({
-  library(cchsflow)
+  if (file.exists("DESCRIPTION")) {
+    devtools::load_all(quiet = TRUE)
+  } else {
+    library(cchsflow)
+  }
   library(cli)
 })
 
