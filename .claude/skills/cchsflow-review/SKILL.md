@@ -264,6 +264,16 @@ ceps/cep-NNN-<domain>/
   <vars>-pumf-integration-test.csv
 ```
 
+#### Save Gem verification findings
+
+If a Gem verification was performed (via the NotebookLM Gem in `docs/review/`), save the findings before they are lost to context compaction:
+
+1. Save the Gem response as `gn-{domain}-gem-findings.md` in the CEP directory
+2. Include: summary table, detailed findings with classification (by-design / pre-existing / not-actionable / blocking), and action taken
+3. Reference the prompt file (`gn-{domain}-variables-prompt.md`) that generated the findings
+
+This must be done **before** posting the PR comment, so the comment can reference the committed findings file.
+
 #### Commit and push CEP artifacts
 
 After saving artifacts, **commit and push them to the PR branch** so other reviewers can access them. CEP artifacts referenced in PR comments must exist on the branch — local-only files create dead references.
@@ -392,7 +402,7 @@ Summarise the retrospective to the user. If skill updates are warranted, propose
 - L0-L6 workflow: `.claude/skills/cchsflow-worksheets/docs/harmonization-workflow.md`
 - Era mapping tables: `.claude/skills/cchsflow-worksheets/docs/variableStart-databaseStart-authoring.md`
 - Schema definitions: `inst/metadata/schemas/core/variables.yaml`, `inst/metadata/schemas/core/variable_details.yaml`
-- Regex patterns and naming conventions: `inst/metadata/documentation/metadata_registry.yaml`
+- Naming conventions: `docs/variable-naming-conventions.md` (in this skill's `docs/` folder)
 - CSV formatting check/fix: `exec/check-worksheets.R`, `exec/fix-worksheets.R` (uses `R/check-worksheet.R`, `R/fix-worksheet.R`). Supports `--subject` and `--variables` for scoped validation.
 - Scope filtering: `R/scope-worksheets.R` (`scope_worksheets()`, `parse_scope_args()`)
 - CSV standardisation with schema validation: `R/csv-utils.R` (`standardise_csv()`), `R/schema-validation.R` (`validate_csv_against_schema()`)

@@ -23,7 +23,13 @@ Key tools for authoring:
 - `mcp__cchs-metadata__suggest_cchsflow_row(variable_name)` — draft a harmonisation row
 - `mcp__cchs-metadata__get_source_conflicts(variable_name, dataset_id)` — find cross-source label disagreements (useful for catching metadata inconsistencies before authoring)
 
-If the MCP is not available, see the troubleshooting section in `.claude/skills/cchsflow-review/SKILL.md` under "If the MCP is not available" for setup instructions (including the standalone CLI fallback). The MCP server (v0.3.0+) lives in `../cchsflow-docs/mcp-server/` and is also available as a [GitHub release](https://github.com/Big-Life-Lab/cchsflow-docs/releases).
+If the MCP is not available:
+1. Check that `../cchsflow-docs/mcp-server/server.py` exists (may need to restore from that repo's main branch)
+2. Verify MCP configuration in `~/.claude.json` includes the `cchs-metadata` server
+3. **Standalone CLI fallback**: `python3 ../cchsflow-docs/mcp-server/server.py --cli search "SMK_005"` (runs without Claude Code)
+4. **File-based fallback**: Read DDI YAML files directly from `../cchsflow-docs/ddi/` or CSVs from `../cchsflow-docs/data/`
+
+The MCP server (v0.3.0+) lives in `../cchsflow-docs/mcp-server/` and is also available as a [GitHub release](https://github.com/Big-Life-Lab/cchsflow-docs/releases).
 
 ## Key references
 
@@ -50,7 +56,7 @@ Detailed documentation is in the `docs/` subdirectory:
 |--------|---------|-------|
 | `_p` | PUMF (Public Use Microdata File) | Grouped/derived variables |
 | `_m` | Master survey file | Ungrouped source variables |
-| `_s` | Share file | Synthetic datasets |
+| `_s` | Share file (deprecated) | Replace with `_m` |
 | `_i` | ICES-linked (deprecated) | Replace with `_m` |
 
 ### PUMF vs Master row splitting

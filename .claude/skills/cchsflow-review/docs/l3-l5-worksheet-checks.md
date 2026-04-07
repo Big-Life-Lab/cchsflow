@@ -107,7 +107,7 @@ Scan for:
 
 ## Check 5b: dummyVariable naming conventions
 
-Verify that `dummyVariable` values follow the naming convention below. (Note: `inst/metadata/documentation/metadata_registry.yaml` is referenced as the authoritative source for these patterns but does not yet exist — this skill section is the current reference.)
+Verify that `dummyVariable` values follow the naming convention below. (See also `docs/variable-naming-conventions.md` in this skill's folder for the full naming rules.)
 
 **Categorical variables** — regex: `^[a-zA-Z0-9_]+_cat[0-9]+(_[0-9]+|_NA[a-z])$`
 

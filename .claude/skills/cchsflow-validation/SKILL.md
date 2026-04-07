@@ -41,6 +41,30 @@ Scoped mode extracts matching rows to temp files, runs checks/fixes on those, th
 
 The R functions `scope_worksheets()` and `parse_scope_args()` in `R/scope-worksheets.R` can also be called programmatically.
 
+## Which skill to use
+
+| Task | Skill |
+|------|-------|
+| **Authoring** new variables or editing worksheets | `cchsflow-worksheets` |
+| **Validating** worksheets for formatting and consistency | `cchsflow-validation` (this skill) |
+| **Reviewing** a PR or self-reviewing harmonisation work | `cchsflow-review` |
+| **Writing** derived variable R functions | `cchsflow-derive` |
+
+Typical flow: worksheets → validation → review (for PRs) or worksheets → validation (for self-review).
+
+## L-stage mapping
+
+| Check | L-stage | When to run |
+|-------|---------|-------------|
+| 1: CSV formatting | L5 | After authoring, before committing |
+| 2: Source references | L3 | After variableStart authoring |
+| 3: Cross-file consistency | L5 | After adding variables to either file |
+| 4: databaseStart coverage | L5 | After modifying databaseStart fields |
+| 5: R CMD check | L6 | Before merge, after R/ file changes |
+| 6: Pre-2007 explicit mappings | L3 | After adding pre-2007 databases |
+| 7: DerivedVar mixed _p/_m | L5 | After writing DerivedVar rows |
+| 8: Trailing empty columns | L5 | After any Excel-based editing |
+
 ## Validation checks
 
 ### Check 1: CSV formatting
@@ -185,7 +209,7 @@ Rscript -e "devtools::load_all('.'); cat('Package loads OK\n')"
 
 If `devtools::load_all()` fails, the GHA will also fail when it tries to install the package.
 
-### Check 7: Pre-2007 explicit mapping coverage
+### Check 6: Pre-2007 explicit mapping coverage
 
 For any variable where `databaseStart` includes pre-2007 databases (`cchs2001_m`, `cchs2001_p`, `cchs2003_m`, `cchs2003_p`, `cchs2005_m`, `cchs2005_p`), verify that `variableStart` contains explicit `db::VAR` entries for those cycles rather than relying on `[VAR]` defaults.
 
@@ -224,7 +248,7 @@ if (length(issues) > 0) {
 
 Pre-2007 mapping gaps are **P1** errors — the variable exists in those cycles but the wrong source variable is read at runtime.
 
-### Check 8: DerivedVar mixed _p/_m row detection
+### Check 7: DerivedVar mixed _p/_m row detection
 
 DerivedVar rows must not mix `_p` (PUMF) and `_m` (Master) databases in a single row when those database types use different feeder variables. If a single DerivedVar row's `databaseStart` contains both `_p` and `_m` entries, `rec_with_table()` will apply the same feeder variable set to all databases in that row — silently producing wrong results when PUMF and Master use different age, sex, or other input variables.
 
@@ -266,7 +290,7 @@ if (nrow(mixed) > 0) {
 
 A mixed row is **always suspect**. It is a **P1** error if the `_p` and `_m` feeder sets differ (use `resolve_dependencies()` with a `databases` filter to confirm). It may be acceptable if feeders are identical across both database types, but this should be verified explicitly.
 
-### Check 6: Trailing empty columns
+### Check 8: Trailing empty columns
 
 Check for trailing empty columns added by Excel editing (a recurring issue across v3 PRs):
 
@@ -286,20 +310,20 @@ else cat('OK: No trailing empty columns\n')
 "
 ```
 
-Expected column counts: variables.csv = 20, variable_details.csv = 22.
+Expected column counts: variables.csv = 10, variable_details.csv = 16. (Defined in YAML schemas at `inst/metadata/schemas/core/`.)
 
 ## Interpreting results
 
 | Check | Pass | Severity | Fail action |
 |-------|------|----------|------------|
-| CSV formatting | No output / clean exit | P2 | Run `Rscript exec/fix-worksheets.R` to auto-fix, then commit |
-| Source references | No invalid refs | P0 | Fix variableStart mappings per era rules |
-| Cross-file consistency | All variables in both files | P1 | Add missing entries to the appropriate file |
-| databaseStart coverage | No mismatches | P1 | Align databaseStart between files |
-| R CMD check | 0 errors, 0 warnings | P0 | Fix R/ files: remove `library()` calls, declare deps in DESCRIPTION |
-| Trailing empty columns | Expected column counts | P2 | Trim to real columns using R `write.csv()` |
-| Pre-2007 explicit mappings | No gaps | P1 | Add explicit `db::VAR` entries for pre-2007 cycles |
-| DerivedVar mixed _p/_m | No mixed rows | P1 | Split rows by database type; verify feeders with `resolve_dependencies()` |
+| 1: CSV formatting | No output / clean exit | P2 | Run `Rscript exec/fix-worksheets.R` to auto-fix, then commit |
+| 2: Source references | No invalid refs | P0 | Fix variableStart mappings per era rules |
+| 3: Cross-file consistency | All variables in both files | P1 | Add missing entries to the appropriate file |
+| 4: databaseStart coverage | No mismatches | P1 | Align databaseStart between files |
+| 5: R CMD check | 0 errors, 0 warnings | P0 | Fix R/ files: remove `library()` calls, declare deps in DESCRIPTION |
+| 6: Pre-2007 explicit mappings | No gaps | P1 | Add explicit `db::VAR` entries for pre-2007 cycles |
+| 7: DerivedVar mixed _p/_m | No mixed rows | P1 | Split rows by database type; verify feeders with `resolve_dependencies()` |
+| 8: Trailing empty columns | Expected column counts | P2 | Trim to real columns using R `write.csv()` |
 
 ## When to run
 
