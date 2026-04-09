@@ -1,65 +1,73 @@
-# pct_time_fun
+# categorize_immigration
 
-test_that("pct_time_fun has expected output when age is out of range", {
-  expect_equal(pct_time_fun(-1, 2, 1), tagged_na("b"))
+# Out-of-range inputs → NA(b)
+test_that("returns NA(b) for out-of-range immigrant_status", {
+  expect_equal(categorize_immigration(-1, 2, 2, 4.5), tagged_na("b"))
 })
 
-test_that("pct_time_fun has expected output when
-          immigrant status is out of range", {
-  expect_equal(pct_time_fun(20, 3, 1), tagged_na("b"))
+test_that("returns NA(b) for out-of-range born_canada", {
+  expect_equal(categorize_immigration(1, -2, 2, 4.5), tagged_na("b"))
 })
 
-test_that("pct_time_fun has expected output when
-          time in Canada is out of range", {
-  expect_equal(pct_time_fun(20, 2, 3), tagged_na("b"))
+test_that("returns NA(b) for out-of-range ethnicity", {
+  expect_equal(categorize_immigration(1, 2, -2, 4.5), tagged_na("b"))
 })
 
-test_that("pct_time_fun has expected output when all arguments are in range", {
-  expect_equal(pct_time_fun(20, 2, 1), 22.5)
+test_that("propagates NA(b) from years", {
+  expect_equal(categorize_immigration(1, 2, 2, tagged_na("b")), tagged_na("b"))
 })
 
-test_that("pct_time_fun has expected output when age is NA", {
-  expect_equal(pct_time_fun(NA, 2, 1), tagged_na("b"))
+# NA(a) propagation
+test_that("propagates NA(a) from immigrant_status", {
+  expect_equal(categorize_immigration(tagged_na("a"), 2, 2, 4.5), tagged_na("a"))
 })
 
-test_that("pct_time_fun has expected output when immigrant status is NA", {
-  expect_equal(pct_time_fun(20, NA, 1), tagged_na("b"))
+test_that("propagates NA(a) from born_canada", {
+  expect_equal(categorize_immigration(1, tagged_na("a"), 2, 4.5), tagged_na("a"))
 })
 
-test_that("pct_time_fun has expected output when time in Canada is NA", {
-  expect_equal(pct_time_fun(20, 2, NA), tagged_na("b"))
+test_that("propagates NA(a) from ethnicity", {
+  expect_equal(categorize_immigration(1, 2, tagged_na("a"), 4.5), tagged_na("a"))
 })
 
-test_that("pct_time_fun has expected output when all arguments are NA", {
-  expect_equal(pct_time_fun(NA, NA, NA), tagged_na("b"))
+test_that("propagates NA(a) from years", {
+  expect_equal(categorize_immigration(1, 2, 2, tagged_na("a")), tagged_na("a"))
 })
 
-# pct_time_fun_cat
-test_that("pct_time_fun_cat has expected output when input is out of range", {
-  expect_equal(pct_time_fun_cat(-1), "NA(b)")
+# All 6 categories — PUMF style (ethnicity 1/2, SDCGRES_cont midpoints 4.5/15)
+test_that("category 1: White Canada-born", {
+  expect_equal(categorize_immigration(2, 1, 1, 4.5), 1L)
 })
 
-test_that("pct_time_fun_cat has expected output when input is in range", {
-  expect_equal(pct_time_fun_cat(1), 1)
+test_that("category 2: Visible minority Canada-born (PUMF-style ethnicity)", {
+  expect_equal(categorize_immigration(2, 1, 2, 4.5), 2L)
 })
 
-# immigration_fun
-test_that("immigration_fun has expected output when SDCFIMM is out of range", {
-  expect_equal(immigration_fun(-1, 2, 2, 1), "NA(b)")
+test_that("category 3: White immigrant, recent", {
+  expect_equal(categorize_immigration(1, 2, 1, 4.5), 3L)
 })
 
-test_that("immigration_fun has expected output when SDCGCBG is out of range", {
-  expect_equal(immigration_fun(1, -2, 2, 1), "NA(b)")
+test_that("category 4: Visible minority immigrant, recent (PUMF-style)", {
+  expect_equal(categorize_immigration(1, 2, 2, 4.5), 4L)
 })
 
-test_that("immigration_fun has expected output when SDCGCGT is out of range", {
-  expect_equal(immigration_fun(1, 2, -2, 1), "NA(b)")
+test_that("category 5: White immigrant, established", {
+  expect_equal(categorize_immigration(1, 2, 1, 15), 5L)
 })
 
-test_that("immigration_fun has expected output when SDCGRES is out of range", {
-  expect_equal(immigration_fun(1, 2, 2, -1), "NA(b)")
+test_that("category 6: Visible minority immigrant, established (PUMF-style)", {
+  expect_equal(categorize_immigration(1, 2, 2, 15), 6L)
 })
 
-test_that("immigration_fun has expected output when all values are in range", {
-  expect_equal(immigration_fun(1, 2, 2, 1), 4)
+# Master style (SDCDCGT_cat7: ethnicity 1-7, SDCDRES raw continuous years)
+test_that("category 2: Visible minority Canada-born (master 7-cat ethnicity)", {
+  expect_equal(categorize_immigration(2, 1, 5, 4.5), 2L)  # cat5 = Japanese/Korean/etc
+})
+
+test_that("category 4: Visible minority immigrant, recent (master 7-cat ethnicity)", {
+  expect_equal(categorize_immigration(1, 2, 3, 5), 4L)  # cat3 = Chinese, 5 years
+})
+
+test_that("category 6: Visible minority immigrant, established (master 7-cat)", {
+  expect_equal(categorize_immigration(1, 2, 7, 12), 6L)  # cat7 = South Asian/Arab/West Asian, 12 years
 })
