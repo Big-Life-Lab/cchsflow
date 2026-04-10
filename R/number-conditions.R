@@ -1,10 +1,10 @@
-#' @title Number of chronic conditions (5 chronic conditions)
+#' @title Number of chronic conditions (5 chronic conditions, without mood disorder)
 #'
 #' @description This function generates a derived variable (number_conditions)
-#'  that counts the number of chronic conditions a respondent has. This function
-#'  takes 5 CCHS-defined conditions (heart disease, cancer, stroke, bowel
-#'  disorder, and arthritis), and well one derived variable (respiratory
-#'  condition) to count the number of conditions a respondent has.
+#'  for the 2001 CCHS cycle. It counts five CCHS-defined conditions (heart
+#'  disease, cancer, stroke, bowel disorder, and arthritis) plus the derived
+#'  respiratory condition variable. Mood disorder (CCC_280) was not collected
+#'  in the 2001 cycle.
 #'
 #' @param CCC_121 variable indicating if respondent has heart disease (1 =
 #'  respondent has heart disease, 2 = respondent does not have heart disease)
@@ -203,6 +203,7 @@ multiple_conditions_fun1 <-
 #' print(num_conditions)
 #'
 #' @seealso \code{\link{multiple_conditions_fun1}}
+#' @seealso \code{\link{multiple_conditions_fun3}}
 #' @export
 
 multiple_conditions_fun2 <-
@@ -235,6 +236,99 @@ multiple_conditions_fun2 <-
     # Calculate number of conditions based on yes
     conditions <-
       (CCC_121 %% 2) + (CCC_131 %% 2) + (CCC_151 %% 2) + (CCC_171 %% 2) +
+      (CCC_280 %% 2) + (resp_condition_der %% 2) + (CCC_051 %% 2)
+
+    if_else2(conditions >= 5, "5+", conditions)
+  }
+
+#' @title Number of chronic conditions (5 chronic conditions, without bowel disorder)
+#'
+#' @description This function generates a derived variable (number_conditions)
+#'  for CCHS 2015-2016 and 2017-2018 cycles (PUMF and master). Bowel disorder
+#'  (CCC_171) is excluded because it was not collected in the PUMF for these
+#'  cycles; mood disorder (CCC_280) is included. This function counts five
+#'  CCHS-defined conditions (heart disease, cancer, stroke, mood disorder, and
+#'  arthritis) plus the derived respiratory condition variable.
+#'
+#' @param CCC_121 variable indicating if respondent has heart disease (1 =
+#'  respondent has heart disease, 2 = respondent does not have heart disease)
+#'
+#' @param CCC_131 variable indicating if respondent has active cancer (1 =
+#'  respondent has active cancer, 2 = respondent does not have active cancer)
+#'
+#' @param CCC_151 variable indicating if respondent suffers from the effects
+#'  of a stroke (1 = respondent suffers from stroke effects, 2 = respondent
+#'  does not suffer from stroke effects)
+#'
+#' @param CCC_280 variable indicating if respondent has a mood disorder (1 =
+#'  respondent has a mood disorder, 2 = respondent does not have a mood
+#'  disorder)
+#'
+#' @param resp_condition_der derived variable indicating if respondent has a
+#'  respiratory condition (1 = respondent is over the age of 35 and has
+#'  a respiratory condition, 2 = respondent is under the age of 35 and has a
+#'  respiratory condition, 3 = respondent does not have a respiratory
+#'  condition). See \code{\link{resp_condition_fun}} for documentation on how
+#'  variable was derived.
+#'
+#' @param CCC_051 variable indicating if respondent has arthritis or
+#'  rheumatism (1 = respondent has arthritis or rheumatism, 2 = respondent
+#'  does not have arthritis or rheumatism)
+#'
+#' @details Bowel disorder (CCC_171) was not collected in the PUMF for
+#'  cchs2015_2016_p and cchs2017_2018_p. To maintain consistency across PUMF
+#'  and master for these cycles, CCC_171 is excluded from both.
+#'  \code{\link{multiple_conditions_fun1}} is used for 2001 cycles;
+#'  \code{\link{multiple_conditions_fun2}} is used for 2003-2014 cycles.
+#'
+#' @return A categorical variable indicating the number of chronic conditions
+#'  a respondent has. Respondents with 5 or more conditions are grouped in the
+#'  "5+" category.
+#'
+#' @examples
+#' library(cchsflow)
+#' conditions_2015_2016 <- suppressWarnings(rec_with_table(
+#'   cchs2015_2016_p,
+#'   c(
+#'     "DHHGAGE_cont", "CCC_091",
+#'     "CCC_031", "CCC_121", "CCC_131", "CCC_151", "CCC_280",
+#'     "resp_condition_der", "CCC_051", "number_conditions"
+#'   )
+#' ))
+#'
+#' head(conditions_2015_2016)
+#'
+#' @seealso \code{\link{multiple_conditions_fun1}}
+#' @seealso \code{\link{multiple_conditions_fun2}}
+#' @export
+
+multiple_conditions_fun3 <-
+  function(CCC_121, CCC_131, CCC_151, CCC_280, resp_condition_der, CCC_051) {
+    # Convert variables to numeric
+    CCC_121 <- as.numeric(CCC_121)
+    CCC_131 <- as.numeric(CCC_131)
+    CCC_151 <- as.numeric(CCC_151)
+    CCC_280 <- as.numeric(CCC_280)
+    resp_condition_der <- as.numeric(resp_condition_der)
+    CCC_051 <- as.numeric(CCC_051)
+
+    # set invalid/NA values to 0
+    CCC_121 <- if_else2(CCC_121 %in% (1:2), CCC_121, 0)
+    CCC_131 <- if_else2(CCC_131 %in% (1:2), CCC_131, 0)
+    CCC_151 <- if_else2(CCC_151 %in% (1:2), CCC_151, 0)
+    CCC_280 <- if_else2(CCC_280 %in% (1:2), CCC_280, 0)
+    resp_condition_der <- if_else2(
+      resp_condition_der %in% (1:3),
+      resp_condition_der, 0
+    )
+    CCC_051 <- if_else2(CCC_051 %in% (1:2), CCC_051, 0)
+
+    # adjust resp_condition to yes = 1, no = 2
+    resp_condition_der <- if_else2(resp_condition_der %in% c(1:2), 1, 2)
+
+    # Calculate number of conditions based on yes
+    conditions <-
+      (CCC_121 %% 2) + (CCC_131 %% 2) + (CCC_151 %% 2) +
       (CCC_280 %% 2) + (resp_condition_der %% 2) + (CCC_051 %% 2)
 
     if_else2(conditions >= 5, "5+", conditions)
