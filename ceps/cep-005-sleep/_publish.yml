@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: d4fca22b-634c-4b2a-b380-88696b5dc838
+      url: https://dmanuel.quarto.pub/cep-005-sleep-variables

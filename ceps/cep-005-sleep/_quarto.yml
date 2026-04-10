@@ -1,0 +1,22 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "CEP-005: Sleep variables"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: availability-matrix.qmd
+        text: Availability matrix
+      - href: integration-test.qmd
+        text: Integration test
+      - href: PR-notes.qmd
+        text: PR notes
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
