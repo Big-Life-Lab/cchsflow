@@ -1,85 +1,75 @@
-#' @title Immigration by ethnicity and settlement
-#' 
-#' @description This function creates a categorical variable based on 
-#' immigrant status (SDCFIMM), country of birth (SDCGCBG), ethnicity (SDCGCGT), 
-#' and time in Canada (SDCGRES). 
-#' 
-#' @details 
-#' immigration_der uses the CCHS variables that have been transformed by 
-#' cchsflow. In order to generate a value for BMI across CCHS cycles, 
-#' the following SDC variables must be transformed and harmonized.
-#' 
-#' 
-#' @param SDCFIMM Immigrant status (1-immigrant, 2-non-immigrant)
-#' 
-#' @param SDCGCBG Country of birth (1-Canada, 2-Outside of Canada)
-#' 
-#' @param SDCGCGT Cultural or racial origin (1-white, 2-visible minority)
-#' 
-#' @param SDCGRES Length/time in Canada since immigration (1- 0-9 years, 2- 10+ 
-#' years)
-#' 
-#' @return Categorical variable (immigration_der) with six categories:
-#' 
-#'  \itemize{
-#'   \item 1 - White Canada-born
-#'   \item 2 - Non-white Canadian born
-#'   \item 3 - White immigrant born outside of Canada (0-9 years in Canada)
-#'   \item 4 - Non-white immigrant born outside of Canada (0-9 years in Canada)
-#'   \item 5 - White immigrant born outside of Canada (10+ years in Canada)
-#'   \item 6 - Non-white immigrant born outside of Canada (10+ years in Canada)
-#' }
-#' 
+#' @title Calculate immigration category
+#'
+#' @description Derives a 6-category immigration classification combining
+#' immigrant status, country of birth, ethnicity (white / visible minority),
+#' and recency of arrival. Works for both PUMF and master CCHS files; the
+#' worksheet supplies database-appropriate feeder variables for each cycle block.
+#'
+#' @param immigrant_status Immigrant status: 1 = immigrant, 2 = non-immigrant
+#'   (SDCFIMM; covers both PUMF and master).
+#'
+#' @param born_canada Country of birth: 1 = Canada, 2 = outside Canada.
+#'   Use SDCGCBG for PUMF cycles; SDCGCB for master cycles.
+#'
+#' @param ethnicity Ethnicity: 1 = White, any value > 1 = visible minority.
+#'   Use SDCGCGT (2-category) for PUMF cycles or SDCDCGT_cat7 (7-category)
+#'   for master cycles — both use 1 = White, so the function handles either.
+#'
+#' @param years Time in Canada in years (continuous). Values < 10 are treated
+#'   as recent; values >= 10 as established. Use SDCGRES_cont (midpoints 4.5
+#'   or 15 derived from categorical SDCGRES) for PUMF cycles; SDCDRES (raw
+#'   continuous 0-97) for master cycles. Not used for Canada-born respondents
+#'   (categories 1 and 2).
+#'
+#' @return Integer 1-6, \code{tagged_na("a")} (not applicable), or
+#'   \code{tagged_na("b")} (missing / unmatched):
+#'   \itemize{
+#'     \item 1 — White, Canada-born
+#'     \item 2 — Visible minority, Canada-born
+#'     \item 3 — White immigrant, 0-9 years in Canada
+#'     \item 4 — Visible minority immigrant, 0-9 years in Canada
+#'     \item 5 — White immigrant, 10+ years in Canada
+#'     \item 6 — Visible minority immigrant, 10+ years in Canada
+#'   }
+#'
 #' @examples
-#' # Using immigration_fun() to create immigration_der values across CCHS cycles
-#' # immigration_fun() is specified in variable_details.csv along with the
-#' # CCHS variables and cycles included.
-#' 
-#' # To transform immigration_der, use rec_with_table() for each CCHS cycle
-#' # and specify immigration_der, along with the various SDC variables.
-#' # Then by using merge_rec_data() you can combine immigration_der across cycles.
-#' 
 #' library(cchsflow)
-#' immigration2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "SDCFIMM", "SDCGCBG", "SDCGCGT", "SDCGRES", "immigration_der"
-#'   )
-#' )
-#' 
-#' head(immigration2001)
-#' 
+#'
+#' # PUMF usage
 #' immigration2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "SDCFIMM", "SDCGCBG", "SDCGCGT", "SDCGRES", "immigration_der"
-#'   )
+#'   cchs2009_2010_p,
+#'   c("SDCFIMM", "SDCGCBG", "SDCGCGT", "SDCGRES_cont", "immigration_der")
 #' )
-#' 
-#' tail(immigration2009_2010)
-#' 
-#' combined_immigration <- merge_rec_data(immigration2001, immigration2009_2010)
-#' 
-#' head(combined_immigration)
-#' 
-#' tail(combined_immigration)
-#' 
+#' head(immigration2009_2010)
+#'
+#' # Scalar usage — PUMF style (SDCGCGT 2-cat, SDCGRES_cont midpoints 4.5/15)
+#' categorize_immigration(
+#'   immigrant_status = 1, born_canada = 2, ethnicity = 2, years = 4.5
+#' ) # -> 4 (visible minority immigrant, recent)
+#'
+#' # Scalar usage — master style (SDCDCGT_cat7 7-cat, SDCDRES raw continuous)
+#' categorize_immigration(
+#'   immigrant_status = 1, born_canada = 2, ethnicity = 5, years = 15
+#' ) # -> 6 (visible minority immigrant, established)
+#'
 #' @export
-
-immigration_fun <-
-  function(SDCFIMM, SDCGCBG, SDCGCGT, SDCGRES){
-    # White Canada-born
-    if_else2(SDCFIMM == 2 & SDCGCBG ==1 & SDCGCGT ==1, 1,
-    # Non-white Canadian born   
-    if_else2(SDCFIMM == 2 & SDCGCBG ==1 & SDCGCGT ==2, 2,
-    # White immigrant born outside of Canada (0-9 years in Canada)
-    if_else2(SDCFIMM == 1 & SDCGCBG ==2 & SDCGCGT ==1 & SDCGRES ==1, 3,
-    # Non-white immigrant born outside of Canada (0-9 years in Canada)
-    if_else2(SDCFIMM == 1 & SDCGCBG ==2 & SDCGCGT ==2 & SDCGRES ==1, 4, 
-    # White immigrant born outside of Canada (10+ years in Canada)
-    if_else2(SDCFIMM == 1 & SDCGCBG ==2 & SDCGCGT ==1 & SDCGRES ==2, 5,
-    # Non-white immigrant born outside of Canada (10+ years in Canada)
-    if_else2(SDCFIMM == 1 & SDCGCBG ==2 & SDCGCGT ==2 & SDCGRES ==2, 6,
-             
-    if_else2(SDCFIMM =="NA(a)"|SDCGCBG =="NA(a)"|SDCGCGT =="NA(a)"
-             |SDCGRES =="NA(a)","NA(a)", "NA(b)"
-             )))))))
-  }
+categorize_immigration <- function(immigrant_status, born_canada, ethnicity,
+                                  years) {
+  dplyr::case_when(
+    # Canada-born (non-immigrant): years not consulted
+    immigrant_status == 2 & born_canada == 1 & ethnicity == 1 ~ 1L,
+    immigrant_status == 2 & born_canada == 1 & ethnicity >  1 ~ 2L,
+    # Immigrant, born outside Canada, recent (< 10 years)
+    immigrant_status == 1 & born_canada == 2 & ethnicity == 1 & years <  10 ~ 3L,
+    immigrant_status == 1 & born_canada == 2 & ethnicity >  1 & years <  10 ~ 4L,
+    # Immigrant, born outside Canada, established (10+ years)
+    immigrant_status == 1 & born_canada == 2 & ethnicity == 1 & years >= 10 ~ 5L,
+    immigrant_status == 1 & born_canada == 2 & ethnicity >  1 & years >= 10 ~ 6L,
+    # NA(a) propagation
+    haven::is_tagged_na(immigrant_status, "a") |
+      haven::is_tagged_na(born_canada,       "a") |
+      haven::is_tagged_na(ethnicity,          "a") |
+      haven::is_tagged_na(years,             "a") ~ tagged_na("a"),
+    TRUE ~ tagged_na("b")
+  )
+}
