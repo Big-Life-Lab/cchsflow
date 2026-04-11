@@ -1,0 +1,105 @@
+---
+title: "CEP-004: Hearing and vision harmonization"
+subtitle: "HUI hearing/vision items and Washington Group measures"
+format:
+  html:
+    toc: true
+---
+
+## Overview
+
+This CEP documents the harmonization of hearing and vision variables from the CCHS Health Utility Index (HUI) module and Washington Group Disability Measures (WDM).
+
+**Status**: L2 complete (semantic mapping defined)
+
+**PR**: [#160](https://github.com/big-life-lab/cchsflow/pull/160)
+
+## Variables in scope
+
+### HUI hearing items (Master only)
+
+| Variable | Description |
+|----------|-------------|
+| HUI06 | Group conversation without hearing aid |
+| HUI07 | Group conversation with hearing aid |
+| HUI07A | Able to hear at all |
+| HUI08 | Quiet room without hearing aid |
+| HUI09 | Quiet room with hearing aid |
+
+### HUI vision items (Master only)
+
+| Variable | Description |
+|----------|-------------|
+| HUI01 | Read newsprint without aid |
+| HUI02 | Read newsprint with aid |
+| HUI03 | Able to see at all |
+| HUI04 | Recognize friend without aid |
+| HUI05 | Recognize friend with aid |
+
+### HUI derived (PUMF and Master)
+
+| Variable | Description |
+|----------|-------------|
+| HUIGHER | Hearing problems (grouped) |
+| HUIGVIS | Vision trouble (grouped) |
+| HUIDHER | Hearing problems (derived) |
+| HUIDVIS | Vision trouble (derived) |
+
+### Washington Group (2017-2018)
+
+| Variable | Description |
+|----------|-------------|
+| WDM_005 | Difficulty seeing |
+| WDM_010 | Difficulty hearing |
+
+## Critical findings
+
+### 2003 Ontario exclusion
+
+**The 2003 PUMF HUI grouped variables (HUICGHER, HUICGVIS) contain NO Ontario data.**
+
+This is a data collection artifact, not a worksheet error. Available provinces in 2003 PUMF:
+
+- Atlantic provinces
+- Quebec
+
+**Impact**: For Ontario dementia research, the 2003 cycle cannot be used for PUMF-based hearing/vision analysis.
+
+### Scale change in 2017-2018
+
+The 2017-2018 cycle uses Washington Group measures instead of HUI:
+
+- **HUI scale**: 6-point (1-6)
+- **WDM scale**: 4-point (1-4)
+
+A 4-category harmonized scale is recommended for cross-era comparison. See [L2: Semantic mapping](L2-semantic-mapping.qmd) for the crosswalk.
+
+## PR #160 review findings
+
+During formal review of PR #160, several worksheet errors were identified and corrected:
+
+1. Database name typos (`cchs_2009_2010_m` → `cchs2009_2010_m`)
+2. HUI06 source variable typo (`HUAC_06` → `HUIC_06`)
+3. HUI09 wrong default source variable (`[HUI_08]` → `[HUI_09]`)
+4. HUI07A missing 2005 and 2007-2008 cycles
+5. HUI09 missing 2011-2012 cycle
+
+See [PR #160 notes](PR-notes.qmd) for complete details.
+
+## Workflow progress
+
+| Stage | Status | Output |
+|-------|--------|--------|
+| L0: Documentation | ✅ Complete | [L0 assessment](L0-documentation-assessment.qmd) |
+| L1: Concordance | ✅ Complete | [L1 concordance](L1-variable-concordance.qmd) |
+| L2: Semantic mapping | ✅ Complete | [L2 mapping](L2-semantic-mapping.qmd) |
+| L3: Worksheets | ⏳ Pending | — |
+| L4: DV specification | ⏳ Pending | — |
+| L5: Testing | ⏳ Pending | — |
+| L6: Integration | 🔄 In progress | [Integration test](integration-test.qmd), [Availability matrix](availability-matrix.qmd) |
+
+## Next steps
+
+1. Create L3 worksheet drafts with recoding rules
+2. Run integration test QMDs against PUMF data
+3. DDI verification before final merge

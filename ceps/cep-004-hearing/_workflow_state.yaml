@@ -1,0 +1,209 @@
+# Workflow state for CEP-004 Hearing/Vision
+# Last updated: 2026-01-26
+
+domain: sensory
+subgroup: hearing-vision
+status: L6_complete
+description: HUI hearing/vision items and Washington Group measures
+priority: high
+branch: hearing
+pr_number: 160
+
+# Variables in scope
+variables:
+  # HUI hearing items (Master only)
+  - HUI06       # Group conversation without hearing aid
+  - HUI07       # Group conversation with hearing aid
+  - HUI07A      # Able to hear at all
+  - HUI08       # Quiet room without hearing aid
+  - HUI09       # Quiet room with hearing aid
+  # HUI vision items (Master only)
+  - HUI01       # Read newsprint without aid
+  - HUI02       # Read newsprint with aid
+  - HUI03       # Able to see at all
+  - HUI04       # Recognize friend without aid
+  - HUI05       # Recognize friend with aid
+  # HUI derived (PUMF and Master)
+  - HUIGHER     # Hearing problems (grouped)
+  - HUIGVIS     # Vision trouble (grouped)
+  - HUIDHER     # Hearing problems (derived)
+  - HUIDVIS     # Vision trouble (derived)
+  # Washington Group (2017-2018)
+  - WDM_005     # Difficulty seeing
+  - WDM_010     # Difficulty hearing
+
+# Stage completion status
+stages:
+  L0_documentation:
+    status: complete
+    date_completed: "2026-01-26"
+    output: L0_documentation_assessment.md
+    sources_reviewed:
+      - ddi_yamls: complete
+      - cchs_available_variables_list: reviewed
+      - existing_pr_worksheets: reviewed
+      - cchsflow_docs: complete
+    critical_findings:
+      - "2003 PUMF HUI (HUICGHER/HUICGVIS) has NO Ontario data"
+      - "HUI06-09 in PR have database name typos (cchs_2009_2010_m)"
+      - "HUI09 row uses wrong source variable [HUI_08] instead of [HUI_09]"
+      - "HUI06 has typo HUAC_06 instead of HUIC_06"
+      - "HUI07A missing 2005 and 2007-2008 cycles"
+      - "HUI09 missing 2011-2012 cycle"
+
+  L1_concordance:
+    status: complete
+    date_completed: "2026-01-26"
+    output: L1_variable_concordance.md
+    summary: |
+      Mapped all era-specific variable names for HUI and WDM.
+      Documented scale differences (HUI 6-point vs WDM 4-point).
+      Identified all errors in existing PR #160 worksheets.
+
+  L2_semantic:
+    status: complete
+    date_completed: "2026-01-26"
+    output: L2_semantic_mapping.md
+    summary: |
+      Defined HUI to WDM crosswalk for 2017-2018 harmonization.
+      Recommended 4-category harmonized scale for cross-era analysis.
+      Documented missing code handling and universe restrictions.
+    key_decisions:
+      - id: D1
+        decision: "Use 4-category harmonized scale"
+        rationale: "Enables consistent comparison between HUI (6-point) and WDM (4-point)"
+
+  L3_worksheets:
+    status: complete
+    date_completed: "2026-01-26"
+    output:
+      - variables.csv (fixes applied)
+      - variable_details.csv (fixes applied)
+    notes: |
+      PR #160 worksheet errors fixed directly in inst/extdata files.
+      HUI06-09 hearing items corrected.
+      HUIGHER/HUIGVIS already present in worksheets.
+
+  L4_dv_specification:
+    status: deferred
+    output: L4_dv_specifications.md
+    notes: |
+      HUIGHER_cat4 and HUIGVIS_cat4 derived variables deferred.
+      Current harmonization uses existing 6-category variables.
+      4-category harmonization can be added in future iteration.
+
+  L5_testing:
+    status: deferred
+    notes: |
+      No new derived variable functions created in this iteration.
+      Unit tests deferred until L4 DV specifications implemented.
+
+  L6_integration:
+    status: complete
+    date_completed: "2026-01-26"
+    output:
+      - availability-matrix.qmd
+      - integration-test.qmd
+    requirements:
+      - canada_wide_analysis: complete
+      - ontario_specific_analysis: complete
+      - age_cutoffs: [50, 55, 60]
+    notes: |
+      QMD files created and rendered successfully.
+      Quarto site published to dmanuel.quarto.pub/cep-004-hearing-and-vision-variables
+
+# DDI verification results
+ddi_verification:
+  date_completed: "2026-01-26"
+  findings:
+    - variable: HUIGHER
+      cycles_verified: ["2009-2010"]
+      status: confirmed_in_pumf_ddi
+    - variable: HUIGVIS
+      cycles_verified: ["2009-2010"]
+      status: confirmed_in_pumf_ddi
+    - variable: HUI09
+      cycle: "2011-2012"
+      status: master_only
+      notes: "Not in 2011-2012 PUMF DDI, correctly configured for Master file only"
+
+# Dependencies
+depends_on: []  # Base module - no dependencies
+
+# Key issues from existing PR #160
+existing_pr_issues:
+  - id: I1
+    severity: error
+    location: "inst/extdata/variables.csv line 176"
+    issue: "HUI06 databaseStart has typo cchs_2009_2010_m (should be cchs2009_2010_m)"
+    status: fixed
+
+  - id: I2
+    severity: error
+    location: "inst/extdata/variables.csv line 176"
+    issue: "HUI06 variableStart has typo HUAC_06 (should be HUIC_06)"
+    status: fixed
+
+  - id: I3
+    severity: error
+    location: "inst/extdata/variables.csv line 180"
+    issue: "HUI09 variableStart uses [HUI_08] instead of [HUI_09]"
+    status: fixed
+
+  - id: I4
+    severity: error
+    location: "inst/extdata/variables.csv lines 176-180"
+    issue: "All HUI06-09 rows have cchs_2009_2010_m typo"
+    status: fixed
+
+  - id: I5
+    severity: warning
+    location: "inst/extdata/variables.csv line 178"
+    issue: "HUI07A missing 2005 and 2007-2008 cycles despite cchs_available_variables_list.csv showing availability"
+    status: fixed
+
+  - id: I6
+    severity: warning
+    location: "inst/extdata/variables.csv line 180"
+    issue: "HUI09 missing 2011-2012 cycle"
+    status: fixed
+
+# Ontario-specific considerations
+ontario_analysis:
+  excluded_cycles:
+    - cycle: "2003"
+      variables: ["HUICGHER", "HUICGVIS"]
+      reason: "No Ontario data in PUMF - Atlantic provinces and Quebec only"
+  target_population: "Adults 50+ for dementia research"
+  age_cutoffs: [50, 55, 60]
+
+# Artifacts created
+artifacts:
+  documentation:
+    - _domain_overview.md
+    - L0_documentation_assessment.md
+    - L1_variable_concordance.md
+    - L2_semantic_mapping.md
+    - PR_NOTES.md
+  quarto_site:
+    - index.qmd
+    - L0-documentation-assessment.qmd
+    - L1-variable-concordance.qmd
+    - L2-semantic-mapping.qmd
+    - PR-notes.qmd
+    - integration-test.qmd
+    - availability-matrix.qmd
+    - _quarto.yml
+    - _publish.yml
+  fix_proposals:
+    - PR160_variables_fix.csv (applied)
+
+# Completion summary
+completion:
+  all_tasks_complete: true
+  pr_ready: true
+  published_url: "https://dmanuel.quarto.pub/cep-004-hearing-and-vision-variables"
+  next_iteration:
+    - "Add HUI01-05 vision items"
+    - "Add WDM_005, WDM_010 standalone variables"
+    - "Create HUIGHER_cat4, HUIGVIS_cat4 derived variables"
