@@ -168,6 +168,8 @@ SMKG203_cont,"cchs2001_p, cchs2003_p, cchs2005_p, ..., cchs2015_2016_p, cchs2017
 
 ### Consistency requirements
 
+See also [csv-conventions.md §4 Union rule](csv-conventions.md) for the canonical statement of this rule.
+
 | Check | Requirement |
 |-------|-------------|
 | Database coverage | variables.csv databaseStart = union of all variable_details.csv databaseStart for that variable |
@@ -359,7 +361,6 @@ variableStart: cchs2003_m::SMKC_09C, cchs2005_m::SMKE_09C, cchs2015_2016_m::SMK_
 
 ## Related documentation
 
-- [field-reference.md](field-reference.md) - Field definitions and naming conventions
-- [csv-templates.md](csv-templates.md) - Column templates for v3.0.0 schema
-- [harmonization-workflow.md](harmonization-workflow.md) - L0-L6 staged workflow
-- [derived-variables.md](derived-variables.md) - Derived function patterns
+- [csv-conventions.md](csv-conventions.md) — structural conventions: cycle ordering, era block collapsing, row sort order, dummyVariable naming, union rule
+- [harmonization-workflow.md](harmonization-workflow.md) — L0-L6 staged workflow
+- [derived-variable-functions.md](derived-variable-functions.md) — Func:: row authoring and PUMF/Master splitting for derived variables

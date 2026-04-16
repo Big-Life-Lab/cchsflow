@@ -39,6 +39,7 @@ Detailed documentation is in the `docs/` subdirectory:
 - [variableStart-databaseStart-authoring.md](docs/variableStart-databaseStart-authoring.md) — technical rules for coordinating `variableStart` and `databaseStart` fields, including era-specific mappings and the dangerous `[VAR]` default pattern
 - [pumf-master-harmonization.md](docs/pumf-master-harmonization.md) — patterns for splitting worksheet rows when PUMF and Master databases require different recoding logic (midpoint imputation vs continuous pass-through)
 - [derived-variable-functions.md](docs/derived-variable-functions.md) — how to write R functions for `Func::` rows: 3-step architecture, semantic parameter naming, `derive_passthrough()`, feeder alignment, and `clean_variables()` worksheet-name mapping
+- [csv-conventions.md](docs/csv-conventions.md) — structural conventions for both CSVs: canonical cycle ordering, single-year parent-child rules, era block collapsing, row sort order within blocks, dummyVariable naming, alphabetical variable ordering, label alignment, and the union rule
 
 ## Quick reference
 
@@ -68,6 +69,54 @@ When PUMF has grouped categorical and Master has true continuous source variable
 ### The dangerous default pattern
 
 If `databaseStart` spans both 2007-2014 and 2015+ cycles, a `[VAR]` default will apply the 2007-2014 name to 2015+ databases where the variable may have been renamed. Always add explicit `db::VAR` mappings for 2015+ cycles.
+
+### Structural conventions (quick reference)
+
+See [csv-conventions.md](docs/csv-conventions.md) for full detail. Key rules:
+
+**Canonical cycle order** — all `_p` chronologically, then all `_m` chronologically; single-year children immediately follow their two-year parent:
+```
+cchs2001_p … cchs2023_p | cchs2001_m … cchs2009_2010_m, cchs2009_m, cchs2010_m … cchs2023_m
+```
+
+**Single-year child rules** — whenever a parent cycle is present, its children must also be present:
+
+| Parent | Children |
+|---|---|
+| `cchs2009_2010_p` | `cchs2010_p` |
+| `cchs2011_2012_p` | `cchs2012_p` |
+| `cchs2013_2014_p` | `cchs2014_p` |
+| `cchs2009_2010_m` | `cchs2009_m`, `cchs2010_m` |
+| `cchs2011_2012_m` | `cchs2012_m` |
+| `cchs2013_2014_m` | `cchs2014_m` |
+
+Children inherit the same source variable as their parent. Child without parent → remove the child.
+
+**Era block collapsing** — merge two blocks into one when they share identical recoding and differ only in which cycles they list (use `[VAR]` pass-through). Do NOT collapse when source variable name changed across eras or recoding differs.
+
+**Row sort order within each era block:**
+
+Categorical / continuous blocks:
+1. Numerical category / copy rows — ascending `recStart`
+2. `NA::a` rows
+3. `NA::b` rows (non-else)
+4. `NA::b` else row
+
+Derived variable (`Func::`) blocks:
+1. `Func::` row — always first
+2. `NA::a` / `NA::b` rows (if present)
+
+**dummyVariable naming** — `{variable}_cat{N}_{x}` where N = `numValidCat`, x = `1`…`N`, then `NAa`, `NAb`. Continuous variables use `N/A`.
+
+**Alphabetical ordering** — both CSVs must be sorted by `variable` column. Insert new variables at the correct alphabetical position.
+
+**Label alignment:**
+- `variables.csv label` ↔ `variable_details.csv variableStartShortLabel`
+- `variables.csv labelLong` ↔ `variable_details.csv variableStartLabel`
+
+**Union rule** — `variables.csv databaseStart` = union of all era block `databaseStart` values; `variables.csv variableStart` = union of all explicit tokens and `[VAR]`/`DerivedVar::` patterns across all era blocks.
+
+---
 
 ### Writing CSVs — quoting rules
 

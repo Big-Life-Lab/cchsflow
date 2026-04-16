@@ -10,13 +10,11 @@ Before authoring `_p` database entries, verify which PUMF files actually exist. 
 |-------|-------------|------------------------|
 | 2001–2017/18 | Released | `cchs2001_p` … `cchs2017_2018_p` |
 | 2019-2020 | Released | `cchs2019_2020_p` |
-| 2021 | **Not released standalone** — combined with 2022 into a 2021–2022 PUMF | No `cchs2021_p`; no `cchs2021_2022_p` yet |
-| 2022 | Combined with 2021 (see above) | No standalone `cchs2022_p` |
-| 2023 | Status uncertain | Check before authoring |
+| 2021 | **Not released standalone** — combined with 2022 into a single 2021–2022 PUMF file | No `cchs2021_p` (invalid) |
+| 2021–2022 combined | Released as one file | `cchs2022_p` |
+| 2023 | Released | `cchs2023_p` |
 
-**Key rule**: `cchs2021_p` is an **invalid database name** — do not use it. The 2021 PUMF data is only available as part of the combined 2021-2022 file, which cchsflow has not yet added as a database.
-
-**For variables with `cchs2021_p` in databaseStart**: This is a branch-wide error introduced during v3-smoking development. Remove `cchs2021_p` from `databaseStart` and `variableStart` for any variable you are working on. The broader fix is tracked separately.
+**Key rule**: `cchs2021_p` is an **invalid database name** — it must never appear in `databaseStart` or `variableStart`. StatsCan combined the 2021 and 2022 collections into a single PUMF release. cchsflow tracks this as `cchs2022_p`. If you encounter `cchs2021_p` anywhere in the worksheets, remove it.
 
 **Future PUMF uncertainty**: StatsCan has signalled that Master data collection will continue but PUMF scope and release frequency may change. When adding new `_p` databases, confirm availability with the cchs-metadata MCP or GN before authoring.
 
