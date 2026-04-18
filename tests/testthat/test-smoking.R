@@ -136,3 +136,107 @@ test_that("SMKG207_fun() has expected outputs when
             expect_equal(SMKG207_fun("NA(a)", 10),
                          tagged_na("a"))
           })
+
+# =============================================================================
+# calculate_SMKG040 — v3 wrapper combining SMKG203_cont + SMKG207_cont
+# =============================================================================
+
+test_that("calculate_SMKG040() returns SMKG203_cont when it is valid", {
+  expect_equal(calculate_SMKG040(SMKG203_cont = 22, SMKG207_cont = tagged_na("a")), 22)
+})
+
+test_that("calculate_SMKG040() falls back to SMKG207_cont when SMKG203_cont is NA", {
+  expect_equal(calculate_SMKG040(SMKG203_cont = tagged_na("a"), SMKG207_cont = 32), 32)
+})
+
+test_that("calculate_SMKG040() returns NA(b) when both inputs are NA", {
+  expect_true(is_tagged_na(calculate_SMKG040(tagged_na("a"), tagged_na("a")), "b"))
+  expect_true(is_tagged_na(calculate_SMKG040(NA_real_, NA_real_), "b"))
+})
+
+# =============================================================================
+# calculate_SMKG203_continuous — PUMF: filter daily smoker, map grouped→midpoint
+# =============================================================================
+
+test_that("calculate_SMKG203_continuous() maps categories to midpoints for daily smoker", {
+  midpoints <- c(8, 13, 16, 18.5, 22, 27, 32, 37, 42, 47, 55)
+  for (cat in seq_along(midpoints)) {
+    expect_equal(calculate_SMKG203_continuous(SMKG005 = 1, SMKG040 = cat), midpoints[cat],
+                 info = paste("Category", cat))
+  }
+})
+
+test_that("calculate_SMKG203_continuous() returns NA(b) for non-daily smokers", {
+  expect_true(is_tagged_na(calculate_SMKG203_continuous(SMKG005 = 2, SMKG040 = 3), "b"))
+  expect_true(is_tagged_na(calculate_SMKG203_continuous(SMKG005 = 3, SMKG040 = 3), "b"))
+})
+
+test_that("calculate_SMKG203_continuous() returns NA(a) when SMKG040 is 'NA(a)'", {
+  expect_true(is_tagged_na(calculate_SMKG203_continuous(SMKG005 = 1, SMKG040 = "NA(a)"), "a"))
+})
+
+test_that("calculate_SMKG203_continuous() returns NA(b) for out-of-range category", {
+  expect_true(is_tagged_na(calculate_SMKG203_continuous(SMKG005 = 1, SMKG040 = 99), "b"))
+})
+
+# =============================================================================
+# calculate_SMKG203_from_combined — Master: same filtering via SMKG203_fun
+# =============================================================================
+
+test_that("calculate_SMKG203_from_combined() maps categories to midpoints for daily smoker", {
+  expect_equal(calculate_SMKG203_from_combined(SMK_005 = 1, SMK_040 = 1),   8)
+  expect_equal(calculate_SMKG203_from_combined(SMK_005 = 1, SMK_040 = 4),  18.5)
+  expect_equal(calculate_SMKG203_from_combined(SMK_005 = 1, SMK_040 = 11), 55)
+})
+
+test_that("calculate_SMKG203_from_combined() returns NA(b) for non-daily smokers", {
+  expect_true(is_tagged_na(calculate_SMKG203_from_combined(SMK_005 = 2, SMK_040 = 3), "b"))
+})
+
+test_that("calculate_SMKG203_from_combined() returns NA(a) when SMK_040 is 'NA(a)'", {
+  expect_true(is_tagged_na(calculate_SMKG203_from_combined(SMK_005 = 1, SMK_040 = "NA(a)"), "a"))
+})
+
+# =============================================================================
+# calculate_SMKG207_continuous — PUMF: filter former daily, map→midpoint
+# =============================================================================
+
+test_that("calculate_SMKG207_continuous() maps categories to midpoints for former daily smokers", {
+  expect_equal(calculate_SMKG207_continuous(SMKG005 = 2, SMKG030 = 1, SMKG040 = 2),  13)
+  expect_equal(calculate_SMKG207_continuous(SMKG005 = 3, SMKG030 = 1, SMKG040 = 9),  42)
+  expect_equal(calculate_SMKG207_continuous(SMKG005 = 3, SMKG030 = 1, SMKG040 = 11), 55)
+})
+
+test_that("calculate_SMKG207_continuous() returns NA(b) for current daily smokers", {
+  expect_true(is_tagged_na(calculate_SMKG207_continuous(SMKG005 = 1, SMKG030 = 1, SMKG040 = 3), "b"))
+})
+
+test_that("calculate_SMKG207_continuous() returns NA(b) when SMKG030 != 1", {
+  expect_true(is_tagged_na(calculate_SMKG207_continuous(SMKG005 = 3, SMKG030 = 2, SMKG040 = 3), "b"))
+})
+
+test_that("calculate_SMKG207_continuous() returns NA(a) when SMKG040 is 'NA(a)' for former daily", {
+  expect_true(is_tagged_na(calculate_SMKG207_continuous(SMKG005 = 2, SMKG030 = 1, SMKG040 = "NA(a)"), "a"))
+})
+
+# =============================================================================
+# calculate_SMKG207_from_combined — Master: same logic, SMK_ prefix
+# =============================================================================
+
+test_that("calculate_SMKG207_from_combined() maps categories to midpoints for former daily smokers", {
+  expect_equal(calculate_SMKG207_from_combined(SMK_005 = 2, SMK_030 = 1, SMK_040 = 2),  13)
+  expect_equal(calculate_SMKG207_from_combined(SMK_005 = 3, SMK_030 = 1, SMK_040 = 7),  32)
+  expect_equal(calculate_SMKG207_from_combined(SMK_005 = 3, SMK_030 = 1, SMK_040 = 11), 55)
+})
+
+test_that("calculate_SMKG207_from_combined() returns NA(b) for current daily smokers", {
+  expect_true(is_tagged_na(calculate_SMKG207_from_combined(SMK_005 = 1, SMK_030 = 1, SMK_040 = 3), "b"))
+})
+
+test_that("calculate_SMKG207_from_combined() returns NA(b) when SMK_030 != 1", {
+  expect_true(is_tagged_na(calculate_SMKG207_from_combined(SMK_005 = 3, SMK_030 = 2, SMK_040 = 3), "b"))
+})
+
+test_that("calculate_SMKG207_from_combined() returns NA(a) when SMK_040 is 'NA(a)' for former daily", {
+  expect_true(is_tagged_na(calculate_SMKG207_from_combined(SMK_005 = 2, SMK_030 = 1, SMK_040 = "NA(a)"), "a"))
+})

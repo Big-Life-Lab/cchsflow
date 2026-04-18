@@ -480,16 +480,15 @@ test_that("calculate_cigs_per_day handles single-element vectors", {
   expect_length(result, 1)
 })
 
-test_that("calculate_cigs_per_day handles zero cigarettes appropriately", {
+test_that("calculate_cigs_per_day returns NA(b) for zero cigarettes", {
 
-  # Zero is an edge case - theoretically implausible for daily smokers
-  # Function should pass through the value (validation is external concern)
+  # SMK_204 valid range is [1,99]; 0 is recoded to tagged_na("b") by clean_variables
   result <- calculate_cigs_per_day(
     SMKDSTY_original = 1,
     SMK_204 = 0,
     SMK_208 = NA
   )
-  expect_equal(result, 0)
+  expect_true(haven::is_tagged_na(result, "b"))
 })
 
 # =============================================================================
