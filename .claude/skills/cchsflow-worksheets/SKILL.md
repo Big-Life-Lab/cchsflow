@@ -1,7 +1,6 @@
 ---
 name: cchsflow-worksheets
 description: Author and edit CCHS harmonization worksheets (variables.csv, variable_details.csv). Use when adding variables, mapping source variables across cycles, following the L0-L6 harmonization workflow, or consulting era-specific naming conventions.
-allowed-tools: Bash(Rscript:*), Bash(R:*), Read, Glob, Grep, mcp__cchs-metadata__*
 ---
 
 # cchsflow worksheet authoring
@@ -102,9 +101,11 @@ Categorical / continuous blocks:
 3. `NA::b` rows (non-else)
 4. `NA::b` else row
 
-Derived variable (`Func::`) blocks:
-1. `Func::` row — always first
-2. `NA::a` / `NA::b` rows (if present)
+Derived variable (`Func::`) blocks — **no `NA::b else` row ever**:
+- Continuous output: exactly 3 rows — Func:: + NA::a + NA::b
+- Categorical output: Func:: row, then N category rows (ascending recEnd), then NA::a + NA::b
+
+Func:: row always has `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`. Collapse two Func:: blocks into one when they call the same function with the same feeder list across consecutive eras.
 
 **dummyVariable naming** — `{variable}_cat{N}_{x}` where N = `numValidCat`, x = `1`…`N`, then `NAa`, `NAb`. Continuous variables use `N/A`.
 
@@ -115,6 +116,17 @@ Derived variable (`Func::`) blocks:
 - `variables.csv labelLong` ↔ `variable_details.csv variableStartLabel`
 
 **Union rule** — `variables.csv databaseStart` = union of all era block `databaseStart` values; `variables.csv variableStart` = union of all explicit tokens and `[VAR]`/`DerivedVar::` patterns across all era blocks.
+
+**NA row label conventions** (fixed values — no variation):
+
+| Row type | catLabel | catLabelLong | catStartLabel |
+|---|---|---|---|
+| `NA::a` | `not applicable` | `not applicable` | `not applicable` |
+| `NA::b` else | `missing` | `missing` | `else` |
+| `NA::b` non-else, codes | `missing` | `missing` | `don't know (X7); refusal (X8); not stated (X9)` |
+| `NA::b` non-else, `N/A` recStart | `missing` | `missing` | `missing` |
+
+For code-range rows, derive X7/X8/X9 from `recStart` lower bound (e.g., `[97,99]` → `don't know (97); refusal (98); not stated (99)`). Category value rows: `Yes`/`No` always capitalised.
 
 ---
 
