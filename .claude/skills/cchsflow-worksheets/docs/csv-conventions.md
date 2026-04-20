@@ -113,6 +113,30 @@ variableStart: cchs2005_p::SMKE_06A, [SMK_06A]
 
 The `[VAR]` default applies to all cycles in `databaseStart` not listed with an explicit `db::VAR` mapping.
 
+### Collapsing Func:: era blocks
+
+The same collapsing rule applies to `Func::` blocks. Two consecutive Func:: era blocks must be merged when they call the **same function with the same feeder list**:
+
+```
+# Before: two separate Func:: blocks (wrong when function + feeders are identical)
+# Block A
+databaseStart: "cchs2015_2016_m, cchs2017_2018_m, cchs2019_2020_m"
+variableStart: "DerivedVar::[SMK_005, SMK_040]"
+recEnd: Func::calculate_SMK_203
+
+# Block B
+databaseStart: "cchs2021_m, cchs2022_m, cchs2023_m"
+variableStart: "DerivedVar::[SMK_005, SMK_040]"
+recEnd: Func::calculate_SMK_203
+
+# After: one merged Func:: block (correct)
+databaseStart: "cchs2015_2016_m, cchs2017_2018_m, cchs2019_2020_m, cchs2021_m, cchs2022_m, cchs2023_m"
+variableStart: "DerivedVar::[SMK_005, SMK_040]"
+recEnd: Func::calculate_SMK_203
+```
+
+Each Func:: block always stays 3 rows after merging (Func:: + NA::a + NA::b). Keep separate blocks only when the feeder list changes across eras (different source variables routing to the function).
+
 ### When NOT to collapse
 
 Do not collapse blocks when:
@@ -120,6 +144,7 @@ Do not collapse blocks when:
 - **Source variable renamed across eras**: e.g., `SMK_06A` → `SMK_060` in 2015+. A `[VAR]` pass-through would incorrectly apply the old name to all cycles in the merged databaseStart. Keep separate blocks with explicit `db::VAR` tokens for each era.
 - **Recoding structure differs**: different number of categories, different midpoints, different labels — the rows themselves cannot be shared, so there is nothing to collapse.
 - **Mixed computation types**: one block uses direct recoding (plain `recStart`/`recEnd` rows) and the other uses `DerivedVar::`/`Func::`. These are fundamentally different row types and must stay in separate blocks.
+- **Feeder list changes across eras**: two Func:: blocks call the same function but with different `DerivedVar::` inputs — keep them separate.
 
 ---
 
@@ -140,12 +165,21 @@ Rows within each era block must be sorted in this order:
 4. `NA::b` `else` row
 
 ### Derived variables (Func:: / DerivedVar::)
-1. `Func::` row — always first
-2. `NA::a` rows (if present)
-3. `NA::b` rows (non-else, if present)
-4. `NA::b` `else` row (if present)
 
-`DerivedVar::` blocks typically contain only the `Func::` row with no NA rows alongside — the derivation function handles all output values internally.
+Row count depends on `typeEnd`:
+
+**Continuous output** (`typeEnd=cont`) — exactly 3 rows:
+1. `Func::` row — `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`, `recEnd=Func::function_name`
+2. `NA::a` row — `recEnd=NA::a`, `recStart=N/A`, `catLabel=not applicable`
+3. `NA::b` row — `recEnd=NA::b`, `recStart=N/A`, `catLabel=missing`
+
+**Categorical output** (`typeEnd=cat`) — Func:: row, then N category rows, then NA rows:
+1. `Func::` row — `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`, `recEnd=Func::function_name`
+2. Category rows 1…N — `recEnd=1`, `recEnd=2`, … ascending (same as direct recoding)
+3. `NA::a` row
+4. `NA::b` row
+
+**Never add a `NA::b else` row to a Func:: block** (either type). The else/catchall pattern belongs only to direct recoding blocks. `recStart=N/A` and `catLabel=N/A` on the Func:: row itself — the function determines all valid output values.
 
 ---
 
@@ -190,6 +224,116 @@ variable_details.csv: variableStartShortLabel = "Age",
 ```
 
 These must match exactly across all rows for that variable.
+
+---
+
+---
+
+## 9. Multi-variable inputs in variables.csv variableStart
+
+When `variables.csv variableStart` contains multi-variable inputs (`cycle::[X, Y]`), the names inside the brackets must be **cchsflow harmonized variable names**, not raw CCHS source variable names.
+
+```
+# Wrong — raw CCHS era-specific names inside brackets
+cchs2001_m::[SMKA_203, SMKA_207], cchs2003_m::[SMKC_203, SMKC_207]
+
+# Correct — cchsflow harmonized variable names inside brackets
+cchs2001_m::[SMK_203, SMK_207], cchs2003_m::[SMK_203, SMK_207]
+```
+
+Era-specific source name mappings (SMKA_203, SMKC_203, etc.) belong in `variable_details.csv` rows. `variables.csv` is a summary registry — its multi-variable inputs declare which cchsflow variables feed a derived variable, not which raw CCHS variables supply the data.
+
+**Consistency across eras**: when consecutive eras call the same function with the same cchsflow feeders (even if the underlying raw sources differ per era), use the same feeder names for all those cycles:
+
+```
+# All post-2015 cycles use the same cchsflow feeders — consistent across eras
+cchs2015_2016_m::[VAR_A, VAR_B], cchs2017_2018_m::[VAR_A, VAR_B],
+cchs2022_m::[VAR_A, VAR_B], cchs2023_m::[VAR_A, VAR_B]
+```
+
+Even if 2022+ maps to different raw CCHS sources, `variables.csv` still references the same cchsflow feeder names because that's what `rec_with_table()` resolves.
+
+---
+
+## 10. Category label and units consistency
+
+### catLabel and catStartLabel
+
+`catStartLabel` must describe the value at `recStart` for that specific row — it must not carry over a label from a preceding row. Rules by row type:
+
+| Row type | catStartLabel |
+|---|---|
+| Single-value integer category | Same as `catLabel` |
+| Range category (`[lo, hi]`) | Label for the lower-bound value |
+| Last category in an ascending series | Same as `catLabel` (it is its own start) |
+| Copy / pass-through row | Describe the data type (e.g., `"Age in years"`) |
+
+**Common error**: the last category row inherits `catStartLabel` from the row above (the second-to-last category). Each row's `catStartLabel` must reflect its own `recStart`.
+
+### units
+
+`units` must be consistent across all rows in a variable block — value rows, NA::a rows, NA::b rows. If any row has `units=years`, all rows in that block must also have `units=years`. Use `N/A` for categorical variables with no meaningful unit.
+
+---
+
+---
+
+## 11. NA row label conventions
+
+The `catLabel`, `catLabelLong`, and `catStartLabel` fields for `NA::a` and `NA::b` rows must follow fixed conventions — no free-text variation allowed.
+
+### NA::a rows
+
+| Field | Required value |
+|---|---|
+| `catLabel` | `not applicable` |
+| `catLabelLong` | `not applicable` |
+| `catStartLabel` | `not applicable` |
+
+All three fields are identical and always lowercase.
+
+### NA::b else rows (`recStart = else`)
+
+| Field | Required value |
+|---|---|
+| `catLabel` | `missing` |
+| `catLabelLong` | `missing` |
+| `catStartLabel` | `else` |
+
+### NA::b non-else rows (`recStart` is a code range)
+
+| Field | Required value |
+|---|---|
+| `catLabel` | `missing` |
+| `catLabelLong` | `missing` |
+| `catStartLabel` | derived from `recStart` code family (see below) |
+
+**catStartLabel format** — read the lower bound of `recStart` to determine the code family:
+
+| recStart example | catStartLabel |
+|---|---|
+| `[7,9]` or `7` | `don't know (7); refusal (8); not stated (9)` |
+| `[97,99]` or `97` | `don't know (97); refusal (98); not stated (99)` |
+| `[997,999]` or `997` | `don't know (997); refusal (998); not stated (999)` |
+| `N/A` (Func:: block) | `missing` |
+
+The trailing digit of the lower bound is always 7 (don't know). Refusal is +1, not stated is +2.
+
+### Category value rows (non-NA)
+
+`catLabel` and `catLabelLong` for Yes/No response categories must have the first letter capitalised: `Yes`, `No`. Never `yes`, `no`.
+
+### Common errors to avoid
+
+| Wrong | Correct |
+|---|---|
+| `catLabelLong = "Not applicable"` | `catLabelLong = "not applicable"` |
+| `catLabelLong = "Don't know/Refusal/Not stated"` | `catLabelLong = "missing"` |
+| `catLabelLong = "Catch-all missing"` | `catLabelLong = "missing"` |
+| `catStartLabel = "Valid skip"` on NA::a | `catStartLabel = "not applicable"` |
+| `catStartLabel = "DK/Refused/NS"` | `catStartLabel = "don't know (97); refusal (98); not stated (99)"` |
+| `catStartLabel = "97-99"` | `catStartLabel = "don't know (97); refusal (98); not stated (99)"` |
+| `catStartLabel = "Else"` (capital E) | `catStartLabel = "else"` |
 
 ---
 
