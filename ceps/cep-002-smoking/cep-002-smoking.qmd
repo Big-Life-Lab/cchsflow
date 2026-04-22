@@ -2,7 +2,7 @@
 title: "CEP-002: Smoking variable harmonisation"
 author: "Caitlin Kral, Maikol Diasparra, and Doug Manuel for the cchsflow development team"
 date: "2026-01-08"
-date-modified: "2026-02-23"
+date-modified: "2026-04-22"
 format:
   html:
     toc: true
@@ -186,6 +186,7 @@ PUMF pack-years estimates have ~15-20% relative error due to grouped age (DHHGAG
 | SMK_06A_cat4 | 2001-2018 | Not available in 2019+ PUMF |
 | pack_years_der | 2001-2023 | PUMF precision ~15-20% error vs Master |
 | age_start_smoking | PUMF 2001-2021 | No PUMF source for 2022-2023 (use Master) |
+| SMKDVSTP | Master 2003-2023 | Not computed by StatCan for 2001; for 2001 Master, `time_quit_smoking` falls back to `SMK_10A`/`SMK_10C` |
 
 ## Master-only variables
 

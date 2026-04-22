@@ -1,7 +1,8 @@
 ---
-title: "Derived Variable Functions"
+title: "Derived variable functions"
 author: "Caitlin Kral, Maikol Diasparra, and Doug Manuel for the cchsflow development team"
 date: "2026-01-09"
+date-modified: "2026-04-22"
 format:
   html:
     toc: true
@@ -11,438 +12,90 @@ format:
 
 ## Overview
 
-This page documents the R functions used to calculate derived smoking variables. Functions are organized by subgroup and follow a consistent architecture:
+This page is a map to the R functions that implement smoking derived variables. Function-level documentation (inputs, return values, examples) lives in the roxygen headers; see `?calculate_pack_years` etc. after loading the package.
 
-- **PUMF functions** (`_pumf` suffix): Use category-derived continuous variables with midpoint estimation
-- **Master functions** (`_master` suffix): Use individual-reported continuous variables
-- **Unified functions** (no suffix): Automatically route to PUMF or Master based on available inputs
+All smoking DVs follow a **unified, source-agnostic** pattern. A single function accepts semantic parameter names (`age`, `age_start_smoking`, `cigs_per_day`) and the worksheet routes PUMF or Master source variables to those parameters via `variable_details.csv`. There are no separate `_pumf` / `_master` function variants.
 
-All functions support the `output_format` parameter:
+### Output format
 
-- `"tagged_na"` (default): Returns `haven::tagged_na()` values preserving missing data provenance
-- `"numeric"`: Returns standard R `NA` values
+All functions accept an `output_format` parameter:
 
-## Function reference
+- `"tagged_na"` (default) — returns `haven::tagged_na()` values preserving missing-data provenance (e.g. `NA::a` for "valid skip", `NA::b` for "don't know").
+- `"numeric"` — returns standard R `NA`.
 
-```{r}
-#| label: tbl-dv-functions
-#| echo: false
-#| message: false
-#| warning: false
+`rec_with_table()` calls the DV functions with their defaults, so tagged-NA propagation is automatic through the harmonisation pipeline.
 
-source("../../R/table-generators.R")
+## Unified derived variables
 
-# Load the function registry if it exists, otherwise use static data
-if (file.exists("derived_functions_registry.csv")) {
-  df <- read.csv("derived_functions_registry.csv", stringsAsFactors = FALSE)
-} else {
-  # Static fallback - smoking functions only
-  df <- data.frame(
-    Function = c(
-      "calculate_pack_years_pumf",
-      "calculate_pack_years_master",
-      "calculate_time_quit_smoking",
-      "calculate_age_start_smoking",
-      "calculate_cigs_per_day",
-      "calculate_SMKDSTY_original",
-      "calculate_SMKDSTY_cat3",
-      "calculate_SMKDSTY_cat5",
-      "calculate_SMKG040_cont",
-      "calculate_SMKG203_cont",
-      "calculate_SMKG207_cont"
-    ),
-    Output = c(
-      "pack_years_der",
-      "pack_years_der",
-      "time_quit_smoking",
-      "age_start_smoking",
-      "cigs_per_day",
-      "SMKDSTY_original",
-      "SMKDSTY_cat3",
-      "SMKDSTY_cat5",
-      "SMKG040_cont",
-      "SMKG203_cont",
-      "SMKG207_cont"
-    ),
-    Type = c(
-      "Continuous",
-      "Continuous",
-      "Continuous",
-      "Continuous",
-      "Continuous",
-      "Categorical (1-6)",
-      "Categorical (1-3)",
-      "Categorical (1-5)",
-      "Continuous",
-      "Continuous",
-      "Continuous"
-    ),
-    Subgroup = c(
-      "05-pack-years",
-      "05-pack-years",
-      "03-cessation",
-      "02-initiation",
-      "04-intensity",
-      "01-status",
-      "01-status",
-      "01-status",
-      "02-initiation",
-      "02-initiation",
-      "02-initiation"
-    ),
-    Data = c(
-      "PUMF",
-      "Master",
-      "Both",
-      "Both",
-      "Both",
-      "Both",
-      "Both",
-      "Both",
-      "PUMF",
-      "PUMF",
-      "PUMF"
-    ),
-    stringsAsFactors = FALSE
-  )
-}
+The four unified feeders and one cumulative-exposure calculation that this PR introduces or rewrites:
 
-knitr::kable(
-  df,
-  col.names = c("Function", "Output variable", "Return type", "Subgroup", "Data source"),
-  align = c("l", "l", "l", "l", "c")
-)
-```
+| Function | Output variable | Subgroup | Routing |
+|----------|-----------------|----------|---------|
+| `calculate_age_start_smoking()` | `age_start_smoking` | 02-initiation | Master `SMK_040` preferred; PUMF `SMKG040_cont` fallback |
+| `calculate_age_first_cigarette()` | `age_first_cigarette` | 02-initiation | Master `SMK_01C` preferred; PUMF `SMKG01C_cont` fallback |
+| `calculate_cigs_per_day()` | `cigs_per_day` | 04-intensity | Routes `SMK_204`/`SMK_208`/`SMK_05B` by `SMKDSTY_original` |
+| `calculate_time_quit_smoking()` | `time_quit_smoking` | 03-cessation | `SMK_09A_cont` (former daily), `SMK_06A_cont` (former occasional), `SMKDVSTP` (Master) |
+| `calculate_pack_years()` | `pack_years_der` | 05-pack-years | Consumes all four feeders + age |
 
-## Smoking status functions
+See the per-subgroup CEP pages ([status](01-status.qmd), [initiation](02-initiation.qmd), [cessation](03-cessation.qmd), [intensity](04-intensity.qmd), [pack-years](05-pack-years.qmd)) for how each variable is harmonised across cycles and the source-level justifications.
 
-### calculate_SMKDSTY_original
+### Full function inventory
 
-Derives 6-category smoking status consistent with pre-2015 SMKDSTY definition.
-
-**Output**: `SMKDSTY_original` (Categorical, 1-6)
-
-**Inputs**:
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| SMK_005 | Current smoking frequency | Yes |
-| SMK_030 | Ever smoked daily (occasional/non-smokers) | Yes |
-| SMK_01A | Ever smoked 100+ cigarettes | Yes |
-
-**Categories**:
-
-1. Daily smoker
-2. Occasional smoker (former daily)
-3. Occasional smoker (never daily)
-4. Former daily smoker (non-smoker now)
-5. Former occasional smoker (non-smoker now)
-6. Never smoker
-
-**Coverage**: PUMF 2001-2023, Master 2001-2023
-
----
-
-### calculate_SMKDSTY_cat3
-
-Derives 3-category smoking status (current/former/never).
-
-**Output**: `SMKDSTY_cat3` (Categorical, 1-3)
-
-**Inputs**: Same as `calculate_SMKDSTY_original`
-
-**Categories**:
-
-1. Current smoker (daily or occasional)
-2. Former smoker
-3. Never smoker
-
-**Coverage**: PUMF 2001-2023, Master 2001-2023
-
----
-
-### calculate_SMKDSTY_cat5
-
-Derives 5-category smoking status with daily/occasional distinction.
-
-**Output**: `SMKDSTY_cat5` (Categorical, 1-5)
-
-**Inputs**: Same as `calculate_SMKDSTY_original`
-
-**Categories**:
-
-1. Daily smoker
-2. Occasional smoker
-3. Former daily smoker
-4. Former occasional smoker
-5. Never smoker
-
-**Coverage**: PUMF 2001-2023, Master 2001-2023
-
-## Initiation functions
-
-### calculate_age_start_smoking
-
-Unified function for age started smoking daily. Routes to appropriate source based on data availability.
-
-**Output**: `age_start_smoking` (Continuous, years)
-
-**Inputs**:
-
-| Variable | Description | Priority |
-|----------|-------------|----------|
-| SMK_040 | Age started daily (Master continuous) | 1 (preferred) |
-| SMKG040_cont | Age started daily (PUMF midpoint) | 2 (fallback) |
-
-**Coverage**: PUMF 2001-2021, Master 2001-2023
-
-**Notes**: Returns `NA` for never-daily smokers (SMKDSTY 3, 5, 6). PUMF values have ~±3 years error from midpoint estimation.
-
----
-
-### calculate_SMKG040_cont
-
-Derives pseudo-continuous age started daily from categorical PUMF data for 2001-2014 cycles.
-
-**Output**: `SMKG040_cont` (Continuous, years)
-
-**Inputs**:
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| SMKG203_cont | Age started daily - current daily smokers | Conditional |
-| SMKG207_cont | Age started daily - former daily smokers | Conditional |
-
-**Coverage**: PUMF 2001-2021 (derived for 2001-2014, direct for 2015-2021)
-
----
-
-### calculate_SMKG203_cont
-
-Converts categorical age started daily (current daily smokers) to pseudo-continuous using midpoint estimation.
-
-**Output**: `SMKG203_cont` (Continuous, years)
-
-**Inputs**:
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| SMK_005 | Current smoking frequency | Yes |
-| SMKG040_cont | Age started daily (2015+) | Conditional |
-
-**Midpoint mapping**:
-
-| Category | Range | Midpoint |
-|----------|-------|----------|
-| 1 | ≤10 years | 8 |
-| 2 | 11-14 years | 12.5 |
-| 3 | 15-17 years | 16 |
-| 4 | 18-19 years | 18.5 |
-| 5 | 20-24 years | 22 |
-| 6 | ≥25 years | 30 |
-
-**Coverage**: PUMF 2001-2023
-
-## Cessation functions
-
-### calculate_time_quit_smoking
-
-Unified function for years since quit smoking. Combines multiple source variables based on smoking status.
-
-**Output**: `time_quit_smoking` (Continuous, years)
-
-**Inputs**:
-
-| Variable | Description | Used for |
-|----------|-------------|----------|
-| SMK_09A_cont | Years quit - former daily | SMKDSTY 4 |
-| SMK_06A_cont | Years quit - never-daily occasional | SMKDSTY 5 |
-| SPU_25I | Months since quit (2022+) | All former |
-
-**Coverage**: PUMF 2001-2021, Master 2001-2023
-
-**Notes**: Returns `NA` for current smokers (SMKDSTY 1, 2, 3) and never smokers (SMKDSTY 6).
-
-## Intensity functions
-
-### calculate_cigs_per_day
-
-Unified function for cigarettes per day. Routes to appropriate source based on smoking status.
-
-**Output**: `cigs_per_day` (Continuous, cigarettes)
-
-**Inputs**:
-
-| Variable | Description | Used for |
-|----------|-------------|----------|
-| SMKDSTY_original | 6-category smoking status | Routing |
-| SMK_204 | CPD - current daily smokers | SMKDSTY 1 |
-| SMK_208 | CPD when daily - former daily | SMKDSTY 2, 4 |
-
-**Coverage**: PUMF 2001-2021, Master 2001-2023
-
-**Notes**: Returns `NA` for never-daily smokers (SMKDSTY 3, 5, 6). PUMF values capped at 50 for privacy.
-
-## Pack-years functions
-
-### calculate_pack_years_pumf
-
-Calculates pack-years using PUMF data with category-derived continuous variables.
-
-**Output**: `pack_years_der` (Continuous, pack-years)
-
-**Inputs**:
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| SMKDSTY_original | 6-category smoking status | Yes |
-| DHHGAGE_cont | Current age (continuous) | Yes |
-| time_quit_smoking | Years since quit | Yes |
-| SMKG203_cont | Age started daily - current daily | Yes |
-| SMKG207_cont | Age started daily - former daily | Yes |
-| SMK_204 | CPD - daily smokers | Yes |
-| SMK_05B | CPD - occasional smokers | Yes |
-| SMK_208 | CPD when daily - former daily | Yes |
-| SMK_05C | Days/month smoking - occasional | Yes |
-| SMKG01C_cont | Age first cigarette | Yes |
-| SMK_01A | Ever smoked 100+ cigarettes | Yes |
-
-**Formula**:
-```
-pack_years = (cigarettes_per_day / 20) × years_smoked
-```
-
-**Coverage**: PUMF 2001-2021
-
-**Notes**: PUMF estimates have ~15-20% relative error due to midpoint estimation and variable capping.
-
----
-
-### calculate_pack_years_master
-
-Calculates pack-years using Master data with individual-reported continuous variables.
-
-**Output**: `pack_years_der` (Continuous, pack-years)
-
-**Inputs**: Same structure as `calculate_pack_years_pumf` but uses Master variable equivalents (SMK203_cont, SMK207_cont, etc.)
-
-**Coverage**: Master 2001-2023
-
-**Notes**: More precise than PUMF due to exact continuous age values.
-
-## Supporting functions
-
-### 3-step DV architecture functions
-
-These functions implement the standardized 3-step derived variable architecture:
-
-| Function | Purpose | Source file |
-|----------|---------|-------------|
-| `clean_variables()` | Step 1: Standardizes inputs, validates bounds, handles missing | clean-variables.R |
-| `any_missing()` | Detects missing values across multiple variables | missing-data-functions.R |
-| `get_priority_missing()` | Returns highest-priority missing code from inputs | missing-data-functions.R |
-| `assign_missing()` | Creates appropriate NA for output format | missing-data-functions.R |
-| `get_missing_pattern()` | Retrieves missing code patterns for a variable | missing-pattern-cache.R |
-| `convert_cont_to_cat()` | Converts continuous to categorical using worksheet rules | continuous-to-categorical.R |
-| `apply_category_rules()` | Applies recoding rules from variable_details | continuous-to-categorical.R |
-
-### Worksheet metadata functions
-
-Functions for loading and querying harmonization worksheets:
-
-| Function | Purpose | Source file |
-|----------|---------|-------------|
-| `load_worksheet_metadata()` | Loads variables.csv or variable_details.csv | worksheet-metadata-loaders.R |
-| `get_variable_bounds()` | Gets valid range for a variable | worksheet-getters.R |
-| `get_variable_type()` | Returns Continuous/Categorical type | worksheet-getters.R |
-| `get_category_rules()` | Gets recoding rules for categorical variables | worksheet-getters.R |
-| `get_category_info()` | Gets category labels and values | worksheet-getters.R |
-
-### Documentation table generators
-
-Functions used to generate programmatic tables in this CEP documentation:
-
-| Function | Purpose | Source file |
-|----------|---------|-------------|
-| `generate_variable_list_table()` | Variable summary table from worksheets | R/table-generators.R |
-| `generate_subject_coverage_matrix()` | PUMF cycle coverage matrix | R/table-generators.R |
-| `generate_subgroup_summary_table()` | Subgroup totals with PUMF/Master counts | R/table-generators.R |
-| `generate_smoking_summary_table()` | Recommended variables by subject | R/table-generators.R |
-| `parse_database_years()` | Extracts PUMF/Master year ranges from databaseStart | R/table-generators.R |
-| `parse_notes_tags()` | Extracts {tag:value} patterns from notes field | R/table-generators.R |
-
-### Validation functions
-
-Functions for validating worksheets and source references:
-
-| Function | Purpose | Source file |
-|----------|---------|-------------|
-| `validate_source_references()` | Checks variableStart refs against DDI | R/validate-source-references.R |
-| `variable_exists_in_database()` | Checks if variable exists in DDI | R/source-lookups.R |
-| `get_variables_for_database()` | Lists all variables in a database DDI | R/source-lookups.R |
-| `standardise_csv()` | Validates and fixes CSV format issues | R/csv-utils.R |
-
-### Integration testing functions
-
-Functions for testing recoding against real PUMF data:
-
-| Function | Purpose | Source file |
-|----------|---------|-------------|
-| `validate_integration_pumf()` | Tests recoding on real PUMF data | R/validate-integration.R |
-| `load_pumf_data()` | Loads PUMF data for integration testing | R/validate-integration.R |
-| `test_single_recoding()` | Tests one variable recoding | R/validate-integration.R |
-| `print_integration_result()` | Formats integration test results | R/validate-integration.R |
-
-### Schema validation functions
-
-Functions for validating CSV structure against schemas:
-
-| Function | Purpose | Source file |
-|----------|---------|-------------|
-| `validate_csv_against_schema()` | Validates CSV against JSON schema | R/schema-validation.R |
-| `validate_patterns()` | Checks field values match regex patterns | R/schema-validation.R |
-| `validate_enums()` | Checks field values are in allowed set | R/schema-validation.R |
-| `validate_cross_field_rules()` | Validates relationships between fields | R/schema-validation.R |
-| `run_comprehensive_schema_tests()` | Runs all schema validations | R/schema-validation.R |
-
-### Test helper functions
-
-Functions used in testthat unit tests:
-
-| Function | Purpose | Source file |
-|----------|---------|-------------|
-| `test_derived_function()` | Standard test harness for DV functions | tests/testthat/helper-utils.R |
-| `test_rec_with_table_function()` | Tests rec_with_table() calls | tests/testthat/helper-utils.R |
-| `create_test_variable_details()` | Creates mock variable_details for tests | tests/testthat/helper-utils.R |
-| `validate_derived_results()` | Validates DV output structure | tests/testthat/helper-utils.R |
-| `parse_variable_start()` | Parses variableStart field for tests | tests/testthat/helper-utils.R |
-| `get_variable_dependencies()` | Extracts variable dependencies | tests/testthat/helper-utils.R |
-
-## Usage example
+The smoking domain has **38 `calculate_*` functions** on this branch, including status categorisations (`calculate_SMKDSTY_cat3`, `_cat5`, `_cat6`), midpoint-continuous derivations (`calculate_SMKG040_cont`, `calculate_SMKG203_cont`, etc.), and era-specific calculations (`calculate_SMK_09A_2003plus`). The complete inventory is visible via:
 
 ```r
-library(cchsflow)
-library(dplyr)
-
-# Load PUMF data
-data <- rec_with_table(cchs2017_2018_p, c(
-  "SMKDSTY_original", "DHHGAGE_cont", "time_quit_smoking",
-  "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B",
-  "SMK_208", "SMK_05C", "SMKG01C_cont", "SMK_01A"
-))
-
-# Calculate pack-years
-data <- data |>
-  mutate(
-    pack_years = calculate_pack_years_pumf(
-      SMKDSTY_original, DHHGAGE_cont, time_quit_smoking,
-      SMKG203_cont, SMKG207_cont, SMK_204, SMK_05B,
-      SMK_208, SMK_05C, SMKG01C_cont, SMK_01A
-    )
-  )
+ls("package:cchsflow", pattern = "^calculate_")
 ```
 
-## Related documentation
+Per-function specifications — parameters, return types, examples — are in each function's roxygen documentation. This file does not duplicate them.
 
-- [05-pack-years](05-pack-years.qmd) - Pack-years variable details and validation
-- [Methodology and rationale](cep-002-smoking.qmd) - DV methodology architecture
+## 3-step architecture
+
+Every unified DV function follows the same three-step contract:
+
+**Step 1 — Clean inputs.** `clean_variables()` is called with `output_format = "tagged_na"` regardless of the caller's requested output format. This converts numeric missing codes (e.g. `96`, `99`) into `tagged_na()` values so that Step 2's `any_missing()` detection works uniformly.
+
+**Step 2 — Domain logic.** A `dplyr::case_when()` block routes by smoking status (or equivalent gate variable), with an `any_missing(...)` branch at the top that delegates to `get_priority_missing()` so the most informative missing code survives.
+
+**Step 3 — Clean output.** `clean_variables()` runs again with the caller's requested `output_format`, applying the variable's `recEnd` bounds from `variable_details.csv` and converting tagged NAs to numeric codes if requested.
+
+Reference implementation: [calculate_pack_years()](../../R/smoke-pack-years.R) — Steps 1/2/3 are each clearly labelled in comments.
+
+### Supporting functions
+
+Shared infrastructure used by the 3-step architecture:
+
+| Function | Step | Purpose |
+|----------|------|---------|
+| `clean_variables()` | 1, 3 | Standardises inputs, validates bounds, converts between missing-code formats |
+| `any_missing()` | 2 | Detects missing values across multiple inputs |
+| `get_priority_missing()` | 2 | Returns highest-priority missing code from inputs |
+| `assign_missing()` | 2 | Creates appropriate NA for the output format |
+| `get_missing_pattern()` | 1, 3 | Retrieves cached missing-code patterns for a variable |
+
+Worksheet-metadata helpers used indirectly:
+
+| Function | Purpose |
+|----------|---------|
+| `load_worksheet_metadata()` | Loads `variables.csv` or `variable_details.csv` |
+| `get_variable_bounds()` | Valid range for a variable |
+| `get_variable_type()` | Continuous vs Categorical |
+| `get_harmonized_variables()` | Filters worksheet by subject, type, or database |
+
+## Testing
+
+Each unified function has a dedicated test file under `tests/testthat/`:
+
+- `test-age_start_smoking.R`
+- `test-cigs_per_day.R`
+- `test-time_quit_smoking.R`
+- `test-pack_years.R`
+- `test-smoking-status.R`
+
+Tests cover every `case_when()` branch, scalar/vector/dataframe inputs, and tagged-NA propagation. See `.claude/skills/cchsflow-derive/SKILL.md` § "Done criteria" for the full checklist.
+
+## References
+
+- [CEP-002: Smoking variable harmonisation](cep-002-smoking.qmd) — design rationale
+- [Variable summary](00-variable-summary.qmd) — variable lists and cycle coverage
+- `.claude/skills/cchsflow-derive/SKILL.md` — authoring and review guidance for DV functions
