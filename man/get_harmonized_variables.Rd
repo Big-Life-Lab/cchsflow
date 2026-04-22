@@ -35,6 +35,7 @@ Queries variables.csv or CEP worksheets using structured metadata
 (subject, section, recommended tags) instead of regex patterns.
 }
 \examples{
+\dontrun{
 # Get all smoking variables
 get_harmonized_variables(subject = "Smoking")
 
@@ -44,4 +45,5 @@ get_harmonized_variables(subject = "Smoking", recommended = "primary")
 # Get from CEP-002 worksheets
 get_harmonized_variables(subject = "Smoking", source = "cep",
                          cep_path = "ceps/cep-002-smoking")
+}
 }

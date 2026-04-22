@@ -4,7 +4,7 @@
 #' the provided variables and variable_details dataframes.
 #' in the passed dataframes
 #'
-#' @param data_to_lab.el A dataframe of CCHS data that lacks labels.
+#' @param data_to_label A dataframe of CCHS data that lacks labels.
 #' @param variable_details A dataframe containing the details of each variable, 
 #' with category labels in the 'catLabel' column.
 #' @param variables_sheet (Optional) A dataframe containing variable labels in 

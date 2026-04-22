@@ -7,12 +7,12 @@
 .create_line_ending_crlf_error(file_type, file_path, row_num)
 }
 \arguments{
+\item{file_type}{The type of worksheet. Can be "variables" or
+"variable_details".}
+
 \item{file_path}{Path to the worksheet}
 
 \item{row_num}{Index of the row with the invalid line ending}
-
-\item{file_type:}{The type of worksheet. Can be "variables" or
-"variable_details".}
 }
 \value{
 A named list

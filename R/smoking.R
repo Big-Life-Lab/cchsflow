@@ -422,6 +422,7 @@ SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
 #' # Then by using merge_rec_data(), you can combine pack_years_cat across
 #' # cycles.
 #' 
+#' \dontrun{
 #' library(cchsflow)
 #'
 #' pack_years_cat_2009_2010 <- rec_with_table(
@@ -449,6 +450,7 @@ SMKG040_fun <- function(SMKG203_cont, SMKG207_cont){
 #'
 #' head(combined_pack_years_cat)
 #' tail(combined_pack_years_cat)
+#' }
 #' @export
 #' 
 pack_years_fun_cat <- function(pack_years_der){

@@ -62,6 +62,7 @@
 #' @return Data frame with matching variables
 #' @export
 #' @examples
+#' \dontrun{
 #' # Get all smoking variables
 #' get_harmonized_variables(subject = "Smoking")
 #'
@@ -71,6 +72,7 @@
 #' # Get from CEP-002 worksheets
 #' get_harmonized_variables(subject = "Smoking", source = "cep",
 #'                          cep_path = "ceps/cep-002-smoking")
+#' }
 get_harmonized_variables <- function(subject = NULL,
                                      section = NULL,
                                      recommended = NULL,
@@ -129,6 +131,7 @@ get_harmonized_variables <- function(subject = NULL,
 #'   as values. Also includes `default` key for `[VAR]` pattern.
 #' @export
 #' @examples
+#' \dontrun{
 #' mappings <- get_source_mappings("SMKDSTY_original")
 #' # Returns: list(
 #' #   cchs2001_p = "SMKADSTY",
@@ -140,7 +143,9 @@ get_harmonized_variables <- function(subject = NULL,
 #' # )
 #'
 #' # Use in code:
+#' cycle <- "cchs2007_2008_p"
 #' source_var <- mappings[[cycle]] %||% mappings$default
+#' }
 get_source_mappings <- function(variable,
                                 source = "main",
                                 cep_path = NULL) {
@@ -181,12 +186,14 @@ get_source_mappings <- function(variable,
 #' @return Character. The source variable name found in df, or NULL if not found.
 #' @export
 #' @examples
+#' \dontrun{
 #' # Find SMKDSTY_original in 2001 data
-#' var_name <- find_variable_in_data(cchs_2001, "SMKDSTY_original", "cchs2001_p
+#' var_name <- find_variable_in_data(cchs_2001, "SMKDSTY_original", "cchs2001_p")
 #' # Returns: "SMKADSTY"
 #'
 #' # Without cycle hint, checks all variants
 #' var_name <- find_variable_in_data(df, "SMKDSTY_original")
+#' }
 find_variable_in_data <- function(df, variable, cycle = NULL, source = "main") {
 
   # Get source mappings
@@ -240,8 +247,10 @@ find_variable_in_data <- function(df, variable, cycle = NULL, source = "main") {
 #' @return Character vector of all source variable names
 #' @export
 #' @examples
+#' \dontrun{
 #' get_source_variants("SMKDSTY_original")
 #' # Returns: c("SMKADSTY", "SMKCDSTY", "SMKEDSTY", "SMKDSTY", "SMKDVSTY")
+#' }
 get_source_variants <- function(variable, source = "main") {
   mappings <- get_source_mappings(variable, source = source)
   unique(unlist(mappings))

@@ -24,8 +24,8 @@
 
 #' Pack-years calculation constants
 #'
-#' These constants are used in calculate_pack_years_pumf() and
-#' calculate_pack_years_master() functions. They cannot be expressed in
+#' These constants are used in calculate_pack_years() and related
+#' pack-years calculation functions. They cannot be expressed in
 #' variable_details.csv because they are calculation parameters, not
 #' recoding bounds.
 #'

@@ -7,12 +7,12 @@
 .create_invalid_csv_error(file_type, file_path, error_message)
 }
 \arguments{
+\item{file_type}{The type of worksheet. Can be "variables" or
+"variable_details".}
+
 \item{file_path}{Path to the worksheet}
 
 \item{error_message}{Reason(s) for why the worksheet is invalid CSV}
-
-\item{file_type:}{The type of worksheet. Can be "variables" or
-"variable_details".}
 }
 \value{
 A named list

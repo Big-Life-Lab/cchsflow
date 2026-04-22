@@ -13,6 +13,9 @@
 )
 }
 \arguments{
+\item{file_type}{The type of worksheet. Can be "variables" or
+"variable_details".}
+
 \item{file_path}{Path to the worksheet}
 
 \item{row_num}{Row number with excessive quotes}
@@ -20,9 +23,6 @@
 \item{col_num}{Column number with excessive quotes}
 
 \item{cell_value}{Value of the cell with excessive quotes}
-
-\item{file_type:}{The type of worksheet. Can be "variables" or
-"variable_details".}
 }
 \value{
 A named list

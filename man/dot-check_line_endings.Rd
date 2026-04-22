@@ -7,13 +7,13 @@
 .check_line_endings(parsed_csv, error_ctx)
 }
 \arguments{
+\item{parsed_csv}{Parsed worksheet contents (list of rows)}
+
 \item{error_ctx}{Information used when creating the error object. A named
 list with the following fields:
 * file_type: The type of worksheet the CSV contains. Can be "variables" or
   "variable_details".
 * file_path: The file path to the worksheet}
-
-\item{csv_text}{A string containing the worksheet contents}
 }
 \value{
 The list of line ending errors found in the worksheet

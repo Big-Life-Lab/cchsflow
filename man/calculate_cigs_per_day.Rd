@@ -100,5 +100,5 @@ result <- calculate_cigs_per_day(status, smk_204, smk_208)
 \seealso{
 \code{\link{calculate_age_start_smoking}} for age started smoking unification,
 \code{\link{calculate_time_quit_smoking}} for time quit smoking unification,
-\code{\link{calculate_pack_years_pumf}} for pack-years calculation using intensity.
+\code{\link{calculate_pack_years}} for pack-years calculation using intensity.
 }

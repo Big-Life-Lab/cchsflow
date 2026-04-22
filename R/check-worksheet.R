@@ -95,7 +95,7 @@ check_worksheet <- function(
 
 #' Check whether a worksheet has the correct line endings
 #'
-#' @param csv_text A string containing the worksheet contents
+#' @param parsed_csv Parsed worksheet contents (list of rows)
 #' @param error_ctx Information used when creating the error object. A named
 #' list with the following fields:
 #' * file_type: The type of worksheet the CSV contains. Can be "variables" or
@@ -217,7 +217,7 @@ check_worksheet <- function(
 
 #' Check a worksheet for excessive quoting
 #'
-#' @param csv_text String containing the worksheet contents
+#' @param parsed_csv Parsed worksheet contents (list of rows)
 #' @param error_ctx Information used when creating the error object. A named
 #' list with the following fields:
 #' * file_type: The type of worksheet the CSV contains. Can be "variables" or
@@ -261,7 +261,7 @@ check_worksheet <- function(
 
 #' Create the error object for when the worksheet could not be found
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path The invalid path
 #'
@@ -277,7 +277,7 @@ check_worksheet <- function(
 
 #' Create the error for when the worksheet is not valid CSV
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param error_message Reason(s) for why the worksheet is invalid CSV
@@ -294,7 +294,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet has invalid line endings
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param row_num Index of the row with the invalid line ending
@@ -316,7 +316,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet has excessive quoting
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param row_num Row number with excessive quotes
@@ -339,7 +339,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet columns are in the wrong order
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param expected_column The column expected at the offending position
@@ -362,7 +362,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet is missing the ID column
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param id_column_name Name of the expected ID column
@@ -381,7 +381,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet rows are unsorted
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param id_column_name Name of the column that should be sorted
@@ -399,7 +399,7 @@ check_worksheet <- function(
 
 #' Create an error for when the worksheet has trailing empty columns
 #'
-#' @param file_type: The type of worksheet. Can be "variables" or
+#' @param file_type The type of worksheet. Can be "variables" or
 #' "variable_details".
 #' @param file_path Path to the worksheet
 #' @param col_num Position of the trailing empty column

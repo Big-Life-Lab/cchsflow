@@ -114,7 +114,7 @@
 #' @seealso
 #' \code{\link{calculate_age_start_smoking}} for age started smoking unification,
 #' \code{\link{calculate_time_quit_smoking}} for time quit smoking unification,
-#' \code{\link{calculate_pack_years_pumf}} for pack-years calculation using intensity.
+#' \code{\link{calculate_pack_years}} for pack-years calculation using intensity.
 #'
 #' @note v3.0.0-alpha, last updated: 2026-01-09, status: active - Unified daily intensity
 #' @export

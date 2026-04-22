@@ -35,15 +35,17 @@ Use in `case_when()` `.default` clauses where domain logic determines
 the appropriate missing type for non-matching cases.
 }
 \examples{
+\dontrun{
 # Domain logic assigns appropriate missing type
 dplyr::case_when(
   smoking_status == "former_daily" ~ age_started_smoking,
   .default = assign_missing("not_applicable", "SMKG207_cont", output_format)
 )
+}
 
 # Different variables may have different missing patterns
-assign_missing("not_applicable", "SMKG207_cont", "tagged_na")  # haven::tagged_na("a") 
-assign_missing("not_applicable", "SMKG207_cont", "original")   # Variable's NA::a code
-assign_missing("not_stated", "SMKG207_cont", "original")       # Variable's NA::b code
+assign_missing("not_applicable", "SMKG207_cont", "tagged_na")
+assign_missing("not_applicable", "SMKG207_cont", "original")
+assign_missing("not_stated", "SMKG207_cont", "original")
 
 }

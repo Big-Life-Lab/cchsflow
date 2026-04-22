@@ -22,9 +22,11 @@ and configurable priority rules. Works element-wise with dplyr::case_when().
 }
 \examples{
 # Universal usage (works with any survey)
+\dontrun{
 result <- dplyr::case_when(
   any_missing(var1, var2) ~ get_priority_missing(var1, var2),
   # ... domain logic
 )
+}
 
 }

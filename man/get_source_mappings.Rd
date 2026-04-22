@@ -22,6 +22,7 @@ Parses the variableStart field to extract source variable names
 for each database/cycle. Returns a named list for easy lookup.
 }
 \examples{
+\dontrun{
 mappings <- get_source_mappings("SMKDSTY_original")
 # Returns: list(
 #   cchs2001_p = "SMKADSTY",
@@ -33,5 +34,7 @@ mappings <- get_source_mappings("SMKDSTY_original")
 # )
 
 # Use in code:
+cycle <- "cchs2007_2008_p"
 source_var <- mappings[[cycle]] \%||\% mappings$default
+}
 }

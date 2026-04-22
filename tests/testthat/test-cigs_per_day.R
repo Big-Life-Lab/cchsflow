@@ -83,23 +83,9 @@ create_test_infrastructure <- function() {
 
 # Load functions with test infrastructure
 setup_test_environment <- function() {
-  # First create the mock infrastructure so sourcing won't fail
-  create_test_infrastructure()
-
-  # Try to source the function file - we need calculate_cigs_per_day
-  tryCatch({
-    source("R/smoking.R")
-  }, error = function(e) {
-    tryCatch({
-      source("../../R/smoking.R")
-    }, error = function(e2) {
-      # Final fallback - try absolute path
-      source("/Users/dmanuel/github/cchsflow/R/smoking.R")
-    })
-  })
-
-  # Re-apply the mock infrastructure AFTER sourcing to override any
-  # conflicting definitions from the sourced files
+  # calculate_cigs_per_day is provided by the loaded cchsflow package
+  # (via library() in tests/testthat.R or devtools::load_all()).
+  # Just install the mock infrastructure — no sourcing needed.
   create_test_infrastructure()
 }
 

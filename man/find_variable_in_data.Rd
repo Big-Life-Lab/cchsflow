@@ -23,3 +23,13 @@ Character. The source variable name found in df, or NULL if not found.
 Checks for a harmonized variable's source name in a data frame,
 handling era-specific naming conventions automatically.
 }
+\examples{
+\dontrun{
+# Find SMKDSTY_original in 2001 data
+var_name <- find_variable_in_data(cchs_2001, "SMKDSTY_original", "cchs2001_p")
+# Returns: "SMKADSTY"
+
+# Without cycle hint, checks all variants
+var_name <- find_variable_in_data(df, "SMKDSTY_original")
+}
+}

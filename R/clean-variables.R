@@ -550,11 +550,12 @@ derive_passthrough <- function(value, variable_name, output_format = "tagged_na"
 #' - Contains "inf" → continuous range
 #'
 #' @examples
+#' \dontrun{
 #' # Integer ranges (existing pattern)
 #' parse_range_notation("[7,9]")
 #' # Returns: list(min=7, max=9, values=c(7,8,9), type="integer")
 #'
-#' # Continuous ranges (new functionality)
+#' # Continuous ranges
 #' parse_range_notation("[18.5,25)")
 #' # Returns: list(min=18.5, max=25, min_inclusive=TRUE, max_inclusive=FALSE, type="continuous")
 #'
@@ -565,6 +566,7 @@ derive_passthrough <- function(value, variable_name, output_format = "tagged_na"
 #' parse_range_notation("NA::a")   # Returns: list(type="special", value="NA::a")
 #' parse_range_notation("copy")    # Returns: list(type="special", value="copy")
 #' parse_range_notation("else")    # Returns: list(type="special", value="else")
+#' }
 #'
 #' @keywords internal
 parse_range_notation <- function(range_string, range_type = "auto", expand_integers = TRUE) {

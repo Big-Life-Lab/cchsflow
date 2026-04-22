@@ -45,10 +45,12 @@
 #'
 #' @examples
 #' # Universal usage (works with any survey)
+#' \dontrun{
 #' result <- dplyr::case_when(
 #'   any_missing(var1, var2) ~ get_priority_missing(var1, var2),
 #'   # ... domain logic
 #' )
+#' }
 #'
 #' @export
 any_missing <- function(..., auto_detect = TRUE, output_format = "tagged_na") {
@@ -79,12 +81,14 @@ any_missing <- function(..., auto_detect = TRUE, output_format = "tagged_na") {
 #' @param output_format Character. Output format control ("tagged_na", "original")
 #' @return Vector with highest priority missing values
 #'
-#' @examples  
+#' @examples
 #' # CCHS priority: "Not Stated" (NA::b) > "Not Applicable" (NA::a)
-#' get_priority_missing(tagged_na("a"), tagged_na("b"))  # Returns tagged_na("b")
-#' 
+#' get_priority_missing(haven::tagged_na("a"), haven::tagged_na("b"))
+#'
+#' \dontrun{
 #' # Universal usage in derived variables
 #' get_priority_missing(height, weight, output_format = "original")
+#' }
 #'
 #' @export
 get_priority_missing <- function(..., auto_detect = TRUE, output_format = "tagged_na") {
@@ -427,16 +431,18 @@ convert_to_original_format <- function(values, config) {
 #' the appropriate missing type for non-matching cases.
 #'
 #' @examples
+#' \dontrun{
 #' # Domain logic assigns appropriate missing type
 #' dplyr::case_when(
 #'   smoking_status == "former_daily" ~ age_started_smoking,
 #'   .default = assign_missing("not_applicable", "SMKG207_cont", output_format)
 #' )
-#' 
+#' }
+#'
 #' # Different variables may have different missing patterns
-#' assign_missing("not_applicable", "SMKG207_cont", "tagged_na")  # haven::tagged_na("a") 
-#' assign_missing("not_applicable", "SMKG207_cont", "original")   # Variable's NA::a code
-#' assign_missing("not_stated", "SMKG207_cont", "original")       # Variable's NA::b code
+#' assign_missing("not_applicable", "SMKG207_cont", "tagged_na")
+#' assign_missing("not_applicable", "SMKG207_cont", "original")
+#' assign_missing("not_stated", "SMKG207_cont", "original")
 #'
 #' @export
 assign_missing <- function(missing_type, variable_name, output_format = "tagged_na") {

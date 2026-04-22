@@ -11,8 +11,8 @@ An object of class \code{list} of length 6.
 PACK_YEARS_CONSTANTS
 }
 \description{
-These constants are used in calculate_pack_years_pumf() and
-calculate_pack_years_master() functions. They cannot be expressed in
+These constants are used in calculate_pack_years() and related
+pack-years calculation functions. They cannot be expressed in
 variable_details.csv because they are calculation parameters, not
 recoding bounds.
 }
