@@ -42,13 +42,21 @@ test_that("pack_years_fun() has expected outputs when
                          12)
           })
 
+test_that("pack_years_fun", {
+  test_derived_function(
+    test_data <- read.csv("../testdata/pack_years.csv"),
+    pack_years_fun
+  )
+})
+
+
 # test_that("pack_years_fun_cat() has expected outputs when
 #           pack_years_der is out of range", {
 #             expect_equal(pack_years_fun_cat(-1),
 #                          "NA(b)")
 #           })
 
-test_that("pack_years_fun() has expected outputs for former daily current 
+test_that("pack_years_fun() has expected outputs for former daily current
           occasional smoker", {
   expect_equal(pack_years_fun(2, 45, 10, NA, 21, NA, 5, 20, 15, NA, NA), 15.25)
 })
