@@ -52,9 +52,9 @@ test_that("calculate_time_quit_smoking_complete routes gradual reducer to SMK_10
   expect_equal(result, 2.0)
 })
 
-test_that("calculate_time_quit_smoking_complete uses SMK_09A_cont as 2001 fallback", {
+test_that("calculate_time_quit_smoking_complete uses SMK_09A_cont when gate is missing", {
 
-  # 2001: no gate available (NA), falls back to SMK_09A_cont
+  # No gate available (NA) — falls back to SMK_09A_cont
   result <- calculate_time_quit_smoking_complete(
     SMKDSTY_cat5 = 3, SMK_10_gate = NA,
     SMK_06A_cont = NA, SMK_09A_cont = 4.0, SMK_10A_cont = NA

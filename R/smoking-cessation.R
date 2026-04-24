@@ -69,7 +69,8 @@
 #' Pathway-aware years since the respondent completely quit smoking. Uses
 #' cat5 smoking status and the quit-timing gate to route to the appropriate
 #' continuous input (SMK_06A_cont / SMK_09A_cont / SMK_10A_cont). Works
-#' uniformly across all cycles 2001+ on both PUMF and Master.
+#' across cycles 2003+ on both PUMF and Master (2001 not supported —
+#' SMK_10A missing that year).
 #'
 #' @details
 #' **Implementation method**: 3-step architecture
@@ -81,7 +82,7 @@
 #' 1. Former occasional (SMKDSTY_cat5 == 4): use SMK_06A_cont
 #' 2. Former daily, direct quit (cat5 == 3, gate == 1): use SMK_09A_cont
 #' 3. Former daily, gradual reducer (cat5 == 3, gate == 2): use SMK_10A_cont
-#' 4. Former daily, 2001 fallback (no gate): use SMK_09A_cont as proxy
+#' 4. Former daily, no gate available: use SMK_09A_cont as proxy
 #'
 #' @param SMKDSTY_cat5 Numeric vector. 5-category smoking status
 #' @param SMK_10_gate Numeric vector. Quit timing gate (1 or 2)
@@ -174,7 +175,7 @@ calculate_time_quit_smoking_complete <- function(SMKDSTY_cat5, SMK_10_gate,
       cleaned$SMK_10_gate == 2L & any_missing(cleaned$SMK_10A_cont) ~
       get_priority_missing(cleaned$SMK_10A_cont, output_format = output_format),
 
-    # Former daily (cat5 == 3), 2001 fallback (no gate) -> use SMK_09A_cont as proxy
+    # Former daily (cat5 == 3), no gate available -> use SMK_09A_cont as proxy
     cleaned$SMKDSTY_cat5 == 3L & any_missing(cleaned$SMK_10_gate) &
       !any_missing(cleaned$SMK_09A_cont) ~ cleaned$SMK_09A_cont,
     cleaned$SMKDSTY_cat5 == 3L & any_missing(cleaned$SMK_10_gate) &
