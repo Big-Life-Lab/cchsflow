@@ -25,24 +25,11 @@ library(haven)
 # calculate_time_quit_smoking_complete - Pathway-aware combining function
 # =============================================================================
 
-test_that("calculate_time_quit_smoking_complete uses SMKDVSTP when available (Master)", {
-
-  # Use 12.0 not 7.0 — clean_variables() auto-detection treats single-digit
-  # integers as missing codes when database context is unavailable
-  result <- calculate_time_quit_smoking_complete(
-    SMKDSTY_cat5 = 3, SMK_10_gate = 1,
-    SMK_06A_cont = NA, SMK_09A_cont = 2.5, SMK_10A_cont = NA,
-    SMKDVSTP = 12.0
-  )
-  expect_equal(result, 12.0)
-})
-
 test_that("calculate_time_quit_smoking_complete routes former occasional to SMK_06A_cont", {
 
   result <- calculate_time_quit_smoking_complete(
     SMKDSTY_cat5 = 4, SMK_10_gate = NA,
-    SMK_06A_cont = 5.0, SMK_09A_cont = NA, SMK_10A_cont = NA,
-    SMKDVSTP = NA
+    SMK_06A_cont = 5.0, SMK_09A_cont = NA, SMK_10A_cont = NA
   )
   expect_equal(result, 5.0)
 })
@@ -51,8 +38,7 @@ test_that("calculate_time_quit_smoking_complete routes direct quitter to SMK_09A
 
   result <- calculate_time_quit_smoking_complete(
     SMKDSTY_cat5 = 3, SMK_10_gate = 1,
-    SMK_06A_cont = NA, SMK_09A_cont = 3.5, SMK_10A_cont = NA,
-    SMKDVSTP = NA
+    SMK_06A_cont = NA, SMK_09A_cont = 3.5, SMK_10A_cont = NA
   )
   expect_equal(result, 3.5)
 })
@@ -61,8 +47,7 @@ test_that("calculate_time_quit_smoking_complete routes gradual reducer to SMK_10
 
   result <- calculate_time_quit_smoking_complete(
     SMKDSTY_cat5 = 3, SMK_10_gate = 2,
-    SMK_06A_cont = NA, SMK_09A_cont = 5.0, SMK_10A_cont = 2.0,
-    SMKDVSTP = NA
+    SMK_06A_cont = NA, SMK_09A_cont = 5.0, SMK_10A_cont = 2.0
   )
   expect_equal(result, 2.0)
 })
@@ -72,8 +57,7 @@ test_that("calculate_time_quit_smoking_complete uses SMK_09A_cont as 2001 fallba
   # 2001: no gate available (NA), falls back to SMK_09A_cont
   result <- calculate_time_quit_smoking_complete(
     SMKDSTY_cat5 = 3, SMK_10_gate = NA,
-    SMK_06A_cont = NA, SMK_09A_cont = 4.0, SMK_10A_cont = NA,
-    SMKDVSTP = NA
+    SMK_06A_cont = NA, SMK_09A_cont = 4.0, SMK_10A_cont = NA
   )
   expect_equal(result, 4.0)
 })
@@ -83,16 +67,14 @@ test_that("calculate_time_quit_smoking_complete returns NA::a for non-formers", 
   # Current daily smoker
   result <- calculate_time_quit_smoking_complete(
     SMKDSTY_cat5 = 1, SMK_10_gate = NA,
-    SMK_06A_cont = NA, SMK_09A_cont = NA, SMK_10A_cont = NA,
-    SMKDVSTP = NA
+    SMK_06A_cont = NA, SMK_09A_cont = NA, SMK_10A_cont = NA
   )
   expect_true(is.na(result))
 
   # Never smoker
   result <- calculate_time_quit_smoking_complete(
     SMKDSTY_cat5 = 5, SMK_10_gate = NA,
-    SMK_06A_cont = NA, SMK_09A_cont = NA, SMK_10A_cont = NA,
-    SMKDVSTP = NA
+    SMK_06A_cont = NA, SMK_09A_cont = NA, SMK_10A_cont = NA
   )
   expect_true(is.na(result))
 })

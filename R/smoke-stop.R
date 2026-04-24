@@ -128,15 +128,14 @@ calculate_SMK_09A_2003plus <- function(data, output_format = "tagged_na") {
 #' @title Years Since Stopped Smoking Completely - TIME_QUIT_SMOKING_COMPLETE (continuous)
 #' @description DOCUMENTATION ONLY - canonical implementation is in smoking-cessation.R.
 #'
-#' Pathway-aware years since completely quit smoking. Uses SMKDVSTP (Master)
-#' when available, then routes by quit pathway on PUMF.
+#' Pathway-aware years since completely quit smoking. Routes by cat5 smoking
+#' status and quit-timing gate to the appropriate continuous input.
 #'
 #' @param SMKDSTY_cat5 Numeric vector. 5-category smoking status
 #' @param SMK_10_gate Numeric vector. Quit timing gate (1 or 2)
 #' @param SMK_06A_cont Numeric vector. Years since quit (former occasional)
 #' @param SMK_09A_cont Numeric vector. Years since stopped daily
 #' @param SMK_10A_cont Numeric vector. Years since quit completely (gradual)
-#' @param SMKDVSTP Numeric vector. Master continuous years since quit completely
 #' @param output_format Character. Output format ("tagged_na" or "original")
 #'
 #' @return Vector of continuous years since cessation
@@ -149,7 +148,7 @@ calculate_SMK_09A_2003plus <- function(data, output_format = "tagged_na") {
 #' @export
 calculate_time_quit_smoking_complete_stub <- function(SMKDSTY_cat5, SMK_10_gate,
                                                        SMK_06A_cont, SMK_09A_cont,
-                                                       SMK_10A_cont, SMKDVSTP,
+                                                       SMK_10A_cont,
                                                        output_format = "tagged_na") {
   stop("DOCUMENTATION ONLY: Use calculate_time_quit_smoking_complete() from smoking-cessation.R")
 }

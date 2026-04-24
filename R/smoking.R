@@ -842,16 +842,13 @@ calculate_SMKG207_from_combined <- function(SMK_005, SMK_030, SMK_040) {
 #' @title Combined time since quit smoking
 #' @description Combines cessation timing from multiple sources with priority
 #'   logic. Provides a single continuous "years since quit" value regardless
-#'   of smoking history pathway. Uses SMKDVSTP (derived smoking status) to
-#'   confirm former-smoker status.
+#'   of smoking history pathway.
 #' @param SMK_09A_cont Years since stopped daily (from worksheet midpoint recode)
 #' @param SMK_06A_cont Years since quit occasional (from worksheet midpoint recode)
-#' @param SMKDVSTP Derived smoking status (for context; primary routing uses
-#'   availability of SMK_09A_cont and SMK_06A_cont)
 #' @return Continuous years since quit; NA::a for current/never smokers,
 #'   NA::b for missing
 #' @export
-calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont, SMKDVSTP) {
+calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont) {
   if_else2(
     !is.na(SMK_09A_cont) & SMK_09A_cont != "NA(a)" & SMK_09A_cont != "NA(b)",
     SMK_09A_cont,
@@ -859,7 +856,7 @@ calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont, SMKDVSTP) {
       !is.na(SMK_06A_cont) & SMK_06A_cont != "NA(a)" & SMK_06A_cont != "NA(b)",
       SMK_06A_cont,
       if_else2(
-        SMKDVSTP == "NA(a)" | SMK_09A_cont == "NA(a)" | SMK_06A_cont == "NA(a)",
+        SMK_09A_cont == "NA(a)" | SMK_06A_cont == "NA(a)",
         tagged_na("a"),
         tagged_na("b")
       )
