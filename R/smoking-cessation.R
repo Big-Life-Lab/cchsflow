@@ -68,9 +68,9 @@
 #'
 #' Pathway-aware years since the respondent completely quit smoking. Uses
 #' cat5 smoking status and the quit-timing gate to route to the appropriate
-#' continuous input (SMK_06A_cont / SMK_09A_cont / SMK_10A_cont). Works
-#' across cycles 2003+ on both PUMF and Master (2001 not supported —
-#' SMK_10A missing that year).
+#' continuous input (SMK_06A_cont / SMK_09A_cont / SMK_10A_cont). Not
+#' supported: 2001 (SMK_10A missing), 2022 (_cont feeders skip 2022), and
+#' cchs2023_p (SMK_10A_cont is Master-only in 2023).
 #'
 #' @details
 #' **Implementation method**: 3-step architecture
