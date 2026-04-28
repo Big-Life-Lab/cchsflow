@@ -166,9 +166,9 @@ Rows within each era block must be sorted in this order:
 
 ### Derived variables (Func:: / DerivedVar::)
 
-Row count depends on `typeEnd`:
+Row count depends on `typeEnd` and on whether the underlying R function can return `NA(a)` / `NA(b)`.
 
-**Continuous output** (`typeEnd=cont`) — exactly 3 rows:
+**Continuous output** (`typeEnd=cont`) — up to 3 rows:
 1. `Func::` row — `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`, `recEnd=Func::function_name`
 2. `NA::a` row — `recEnd=NA::a`, `recStart=N/A`, `catLabel=not applicable`
 3. `NA::b` row — `recEnd=NA::b`, `recStart=N/A`, `catLabel=missing`
@@ -178,6 +178,8 @@ Row count depends on `typeEnd`:
 2. Category rows 1…N — `recEnd=1`, `recEnd=2`, … ascending (same as direct recoding)
 3. `NA::a` row
 4. `NA::b` row
+
+**NA::a / NA::b row exception**: an `NA::a` row may be **omitted** if the underlying R function never returns `tagged_na("a")` (i.e. never produces `NA(a)`). Likewise for `NA::b`. To verify before omitting, inspect the function body for `tagged_na("a")`, `tagged_na("b")`, `assign_missing("not_applicable", …)`, `assign_missing("not_stated", …)`, or string returns of `"NA(a)"` / `"NA(b)"`. If none of those paths exist, the corresponding row is by-design absent and is not a convention violation.
 
 **Never add a `NA::b else` row to a Func:: block** (either type). The else/catchall pattern belongs only to direct recoding blocks. `recStart=N/A` and `catLabel=N/A` on the Func:: row itself — the function determines all valid output values.
 
@@ -229,9 +231,57 @@ These must match exactly across all rows for that variable.
 
 ---
 
-## 9. Multi-variable inputs in variables.csv variableStart
+## 9. Derived variable inputs in variables.csv variableStart
 
-When `variables.csv variableStart` contains multi-variable inputs (`cycle::[X, Y]`), the names inside the brackets must be **cchsflow harmonized variable names**, not raw CCHS source variable names.
+A derived variable's `variables.csv variableStart` summarizes which cchsflow variables feed it. The format depends on the structure of its `variable_details.csv` era blocks.
+
+### When to use `DerivedVar::[union]` (preferred for purely-derived variables)
+
+Use a single `DerivedVar::[union of all feeders across era blocks]` token in `variables.csv variableStart` when **all** of the following conditions hold for the variable's `variable_details.csv` rows:
+
+1. Every era block specifies its inputs via either:
+   - `DerivedVar::[X, Y, …]` in a Func:: row (functional derivation), OR
+   - `cycle::[X, Y, …]` per-cycle multi-variable token.
+2. **No** era block uses a `[VAR]` default pass-through.
+3. **No** era block uses a singular `cycle::SOURCE` mapping.
+
+The union must list every cchsflow variable that appears as a feeder in any era block, with each name appearing exactly once.
+
+```
+# Example — pack_years_der (functional derivation across PUMF/Master era blocks)
+# variable_details.csv:
+#   Block 1 (PUMF):   variableStart = "DerivedVar::[SMKDSTY_original, DHHGAGE_cont, age_start_smoking, ...]"
+#   Block 2 (Master): variableStart = "DerivedVar::[SMKDSTY_original, DHH_AGE,      age_start_smoking, ...]"
+
+# variables.csv (correct — single DerivedVar::[union])
+variableStart = "DerivedVar::[SMKDSTY_original, DHHGAGE_cont, DHH_AGE, age_start_smoking, ...]"
+```
+
+```
+# Example — immigration_der (multi-source pass-through, cycle::[X, Y] per cycle)
+# variable_details.csv era blocks all use cycle::[X, Y, ...] tokens:
+#   cchs2001_m::[SDCFIMM, SDCGCB, SDCDCGT_cat7, SDCDRES],
+#   cchs2003_m::[SDCFIMM, SDCGCB, SDCDCGT_cat7, SDCDRES], ...
+
+# variables.csv (correct — collapse to DerivedVar::[union], not per-cycle tokens)
+variableStart = "DerivedVar::[SDCFIMM, SDCGCB, SDCDCGT_cat7, SDCDRES, SDCGCBG, SDCGCGT, SDCGRES_cont]"
+```
+
+This applies to both:
+- **Functional derived variables** (e.g., `pack_years_der`, `time_quit_smoking_complete`) whose era blocks use `DerivedVar::[…]` in Func:: rows.
+- **Multi-source pass-through variables** (e.g., `immigration_der`, `COPD_Emph_der`) whose era blocks use `cycle::[X, Y]` per-cycle multi-var tokens.
+
+### When to keep cycle-specific tokens
+
+Use cycle-specific tokens in `variables.csv variableStart` only when the union format cannot represent the structure — i.e., when **any** of these is true:
+- An era block uses a `[VAR]` default pass-through.
+- An era block uses a singular `cycle::SOURCE` mapping.
+
+In these cases preserve the per-cycle tokens and `[VAR]` patterns directly so the variableStart still satisfies the union rule (§4).
+
+### Names inside brackets must be cchsflow names
+
+Whatever format is used, names inside `[…]` brackets in `variables.csv variableStart` must be **cchsflow harmonized variable names**, not raw CCHS source names:
 
 ```
 # Wrong — raw CCHS era-specific names inside brackets
@@ -241,9 +291,11 @@ cchs2001_m::[SMKA_203, SMKA_207], cchs2003_m::[SMKC_203, SMKC_207]
 cchs2001_m::[SMK_203, SMK_207], cchs2003_m::[SMK_203, SMK_207]
 ```
 
-Era-specific source name mappings (SMKA_203, SMKC_203, etc.) belong in `variable_details.csv` rows. `variables.csv` is a summary registry — its multi-variable inputs declare which cchsflow variables feed a derived variable, not which raw CCHS variables supply the data.
+Era-specific source name mappings (SMKA_203, SMKC_203, etc.) belong in `variable_details.csv` rows. `variables.csv` is a summary registry — its inputs declare which cchsflow variables feed a derived variable, not which raw CCHS variables supply the data.
 
-**Consistency across eras**: when consecutive eras call the same function with the same cchsflow feeders (even if the underlying raw sources differ per era), use the same feeder names for all those cycles:
+### Consistency across eras
+
+When consecutive eras call the same function with the same cchsflow feeders (even if the underlying raw sources differ per era), use the same feeder names for all those cycles. Under the `DerivedVar::[union]` format this is automatic; under per-cycle cycle-specific tokens, write each cycle with the same bracket contents:
 
 ```
 # All post-2015 cycles use the same cchsflow feeders — consistent across eras
