@@ -32,22 +32,22 @@ daily smoker.
 # SMKG207_fun() is specified in variable_details.csv along with the 
 # CCHS variables and cycles included.
 
-# To transform SMKG207_A across cycles, use rec_with_table() for each
-# CCHS cycle and specify SMKG207_A.
-# For CCHS 2001-2014, only specify SMKG207_A.
-# For CCHS 2015-2018, specify the parameters and SMKG207_A for former daily 
+# To transform SMKG207_pre2005 across cycles, use rec_with_table() for each
+# CCHS cycle and specify SMKG207_pre2005.
+# For CCHS 2001-2014, only specify SMKG207_pre2005.
+# For CCHS 2015-2018, specify the parameters and SMKG207_pre2005 for former daily 
 # smoker age.
 
 library(cchsflow)
 
 agecigfd_2009_2010 <- rec_with_table(
-  cchs2009_2010_p, "SMKG207_A")
+  cchs2009_2010_p, "SMKG207_pre2005")
 
 head(agecigfd_2009_2010)
 
 agecigfd_2017_2018 <- rec_with_table(
   cchs2017_2018_p,c(
-    "SMK_030","SMKG040","SMKG207_A"
+    "SMK_030","SMKG040","SMKG207_pre2005"
   )
 )
 
