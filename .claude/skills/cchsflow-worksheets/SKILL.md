@@ -102,8 +102,10 @@ Categorical / continuous blocks:
 4. `NA::b` else row
 
 Derived variable (`Func::`) blocks — **no `NA::b else` row ever**:
-- Continuous output: exactly 3 rows — Func:: + NA::a + NA::b
+- Continuous output: up to 3 rows — Func:: + NA::a + NA::b
 - Categorical output: Func:: row, then N category rows (ascending recEnd), then NA::a + NA::b
+
+`NA::a` / `NA::b` may be omitted if the R function never returns `tagged_na("a")` / `tagged_na("b")` respectively. Verify by inspecting the function body for `tagged_na`, `assign_missing`, or string returns of `"NA(a)"` / `"NA(b)"` before omitting.
 
 Func:: row always has `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`. Collapse two Func:: blocks into one when they call the same function with the same feeder list across consecutive eras.
 
@@ -116,6 +118,8 @@ Func:: row always has `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`. Collapse 
 - `variables.csv labelLong` ↔ `variable_details.csv variableStartLabel`
 
 **Union rule** — `variables.csv databaseStart` = union of all era block `databaseStart` values; `variables.csv variableStart` = union of all explicit tokens and `[VAR]`/`DerivedVar::` patterns across all era blocks.
+
+**Derived variable variableStart format (§9)** — when every era block in `variable_details.csv` uses multi-variable inputs (`DerivedVar::[X, Y, …]` Func:: rows OR `cycle::[X, Y, …]` per-cycle tokens) with no `[VAR]` defaults and no singular `cycle::SOURCE` mappings, `variables.csv variableStart` should collapse to a single `DerivedVar::[union of all feeders]` token. Otherwise keep cycle-specific tokens.
 
 **NA row label conventions** (fixed values — no variation):
 

@@ -9,7 +9,9 @@
 #' @return List containing schema configuration:
 #'   \itemize{
 #'     \item expected_column_order: Character vector of column names in expected order
-#'     \item id_column_name: Name of the ID column used for row sorting (variables only)
+#'     \item id_column_name: Name of the ID column used for row sorting, or NULL
+#'       if not defined in the schema (present in variables.yaml, absent in
+#'       variable_details.yaml)
 #'   }
 #'
 #' @export
@@ -30,5 +32,12 @@ load_schema <- function(file_type) {
     mustWork = TRUE
   )
 
-  return(yaml::read_yaml(schema_path))
+  tryCatch(
+    yaml::read_yaml(schema_path),
+    error = function(e) {
+      stop("Failed to load schema for '", file_type,
+           "'. The schema file at ", schema_path, " may be corrupted: ",
+           e$message)
+    }
+  )
 }
