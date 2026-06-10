@@ -10,7 +10,6 @@ calculate_time_quit_smoking_complete_stub(
   SMK_06A_cont,
   SMK_09A_cont,
   SMK_10A_cont,
-  SMKDVSTP,
   output_format = "tagged_na"
 )
 }
@@ -25,8 +24,6 @@ calculate_time_quit_smoking_complete_stub(
 
 \item{SMK_10A_cont}{Numeric vector. Years since quit completely (gradual)}
 
-\item{SMKDVSTP}{Numeric vector. Master continuous years since quit completely}
-
 \item{output_format}{Character. Output format ("tagged_na" or "original")}
 }
 \value{
@@ -35,8 +32,8 @@ Vector of continuous years since cessation
 \description{
 DOCUMENTATION ONLY - canonical implementation is in smoking-cessation.R.
 
-Pathway-aware years since completely quit smoking. Uses SMKDVSTP (Master)
-when available, then routes by quit pathway on PUMF.
+Pathway-aware years since completely quit smoking. Routes by cat5 smoking
+status and quit-timing gate to the appropriate continuous input.
 }
 \examples{
 \dontrun{
