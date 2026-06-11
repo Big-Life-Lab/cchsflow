@@ -1,0 +1,173 @@
+{
+  "summary": "cchsflow v3 (working tree, branch fix/v3-smoking-worksheet-sync) has no Imports field at all: all 9 runtime packages (haven, dplyr, sjlabelled, stringr, magrittr, yaml, readr, purrr, cli) sit in Depends, attaching ~996 exported symbols to the user search path and silently masking base/stats functions (dplyr) and haven I/O functions (sjlabelled). glue and stats are used via :: but undeclared (R CMD check WARNING), withr is used in tests but absent from Suggests, and cli is a Depends package never called from R/ at all. The NAMESPACE exports 125 symbols, of which ~36 are internal plumbing (cache_pattern, apply_database_heuristics, auto_detect_database, _stub functions, worksheet loaders) that leaked via blanket @export, freezing implementation details into the public API just before a v4 refactor. pkg.globals (R/strings.R) defines 84 string constants of which roughly 47-53 are dead bllflow leftovers (tableOne, LongTable, bllFlowContent, WorkingData, FunctionList, Modules, columnNames groups). There is no .onLoad/.onAttach; mutable state lives in 5 top-level namespace environments, one of which (.complete_patterns_cache) is built without parent = emptyenv() unlike its siblings. R/ also contains non-source content (R/legacy/, R/docs/, R/README.md) that R never loads but R CMD check flags. The pkgdown reference index still lists deleted v2 topics (bmi_fun, adl_fun, resp_condition_fun1-3, low_drink_*) so the docs site cannot build, while ~60 new exports are unindexed. Net: the dependency/namespace layer is the cheapest place to buy v4 freedom -- moving Depends to Imports, declaring glue/stats/withr, and un-exporting the 36 internals are S-to-M effort fixes that would eliminate every R CMD check dependency warning and shrink the API surface the v4 engine must remain compatible with.",
+  "issues": [
+    {
+      "title": "All 9 runtime dependencies in Depends; no Imports field exists",
+      "area": "DESCRIPTION / search path",
+      "evidence": [
+        "DESCRIPTION lines 38-48: Depends: R (>= 3.5.0), haven (>= 1.1.2), dplyr (>= 0.8.2), sjlabelled (>= 1.0.17), stringr (>= 1.2.0), magrittr, yaml, readr, purrr, cli -- and no Imports: field anywhere in the file",
+        "Measured cost (Rscript on installed versions): haven 28 + dplyr 284 + sjlabelled 46 + stringr 63 + magrittr 42 + yaml 6 + readr 103 + purrr 184 + cli 240 = 996 exported symbols attached to the user's search path by library(cchsflow)",
+        "Masking measured: dplyr masks 6 base/stats names (filter, lag, intersect, union, setdiff, setequal); purrr masks base %||% (R >= 4.4); sjlabelled (listed after haven) masks haven::read_stata, read_spss, read_sas, write_sas, as_factor, zap_labels; purrr masks magrittr::set_names",
+        "git show main:DESCRIPTION confirms v2/CRAN had 6 Depends; v3 added yaml, readr, purrr, cli to Depends instead of opening an Imports field",
+        "Internal code does not need the attachment: NAMESPACE already uses importFrom (10 lines) and qualified calls (66 haven::, 53 dplyr::, 22 purrr::); only 3 unqualified dplyr calls exist (recode-with-table.R:939-941 rowwise/select/do) and all are covered by importFrom"
+      ],
+      "why_design_issue": "R Packages 2e (Wickham & Bryan, ch. 'Dependencies') is explicit: 'Unless there is a good reason otherwise, you should always list packages in Imports not Depends.' Depends mutates the user's global search path as a side effect of library(cchsflow): a user who attaches cchsflow gets a different read_sas() (sjlabelled's, not haven's) and a different filter()/lag() (dplyr's, not stats') than before, with only easily-missed startup masking messages. It also makes cchsflow's behaviour dependent on what else the user attaches afterward, and inflates perceived weight of the package. CRAN's Writing R Extensions reserves Depends for packages whose namespace must be attached for the package to work -- none of these qualify since cchsflow already importFrom()s or ::-qualifies everything it needs.",
+      "severity": "high",
+      "candidate_fix": "Move all 9 packages from Depends to a new Imports field, keeping only R (>= ...) in Depends. The package code needs almost nothing: the 3 unqualified calls in recode-with-table.R are already covered by importFrom. The real (small) cost is docs: Rd examples that assume attachment (e.g. unqualified filter() in worksheet-getters.R:209-210 example; 42 example lines calling tagged_na() unqualified) need library(dplyr)/library(haven) lines or haven::/dplyr:: qualification; vignettes already call library(dplyr)/library(haven)/library(readr) explicitly so they survive unchanged. Announce in NEWS that %>% and tagged_na are no longer auto-attached.",
+      "effort": "M"
+    },
+    {
+      "title": "Undeclared dependencies: glue and stats used via :: but absent from DESCRIPTION; withr used in tests but not in Suggests",
+      "area": "DESCRIPTION / R CMD check",
+      "evidence": [
+        "R/check-worksheet.R:274, 291, 313, 336, 359, 378, 396, 415 -- eight glue::glue() calls; 'glue' appears nowhere in DESCRIPTION",
+        "R/alcohol.R:93 and R/clean-variables.R:637 -- stats::setNames(); 'stats' not declared in Imports",
+        "tests/testthat/helper-create-test-csv.R:19 -- withr::local_tempfile(); Suggests lists only testthat, kableExtra, DT, rmarkdown, knitr, pkgdown",
+        "R CMD check consequence: 'checking dependencies in R code' emits a WARNING \"'::' or ':::' imports not declared from: 'glue' 'stats'\", and 'checking for unstated dependencies in tests' flags withr"
+      ],
+      "why_design_issue": "CRAN policy and Writing R Extensions require every package whose namespace is accessed (even via ::) to be declared in Imports, and every package used only in tests/vignettes to be in Suggests. An undeclared Import means install.packages('cchsflow') can produce a library where check_worksheet() errors at runtime with 'there is no package called glue' -- the dependency solver never installed it. This is a hard CRAN blocker and exactly the class of WARNING that would embarrass a resubmission.",
+      "severity": "high",
+      "candidate_fix": "Add glue and stats to Imports (or, since the team standard is cli for messaging, replace the 8 glue::glue() calls with cli::format_inline()/sprintf and avoid the new dependency); add withr to Suggests. One-line DESCRIPTION edits plus optionally an 8-call mechanical refactor.",
+      "effort": "S"
+    },
+    {
+      "title": "125 exports with ~36 internal plumbing functions leaked into the public API",
+      "area": "NAMESPACE / API surface",
+      "evidence": [
+        "NAMESPACE: 125 export() lines (grep -c). Cross-referencing inst/extdata/variable_details.csv shows only 46 are referenced as Func:: by the worksheets; 79 are not",
+        "36 of the 79 are infrastructure: cache_pattern, get_cached_pattern, has_cached_pattern, clear_missing_patterns_cache, clear_complete_patterns_cache, get_complete_pattern, get_missing_pattern, get_missing_pattern_auto, get_missing_pattern_bulk, get_variable_missing_pattern, apply_database_heuristics, auto_detect_database, extract_years_from_database_names, find_variable_in_data, assign_missing, get_copy_mappings, get_else_mappings, get_source_mappings, get_source_variants, get_variable_bounds, get_variable_limits, get_variable_type, load_schema, load_worksheet_metadata, load_worksheet_schemas, list_subjects, is_equal, etc.",
+        "R/missing-pattern-cache.R alone carries 15 @export tags and zero @keywords internal",
+        "R/smoke-stop.R:149 and :180 export calculate_time_quit_smoking_complete_stub and calculate_time_quit_smoking_daily_stub -- scaffolding stubs in the public API",
+        "Export is not even needed for engine dispatch: R/recode-with-table.R:980 resolves DerivedVar functions with do.call(get(custom_function_name), row_values), and get() from the package namespace finds unexported functions (and user globalenv functions via the search path)"
+      ],
+      "why_design_issue": "R Packages 2e: 'export a function only if it is part of the API you are committing to... the fewer exports, the easier it is to change things later.' Every exported symbol must be documented, kept backward-compatible, and survives into pkgdown and CRAN checks. Exporting the missing-pattern cache, database heuristics, and worksheet-loader internals freezes the exact implementation details the v4 engine refactor intends to replace -- v4 would either break 'public' API or carry dead compatibility shims. Exported _stub functions signal unfinished work to every user reading the reference index.",
+      "severity": "high",
+      "candidate_fix": "Triage the 125 exports into three tiers before v4: (1) engine API (rec_with_table, merge_rec_data, set_data_labels, clean_variables, any_missing/get_priority_missing); (2) DV functions referenced by worksheets (46 Func:: targets, keep exported for transparency); (3) infrastructure (36) -- flip @export to @keywords internal or @noRd, or at minimum mark with lifecycle::badge('experimental'). Delete the two _stub exports. Mechanical roxygen edit + devtools::document(); the semver cost is cheapest now, before v3 is released.",
+      "effort": "M"
+    },
+    {
+      "title": "cli is a hard Depends but is never called from package code",
+      "area": "DESCRIPTION / dependencies",
+      "evidence": [
+        "grep 'cli::' R/*.R returns zero hits; grep for cli_alert/cli_abort/etc. in R/ returns zero hits",
+        "cli is used only by developer scripts outside the package code path: exec/check-worksheets.R (library(cli), cli_alert_info at line 68) and exec/fix-worksheets.R (6 cli:: calls total across exec/)",
+        "DESCRIPTION line 48: cli listed in Depends, attaching its 240 exports to every user's search path",
+        "R CMD check consequence: NOTE 'Package in Depends field not imported from: cli'"
+      ],
+      "why_design_issue": "A dependency that the package namespace never touches is pure cost: it is installed for every user, attached to their search path, and audited by CRAN, while providing nothing at runtime. exec/ scripts are developer tooling and do not justify a user-facing dependency; R Packages 2e recommends Suggests (or nothing) for tooling used only in development workflows.",
+      "severity": "medium",
+      "candidate_fix": "Remove cli from Depends. Either move it to Suggests with a requireNamespace() guard in exec/ scripts, or -- if the team adopts cli as the package's messaging layer (replacing glue and bare message()/stop()) -- put it in Imports and actually use it. One-line DESCRIPTION change.",
+      "effort": "S"
+    },
+    {
+      "title": "pkg.globals environment: 84 string constants, ~47-53 dead bllflow leftovers",
+      "area": "internal globals / R/strings.R",
+      "evidence": [
+        "R/strings.R:2 'pkg.globals <- new.env()' followed by 84 constant assignments in 11 groups",
+        "Usage scan (grep across R/ and tests/): argument.* group 24 defined / 79 uses; MSW.* 5 defined / 13 uses; ddiValue.* 5 defined / 1 use; ddiValueName.* 3 defined / 1 use; columnNames.* 5/0; bllFlowContent.* 8/0; tableOne.* 11/0; LongTable.* 18/0; Modules.* 1/0; WorkingData.* 2/0; FunctionList.* 2/0",
+        "Comments name the foreign origin: '# BLLFlow object content', '# Table one variable names', '# Long table column names' (R/strings.R:42-90) -- artifacts of the bllflow project this engine was extracted from",
+        "65 pkg.globals references in R/recode-with-table.R alone (plus R/label-utils.R), e.g. variable_details[[pkg.globals$argument.CatValue]] at recode-with-table.R:441",
+        "Meanwhile the v3 code path defines the same schema a second way: inst/ worksheet YAML schemas read by load_worksheet_schemas()/load_schema() (R/worksheet-loaders.R, R/load-schema.R) -- two competing sources of truth for column names"
+      ],
+      "why_design_issue": "Dead constants from another package obscure which worksheet columns are actually contractual, and the env-of-strings pattern (pkg.globals$argument.CatValue == 'recEnd', a name that matches neither the constant nor the column it denotes) makes the 983-line engine harder to read than literal column names would. Worse, v3 introduced YAML worksheet schemas as a second source of column-name truth, so the same fact now lives in two places that can drift. R Packages 2e treats package-level option/constant sprawl as a smell; the standard advice is one canonical constants object, trimmed to what is used.",
+      "severity": "medium",
+      "candidate_fix": "Delete the 7 fully dead groups (~47 constants) outright -- git history preserves them. For v4, collapse the remaining argument.*/MSW.* strings into the worksheet YAML schema already shipped in inst/, making the schema the single source of column names, and rename the misleading constants (argument.From -> recStart, argument.CatValue -> recEnd) in the interim.",
+      "effort": "S"
+    },
+    {
+      "title": "No .onLoad; mutable state in 5 top-level namespace environments with inconsistent construction",
+      "area": "package state / load behaviour",
+      "evidence": [
+        "grep for .onLoad/.onAttach/.onUnload/zzz across R/ returns nothing -- the package has no load hooks at all",
+        "Five top-level environments hold mutable session state: pkg.globals (R/strings.R:2), .cchsflow_cache and .cchsflow_cache$pattern_warnings (R/clean-variables.R:14-15, parent = emptyenv()), .missing_patterns_cache and .database_warnings_cache (R/missing-pattern-cache.R:26-27, parent = emptyenv()), .complete_patterns_cache (R/missing-pattern-cache.R:884, new.env() with NO parent = emptyenv())",
+        "R/missing-pattern-cache.R:921 has_cached_complete_pattern() uses exists(cache_key, envir = .complete_patterns_cache) without inherits = FALSE; because that env's parent is the package namespace, a cache-key/namespace-name collision would silently resolve to a package object",
+        "Caches are keyed 'variable::database' (missing-pattern-cache.R:897) and live for the whole R session with only manually-exported clear_*_cache() functions; nothing invalidates them when the user passes a different variable_details data frame to rec_with_table()"
+      ],
+      "why_design_issue": "The absence of .onLoad is itself fine (good, even -- nothing to do at load). The problems are the inconsistencies around it: R Packages 2e's canonical pattern for package caches is new.env(parent = emptyenv()) precisely so that get()/exists() cannot fall through to the namespace, and one of the four caches misses both the parent and the inherits=FALSE guard. More structurally, session-lifetime caches keyed only by variable+database name assume the worksheet metadata never changes within a session -- but rec_with_table() accepts user-supplied variable_details, so a user who edits their worksheet mid-session can get stale cleaning patterns with no warning. That is a correctness trap, not just hygiene.",
+      "severity": "medium",
+      "candidate_fix": "Short term: add parent = emptyenv() at missing-pattern-cache.R:884 and inherits = FALSE to the exists() calls; consolidate the four cache envs into one .cchsflow_cache with sub-environments. v4: scope the cache to the engine call (an environment created inside rec_with_table and threaded through) or key it by a hash of the worksheet rows, eliminating both the staleness trap and the need for exported clear_*_cache() functions.",
+      "effort": "S"
+    },
+    {
+      "title": "Non-source content inside R/: legacy/, docs/, README.md are never loaded but checked",
+      "area": "package layout",
+      "evidence": [
+        "ls R/ shows R/README.md, R/docs/ (containing README.md) and R/legacy/ (README.md, adl-legacy.R, alcohol-legacy.R, bmi-legacy.R)",
+        "R only sources files matching R/*.[RrSq] at the top level; roxygen2 and load_all() likewise ignore subdirectories -- the legacy code is inert",
+        "R CMD check flags this under 'checking package subdirectories': non-source files/directories in R/ produce a NOTE, and R CMD build ships them in the tarball"
+      ],
+      "why_design_issue": "Writing R Extensions defines R/ as containing only R source; anything else is dead weight that ships in the tarball, draws a check NOTE, and -- worse for a team mid-refactor -- misleads readers into thinking adl-legacy.R/alcohol-legacy.R are live fallbacks when they cannot be loaded. Version history belongs in git, not in a parallel directory tree.",
+      "severity": "medium",
+      "candidate_fix": "Delete R/legacy/, R/docs/ and R/README.md (git history preserves the legacy implementations; the CEP documents already record the v2->v3 mapping). If the team wants the legacy code browsable in the installed package, inst/legacy/ is the sanctioned location, but deletion is cleaner.",
+      "effort": "S"
+    },
+    {
+      "title": "Documentation index drift: 20 dot-*.Rd internal man pages, and a pkgdown reference index that references deleted v2 topics",
+      "area": "NAMESPACE / man / pkgdown",
+      "evidence": [
+        "man/ contains 170 Rd files for 125 exports; 20 are dot-prefixed internal helpers (man/dot-append_to_list.Rd, man/dot-check_column_order.Rd, ...) generated because check-worksheet.R documents unexported helpers with full roxygen but no @noRd/@keywords internal (man/dot-append_to_list.Rd shows no \\keyword{internal})",
+        "_pkgdown.yml reference index (lines 58-96) still lists deleted v2 topics whose Rd files git status shows as deleted: bmi_fun, adjusted_bmi_fun, bmi_fun_cat, resp_condition_fun1/2/3, binge_drinker_fun, adl_fun, adl_score_5_fun, low_drink_short_fun, low_drink_long_fun, low_drink_score_fun, low_drink_score_fun1, immigration_fun, pct_time_fun, pct_time_fun_cat -- pkgdown::build_site() fails on missing topics by default",
+        "_pkgdown.yml 'Utility functions' section (lines 149-158) indexes unexported internals (compare_value_based_on_interval, get_data_variable_name, label_data, recode_columns, recode_variable_NA_formating) as if they were API",
+        "None of the ~60 new v3 exports (calculate_*, clean_variables, cache functions, worksheet getters) appear in the reference index"
+      ],
+      "why_design_issue": "The man/ index and pkgdown reference are the public face of the API contract. Internal dot-helpers with user-facing man pages blur the public/private boundary R Packages 2e tells you to draw with @noRd; a reference index that names 15 deleted functions means the documentation site cannot build from this branch -- an immediate, visible embarrassment -- and the 60 undocumented-in-index exports mean the actual v3 API is invisible to users.",
+      "severity": "medium",
+      "candidate_fix": "Add @noRd to the dot-helpers in R/check-worksheet.R (removes 20 Rd files); rewrite _pkgdown.yml reference to match the triaged export list from the API-surface fix (or temporarily use a catch-all '- matches(\".*\")' section while v3 is in flux); verify with pkgdown::check_pkgdown().",
+      "effort": "S"
+    },
+    {
+      "title": "Engine dispatch couples namespace to superseded dplyr verbs and string-based get() lookup",
+      "area": "NAMESPACE / engine coupling",
+      "evidence": [
+        "NAMESPACE: importFrom(dplyr, do) and importFrom(dplyr, rowwise) -- dplyr::do() has been superseded since dplyr 1.0 (2020) and is documented by dplyr as no longer recommended",
+        "R/recode-with-table.R:938-946: recoded_data %>% rowwise() %>% select(used_feeder_vars) %>% do(column_being_added = calculate_custom_function_row_value(...)) -- the rowwise/do pattern is the core DerivedVar execution path",
+        "R/recode-with-table.R:980: do.call(get(custom_function_name), row_values) -- positional-argument, string-named function resolution with no namespace anchor; get() searches package namespace -> imports -> base -> globalenv, so any same-named object anywhere on that chain (including a user's global variable) is silently called",
+        "R/recode-with-table.R:939 select(used_feeder_vars) passes an external character vector to tidyselect without all_of(), which dplyr deprecated (ambiguity warning) and will eventually error"
+      ],
+      "why_design_issue": "From a dependency-stability standpoint the package's most critical function is built on the part of dplyr most likely to be removed (do) and a tidyselect calling convention already in the deprecation pipeline -- a future dplyr release can break every DerivedVar in the worksheets without cchsflow changing a line. The get()-by-string dispatch additionally means the effective API includes 'any function name mentioned in a worksheet cell', which no NAMESPACE audit can see; it also makes positional argument order a silent contract (already identified as a v4 pain point in cep-017).",
+      "severity": "medium",
+      "candidate_fix": "This is v4 scope (cep-017-v4-engine): replace rowwise()+do() with a vectorized call (the v3 DV functions are already vector-safe by design standard), wrap tidyselect args in all_of(), and resolve DerivedVar functions through an explicit registry (named list or getExportedValue with a declared environment) with named-argument matching. Interim v3 hardening: at minimum add all_of() and a match.fun existence check with a clear error.",
+      "effort": "L"
+    },
+    {
+      "title": "DESCRIPTION metadata stale and internally inconsistent",
+      "area": "DESCRIPTION",
+      "evidence": [
+        "DESCRIPTION: Version 2.1.0 and Date: 2022-05-05 on a branch four years into v3 development",
+        "DESCRIPTION carries both a manual 'Author: See Authors@R' / 'Maintainer: Kitty Chen' block AND Authors@R; R CMD check derives Author/Maintainer from Authors@R and NOTEs any mismatch ('Author field differs from that derived from Authors@R')",
+        "Description text still says 'currently, 2001 to 2018' while the worksheets now cover cycles through 2023 (recent commits extend variables to 2019-2020 and 2022-2023)",
+        "Depends: R (>= 3.5.0) while the team's own standard (CLAUDE.md R environment standards) sets a 4.2.0 floor for StatsCan/ICES compatibility"
+      ],
+      "why_design_issue": "CRAN derives the canonical Author/Maintainer from Authors@R; hand-maintained parallel fields are a documented NOTE source. A 2022 date and 2001-2018 coverage claim on a package whose selling point is cycle coverage actively misinforms users, and an R floor below what the package is actually tested against (and below the team's own deployment floor) promises support nobody verifies.",
+      "severity": "low",
+      "candidate_fix": "Delete the manual Author/Maintainer lines (R builds them from Authors@R), bump Version to a 3.0.0 dev version (3.0.0.9000), drop or update Date (roxygen/CRAN no longer need it), update the Description coverage text, and raise Depends to R (>= 4.2.0) to match the team standard -- or document why 3.5.0 is retained.",
+      "effort": "S"
+    },
+    {
+      "title": "No utils::globalVariables() declaration for NSE column references",
+      "area": "R CMD check hygiene",
+      "evidence": [
+        "grep globalVariables R/ returns nothing",
+        "R/worksheet-getters.R:89 and :296 use select(variable, !!!dots) -- bare column name 'variable' in tidyselect",
+        "R/recode-with-table.R:939-941 uses rowwise()/select()/do() with NSE; codetools-based 'checking R code for possible problems' emits 'no visible binding for global variable' NOTEs for each bare column name"
+      ],
+      "why_design_issue": "These NOTEs are noise that buries real problems in R CMD check output; R Packages 2e's standard remedies are the .data pronoun (rlang) or a utils::globalVariables() declaration in a single file. With a CRAN resubmission planned for v3/v4, every avoidable NOTE increases reviewer friction.",
+      "severity": "low",
+      "candidate_fix": "Prefer the .data$variable pronoun (dplyr already imported) over globalVariables(); for tidyselect contexts use all_of()/any_of() with character vectors, which also fixes the deprecated select(used_feeder_vars) pattern. One sweep through the ~5 sites.",
+      "effort": "S"
+    },
+    {
+      "title": "if_else2 exported with no deprecation signalling despite team decision to retire it",
+      "area": "NAMESPACE / API lifecycle",
+      "evidence": [
+        "R/utility-functions.R:29-35: if_else2 defined and @export'ed with no deprecation notice; still called in 11 R/ files",
+        "Project memory / derive-function standards (project_derive_function_standards.md) record the v3 decision to 'deprecate if_else2()' in favour of dplyr::case_when in the 3-step architecture",
+        "Companion utility is_equal is likewise exported (NAMESPACE) and indexed as API in _pkgdown.yml:152-153"
+      ],
+      "why_design_issue": "An export the team has decided to retire, still advertised without a lifecycle marker, invites new external code to depend on it -- raising the cost of the very removal v4 plans. R Packages 2e / lifecycle conventions: deprecate loudly (badge + .Deprecated()/lifecycle::deprecate_warn) one release before removal.",
+      "severity": "low",
+      "candidate_fix": "Add lifecycle to Suggests-free deprecation via .Deprecated('dplyr::case_when') or a lifecycle::deprecate_warn() in if_else2, mark the Rd with a deprecation badge, and migrate the 11 internal call sites to case_when as files are touched (the smoking/BMI/ADL/alcohol files already did this).",
+      "effort": "S"
+    }
+  ]
+}

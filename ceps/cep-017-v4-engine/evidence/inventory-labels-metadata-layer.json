@@ -1,0 +1,179 @@
+{
+  "dimension": "labels-metadata-layer",
+  "date": "2026-06-10",
+  "repos": {
+    "cchsflow": "/Users/dmanuel/github/cchsflow (branch fix/v3-smoking-worksheet-sync, uncommitted working tree treated as v3 state)",
+    "scoping_docs": [
+      "/tmp/recodeflow-pr43/labels.qmd",
+      "/tmp/recodeflow-pr43/doug-originals/labels.qmd",
+      "/tmp/recodeflow-pr43/doug-originals/new-labels.qmd"
+    ]
+  },
+  "method": "Read R/label-utils.R, R/recode-with-table.R, R/merge-data.R, R/clean-variables.R, R/strings.R, DESCRIPTION, NAMESPACE, tests; fetched GitHub issue #159; ran three live Rscript repros against the working tree (devtools::load_all) at /tmp/v4-research/labels-repro{,2,3}.R; compared against recodeflow PR43 labels scoping documents.",
+  "summary": "The labels layer is the part of cchsflow furthest from its own v4 scoping targets. Labels are built from per-row source-variable label columns in variable_details (variables.csv's label/labelLong columns are demonstrably dead), attached as sjlabelled-flavoured and ad-hoc attributes (factor + character-coded 'labels', plus custom 'labels_long'/'label_long'/'unit') that the labelled/haven ecosystem cannot consume, and fused to the recode engine with hidden type coercion and no opt-out. Live repros confirmed: (1) issue #159 is misdiagnosed - rec_with_table fails on ANY tibble input (including plain numeric tibbles) inside label_data's single-bracket indexing, while haven_labelled columns in a plain data.frame recode fine and haven::zap_labels does not fix it; (2) set_data_labels and merge_rec_data hard-stop on the package's own shipped metadata (DHHGAGE_cat5 has two distinct variableStartLabel values); (3) categorical missing is a literal factor level 'NA(b)' invisible to is.na(), inconsistent with the tagged_na encoding used for continuous variables, which both blocks haven::write_sav export and forces the new v3 clean layer to parse the legacy engine's own string output; (4) one catLabel mapping to multiple recEnd values silently drops value labels in 5 shipped variables; (5) labels do not survive bind_rows or base subsetting, so the canonical workflow is a full relabel via merge_rec_data, which hardcodes cchsflow:: worksheets. The fix direction is well-articulated in the labels scoping docs (haven_labelled output via the labelled package, separation of recode and label stages, sheets as single source of truth, labels on continuous special values) and matches CEP-017 v4 scope item 5 (decompose rec_with_table into detect/recode/derive/label stages).",
+  "issues": [
+    {
+      "title": "rec_with_table() fails on any tibble input inside label_data(); issue #159 misdiagnoses this as a haven_labelled problem",
+      "area": "label_data / input coercion (issue #159)",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:184-211 - label_data uses single-bracket `data_to_label[, variable_name]` nine times; on a tibble this returns a 1-column tibble, so `as.numeric(data_to_label[, variable_name])` (line 203-204) throws \"'list' object cannot be coerced to type 'double'\" and `is.factor(...)` (lines 184, 198) is always FALSE",
+        "Live repro (labels-repro.R): tibble::as_tibble(cchs2001_p) with PLAIN numeric columns -> ERROR: 'list' object cannot be coerced to type 'double'; CALL: label_data(label_list = label_list, data_to_label = recoded_data)",
+        "Live repro (labels-repro2.R): haven::labelled() columns inside a plain data.frame recode successfully for cont, cat, and DerivedVar paths (HWTGHTM, DHH_SEX, HWTGBMI_der all OK) - the haven_labelled class is NOT the trigger",
+        "Live repro (labels-repro3.R): haven::zap_labels() on the tibble (issue #159's 'Option 2' workaround) still fails with the same error - confirming the issue's root-cause analysis and proposed fix (strip haven_labelled) would not resolve the bug",
+        "gh issue view 159: reports 'list' object cannot be coerced to type 'double' for haven::read_sav() input; read_sav returns a tibble, which is the actual trigger; the 'as.data.frame(df)' workaround works because it converts the tibble, not because it strips labels",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:457 - `recoded_data <- data[, 0]` propagates the input's tibble class into the frame label_data later receives"
+      ],
+      "why_design_issue": "The engine's only entry point silently assumes base-data.frame single-bracket semantics deep inside the label layer. Every modern import path (haven::read_sav, readr::read_csv, ODESSI PUMF distributions) returns tibbles, so the package fails on the data sources it exists to serve, and the open issue's proposed fix targets the wrong cause. A v4 that keeps column-extraction-by-`[ , ]` will re-inherit the bug.",
+      "severity": "high",
+      "candidate_fix": "Short term: replace `data_to_label[, variable_name]` with `data_to_label[[variable_name]]` throughout label_data (and audit recode-with-table.R for the same pattern), add a tibble + haven_labelled regression test, and correct the diagnosis on issue #159. v4: operate on extracted vectors and reassign once per column; accept any data.frame subclass.",
+      "effort": "S"
+    },
+    {
+      "title": "set_data_labels()/merge_rec_data() hard-stop on the package's own shipped worksheets (heterogeneous variableStartLabel)",
+      "area": "create_label_list_element validation",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:132-148 - create_label_list_element stop()s if any row of a cat variable has a different variableStartLabel from row 1",
+        "Live repro (labels-repro3.R): rec_with_table(cchs2015_2016_p, 'DHHGAGE_cat5') succeeds, but set_data_labels() on its output ERRORs: 'DHHGAGE_cat5 does not contain all identical variableStartLabel variable cant change variableLabel for different values. VAL1: Age (20-year age groups) VAL2: Age'",
+        "Worksheet scan (labels-repro2.R): 2 shipped cat variables (DHHGAGE_cat5, SMKG203_2005plus) have >1 distinct variableStartLabel across rows",
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:50-61 - set_data_labels filters variable_details only by variable name, never by database, so it sees the cross-database label conflicts that rec_with_table's per-database row filter (recode-with-table.R:319-321) happens to avoid",
+        "/Users/dmanuel/github/cchsflow/R/merge-data.R:61 - merge_rec_data unconditionally calls set_data_labels, so the documented multi-cycle merge workflow crashes whenever the merged data contains such a variable"
+      ],
+      "why_design_issue": "The label layer treats a per-source metadata column (the StatCan label of the start variable, which legitimately varies by era/cycle) as if it were a single harmonized-variable label, then enforces that misconception with stop(). The crash fires after all recoding work is done, in a utility whose job is cosmetic, and it fires on metadata the package itself ships. It also imposes a hidden authoring constraint: worksheet authors cannot faithfully record per-era source labels without breaking set_data_labels.",
+      "severity": "high",
+      "candidate_fix": "Short term: downgrade the stop() to a warning and take the first non-NA label (or the per-database row's label). Real fix (v4): source the harmonized variable label from variables.csv `label`/`labelLong` (one row per variable, no conflict possible) and reserve variableStartLabel as per-row provenance metadata - which also resolves the dead-column issue below.",
+      "effort": "S"
+    },
+    {
+      "title": "Categorical missing is a literal factor level 'NA(a)/NA(b)/NA(c)' while continuous missing is tagged_na - inconsistent semantics that break is.na(), block SPSS export, and leak into the v3 clean layer",
+      "area": "missing-value encoding in label/recode output",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:807-825 - recode_variable_NA_formating: cat type gets the string paste('NA(', tag, ')'), cont type gets haven::tagged_na(tag)",
+        "Live repro (labels-repro2.R): DHH_SEX with 5 NA source rows -> factor levels '1, 2, NA(b)'; table() shows NA(b)=5, <NA>=0; is.na(out$DHH_SEX[1]) is FALSE on a missing observation",
+        "Live repro (labels-repro.R): haven::write_sav() on rec_with_table output ERRORs: 'Failed to insert value [195, 2]: The file format does not supported character tags for missing values' - the tagged_na continuous side cannot round-trip to SPSS either, contradicting the scoping goal of SPSS/Stata export via haven",
+        "/Users/dmanuel/github/cchsflow/R/merge-data.R:50-58 - merge_rec_data adds yet another string level 'NA(c)' to factors",
+        "/Users/dmanuel/github/cchsflow/R/clean-variables.R:537-563 - coerce_cchs_label_strings exists specifically to re-parse \"rec_with_table() factor levels ('NA(a)', 'NA(b)')\" back into tagged NAs, i.e. the new 3-step architecture must reverse-engineer the legacy engine's own output encoding",
+        "/tmp/recodeflow-pr43/labels.qmd 'Tagged NA' section and doug-originals/labels.qmd section 6: missing categories should be labelled tagged_na values, 'No Interference with tagged NAs', haven_labelled_spss/na_values mooted for SPSS round-trip"
+      ],
+      "why_design_issue": "Missingness is the analytically load-bearing metadata in CCHS work, and the package encodes it two different ways depending on toType. The categorical encoding ('NA(b)' as a valid factor level) silently enters models, crosstabs and survey weights as a real category, and defeats every standard missing-data tool (is.na, na.omit, tidyr::drop_na). The dual encoding forces string round-tripping inside the package itself (clean-variables.R) and makes faithful export impossible. This is the single biggest semantic decision v4 must make.",
+      "severity": "high",
+      "candidate_fix": "Pick one ecosystem-native representation in v4: haven_labelled (numeric codes + tagged_na for missing, value labels on both valid and missing codes), with labelled_spss/na_values or zap_missing() helpers for SPSS export, and an explicit opt-in as_factor() conversion for users who want factors. Keep 'NA(a)' strings only as a deprecated legacy output mode during transition.",
+      "effort": "L"
+    },
+    {
+      "title": "Value labels are attached in a nonstandard sjlabelled-on-factor form (character-coded 'labels' attr) that labelled/haven cannot consume",
+      "area": "label attribute format / ecosystem interop",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:183-196 - cat variables are coerced to factor of code strings, then sjlabelled::set_labels attaches labels; line 195-196 adds a custom 'labels_long' attribute; lines 207-212 add 'label', 'unit', 'label_long' attributes",
+        "Live repro (labels-repro.R, run 6): DHH_SEX output is class 'factor' with levels '1','2' and attr labels = c(Male='1', Female='2', 'not applicable'='NA(a)', missing='NA(b)') - typeof character, including codes ('NA(a)','NA(b)') that are not even levels of the factor; labels_long is an identical duplicate",
+        "Live repro (labels-repro.R, run 9): labelled::val_labels(out$DHH_SEX) returns NULL - the de-facto standard package cannot see the value labels; sjlabelled::as_label() works but emits 'NAs introduced by coercion' warnings on every call (labels-repro3.R run F)",
+        "/tmp/recodeflow-pr43/labels.qmd 'R ecosystem' section and doug-originals/labels.qmd section 1: scoping requires labelled::var_label()/set_value_labels() conventions producing haven_labelled vectors so write_sav/write_dta work",
+        "Users see factors of numeric code strings ('1','2') in every table/plot unless they discover sjlabelled::as_label - value labels are decorative, not functional"
+      ],
+      "why_design_issue": "The output is neither a useful factor (levels are opaque codes, not label text) nor a haven_labelled vector (class absent, codes stored as character). Every attribute except 'label' ('labels' on a factor with char codes, 'labels_long', 'label_long', 'unit') is a private convention no other package reads, so the metadata cannot flow into gtsummary, ggplot, codebook generators, or haven exports. This directly contradicts the v4 scoping commitment to ecosystem conventions.",
+      "severity": "high",
+      "candidate_fix": "v4: emit haven_labelled (numeric codes, named-numeric labels, var_label) as the default output; provide as_factor(levels='labels') for factor users; drop labels_long/label_long/unit attributes from columns and serve long labels and units through a codebook/metadata accessor (get_variable_metadata()) per the scoping docs' 'minimal coupling to data object' principle.",
+      "effort": "M"
+    },
+    {
+      "title": "variables.csv label/labelLong are dead for labelling; labels actually come from variable_details' source-variable label columns, contradicting the documented API and the single-source-of-truth principle",
+      "area": "worksheet-to-label flow / set_data_labels API",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/strings.R:27-28 - argument.VariableLabel='variableStartLabel', argument.VariableLabelShort='variableStartShortLabel'; create_label_list_element (label-utils.R:101-104) reads only these variable_details columns for the label/label_long attributes",
+        "Live repro (labels-repro3.R run A): mutating variables.csv label/labelLong for HWTGHTM to 'MUTATED LABEL' and re-running set_data_labels leaves attr(label)='Height' and attr(label_long)='Height (metres)/self-reported - (D,G)' - the variables sheet columns have zero effect on labels",
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:10-11 - roxygen documents variables_sheet as 'A dataframe containing variable labels in the label column' (false); label-utils.R:7 also documents a parameter 'data_to_lab.el' that does not exist (actual arg data_to_label, line 44)",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:758-795 - update_variable_details_based_on_variable_sheet merges variables.csv label/labelLong/units into variable_details, but only 'units' is subsequently read; the merged label columns are dead code; set_data_labels (label-utils.R:56-60) likewise sets label/labelLong to NA when variables_sheet is NULL, to no effect",
+        "The attached label_long 'Height (metres)/self-reported - (D,G)' carries StatCan source-variable notation ('- (D,G)') - the harmonized variable inherits a cycle-specific source label as its description, from whichever applicable row happens to be first (label-utils.R:96)",
+        "/tmp/recodeflow-pr43/labels.qmd 'Variables and variable details': 'the sheets uses the standard that variable labels are encoded in the label column in the variables sheet' and 'sheets are the source of truth'"
+      ],
+      "why_design_issue": "There are two parallel label stores (variables.csv label/labelLong vs variable_details variableStartShortLabel/variableStartLabel) that worksheet authors must keep manually in sync, and the one the documentation and scoping designate as authoritative is silently ignored. The tests only pass because the duplicated values currently agree (tests/testthat/test-label-utils.R compares against variables$label). first-row selection also makes labels order- and database-dependent.",
+      "severity": "medium",
+      "candidate_fix": "Make variables.csv label/labelLong/units the single source for harmonized variable-level labels (one row per variable); repurpose variableStartLabel/variableStartShortLabel as per-row source provenance not attached to output; fix the roxygen (param name, variables_sheet description); add a worksheet-checker rule flagging divergence between the two stores during the transition.",
+      "effort": "M"
+    },
+    {
+      "title": "Value-label construction silently drops labels when one catLabel maps to multiple codes (5 shipped variables affected)",
+      "area": "create_label_list_element value-label assembly",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:153-158 - `ret_list$values[[catLabel]] <- value` assigns by name, so a repeated catLabel overwrites the previous code's entry; only the last code keeps the label, earlier codes lose theirs with no warning",
+        "Worksheet scan (labels-repro3.R run C): 5 cat variables where one catLabel maps to >1 distinct recEnd: CCC_091 ('N/A'), COPD_Emph_der ('N/A'), DHHGAGE_cat5 ('Age'), LBFA_31A_c ('Unique to Prim. Ind./Proc./Manu.'), number_conditions ('N/A') - e.g. 'N/A' labels both NA(a) and NA(b), so the not-applicable vs not-stated distinction loses its label",
+        "Worksheet scan (labels-repro2.R run 8): 231 cat variables have duplicated catLabel rows overall (mostly benign same-label-same-code across cycles, but the mechanism cannot distinguish benign from harmful duplicates)"
+      ],
+      "why_design_issue": "A named-list keyed by label text is the wrong data structure for a code->label mapping (labels are not unique keys; codes are). The failure is silent and data-dependent, so a worksheet edit can quietly delabel a missing-data category. haven's convention (named vector, names=labels, values=codes, duplicates allowed via c()) handles this correctly.",
+      "severity": "medium",
+      "candidate_fix": "Build the labels vector with c()/setNames preserving duplicate names (haven allows duplicated label text across codes), key any internal lookup by code not label, and add a worksheet-validation warning when one catLabel maps to multiple recEnd within a variable so authors can intentionally disambiguate (e.g. 'N/A - not applicable' vs 'N/A - not stated').",
+      "effort": "S"
+    },
+    {
+      "title": "Labelling is fused to recoding with hidden type coercion and no opt-out, contradicting the separation-of-concerns scope",
+      "area": "engine architecture / label stage coupling",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:686-688 - recode_columns unconditionally ends with `label_data(label_list, recoded_data)`; rec_with_table has no argument to skip labelling",
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:183-206 - label_data is also the type-coercion layer: every cat variable is coerced to factor (line 184-187) and every cont variable to numeric via as.numeric(levels())[...] or as.numeric() (lines 198-205); output column types are decided inside the 'label' function",
+        "/tmp/recodeflow-pr43/labels.qmd 'Separation of concerns': 'The library should separate the process of recoding and labels attachment'",
+        "/Users/dmanuel/github/cchsflow/ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md:44 - v4 scope item 5: 'Decompose rec_with_table() into detect / recode / derive / label stages on public primitives'",
+        "Tibble crash (issue above) is a direct casualty: a labelling cosmetic step can abort the whole recode after all computation succeeded"
+      ],
+      "why_design_issue": "Users cannot get recoded-but-unlabelled output, cannot substitute their own labelling framework, and the engine's output types (factor vs numeric) are a side effect of a function named label_data. Failures in label metadata (heterogeneous variableStartLabel, tibble indexing) abort recoding. This blocks the v4 staged-pipeline goal and makes the label layer untestable in isolation.",
+      "severity": "medium",
+      "candidate_fix": "In v4, make the recode/derive stages return correctly-typed columns and expose labelling as an explicit, optional stage (apply_labels(data, variables, variable_details)) built on labelled::; rec_with_table becomes a thin composition with a label = TRUE/FALSE argument for compatibility.",
+      "effort": "M"
+    },
+    {
+      "title": "Continuous variables get no value labels at all - tagged-NA categories and special codes are unlabelled, against explicit scoping requirements",
+      "area": "value-label completeness (cont variables)",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:105 - `if (is_equal(ret_list$type, pkg.globals$ddiValueName.Cat))` guards the entire values/values_long loop; cont variables exit with empty values",
+        "Live repro (labels-repro.R run 6): HWTGHTM output attributes are only label/unit/label_long - no labels attr; haven::na_tag shows tags 'b' present in the data but nothing in the column metadata says what tag 'a' vs 'b' means",
+        "/tmp/recodeflow-pr43/labels.qmd 'Variable and value labels': 'The library should allow users to attach labels to these special values within continuous variables without needing to convert them to categorical'",
+        "/tmp/recodeflow-pr43/doug-originals/labels.qmd section 6: 'if using haven::tagged_na(x) for Refused, the value label Refused will be associated with that tagged NA value'"
+      ],
+      "why_design_issue": "Half the harmonized variables (everything toType=cont) lose their missing-category documentation at the data level: a user inspecting HWTGHTM has no way to learn that tagged_na('a') means not-applicable and 'b' means not-stated without reading package vignettes. haven_labelled supports labels on tagged_na values natively, so this is a gap, not a limitation of the target representation.",
+      "severity": "medium",
+      "candidate_fix": "Attach value labels to cont variables for their special/missing codes (labels = c('not applicable' = tagged_na('a'), 'missing' = tagged_na('b'), 'not asked in cycle' = tagged_na('c'))) using haven::labelled; worksheet rows for cont NA categories already carry catLabel text to source these from.",
+      "effort": "S"
+    },
+    {
+      "title": "Labels do not survive bind_rows or base subsetting; the canonical recovery path (merge_rec_data) hardcodes cchsflow worksheets and warns on any extra column",
+      "area": "label persistence through dplyr / merge workflow",
+      "evidence": [
+        "Live repro (labels-repro.R run 7): after dplyr::filter/mutate labels survive; after dplyr::bind_rows ALL label attrs are dropped (labels and label both FALSE); after base `[` row-subset the factor's labels attr is dropped",
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:33-41 - the package's own @examples for set_data_labels demonstrate the loss: bind_rows two cycles, get_label() shows labels gone, re-apply set_data_labels",
+        "/Users/dmanuel/github/cchsflow/R/merge-data.R:61-62 - merge_rec_data relabels via set_data_labels(new_data, cchsflow::variable_details, cchsflow::variables) - hardcoded package worksheets, so recodeflow-style users with custom worksheets get wrong/missing labels with no override parameter",
+        "Live repro (labels-repro.R run 10): set_data_labels warns for every data column absent from the sheets ('extra_col is missing from variable_details...'), so analysts who added ID/weight/derived columns get warning spam on every relabel",
+        "/tmp/recodeflow-pr43/labels.qmd 'Preserving Labels': labels 'should be preserved regardless of the transformations applied' for dplyr/tidyr"
+      ],
+      "why_design_issue": "Because the attributes live on bare factors/numerics, vctrs strips them in exactly the operation (bind_rows across cycles) that is cchsflow's core use case. The workaround couples users to a full re-label step that assumes package-shipped metadata and noisy warnings. Switching to haven_labelled vectors would make labels survive bind_rows/vec_c natively, eliminating most of the problem rather than patching it.",
+      "severity": "medium",
+      "candidate_fix": "Adopt haven_labelled output (labels survive vctrs operations including bind_rows); give merge_rec_data variable_details=/variables= parameters defaulting to the package sheets; make the unknown-column warning a single summarized message or opt-in.",
+      "effort": "M"
+    },
+    {
+      "title": "sjlabelled dependency (in Depends, not Imports) for three function calls, while the scoping standard is the labelled package",
+      "area": "dependencies / sjlabelled vs labelled",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/DESCRIPTION:37-47 - haven, dplyr, sjlabelled, stringr, magrittr, yaml, readr, purrr, cli are all in Depends, attaching nine packages to the user's search path on library(cchsflow)",
+        "/Users/dmanuel/github/cchsflow/NAMESPACE:134-136 and R/label-utils.R:172 - the entire sjlabelled surface used is set_label, set_label<-, set_labels (one importFrom, used only in label_data)",
+        "/tmp/recodeflow-pr43/labels.qmd 'R ecosystem' and doug-originals/labels.qmd section 1: target packages are haven and labelled (labelled::var_label, labelled::set_value_labels) - sjlabelled appears only in the references list",
+        "labelled::set_variable_labels/set_value_labels are drop-in equivalents for the three calls; labelled is the actively-developed standard (larmarange) used by gtsummary and the broader ecosystem"
+      ],
+      "why_design_issue": "A whole attached dependency (plus its haven/sjmisc lineage) for three calls, with the package's own scoping documents standardizing on a different library, creates needless install weight, search-path pollution and a mixed-convention codebase (sjlabelled attributes here, haven::tagged_na there, custom attrs elsewhere). Depends-instead-of-Imports is also a CRAN-review smell.",
+      "severity": "low",
+      "candidate_fix": "Move all dependencies from Depends to Imports (keep R version in Depends); replace the three sjlabelled calls with labelled:: equivalents (or plain structure()/attr assignment during transition) and drop sjlabelled entirely in v4.",
+      "effort": "S"
+    },
+    {
+      "title": "API/doc/test hygiene: phantom @param, documented-but-unexported label_data, duplicated labels_long attribute, and a single 18-line label test",
+      "area": "documentation and test coverage of label layer",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:7 - roxygen documents '@param data_to_lab.el' but the function signature (line 44) is data_to_label; R CMD check will flag the mismatch",
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:165-175 + man/label_data.Rd + NAMESPACE - label_data has a user-facing Rd page but is not exported (no @keywords internal either), so help shows a function users cannot call",
+        "Live repro (labels-repro.R run 6): labels_long attr is byte-identical to labels for DHH_SEX (catLabel == catLabelLong for most worksheet rows), pure duplication on every cat column",
+        "/Users/dmanuel/github/cchsflow/tests/testthat/test-label-utils.R - entire label-layer test suite is 18 lines and checks only that variable labels match variables.csv$label; zero tests for value labels, NA(x) levels, tibble input, dplyr survival, or merge_rec_data labelling (which is why the DHHGAGE_cat5 crash and tibble crash ship undetected)"
+      ],
+      "why_design_issue": "The label layer has effectively no safety net: the one existing test validates the one pathway that happens to work, and documentation actively misleads (phantom param, dead variables_sheet semantics per issue above). Any v4 refactor of this layer starts without a behavioural specification.",
+      "severity": "low",
+      "candidate_fix": "Fix the roxygen param name; mark label_data/create_label_list_element @keywords internal or export them deliberately; drop labels_long when identical to labels; before v4 work, write characterization tests covering value labels, NA-level behaviour, tibble input, bind_rows + merge_rec_data, and set_data_labels with custom sheets.",
+      "effort": "S"
+    }
+  ]
+}

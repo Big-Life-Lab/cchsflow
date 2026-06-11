@@ -1,0 +1,285 @@
+{
+  "summary": "Deep audit of cchsflow R/recode-with-table.R (983 lines). Structure: rec_with_table (entry, lines 154-245: loads worksheets via data(), deparse(substitute()) database naming, list-vs-data.frame branch) -> recode_call (248-351: variable filtering by character vector or variables-sheet merge, var_labels patching, grepl database row filter) -> recode_columns (431-691: 3-way row split into map::/DerivedVar::/plain, per-variable while loop with else handling, bracket-interval parsing, compare_value_based_on_interval, log_table, notes; then derived-variable while loop) -> recode_derived_variables (827-973: recursive feeder resolution with var_stack cycle detection, rowwise()+do() per-row dispatch) -> calculate_custom_function_row_value (974-983: unname + do.call positional dispatch). Labeling delegated to R/label-utils.R (create_label_list_element, label_data); column-name constants in R/strings.R pkg.globals (which carries a large dead inventory of bllflow-era constants: bllFlowContent.*, tableOne.*, LongTable.*, WorkingData.*, FunctionList.* used nowhere outside strings.R). Two high-severity bugs were PROVEN LIVE against the loaded package: (1) list-mode rec_with_table recodes every database with the FIRST database's rules (the loop passes the whole database_name vector to recode_call; grepl uses only pattern[1] with warnings); (2) the interval parser silently mangles set-syntax recStart like '[7,8,9]' into the interval [7,8], dropping 9 to the else row -- 14 production worksheet rows (HUI_01..HUI_09) use this syntax and are only coincidentally correct because their else row maps to the same NA::b. Also proven live: a plain data.frame is routed into the list branch whenever ncol(data) == length(database_name) because is.list() is TRUE for data.frames; and the categorical/continuous missing-data split where categoricals receive literal string sentinels 'NA(b)' while continuous receive haven::tagged_na, with as.factor()/factor() coercion (engine line 953, label-utils line 186) destroying tagged NAs returned by v3 derived functions. The derived-variable dispatch uses deprecated dplyr rowwise()+do() (superseded since dplyr 1.0.0, 2020) with bare-character-vector select() (tidyselect >=1.1 deprecation) and calls each custom function once per data row via unnamed positional do.call, so argument order silently couples worksheet variableStart order to function formals. The roxygen documentation promises sjmisc::rec features (comma lists, colon ranges, min/max/lo/hi, NA-as-recFrom) that the engine does not implement and the worksheet does not use, and documents wrong defaults for append_to_data and notes. log= prints a per-variable recode table and notes= prints worksheet notes, but both are silently ignored for DerivedVar:: variables. custom_function_path is source()d into the global environment despite a comment claiming a new environment, and get() resolution lets worksheet Func:: cells invoke any reachable global function. Dead code: map:: row split never consumed, append_non_db_columns hardcoded FALSE, '(,)' interval branch unreachable, factor-levels append no-op from the stringsAsFactors era, is_equal(x,'character(0)') literal-string comparison, '. <- NULL' NSE hack, pointless assign() side effect. Issue count: 4 high, 9 medium, 8 low.",
+  "issues": [
+    {
+      "title": "List-mode recoding applies the first database's rules to every database (silent data corruption)",
+      "area": "rec_with_table list branch",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:188-203 -- for (data_name in database_name) loop passes database_name = database_name (the FULL vector), not data_name, to recode_call",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:320 -- grepl(database_name, variable_details$databaseStart) uses only pattern[1] when given a vector",
+        "Live repro (Rscript, devtools::load_all): list(db_one, db_two) with distinct rules (db_two recodes to 991/992) returned db_two$TEST_VAR == c('1','2') -- db_one's rules -- plus six 'argument pattern has length > 1 and only the first element will be used' warnings",
+        "/Users/dmanuel/github/cchsflow/tests/testthat/test-recode-with-table.R (39 lines) -- zero list-mode tests; only 4 single-data.frame golden tests"
+      ],
+      "why_design_issue": "A documented API mode ('data ... Can also be a list of dataframes', doc lines 103-107) silently produces wrong harmonized data for every database after the first. This is exactly the class of silent cross-cycle error the package exists to prevent, and it is invisible unless the user notices grepl warnings.",
+      "severity": "high",
+      "candidate_fix": "Pass data_name (the loop variable) to recode_call; also apply attach_data_name in this branch; add list-mode regression test with per-database rules. One-line fix plus tests in v3; in v4, make database identity an explicit per-call argument rather than a regex filter.",
+      "effort": "S"
+    },
+    {
+      "title": "Interval parser silently mangles set-syntax recStart ('[7,8,9]' becomes interval [7,8], third value dropped to else)",
+      "area": "recode_columns interval parsing",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:571-601 -- strsplit on ',' but only from_values[[1]] and [[2]] are used; third element ignored; interval_right becomes '8' -> invalid -> silently replaced by default '[,]' (lines 604-609)",
+        "Live repro: recStart '[7,8,9]' -> recEnd NA::b with else -> 2 produced SRC 7,8 -> 'NA(b)' but SRC 9 -> '2' (else), with runtime message 'invalid interval was passed. Default interval will be used: [,]'",
+        "Worksheet scan (Rscript read.csv on inst/extdata/variable_details.csv): 14 rows use recStart '[7,8,9]' across HUI_01..HUI_09; only coincidentally correct because their else row is also NA::b",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:571-574 -- bracket detection regex '\\\\[*\\\\]' / '\\\\(*\\\\)' actually matches ANY string containing ']' or ')' (the * quantifies the bracket, not a wildcard), so any stray bracket in recStart enters the interval path and a one-element split crashes at from_values[[2]]"
+      ],
+      "why_design_issue": "The engine accepts-and-mangles worksheet syntax that authors evidently believed valid, with no validation layer; correctness currently depends on a coincidence in the else rows. A grammar the parser does not reject is a grammar it must implement.",
+      "severity": "high",
+      "candidate_fix": "Define and validate a formal recStart grammar (single value | [a,b] with (/[ variants | else | else copy); error loudly on >2 comma elements or unparseable cells; fix the bracket-detection regex to '^\\\\[.*\\\\]$' style anchors. In v4 move validation into check-worksheets so bad syntax never reaches the engine.",
+      "severity_note": null,
+      "effort": "M"
+    },
+    {
+      "title": "Split missing-data regime: literal 'NA(b)' string sentinels for categoricals vs haven::tagged_na for continuous; factor coercion destroys tagged NAs",
+      "area": "recode_variable_NA_formating / label_data / derived coercion",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:807-825 -- recode_variable_NA_formating: cat -> paste('NA(', tag, ')') string; cont -> haven::tagged_na(tag)",
+        "Live repro output: categorical TEST_VAR values are the literal string/factor level 'NA(b)', not NA",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:949-954 -- derived cat variables coerced with as.factor(unlist(...)); live demo: as.factor(c(1,2,tagged_na('b'))) loses the 'b' tag (na_tag NA after round trip)",
+        "/Users/dmanuel/github/cchsflow/R/label-utils.R:184-186 -- label_data re-factors any non-factor cat column, same tag destruction",
+        "/Users/dmanuel/github/cchsflow/R/bmi.R:203 -- v3 functions (e.g. calculate_bmi pathway) return haven::tagged_na('b'), so v3 3-step outputs routed through the cat branch lose missing-reason detail"
+      ],
+      "why_design_issue": "Two incompatible missingness encodings live in one output dataframe: is.na() is FALSE for categorical missing ('NA(b)' is a level), TRUE for continuous missing, and the tag detail v3 functions carefully produce is destroyed at the engine boundary for cat-typed deriveds. This directly blocks the v4 goal of a coherent metadata-driven missing-data contract and contaminates downstream tables/models.",
+      "severity": "high",
+      "candidate_fix": "Pick one representation per output contract (haven labelled + tagged_na, or explicit factor missing levels) and apply it uniformly in one boundary function; never coerce through as.factor/as.character for values carrying tags. This is an architecture decision for the v4 engine, with a migration shim for v3.",
+      "effort": "L"
+    },
+    {
+      "title": "Derived-variable dispatch: deprecated rowwise()+do() calling custom functions once per row via unnamed positional do.call",
+      "area": "recode_derived_variables / calculate_custom_function_row_value",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:937-947 -- recoded_data %>% rowwise() %>% select(used_feeder_vars) %>% do(column_being_added = calculate_custom_function_row_value(., ...)); do() superseded since dplyr 1.0.0 (2020); select() with a bare character vector triggers the tidyselect >=1.1 'use all_of()' deprecation",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:974-983 -- row_values <- unname(row_values); do.call(get(custom_function_name), row_values): arguments matched purely by POSITION, so worksheet variableStart order must match the function's formals order; a transposition is silent wrong data",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:150 -- @importFrom dplyr rowwise select do case_when (engine itself never uses case_when)",
+        "Per-row dispatch means an n-row CCHS cycle (~100k rows) incurs n R function calls per derived variable even though every v3 function is vectorized (CEP-017 context)"
+      ],
+      "why_design_issue": "The dispatch relies on two deprecated dplyr idioms slated for eventual removal, has O(rows) interpretive overhead that dominates rec_with_table runtime for derived variables, and the unnamed positional contract is the single most dangerous coupling in the package: nothing checks that feeder order matches formals.",
+      "severity": "high",
+      "candidate_fix": "Replace with a single vectorized call: do.call(fun, setNames(as.list(recoded_data[used_feeder_vars]), names(formals(fun))[seq_along(used_feeder_vars)])) after asserting length/name compatibility against formals(); fall back to mapply only for genuinely scalar functions. v4 should require named argument binding declared in the worksheet or function metadata.",
+      "effort": "L"
+    },
+    {
+      "title": "Plain data.frame routed into the list branch when ncol(data) == length(database_name)",
+      "area": "rec_with_table branching",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:186-187 -- if (is.list(data) && length(database_name) == length(data)): is.list() is TRUE for every data.frame and length(df) is its column count",
+        "Live repro: a 1-column data.frame with one database_name errored 'The data testdb is missing from the passed list please verify the names are correct'"
+      ],
+      "why_design_issue": "Type dispatch by duck-typing on is.list() misclassifies the most common input type; the failure mode is an unrelated error message that points users at a 'list' they never passed.",
+      "severity": "medium",
+      "candidate_fix": "Test is.data.frame(data) first, and treat the list branch as 'is.list(data) && !is.data.frame(data)'; validate names(data) against database_name explicitly.",
+      "effort": "S"
+    },
+    {
+      "title": "Roxygen documents sjmisc::rec features the engine does not implement (comma lists, colon ranges, min/max/lo/hi, NA as recFrom)",
+      "area": "rec_with_table documentation vs parser",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:75-100 -- docs promise recFrom '1,2', '1:4', 'min:4', lo/hi tokens, and recFrom 'NA'",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:571-616 -- parser only handles bracket intervals, single values, else, copy; a comma list without brackets goes to the scalar branch and as.numeric('1,2') -> NA -> string-equality miss",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:713-717 -- recFrom 'NA' can never match data NAs: which('NA' == col) drops NA comparisons, so the documented NA-recode feature is impossible",
+        "Worksheet scan: 0 colon ranges, 0 comma lists without brackets, 0 min/max/lo/hi tokens, 0 bare-NA recStart in 3,839 rows -- the features are unused as well as unimplemented",
+        "Doc default mismatches: lines 113-114 claim append_to_data default TRUE (code line 160: FALSE); lines 117-118 claim notes default FALSE (code line 162: TRUE)"
+      ],
+      "why_design_issue": "The user-facing contract is inherited verbatim from bllflow/sjmisc and is fiction; worksheet authors reading the help page will write rows the engine silently never matches. Wrong documented defaults additionally invert the user's mental model of what the function returns and prints.",
+      "severity": "medium",
+      "candidate_fix": "Rewrite the roxygen to describe the actual grammar and defaults now (S); in v4, generate documentation from the validated grammar definition so docs and parser cannot drift.",
+      "effort": "S"
+    },
+    {
+      "title": "log= and notes= are silently ignored for derived (DerivedVar::) variables",
+      "area": "recode_derived_variables logging",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:827-973 -- log and print_note are parameters of recode_derived_variables but are only ever passed through the recursive call (lines 916-917); no message/print uses them",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:634-643 and 646-659 -- note printing and the log_table print exist only in the plain-recode path",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:545-548,619-623 -- log_table is built row-by-row even when log = FALSE (wasted work); line 606-609 'invalid interval' message prints unconditionally regardless of log/notes"
+      ],
+      "why_design_issue": "The two observability switches the API offers cover only half the engine; derived variables -- the riskiest transformations -- produce no recode log and never surface their worksheet notes. Meanwhile unconditional message() calls (also lines 171-183 on default loading) cannot be turned off except via suppressMessages.",
+      "severity": "medium",
+      "candidate_fix": "v4: a structured logging object (per-variable provenance: rows matched per rule, feeder functions called, notes) returned or emitted through one verbosity control; v3 stopgap: print feeder/function info under log and notes in the derived path, and gate the interval message behind a warning.",
+      "effort": "M"
+    },
+    {
+      "title": "custom_function_path is source()d into the global environment despite comment claiming a new environment; get() dispatch resolves any reachable function",
+      "area": "rec_with_table custom function loading",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:166-169 -- comment 'If custom Functions are passed create new environment and source' followed by bare source(custom_function_path); source() default local=FALSE evaluates in globalenv, polluting/overwriting user bindings",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:980 -- do.call(get(custom_function_name), ...): get() walks function env -> namespace -> imports -> base -> globalenv, so any Func:: cell in a worksheet executes whatever function of that name is reachable, with no allowlist"
+      ],
+      "why_design_issue": "Comment-code mismatch hides a real side effect (global namespace pollution and silent overwriting of user functions), and worksheet data effectively names arbitrary code to execute -- a robustness and provenance problem for a package whose worksheets are community-edited CSVs.",
+      "severity": "medium",
+      "candidate_fix": "source(custom_function_path, local = fn_env <- new.env(parent = asNamespace('cchsflow'))) and resolve via get(name, envir = fn_env, inherits = TRUE) with an explicit registry/allowlist of derivation functions; error with a clear message when the function is not found.",
+      "effort": "S"
+    },
+    {
+      "title": "Error path in get_data_variable_name references undefined 'row', masking the real error with a closure-coercion failure",
+      "area": "get_data_variable_name",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:394-410 -- stop(paste('The row', row, 'for the variable', ...)): no 'row' exists in this function's scope; it resolves to base::row (a function)",
+        "Live check: paste('x', row, 'y') errors 'cannot coerce type closure to vector of type character', so users hitting a databaseStart/variableStart mismatch see an inscrutable coercion error instead of the diagnostic message"
+      ],
+      "why_design_issue": "The one diagnostic that explains a common worksheet authoring mistake (database missing from variableStart) is unreachable; debugging cost lands on every worksheet contributor.",
+      "severity": "medium",
+      "candidate_fix": "Drop 'row' from the message or pass the row index/variable row in as an argument; add a unit test that asserts the error message text.",
+      "effort": "S"
+    },
+    {
+      "title": "Database matching is unanchored regex substring matching (grepl without fixed=TRUE or tokenization)",
+      "area": "recode_call / get_data_variable_name filtering",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:320 -- grepl(database_name, variable_details$databaseStart): database_name used as a regex pattern against comma-separated cell text; 'cchs2015' would match 'cchs2015_2016_p' rows",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:378,382 -- grepl(data_name, var_start_names) inside variableStart parsing, same substring semantics; a database name occurring inside a variable name is a false positive",
+        "No escaping of regex metacharacters anywhere in the path"
+      ],
+      "why_design_issue": "Era/cycle identifiers differ by suffixes ('cchs2009_s' vs 'cchs2009_2010_s' family); substring semantics make near-miss database names silently select the wrong rule rows instead of erroring, the exact failure class the team already tracks for worksheet QA.",
+      "severity": "medium",
+      "candidate_fix": "strsplit(databaseStart, ',') + trimws + exact %in% matching; same tokenization for variableStart 'db::var' pairs; validate the requested database_name against the known database list and error on no exact match.",
+      "effort": "S"
+    },
+    {
+      "title": "recode_variable_NA_formating is fragile: substring 'NA' trigger and unguarded [[3]] crash on malformed cells",
+      "area": "recode_variable_NA_formating",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:809 -- grepl('NA', cell_value): any recEnd merely containing the letters 'NA' enters the tagged-NA path",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:810-814 -- strsplit(cell_value, ':')[[1]] then na_value_list[[3]]: a bare 'NA' cell (or 'NA:a') errors 'subscript out of bounds' with no context; worksheet currently has 1,495 'NA::' rows and 0 bare-NA rows so the crash is latent, awaiting one typo",
+        "No validation that the tag is a single letter a-z as haven::tagged_na requires"
+      ],
+      "why_design_issue": "The central missingness parser trusts its input completely; one malformed worksheet cell produces an uncontextualized crash deep in the engine instead of a row-addressed validation error.",
+      "severity": "medium",
+      "candidate_fix": "Anchor with regexpr '^NA::([a-z])$'; on mismatch raise an error naming the variable and cell content; share the same parse with the worksheet checker so it is caught at authoring time.",
+      "effort": "S"
+    },
+    {
+      "title": "No dependency resolution against the full worksheet: feeder variables must be explicitly listed in `variables`",
+      "area": "recode_call filtering + recode_derived_variables recursion",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:270-286 -- variable_details is subset to the requested variables BEFORE recoding; the recursive feeder search (lines 908-928) only sees this filtered set",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:866-890 -- requesting only 'HWTGBMI_der' without 'HWTGHTM','HWTGWTK' triggers the 'could not be derived because ... was never specified' warning and the variable is silently absent from output",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:871-877 -- the warning interpolates feeder_vars (all unresolved feeders) rather than non_func_missing_variables (the actual missing set), so the message can blame the wrong variables",
+        "Examples (doc lines 127-141) work around this by always listing feeders alongside the derived variable"
+      ],
+      "why_design_issue": "The engine contains a recursion and cycle detector that could resolve dependencies, but upfront filtering cripples it; users must hand-maintain transitive feeder lists, and failure is a warning plus a missing column rather than either auto-resolution or a hard error. CEP-015 variable-tools exists partly to paper over this.",
+      "severity": "medium",
+      "candidate_fix": "Resolve the feeder closure against the FULL variable_details before filtering (keep requested variables as the output set, feeders as intermediate, dropped unless append requested); fix the warning to report non_func_missing_variables; v4: explicit dependency graph as a first-class object.",
+      "effort": "M"
+    },
+    {
+      "title": "Row-indexing mismatch between variable_rows and fun_variable_rows in derived processing; early return abandons remaining Func rows",
+      "area": "recode_derived_variables",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:853-861 -- loop runs seq_len(nrow(fun_variable_rows)) but feeder_vars are read from variable_rows[row_num, ] (ALL rows for the variable, including category-label rows), while the function name is read from fun_variable_rows[row_num, ] (line 931-933): positional indices into two differently filtered frames",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:879-890 -- on missing feeders the function returns from INSIDE the for loop, skipping any remaining Func rows for that variable",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:955-956 -- multiple Func rows for one variable each overwrite the whole column; last writer wins with no warning"
+      ],
+      "why_design_issue": "Works today only because every row of a derived variable shares one variableStart cell; any worksheet where label rows precede the Func row with a different variableStart (e.g. era-specific deriveds) reads feeders from the wrong row -- a correctness landmine for exactly the multi-era harmonization v3 is adding.",
+      "severity": "medium",
+      "candidate_fix": "Iterate over fun_variable_rows only and take feeders from the same row object; warn or error if a variable has multiple Func rows matching one database; continue (not return) on unresolvable rows.",
+      "effort": "S"
+    },
+    {
+      "title": "Dead code inventory: map:: split never consumed, append_non_db_columns hardcoded, unreachable '(,)' branch, no-op levels() append, 'character(0)' literal comparison, '. <- NULL' hack, pointless assign()",
+      "area": "whole file + strings.R",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:439-441 -- map_variables_to_process computed and never referenced again; 0 'map::' rows exist in inst/extdata/variable_details.csv, and any such row would be silently dropped (rec filter at 448-451 excludes them)",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:185 -- append_non_db_columns <- FALSE hardcoded, making lines 332-342 unreachable while the flag is plumbed through two function signatures",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:741-748 -- '(,)' interval branch unreachable from the engine: valid_intervals (line 455) excludes it and lines 604-609 coerce anything invalid to '[,]' first",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:549-551 -- levels(recoded_data[[var]]) <- c(levels(...), levels(character_column)) is a stringsAsFactors-era no-op (levels() of a character column is NULL)",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:516-517 -- !is_equal(else_value, 'character(0)') compares against the literal STRING 'character(0)'; the intended zero-length check is already covered by length(else_value)==1, so the clause is dead",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:1-2 -- '. <- NULL' R CMD check hack for the do() pronoun, with cryptic comment '# Removing Note'",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:962-963 -- label_list[[var]] <- assign(var, create_label_list_element(...)): assign() is used purely for its return value, creating a stray local binding named after the CCHS variable (would shadow locals like 'label_list' if a variable carried such a name)",
+        "/Users/dmanuel/github/cchsflow/R/strings.R:43-101 -- bllFlowContent.*, tableOne.*, LongTable.*, Modules.*, WorkingData.*, FunctionList.* constants referenced nowhere else in R/ (grep confirms only strings.R)"
+      ],
+      "why_design_issue": "Roughly a fifth of the engine is vestigial bllflow scaffolding; every dead path raises the comprehension cost of an already 983-line file and misleads contributors about what worksheet syntax (map::) is supported.",
+      "severity": "low",
+      "candidate_fix": "Delete dead branches and constants in a mechanical cleanup commit gated by the existing golden tests; replace the '.' hack with utils::globalVariables or eliminate it when do() goes.",
+      "effort": "S"
+    },
+    {
+      "title": "compare_value_based_on_interval uses an obfuscated x %in% x[which(cond)] construction instead of direct vectorized comparison",
+      "area": "compare_value_based_on_interval",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:712-755 -- every branch computes data[[col]] %in% data[[col]][which(cond)]: builds the satisfying VALUE set then re-tests membership, i.e. a double pass + hash to express coalesce(cond, FALSE)",
+        "Side effect relied upon implicitly: %in% maps NA comparisons to FALSE, which is the only reason NAs in source data fall through to the else row"
+      ],
+      "why_design_issue": "The core matching primitive hides its NA semantics inside an idiom no reviewer reads correctly on first pass; the NA-to-FALSE behaviour that the whole else/NA::b system depends on is an accident of %in%, not a stated contract.",
+      "severity": "low",
+      "candidate_fix": "Rewrite as cond <- (lo <= x & x <= hi) (per interval); return cond & !is.na(cond), with a comment stating that NA never matches a rule and falls to else. Behaviour-preserving, testable.",
+      "effort": "S"
+    },
+    {
+      "title": "Quadratic/per-cell recode loop: per-variable while-loop with repeated dataframe filtering and per-category column assignment",
+      "area": "recode_columns main loop",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:459-468 -- while (nrow(rec_variables_to_process) > 0) re-filters the rows dataframe twice per variable",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:632-633 -- recoded_data[valid_row_index, variable] <- value executes one full-length logical-index data.frame assignment per worksheet category row (3,839 rows in the current worksheet), each triggering data.frame copy semantics",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:491-507 -- O(n^2) duplicate-From detection loop (sum over the vector inside a for over the vector)",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:545-548,619-623 -- log_table assembled cell-by-cell even when log = FALSE"
+      ],
+      "why_design_issue": "Combined with per-row derived dispatch this makes rec_with_table the slowest step of every cchsflow pipeline; for v4's goal of running all variables across all cycles, an O(categories x rows) data.frame-assignment engine does not scale.",
+      "severity": "medium",
+      "candidate_fix": "v4: compile each variable's rules to a lookup/join (data.frame of from-interval -> to) applied via findInterval/match once per variable on plain vectors; use duplicated() for the dup check; build the log from rule-match counts already computed.",
+      "effort": "L"
+    },
+    {
+      "title": "attach_data_name only honoured in the single-data.frame branch",
+      "area": "rec_with_table",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:229-231 -- data[['data_name']] <- database_name applied only in the data.frame branch; the list branch (188-214) never applies it despite the parameter being documented generically (line 121-122)"
+      ],
+      "why_design_issue": "Provenance tagging is precisely most useful when recoding multiple cycles for bind_rows, the one mode where it silently does nothing.",
+      "severity": "low",
+      "candidate_fix": "Set data[[data_name]][['data_name']] <- data_name inside the list-branch loop; add to the list-mode regression test.",
+      "effort": "S"
+    },
+    {
+      "title": "Variables-sheet path silently drops unknown variables and reorders rows via merge(); character-vector path warns",
+      "area": "update_variable_details_based_on_variable_sheet",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:788-792 -- rows for variables absent from the variables sheet are filtered out with no message, whereas the character-vector path (277-285) warns about requested-but-missing variables",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:780-787 -- merge() with default sort=TRUE reorders variable_details rows, changing label 'first row' selection and processing order between the two input modes"
+      ],
+      "why_design_issue": "Two input modes for the same parameter have different silence/ordering semantics; users switching from a name vector to a worksheet subset lose the missing-variable diagnostics without notice.",
+      "severity": "low",
+      "candidate_fix": "merge(..., sort = FALSE); emit the same missing-variable warning in both paths; long term collapse the dual-typed `variables` parameter into two explicit arguments.",
+      "effort": "S"
+    },
+    {
+      "title": "API surface and hygiene: dual-typed `variables` param, exported is_equal, misspelled internals, typo-laden messages, tests relying on partial argument matching",
+      "area": "exported API / style",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:104-105 -- `variables` accepts a character vector OR a variables-sheet data.frame (run-time type sniffing at 261-269)",
+        "/Users/dmanuel/github/cchsflow/NAMESPACE:110 -- export(is_equal): a generic NA-tolerant comparator exported from a survey-harmonization package's API, also misused internally (line 517)",
+        "recode_variable_NA_formating ('formating'), plus message/comment typos: 'instanses' (line 36), 'Detemine' (184), 'varialbe' (470), 'seperate' (383), 'more then once' (500), 'varLalbel' (299), multi-line stop() strings with embedded source indentation (205-213, 232-241)",
+        "/Users/dmanuel/github/cchsflow/tests/testthat/test-recode-with-table.R:7 -- tests pass note = FALSE, working only through R partial matching against `notes`"
+      ],
+      "why_design_issue": "These are the embarrassment-class defects v4 wants to shed: a flagship function whose own test suite misspells its argument, exported helpers that belong in utils, and user-facing error text with typos and source-code indentation baked in.",
+      "severity": "low",
+      "candidate_fix": "v4: split variables/variables_sheet parameters, soft-deprecate is_equal (lifecycle), rename internals, sweep messages through a single formatter (cli or sprintf), fix tests to use full argument names.",
+      "effort": "M"
+    },
+    {
+      "title": "Unconditional chatty message() calls not governed by any verbosity control",
+      "area": "rec_with_table defaults / recode_columns",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:171-182 -- three message() calls fire on every default invocation (no variable_details / no variables / no database_name), with hard-wrapped indentation inside the strings",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:606-609 -- per-occurrence 'invalid interval' message prints regardless of log/notes settings (observed in live repro)"
+      ],
+      "why_design_issue": "The package already exposes log= and notes= but routes none of these through them, so pipelines wrap everything in suppressMessages and thereby also hide genuinely important diagnostics (like the interval mangling).",
+      "severity": "low",
+      "candidate_fix": "One verbosity/quiet parameter (or cli-based condition classes) governing all engine chatter; promote the invalid-interval case from message to warning since it indicates worksheet error.",
+      "effort": "S"
+    },
+    {
+      "title": "database_name from deparse(substitute(data)) produces garbage identifiers for non-symbol arguments",
+      "area": "rec_with_table defaults",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:180-183 -- database_name <- deparse(substitute(data)); a caller passing my_list[['cchs2001_p']] or head(df) gets databaseStart pattern 'my_list[[\"cchs2001_p\"]]' which then silently matches nothing at line 320 (grepl), recoding zero variables",
+        "Combined with the regex matching issue, the failure mode is an empty/NA-filled output rather than an error"
+      ],
+      "why_design_issue": "NSE-derived defaults are fine for messages but here the deparsed text drives row selection; the convenience default converts a naming slip into silent empty output.",
+      "severity": "low",
+      "candidate_fix": "Keep the default but validate it against the set of database tokens present in variable_details$databaseStart and stop with the candidate list when nothing matches.",
+      "effort": "S"
+    }
+  ]
+}

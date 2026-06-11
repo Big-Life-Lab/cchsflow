@@ -1,0 +1,149 @@
+{
+  "summary": "cchsflow ships its harmonization worksheets in three competing runtime forms (inst/extdata CSVs, lazy-loaded data/*.RData with an undocumented column projection, and a runtime-written RData cache inside the installed package directory), with no data-raw/ rebuild pipeline anywhere in the repo or its history. The 15 sample datasets (12 PUMF subsets + 3 orphaned synthetic share subsets, all 200 rows) have documented StatCan provenance but no reproducible generation script, and cover none of the 2019-2023 cycles that v3's worksheets now harmonize. Git history carries 844MB of .git, ~420MB of which is 431 committed versions of variable_details.csv, plus 52MB of deleted DDI XMLs and 13.6MB of RData binary churn (102 of 108 v3 data/ commits touch binaries). Installed size (~7.3MB) is dominated by a 3MB logo PDF in man/figures and the worksheets being shipped twice. For v4: one canonical worksheet artifact with a scripted build step, a fresh or rewritten repo, scripted sample generation extended to 2019-2023, and removal of the runtime disk cache are the load-bearing fixes.",
+  "issues": [
+    {
+      "title": "Three competing runtime sources of worksheet metadata; one path writes RData into the installed package directory",
+      "area": "metadata artifacts / runtime IO",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:170-178 — rec_with_table falls back to lazy data: data(variable_details, package = \"cchsflow\", envir = environment()) (the data/*.RData copies, 16-col projection)",
+        "/Users/dmanuel/github/cchsflow/R/worksheet-getters.R:48 and :212-214 — get_variables()/get_variable_details() default use_rdata = FALSE, reading inst/extdata/*.csv (23 cols) via load_worksheet_metadata()",
+        "/Users/dmanuel/github/cchsflow/R/worksheet-loaders.R:32 — load_worksheet_metadata() itself defaults use_rdata = TRUE",
+        "/Users/dmanuel/github/cchsflow/R/worksheet-loaders.R:35,43-53 — when use_rdata=TRUE it prefers inst/extdata/<type>.RData (resolved via system.file()) over the CSV, so a stale cache silently wins over an edited CSV",
+        "/Users/dmanuel/github/cchsflow/R/worksheet-loaders.R:59-62 and :114-125 — save_metadata_to_rdata() auto-writes the RData cache to the system.file(\"extdata\") path, i.e. into the installed library (CRAN policy violation; fails silently via warning on read-only libraries)",
+        "/Users/dmanuel/github/cchsflow/R/worksheet-getters.R:140-143 — get_variable_limits(use_rdata = TRUE) declares the parameter but never forwards it to get_variable_details(), so the flag is dead",
+        "Working-tree check (Rscript): CSV variables 418x18 vs RData variables 418x10; CSV details 3839x23 vs RData details 3839x16; common-column content currently identical"
+      ],
+      "why_design_issue": "The legacy engine (rec_with_table) and the v3 3-step infrastructure can read different physical artifacts in the same session: lazy data, CSV, or an auto-generated on-disk cache. Any of the three can drift. Writing into the package installation directory at runtime is a CRAN policy violation and breaks shared/read-only library installs. The use_rdata defaults are inconsistent across layers (TRUE in the loader, FALSE in the getters), so behaviour depends on which entry point a caller uses.",
+      "severity": "high",
+      "candidate_fix": "v4: one metadata accessor backed by a package-environment memoised cache (in-memory only). Declare one canonical on-disk artifact (the CSVs) and treat any RData as a build-time product. Delete save_metadata_to_rdata() and the RData-preference branch; remove the dead use_rdata plumbing.",
+      "effort": "M"
+    },
+    {
+      "title": "No data-raw/ pipeline: data/*.RData rebuilt by hand with an undocumented 18->10 / 23->16 column projection",
+      "area": "rebuild discipline",
+      "evidence": [
+        "ls /Users/dmanuel/github/cchsflow/data-raw -> NO data-raw directory",
+        "grep across repo finds no usethis::use_data()/use_data() call anywhere; CONTRIBUTING.md contains no RData/rebuild guidance",
+        "Rebuilds appear only as ad hoc commit messages: d50d7aa2 'rebuilt RData from csv worksheets', e3fbf85f 'Cleaned csv worksheets ... rebuild RData as a result', f934ebf2 'rebuilt .RData files from updated csv worksheets'",
+        "Projection is implicit: variables.csv has 18 cols (incl. version, lastUpdated, reviewNotes, ICES.confirmation, status, versionNotes), variables.RData keeps 10; variable_details.csv 23 cols, RData keeps 16 — the drop list is recorded nowhere in the repo",
+        "Column order also differs between CSV and RData (e.g. variables RData: variable, label, labelLong, section, subject, variableType, ... vs CSV order)"
+      ],
+      "why_design_issue": "The lazy-data worksheets are a de facto public API (rec_with_table's default input, exported datasets with man pages, tested by tests/testthat/test-data.R), yet their derivation from the CSVs is tribal knowledge reproduced by hand each time. Any contributor who rebuilds with the wrong column set silently changes the package API. There is no CI check that data/*.RData matches the projection of inst/extdata/*.csv.",
+      "severity": "high",
+      "candidate_fix": "Add data-raw/rebuild-worksheets.R that reads the CSVs, applies an explicit, commented column projection, and calls usethis::use_data(..., overwrite = TRUE); add a CI/testthat check asserting identical(projection(csv), rdata). Document in CONTRIBUTING.md.",
+      "effort": "S"
+    },
+    {
+      "title": "Git history bloat: 844MB .git, ~420MB of it is 431 committed versions of variable_details.csv",
+      "area": "repository size / VCS hygiene",
+      "evidence": [
+        "du -sh .git -> 844M",
+        "Blob-size sweep by path: inst/ 525.9MB across 853 blobs; inst/extdata/variable_details.csv alone = 431 unique blobs, 420.4MB; inst/extdata/variables.csv = 325 blobs, 36.8MB",
+        "inst/extdata/CCHS_DDI/*.xml (since deleted, e.g. commit e15b1088/ea2afcca era, removed by 7f27a2ef '[Feat] Updated cran check') = 23 blobs, 51.6MB still in history",
+        "docs/ (committed pkgdown site) = 94.2MB of historical blobs; largest single blob docs/articles/variableDetails.html 8.8MB",
+        "data/ = 222 blobs, 13.6MB; includes a full-cycle data/cchs2003.Rdata 4.6MB blob (added 938bb54d, renamed/removed bd1ee4c3)",
+        "man/figures/cchsflow-logo.pdf 3.5MB blob"
+      ],
+      "why_design_issue": "A 1MB CSV that is rewritten on nearly every harmonization PR (often with Excel-induced whole-file reformatting — quoting churn, trailing empty columns, row re-sorting) behaves like an uncompressable binary in git. Clone time and CI checkout cost grow monotonically; an 844MB .git for a metadata package is embarrassing and will be inherited by v4 unless addressed. The committed pkgdown docs/ and once-committed DDI XMLs compound it.",
+      "severity": "high",
+      "candidate_fix": "For v4, start a fresh repo (or git filter-repo the history) and stop committing build products: deploy pkgdown via GHA instead of docs/, never commit DDI/source documentation bundles, and adopt the canonical-CSV-with-minimal-quoting discipline (already enforced by exec/fix-worksheets.R) plus row-stable sorting to keep diffs delta-friendly. Consider moving worksheets to a versioned metadata package or release-attached artifacts.",
+      "effort": "L"
+    },
+    {
+      "title": "Shipped sample data covers none of the cycles v3 newly harmonizes (2019-2023)",
+      "area": "sample data coverage",
+      "evidence": [
+        "variables.csv databaseStart references 34 distinct databases incl. cchs2019_2020_p, cchs2022_p, cchs2023_p, cchs2019_2020_m, cchs2021_m, cchs2022_m, cchs2023_m; data/ ships only 12 PUMF subsets ending at cchs2017_2018_p (file mtimes: 2022-02-22 and 2022-09-08; none newer)",
+        "Referenced-but-not-shipped list (Rscript check): cchs2019_2020_p, cchs2022_p, cchs2023_p plus all 16 _m master databases",
+        "DESCRIPTION Description still reads 'currently, 2001 to 2018' (Version: 2.1.0, Date: 2022-05-05)",
+        "Dirty databaseStart tokens also surfaced by the same check: '' (empty), 'cchs2007_2008m', 'cchs2007_2008p' (missing underscore) — rows that can never match a database"
+      ],
+      "why_design_issue": "The headline feature of v3 is extending harmonization through 2023, but no shipped artifact lets a user or CI run rec_with_table()/vignettes end-to-end on a 2019-2020, 2022, or 2023 PUMF. L6 implementation validation of new worksheet rows cannot be exercised inside the package. Master (_m) cycles are untestable by design (confidential), but the PUMF gaps are fixable. The malformed databaseStart tokens are silent dead rows.",
+      "severity": "high",
+      "candidate_fix": "Generate 200-row subsets of the 2019-2020, 2022, and 2023 PUMFs through the new data-raw pipeline (StatCan open licence permits redistribution, as for existing subsets); add them to data/ with proper Rd provenance. Add a worksheet check validating databaseStart tokens against an enumerated database registry. Document that _m cycles are validated only against synthetic/structural tests.",
+      "effort": "M"
+    },
+    {
+      "title": "200-row sample subsets are not reproducible: no generation script, seed, or sampling method ever committed",
+      "area": "sample data provenance",
+      "evidence": [
+        "No data-raw/ directory; git log --all --diff-filter=A --name-only shows no sampling/subset script ever added in repo history",
+        "Generation visible only as ad hoc commits: 2cd3ec30 '[Feature] adding subsets of each CCHS cycle', 17eac47c '[Fix] Lowered sample number of rows to 200', 51a8c28d '[Feature] updata .RData files to only include variables from variables.csv'",
+        "/Users/dmanuel/github/cchsflow/R/data.R:38-66 documents source, access date (Jan 2020), StatCan open licence, OSF DDI links — but not how the 200 rows were selected (random? seed? first-n?)",
+        "cchs2001_p is 200 rows x 614 cols (full PUMF width), so even the column-subsetting claim in 51a8c28d does not describe the current artifacts"
+      ],
+      "why_design_issue": "For an epidemiology package whose pitch is methodological defensibility, the bundled data cannot be regenerated or audited. When a new cycle is added (issue above) there is no procedure to follow, so each generation event reinvents the method, and nobody can verify the subsets are unmodified StatCan microdata rows.",
+      "severity": "medium",
+      "candidate_fix": "Scripted, seeded subsetting in data-raw/ (runs against locally held PUMFs; the script is committed even though the inputs cannot be). Record sampling method and seed in each dataset's Rd. Regenerate or at minimum retro-document existing sets.",
+      "effort": "S"
+    },
+    {
+      "title": "Three orphaned synthetic share datasets ship with copy-paste provenance errors",
+      "area": "sample data / documentation",
+      "evidence": [
+        "cchs2009_s, cchs2010_s, cchs2012_s (61-69KB each, added 4d271329 '[Feature] add subsets of synthetic shared data') are referenced by ZERO databaseStart entries in variables.csv or variable_details.csv (python csv check: '_s references: []') — worksheets were re-pointed to _m names",
+        "/Users/dmanuel/github/cchsflow/R/data.R:441-443 — licence paragraph says 'Source from Statistics Canada, Canadian Community Health Survey PUMF, accessed May 2022' for datasets the same page calls synthetic, not PUMF",
+        "/Users/dmanuel/github/cchsflow/R/data.R:437-439 — self-referential note: the cchs2009_s page warns its respondents 'may also be in the 2009 synthetic subset' (should reference the 2009/2009-2010 PUMF subset)"
+      ],
+      "why_design_issue": "Shipped, exported, documented datasets that no worksheet row can recode are dead weight that misleads users (they look like supported databases). The provenance text contradicts itself (synthetic vs PUMF), which matters because synthetic files and PUMFs have different redistribution and inference properties.",
+      "severity": "medium",
+      "candidate_fix": "In v4 either drop the _s datasets and their Rd pages (preferred, given _s database names were deprecated in favour of _m), or restore worksheet support and fix the Rd provenance/overlap text.",
+      "effort": "S"
+    },
+    {
+      "title": "Binary RData churn: 102 of 108 v3 data/ commits rewrite binaries, with delete-then-re-add cycles across branches",
+      "area": "VCS workflow for binary artifacts",
+      "evidence": [
+        "git log v3 -- data/ = 108 commits; git log v3 -- 'data/*.RData' = 102 commits",
+        "Worksheet RData alone: 153 unique historical blobs, 4.2MB; all data/ = 222 blobs, 13.6MB",
+        "Delete/re-add churn: fad4dcad and ae098b22 (duplicated commit, 2025-07-11) 'Removes obsolete binary data files' delete data/variables.RData + variable_details.RData on feature-v3.0.0-validation-infrastructure-yulric; 74dcbe80 'delete variable_details.RData. Not needed for this PR'; 66eac9a1 'remove obsolete RData files' — yet v3 HEAD ships both files, re-added/rebuilt by d50d7aa2",
+        "Sample-set churn: 7e0bb656 '[Feature] remove cchs2010_p, cchs2012_p, cchs2014_p ...' deleted three sets that 2c6ad1b9 '[Feature] add .rda and documentation for duplicate cycles' later restored",
+        "git status snapshot at session start showed data/variables.RData and data/variable_details.RData modified yet again in the working tree (since committed in e3fbf85f)"
+      ],
+      "why_design_issue": "Binary RData files cannot be diffed or merge-resolved, so every worksheet PR carries an unreviewable binary payload, and parallel branches disagree about whether the files should even exist. The team has already flip-flopped (deleted as 'obsolete', then rebuilt as required), which signals there is no agreed contract for what data/*.RData is for.",
+      "severity": "medium",
+      "candidate_fix": "Make CSVs the only hand-edited, reviewed artifact; regenerate RData deterministically via data-raw in CI (or a pre-release step) so binary commits happen once per release, not per PR. Settle the contract in CONTRIBUTING.md.",
+      "effort": "M"
+    },
+    {
+      "title": "Installed size ~7.3MB is dominated by a 3MB logo PDF and the worksheets shipped twice",
+      "area": "package size",
+      "evidence": [
+        "man/figures/cchsflow-logo.pdf = 3.0MiB on disk (3.5MB git blob); man/ totals 4.3MB of which man/figures is 3.6MB — man/figures is installed into help/figures",
+        "inst/extdata = 2.0MB (variable_details.csv 1MiB, variables.csv 252KiB, sample_*.csv ~11KiB) and data/ = 904KB — the same worksheet content shipped as both CSV and lazy RData",
+        "Component sum R(648K)+data(904K)+inst(2.0M)+man(4.3M) ~= the reported 7.3MB installed; CRAN flags installed sizes over ~5MB with a NOTE",
+        "DESCRIPTION: LazyData: true (appropriate for the 15 sample sets; not the size problem)"
+      ],
+      "why_design_issue": "Roughly 40% of the installed footprint is a vector logo that no function or vignette needs at runtime, and another ~1.3MB is pure duplication of worksheet content across data/ and inst/extdata. The CRAN size NOTE is avoidable without touching any functionality. Sample data itself (904KB for 15 sets) is modest and defensible to keep in-package; a separate data package is only warranted if per-cycle samples grow or masters-like artifacts are added.",
+      "severity": "medium",
+      "candidate_fix": "Delete or .Rbuildignore the logo PDF (keep the 67KB PNG/SVG for pkgdown). Ship worksheets in one form only (CSV canonical; lazy RData generated from it — or drop the CSV from inst/ and expose a getter). Revisit a cchsflow.data companion package only if v4 adds 2019-2023 samples and the data/ payload approaches CRAN limits.",
+      "effort": "S"
+    },
+    {
+      "title": "Stale DESCRIPTION metadata about the data artifacts",
+      "area": "metadata / documentation",
+      "evidence": [
+        "DESCRIPTION: Version: 2.1.0, Date: 2022-05-05, Maintainer: Kitty Chen on a branch implementing v3",
+        "DESCRIPTION Description: 'currently, 2001 to 2018' while worksheets reference cchs2019_2020_*, cchs2022_*, cchs2023_*",
+        "R/data.R:1 and :20 document the datasets as 'variables.csv'/'variable_details.csv' though the objects users load are the reduced-column RData projections"
+      ],
+      "why_design_issue": "Users discovering the package see a 2022-era 2.1.0 covering 2001-2018; the shipped dataset docs describe the CSV files rather than the actual lazy-data objects (which have fewer columns). Small, but it is the package's front door.",
+      "severity": "low",
+      "candidate_fix": "Update Version/Date/Description for v3; have the variables/variable_details Rd pages document the actual object schema (column list) and note the CSV-to-RData projection.",
+      "effort": "S"
+    },
+    {
+      "title": "Duplicate vignette trees and non-standard R/ subdirectories ship or shadow dead artifacts",
+      "area": "build hygiene",
+      "evidence": [
+        "vignettes/ (84K) and Vignettes/ (84K) both exist; currently byte-identical (diff -q silent) but only ^Vignettes$ is in .Rbuildignore — two copies invite drift, as both reference the sample datasets and sample_*.csv",
+        "R/legacy/ (80K: adl-legacy.R, alcohol-legacy.R, bmi-legacy.R) and R/docs/ (12K README.md) are subdirectories of R/ — never collated by R, not in .Rbuildignore, and trigger R CMD check non-standard-directory NOTEs while shipping dead code in the tarball",
+        "inst/docs is an empty directory (0B); .DS_Store files committed-adjacent at inst/, inst/extdata/, inst/metadata/schemas/ (git-ignored but present on disk)"
+      ],
+      "why_design_issue": "Each duplicate or non-standard location is a place where the data-usage story (which sample data, which worksheets) can silently diverge from what is built and checked. R/legacy especially: it looks like source code but is unreachable, confusing both contributors and tooling.",
+      "severity": "low",
+      "candidate_fix": "Delete Vignettes/ (keep vignettes/). Move R/legacy and R/docs out of R/ (e.g. to a top-level legacy/ that is .Rbuildignore'd, or delete after v4 ports the functions). Remove empty inst/docs.",
+      "effort": "S"
+    }
+  ]
+}

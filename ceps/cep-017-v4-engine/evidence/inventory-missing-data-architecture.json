@@ -1,0 +1,158 @@
+{
+  "dimension": "missing-data-architecture",
+  "repo": "/Users/dmanuel/github/cchsflow",
+  "branch": "fix/v3-smoking-worksheet-sync (working tree as v3 state)",
+  "date": "2026-06-10",
+  "summary": "The v3 missing-data stack (Levels 3-6: worksheet getters, pattern cache, any_missing/get_priority_missing, clean_variables) is structurally sound as a design sketch but ships with four never-migrated or broken pieces that mean its 'metadata-driven' claims are largely dead code in practice: (1) the NA::a/NA::b pair is hardcoded across ~6 sites plus the worksheet QA schema, while the recodeflow scoping spec requires NA::<any lowercase>; (2) missing_priority_rules.yaml was authored on the 3-step-tidyverse branch (commit 370b673b, na_b=1 'Not Stated wins') but never merged, so the built-in fallback silently INVERTS documented CCHS priority (empirically: get_priority_missing(tagged a, tagged b) returns 'a'); (3) the Level 2A database-config-loader was also never migrated, so exported get_missing_pattern_auto() errors with 'could not find function'; (4) extract_variable_name()'s call-stack hack resolves to the HWTGBMI_der fallback for every real call shape (cleaned$VAR), and HWTGBMI_der's own pattern is EMPTY because its worksheet missing rows use recStart='N/A' which should_skip_term() discards — so any_missing(c(1.7,996,999)) returns all FALSE. The pipeline only works because Step-1 cleaning has already tagged the codes. Separately: caches are process-local environments keyed by (variable, database) with no worksheet fingerprint and a partial clear API (clear_missing_patterns_cache() leaves the complete-pattern cache that clean_variables actually uses — demonstrated); rec_with_table's user-supplied variable_details is ignored by the 3-step stack; load_worksheet_metadata(use_rdata=TRUE) writes RData into the package dir at runtime. One rec_with_table output empirically contains three NA representations (tagged_na for recoded cont, 'NA(a)'/'NA(b)' factor levels for recoded cat, plain NA for derived cat after as.factor). Element-wise R loops make any_missing 0.29s and get_priority_missing 0.61s per 100k rows per call, with ~14 calls in one smoking-cessation case_when.",
+  "issues": [
+    {
+      "title": "NA::a/NA::b hardcoded across the v3 stack and QA schema; recodeflow spec requires NA::<any lowercase>",
+      "area": "missing-data-architecture/tag-extensibility",
+      "evidence": [
+        "/tmp/recodeflow-pr43/missing-data.qmd:22-25 — spec: 'standard NA::<type> where type can any lowercase character'",
+        "/Users/dmanuel/github/cchsflow/R/missing-pattern-cache.R:252-256 — map_recStart_to_recEnd records only rec_end == 'NA::a' / 'NA::b'; any other NA::<tag> hits `next` and its codes are silently dropped (no na_c bucket, no warning)",
+        "/Users/dmanuel/github/cchsflow/R/missing-pattern-cache.R:115 — cache_pattern() validates patterns as exactly list(na_a_codes, na_b_codes)",
+        "/Users/dmanuel/github/cchsflow/R/clean-variables.R:349-352 and 507-511 — resolve_else_value()/apply_else_rule() handle only 'NA::a' and 'NA::b' actions",
+        "/Users/dmanuel/github/cchsflow/R/clean-variables.R:714 — parse_range_notation() special-code regex '^(NA::[ab]|copy|else)$' — NA::c is not even recognized as special",
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:140-145 — config schema is fixed fields na_a_codes/na_b_codes/na_a_priority/na_b_priority",
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:357-364 — get_value_priority(): tags other than a/b are coerced to na_b priority",
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:448-468 — assign_missing() accepts only 'not_applicable'/'not_stated'",
+        "/Users/dmanuel/github/cchsflow/inst/metadata/schemas/core/variable_details.yaml:140 — worksheet QA recEnd pattern '^([0-9]+|[0-9]+\\\\.[0-9]+|NA::[ab]|Func::...|copy)$' blocks authors from writing any other tag",
+        "Irony: the LEGACY engine is generic — /Users/dmanuel/github/cchsflow/R/recode-with-table.R:807-825 recode_variable_NA_formating() takes strsplit(cell,':')[[1]][[3]] and calls tagged_na(<any letter>) / paste0('NA(',letter,')')",
+        "Current worksheet uses only a/b (command output: NA::a 515 rows, NA::b 980 rows), so no data is lost today — the issue is structural"
+      ],
+      "why_design_issue": "The v4/recodeflow scoping commits to NA::<any lowercase> (e.g. distinguishing Don't Know / Refusal / Not Stated as separate tags, which CCHS source data actually has as codes 7/8/9). The new 'flexible' v3 infrastructure is less flexible than the 983-line legacy engine it is meant to replace, and the hardcoding is smeared across six call sites plus the QA schema, so extending it requires coordinated edits everywhere. Worse, an author who writes NA::d today passes nothing loudly — pattern extraction silently drops the codes (cache layer) while the legacy engine would honour them, so the two engines would disagree silently.",
+      "severity": "medium",
+      "candidate_fix": "Replace the paired na_a_codes/na_b_codes fields with a single named structure codes_by_tag = list(a = ..., b = ..., ...) populated by one regex '^NA::([a-z])$' capture in map_recStart_to_recEnd(); priorities become a named vector from YAML/schema; get_value_priority/assign_missing/resolve_else_value iterate tags generically; widen the schema recEnd pattern to NA::[a-z]. Keep a/b as the documented CCHS convention in metadata, not code.",
+      "effort": "M"
+    },
+    {
+      "title": "missing_priority_rules.yaml never shipped — built-in fallback silently inverts documented CCHS priority (NA::a wins instead of NA::b)",
+      "area": "missing-data-architecture/priority-rules",
+      "evidence": [
+        "find inst/metadata -type f — only documentation/metadata_registry.yaml, schemas/core/variable_details.yaml, schemas/core/variables.yaml exist; neither schemas/cchs/missing_priority_rules.yaml nor schemas/core/missing_priority_rules.yaml is present",
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:168-172 — load_priority_rules() looks for both paths",
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:194-198 — built-in fallback rules <- list(na_a = 1, na_b = 2) ('na_a higher priority as general fallback') + warning 'Priority rules YAML files not found, using built-in general fallback'",
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:85 — the function's own docs: '# CCHS priority: \"Not Stated\" (NA::b) > \"Not Applicable\" (NA::a)'",
+        "git: commit 370b673b (2025-08-03, only on branch 3-step-tidyverse, NOT on the v3 branch) added inst/metadata/schemas/cchs/missing_priority_rules.yaml with na_a: 2, na_b: 1 — 'Not Stated' highest priority, citing StatsCan convention. The R code was migrated to the v3 branch; the YAML never was.",
+        "Empirical (Rscript, devtools::load_all): load_priority_rules() warns and returns $na_a 1 / $na_b 2; get_priority_missing(haven::tagged_na('a'), haven::tagged_na('b')) returns tag 'a' — opposite of the documented CCHS hierarchy",
+        "Warning fires on first use in every session (cached afterwards in .priority_rules_cache, missing-data-functions.R:151,201)"
+      ],
+      "why_design_issue": "A documented, methodologically deliberate semantic (refusal is more informative than structural non-applicability) is silently replaced by its inverse on every installation, with only a session warning that reads like a config nit. Every derived variable that resolves competing missing tags via get_priority_missing() — all smoking, ADL, alcohol, BMI 3-step functions — currently labels conflicted rows 'not applicable' where the design says 'not stated'. This is exactly the class of silent methodological drift the package exists to prevent, and it would embarrass the package in an epidemiological audit.",
+      "severity": "high",
+      "candidate_fix": "Ship the YAML (recover content from commit 370b673b on 3-step-tidyverse) into inst/metadata/schemas/cchs/ and core/, or per v4 open question 2 fold priorities into the declared NA-pattern schema. Whichever wins, make the built-in fallback match the documented CCHS order and add a regression test asserting get_priority_missing(tagged a, tagged b) returns tag 'b'.",
+      "effort": "S"
+    },
+    {
+      "title": "Level 2A database-config-loader never migrated: exported get_missing_pattern_auto() always errors; auto_detect_database() permanently on hardcoded fallback",
+      "area": "missing-data-architecture/never-migrated-infrastructure",
+      "evidence": [
+        "grep: load_database_config / auto_detect_database_type are called at /Users/dmanuel/github/cchsflow/R/missing-pattern-cache.R:451-465 (guarded by exists()) and :873 (UNguarded) but defined nowhere in R/ or tests/",
+        "NAMESPACE:96 — export(get_missing_pattern_auto)",
+        "Empirical: get_missing_pattern_auto('HWTGBMI_der') → 'ERROR: could not find function \"load_database_config\"' — an exported function that can never succeed",
+        "Empirical session warning on every auto-detect path: 'Database configuration functions not available. Using default CCHS configuration.' (missing-pattern-cache.R:453-456)",
+        "Fallback config (missing-pattern-cache.R:458-461) lacks type_hierarchy/naming_patterns, so extract_years_from_database_names() returns all NA (:572-574) and select_most_recent_by_year() falls through to lexicographic sort (:650-652) — database selection for multi-database variables is alphabetical string order, observed picking 'cchs2019_2020_p'",
+        "File headers reference the missing layer as a dependency: missing-pattern-cache.R:9 'DEPENDS ON: ... Level 2A (database-config-loader.R)' — the file does not exist in R/"
+      ],
+      "why_design_issue": "Like the priority YAML, half of a designed configuration layer was migrated and half was not. The result is a public API that throws 'could not find function' (a packaging embarrassment R CMD check cannot catch because the call is inside a function body), exists()-guards that make behaviour depend on what happens to be in scope, and database auto-selection that silently degrades to lexicographic ordering — which happens to work for CCHS names but is undeclared, untested behaviour.",
+      "severity": "high",
+      "candidate_fix": "Decide in v4 scope: either migrate/reimplement the config loader (recoverable from the 3-step-tidyverse branch) or delete the dead parameter surface — remove get_missing_pattern_auto(), the database_config parameters, and the exists() guards, and make database selection an explicit required argument (the bulk path already requires it). The v4 engine should not keep exists()-based soft dependencies.",
+      "effort": "S"
+    },
+    {
+      "title": "No cache invalidation: worksheet edits mid-session yield mixed-version results; clear API is partial; user-supplied variable_details ignored by the 3-step stack; runtime RData writes shadow CSV edits",
+      "area": "missing-data-architecture/cache-invalidation",
+      "evidence": [
+        "Cache inventory (all package-namespace environments, no worksheet fingerprint in keys): .missing_patterns_cache and .database_warnings_cache (/Users/dmanuel/github/cchsflow/R/missing-pattern-cache.R:26-27), .complete_patterns_cache (:884), .priority_rules_cache (R/missing-data-functions.R:151), .cchsflow_cache$pattern_warnings (R/clean-variables.R:14-15), .variable_warnings_cache (R/worksheet-getters.R:22-24)",
+        "Keys are (variable, database) only: cache_pattern (missing-pattern-cache.R:107-134), cache_complete_pattern (:895-898 — key paste(variable, database, sep='::'))",
+        "Meanwhile load_worksheet_metadata() re-reads the CSV on every call (R/worksheet-loaders.R:56-65; no worksheet-level memoization) — so after a mid-session edit to variable_details.csv, variables not yet cached get NEW patterns while already-cached variables keep OLD patterns: one clean_variables() call can mix two worksheet versions with no warning",
+        "Partial clear API, demonstrated empirically: after get_missing_pattern('DHH_SEX','cchs2001_p') then clear_missing_patterns_cache(), has_cached_pattern is FALSE but has_cached_complete_pattern is still TRUE — and clean_variables() reads the COMPLETE cache (clean-variables.R:127-128 via get_complete_pattern), so the obvious exported clear function does not actually refresh cleaning behaviour; clear_complete_patterns_cache() is a separate call (missing-pattern-cache.R:1012-1014) and .priority_rules_cache has no public clear at all",
+        "rec_with_table(variable_details = <user df>) (R/recode-with-table.R:158, 170-174) drives recode rows from the user's worksheet, but Func:: derived functions internally call clean_variables() → get_complete_pattern() → get_variable_details() → load_worksheet_metadata(), which always reads the BUNDLED worksheet — a user passing a modified worksheet gets recode rules from their file and DV cleaning patterns from the package's file",
+        "save_metadata_to_rdata (R/worksheet-loaders.R:59-62, 114-125): load_worksheet_metadata(use_rdata=TRUE) WRITES <type>.RData next to the CSV at runtime — in an installed package that is the package library (CRAN policy violation), and because the RData is preferred when present (:43-53) with no mtime check, it persistently shadows later CSV edits across sessions"
+      ],
+      "why_design_issue": "The architecture treats worksheet metadata as immutable but provides no mechanism to enforce or detect that assumption. cchsflow's own development workflow (this repo, this week) edits variable_details.csv constantly in live sessions; the result is silently inconsistent recodes that differ depending on call order. The fragmented clear API means even a user who knows about caching cannot reliably reset it. The user-worksheet bypass breaks rec_with_table's documented contract that variable_details parameterizes the recode.",
+      "severity": "high",
+      "candidate_fix": "v4: one cache registry keyed by (worksheet fingerprint [mtime+size or xxhash], variable, database); load_worksheet_metadata memoizes the parsed worksheet under the same fingerprint and invalidates all dependent pattern entries when it changes; single exported clear_cchsflow_caches(); thread the worksheet object (or fingerprint) explicitly through get_complete_pattern/clean_variables so user-supplied worksheets parameterize the whole pipeline; delete the runtime RData auto-save.",
+      "effort": "M"
+    },
+    {
+      "title": "Process-local caches under parallel workers: cold-start re-derivation, per-worker warning storms, serial/parallel divergence after worksheet edits, RData write races",
+      "area": "missing-data-architecture/parallelism",
+      "evidence": [
+        "All six caches are namespace environments created at load time (citations in previous issue) — PSOCK/future-multisession workers each load a fresh cchsflow namespace with empty caches",
+        "Cost per cold variable: each get_variable_details() call re-reads the full worksheet — 1.78 MB / 3,839 rows, measured 0.026 s per read (command output) — once per uncached variable per worker, plus pattern parsing",
+        "Once-per-session warning deduplication is per-process: auto_detect_database multi-database warning (missing-pattern-cache.R:477-488 keyed in .database_warnings_cache), clean_variables pattern-fallback warning (clean-variables.R:131-138), get_variable_details not-found warnings (worksheet-getters.R:257-264), priority-rules warning (missing-data-functions.R:197) — N workers emit N copies of each",
+        "Forked workers (mclapply): inherit the pre-fork cache snapshot copy-on-write; entries populated after fork are lost per task. Combined with the no-invalidation issue: a parent that cached patterns before a worksheet edit keeps stale entries while fresh PSOCK workers read the edited CSV — serial and parallel runs of the same code can return different recodes",
+        "load_worksheet_metadata(use_rdata=TRUE) auto-save (worksheet-loaders.R:59-62): multiple workers calling it concurrently race writing the same <type>.RData path with non-atomic save()"
+      ],
+      "why_design_issue": "The v4 scope outline (ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md, open question 4) explicitly asks how caches behave under mclapply/future/targets — today the answer is: correct only if worksheets never change and only at the cost of per-worker re-derivation and duplicated warnings, with a genuine file-write race when use_rdata=TRUE. Survey-scale users (multi-cycle CCHS, targets pipelines) are exactly the users who parallelize.",
+      "severity": "medium",
+      "candidate_fix": "Same fingerprint-keyed registry as the invalidation fix makes worker state self-consistent; precompute patterns eagerly (one bulk pass per worksheet, exported as a plain serializable object) so workers receive patterns as data rather than rebuilding them; route warnings through a once-per-fingerprint mechanism or rlang::warn(.frequency='once'); remove the runtime RData write.",
+      "effort": "M"
+    },
+    {
+      "title": "extract_variable_name() call-stack hack never resolves real call shapes — every any_missing/get_priority_missing falls back to HWTGBMI_der, whose pattern is EMPTY",
+      "area": "missing-data-architecture/auto-detection",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:218-237 — sys.call(-1) + as.character(call_info[[2]]) + hardcoded fallback return('HWTGBMI_der')",
+        "Every real call site uses cleaned$VAR shape: e.g. R/smoking-status.R:456-457,468,480; R/smoking-cessation.R:143-183; as.character(quote(cleaned$SMK_005)) is c('$','cleaned','SMK_005') (verified), so the length-3 vector makes `nchar(var_name) > 0 && ...` error in the && — swallowed by tryCatch → fallback",
+        "Empirical probes (mimicking any_missing's frame): probe(cleaned$SMK_005) → 'HWTGBMI_der'; probe(height * 2) → 'HWTGBMI_der'; probe(height) → 'height' (the LOCAL argument name, not a worksheet name) which then triggers missing-data-functions.R:131-134 'Could not get pattern for ..., using BMI fallback'",
+        "The fallback pattern itself is empty: HWTGBMI_der's worksheet missing rows are recStart='N/A' → recEnd=NA::a/NA::b (worksheet query output), and should_skip_term() skips '^N/A$' (missing-pattern-cache.R:295-301), so get_missing_pattern('HWTGBMI_der') = list(na_a_codes = num(0), na_b_codes = num(0)) (verified with str())",
+        "Net behavioural consequence, verified: any_missing(c(1.7, 996, 999)) → FALSE FALSE FALSE — raw CCHS missing codes are never detected by Level 5; detection works only for values already converted to tagged/plain NA by Step-1 clean_variables()",
+        "auto_detect=FALSE branch (missing-data-functions.R:66-68, 104-106) hardcodes the same empty 'HWTGBMI_der' config while the comment calls it a 'Known variable with standard pattern'",
+        "Commit 370b673b message sold this as 'Auto-detection: Variable name parsing enables metadata-driven processing' — it is dead code in practice"
+      ],
+      "why_design_issue": "Non-standard evaluation to guess a metadata key from the caller's source text is fragile by construction (fails for $-access, pipes, arithmetic, renamed locals) and here it fails for 100% of in-package call sites, silently. The entire Level 4→5 'metadata integration' is inoperative; the system works only because of an undeclared contract that inputs are pre-cleaned. A function whose correctness depends on how its arguments are spelled at the call site cannot be part of a v4 public API.",
+      "severity": "high",
+      "candidate_fix": "Delete the NSE hack. Two clean options for v4: (a) make the contract explicit — any_missing()/get_priority_missing() operate only on tagged/plain NA (document that inputs must come from clean_variables()) and drop code-based detection entirely; or (b) accept an explicit pattern/variable_name argument (any_missing(..., .pattern = pat)) resolved once per function from the same metadata the Step-1 call already used. Option (a) is smaller and matches actual v3 usage.",
+      "effort": "M"
+    },
+    {
+      "title": "Two contradictory fallback patterns for unknown variables: clean_variables() invents a broad hardcoded CCHS pattern while Level 5 falls back to an empty one",
+      "area": "missing-data-architecture/fallback-consistency",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/clean-variables.R:127-146 — on metadata lookup failure clean_variables() fabricates na_a={6,96,996}, na_b={7,8,9,97,98,99,997,998,999}, copy range 1-95, with a once-per-variable warning ('Using default CCHS pattern for X')",
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:130-134 — get_missing_config() falls back to get_missing_pattern('HWTGBMI_der'), which is empty (num(0)/num(0), verified)",
+        "So for the same unknown variable in the same pipeline: Step 1 treats 6/7/8/9/96/.../999 as missing and CONVERTS them; Step 2's any_missing detects no codes at all",
+        "Corruption risk: clean_variables(vars = list(myvar = x)) for any variable not in variable_details.csv whose valid categories include 6-9 (CCHS has many, e.g. 10+ category variables) silently converts valid responses 6,7,8,9 to tagged NA — guarded only by a warning that is suppressed after first occurrence per session (clean-variables.R:131-138)",
+        "The 996 in na_a and 996L/999L defaults also reappear hardcoded in assign_missing (missing-data-functions.R:483,490) and convert_tagged_na_to_original_codes (clean-variables.R:268-279)"
+      ],
+      "why_design_issue": "Fallbacks are where 'metadata-driven' systems leak their assumptions. Here the two halves of the 3-step pattern disagree about the same unknown variable, and the more dangerous half (destructive conversion of possibly-valid 6-9 values) is the one that fires routinely for intermediate variable names. A harmonization package whose cleaning step can silently destroy valid category codes on a name typo is a correctness liability.",
+      "severity": "medium",
+      "candidate_fix": "Make unknown-variable behaviour fail-closed and uniform: clean_variables() should error (or pass through untouched with one prominent warning) when no metadata exists, never invent codes; the empty Level-5 fallback should be removed along with the extract_variable_name hack (previous issue). Where a generic CCHS pattern is genuinely wanted, require opt-in: clean_variables(..., default_pattern = cchs_single_digit()).",
+      "effort": "S"
+    },
+    {
+      "title": "Three NA representations in one rec_with_table() output: tagged_na (recoded cont), 'NA(a)'/'NA(b)' factor levels (recoded cat), plain NA (derived cat)",
+      "area": "missing-data-architecture/output-representation",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:807-825 — recode_variable_NA_formating(): cat type → paste0('NA(', tag, ')') string (becomes a factor LEVEL); non-cat → haven::tagged_na(tag)",
+        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:949-954 — derived-variable dispatch: toType cat → as.factor(unlist(...)), which converts tagged NA doubles to plain NA (tag unrecoverable); verified at unit level: as.factor(unlist(list(1,2,tagged_na('b')))) → levels 1,2 + 1 plain NA",
+        "End-to-end, one call (rec_with_table on constructed cchs2001_p-shaped data with codes 6-9/96/99): HWTGHTM numeric with na_tag a,b; ADL_01 factor with levels '1, 2, NA(a), NA(b)'; ADL_der (Func::assess_adl, the repaired v3 3-step function returning tagged NA) factor with levels '1, 2' and 4 PLAIN NAs — table printed in audit transcript",
+        "Downstream defensive shim exists precisely because of this split: coerce_cchs_label_strings (clean-variables.R:549-563) re-parses 'na(a)'/'na(b)' strings back to tagged NA when worksheet-recoded factors are fed into DV functions",
+        "User-facing gotchas: is.na() is FALSE for 'NA(b)' factor entries (they are ordinary levels), so naive complete-case filtering silently keeps them; the a/b distinction is unrecoverable in every derived categorical (ADL_der, SMKDSTY-family, smoke_simple, ...); the three forms do not round-trip through bind_rows/joins consistently",
+        "v4 scope goal 3 (ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md): 'One representation per output dataframe; tagged NAs survive categorical handling' — and open question 3 asks whether 'NA(b)' levels are a compatibility break"
+      ],
+      "why_design_issue": "Missing-data semantics is the package's core value proposition, yet what a missing value looks like depends on which of three internal code paths produced the column. Analysts must know implementation details to count missing correctly, and the derived-categorical path destroys information (a/b distinction) that both other paths preserve. This blocks the v4 goal of consistent end-to-end semantics and is the kind of inconsistency that surfaces in user bug reports and reviews.",
+      "severity": "high",
+      "candidate_fix": "Standardize on haven semantics at the engine boundary: keep categoricals as haven::labelled doubles (value labels for categories, tagged_na for missing) through the whole pipeline, and convert to factor only at an explicit user-facing step (e.g. haven::as_factor(levels='labels') with an opt-in 'NA(x)' level shim for v3 compatibility). Derived dispatch must stop calling as.factor on function output (recode-with-table.R:953). Plan as a documented compatibility break with a transition shim, per v4 phase 3.",
+      "effort": "L"
+    },
+    {
+      "title": "Element-wise R loops in any_missing/get_priority_missing: ~0.3-0.6 s per call per 100k rows, ~14 calls per derived variable, plus an input-length inconsistency",
+      "area": "missing-data-architecture/performance",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:262-291 — detect_missing_vectorized(): for (i in 1:n) over rows, inner for (var in vars), per-element haven::is_tagged_na(val), is.na(val), val %in% all_missing_codes",
+        "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R:313-331 — apply_priority_hierarchy(): same double loop calling get_value_priority() per element; :392-399 convert_to_original_format() loops again",
+        "Measured (Rscript, this audit): 100,000 rows x 2 vars — any_missing 0.292 s, get_priority_missing 0.609 s. The vectorized equivalent (is.na(x) | x %in% codes, with haven::is_tagged_na vectorized) is on the order of milliseconds — roughly two orders of magnitude",
+        "Call density: one case_when in calculate_time_quit_smoking (R/smoking-cessation.R:143-183) contains ~14 any_missing/get_priority_missing calls; case_when evaluates every branch fully, so one derived variable costs several seconds per 100k rows; CCHS master cycles exceed 100k rows and rec_with_table derives many variables per run",
+        "Length-contract inconsistency: detect_missing_vectorized sizes output as max(sapply(vars, length)) (:253) but apply_priority_hierarchy uses n <- length(vars[[1]]) (:310) — if the first argument is the shortest (e.g. a scalar gate), the priority result is silently truncated relative to the detection result fed to the same case_when",
+        "haven::is_tagged_na and %in% are already vectorized; the loops add no semantics, only interpreter overhead"
+      ],
+      "why_design_issue": "These functions sit in the innermost hot path of the v4 engine design (every branch of every derived variable's case_when). Interpreted per-element loops over survey-scale data make the 3-step architecture measurably slower than the legacy rowwise engine it is meant to retire, undermining the migration argument; the vars[[1]]-length bug is a latent correctness defect from the same hand-rolled iteration.",
+      "severity": "medium",
+      "candidate_fix": "Rewrite both as pure vector operations: missing <- Reduce(`|`, lapply(vars, function(v) haven::is_tagged_na(v) | is.na(v) | v %in% codes)); priority via a small numeric matrix (one column per var of per-element priorities from vectorized tag tests) reduced with max.col/pmin; share normalize_input_lengths() (clean-variables.R:574-593) so both functions recycle identically. Add a 1e6-row benchmark test.",
+      "effort": "S"
+    }
+  ]
+}
