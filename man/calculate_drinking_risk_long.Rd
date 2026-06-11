@@ -2,7 +2,7 @@
 % Please edit documentation in R/alcohol.R
 \name{calculate_drinking_risk_long}
 \alias{calculate_drinking_risk_long}
-\title{Assess long-term alcohol health risks using Low-Risk Guidelines}
+\title{Long-term (chronic) drinking risk under the Low-Risk Guidelines}
 \usage{
 calculate_drinking_risk_long(
   DHH_SEX,
@@ -16,93 +16,90 @@ calculate_drinking_risk_long(
   ALW_2A5,
   ALW_2A6,
   ALW_2A7,
-  min_DHH_SEX = 1,
-  max_DHH_SEX = 2,
-  min_ALWDWKY = 0,
-  max_ALWDWKY = 995,
-  min_ALC_1 = 1,
-  max_ALC_1 = 2,
-  min_ALW_1 = 1,
-  max_ALW_1 = 2,
-  min_ALW_2A1 = 0,
-  max_ALW_2A1 = 995,
-  min_ALW_2A2 = 0,
-  max_ALW_2A2 = 995,
-  min_ALW_2A3 = 0,
-  max_ALW_2A3 = 995,
-  min_ALW_2A4 = 0,
-  max_ALW_2A4 = 995,
-  min_ALW_2A5 = 0,
-  max_ALW_2A5 = 995,
-  min_ALW_2A6 = 0,
-  max_ALW_2A6 = 995,
-  min_ALW_2A7 = 0,
-  max_ALW_2A7 = 995,
-  validate_params = NULL,
-  log_level = "silent"
+  output_format = "tagged_na"
 )
 }
 \arguments{
-\item{DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7}{As in calculate_drinking_risk_short()}
+\item{DHH_SEX}{Sex (1 = male, 2 = female). Accepts raw CCHS codes,
+tagged NAs, or labelled strings.}
+
+\item{ALWDWKY}{Total drinks in the past week.}
+
+\item{ALC_1}{Had drinks in the past year (1 = yes, 2 = no).}
+
+\item{ALW_1}{Had drinks in the past week (1 = yes, 2 = no).}
+
+\item{ALW_2A1}{Number of drinks on Sunday.}
+
+\item{ALW_2A2}{Number of drinks on Monday.}
+
+\item{ALW_2A3}{Number of drinks on Tuesday.}
+
+\item{ALW_2A4}{Number of drinks on Wednesday.}
+
+\item{ALW_2A5}{Number of drinks on Thursday.}
+
+\item{ALW_2A6}{Number of drinks on Friday.}
+
+\item{ALW_2A7}{Number of drinks on Saturday.}
+
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Integer long-term risk indicator. Missing data handled as:
-  \itemize{
-    \item \code{haven::tagged_na("a")} for not applicable cases (non-drinkers)
-    \item \code{haven::tagged_na("b")} for missing/invalid responses
-  }
-  Values: 1 = increased long-term risk, 2 = no increased long-term risk.
+Numeric vector: 1 = increased long-term risk, 2 = no increased
+  long-term risk. Missing data: \code{haven::tagged_na("a")} (not
+  applicable), \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Assess long-term health risks from drinking patterns following Canada's Low-Risk Guidelines.
-Evaluates daily and weekly consumption against sex-specific chronic risk thresholds for
-long-term health outcomes assessment.
+Assesses long-term health risk from drinking patterns following Canada's
+Low-Risk Alcohol Drinking Guidelines: risk is flagged when daily
+consumption reaches 4 drinks (males) / 3 drinks (females) on any day, or
+weekly consumption reaches 20 drinks (males) / 15 drinks (females).
 }
 \details{
-Risk criteria: Males: ≥4 drinks/day OR ≥20 drinks/week; Females: ≥3 drinks/day OR ≥15 drinks/week.
-Focus on chronic health risks (liver disease, cancer, cardiovascular). Same preprocessing and
-missing data handling as short-term version.
+Non-drinkers in the past year (\code{ALC_1} = 2) or past week
+(\code{ALW_1} = 2) receive \code{haven::tagged_na("a")} (not applicable).
+Thresholds are reached inclusively (e.g. exactly 20 drinks/week flags a
+male respondent). Missing-data handling follows the v3 3-step
+architecture with priority not applicable > not stated; out-of-range
+inputs receive the worksheet's else rule.
 }
 \note{
-v3.0.0, last updated: 2025-07-05, status: active, Note: Enhanced with comprehensive long-term risk assessment
+v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
+  implementation; replaces the abandoned helper-based draft.
 }
 \examples{
-# Standard cchsflow workflow (primary usage)
-library(cchsflow)
+# Scalar: male reaching the weekly threshold
+calculate_drinking_risk_long(1, 20, 1, 1, 3, 3, 3, 3, 3, 3, 2) # 1
+
+# Scalar: female within thresholds
+calculate_drinking_risk_long(2, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1) # 2
+
+# Vector: at-risk male, non-drinker
+calculate_drinking_risk_long(
+  c(1, 1), c(20, 0), c(1, 2), c(1, 2), c(3, 0), c(3, 0),
+  c(3, 0), c(3, 0), c(3, 0), c(3, 0), c(2, 0)
+) # 1, tagged_na("a")
+
+\dontrun{
+# Standard cchsflow workflow
 result <- rec_with_table(
   cchs2013_2014_p,
   c(
     "DHH_SEX", "ALWDWKY", "ALC_1", "ALW_1", "ALW_2A1", "ALW_2A2",
-    "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDLOWL_der"
+    "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDVLTR_der"
   )
 )
-
-# Scalar usage examples with variable labels
-# calculate_drinking_risk_long(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
-#                          (sex,    weekly,  year, week,  sun,     mon,     tue,     wed,     thu,     fri,     sat)
-calculate_drinking_risk_long(1, 20, 1, 1, 0, 0, 4, 0, 0, 0, 0) # Returns: 1L (male long-term risk: 4 drinks/day OR 20/week)
-calculate_drinking_risk_long(2, 14, 1, 1, 2, 2, 2, 2, 2, 2, 2) # Returns: 2L (female no risk: <3 drinks/day AND <15/week)
-calculate_drinking_risk_long(1, 19, 1, 1, 3, 3, 3, 3, 3, 3, 1) # Returns: 2L (male no risk: <4 drinks/day AND <20/week)
-calculate_drinking_risk_long(2, 15, 1, 1, 2, 2, 2, 2, 2, 2, 3) # Returns: 1L (female risk: 15 drinks/week exactly threshold)
-calculate_drinking_risk_long(1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0) # Returns: tagged_na("a") (non-drinker: not applicable)
-
-# Vector processing with missing data and edge cases
-calculate_drinking_risk_long(
-  c(1, 2, 6, 8, 9), # Mixed valid/CCHS codes for sex
-  c(20, 15, 8, 996, 997), # Mixed weekly drinks with CCHS codes
-  c(1, 1, 1, 1, 2), # Mixed alcohol use statuses
-  c(1, 1, 1, 2, 1), # Mixed weekly drinking statuses
-  c(4, 3, 2, 0, 7), # Mixed Sunday drinks
-  c(0, 0, 0, 0, 8), c(0, 0, 0, 0, 9), c(0, 0, 0, 0, 0),
-  c(0, 0, 0, 0, 0), c(0, 0, 0, 0, 0), c(0, 0, 0, 0, 0)
-) # Returns: c(1L, 1L, tagged_na("b"), tagged_na("b"), tagged_na("a"))
+}
 
 }
 \references{
-Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines
-for low-risk drinking. Canadian Centre on Substance Abuse.
+Butt, P., et al. (2011). Alcohol and health in Canada: a summary of
+evidence and guidelines for low-risk drinking. Canadian Centre on
+Substance Abuse.
 }
 \seealso{
-\code{\link{calculate_drinking_risk_short}} for short-term drinking risk assessment
-\code{\link{calculate_binge_drinking}} for binge drinking assessment
+\code{\link{calculate_binge_drinking}},
+  \code{\link{calculate_drinking_risk_short}}
 }

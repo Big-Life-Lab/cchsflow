@@ -2,95 +2,73 @@
 % Please edit documentation in R/adl.R
 \name{score_adl}
 \alias{score_adl}
-\title{Enhanced ADL help score (count of tasks requiring help)}
+\title{Activities of Daily Living (ADL) 5-item help score}
 \usage{
-score_adl(
-  ADL_01,
-  ADL_02,
-  ADL_03,
-  ADL_04,
-  ADL_05,
-  min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
-  validate_params = NULL,
-  log_level = "silent"
-)
+score_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, output_format = "tagged_na")
 }
 \arguments{
-\item{ADL_01, ADL_02, ADL_03, ADL_04, ADL_05}{ADL variables as in assess_adl()}
+\item{ADL_01}{Help needed preparing meals (1 = yes, 2 = no). Accepts raw
+CCHS codes, tagged NAs, or labelled strings.}
 
-\item{min_ADL_01, max_ADL_01, min_ADL_02, max_ADL_02, min_ADL_03, max_ADL_03, min_ADL_04, max_ADL_04, min_ADL_05, max_ADL_05}{Validation parameters (defaults from variable_details.csv)}
+\item{ADL_02}{Help needed getting to appointments/errands (1 = yes, 2 = no).}
 
-\item{validate_params}{Auto-detect validation mode (default NULL for auto-detection)}
+\item{ADL_03}{Help needed doing housework (1 = yes, 2 = no).}
 
-\item{log_level}{Logging level: "silent" (default), "warning", "verbose"}
+\item{ADL_04}{Help needed doing personal care (1 = yes, 2 = no).}
+
+\item{ADL_05}{Help needed moving inside the house (1 = yes, 2 = no).}
+
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-**Data Type**: Numeric count (0-5)
-**Missing Data Handling**:
-- Returns `haven::tagged_na("a")` if any input is not applicable
-- Returns `haven::tagged_na("b")` if any input is missing/invalid
-**Values**: 0-5 representing count of tasks requiring help
+Numeric count 0-5. Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-**Purpose**: Count number of ADL tasks requiring help (0-5 scale) for granular functional assessment
-**Method**: Sums "needs help" responses across 5 consistent ADL items
-**Clinical Context**: Graduated disability measure for research and clinical assessment
+Counts the number of ADL tasks (0-5) for which the respondent needs help,
+using the 5 tasks asked consistently across CCHS cycles.
 }
 \details{
-**Transformation Warnings**:
-⚠️ **CAUTION - Methodological Changes**: Count-based scoring provides more
-granular assessment than binary indicator but requires complete data for valid interpretation.
-
-**Calculation Details**:
-- Counts number of ADL tasks with "needs help" response (=1)
-- Range: 0 (independent) to 5 (maximum dependence)
-- Missing data in ANY item invalidates entire score
-- Preserves not applicable semantics across all items
+Provides a graduated disability measure: 0 (independent) to
+5 (needs help with all tasks). Missing data in any item invalidates the
+score, with priority not applicable > not stated. See
+\code{\link{assess_adl}} for the task list and cross-cycle notes.
 }
 \note{
-v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced scoring with comprehensive missing data validation
+v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
+  implementation; replaces the abandoned helper-based draft.
 }
 \examples{
-# Standard cchsflow workflow (primary usage)
-library(cchsflow)
+# Scalar
+score_adl(2, 2, 2, 2, 2) # 0 (independent)
+score_adl(1, 2, 1, 2, 2) # 2 (help with two tasks)
+
+# Vector
+score_adl(c(1, 2), c(1, 2), c(2, 2), c(1, 2), c(2, 2)) # 3, 0
+
+# Dataframe
+library(dplyr)
+data.frame(
+  ADL_01 = c(1, 2), ADL_02 = c(1, 2), ADL_03 = c(2, 2),
+  ADL_04 = c(1, 2), ADL_05 = c(2, 2)
+) \%>\%
+  mutate(adl_score = score_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05))
+
+\dontrun{
+# Standard cchsflow workflow
 result <- rec_with_table(
   cchs2013_2014_p,
-  c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADLSCORE_der")
+  c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_score_5")
 )
+}
 
-# Scalar usage examples
-# score_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
-#          (meals, appts,  house,  care,   move)
-score_adl(2, 2, 2, 2, 2) # Returns: 0 (no help needed)
-score_adl(1, 2, 1, 2, 2) # Returns: 2 (help with 2 tasks: meals and housework)
-score_adl(1, 1, 1, 1, 1) # Returns: 5 (complete dependence)
-score_adl(1, 2, 2, 2, 2) # Returns: 1 (help with 1 task: meals only)
-
-# Vector processing with missing data
-score_adl(
-  c(1, 2, 6, 7), # Mixed valid/missing codes
-  c(1, 2, 2, 2),
-  c(2, 1, 2, 2),
-  c(2, 2, 2, 2),
-  c(2, 2, 2, 2)
-) # Returns: c(2, 1, tagged_na("a"), tagged_na("b"))
-
-# Vector with mixed missing types
-score_adl(
-  c(1, 2, "Missing", haven::tagged_na("a")),
-  c(1, 2, 2, 2),
-  c(2, 2, 2, 2),
-  c(2, 2, 2, 2),
-  c(2, 2, 2, 2)
-) # Returns: c(2, 1, tagged_na("b"), tagged_na("a"))
-
+}
+\references{
+Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
+JAMA, 185(12), 914-919.
+}
+\seealso{
+\code{\link{assess_adl}}, \code{\link{score_adl_6}}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/adl.R
 \name{score_adl_6}
 \alias{score_adl_6}
-\title{Enhanced 6-item ADL help score with comprehensive validation}
+\title{Activities of Daily Living (ADL) 6-item help score}
 \usage{
 score_adl_6(
   ADL_01,
@@ -11,94 +11,71 @@ score_adl_6(
   ADL_04,
   ADL_05,
   ADL_06,
-  min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_06 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_06 = ADL_VALIDATION_BOUNDS$response$max,
-  validate_params = NULL,
-  log_level = "silent"
+  output_format = "tagged_na"
 )
 }
 \arguments{
-\item{ADL_01, ADL_02, ADL_03, ADL_04, ADL_05}{Core ADL variables as in other functions}
+\item{ADL_01}{Help needed preparing meals (1 = yes, 2 = no). Accepts raw
+CCHS codes, tagged NAs, or labelled strings.}
 
-\item{ADL_06}{Help needed doing finances (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+\item{ADL_02}{Help needed getting to appointments/errands (1 = yes, 2 = no).}
 
-\item{min_ADL_01, max_ADL_01, min_ADL_02, max_ADL_02, min_ADL_03, max_ADL_03, min_ADL_04, max_ADL_04, min_ADL_05, max_ADL_05, min_ADL_06, max_ADL_06}{Validation parameters (defaults from variable_details.csv)}
+\item{ADL_03}{Help needed doing housework (1 = yes, 2 = no).}
 
-\item{validate_params}{Auto-detect validation mode (default NULL for auto-detection)}
+\item{ADL_04}{Help needed doing personal care (1 = yes, 2 = no).}
 
-\item{log_level}{Logging level: "silent" (default), "warning", "verbose"}
+\item{ADL_05}{Help needed moving inside the house (1 = yes, 2 = no).}
+
+\item{ADL_06}{Help needed managing finances (1 = yes, 2 = no). Accepts raw
+CCHS codes, tagged NAs, or labelled strings.}
+
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-**Data Type**: Numeric count (0-6)
-**Missing Data Handling**: Same as 5-item version
-**Values**: 0-6 representing count of tasks requiring help
+Numeric count 0-6. Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-**Purpose**: Count ADL help requirements using 6-item scale including financial management
-**Method**: Extends 5-item ADL to include financial management (available 2003+)
-**Clinical Context**: Comprehensive functional assessment including instrumental ADL component
+Counts the number of ADL tasks (0-6) for which the respondent needs help,
+extending the 5-item score with financial management.
 }
 \details{
-**Transformation Warnings**:
-⚠️ **CAUTION - Temporal Changes**: ADL_06 (finances) available only in CCHS
-2003-2014 cycles. Use 5-item version for 2001 or 2015+ analyses.
-
-⚠️ **CAUTION - Population Restrictions**: Financial management questions may
-have different age restrictions or applicability rules across cycles.
-
-**Calculation Details**:
-- Extends 5-item ADL with financial management component
-- Range: 0 (independent) to 6 (maximum dependence)
-- Same missing data handling as 5-item version
-- Recommended for 2003-2014 cycle analyses
+ADL_06 (help managing finances) is available in CCHS 2003-2014 cycles
+only; use \code{\link{score_adl}} for 2001 or 2015+ analyses. Missing
+data handling matches the 5-item version.
 }
 \note{
-v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced 6-item scoring for comprehensive functional assessment
+v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
+  implementation; replaces the abandoned helper-based draft.
 }
 \examples{
-# Standard cchsflow workflow (primary usage)
-library(cchsflow)
+# Scalar
+score_adl_6(2, 2, 2, 2, 2, 2) # 0 (independent)
+score_adl_6(1, 2, 1, 2, 2, 1) # 3 (help with three tasks)
+
+# Vector
+score_adl_6(
+  c(1, 2), c(1, 2), c(2, 2), c(1, 2), c(2, 2), c(1, 2)
+) # 4, 0
+
+\dontrun{
+# Standard cchsflow workflow (2003-2014 cycles)
 result <- rec_with_table(
   cchs2007_2008_p,
-  c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06", "ADLSCORE6_der")
+  c(
+    "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06",
+    "ADL_score_6"
+  )
 )
+}
 
-# Scalar usage examples
-# score_adl_6(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06)
-#            (meals, appts,  house,  care,   move,   finances)
-score_adl_6(2, 2, 2, 2, 2, 2) # Returns: 0 (independent with all tasks)
-score_adl_6(1, 2, 1, 2, 2, 1) # Returns: 3 (help with 3 tasks: meals, housework, finances)
-score_adl_6(1, 1, 1, 1, 1, 1) # Returns: 6 (complete dependence)
-score_adl_6(2, 2, 2, 2, 2, 1) # Returns: 1 (help only with finances)
-
-# Vector processing with missing data and edge cases
-score_adl_6(
-  c(1, 2, 6, 96), # Mixed valid/categorical age codes
-  c(1, 2, 2, 2),
-  c(2, 1, 2, 2),
-  c(2, 2, 2, 2),
-  c(2, 2, 2, 2),
-  c(2, 2, 2, 97) # "Don't know" for finances
-) # Returns: c(2, 1, tagged_na("a"), tagged_na("b"))
-
-# Vector demonstrating financial component (ADL_06)
-score_adl_6(
-  c(2, 2, 2), # No help with basic ADLs
-  c(2, 2, 2),
-  c(2, 2, 2),
-  c(2, 2, 2),
-  c(2, 2, 2),
-  c(1, "Refusal", 2) # Different financial help needs
-) # Returns: c(1, tagged_na("b"), 0)
-
+}
+\references{
+Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
+JAMA, 185(12), 914-919.
+}
+\seealso{
+\code{\link{assess_adl}}, \code{\link{score_adl}}
 }

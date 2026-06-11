@@ -2,108 +2,83 @@
 % Please edit documentation in R/adl.R
 \name{assess_adl}
 \alias{assess_adl}
-\title{Enhanced Activities of Daily Living (ADL) help indicator}
+\title{Activities of Daily Living (ADL) help indicator}
 \usage{
-assess_adl(
-  ADL_01,
-  ADL_02,
-  ADL_03,
-  ADL_04,
-  ADL_05,
-  min_ADL_01 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_01 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_02 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_02 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_03 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_03 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_04 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_04 = ADL_VALIDATION_BOUNDS$response$max,
-  min_ADL_05 = ADL_VALIDATION_BOUNDS$response$min,
-  max_ADL_05 = ADL_VALIDATION_BOUNDS$response$max,
-  validate_params = NULL,
-  log_level = "silent"
-)
+assess_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, output_format = "tagged_na")
 }
 \arguments{
-\item{ADL_01}{Help needed preparing meals (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+\item{ADL_01}{Help needed preparing meals (1 = yes, 2 = no). Accepts raw
+CCHS codes, tagged NAs, or labelled strings.}
 
-\item{ADL_02}{Help needed getting to appointments/errands (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+\item{ADL_02}{Help needed getting to appointments/errands (1 = yes, 2 = no).}
 
-\item{ADL_03}{Help needed doing housework (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+\item{ADL_03}{Help needed doing housework (1 = yes, 2 = no).}
 
-\item{ADL_04}{Help needed doing personal care (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+\item{ADL_04}{Help needed doing personal care (1 = yes, 2 = no).}
 
-\item{ADL_05}{Help needed moving inside house (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+\item{ADL_05}{Help needed moving inside the house (1 = yes, 2 = no).}
 
-\item{min_ADL_01, max_ADL_01, min_ADL_02, max_ADL_02, min_ADL_03, max_ADL_03, min_ADL_04, max_ADL_04, min_ADL_05, max_ADL_05}{Validation parameters (defaults from variable_details.csv)}
-
-\item{validate_params}{Auto-detect validation mode (default NULL for auto-detection)}
-
-\item{log_level}{Logging level: "silent" (default), "warning", "verbose"}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-**Data Type**: Numeric binary indicator
-**Missing Data Handling**:
-- Returns `haven::tagged_na("a")` for not applicable cases
-- Returns `haven::tagged_na("b")` for missing/invalid responses
-**Values**: 1 = needs help with ≥1 task, 2 = no help needed with any task
+Numeric vector: 1 = needs help with at least one task,
+  2 = no help needed with any task. Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-**Purpose**: Create binary indicator for ADL help requirements using variables consistent across CCHS cycles
-**Method**: Examines 5 core ADL tasks available in all cycles (2001-2018)
-**Clinical Context**: Functional limitation assessment for population health research
+Creates a binary indicator for needing help with activities of daily
+living, using the 5 ADL tasks asked consistently across CCHS cycles.
 }
 \details{
-**Transformation Warnings**:
-⚠️ **CAUTION - Temporal Changes**: Original CCHS derived variable ADLF6R uses
-different ADL components across cycles. This function uses consistent 5-item
-subset for cross-cycle comparability.
+The five core tasks (meal preparation, getting to appointments/errands,
+housework, personal care, moving inside the house) are available in all
+CCHS cycles from 2001 onward, making this indicator suitable for
+cross-cycle analyses. The original CCHS derived variable ADLF6R uses
+different components across cycles; this function deliberately uses the
+consistent 5-item subset.
 
-⚠️ **CAUTION - Population Restrictions**: ADL questions typically restricted
-to respondents with activity limitations. Not applicable responses preserved.
+ADL questions are typically restricted to respondents with activity
+limitations; not-applicable responses are preserved as
+\code{haven::tagged_na("a")}.
 
-**Calculation Details**:
-- Uses ADL_01 through ADL_05 (consistent across all CCHS cycles)
-- Any "needs help" (=1) response results in overall score of 1
-- All "no help needed" (=2) responses result in overall score of 2
-- Missing Data: Comprehensive preprocessing of CCHS codes (6,7,8,9)
-- Priority: Not applicable > Missing > Valid responses
+Missing-data handling follows the v3 3-step architecture: input codes
+(6, 7, 8, 9) are converted using variable_details.csv metadata, with
+priority not applicable > not stated when inputs mix missing types.
+Out-of-range inputs receive the worksheet's else rule
+(\code{haven::tagged_na("b")}).
 }
 \note{
-v3.0.0, last updated: 2025-06-30, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
+v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
+  implementation; replaces the abandoned helper-based draft.
 }
 \examples{
-# Standard cchsflow workflow (primary usage)
-library(cchsflow)
+# Scalar
+assess_adl(1, 2, 2, 2, 2) # 1 (needs help with meals)
+assess_adl(2, 2, 2, 2, 2) # 2 (no help needed)
+
+# Vector with CCHS missing codes
+assess_adl(
+  c(1, 2, 6, 7),
+  c(2, 2, 2, 2), c(2, 2, 2, 2), c(2, 2, 2, 2), c(2, 2, 2, 2)
+) # 1, 2, tagged_na("a"), tagged_na("b")
+
+# Dataframe
+library(dplyr)
+data.frame(
+  ADL_01 = c(1, 2), ADL_02 = c(2, 2), ADL_03 = c(2, 2),
+  ADL_04 = c(2, 2), ADL_05 = c(2, 2)
+) \%>\%
+  mutate(adl_help = assess_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05))
+
+\dontrun{
+# Standard cchsflow workflow
 result <- rec_with_table(
   cchs2013_2014_p,
-  c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADLF6R_der")
+  c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der")
 )
-
-# Scalar usage examples
-# assess_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
-#           (meals, appts,  house,  care,   move)
-assess_adl(1, 2, 2, 2, 2) # Returns: 1 (needs help with meals only)
-assess_adl(2, 2, 2, 2, 2) # Returns: 2 (no help needed with any task)
-assess_adl(1, 1, 1, 1, 1) # Returns: 1 (needs help with all tasks)
-
-# Vector processing with missing data and edge cases
-assess_adl(
-  c(1, 2, 6, 7, 8, 9), # Mixed valid/CCHS codes
-  c(2, 2, 2, 2, 2, 2),
-  c(2, 2, 2, 2, 2, 2),
-  c(2, 2, 2, 2, 2, 2),
-  c(2, 2, 2, 2, 2, 2)
-) # Returns: c(1, 2, tagged_na("a"), tagged_na("b"), tagged_na("b"), tagged_na("b"))
-
-# Vector with string missing values
-assess_adl(
-  c(1, 2, "Not applicable"),
-  c(2, 2, 2),
-  c(2, 2, 2),
-  c(2, 2, 2),
-  c(2, 2, 2)
-) # Returns: c(1, 2, tagged_na("a"))
+}
 
 }
 \references{
@@ -111,6 +86,5 @@ Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
 JAMA, 185(12), 914-919.
 }
 \seealso{
-\code{\link{score_adl}} for count-based ADL scoring
-\code{\link{score_adl_6}} for 6-item ADL scoring
+\code{\link{score_adl}}, \code{\link{score_adl_6}}
 }

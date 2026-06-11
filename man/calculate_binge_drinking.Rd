@@ -2,7 +2,7 @@
 % Please edit documentation in R/alcohol.R
 \name{calculate_binge_drinking}
 \alias{calculate_binge_drinking}
-\title{Identify binge drinking patterns with sex-specific thresholds}
+\title{Binge drinking indicator with sex-specific thresholds}
 \usage{
 calculate_binge_drinking(
   DHH_SEX,
@@ -14,117 +14,97 @@ calculate_binge_drinking(
   ALW_2A5,
   ALW_2A6,
   ALW_2A7,
-  min_DHH_SEX = 1,
-  max_DHH_SEX = 2,
-  min_ALW_1 = 1,
-  max_ALW_1 = 2,
-  min_ALW_2A1 = 0,
-  max_ALW_2A1 = 995,
-  min_ALW_2A2 = 0,
-  max_ALW_2A2 = 995,
-  min_ALW_2A3 = 0,
-  max_ALW_2A3 = 995,
-  min_ALW_2A4 = 0,
-  max_ALW_2A4 = 995,
-  min_ALW_2A5 = 0,
-  max_ALW_2A5 = 995,
-  min_ALW_2A6 = 0,
-  max_ALW_2A6 = 995,
-  min_ALW_2A7 = 0,
-  max_ALW_2A7 = 995,
-  validate_params = NULL,
-  log_level = "silent"
+  output_format = "tagged_na"
 )
 }
 \arguments{
-\item{DHH_SEX}{CCHS variable for sex (1=male, 2=female). Accepts raw CCHS codes or preprocessed values.}
+\item{DHH_SEX}{Sex (1 = male, 2 = female). Accepts raw CCHS codes,
+tagged NAs, or labelled strings.}
 
-\item{ALW_1}{Had drinks in past week (1=yes, 2=no). Accepts raw CCHS codes or preprocessed values.}
+\item{ALW_1}{Had drinks in the past week (1 = yes, 2 = no).}
 
-\item{ALW_2A1}{Number of drinks on Sunday. Accepts raw CCHS codes or preprocessed values.}
+\item{ALW_2A1}{Number of drinks on Sunday.}
 
-\item{ALW_2A2}{Number of drinks on Monday. Accepts raw CCHS codes or preprocessed values.}
+\item{ALW_2A2}{Number of drinks on Monday.}
 
-\item{ALW_2A3}{Number of drinks on Tuesday. Accepts raw CCHS codes or preprocessed values.}
+\item{ALW_2A3}{Number of drinks on Tuesday.}
 
-\item{ALW_2A4}{Number of drinks on Wednesday. Accepts raw CCHS codes or preprocessed values.}
+\item{ALW_2A4}{Number of drinks on Wednesday.}
 
-\item{ALW_2A5}{Number of drinks on Thursday. Accepts raw CCHS codes or preprocessed values.}
+\item{ALW_2A5}{Number of drinks on Thursday.}
 
-\item{ALW_2A6}{Number of drinks on Friday. Accepts raw CCHS codes or preprocessed values.}
+\item{ALW_2A6}{Number of drinks on Friday.}
 
-\item{ALW_2A7}{Number of drinks on Saturday. Accepts raw CCHS codes or preprocessed values.}
+\item{ALW_2A7}{Number of drinks on Saturday.}
+
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Integer binge drinking indicator. Missing data handled as:
-  \itemize{
-    \item \code{haven::tagged_na("a")} for not applicable cases (no drinking in past week)
-    \item \code{haven::tagged_na("b")} for missing/invalid responses
-  }
-  Values: 1 = binge drinker, 2 = non-binge drinker.
+Numeric vector: 1 = binge drinker, 2 = non-binge drinker.
+  Missing data: \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Identify binge drinking patterns based on sex-specific daily consumption thresholds. Examines
-daily alcohol consumption across the week, applying sex-specific binge criteria for acute
-alcohol risk assessment in population health research.
+Identifies binge drinking from daily consumption over the past week:
+5 or more drinks on any single day for males, 4 or more for females.
 }
 \details{
-Only applied to respondents who had alcohol in past week. Non-drinkers receive not applicable status.
-Enhanced preprocessing may identify different patterns compared to legacy if_else2() implementation.
-
-Calculation criteria: Males: Binge = ≥5 drinks on any single day; Females: Binge = ≥4 drinks on any single day.
-Comprehensive preprocessing of CCHS codes (6,7,8,9 and 996-999) is applied. Priority: Not applicable > Missing > Valid assessment.
+Only respondents who drank in the past week (\code{ALW_1} = 1) are
+assessed; non-drinkers receive \code{haven::tagged_na("a")} (not
+applicable). Missing-data handling follows the v3 3-step architecture:
+input codes (6-9 single-digit, 996-999 triple-digit) are converted using
+variable_details.csv metadata, with priority not applicable > not stated.
+Out-of-range inputs receive the worksheet's else rule
+(\code{haven::tagged_na("b")}).
 }
 \note{
-v3.0.0, last updated: 2025-07-05, status: active, Note: Enhanced with comprehensive preprocessing and modern missing data handling
+v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
+  implementation; replaces the abandoned helper-based draft.
 }
 \examples{
-# Standard cchsflow workflow (primary usage)
-library(cchsflow)
+# Scalar: male with 6 drinks on Tuesday
+calculate_binge_drinking(1, 1, 3, 1, 6, 0, 3, 2, 2) # 1 (binge)
+
+# Scalar: female, at most 3 drinks on any day
+calculate_binge_drinking(2, 1, 1, 2, 2, 3, 0, 1, 2) # 2 (non-binge)
+
+# Vector: drinker, non-drinker
+calculate_binge_drinking(
+  c(1, 1), c(1, 2), c(6, 0), c(0, 0), c(0, 0), c(0, 0),
+  c(0, 0), c(0, 0), c(0, 0)
+) # 1, tagged_na("a")
+
+# Dataframe
+library(dplyr)
+data.frame(
+  DHH_SEX = c(1, 2), ALW_1 = c(1, 1), ALW_2A1 = c(5, 2),
+  ALW_2A2 = c(0, 2), ALW_2A3 = c(0, 2), ALW_2A4 = c(0, 2),
+  ALW_2A5 = c(0, 2), ALW_2A6 = c(0, 2), ALW_2A7 = c(0, 2)
+) \%>\%
+  mutate(binge = calculate_binge_drinking(
+    DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4,
+    ALW_2A5, ALW_2A6, ALW_2A7
+  ))
+
+\dontrun{
+# Standard cchsflow workflow
 result <- rec_with_table(
   cchs2013_2014_p,
   c(
     "DHH_SEX", "ALW_1", "ALW_2A1", "ALW_2A2", "ALW_2A3",
-    "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALCDBINGE_der"
+    "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "binge_drinker"
   )
 )
-
-# Scalar usage examples with variable labels
-# calculate_binge_drinking(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6, ALW_2A7)
-#                      (sex,    drinks, sun,     mon,     tue,     wed,     thu,     fri,     sat)
-calculate_binge_drinking(1, 1, 3, 1, 6, 0, 3, 8, 2) # Returns: 1L (male binge: 6 drinks Tue, 8 drinks Fri)
-calculate_binge_drinking(2, 1, 1, 2, 2, 3, 0, 1, 2) # Returns: 2L (female non-binge: all days ≤3 drinks)
-calculate_binge_drinking(1, 1, 4, 4, 4, 4, 4, 4, 4) # Returns: 2L (male non-binge: all days <5 drinks)
-calculate_binge_drinking(2, 1, 0, 0, 0, 0, 4, 0, 0) # Returns: 1L (female binge: 4 drinks Thu exactly threshold)
-calculate_binge_drinking(1, 2, 0, 0, 0, 0, 0, 0, 0) # Returns: tagged_na("a") (non-drinker: not applicable)
-
-# Vector processing with missing data and edge cases
-calculate_binge_drinking(
-  c(1, 2, 6, 7, 8, 9), # Mixed valid/CCHS codes for sex
-  c(1, 1, 1, 2, 1, 1), # Mixed drinking statuses
-  c(5, 4, 2, 0, 7, 996), # Mixed Sunday drinks with CCHS codes
-  c(0, 0, 0, 0, 8, 997), # Mixed Monday drinks
-  c(0, 0, 0, 0, 9, 998), # Tuesday
-  c(0, 0, 0, 0, 0, 999), # Wednesday
-  c(0, 0, 0, 0, 0, 0), # Thursday
-  c(0, 0, 0, 0, 0, 0), # Friday
-  c(0, 0, 0, 0, 0, 0) # Saturday
-) # Returns: c(1L, 1L, tagged_na("b"), tagged_na("a"), tagged_na("b"), tagged_na("b"))
-
-# Vector with string missing values
-calculate_binge_drinking(
-  c(1, 2, "Not applicable"), # Mixed sex with string NA
-  c(1, 1, 1),
-  c(6, 3, 2), c(0, 0, 0), c(0, 0, 0), c(0, 0, 0),
-  c(0, 0, 0), c(0, 0, 0), c(0, 0, 0)
-) # Returns: c(1L, 2L, tagged_na("b"))
+}
 
 }
 \references{
-Butt, P., et al. (2011). Alcohol and health in Canada: a summary of evidence and guidelines
-for low-risk drinking. Canadian Centre on Substance Abuse.
+Butt, P., et al. (2011). Alcohol and health in Canada: a summary of
+evidence and guidelines for low-risk drinking. Canadian Centre on
+Substance Abuse.
 }
 \seealso{
-\\code{\\link{calculate_drinking_risk_short}} for short-term drinking risk assessment
-\\code{\\link{calculate_drinking_risk_long}} for long-term drinking risk assessment
+\code{\link{calculate_drinking_risk_short}},
+  \code{\link{calculate_drinking_risk_long}}
 }

@@ -31,8 +31,7 @@ test_that("calculate_binge_drinking() handles basic valid inputs correctly", {
     DHH_SEX = 1, # male
     ALW_1 = 1, # had drinks in past week
     ALW_2A1 = 5, ALW_2A2 = 0, ALW_2A3 = 0, ALW_2A4 = 0,
-    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0, # 5 drinks on Sunday only
-    log_level = "silent"
+    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0 # 5 drinks on Sunday only
   )
   expect_equal(result_male_binge, 1L) # binge drinker
 
@@ -41,8 +40,7 @@ test_that("calculate_binge_drinking() handles basic valid inputs correctly", {
     DHH_SEX = 2, # female
     ALW_1 = 1, # had drinks in past week
     ALW_2A1 = 0, ALW_2A2 = 4, ALW_2A3 = 0, ALW_2A4 = 0,
-    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0, # 4 drinks on Monday only
-    log_level = "silent"
+    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0 # 4 drinks on Monday only
   )
   expect_equal(result_female_binge, 1L) # binge drinker
 
@@ -51,8 +49,7 @@ test_that("calculate_binge_drinking() handles basic valid inputs correctly", {
     DHH_SEX = 1, # male
     ALW_1 = 1, # had drinks in past week
     ALW_2A1 = 2, ALW_2A2 = 2, ALW_2A3 = 0, ALW_2A4 = 0,
-    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0, # max 2 drinks per day
-    log_level = "silent"
+    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0 # max 2 drinks per day
   )
   expect_equal(result_male_no_binge, 2L) # not a binge drinker
 
@@ -61,8 +58,7 @@ test_that("calculate_binge_drinking() handles basic valid inputs correctly", {
     DHH_SEX = 1, # male
     ALW_1 = 2, # no drinks in past week
     ALW_2A1 = 0, ALW_2A2 = 0, ALW_2A3 = 0, ALW_2A4 = 0,
-    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0,
-    log_level = "silent"
+    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0
   )
   expect_true(is_tagged_na(result_no_drinks, "a")) # not applicable
 })
@@ -72,32 +68,28 @@ test_that("calculate_binge_drinking() handles out of range inputs correctly", {
   result_invalid_sex <- calculate_binge_drinking(
     DHH_SEX = -1, # invalid sex
     ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_sex, "b"))
 
   # Test case: ALW_1 out of range
   result_invalid_alw1 <- calculate_binge_drinking(
     DHH_SEX = 1, ALW_1 = -1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_alw1, "b")) # invalid/missing for invalid ALW_1
 
   # Test case: ALW_2A1 out of range
   result_invalid_alw2a1 <- calculate_binge_drinking(
     DHH_SEX = 1, ALW_1 = 1, ALW_2A1 = -1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_alw2a1, "b"))
 
   # Test case: ALW_2A2 out of range
   result_invalid_alw2a2 <- calculate_binge_drinking(
     DHH_SEX = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = -1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_alw2a2, "b"))
 })
@@ -114,8 +106,7 @@ test_that("calculate_binge_drinking() handles vector inputs correctly", {
     ALW_2A4 = c(0, 1, 0), # Person 1: 0, Person 2: 1 drink, Person 3: 0
     ALW_2A5 = c(0, 0, 0), # All: 0 drinks
     ALW_2A6 = c(0, 0, 0), # All: 0 drinks
-    ALW_2A7 = c(0, 0, 0), # All: 0 drinks
-    log_level = "silent"
+    ALW_2A7 = c(0, 0, 0) # All: 0 drinks
   )
 
   expect_equal(result_vector[1], 1L) # Person 1: binge drinker
@@ -135,8 +126,7 @@ test_that("calculate_drinking_risk_short() handles basic valid inputs correctly"
     ALC_1 = 1, # drinks in past year
     ALW_1 = 1, # had drinks in past week
     ALW_2A1 = 4, ALW_2A2 = 4, ALW_2A3 = 4, ALW_2A4 = 4,
-    ALW_2A5 = 4, ALW_2A6 = 0, ALW_2A7 = 0, # 4 drinks/day x 5 days
-    log_level = "silent"
+    ALW_2A5 = 4, ALW_2A6 = 0, ALW_2A7 = 0 # 4 drinks/day x 5 days
   )
   expect_equal(result_male_high_risk, 1L) # high risk
 
@@ -147,8 +137,7 @@ test_that("calculate_drinking_risk_short() handles basic valid inputs correctly"
     ALC_1 = 1, # drinks in past year
     ALW_1 = 1, # had drinks in past week
     ALW_2A1 = 2, ALW_2A2 = 2, ALW_2A3 = 2, ALW_2A4 = 2,
-    ALW_2A5 = 2, ALW_2A6 = 0, ALW_2A7 = 0, # 2 drinks/day x 5 days
-    log_level = "silent"
+    ALW_2A5 = 2, ALW_2A6 = 0, ALW_2A7 = 0 # 2 drinks/day x 5 days
   )
   expect_equal(result_female_low_risk, 2L) # low risk
 
@@ -159,8 +148,7 @@ test_that("calculate_drinking_risk_short() handles basic valid inputs correctly"
     ALC_1 = 2, # no drinks in past year
     ALW_1 = 2, # no drinks in past week
     ALW_2A1 = 0, ALW_2A2 = 0, ALW_2A3 = 0, ALW_2A4 = 0,
-    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0,
-    log_level = "silent"
+    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0
   )
   expect_true(is_tagged_na(result_no_drinks, "a")) # not applicable
 })
@@ -170,24 +158,21 @@ test_that("calculate_drinking_risk_short() handles out of range inputs correctly
   result_invalid_sex <- calculate_drinking_risk_short(
     DHH_SEX = -1, # invalid sex
     ALWDWKY = 10, ALC_1 = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_sex, "b"))
 
   # Test case: ALWDWKY out of range
   result_invalid_alwdwky <- calculate_drinking_risk_short(
     DHH_SEX = 1, ALWDWKY = -1, ALC_1 = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_alwdwky, "b"))
 
   # Test case: ALC_1 out of range
   result_invalid_alc1 <- calculate_drinking_risk_short(
     DHH_SEX = 1, ALWDWKY = 10, ALC_1 = -1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_alc1, "b"))
 })
@@ -205,8 +190,7 @@ test_that("calculate_drinking_risk_short() handles vector inputs correctly", {
     ALW_2A4 = c(5, 1, 0, 3),
     ALW_2A5 = c(5, 1, 0, 3),
     ALW_2A6 = c(0, 1, 0, 0),
-    ALW_2A7 = c(0, 1, 0, 0),
-    log_level = "silent"
+    ALW_2A7 = c(0, 1, 0, 0)
   )
 
   expect_equal(result_vector[1], 1L) # Person 1: high risk (male, >3 drinks/day)
@@ -227,8 +211,7 @@ test_that("calculate_drinking_risk_long() handles basic valid inputs correctly",
     ALC_1 = 1, # drinks in past year
     ALW_1 = 1, # had drinks in past week
     ALW_2A1 = 3, ALW_2A2 = 3, ALW_2A3 = 3, ALW_2A4 = 3,
-    ALW_2A5 = 3, ALW_2A6 = 3, ALW_2A7 = 2, # ~20 drinks/week
-    log_level = "silent"
+    ALW_2A5 = 3, ALW_2A6 = 3, ALW_2A7 = 2 # ~20 drinks/week
   )
   expect_equal(result_male_high_risk, 1L) # high risk
 
@@ -239,8 +222,7 @@ test_that("calculate_drinking_risk_long() handles basic valid inputs correctly",
     ALC_1 = 1, # drinks in past year
     ALW_1 = 1, # had drinks in past week
     ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1, ALW_2A4 = 1,
-    ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1, # 7 drinks/week
-    log_level = "silent"
+    ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1 # 7 drinks/week
   )
   expect_equal(result_female_low_risk, 2L) # low risk
 
@@ -251,8 +233,7 @@ test_that("calculate_drinking_risk_long() handles basic valid inputs correctly",
     ALC_1 = 2, # no drinks in past year
     ALW_1 = 2, # no drinks in past week
     ALW_2A1 = 0, ALW_2A2 = 0, ALW_2A3 = 0, ALW_2A4 = 0,
-    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0,
-    log_level = "silent"
+    ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0
   )
   expect_true(is_tagged_na(result_no_drinks, "a")) # not applicable
 })
@@ -262,24 +243,21 @@ test_that("calculate_drinking_risk_long() handles out of range inputs correctly"
   result_invalid_sex <- calculate_drinking_risk_long(
     DHH_SEX = -1, # invalid sex
     ALWDWKY = 10, ALC_1 = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_sex, "b"))
 
   # Test case: ALWDWKY out of range
   result_invalid_alwdwky <- calculate_drinking_risk_long(
     DHH_SEX = 1, ALWDWKY = -1, ALC_1 = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_alwdwky, "b"))
 
   # Test case: ALC_1 out of range
   result_invalid_alc1 <- calculate_drinking_risk_long(
     DHH_SEX = 1, ALWDWKY = 10, ALC_1 = -1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
-    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1,
-    log_level = "silent"
+    ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
   expect_true(is_tagged_na(result_invalid_alc1, "b"))
 })
@@ -297,8 +275,7 @@ test_that("calculate_drinking_risk_long() handles vector inputs correctly", {
     ALW_2A4 = c(3, 1, 0, 2),
     ALW_2A5 = c(3, 1, 0, 2),
     ALW_2A6 = c(3, 0, 0, 2),
-    ALW_2A7 = c(2, 0, 0, 0),
-    log_level = "silent"
+    ALW_2A7 = c(2, 0, 0, 0)
   )
 
   expect_equal(result_vector[1], 1L) # Person 1: high risk (male, >14 drinks/week)
@@ -333,8 +310,7 @@ test_that("alcohol functions handle large datasets efficiently", {
     result_binge <- calculate_binge_drinking(
       large_data$DHH_SEX, large_data$ALW_1, large_data$ALW_2A1,
       large_data$ALW_2A2, large_data$ALW_2A3, large_data$ALW_2A4,
-      large_data$ALW_2A5, large_data$ALW_2A6, large_data$ALW_2A7,
-      log_level = "silent"
+      large_data$ALW_2A5, large_data$ALW_2A6, large_data$ALW_2A7
     )
   })
 
@@ -343,8 +319,7 @@ test_that("alcohol functions handle large datasets efficiently", {
       large_data$DHH_SEX, large_data$ALWDWKY, large_data$ALC_1, large_data$ALW_1,
       large_data$ALW_2A1, large_data$ALW_2A2, large_data$ALW_2A3,
       large_data$ALW_2A4, large_data$ALW_2A5, large_data$ALW_2A6,
-      large_data$ALW_2A7,
-      log_level = "silent"
+      large_data$ALW_2A7
     )
   })
 
@@ -353,8 +328,7 @@ test_that("alcohol functions handle large datasets efficiently", {
       large_data$DHH_SEX, large_data$ALWDWKY, large_data$ALC_1, large_data$ALW_1,
       large_data$ALW_2A1, large_data$ALW_2A2, large_data$ALW_2A3,
       large_data$ALW_2A4, large_data$ALW_2A5, large_data$ALW_2A6,
-      large_data$ALW_2A7,
-      log_level = "silent"
+      large_data$ALW_2A7
     )
   })
 
@@ -367,16 +341,14 @@ test_that("alcohol functions handle extreme edge cases gracefully", {
   # Test with all NA input
   result_all_na <- calculate_binge_drinking(
     rep(NA, 5), rep(NA, 5), rep(NA, 5), rep(NA, 5), rep(NA, 5),
-    rep(NA, 5), rep(NA, 5), rep(NA, 5), rep(NA, 5),
-    log_level = "silent"
+    rep(NA, 5), rep(NA, 5), rep(NA, 5), rep(NA, 5)
   )
   expect_length(result_all_na, 5)
 
   # Test with empty vectors
   result_empty <- calculate_binge_drinking(
     numeric(0), numeric(0), numeric(0), numeric(0), numeric(0),
-    numeric(0), numeric(0), numeric(0), numeric(0),
-    log_level = "silent"
+    numeric(0), numeric(0), numeric(0), numeric(0)
   )
   expect_length(result_empty, 0)
 })
@@ -406,24 +378,21 @@ test_that("alcohol functions work correctly in cchsflow workflows", {
   test_data$binge_drinker <- calculate_binge_drinking(
     test_data$DHH_SEX, test_data$ALW_1, test_data$ALW_2A1,
     test_data$ALW_2A2, test_data$ALW_2A3, test_data$ALW_2A4,
-    test_data$ALW_2A5, test_data$ALW_2A6, test_data$ALW_2A7,
-    log_level = "silent"
+    test_data$ALW_2A5, test_data$ALW_2A6, test_data$ALW_2A7
   )
 
   test_data$short_term_risk <- calculate_drinking_risk_short(
     test_data$DHH_SEX, test_data$ALWDWKY, test_data$ALC_1, test_data$ALW_1,
     test_data$ALW_2A1, test_data$ALW_2A2, test_data$ALW_2A3,
     test_data$ALW_2A4, test_data$ALW_2A5, test_data$ALW_2A6,
-    test_data$ALW_2A7,
-    log_level = "silent"
+    test_data$ALW_2A7
   )
 
   test_data$long_term_risk <- calculate_drinking_risk_long(
     test_data$DHH_SEX, test_data$ALWDWKY, test_data$ALC_1, test_data$ALW_1,
     test_data$ALW_2A1, test_data$ALW_2A2, test_data$ALW_2A3,
     test_data$ALW_2A4, test_data$ALW_2A5, test_data$ALW_2A6,
-    test_data$ALW_2A7,
-    log_level = "silent"
+    test_data$ALW_2A7
   )
 
   # Verify results are reasonable
