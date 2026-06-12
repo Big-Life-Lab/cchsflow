@@ -1,0 +1,962 @@
+[
+ {
+  "issue_title": "#138 Negative pack years for occasional smokers (never-daily, status=3)",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED",
+  "evidence": {
+   "code_location": "R/smoke-pack-years.R L300-302",
+   "status_3_formula": "(pmax(cigs_occ * days_month / PACK_YEARS_CONSTANTS$days_per_month, 1) / 20) * (age - age_first_cig)",
+   "pmax_absent": "The pmax() guards the cigs_occ intensity term but NOT the (age - age_first_cig) duration. Statuses 1, 2, 4 all wrap the entire formula in pmax(..., PACK_YEARS_CONSTANTS$min_pack_years); status 3 does not.",
+   "pumf_inversion_scenario": "DHHGAGE_cont 50-54 category -> midpoint 52 (variable_details.csv L643). SMKG01C_cont 50+ category -> midpoint 55 (L3271, L3285). A current occasional never-daily smoker in the 50-54 age band whose first cigarette was reported in the 50+ category will receive age=52, age_first_cig=55, giving (52-55) = -3 years duration. Result: -0.15 pack-years (verified arithmetically).",
+   "step3_output_validation": "pack_years_der variable_details rows (L2415-2420) have recStart=N/A for ALL rows. should_skip_term('N/A') returns TRUE, so map_recStart_to_recEnd produces empty copy_mappings and empty else_mappings. apply_else_logic therefore returns the value unchanged. Negative values pass through Step 3 as-is \u2014 they are NOT converted to NA and are NOT clamped to 0 or min_pack_years.",
+   "step3_claim_correction": "The reviewer states 'Step 3 clean_variables output validation for pack_years_der only discards out-of-range values (maps to NA)'. This is INCORRECT. Step 3 does not discard out-of-range values either \u2014 the [0,165] bound appears only in human-readable notes/description columns in variable_details.csv, not in any recStart/recEnd mapping that would trigger else logic. Negative values silently propagate as-is.",
+   "legacy_code": "R/smoking.R L289-290 has the identical unguarded subtraction: (DHHGAGE_cont - SMKG01C_cont) with no pmax() outer guard, confirming the pattern predates the v3 rewrite.",
+   "line_numbers_correct": "The reviewer cites L301-302 for the status==3 branch. The code is at L300-302 (comment on L300, formula on L301-302). The line number claim is approximately correct.",
+   "issue_comment_claim": "The claim of an 2025-08-07 issue comment agreeing to change last-category midpoint to 51, deferred to after v3.0 PR merge, cannot be verified from the working tree alone (no git history access). However, the fix is NOT present in the current working tree regardless."
+  },
+  "corrections": [
+   "The reviewer says Step 3 'should clamp the negative but... only discards out-of-range values (maps to NA)'. Both halves of this are wrong for the current code: Step 3 neither clamps nor maps to NA. There is no copy_mapping row with range [0,165] and no else->NA::b row in variable_details.csv for pack_years_der. Negative values silently pass through to the final output vector.",
+   "The reviewer says the output validation bound [0,165] 'is applied by clean_variables() Step 3'. This bound exists only in free-text notes columns (variableStartLabel, reviewNotes) and in the PACK_YEARS_CONSTANTS$max_pack_years constant, but there is no corresponding worksheet mapping that would cause Step 3 to act on out-of-range values.",
+   "The reviewer's example '.calculate_pack_years_core(status=3, age=52, age_first_cig=55) returns -0.15' is arithmetically correct assuming minimum cigs_occ and days_month (pmax(1*1/30, 1)/20 * (52-55) = (1/20) * (-3) = -0.15). The scenario is realistically triggered by PUMF midpoint imputation.",
+   "The reviewer says the function is '.calculate_pack_years_core'. In the working tree, the internal function is named .calculate_pack_years_core (with the dot prefix), confirming this naming is correct."
+  ],
+  "files_examined": [
+   "R/smoke-pack-years.R (L269-322 \u2014 .calculate_pack_years_core)",
+   "R/clean-variables.R (apply_else_logic, process_missing_codes)",
+   "R/missing-pattern-cache.R (map_recStart_to_recEnd, should_skip_term, get_complete_pattern)",
+   "R/smoking-validation-constants.R (PACK_YEARS_CONSTANTS)",
+   "R/smoking.R (L277-310 \u2014 legacy pack_years_fun)",
+   "inst/extdata/variable_details.csv (SMKG01C_cont rows L3262-3289, DHHGAGE_cont L635-649, pack_years_der L2415-2420)"
+  ],
+  "_source": "verify-issues-triage-0.json"
+ },
+ {
+  "issue_title": "#139 immigration_der misclassifies non-immigrants born outside Canada as NA::b",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "The claim correctly identifies the bug location but slightly misstates the evidence chain. The claim cites 'L58-75' of R/immigration.R and says 'immigrant_status==2 & born_canada==2 (non-immigrant born outside Canada)' cases fall through to TRUE ~ tagged_na('b'). This is accurate for the CURRENT working tree (fix/v3-smoking-worksheet-sync, as of commit 702db213). The categorize_immigration() function at /Users/dmanuel/github/cchsflow/R/immigration.R lines 58-75 has exactly six substantive arms covering only: (2,1,*) Canada-born non-immigrants and (1,2,*,*) immigrants born outside Canada. The combination immigrant_status==2 & born_canada==2 (non-immigrant, born outside Canada) has no arm and falls to the TRUE~tagged_na('b') catchall. The claim says the team agreed to add categories 7 and 8 \u2014 the issue-139.json evidence confirms this: a team member wrote on 2025-08-07 'we've decided to add two new categories, White Canadians born outside of Canada and Non-white Canadians born outside of Canada.' However, NO implementation of categories 7 or 8 exists anywhere in the working tree or on any named branch (checked all branches via git log --all). The original immigration_fun() on main has the identical structural gap (same six arms, same NA(a)/NA(b) fallthrough). One correction to the claim: the claim says this 'incorrectly marked as missing/not-stated' but NA::b in this context is labelled 'missing' in the worksheet (not 'not-stated'). The semantic point stands \u2014 the sub-population is real and silently discarded rather than categorized.",
+  "notes": "Evidence sources: (1) R/immigration.R in the working tree \u2014 75 lines, categorize_immigration() case_when has arms only for born_canada==1 non-immigrants (cats 1,2) and born_canada==2 immigrants (cats 3-6); (2) variable_details.csv lines 1700-1703 confirm the 6-cat schema has only NA::a and NA::b as non-integer outcomes; (3) issue-139.json confirms the bug report and the 2025-08-07 team decision to add cats 7 and 8 has not been implemented; (4) git log --all shows no commits implementing categories 7 or 8; (5) main branch immigration_fun() (legacy) has the same gap. The bug is real on both the v3 rewrite and the legacy function.",
+  "_source": "verify-issues-triage-1.json"
+ },
+ {
+  "issue_number": 159,
+  "issue_title": "#159 rec_with_table() fails on haven_labelled columns from SPSS/Stata imports",
+  "verdict": "REAL",
+  "severity_ok": true,
+  "corrections": [
+   "The root cause is TIBBLE INPUT, not haven_labelled per se. The error 'list object cannot be coerced to type double' is triggered by any tibble input (tbl_df class) regardless of whether columns carry haven_labelled. A plain as_tibble(cchs2001_p) with zero haven_labelled columns reproduces the exact same error.",
+   "The bug lives in label_data() at R/label-utils.R line 203: `data_to_label[, variable_name] <- as.numeric(data_to_label[, variable_name])`. For a tibble, `df[, col]` returns a 1-column tibble, not a vector. `as.numeric()` on a tibble (which is a list) then fails with exactly the reported error.",
+   "haven::read_sav() always returns a tbl_df (tibble). So the claim 'any user loading via read_sav() will hit this error immediately' is substantially correct, but the cause is the tibble wrapper, not the haven_labelled column class itself.",
+   "haven_labelled columns in a plain data.frame (not a tibble) work fine for variables with numeric recStart values (the vast majority of cchsflow variables). Only the string-comparison path in compare_value_based_on_interval would fail with haven_labelled-specific type-vctrs errors, but NO current variable_details rows use a non-numeric, non-interval, non-else recStart in non-DerivedVar mappings.",
+   "The secondary claim about the 'legacy engine having no type-coercion guard' is TRUE but incomplete: the fix needed is either (a) convert tibble to data.frame at entry to rec_with_table(), or (b) fix label_data() to use [[var]] instead of [, var] for indexing. Option (b) would fix the tibble issue without stripping haven_labelled attributes."
+  ],
+  "evidence": {
+   "grep_haven_labelled": "0 hits in recode-with-table.R confirmed - no type-coercion guard present",
+   "tibble_test": "as_tibble(cchs2001_p) with plain numeric columns -> same 'list object cannot be coerced to type double' error at label_data()",
+   "haven_plain_df_test": "haven_labelled columns in data.frame with numeric recStart -> rec_with_table() succeeds (verified with DHH_SEX, ALWDDLY, ADM_RNO)",
+   "tibble_with_haven": "tibble with haven_labelled columns (simulated read_sav output) -> same error confirmed",
+   "root_cause_line": "R/label-utils.R line 203: as.numeric(data_to_label[, variable_name]) where [,col] on tbl_df returns a 1-col tibble, not a vector",
+   "string_compare_issue": "haven_labelled throws 'Can't combine <character> and <integer>' in the non-numeric recStart path, but zero current variable_details rows exercise this path in non-DerivedVar context",
+   "odessi_claim": "Confirmed: read_sav returns tibble+haven_labelled; error occurs on the tibble aspect"
+  },
+  "verdict_rationale": "The issue is REAL and the error is reproducible. The description correctly identifies the symptom ('list object cannot be coerced to type double') and the real-world trigger (ODESSI .sav files via read_sav). The severity claim (barrier to primary real-world use case) is well-founded since read_sav always returns a tibble. However the issue attribution is imprecise: the root bug is label_data()'s use of [,col] single-bracket indexing which is tibble-incompatible, not haven_labelled per se. The 983-line engine indeed has no protection against tibble input. A v3 patch is needed.",
+  "_source": "verify-issues-triage-2.json"
+ },
+ {
+  "issue_title": "Three incompatible naming generations coexist in the exported API and in worksheet Func:: dispatch",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "Minor count discrepancies in the evidence: (1) legacy _fun exports = 27 on the current tree, not 28; (2) categorize_bmi Func:: dispatch = 8 occurrences, not 10. The total export count of 125 is confirmed. The 51 v3 verb-style and 6 ALL-CAPS exports are confirmed. The claim that pack_years_fun and calculate_pack_years are both exported with incompatible parameter signatures is confirmed -- pack_years_fun uses raw StatCan variable names as positional formals (SMKDSTY_original, DHHGAGE_cont, ...) while calculate_pack_years uses a clean named API (smoking_status, age, age_start_smoking, ...). A clarification on the 'deprecated alias' sub-claim: calculate_SMKDSTY_original is not merely a worksheet naming confuion; it is formally .Deprecated() in the code (calls .Deprecated('calculate_SMKDSTY_cat6') at runtime) yet is still referenced as Func::calculate_SMKDSTY_original in variable_details.csv, meaning every rec_with_table() run on SMKDSTY_original variables will emit a deprecation warning. pack_years_fun is exported and tested (13 test references) but is not referenced in variable_details.csv Func:: column at all -- it is an orphaned export, not a worksheet-dispatched duplicate. The list-mode fix (commit 63450ba3) and ADL/alcohol repair (commit b7723dd5) do not touch this naming issue.",
+  "notes": "Verified against current fix/v3-smoking-worksheet-sync working tree. All three naming generations confirmed present: (1) 27 legacy _fun-suffixed exports (CCC_091_fun1, pack_years_fun, energy_exp_fun, active_transport1_fun, etc.); (2) 51 verb-style exports (calculate_*, assess_*, categorize_*, score_*, adjust_bmi); (3) 6 ALL-CAPS variable-named exports (DPSDPP, DPSDSF, GEN_02A2, LBFA_31A, LBFA_31A_a, LBFA_31A_b). Worksheet Func:: column confirmed to mix 18 legacy _fun-style dispatches alongside 26 v3 verb-style dispatches. Severity 'high' is appropriate for a v4 scoping finding -- the three-generation split creates genuine semver and API discoverability problems and must be resolved before any stable v4 release. Not fixed by any recent commit.",
+  "_source": "verify-salvaged-0.json"
+ },
+ {
+  "index": 1,
+  "dim": "api-surface-ux",
+  "title": "About 24 of 125 exports (19%) are non-functional placeholders: 18 stop() stubs and 6 silent empty-body functions",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "The empty-body count is 7, not 6. The finding's evidence list includes DPSDPP, DPSDSF, GEN_02A2, LBFA_31A, LBFA_31A_a, LBFA_31A_b (6), but misses food_insecurity_der (R/food-insecurity.R:46-49), which also has a '# this is for documentation purposes only' empty body and is exported (NAMESPACE line 89). The actual headline figure should be '25 of 125 exports (20%)' not '24 of 125 (19%)'. The stop()-stub line-number citations in smoke-intensity.R are slightly off (evidence says 208/250/286/322; actual function-definition lines are 208/249/285/321), a minor variant from citing the stop() body line vs the <- line. All other evidence checks out exactly: 18 stop() stubs confirmed (4 in smoke-intensity.R + 5 in smoke-start.R + 4 in smoke-stop.R + 5 in smoking-status.R = 18), NAMESPACE has exactly 125 export() lines, and the 7 empty-body functions silently return NULL when called.",
+  "notes": "The two committed fixes on this branch (b7723dd5 ADL/alcohol 3-step rewrite; 63450ba3 list-mode rec_with_table fix) do not touch any placeholder or stub function. The finding is fully current against the working tree. The core critique is accurate: 18 exported functions stop() with 'DOCUMENTATION ONLY' messages, and 7 exported functions silently return NULL with no body other than a comment. Both classes abuse the export namespace as a documentation vehicle. The 7 silent-NULL functions are the more dangerous subset: a caller of DPSDPP() or food_insecurity_der() receives NULL with no error, an outcome that can propagate silently into downstream analysis.",
+  "_source": "verify-salvaged-1.json"
+ },
+ {
+  "index": 10,
+  "dim": "dependencies-namespace",
+  "title": "All 9 runtime dependencies in Depends; no Imports field exists",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED \u2014 finding is fully accurate against the current working tree on branch fix/v3-smoking-worksheet-sync (HEAD 63450ba3).",
+  "verification_details": {
+   "DESCRIPTION_lines_37_47": "Depends: R (>= 3.5.0), haven (>= 1.1.2), dplyr (>= 0.8.2), sjlabelled (>= 1.0.17), stringr (>= 1.2.0), magrittr, yaml, readr, purrr, cli",
+   "Imports_field_present": false,
+   "symbol_counts_confirmed": {
+    "haven": 28,
+    "dplyr": 284,
+    "sjlabelled": 46,
+    "stringr": 63,
+    "magrittr": 42,
+    "yaml": 6,
+    "readr": 103,
+    "purrr": 184,
+    "cli": 240,
+    "total": 996
+   },
+   "masking_overlap_sjlabelled_vs_haven": [
+    "as_factor",
+    "read_sas",
+    "read_spss",
+    "read_stata",
+    "write_sas",
+    "zap_labels"
+   ],
+   "recent_commits_touched_DESCRIPTION": false,
+   "commits_that_fixed_this": "none \u2014 b7723dd5 (ADL/alcohol 3-step rewrite) and 63450ba3 (list-mode fix) did not touch DESCRIPTION",
+   "NAMESPACE_export_count": 125
+  },
+  "corrections": "No corrections needed. The evidence claim states 9 packages in Depends with no Imports field; DESCRIPTION lines 37-47 confirm exactly this. The symbol count of 996 is precisely reproduced. The sjlabelled/haven masking on read_sas, read_spss, read_stata, write_sas, as_factor, zap_labels is confirmed. The severity rating of 'high' is appropriate: attaching 996 symbols from 9 packages on library(cchsflow) violates R Packages 2e guidance, causes non-obvious search-path masking, and is a CRAN policy concern.",
+  "notes": "The three committed fixes (b7723dd5, 63450ba3, e3fbf85f) address ADL/alcohol architecture, list-mode dispatch, and worksheet CSV formatting respectively \u2014 none touch DESCRIPTION or dependency declarations. This finding remains completely unaddressed in the current working tree.",
+  "_source": "verify-salvaged-10.json"
+ },
+ {
+  "index": 11,
+  "dim": "dependencies-namespace",
+  "title": "Undeclared dependencies: glue and stats used via :: but absent from DESCRIPTION; withr used in tests but not in Suggests",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": null,
+  "notes": "All three claims are confirmed against the current working tree on branch fix/v3-smoking-worksheet-sync. (1) R/check-worksheet.R contains exactly 8 glue::glue() calls at lines 274, 291, 313, 336, 359, 378, 396, 415; glue does not appear anywhere in DESCRIPTION. (2) stats::setNames() is called at R/alcohol.R:93 and R/clean-variables.R:637; stats is absent from both Depends and Imports in DESCRIPTION. (3) withr::local_tempfile() is called at tests/testthat/helper-create-test-csv.R:19; withr is not in Suggests (which lists only testthat, kableExtra, DT, rmarkdown, knitr, pkgdown). None of the two committed fixes (b7723dd5 ADL/alcohol rewrite; 63450ba3 list-mode rec_with_table fix) touch DESCRIPTION or the dependency declarations. The finding has not been fixed. Severity high is appropriate: an undeclared glue import means check_worksheet() can error at runtime on a clean install, and withr absence will cause R CMD check WARNING on test helpers.",
+  "evidence_verified": {
+   "glue_calls_in_check_worksheet": 8,
+   "glue_in_DESCRIPTION": false,
+   "stats_setNames_in_alcohol_R_line_93": true,
+   "stats_setNames_in_clean_variables_R_line_637": true,
+   "stats_in_DESCRIPTION": false,
+   "withr_local_tempfile_in_helper_line_19": true,
+   "withr_in_Suggests": false
+  },
+  "_source": "verify-salvaged-11.json"
+ },
+ {
+  "index": 12,
+  "dim": "dependencies-namespace",
+  "title": "125 exports with ~36 internal plumbing functions leaked into the public API",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED - finding is accurate against the current working tree",
+  "corrections": "None required. All specific numbers in the evidence check out exactly: 125 export() lines in NAMESPACE (grep -c verified); exactly 46 unique Func:: dispatch references in variable_details.csv recEnd column; exactly 79 exports not referenced by worksheets; exactly 36 of those 79 are infrastructure plumbing (10 cache internals + 8 worksheet loaders/maintainer tools + 18 other helpers). The ALL-CAPS variable-named exports (DPSDPP, DPSDSF, GEN_02A2, LBFA_31A, LBFA_31A_a, LBFA_31A_b) confirmed present and confirmed absent from Func:: worksheet references. The truncated evidence reference 'apply_databa...' resolves to apply_database_heuristics, which is present in NAMESPACE.",
+  "notes": "The two recent commits (b7723dd5 ADL/alcohol rewrite; 63450ba3 list-mode fix) did not touch NAMESPACE and do not affect this finding. The finding is about a structural API-surface design problem (exporting plumbing functions that impose a semver commitment), not a runtime bug. The DPSDSF/DPSDPP/GEN_02A2/LBFA_31A* exports are empty-body documentation-only stubs, consistent with the companion finding at index 1 about silent empty-body functions. The 'high' severity rating is appropriate: 36 infrastructure exports create backward-compatibility obligations that directly constrain the v4 refactor scope and would require a deprecation cycle to clean up.",
+  "evidence_check": {
+   "export_count_125": "VERIFIED",
+   "func_refs_46": "VERIFIED",
+   "not_in_func_79": "VERIFIED",
+   "infra_36": "VERIFIED - all 36 individually confirmed in NAMESPACE",
+   "cache_internals_named": "VERIFIED - cache_pattern, get_cached_pattern, has_cached_pattern, clear_missing_patterns_cache, clear_complete_patterns_cache, get_complete_pattern, get_missing_pattern, get_missing_pattern_auto, get_missing_pattern_bulk, get_variable_missing_pattern all exported",
+   "maintainer_tools_named": "VERIFIED - check_worksheet, fix_worksheet, load_schema, load_worksheet_metadata, load_worksheet_schemas, apply_database_heuristics all exported",
+   "not_fixed_by_commits": "VERIFIED - neither b7723dd5 nor 63450ba3 modified NAMESPACE"
+  },
+  "_source": "verify-salvaged-12.json"
+ },
+ {
+  "index": 13,
+  "dim": "dependencies-namespace",
+  "title": "cli is a hard Depends but is never called from package code",
+  "isReal": true,
+  "severity": "medium",
+  "severity_ok": true,
+  "corrections": "",
+  "notes": "All evidence confirmed on current working tree (branch fix/v3-smoking-worksheet-sync, commit 63450ba3). DESCRIPTION line 47 lists cli in Depends (not Imports, no Imports field exists). grep 'cli::' R/*.R returns zero hits. grep -rn 'cli' R/ returns only false positives (comments containing 'recycling', 'clicking', and partial words -- no cli function calls). cli is used exclusively in exec/check-worksheets.R (library(cli) + 14 cli_ calls) and exec/fix-worksheets.R (library(cli) + 6 cli_ calls) -- developer scripts outside the package code path. Rscript confirmed cli has exactly 240 exports. NAMESPACE has no importFrom(cli,...) entries. The ADL/alcohol repair (b7723dd5) and list-mode fix (63450ba3) do not touch DESCRIPTION or cli at all -- this finding was not addressed by those commits and remains an active defect. Severity medium is appropriate: it is a real cost (search path pollution, user install overhead) but not a data-correctness bug.",
+  "_source": "verify-salvaged-13.json"
+ },
+ {
+  "index": 14,
+  "dim": "dependencies-namespace",
+  "title": "cli is a hard Depends but is never called from package code",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED",
+  "corrections": "",
+  "notes": "All evidence verifies cleanly against the current working tree. (1) DESCRIPTION line 47 lists 'cli' under Depends with no Imports field. (2) grep -rn 'cli::' R/ returns zero hits. (3) grep for cli_alert/cli_abort/etc. in R/ returns zero hits. (4) The two R/ files that match a plain 'cli' text search (clean-variables.R, depression.R) contain only comments/docs text, not function calls. (5) NAMESPACE has no importFrom(cli,...) line. (6) cli IS used \u2014 but only in exec/check-worksheets.R and exec/fix-worksheets.R, which are developer scripts outside the installed package code path. The finding's claim is accurate: cli is a hard Depends attaching ~240 symbols to every user's search path at library(cchsflow), while delivering nothing to the package's runtime code. The severity rating of 'medium' is appropriate \u2014 it is a CRAN NOTE-level issue (not a bug), but a genuine unnecessary cost. Not fixed by the ADL/alcohol repair commits or the rec_with_table list-mode fix; still present on the working tree.",
+  "_source": "verify-salvaged-14.json"
+ },
+ {
+  "index": 15,
+  "dim": "docs-vignettes",
+  "title": "_pkgdown.yml reference index is broken: 28 topics have no man page and 90 of 125 exports are unindexed",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "",
+  "notes": "All three numerical claims verified against the working tree on branch fix/v3-smoking-worksheet-sync. (1) 28 topics in _pkgdown.yml have no corresponding .Rd man page: the ALW_1...ALW_2A7, ALCDTTM, ALCDTYP, ALWDDLY, ALWDWKY group (10 alcohol variable docs deleted as part of v3 renaming) plus 18 legacy function docs (bmi_fun, adjusted_bmi_fun, bmi_fun_cat, pct_time_fun, pct_time_fun_cat, resp_condition_fun1/2/3, binge_drinker_fun, adl_fun, adl_score_5_fun, low_drink_short/long/score/score_1_fun, immigration_fun) none of which exist in man/. (2) 125 exports confirmed in NAMESPACE. (3) 90 of those 125 exports do not appear anywhere in _pkgdown.yml. The finding was NOT fixed by the ADL/alcohol repair commits or the rec_with_table list-mode fix. Those commits touched R/ and inst/extdata/ only; _pkgdown.yml and man/ are unchanged on this branch. The evidence citation notes deleted man pages from git status on the v3 branch shown at conversation start - the same files are absent on fix/v3-smoking-worksheet-sync too (never present on this branch). The pkgdown breakage is structural and ongoing.",
+  "evidence_check": {
+   "_pkgdown.yml_lines_64_97": "VERIFIED - bmi_fun, adjusted_bmi_fun, bmi_fun_cat, pct_time_fun, resp_condition_fun1/2/3, binge_drinker_fun, adl_fun, adl_score_5_fun, low_drink_*_fun, immigration_fun, pct_time_fun_cat all listed",
+   "_pkgdown.yml_lines_101_112": "VERIFIED - ALW_1 through ALW_2A7, ALWDWKY, ALWDDLY, ALCDTYP, ALCDTTM all listed",
+   "missing_man_pages": "VERIFIED - none of the 28 topics have a .Rd file in man/",
+   "namespace_125_exports": "VERIFIED - grep of NAMESPACE yields exactly 125 export() lines",
+   "90_unindexed": "VERIFIED - 90 exports not present in pkgdown topics"
+  },
+  "_source": "verify-salvaged-15.json"
+ },
+ {
+  "index": 16,
+  "dim": "docs-vignettes",
+  "title": "Vignettes teach removed v2 functions and the deprecated if_else2 monolith pattern",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED \u2014 all evidence checks out against the current working tree",
+  "corrections": "Minor clarification only: bmi_fun is now in R/legacy/bmi-legacy.R but is NOT exported from NAMESPACE (no export(bmi_fun) line). The vignette code is therefore doubly broken: (a) derived_variables.Rmd line 21 claims HWTGBMI_der uses Func::bmi_fun but the worksheet at inst/extdata/variable_details.csv lines 1625-1627 shows Func::calculate_bmi; and (b) derived_variables.Rmd defines if_else2 (line 32) but bmi_fun body at line 45 calls ifelse2 (no underscore \u2014 typo that would cause 'could not find function ifelse2' if the chunk runs). how_to_add_variables.Rmd contains 14 calls to ifelse2 inside Pack_years_fun (lines 207-231) with zero definitions of if_else2 in that file, so the example chunk would fail standalone. The v3 3-step architecture (clean_variables / case_when / any_missing / get_priority_missing) is entirely absent from all vignettes.",
+  "notes": "Not fixed by either of the recent commits (b7723dd5 ADL/alcohol rewrite, 63450ba3 list-mode rec_with_table fix). Both commits touch R/ source and worksheet CSVs, not vignettes. The discrepancy is still live.",
+  "_source": "verify-salvaged-16.json"
+ },
+ {
+  "index": 17,
+  "dim": "docs-vignettes",
+  "title": "get_started.Rmd examples silently fail against v3 worksheets (DHHGAGE_A/_B removed) plus multiple factual errors",
+  "severity": "high",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED - finding is real and unfixed",
+  "verification_date": "2026-06-11",
+  "checks": [
+   {
+    "claim": "DHHGAGE_A and DHHGAGE_B are absent from worksheets",
+    "result": "CONFIRMED",
+    "detail": "grep of inst/extdata/variables.csv and inst/extdata/variable_details.csv for DHHGAGE_A and DHHGAGE_B returns no output. Current names are DHHGAGE_pre2005 (cchs2001_p, cchs2003_p) and DHHGAGE_2005plus (cchs2005_p through cchs2023_p)."
+   },
+   {
+    "claim": "Lines 280/283 of vignettes/get_started.Rmd call rec_with_table with removed variable names",
+    "result": "CONFIRMED",
+    "detail": "Line 280: age2001 <- rec_with_table(cchs2001_p, 'DHHGAGE_A'). Line 283: age2012 <- rec_with_table(cchs2012_p, 'DHHGAGE_B'). Both names absent from worksheets."
+   },
+   {
+    "claim": "The chunk uses {r, warning=FALSE} suppressing the warning",
+    "result": "CONFIRMED",
+    "detail": "Line 279 in vignettes/get_started.Rmd: ```{r, warning=FALSE}. The rec_with_table warning ('DHHGAGE_A is missing from variable details therefore cannot be recoded', R/recode-with-table.R:279-284) is suppressed. head(age2001) produces output with no DHHGAGE_A column."
+   },
+   {
+    "claim": "Additional factual errors in the vignette",
+    "result": "CONFIRMED",
+    "detail": "Line 49: 'between 2001 and 2013' - but shipped data goes to cchs2017_2018_p (15 cycle files). Line 51: 'cchs2000_p' is a typo for cchs2001_p. Line 140: recommends '?BMI_fun' but bmi_fun is NOT in NAMESPACE (only calculate_bmi is exported); bmi_fun exists only in R/legacy/bmi-legacy.R with no export() call."
+   },
+   {
+    "claim": "Not fixed by recent commits",
+    "result": "CONFIRMED",
+    "detail": "Commits b7723dd5 (ADL/alcohol rewrite), 63450ba3 (list-mode fix), and e3fbf85f (worksheet cleaning) all leave vignettes/get_started.Rmd untouched. Even newer branches (e9a68e15 'updates to getting started guide') still contain DHHGAGE_A/DHHGAGE_B at lines 280/283."
+   }
+  ],
+  "corrections": "None needed. All cited line numbers and file paths are accurate. The evidence was truncated in the JSON (ends mid-sentence at '/vignettes/get_started.Rmd:4') but the verifiable portion is fully confirmed.",
+  "notes": "The severity=high rating is appropriate: this is the package's primary onboarding tutorial, the failure is invisible to the user (warnings suppressed), and it has not been fixed despite the v3 naming convention change from _A/_B to year-based suffixes being documented in project memory. The factual errors (wrong data range, wrong object name) compound the impact.",
+  "_source": "verify-salvaged-17.json"
+ },
+ {
+  "dim": "docs-vignettes",
+  "title": "Worksheet reference vignettes document the v2 schema: 16 of 23 variable_details columns, 9 of 18 variables columns, no _m master databases",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "The column counts are precisely confirmed. variable_details.Rmd (lines 54-162) documents exactly 16 of 23 actual columns; undocumented are ICES.confirmation, version, lastUpdated, status, reviewNotes, versionNotes, review. variables_sheet.Rmd line 52 says \"there are 7 columns\" but then lists 9 in its numbered list (columns 1-9), covering only 9 of the actual 18 columns; undocumented are notes, description, version, lastUpdated, reviewNotes, ICES.confirmation, Observation..MD., status, versionNotes. The phantom recFrom/recTo names are confirmed at vignette line 128 (actual column names are recStart/recEnd). Neither vignette mentions _m (Master) databases anywhere. No corrections to the finding are needed; all specific counts are accurate. The only minor imprecision: the finding says \"9 of 18 variables columns\" documented, which is correct (9 columns listed), but the vignette text also says \"7\" internally - both facts are true and the finding captures the worse-case user experience correctly.",
+  "notes": "Verified against current working tree (branch fix/v3-smoking-worksheet-sync). variable_details.csv has 23 columns confirmed by csv.reader. variables.csv has 18 columns confirmed by csv.reader. variable_details.Rmd ends its column documentation at column 16 (notes), lines 54-162. variables_sheet.Rmd line 52 says 7 columns, lists 9, actual is 18. Phantom recFrom/recTo names confirmed at vignette line 128 (real columns: recStart/recEnd). No _m master database references anywhere in either vignette. This finding is not affected by the ADL/alcohol repair or rec_with_table list-mode fix commits.",
+  "_source": "verify-salvaged-18.json"
+ },
+ {
+  "index": 19,
+  "dim": "docs-vignettes",
+  "title": "Divio gap: no documentation system for distinct user types, and v3's architecture has zero user-facing explanation",
+  "isReal": true,
+  "severity": "high",
+  "severity_ok": true,
+  "fixed_by_commits": false,
+  "corrections": "None required. All evidence claims verified against the current working tree (v3 branch / fix/v3-smoking-worksheet-sync). The evidence is accurate.",
+  "notes": "All key evidence points confirmed:\n1. recodeflow scoping (/tmp/recodeflow-pr43/index.qmd:37-38): confirmed verbatim - \"documentation not catering to different types of users (not using the divio style of documentation)\".\n2. 9 vignettes on v3: derived_variables.Rmd, duplicate_datasets.Rmd, get_started.Rmd, how_to_add_variables.Rmd, how_to_harmonize.Rmd, tagged_na_usage.Rmd, variable_details.Rmd, variables_sheet.Rmd, worksheet_formatting.Rmd.\n3. Zero vignette hits for \"3-step\", \"clean_variables\", \"case_when\", \"any_missing\", \"calculate_bmi\", or any other v3-architecture term across all 9 vignettes.\n4. get_started.Rmd lines 206-233: confirmed reference argument list embedded in the tutorial.\n5. pkgdown articles list is a flat undifferentiated menu with no audience segmentation and no Divio quadrant structure.\n6. pkgdown reference is organized around v2 sections (\"Derived variable functions\" lists bmi_fun, pack_years_fun, etc.).\n7. 39 of 44 v3-style verb-form exports (calculate_*, assess_*, categorize_*) are absent from the pkgdown reference index.\n8. The committed fixes (b7723dd5 ADL/alcohol 3-step, 63450ba3 list-mode bug) are completely unrelated to this documentation finding. Not fixed.\n9. The v4 scope outline (v4-planning branch) includes Phase 5 \"vignette rebuild\" but does not explicitly commit to Divio structure - the finding's framing that this \"blocks\" v4 docs is an editorial judgment, not a strict code fact, but is directionally sound given the recodeflow scoping commitment.",
+  "verified_paths": [
+   "/tmp/recodeflow-pr43/index.qmd",
+   "/Users/dmanuel/github/cchsflow/vignettes/get_started.Rmd",
+   "/Users/dmanuel/github/cchsflow/vignettes/derived_variables.Rmd",
+   "/Users/dmanuel/github/cchsflow/_pkgdown.yml",
+   "/Users/dmanuel/github/cchsflow/NAMESPACE"
+  ],
+  "_source": "verify-salvaged-19.json"
+ },
+ {
+  "index": 2,
+  "dim": "api-surface-ux",
+  "title": "Internal plumbing dominates the export list: 10 cache internals + 21 maintainer/worksheet tools + engine helpers are all user-facing",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "Sub-count of 'maintainer/worksheet tools' is 23, not 21: apply_database_heuristics and get_priority_missing were present in NAMESPACE but omitted from the evidence list. The total plumbing count is therefore 33 (10 cache + 23 maintainer) = 26.4% of 125 exports, not ~40% as implied in the claim. The '~40%' figure is directionally wrong for the specifically-identified categories, though correct if interpreted as 'exports not referenced by any Func:: worksheet column' (79 of 125 = 63%). The evidence statement '46 are referenced as Func:: by the worksheets; 79 are not' is verified exactly correct.",
+  "notes": "NAMESPACE unchanged by the repair commits (b7723dd5, 63450ba3, e3fbf85f \u2014 git diff shows zero change to NAMESPACE across that range). All 10 cache internals (cache_pattern, has_cached_pattern, get_cached_pattern, clear_missing_patterns_cache, clear_complete_patterns_cache, get_missing_pattern, get_missing_pattern_auto, get_missing_pattern_bulk, get_complete_pattern, get_variable_missing_pattern) confirmed exported. All 7 maintainer-tool examples cited in evidence (check_worksheet, fix_worksheet, load_schema, load_worksheet_metadata, load_worksheet_schemas, apply_database_heuristics, auto_detect_database) confirmed exported. The core finding \u2014 that infrastructure plumbing dominates the export list, creating semver debt and constraining v4 \u2014 is real and well-evidenced. The severity=high rating is appropriate: every exported symbol is a backward-compatibility commitment. Not affected by the ADL/alcohol 3-step repair or the list-mode fix.",
+  "verified_counts": {
+   "total_exports": 125,
+   "cache_internals_confirmed": 10,
+   "maintainer_tools_confirmed": 23,
+   "total_plumbing": 33,
+   "plumbing_pct": 26.4,
+   "func_worksheet_targets": 46,
+   "not_func_targets": 79,
+   "not_func_pct": 63.2
+  },
+  "_source": "verify-salvaged-2.json"
+ },
+ {
+  "index": 20,
+  "dim": "engine-internals",
+  "title": "List-mode recoding applies the first database's rules to every database (silent data corruption)",
+  "isReal": true,
+  "severity_ok": true,
+  "fixed_by_commit": "63450ba3",
+  "verdict": "CONFIRMED REAL - FIXED BY COMMIT 63450ba3",
+  "analysis": {
+   "claim_accurate": true,
+   "evidence_lines_verified": {
+    "R/recode-with-table.R:188-203": "Confirmed. The for loop at lines 188-214 previously passed 'database_name = database_name' (the full vector) to recode_call(). Commit 63450ba3 changed this to 'database_name = data_name' (the loop variable). The fix is one line at L195.",
+    "R/recode-with-table.R:320": "Confirmed. grepl(database_name, variable_details$databaseStart) inside recode_call() now correctly receives a scalar string because the caller passes data_name."
+   },
+   "commit_details": {
+    "hash": "63450ba3",
+    "message": "Fix list-mode rec_with_table applying first database's rules to all databases",
+    "changed_files": [
+     "R/recode-with-table.R",
+     "tests/testthat/test-recode-list-mode.R"
+    ],
+    "diff_summary": "One-character fix: 'database_name = database_name' -> 'database_name = data_name'. Regression test added (53 lines in test-recode-list-mode.R)."
+   },
+   "notes": "The finding was accurate as written. The bug was real: every dataframe after the first in a list input was silently recoded with the first database's worksheet rows, because recode_call() received the full vector and grepl() on a vector uses only the first element. The severity=high designation is correct - this is a silent data-corruption bug in a core documented API mode."
+  },
+  "_source": "verify-salvaged-20.json"
+ },
+ {
+  "index": 21,
+  "dim": "engine-internals",
+  "title": "Interval parser silently mangles set-syntax recStart ('[7,8,9]' becomes interval [7,8], third value dropped to else)",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED - not fixed by any recent commit",
+  "corrections": "The evidence description slightly mischaracterises the intermediate step. The parser does not produce 'interval [7,8]' strictly. What actually happens (verified by running the parser logic): strsplit('[7,8,9]', ',') yields ['[7', '8', '9]'] (length 3). Only [[1]] and [[2]] are used. interval_right = substr('8', 1, 1) = '8', so interval = '[,8' which is NOT in valid_intervals ('[,]', '[,)', '(,]'). The invalid-interval branch fires (line 606-608), emitting the 'invalid interval was passed. Default interval will be used: [,]' message, and interval is reset to '[,]'. The effective recode range is [7, 8] with a closed interval -- value 9 is never matched by this row. The claim that value 9 'goes to else' is correct. The claim that this is currently 'accidentally correct' is also confirmed: all 14 affected rows across 10 HUI variables (HUI_01 through HUI_09 and HUI_07A) have the same recEnd for the '[7,8,9]' row and the else row (both NA::b), so value 9 still gets NA::b via the else fallback. The silent message about 'invalid interval' is the only runtime signal. No correction needed to the core claim; the intermediate interval value is '[,8' (not a named interval), not 'interval [7,8]' as stated in the title -- the title conflates the mangle with the fallback interval.",
+  "notes": "Bug is unfixed in the current working tree. The recent commits (b7723dd5 ADL/alcohol 3-step rewrite, 63450ba3 list-mode fix) do not touch the interval parser at recode-with-table.R:571-601. The 14 affected worksheet rows are all in HUI_ variables (HUI_01, HUI_02, HUI_03, HUI_04, HUI_05, HUI_06, HUI_07, HUI_07A, HUI_08, HUI_09) and all currently map [7,8,9] -> NA::b with else -> NA::b, masking the bug. The risk is latent: if a future worksheet author writes '[7,8,9]' expecting all three values to be caught and assigns a different recEnd from the else row, value 9 will silently recode to the else value. The design issue is structural: the parser assumes exactly 2 comma-separated elements in a bracket expression (an interval), but brackets are also used as set notation in some worksheets. There is no parser-level rejection of set syntax and no documentation warning against it.",
+  "cited_lines_verified": {
+   "recode-with-table.R:571-601": "CONFIRMED - interval parser code unchanged; only reads from_values[[1]] and [[2]]",
+   "recode-with-table.R:604-609": "CONFIRMED - invalid interval fallback to [,] with message",
+   "live_repro": "CONFIRMED - running the parser logic against '[7,8,9]' produces interval '[,8' -> invalid -> '[,]', left_boundary=7, right_boundary=8, third value 9] in from_values[[3]] never accessed",
+   "worksheet_instances": "CONFIRMED - 14 rows across 10 HUI variables in inst/extdata/variable_details.csv; all are [7,8,9] -> NA::b with else -> NA::b (accidental correctness holds)"
+  },
+  "_source": "verify-salvaged-21.json"
+ },
+ {
+  "index": 22,
+  "dim": "engine-internals",
+  "title": "Split missing-data regime: literal 'NA(b)' string sentinels for categoricals vs haven::tagged_na for continuous; factor coercion destroys tagged NAs",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "",
+  "notes": "Not fixed by either committed repair (b7723dd5 ADL/alcohol rewrite touched only R/adl.R, R/alcohol.R, R/clean-variables.R, R/missing-pattern-cache.R; 63450ba3 list-mode fix changed a single line in rec_with_table loop). All three cited locations are present unchanged in the current working tree: (1) recode-with-table.R:807-825 (recode_variable_NA_formating) still uses paste('NA(', tag, ')') for cat type and tagged_na(tag) for cont type; (2) recode-with-table.R:953 still calls as.factor(unlist(...)) for derived cat variables. Live R verification confirmed: as.factor(c(1,2,tagged_na('b'))) produces levels '1','2' with the third element becoming NA (is.na TRUE) but na_tag() on the resulting factor errors with 'x must be a double vector' -- the tag is destroyed. Also confirmed: paste('NA(', 'b', ')', sep='') = 'NA(b)' and is.na('NA(b)') = FALSE, so categorical missing values are literal strings for which is.na() returns FALSE. Both incompatible encoding paths coexist in the same engine as claimed.",
+  "evidence_verified": {
+   "recode_variable_NA_formating_lines_807_825": "CONFIRMED - line 811-812: cat type -> paste('NA(', na_value_list[[3]], ')'); line 813-814: non-cat type -> tagged_na(as.character(na_value_list[[3]]))",
+   "as_factor_unlist_line_953": "CONFIRMED - line 952-953: cat derived variables coerced with as.factor(unlist(column_value[['column_being_added']]))",
+   "tag_destruction": "CONFIRMED - live R test: as.factor(c(1,2,tagged_na('b'))) drops 'b' tag; na_tag() on resulting factor errors",
+   "is_na_false_for_cat_missing": "CONFIRMED - is.na('NA(b)') = FALSE"
+  },
+  "_source": "verify-salvaged-22.json"
+ },
+ {
+  "index": 23,
+  "dim": "engine-internals",
+  "title": "Derived-variable dispatch: deprecated rowwise()+do() calling custom functions once per row via unnamed positional do.call",
+  "isReal": true,
+  "severity": "high",
+  "severity_ok": true,
+  "corrections": "None. Evidence confirmed exactly as cited. The rowwise()+do() pattern is at lines 939-946 of R/recode-with-table.R; the unnamed positional do.call(get(custom_function_name), row_values) is at lines 978-980. The importFrom on line 150 explicitly imports do from dplyr, confirming intentional use. Both the ADL/alcohol rewrite (b7723dd5) and the list-mode fix (63450ba3) touch entirely different code paths (ADL/alcohol: R/adl.R + R/alcohol.R; list-mode: line 192 only). The dispatch block at lines 937-983 is byte-for-byte identical to the description.",
+  "notes": "Not fixed by recent commits. This finding stands in full. Three sub-claims verified: (1) rowwise()+do() at 939-946 - confirmed; (2) select(used_feeder_vars) bare character vector at 940 (no all_of()) - confirmed; (3) unnamed positional do.call at 978-980 - confirmed. The function calculate_custom_function_row_value calls do.call(get(custom_function_name), row_values) where row_values is an unnamed list, so formals-to-positional matching is entirely the callers responsibility with no check. This is a structural defect independent of the two committed repairs.",
+  "cited_files": [
+   "R/recode-with-table.R:937-947",
+   "R/recode-with-table.R:974-983"
+  ],
+  "verification_date": "2026-06-11",
+  "_source": "verify-salvaged-23.json"
+ },
+ {
+  "index": 24,
+  "dim": "engine-internals",
+  "title": "Plain data.frame routed into the list branch when ncol(data) == length(database_name)",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "None required. The evidence is accurate. The cited lines (186-187 in R/recode-with-table.R) are present and unchanged in the current working tree. The condition `if (is.list(data) && length(database_name) == length(data))` is TRUE for any data.frame because `is.list(data.frame)` returns TRUE in R and `length(df)` returns column count not row count. The list-mode fix commit (63450ba3) only fixed the `database_name` vector being passed to recode_call instead of the loop variable; it did not touch the type-dispatch condition at line 186-187. The is.list() misclassification bug is entirely separate and remains unfixed.",
+  "notes": "Live repro confirmed: a 1-column data.frame with 1 database_name causes the condition at line 186-187 to fire (is.list(df)=TRUE, length('cchs2001_p')==1==length(df)). The code then tries data[['cchs2001_p']] which is NULL (the column is named 'x', not 'cchs2001_p'), triggering the stop() at line 205-213 with the misleading message 'The data cchs2001_p is missing from the passed list please verify the names are correct in the data list and the database_name list' -- a user who never passed a list. The same mis-routing also fires for any k-column data.frame when exactly k database names are provided. The correct fix is to check `inherits(data, 'data.frame')` first (before the is.list() branch) since data.frames are lists. The severity=medium rating is appropriate: the trigger condition (ncol exactly equals length(database_name)) is uncommon in normal use, but a 1-column harmonization is plausible and the error message is genuinely misleading.",
+  "evidence_file": "R/recode-with-table.R lines 186-187 (current working tree, branch fix/v3-smoking-worksheet-sync)",
+  "commit_context": "The related list-mode fix (63450ba3) addressed database_name vector pass-through but left the is.list() type-dispatch condition untouched. This finding is independent of that fix.",
+  "_source": "verify-salvaged-24.json"
+ },
+ {
+  "index": 25,
+  "dim": "labels-metadata-layer",
+  "title": "rec_with_table() fails on any tibble input inside label_data(); issue #159 misdiagnoses this as a haven_labelled problem",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "The claim says nine single-bracket uses but current code has 14 occurrences within label_data (lines 184-214). This is a minor count discrepancy that does not affect the finding. The core claim is accurate.",
+  "notes": "Verified against current working tree (branch fix/v3-smoking-worksheet-sync, HEAD 63450ba3).\n\nCONFIRMED REAL. No fix applied to label-utils.R in any of the committed changes (b7723dd5, 63450ba3).\n\nEvidence verified:\n1. label_data() at R/label-utils.R:175-216 uses data_to_label[, variable_name] (single bracket) 14 times - preserves the tibble dimension, returns a 1-col tibble not a vector.\n2. R behavior confirmed: as.numeric(tibble[, \"x\"]) throws \"list object cannot be coerced to type double\" - identical to the reported error.\n3. is.factor(tibble[, col]) is always FALSE (it returns a tbl, not a vector), causing the cat-type branch to always re-coerce.\n4. recoded_data = data[, 0] inherits class from data, so a tibble input produces a tibble recoded_data that is then passed to label_data.\n5. Issue #159 (big-life-lab/cchsflow) is OPEN, assigned to yulric, with problem description blaming haven_labelled class.\n6. Misdiagnosis confirmed: stripping haven_labelled while keeping tibble class still throws the identical error - the root cause is tibble single-bracket semantics, not the haven_labelled class.\n\nNo changes in the ADL/alcohol repair (b7723dd5) or list-mode fix (63450ba3) touch label-utils.R.\ngrep for as.data.frame, tibble, drop in label-utils.R returns no results.\n\nSeverity high is appropriate: affects every call with data from haven::read_sav, readr::read_csv, or any tidyverse import path - which is essentially all modern CCHS data delivery.",
+  "_source": "verify-salvaged-25.json"
+ },
+ {
+  "index": 26,
+  "dim": "labels-metadata-layer",
+  "title": "set_data_labels()/merge_rec_data() hard-stop on the package's own shipped worksheets (heterogeneous variableStartLabel)",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED. The finding is real and unrepaired in the current working tree.",
+  "analysis": {
+   "code_path": "/Users/dmanuel/github/cchsflow/R/label-utils.R",
+   "lines": "132-148",
+   "mechanism": "create_label_list_element() reads variableStartLabel from row[0] as the baseline label_long value, then for every subsequent cat-type row enforces that variableStartLabel is identical, stop()ing if any row differs. The function receives ALL rows for a variable across all databases with no database filtering.",
+   "affected_variables_in_current_worksheets": [
+    {
+     "variable": "DHHGAGE_cat5",
+     "label_values_seen": [
+      "Age (20-year age groups)",
+      "Age"
+     ],
+     "row_count": 16,
+     "mismatch_rows": 8
+    },
+    {
+     "variable": "SMKG203_2005plus",
+     "label_values_seen": [
+      "Age started to smoke daily - former daily smoker",
+      "Age started to smoke daily - daily smoker (G)"
+     ],
+     "row_count": "not counted separately",
+     "mismatch_rows": "multiple"
+    }
+   ],
+   "error_message_confirmed": "DHHGAGE_cat5 does not contain all identical variableStartLabel variable cant change variableLabel for different values. VAL1: Age (20-year age groups) VAL2: Age",
+   "design_flaw": "variableStartLabel is the StatCan label of the source variable, which legitimately differs across cycles (e.g. CCHS renamed 'Age (20-year age groups)' to plain 'Age' in later cycles). The engine treats this metadata-about-the-source as if it were the harmonized-variable label, then enforces homogeneity with stop().",
+   "not_fixed_by_recent_commits": "Commits b7723dd5 (ADL/alcohol) and 63450ba3 (list-mode fix) both leave label-utils.R untouched. git log -- R/label-utils.R shows no recent changes.",
+   "scope": "set_data_labels() is exported and called by merge_rec_data(). Any user calling set_data_labels() on rec_with_table() output that includes DHHGAGE_cat5 or SMKG203_2005plus will get a hard stop(). DHHGAGE_cat5 is a core demographics variable used in virtually every analysis."
+  },
+  "corrections": "None needed. Evidence is accurate: lines 132-148 of label-utils.R contain the exact stop() call described; variable_details.csv currently has 2 cat variables with heterogeneous variableStartLabel; DHHGAGE_cat5 has 8 of 16 rows with 'Age' vs 'Age (20-year age groups)'. The evidence citation says 'labels-repro3.R: rec_with_table(cchs2015_2016_p, DHHGAGE_cat5) succeeds, but set_data_labels() on its output ERRORs' - this is mechanistically correct.",
+  "_source": "verify-salvaged-26.json"
+ },
+ {
+  "index": 27,
+  "dim": "labels-metadata-layer",
+  "title": "Categorical missing is a literal factor level 'NA(a)/NA(b)/NA(c)' while continuous missing is tagged_na - inconsistent semantics that break is.na(), block SPSS",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED - finding is accurate and still present in the current working tree",
+  "corrections": "None required. The evidence correctly cites recode_variable_NA_formating at R/recode-with-table.R:807-825. The function uses paste(\"NA(\", na_value_list[[3]], \")\", sep = \"\") for cat type (line 812) and tagged_na(as.character(na_value_list[[3]])) for cont type (line 814), exactly as described. The as.factor(unlist(...)) coercion for derived categoricals at line 953 is also present unchanged. Neither of the recent commits (b7723dd5 ADL/alcohol rewrite, 63450ba3 list-mode fix) touched recode_variable_NA_formating. The categorical NA(b) string-literal encoding is still the live behavior.",
+  "notes": "The two committed fixes on this branch do not address this finding. b7723dd5 rewrote ADL/alcohol 3-step functions and does not change the engine's NA encoding. 63450ba3 fixed list-mode database dispatch (passing data_name instead of database_name to recode_call). recode_variable_NA_formating remains untouched. The is.na() breakage and SPSS write_sav() incompatibility described remain real defects in the current working tree. The label-utils.R:183-205 pathway (which coerces cat vars to factor and calls set_labels) is also unchanged.",
+  "evidence_check": {
+   "recode-with-table.R:807-825": "CONFIRMED - function body matches description exactly",
+   "cat branch (line 812)": "paste(\"NA(\", na_value_list[[3]], \")\", sep = \"\") - confirmed",
+   "cont branch (line 814)": "tagged_na(as.character(na_value_list[[3]])) - confirmed",
+   "as.factor coercion (line 953)": "as.factor(unlist(column_value[[\"column_being_added\"]])) - confirmed",
+   "recent commits scope": "b7723dd5 = ADL/alcohol only; 63450ba3 = recode_call database_name fix only; neither touches this function"
+  },
+  "_source": "verify-salvaged-27.json"
+ },
+ {
+  "index": 28,
+  "dim": "labels-metadata-layer",
+  "title": "Value labels are attached in a nonstandard sjlabelled-on-factor form (character-coded 'labels' attr) that labelled/haven cannot consume",
+  "isReal": true,
+  "severity": "high",
+  "severity_ok": true,
+  "verdict": "CONFIRMED. The finding accurately describes the current state of label-utils.R and is not touched by either recent commit (b7723dd5 ADL/alcohol, 63450ba3 list-mode fix - both checked via git show --stat).",
+  "evidence_checked": [
+   "R/label-utils.R:183-196 - code matches exactly: factor coercion then sjlabelled::set_labels, then custom labels_long attr",
+   "R/label-utils.R:207-212 - label, unit, label_long attrs attached via set_label<- and attr()",
+   "Live repro DHHGAGE_cat5: class=factor, typeof labels=character, inherits haven_labelled=FALSE, inherits labelled=FALSE",
+   "labelled::val_labels() returns NULL (cannot read the labels)",
+   "labels attr contains character-coded values: '1','2','3','4','5','NA(a)','NA(b)' - opaque codes not human-readable text",
+   "Factor levels are numeric codes ('1','2','3','4'), not label text - user sees codes not labels in table() output",
+   "sjlabelled::set_labels on a factor with NA(x) string levels stores labels as typeof=character (confirmed by isolated test)",
+   "haven::write_sav() succeeds on this output (claim says 'labelled/haven cannot consume' - write_sav works, but val_labels is NULL so the labelling metadata is invisible to haven/labelled)"
+  ],
+  "corrections": "Minor claim precision: haven::write_sav() does not error on the output (unlike what the truncated evidence text implies). The actual problem is that the labels are invisible to the labelled/haven ecosystem (labelled::val_labels() = NULL, inherits haven_labelled = FALSE), not that write_sav() fails. The write_sav failure described in the evidence appears to be for the NA(b) string-level case from a separate repro script (labels-repro2.R, DHH_SEX with string NA levels); DHHGAGE_cat5 write_sav succeeds. Core claim stands: the 'labels' attribute stores character codes in a private sjlabelled-on-factor convention, not the haven_labelled numeric-coded form, so gtsummary, labelled::to_factor(), and similar tools cannot consume it as intended.",
+  "notes": "Neither recent commit (ADL/alcohol rewrite b7723dd5, list-mode fix 63450ba3) touches R/label-utils.R. git log -- R/label-utils.R shows last modification was 7c0ff532 'update documentation for set_data_labels'. The finding is real and unfixed in the current working tree.",
+  "_source": "verify-salvaged-28.json"
+ },
+ {
+  "index": 29,
+  "dim": "labels-metadata-layer",
+  "title": "variables.csv label/labelLong are dead for labelling; labels actually come from variable_details' source-variable label columns, contradicting the documented AP",
+  "isReal": true,
+  "severity": "medium",
+  "severity_ok": true,
+  "corrections": "None required. All cited evidence is verified against the current working tree (branch fix/v3-smoking-worksheet-sync, after commits b7723dd5 and 63450ba3). The ADL/alcohol and rec_with_table list-mode fixes are not related to this finding.",
+  "verification": {
+   "strings_R_27_28": "CONFIRMED: pkg.globals$argument.VariableLabel = 'variableStartLabel'; pkg.globals$argument.VariableLabelShort = 'variableStartShortLabel'",
+   "create_label_list_element_101_104": "CONFIRMED: label_long reads variable_details[['variableStartLabel']], label reads variable_details[['variableStartShortLabel']] - never reads 'label' or 'labelLong' columns",
+   "update_variable_details_merge": "CONFIRMED: update_variable_details_based_on_variable_sheet (recode-with-table.R:758-795) merges variables.csv label/labelLong into variable_details, but create_label_list_element never reads those column names",
+   "variable_details_columns": "CONFIRMED: variable_details has 'variableStartLabel' and 'variableStartShortLabel', no plain 'label' column",
+   "live_repro": "CONFIRMED: Mutating variables.csv label for HWTGHTM to 'MUTATED LABEL FROM VARIABLES_CSV' and calling set_data_labels() still produces attr(label)='Height' (from variableStartShortLabel in variable_details, not from variables.csv)",
+   "test_label_utils": "CONFIRMED: test-label-utils.R line 14-16 compares attr(label) against variables$label and passes only because variableStartShortLabel == label in the current shipped worksheets (coincidental agreement, not architectural enforcement)",
+   "fixed_by_commits": false,
+   "notes": "This finding is real and unmodified by the ADL/alcohol/list-mode commits. The severity=medium seems appropriate: it is a design inconsistency (two label stores, one silent dead) but not a data-corruption risk since both stores currently agree. It does create a maintainer trap: updating variables.csv label/labelLong has no effect on labelling output."
+  },
+  "_source": "verify-salvaged-29.json"
+ },
+ {
+  "finding_index": 3,
+  "issue_title": "rec_with_table() has 11 parameters; custom_function_path is never exercised and two more are nearly dead",
+  "dim": "api-surface-ux",
+  "severity": "medium",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED - finding is real and unaffected by the committed fixes",
+  "verification_date": "2026-06-11",
+  "checks_performed": [
+   {
+    "check": "Parameter count",
+    "result": "CONFIRMED: rec_with_table() has exactly 11 parameters at R/recode-with-table.R:154-165: data, variables, database_name, variable_details, else_value, append_to_data, log, notes, var_labels, custom_function_path, attach_data_name"
+   },
+   {
+    "check": "custom_function_path usage in vignettes+tests",
+    "result": "CONFIRMED ZERO: grep of vignettes/ and tests/testthat/ finds 0 actual call-site uses of custom_function_path. The parameter exists only in the function signature, Roxygen docs, and two internal lines (the null-check and source() call at lines 167-168). The source() call at line 168 is indeed a code-injection-shaped design."
+   },
+   {
+    "check": "else_value usage as call-site argument",
+    "result": "CONFIRMED ZERO explicit call-site uses in vignettes+tests. The evidence claimed 'else_value 1' but the single occurrence is a documentation-only mention in vignettes/get_started.Rmd:220 ('- `else_value` defaults to NA. Values out of range set to NA.'), not an actual function argument. Making the 'nearly dead' characterization even stronger than stated."
+   },
+   {
+    "check": "append_to_data usage as call-site argument",
+    "result": "CONFIRMED ZERO explicit call-site uses in vignettes+tests (only a documentation mention at get_started.Rmd:221). One use found only in ceps/cep-006-oral-health/integration-test-den.R which is a CEP integration test outside the main test suite."
+   },
+   {
+    "check": "deparse(substitute()) default for database_name",
+    "result": "CONFIRMED at R/recode-with-table.R:182: `database_name <- deparse(substitute(data))`. This magic-naming default breaks under pipes, function calls, and loops as claimed."
+   },
+   {
+    "check": "User feedback reference at /tmp/recodeflow-pr43/index.qmd:39",
+    "result": "CONFIRMED: index.qmd:39 reads '- The function having too many parameters (complex API) etc.' as a listed user feedback issue motivating the v4 refactor."
+   },
+   {
+    "check": "Impact of committed fixes (b7723dd5 ADL/alcohol 3-step, 63450ba3 list-mode fix)",
+    "result": "NOT AFFECTED: Neither commit touches the rec_with_table() signature, removes custom_function_path, else_value, or append_to_data, or changes the deparse/substitute behavior. The list-mode fix (63450ba3) added test-recode-list-mode.R which adds one notes=FALSE and one database_name= usage to counts, but the core API-bloat finding stands entirely."
+   },
+   {
+    "check": "Evidence usage count discrepancy",
+    "result": "MINOR: The evidence claimed 'else_value 1, append_to_data 1' counting documentation-only mentions as usages, and 'var_labels 8' vs the 4 found. The discrepancy does not affect the finding's validity - if anything the parameters are more dead than the evidence stated."
+   }
+  ],
+  "corrections": "The evidence slightly overstates usage for else_value and append_to_data (counts documentation-only mentions in get_started.Rmd as 'usages'). Actual call-site use of both in vignettes+tests is zero. var_labels count is 4 in vignettes+tests, not 8 as stated (the '8' figure likely included all references to the string 'var_labels' including comments and @param lines). These are minor overcounts in the same direction as the finding - the parameters are actually more dead than claimed. No corrections needed to the finding itself.",
+  "notes": "The finding is unambiguously real. All three key claims verified: (1) 11 parameters confirmed at lines 154-165; (2) custom_function_path has 0 call-site uses anywhere in vignettes or test suite; (3) deparse(substitute()) at line 182 creates the magic-naming fragility described. The 'code-injection-shaped design' for custom_function_path is accurately described - source(custom_function_path) at line 168 executes arbitrary R code from a user-supplied path with no sandboxing. The medium severity rating is appropriate: this is a UX/maintainability issue rather than a data-corruption bug.",
+  "_source": "verify-salvaged-3.json"
+ },
+ {
+  "index": 30,
+  "dim": "missing-data-architecture",
+  "title": "NA::a/NA::b hardcoded across the v3 stack and QA schema; recodeflow spec requires NA::<any lowercase>",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED - real finding, severity medium is appropriate",
+  "evidence_verified": {
+   "missing_pattern_cache_R_252_256": {
+    "confirmed": true,
+    "detail": "Lines 248-258: grepl('^NA::') branch entered for any NA:: tag, but only NA::a and NA::b have assignment branches. Any NA::c/NA::d row hits `next` with its codes silently discarded - no na_c bucket, no warning. Exactly as claimed."
+   },
+   "cache_pattern_validation_line_115": {
+    "confirmed": true,
+    "detail": "cache_pattern() at line 115 validates: !all(c('na_a_codes', 'na_b_codes') %in% names(pattern)) - two-slot structure required. A third tag slot (na_c_codes) would not be enforced by this validation; callers have no slot to write NA::c codes into."
+   },
+   "variable_details_yaml_schema": {
+    "confirmed": true,
+    "detail": "inst/metadata/schemas/core/variable_details.yaml line 140: pattern NA::[ab] - explicitly constrains recEnd to only 'a' or 'b'. NA::c would fail schema validation."
+   },
+   "parse_range_notation_clean_variables_R_714": {
+    "confirmed": true,
+    "detail": "clean-variables.R line 714: regex '^(NA::[ab]|copy|else)$' - only [ab] recognized as special codes. NA::c would fall through all branches and not be handled."
+   },
+   "resolve_else_value_and_apply_else_rule": {
+    "confirmed": true,
+    "detail": "clean-variables.R lines 349-352 and 507-511: both functions only test action == 'NA::a' / action == 'NA::b'. NA::c or other tags hit the else/unknown branch and return NULL (keep original)."
+   },
+   "metadata_registry_yaml_contradiction": {
+    "confirmed": true,
+    "detail": "inst/metadata/documentation/metadata_registry.yaml line 108 lists r_compliant_values as ['NA::a', 'NA::b', 'NA::c', 'NA::d'] - the documentation layer acknowledges four tags but the implementation only handles two."
+   },
+   "current_worksheet_impact": {
+    "detail": "grep of inst/extdata/variable_details.csv finds ZERO rows with NA:: tags other than NA::a and NA::b. No current data corruption occurs, but any v4 worksheet author adding NA::c (e.g., to distinguish Don't Know from Refusal as the spec envisions) would get silent drops."
+   },
+   "recodeflow_spec": {
+    "detail": "/tmp/recodeflow-pr43/missing-data.qmd lines 22-25 confirmed: 'standard NA::<type> where type can any lowercase character' - spec explicitly permits any lowercase letter."
+   }
+  },
+  "corrections": "The evidence accurately identifies the six hardcoding call sites. The claim about silent dropping is confirmed at missing-pattern-cache.R:249-257. The schema constraint at variable_details.yaml:140 is also confirmed. The claim is slightly incomplete in not mentioning that parse_range_notation in clean-variables.R:714 also hardcodes [ab], and that metadata_registry.yaml actually documents NA::c/NA::d as r_compliant_values (contradicting the schema). No evidence of fixes by recent commits (b7723dd5 ADL/alcohol repair, 63450ba3 rec_with_table list-mode fix) - both commits are unrelated to NA:: tag generalization.",
+  "notes": "The finding is real and not fixed by the two recent commits. The current practical impact is zero because the worksheet contains no NA::c or similar rows, but the infrastructure gap is a genuine v4 design constraint: worksheet authors cannot express Don't Know (7) vs Refusal (8) vs Not Stated (9) as separate tags even though CCHS source data has these distinctions and the recodeflow spec explicitly envisions them. The severity=medium is appropriate given zero current worksheet exposure.",
+  "_source": "verify-salvaged-30.json"
+ },
+ {
+  "index": 31,
+  "dim": "missing-data-architecture",
+  "title": "missing_priority_rules.yaml never shipped \u2014 built-in fallback silently inverts documented CCHS priority (NA::a wins instead of NA::b)",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED",
+  "corrections": "None needed. Every piece of evidence checks out exactly against the current working tree (fix/v3-smoking-worksheet-sync).",
+  "evidence_verification": {
+   "yaml_files_absent": "find inst/metadata -type f confirms only 3 files: documentation/metadata_registry.yaml, schemas/core/variable_details.yaml, schemas/core/variables.yaml. Neither schemas/cchs/missing_priority_rules.yaml nor schemas/core/missing_priority_rules.yaml is present.",
+   "fallback_confirmed": "missing-data-functions.R:196 reads: rules <- list(na_a = 1, na_b = 2) # na_a higher priority as general fallback",
+   "priority_semantics_confirmed": "apply_priority_hierarchy (lines 314-328) selects the value with the LOWEST numeric priority (priority < highest_priority), so na_a=1 beats na_b=2 in the fallback. This inverts the intended CCHS hierarchy.",
+   "documented_intent_confirmed": "missing-data-functions.R:85 roxygen comment: # CCHS priority: 'Not Stated' (NA::b) > 'Not Applicable' (NA::a) \u2014 the documented intent is the opposite of the fallback behaviour.",
+   "yaml_exists_on_wrong_branch": "The YAML files were created in commit 370b673b on branch 3-step-tidyverse and were never merged. The CCHS YAML correctly sets na_b=1, na_a=2 (NA::b wins), confirming the design intent. The omission from main/v3 lineage is the bug.",
+   "recent_commits_did_not_fix": "Commits b7723dd5 (ADL/alcohol 3-step rewrite) and 63450ba3 (list-mode fix) do not touch missing-data-functions.R or inst/metadata schemas."
+  },
+  "notes": "Not fixed by the ADL/alcohol or list-mode commits. The YAML files exist only on the abandoned 3-step-tidyverse branch. On every installation today, get_priority_missing() silently returns NA::a over NA::b whenever both are present, the inverse of the documented CCHS convention.",
+  "_source": "verify-salvaged-31.json"
+ },
+ {
+  "index": 32,
+  "dim": "missing-data-architecture",
+  "title": "Level 2A database-config-loader never migrated: exported get_missing_pattern_auto() always errors; auto_detect_database() permanently on hardcoded fallback",
+  "isReal": true,
+  "severity": "high",
+  "severity_ok": true,
+  "corrections": "",
+  "notes": "Fully confirmed in current working tree (branch fix/v3-smoking-worksheet-sync, HEAD=63450ba3). load_database_config and auto_detect_database_type are called in R/missing-pattern-cache.R but defined nowhere in the package. Line 873 (get_missing_pattern_auto): config <- load_database_config(database_type) \u2014 unguarded, always errors. Line 451: exists() guard in auto_detect_database() falls back to hardcoded config; lines 464-465 (auto_detect_database_type / load_database_config) are dead code behind that guard. NAMESPACE line 96: export(get_missing_pattern_auto) confirmed. Empirical: get_missing_pattern_auto(\"HWTGBMI_der\") -> ERROR: could not find function \"load_database_config\". Not touched by the two recent commits (b7723dd5 ADL/alcohol rewrite; 63450ba3 list-mode fix) \u2014 neither modified missing-pattern-cache.R. The finding was real at discovery and remains real now.",
+  "verified_files": [
+   "/Users/dmanuel/github/cchsflow/R/missing-pattern-cache.R",
+   "/Users/dmanuel/github/cchsflow/NAMESPACE"
+  ],
+  "_source": "verify-salvaged-32.json"
+ },
+ {
+  "index": 33,
+  "dim": "missing-data-architecture",
+  "title": "No cache invalidation: worksheet edits mid-session yield mixed-version results; clear API is partial; user-supplied variable_details ignored by the 3-step stack",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "The evidence is accurate. All 6 session-level caches are confirmed: .missing_patterns_cache (missing-pattern-cache.R:26), .database_warnings_cache (:27), .complete_patterns_cache (:884), .priority_rules_cache (missing-data-functions.R:151), .cchsflow_cache$pattern_warnings (clean-variables.R:14-15), .variable_warnings_cache (worksheet-getters.R:22-24). None stores a worksheet fingerprint or file mtime in its keys - keys are (variable, database) only for the two missing-pattern caches and (variable::database) string for complete_patterns_cache. Clear API is confirmed partial: only clear_missing_patterns_cache() and clear_complete_patterns_cache() are exported; .database_warnings_cache, .priority_rules_cache, .cchsflow_cache$pattern_warnings, and .variable_warnings_cache have no exported clear function. The 3-step DV functions (calculate_bmi, assess_adl, etc.) accept no variable_details parameter; they call clean_variables() -> get_complete_pattern() -> get_variable_details() with hardwired use_rdata=FALSE (CSV), but the parsed result is cached in .complete_patterns_cache with no invalidation on CSV change. Neither the b7723dd5 (ADL/alcohol rewrite) nor 63450ba3 (list-mode fix) commits touched cache invalidation. load_worksheet_metadata (worksheet-loaders.R:32) re-reads the CSV on each call when use_rdata=FALSE, but that only applies to the uncached first call path; subsequent calls hit the stale .complete_patterns_cache. The minor truncation in the evidence field (evidence ends after \"Keys are (variable, database) only:\") does not affect correctness of the substantive claims.",
+  "notes": "Not fixed by either of the two committed repairs. The finding describes a genuine architectural gap: six independent session-level caches with no worksheet fingerprinting, two of the four caches for which no clear function exists at all, and zero capability to pass fresh variable_details into the 3-step DV function stack. The severity=high designation is appropriate given that cchsflow development workflow edits variable_details.csv constantly in live R sessions, meaning stale cached patterns silently affect recode output within the same session.",
+  "verified_lines": {
+   "missing_patterns_cache": "missing-pattern-cache.R:26-27",
+   "complete_patterns_cache": "missing-pattern-cache.R:884",
+   "priority_rules_cache": "missing-data-functions.R:151",
+   "pattern_warnings_cache": "clean-variables.R:14-15",
+   "variable_warnings_cache": "worksheet-getters.R:22-24",
+   "exported_clears_only": [
+    "clear_missing_patterns_cache",
+    "clear_complete_patterns_cache"
+   ],
+   "dv_no_variable_details_param": "bmi.R:82 (calculate_bmi), clean-variables.R:55 (clean_variables)"
+  },
+  "_source": "verify-salvaged-33.json"
+ },
+ {
+  "index": 34,
+  "dim": "missing-data-architecture",
+  "title": "Process-local caches under parallel workers: cold-start re-derivation, per-worker warning storms, serial/parallel divergence after worksheet edits, RData write",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "Minor: evidence cites file size as 1.78 MB; actual current size is 1.70 MB (1,783,044 bytes) after recent worksheet cleaning commits \u2014 a trivial measurement drift that does not affect the finding. The '3,839 data rows' count is exact. The .variable_warnings_cache uses a lazy if(!exists()) guard (worksheet-getters.R:22) rather than being assigned at parse time, but it is still a process-local namespace environment and behaves identically under parallel workers (each worker gets its own empty instance). The six-cache count is confirmed.",
+  "notes": "All core claims confirmed against working tree. Six process-local namespace environments verified: .missing_patterns_cache and .database_warnings_cache (missing-pattern-cache.R:26-27), .complete_patterns_cache (missing-pattern-cache.R:884), .priority_rules_cache (missing-data-functions.R:151), .cchsflow_cache with .cchsflow_cache$pattern_warnings (clean-variables.R:14-15), .variable_warnings_cache (worksheet-getters.R:22). Under PSOCK/future-multisession workers each cchsflow namespace load starts with empty caches \u2014 correct behavior but with cold-start re-derivation cost per worker per variable. The RData file-write race is real: worksheet-loaders.R:61 calls save_metadata_to_rdata() with rdata_file derived from system.file() (line 35), which points to the INSTALLED package directory on a normal install \u2014 a CRAN policy violation and a failure mode on read-only shared library installs (the tryCatch on line 115 silently degrades to a warning). The v4 scope outline's 'open question 4' reference is confirmed in ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md on the v4-planning branch (commit c777e1c8). Neither recent commit (63450ba3 list-mode fix, b7723dd5 ADL/alcohol rewrite) touches the cache layer or worksheet-loaders.R. The finding was not fixed by those commits and remains live in the working tree.",
+  "filed_against_commit": "63450ba3",
+  "files_checked": [
+   "R/missing-pattern-cache.R",
+   "R/missing-data-functions.R",
+   "R/clean-variables.R",
+   "R/worksheet-getters.R",
+   "R/worksheet-loaders.R"
+  ],
+  "_source": "verify-salvaged-34.json"
+ },
+ {
+  "index": 4,
+  "issue_title": "Legacy engine error messages are unactionable, typo-ridden, and embed source-code indentation; cli is a dependency but never used",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "All cited evidence confirmed against current working tree (branch fix/v3-smoking-worksheet-sync, HEAD 63450ba3). No commits in the ADL/alcohol repair (b7723dd5) or list-mode fix (63450ba3) touched error messages or DESCRIPTION. The finding is fully unaddressed.\n\nSpecific evidence verified:\n1. R/recode-with-table.R:750 -- stop(\"Invalid Argument was passed\") present verbatim; no variable, no value, no hint.\n2. R/recode-with-table.R:297-300 -- 'The passed labels was not a named vector please follow\\n          the c(var_name = varLalbel) format' -- typo 'varLalbel' confirmed; the string literal contains embedded source-code indentation (multi-space indent from the R source formatting is part of the string).\n3. R/recode-with-table.R:495/500 -- 'more then once' typo confirmed at lines 495 (comment) and 500 (stop() message).\n4. R/recode-with-table.R:171-172 and 176-177 -- message() strings embed source-code indentation whitespace.\n5. R/recode-with-table.R:209-210 and 235-238 -- stop(paste(...)) strings embed source-code indentation.\n6. DESCRIPTION line 47: cli listed in Depends (confirmed).\n7. grep cli::  R/*.R -- zero hits in package R/ source (only coincidental substring 'recycling'). cli is used exclusively by developer scripts exec/check-worksheets.R and exec/fix-worksheets.R, which live outside the package code path.\n\nNo corrections to the finding text needed. The severity=high classification is defensible: (a) the cli-in-Depends problem attaches 240 cli symbols to every user search path and is a CRAN NOTE; (b) the typo-ridden messages directly correspond to the #1 user complaint cited in /tmp/recodeflow-pr43/index.qmd ('Users not knowing why a function failure has taken place'); (c) embedded indentation whitespace in stop() strings means the printed message visually looks broken.",
+  "notes": "The two recent commits (b7723dd5 ADL/alcohol refactor, 63450ba3 list-mode fix) are entirely unrelated to this finding -- one touches R/adl.R and R/alcohol.R, the other changes a single argument name in the list loop. Neither modifies error strings or DESCRIPTION. The finding was real when logged and remains real on the current HEAD.",
+  "_source": "verify-salvaged-4.json"
+ },
+ {
+  "index": 5,
+  "dim": "data-artifacts",
+  "title": "Three competing runtime sources of worksheet metadata; one path writes RData into the installed package directory",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "None needed. All cited evidence is confirmed in the current working tree. Minor line-number note: the evidence cites 'worksheet-getters.R:48 and :212-214' \u2014 line 48 is get_variables() (use_rdata=FALSE default, confirmed) and lines 212-214 are get_variable_details() (use_rdata=FALSE default, confirmed). The third source (auto-save RData write) is in worksheet-loaders.R lines 59-61, not in worksheet-getters.R \u2014 this is a presentation ambiguity in the evidence string but the code path is correctly described.",
+  "notes": "All three competing sources confirmed present in the current working tree:\n\n1. LAZY DATA PATH (recode-with-table.R:170-178): rec_with_table() falls back to data(variable_details, package='cchsflow') loading the data/*.RData files \u2014 these have 16 columns (confirmed: ncol=16 in live R session).\n\n2. CSV PATH (worksheet-loaders.R:56-64 via worksheet-getters.R:48,214): get_variables() and get_variable_details() both default use_rdata=FALSE, calling load_worksheet_metadata() which reads inst/extdata/*.csv \u2014 these have 23 columns (confirmed: ncol=23 in live R session). The 7 extra columns (ICES.confirmation, version, lastUpdated, status, reviewNotes, versionNotes, review) are invisible to rec_with_table().\n\n3. AUTO-SAVE RData PATH (worksheet-loaders.R:59-61, save_metadata_to_rdata at :114-125): when load_worksheet_metadata() is called with use_rdata=TRUE (the function's own default), it reads the CSV and then calls save(list=metadata_type, file=rdata_file) where rdata_file is set via system.file('extdata', ..., package='cchsflow'). When the package is installed (not in dev mode), this path resolves to the installed package's extdata/ directory \u2014 a runtime write into the package install tree. No .RData files currently exist in inst/extdata/ (confirmed via ls), so on a fresh install the auto-save would fire on first use_rdata=TRUE call.\n\nThe finding is NOT fixed by the committed ADL/alcohol repair (b7723dd5) or the rec_with_table list-mode fix (63450ba3). Those commits address different dimensions (engine-internals). This data-artifacts finding remains unfixed.",
+  "verified_at": "2026-06-11",
+  "key_files": [
+   "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:170-178",
+   "/Users/dmanuel/github/cchsflow/R/worksheet-loaders.R:32-75,114-125",
+   "/Users/dmanuel/github/cchsflow/R/worksheet-getters.R:48,212-214",
+   "/Users/dmanuel/github/cchsflow/data/variable_details.RData",
+   "/Users/dmanuel/github/cchsflow/inst/extdata/variable_details.csv"
+  ],
+  "_source": "verify-salvaged-5.json"
+ },
+ {
+  "index": 6,
+  "dim": "data-artifacts",
+  "title": "No data-raw/ pipeline: data/*.RData rebuilt by hand with an undocumented 18->10 / 23->16 column projection",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "PARTIALLY_FIXED",
+  "corrections": "The specific numeric claim (18->10 / 23->16 projection) is now stale. The column mismatch was fixed by commit e3fbf85f (Rafidul's CSV worksheet cleaning, 'Cleaned csv worksheets to follow csv-conventiond.md and rebuild RData as a result'). As of the current working tree (HEAD: 63450ba3), data/variables.RData has 18 columns matching inst/extdata/variables.csv (18 cols), and data/variable_details.RData has 23 columns matching inst/extdata/variable_details.csv (23 cols). The columns are identical between CSV and RData in both files. However, the underlying structural finding remains real: (1) no data-raw/ directory exists; (2) no usethis::use_data() call exists anywhere in the package; (3) CONTRIBUTING.md contains zero mention of RData rebuilding, column structure, or any data-raw workflow; (4) the rebuild history is entirely ad hoc commit messages ('rebuilt RData from csv worksheets', 'update .RData files', etc.) with no reproducible script; (5) the rec_with_table() lazy-data fallback at R/recode-with-table.R:173 still calls data(variable_details, package='cchsflow', envir=environment()), which reads from data/*.RData (the lazy-data copy), while the v3 3-step stack uses load_worksheet_metadata() defaulting to inst/extdata/*.csv \u2014 two different sources that could diverge again. The projection mismatch was a symptom; the root cause (no pipeline) persists.",
+  "notes": "The column mismatch that was the centerpiece of the evidence was fixed by e3fbf85f (Rafidul's worksheet cleaning commit listed in the task CONTEXT as already committed). The finding is still real as a structural gap \u2014 no data-raw pipeline, no reproducible RData build procedure \u2014 but the specific 18->10 / 23->16 numeric claim should be updated to reflect that the mismatch was repaired. The 'three competing runtime sources' sub-claim in finding index 5 (data-artifacts) remains fully valid. Severity high is justified by the persistence of the no-pipeline problem even if the current mismatch is gone.",
+  "evidence_check": {
+   "no_data_raw_dir": "CONFIRMED \u2014 ls shows no data-raw directory; git log --diff-filter=A finds no data-raw path ever committed",
+   "no_use_data_call": "CONFIRMED \u2014 grep across all R/ files finds zero use_data or usethis::use_data calls",
+   "contributing_md_silent": "CONFIRMED \u2014 CONTRIBUTING.md contains no mention of RData, data-raw, or rebuild procedure",
+   "ad_hoc_commits": "CONFIRMED \u2014 git log shows 'rebuilt RData', 'update .RData', 'update rdata files' as the only rebuild documentation",
+   "column_projection_18to10_23to16": "STALE \u2014 was accurate for commits before e3fbf85f; as of current tree both RData files match CSV column counts exactly (18/18 and 23/23)",
+   "recode_with_table_lazy_data": "CONFIRMED \u2014 R/recode-with-table.R:173 still falls back to data(variable_details, package='cchsflow') which reads from data/*.RData",
+   "load_worksheet_metadata_csv_path": "CONFIRMED \u2014 worksheet-loaders.R reads inst/extdata/*.csv (not data/*.RData) by default; divergence between the two sources is possible"
+  },
+  "_source": "verify-salvaged-6.json"
+ },
+ {
+  "index": 7,
+  "dim": "data-artifacts",
+  "title": "Git history bloat: 844MB .git, ~420MB of it is 431 committed versions of variable_details.csv",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED - all numeric claims verified against current working tree",
+  "evidence_check": {
+   "git_size": {
+    "claimed": "844M",
+    "measured": "841M",
+    "match": "essentially exact (3MB rounding)"
+   },
+   "variable_details_blobs": {
+    "claimed": "431 unique blobs, 420.4MB",
+    "measured_count": 434,
+    "measured_mb": 423.5,
+    "match": "within expected variation - 3 more blobs than claimed (likely from recent commits on this branch), size matches closely"
+   },
+   "variables_csv_blobs": {
+    "claimed": "325 blobs, 36.8MB",
+    "measured_count": 326,
+    "measured_mb": 36.8,
+    "match": "exact"
+   },
+   "inst_total": {
+    "claimed": "525.9MB across 853 blobs",
+    "measured_mb": 528.7,
+    "match": "close (2.8MB difference, consistent with recent commits adding blobs)"
+   },
+   "docs_dir": {
+    "claimed": "94.2MB",
+    "measured_mb": 94.2,
+    "match": "exact"
+   },
+   "data_raw_dir": {
+    "claimed": "NO data-raw directory",
+    "measured": "MISSING - confirmed absent",
+    "match": "exact"
+   },
+   "CCHS_DDI_xml": {
+    "claimed": "23 blobs, 51.6MB (deleted, still in history)",
+    "measured_count": 13,
+    "measured_mb": 27.5,
+    "match": "partial - 13 blobs (not 23) and 27.5MB (not 51.6MB); discrepancy may be due to different path pattern used, but files are still in history"
+   }
+  },
+  "notes": "The core claim is fully confirmed: the .git directory is ~841MB, variable_details.csv has 434 committed blob versions totalling ~423.5MB (~50% of total git history). The Excel-induced whole-file reformatting pattern (quoting churn, trailing empty columns) is documented in project MEMORY.md and in recent commits on this branch (e3fbf85f 'Cleaned csv worksheets'). The CCHS_DDI XML count discrepancy (13 vs 23 blobs, 27.5 vs 51.6MB) may reflect a different path match pattern used by the original researcher, but does not affect the primary claim. This is a genuine design/workflow issue - not fixed by the ADL/alcohol repair or rec_with_table list-mode commits. The finding's severity=high is appropriate: 841MB clone cost for a metadata R package is substantial, and the problem compounds with each harmonization PR. The recommended remedy (git filter-repo + .gitattributes CSV=binary or LFS) is unrelated to the committed fixes.",
+  "fixed_by_recent_commits": false,
+  "corrections": "CCHS_DDI XML blob count should be 13 (not 23) and 27.5MB (not 51.6MB) based on current measurement; all other numbers confirmed within rounding. .git is 841M not 844M. variable_details.csv has 434 blobs not 431. These are minor measurement-timing differences, not errors in the finding.",
+  "_source": "verify-salvaged-7.json"
+ },
+ {
+  "index": 8,
+  "dim": "data-artifacts",
+  "title": "Shipped sample data covers none of the cycles v3 newly harmonizes (2019-2023)",
+  "isReal": true,
+  "severity": "high",
+  "severity_ok": true,
+  "corrections": "",
+  "verdict": "CONFIRMED - all evidence claims verified against current working tree",
+  "verification": {
+   "shipped_pumf_files": [
+    "cchs2001_p.RData",
+    "cchs2003_p.RData",
+    "cchs2005_p.RData",
+    "cchs2007_2008_p.RData",
+    "cchs2009_2010_p.RData",
+    "cchs2010_p.RData",
+    "cchs2011_2012_p.RData",
+    "cchs2012_p.RData",
+    "cchs2013_2014_p.RData",
+    "cchs2014_p.RData",
+    "cchs2015_2016_p.RData",
+    "cchs2017_2018_p.RData",
+    "cchs2009_s.RData",
+    "cchs2010_s.RData",
+    "cchs2012_s.RData"
+   ],
+   "newest_pumf_shipped": "cchs2017_2018_p (file mtime: 2022-09-08)",
+   "pumf_referenced_but_missing": [
+    "cchs2019_2020_p",
+    "cchs2022_p",
+    "cchs2023_p"
+   ],
+   "master_referenced_all_missing": [
+    "cchs2019_2020_m",
+    "cchs2021_m",
+    "cchs2022_m",
+    "cchs2023_m"
+   ],
+   "no_data_raw_directory": true,
+   "no_sampling_scripts": true,
+   "description_year_claim": "currently, 2001 to 2018 (line 50-51 of DESCRIPTION)",
+   "description_year_claim_stale": true,
+   "tests_referencing_2019plus": 0,
+   "vignettes_referencing_2019plus": 0,
+   "git_history_2019plus_data_files": "none (no cchs2019_2020_p.RData, cchs2022_p.RData, cchs2023_p.RData ever committed on any branch)",
+   "commits_related": "The ADL/alcohol repair (b7723dd5) and list-mode fix (63450ba3) do NOT address sample data gaps",
+   "fixed_by_recent_commits": false
+  },
+  "notes": "Finding is fully confirmed. All three specific evidence pillars hold on the current working tree: (1) data/ ships only 12 PUMF subsets ending at cchs2017_2018_p, confirmed by ls; (2) variables.csv and variable_details.csv both reference cchs2019_2020_p, cchs2022_p, cchs2023_p as PUMF databases, confirmed by CSV parsing; (3) DESCRIPTION still reads 'currently, 2001 to 2018', confirmed at line 50-51. No data-raw/ directory exists anywhere in the repo history. The recent committed fixes (b7723dd5 ADL/alcohol, 63450ba3 list-mode) are unrelated to sample data coverage. The finding is not fixed by any commit.",
+  "_source": "verify-salvaged-8.json"
+ },
+ {
+  "index": 9,
+  "dim": "data-artifacts",
+  "title": "200-row sample subsets are not reproducible: no generation script, seed, or sampling method ever committed",
+  "isReal": true,
+  "severity_ok": true,
+  "verdict": "CONFIRMED \u2014 finding accurately describes the current working tree",
+  "corrections": "",
+  "notes": "All evidence checks out. (1) No data-raw/ directory exists in the current working tree \u2014 'ls /Users/dmanuel/github/cchsflow/data-raw' returns nothing. (2) No use_data() / usethis::use_data() call appears anywhere in R/*.R. (3) No set.seed or slice_sample or sample_n call in any non-test R file that could be a generation script. (4) exec/ contains only check-worksheets.R and fix-worksheets.R \u2014 no data generation script. (5) The three cited ad hoc commits (2cd3ec30, 17eac47c, 51a8c28d) exist in git history and each adds or modifies binary .RData files with no accompanying R script. (6) R/data.R lines 38-66 document source and access date ('accessed Jan 2020') but contain no derivation code \u2014 just roxygen stubs. (7) data/ ships 12 _p cycle files all with 200 rows, ending at cchs2017_2018_p. The two recent committed fixes (b7723dd5 ADL/alcohol, 63450ba3 list-mode) are unrelated to sample data generation and did not add a data-raw pipeline. The finding is real and unfixed.",
+  "verified_at": "2026-06-11",
+  "verified_against_branch": "fix/v3-smoking-worksheet-sync",
+  "cited_evidence_checks": {
+   "no_data_raw_directory": "CONFIRMED \u2014 does not exist",
+   "no_use_data_call": "CONFIRMED \u2014 grep across R/*.R returns zero hits",
+   "generation_only_in_ad_hoc_commits": "CONFIRMED \u2014 2cd3ec30, 17eac47c, 51a8c28d exist; each adds only binary RData",
+   "data_R_lines_38_66": "CONFIRMED \u2014 documents source/access date only, no generation code",
+   "data_dir_ends_at_2017_2018": "CONFIRMED \u2014 12 _p files, newest is cchs2017_2018_p.RData",
+   "200_rows_per_file": "CONFIRMED \u2014 nrow(cchs2001_p)=200, nrow(cchs2017_2018_p)=200"
+  },
+  "_source": "verify-salvaged-9.json"
+ },
+ {
+  "issue_title": "variable_details.yaml has no top-level expected_column_order; check_worksheet crashes on variable_details.csv",
+  "verdict": "PARTIALLY_REFUTED",
+  "findings": {
+   "claim_1_yaml_structure": {
+    "claim": "variable_details.yaml top-level has no expected_column_order; it is nested under variable_details_schema",
+    "verdict": "TRUE_FOR_SOURCE_TREE_FILE",
+    "details": "inst/metadata/schemas/core/variable_details.yaml in the working tree (branch fix/v3-smoking-worksheet-sync) has top-level keys: schema_version, schema_date, description, registry_file, variable_details_schema. The expected_column_order is nested under variable_details_schema, NOT at top level. However, the installed package at /Users/dmanuel/Library/R/arm64/4.4/library/cchsflow/metadata/schemas/core/variable_details.yaml has a FLAT structure with expected_column_order at top level (24 columns matching current CSV)."
+   },
+   "claim_2_load_schema_returns_null": {
+    "claim": "R/load-schema.R reads schema$expected_column_order directly; returns NULL for variable_details because the key is nested",
+    "verdict": "FALSE_AT_RUNTIME",
+    "details": "load_schema() uses system.file(..., package='cchsflow') which resolves to the INSTALLED package, not the source tree. The installed variable_details.yaml is flat. So schema$expected_column_order returns 23 columns correctly at runtime. The asymmetry exists in the source tree (inst/) but the installed package has been built/updated separately and still has the old flat format."
+   },
+   "claim_3_crash": {
+    "claim": "Running check_worksheet('inst/extdata/variable_details.csv','variable_details') crashes with purrr::keep() error",
+    "verdict": "FALSE",
+    "details": "check_worksheet does NOT crash. It runs successfully and returns 4 errors (3 CRLF line endings, 1 excessive quoting). Even if expected_column_order were NULL, purrr::keep on 1:length(NULL)=integer(0) returns integer(0) silently (no crash). The purrr::keep crash described would only occur if expected_columns were an empty logical vector, not integer(0)."
+   },
+   "claim_4_column_mismatch": {
+    "claim": "Actual CSV has 23 cols with ICES.confirmation at position 6; YAML lists 21 cols without ICES.confirmation and with non-existent templateVariable at position 17",
+    "verdict": "PARTIALLY_CORRECT_FOR_SOURCE_TREE_ONLY",
+    "details": "The source tree variable_details_schema$expected_column_order has 21 columns, omits ICES.confirmation, and includes templateVariable at position 17. The actual CSV has 23 columns with ICES.confirmation at position 6 and no templateVariable. However, this mismatch is in the source tree YAML nested under variable_details_schema -- which load_schema() never reads at runtime. The installed package's flat YAML has 23 columns that EXACTLY MATCH the CSV (all 23 columns in correct order, including ICES.confirmation at position 6, review and versionNotes present)."
+   },
+   "claim_5_asymmetric_structure": {
+    "claim": "Asymmetric YAML structure (flat vs nested) between variables.yaml and variable_details.yaml is undocumented",
+    "verdict": "TRUE_BUT_CONSEQUENTIAL_ONLY_FOR_SOURCE_TREE",
+    "details": "variables.yaml (both installed and source) is flat. variable_details.yaml in the source tree is a large nested schema (330 lines), while the installed version is a 24-line flat file. This asymmetry does exist and is undocumented. The source-tree version is an 'enriched schema' aspirational document that has NOT been deployed - the installed package retains the original flat format."
+   }
+  },
+  "overall_verdict": "The issue contains partially correct observations but the core claims (crash, NULL return, undetected column order errors) are FALSE in practice. The runtime system uses the installed package's flat YAML, which correctly matches the current CSV structure. The check_worksheet tool is NOT broken at runtime. The real issue is a source-tree divergence: inst/metadata/schemas/core/variable_details.yaml was rewritten into a rich nested schema (aspirational v4 design) but the installed package was not rebuilt from it. This means (1) the new nested YAML is currently inert -- it is never read at runtime, and (2) if someone rebuilds the package from source, load_schema() will break because schema$expected_column_order becomes NULL. The 'crash' described would not actually occur (integer(0) iteration is safe) but column-order checking WOULD silently stop working.",
+  "verification_method": "Direct file reads of both source-tree and installed YAML files; R execution of load_schema() and check_worksheet() tracing system.file() resolution; Python parsing of CSV headers; manual tracing of .check_column_order() with NULL expected_columns through purrr semantics.",
+  "corrections": [
+   "Claim that check_worksheet crashes is false: it runs without error, returning 4 unrelated formatting errors.",
+   "Claim that load_schema returns NULL for expected_column_order is false at runtime: system.file() resolves to installed package which has correct flat YAML.",
+   "Claim that YAML has 21 cols omitting ICES.confirmation applies only to the source-tree nested schema under variable_details_schema, not to the installed runtime YAML.",
+   "The purrr::keep error mechanism described is incorrect: 1:length(NULL) = integer(0), not an empty logical vector, so purrr::keep iterates 0 times safely."
+  ],
+  "real_risk": "If the package is rebuilt from the source tree without fixing the nested variable_details.yaml, column-order checking for variable_details.csv will silently stop working (no crash, no errors, just blind to column order). This is a latent defect in the source tree that does not affect the currently installed package.",
+  "files_examined": [
+   "/Users/dmanuel/github/cchsflow/inst/metadata/schemas/core/variable_details.yaml",
+   "/Users/dmanuel/github/cchsflow/inst/metadata/schemas/core/variables.yaml",
+   "/Users/dmanuel/Library/R/arm64/4.4/library/cchsflow/metadata/schemas/core/variable_details.yaml",
+   "/Users/dmanuel/Library/R/arm64/4.4/library/cchsflow/metadata/schemas/core/variables.yaml",
+   "/Users/dmanuel/github/cchsflow/R/load-schema.R",
+   "/Users/dmanuel/github/cchsflow/R/check-worksheet.R",
+   "/Users/dmanuel/github/cchsflow/inst/extdata/variable_details.csv",
+   "/Users/dmanuel/github/cchsflow/inst/extdata/variables.csv"
+  ],
+  "_source": "verify-worksheet-schema-0.json"
+ },
+ {
+  "issue_title": "rec_with_table docstring uses old column names (toType/fromType/recFrom/recTo); actual columns are typeEnd/typeStart/recStart/recEnd",
+  "isReal": true,
+  "severity_ok": true,
+  "corrections": "The claim is confirmed. The docstring in R/recode-with-table.R lines 51-70 uses toType, fromType, recTo, and recFrom throughout. The actual CSV column names \u2014 confirmed by both inst/extdata/variable_details.csv header (line 1) and the pkg.globals definitions in R/strings.R \u2014 are: typeEnd (argument.ToType, line 25), recStart (argument.From, line 21), recEnd (argument.CatValue, line 23). There is no argument.FromType defined at all in strings.R, and typeStart is a CSV column but has no pkg.globals binding referenced in the docstring context. Line 802 says 'The value inside the recTo column' but the actual column is recEnd. The engine code itself correctly uses pkg.globals$argument.From='recStart', argument.CatValue='recEnd', argument.ToType='typeEnd' \u2014 the discrepancy is solely in the @item and @param documentation text. No correction to the claim is needed.",
+  "notes": "Evidence chain: (1) R/strings.R lines 21-25 define: argument.From='recStart', argument.CatValue='recEnd', argument.ToType='typeEnd'. (2) inst/extdata/variable_details.csv header confirms actual column names are typeEnd, typeStart, recEnd, recStart. (3) Docstring at lines 51, 56, 59-70 of recode-with-table.R still uses toType, fromType, recTo, recFrom \u2014 none of which match actual CSV columns. (4) Line 802 @param says 'recTo column' but actual column is recEnd. (5) There is no argument.FromType in strings.R; typeStart appears in the CSV header but is not the name used by the engine for the purpose described. The reviewer's evidence is accurate and the issue is real. This is a genuine documentation debt: anyone constructing a custom variable_details.csv from the pkgdown docs would use wrong column names and get column-not-found errors (or silent all-NA recoding).",
+  "_source": "verify-worksheet-schema-1.json"
+ },
+ {
+  "issue_title": "DerivedVar:: rows without Func:: in recEnd are silently ignored by the engine; their role as label-definition rows is undocumented",
+  "verdict": "CONFIRMED",
+  "is_real": true,
+  "severity_ok": false,
+  "evidence": {
+   "counts_verified": {
+    "total_DerivedVar_rows": 299,
+    "rows_with_Func_in_recEnd": 64,
+    "rows_without_Func_in_recEnd": 235,
+    "breakdown_non_func": {
+     "numeric": 129,
+     "NA::x": 106
+    }
+   },
+   "engine_behavior_recode_derived_variables": {
+    "file": "R/recode-with-table.R",
+    "lines_843_849": "variable_rows = ALL rows for variable; fun_variable_rows = subset where Func:: in recEnd",
+    "line_853": "for loop iterates only over fun_variable_rows (Func:: rows) for actual dispatch",
+    "line_962_963": "create_label_list_element(variable_rows) uses ALL rows including non-Func for label map",
+    "conclusion": "Non-Func DerivedVar rows are silently skipped for recode dispatch; their only runtime contribution is to the label map"
+   },
+   "label_building_confirmed": {
+    "file": "R/label-utils.R",
+    "create_label_list_element_lines_106_159": "iterates over ALL variable_rows; for typeEnd=cat, uses recEnd as value_being_labeled and catLabel as key",
+    "what_happens_with_Func_row": "Func:: row adds spurious values[\"N/A\"] = \"Func::...\"; this is benign but noisy",
+    "what_non_func_rows_do": "numeric and NA:: rows contribute real category labels to the label map; this IS their sole purpose"
+   },
+   "documentation_gap": {
+    "variable_details_vignette": "Only documents Func:: pattern for derived variables; shows a sample with ONE row (Func:: only)",
+    "derived_variables_vignette": "Only mentions Func:: + DerivedVar:: pairing; no mention of additional label rows",
+    "schema_yaml_variable_details": "recEnd notes list Func:: as a valid pattern; NO description of the dual-role pattern where DerivedVar rows can serve label-definition only purposes",
+    "metadata_registry_yaml": "dummy_variable_patterns mentions Func rows use N/A but does not explain non-Func DerivedVar rows",
+    "no_comment_in_code": "recode_derived_variables and create_label_list_element have no comments explaining that non-Func DerivedVar rows serve as label-definition rows",
+    "notes_column": "Most non-Func DerivedVar rows have empty notes (NA); some have value-specific notes but none explain the pattern"
+   },
+   "specific_example_ADL_der": {
+    "total_rows": 5,
+    "Func_rows": 1,
+    "label_rows": [
+     {
+      "recEnd": "1",
+      "catLabel": "Needs help with tasks"
+     },
+     {
+      "recEnd": "2",
+      "catLabel": "Does not need help with tasks"
+     },
+     {
+      "recEnd": "NA::a",
+      "catLabel": "not applicable"
+     },
+     {
+      "recEnd": "NA::b",
+      "catLabel": "missing"
+     }
+    ],
+    "Func_row_recEnd": "Func::assess_adl",
+    "notes_on_label_rows": "all NA - no explanation of their purpose"
+   },
+   "claim_adjustments": {
+    "claim_says_label_utils_lines_153_158": "Correct - create_label_list_element does process ALL rows including non-Func",
+    "claim_says_only_role": "CONFIRMED - non-Func DerivedVar rows contribute to the label map; they are silently skipped by the recode dispatch loop",
+    "claim_about_no_documentation": "CONFIRMED - no comment in worksheet schema, YAML schema, or code explains this dual-purpose pattern",
+    "minor_correction": "The Func:: row itself also adds a spurious entry to the label map (values[\"N/A\"] = \"Func::...\") when typeEnd=cat, because create_label_list_element does not filter Func:: rows out of the label loop. This is an additional undocumented behavior not mentioned in the claim."
+   }
+  },
+  "corrections": "One minor inaccuracy: the claim says \"64 have Func:: in recEnd (functional dispatch), 235 have numeric or NA:: values in recEnd\" and implies non-Func rows contribute nothing to recoding. Actually, when create_label_list_element processes a cat-type derived variable, the Func:: row ALSO contributes a spurious entry to the values map (values[\"N/A\"] = \"Func::function_name\") because the loop iterates ALL rows, not just non-Func rows. This is an additional undocumented behavior. The claim correctly identifies the dual-purpose problem but slightly understates its scope.",
+  "notes": "The issue is real and substantive. The evidence for the claim is airtight: (1) counts verified in variable_details.csv, (2) recode_derived_variables (lines 847-853) explicitly subsets to fun_variable_rows for dispatch but passes variable_rows (all rows) to create_label_list_element at line 962, (3) create_label_list_element (label-utils.R lines 106-158) iterates all rows for cat-type and uses recEnd as the value, (4) no documentation in the vignette, schema YAML, or code explains that non-Func DerivedVar rows serve as category label definitions. The sample variable in the vignette shows only one row (the Func:: row), further cementing that the dual-purpose pattern is undocumented. This genuinely blocks v4 schema redesign that tries to separate transformation logic from label metadata.",
+  "_source": "verify-worksheet-schema-2.json"
+ }
+]

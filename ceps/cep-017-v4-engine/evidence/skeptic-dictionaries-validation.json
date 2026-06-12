@@ -1,0 +1,74 @@
+{
+  "task": "skeptic-pass: dictionaries-validation",
+  "date": "2026-06-11",
+  "sources_checked": [
+    "https://cran.r-project.org/package=validate",
+    "https://cran.r-project.org/package=pointblank",
+    "https://cran.r-project.org/package=codebook",
+    "https://cran.r-project.org/package=datadictionary",
+    "https://cran.r-project.org/package=codebookr",
+    "https://cran.r-project.org/package=retroharmonize",
+    "https://rstudio.github.io/pointblank/reference/create_informant.html",
+    "https://rstudio.github.io/pointblank/reference/draft_validation.html",
+    "https://rstudio.github.io/pointblank/reference/col_vals_in_set.html",
+    "https://data-cleaning.github.io/validate/",
+    "https://github.com/data-cleaning/validate",
+    "https://github.com/rstudio/pointblank",
+    "https://rubenarslan.github.io/codebook/",
+    "https://github.com/DoctorBJones/datadictionary",
+    "https://rubenarslan.github.io/codebook/articles/codebook_tutorial.html",
+    "https://retroharmonize.dataobservatory.eu/articles/labelled_spss_survey.html",
+    "https://cran.r-project.org/web/packages/datadictionary/readme/README.html"
+  ],
+
+  "verified": [
+    "validate v1.1.7, published 2025-12-10, GPL-3 license — confirmed CRAN page",
+    "validate imports: stats, graphics, grid, settings, yaml (lightweight, no tidyverse) — confirmed CRAN page",
+    "validate GitHub: 431 stars, 49 open issues — confirmed GitHub page",
+    "validate supports YAML import/export of rules (Data Validation Cookbook section 8.2) — confirmed cookbook site",
+    "validate supports cross-dataset comparison (Data Validation Cookbook section 10) — confirmed cookbook site",
+    "validate rules are first-class portable objects (validator(), confront() pattern) — confirmed GitHub/cookbook",
+    "pointblank v0.12.3, published 2025-11-28, MIT license — confirmed CRAN page",
+    "pointblank dependency surface: dplyr, tibble, tidyr, DBI, gt, glue, yaml, rlang, etc. — confirmed CRAN page (heavy import list)",
+    "pointblank GitHub: ~1,000 stars (displayed as '1k') under rstudio/pointblank, not redirected — confirmed GitHub page",
+    "pointblank note: posit-dev/pointblank is the Python version; R version stays at rstudio/pointblank — confirmed GitHub search",
+    "create_informant() supports YAML round-trip via yaml_write() / yaml_read_informant() — confirmed docs page",
+    "create_informant() supports info_columns(), info_section(), and snip_list/snip_stats/snip_lowest/snip_highest snippets — confirmed docs page",
+    "draft_validation() auto-generates a starter validation .R/.Rmd from column inference including col_vals_between, rows_distinct, col_schema_match — confirmed docs page",
+    "col_vals_in_set() set parameter is a literal R vector (cannot reference external dictionary directly) — confirmed docs page",
+    "codebook v0.10.1, published 2026-03-03, MIT license — confirmed CRAN page",
+    "codebook supports JSON-LD export for dataset discovery — confirmed CRAN README",
+    "codebook computes psychometric reliabilities (internal consistencies, retest, multilevel) — confirmed CRAN README and tutorial",
+    "codebook paper: Arslan RC (2019), Advances in Methods and Practices in Psychological Science — confirmed CRAN citation page and Semantic Scholar",
+    "dict_to_list() exists in codebook package; converts two-column data frame (variable, label) to named list for var_label() — confirmed tutorial vignette",
+    "datadictionary v1.0.1, published 2025-07-22 (CRAN says March 20 2025 internally, July 22 2025 on CRAN listing), MIT license — confirmed CRAN page",
+    "datadictionary exports create_dictionary() and summarise_variable() — confirmed README",
+    "datadictionary create_dictionary() produces tibble with columns: item, label, class, summary, value — confirmed README",
+    "datadictionary GitHub: 11-12 stars (search result says 11, benchmark says 12 — minor discrepancy, both reflect very low adoption) — confirmed GitHub search",
+    "codebookr v0.1.9, published 2026-02-13, MIT license — confirmed CRAN page",
+    "codebookr depends on haven + flextable + officer (Word document output) — confirmed CRAN page",
+    "retroharmonize v0.2.8, published 2026-05-21, GPL-3 license — confirmed CRAN page",
+    "retroharmonize labelled_spss_survey S3 class extends haven::labelled_spss — confirmed dedicated vignette",
+    "retroharmonize preserves variable labels, value labels, missing value ranges across waves — confirmed vignette",
+    "GPL-2+ ('GPL-2 or later') is compatible with GPL-3 because the 'or later' clause allows upgrading — confirmed multiple licensing sources",
+    "codebook Cronbach's alpha claim: package computes reliability coefficients including internal consistencies, but 'Cronbach's alpha' not explicitly named in accessible docs — confirmed CRAN README mentions 'reliabilities'"
+  ],
+
+  "refuted": [
+    "Claim that retroharmonize's S3 class is named 'labelled_spss_survey' extending 'haven::labelled_spss' is CONFIRMED but the claim text says it 'extends haven::labelled_spss' — this is slightly imprecise. The actual class name is 'retroharmonize_labelled_spss' (per rdrr.io source), not just 'labelled_spss_survey'. The benchmark text uses 'labelled_spss_survey S3 class' which is the class name per the dedicated vignette URL title. Both names appear in documentation; no clear refutation but the naming is ambiguous.",
+    "Claim that datadictionary has '12 stars, forks: 0' — GitHub search returns 11 stars. Minor discrepancy (1 star difference), not a material error, likely timing difference. Not a fabricated claim.",
+    "Claim that pointblank GitHub repo 'moved to https://github.com/posit-dev/pointblank' — REFUTED for the R package. The R package remains at rstudio/pointblank. posit-dev/pointblank is a separate Python package. The rstudio/pointblank R repo has ~1,000 stars and is not redirected. The benchmark correctly notes '(moved to https://github.com/posit-dev/pointblank)' which is inaccurate for the R package.",
+    "Claim that codebook 'computes psychometric reliabilities and emits JSON-LD' — both halves verified. Cronbach's alpha specifically: the package computes internal consistencies and other reliabilities but the term 'Cronbach's alpha' does not appear prominently in the public README/tutorial prose (the CRAN README says 'reliabilities (internal consistencies, retest, multilevel)'). The claim is substantively correct even if the exact term is not used in all docs."
+  ],
+
+  "unconfirmable": [
+    "Exact GitHub forks count for DoctorBJones/datadictionary (search showed 0 forks but could not confirm from a live page)",
+    "Whether validate's GPL-3 creates an actual licence conflict with cchsflow's specific GPL-2+ declaration — depends on how 'GPL-2+' is written in the DESCRIPTION file; not checked"
+  ],
+
+  "summary": {
+    "overall_assessment": "The benchmark's factual claims about package versions, dates, licenses, and features are highly accurate. All six package version/date/license tuples confirmed. validate's GPL-3, YAML support, and cross-dataset comparison confirmed. pointblank's informant YAML round-trip, snip_* functions, and heavy dependency list confirmed. col_vals_in_set() set-as-literal-vector confirmed. codebook's dict_to_list(), JSON-LD export, and psychometric focus confirmed. datadictionary's two-function minimal footprint confirmed. codebookr's Word-output focus confirmed. retroharmonize's S3 class extending haven::labelled_spss confirmed. One claim needs correction: the rstudio/pointblank R package has NOT moved to posit-dev/pointblank; that URL hosts a separate Python package.",
+    "correction_needed": "In the benchmark text, the pointblank GitHub URL annotation '(moved to https://github.com/posit-dev/pointblank)' is incorrect for the R package. The R package is at https://github.com/rstudio/pointblank and has not been redirected. posit-dev/pointblank is an independent Python port.",
+    "licence_note": "GPL-2+ is compatible with GPL-3 when '+' means 'or later'. The validate dependency risk in the benchmark is correctly flagged as needing verification; the 'if ambiguous, imitate' advice is sound."
+  }
+}

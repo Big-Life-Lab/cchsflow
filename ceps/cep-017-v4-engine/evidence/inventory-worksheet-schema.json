@@ -1,0 +1,295 @@
+{
+  "inventory": "worksheet-schema",
+  "summary": "Audit of cchsflow inst/extdata/variables.csv (18 cols, 418 rows) and variable_details.csv (23 cols, 3839 rows). Key findings: (1) the variable_details.yaml schema has no top-level expected_column_order so check_worksheet silently fails on variable_details.csv; (2) eleven pkg.globals constants define column names that either do not exist in the worksheets or are never referenced in the engine; (3) docstring column names (toType/fromType/recFrom/recTo) diverge from actual names (typeEnd/typeStart/recStart/recEnd); (4) DerivedVar:: rows that carry numeric recEnd values are pure label-definition rows with no documented contract, making it impossible to distinguish documentation from logic; (5) the notes field in variables.csv carries embedded machine-readable tags ({recommended:X}) with no schema; (6) ten org-facing workflow columns (ICES.confirmation, Observation..MD., review, versionNotes, etc.) are never read by the engine, have no documented enum constraints, contain typos, and bloat both sheets; (7) databaseStart is a comma-separated list in both worksheets but has different semantics in each; (8) two legacy databaseStart identifiers (cchs2007_2008m, cchs2007_2008p, missing underscore) exist alongside correct forms.",
+  "issues": [
+    {
+      "title": "variable_details.yaml has no top-level expected_column_order; check_worksheet crashes on variable_details.csv",
+      "area": "schema-definition",
+      "evidence": [
+        "inst/metadata/schemas/core/variable_details.yaml top-level keys: schema_version, schema_date, description, registry_file, variable_details_schema — no expected_column_order at top level",
+        "inst/metadata/schemas/core/variables.yaml has expected_column_order at top level — works correctly",
+        "R/load-schema.R reads schema$expected_column_order directly; returns NULL for variable_details",
+        "Running check_worksheet('inst/extdata/variable_details.csv','variable_details') crashes with purrr::keep() error: '.p() must return a single TRUE or FALSE, not an empty logical vector'",
+        "The actual column order in the CSV (23 cols including ICES.confirmation at position 6) differs from the YAML variable_details_schema$expected_column_order (21 cols, ICES.confirmation absent, templateVariable at position 17)"
+      ],
+      "why_design_issue": "The worksheet validation tool is broken for the most complex and change-prone file in the package. Errors in variable_details.csv column ordering go undetected. The YAML nesting mismatch between variables.yaml (flat) and variable_details.yaml (nested under variable_details_schema) is an undocumented asymmetry that will confuse future contributors.",
+      "severity": "high",
+      "candidate_fix": "Move expected_column_order and id_column_name to the top level of variable_details.yaml to match the structure of variables.yaml. The expected_column_order should list all 23 actual columns (including ICES.confirmation at position 6 and removing templateVariable which is not present). Update load_schema to handle or reject the nested form.",
+      "effort": "S"
+    },
+    {
+      "title": "Docstring column names (toType/fromType/recFrom/recTo) diverge from actual column names (typeEnd/typeStart/recStart/recEnd)",
+      "area": "naming-conventions",
+      "evidence": [
+        "R/recode-with-table.R line 51: '@item{toType}' — actual column is typeEnd",
+        "R/recode-with-table.R line 56: '@item{fromType}' — actual column is typeStart",
+        "R/recode-with-table.R lines 59–70: uses 'recFrom'/'recTo' throughout — actual columns are recStart/recEnd",
+        "R/recode-with-table.R line 802: '@param cell_value The value inside the recTo column' — actual column is recEnd",
+        "pkg.globals$argument.From = 'recStart', pkg.globals$argument.CatValue = 'recEnd', pkg.globals$argument.ToType = 'typeEnd' — correct in code but docstring uses old names"
+      ],
+      "why_design_issue": "Anyone reading the exported function documentation (e.g. on pkgdown or CRAN) and trying to construct a custom variable_details will use the wrong column names and get silent failures. This documentation debt predates the rename of the columns and has persisted through the v3 development cycle.",
+      "severity": "high",
+      "candidate_fix": "Update the @details/@description section of rec_with_table Roxygen block to use the current column names: typeEnd (not toType), typeStart (not fromType), recStart (not recFrom), recEnd (not recTo). Cross-reference the YAML schema for the full column list.",
+      "effort": "S"
+    },
+    {
+      "title": "Eleven pkg.globals column-name constants are never used in the engine and several point to non-existent column names",
+      "area": "naming-conventions",
+      "evidence": [
+        "R/strings.R defines: argument.VariableStartType='variableStartType', argument.VariableStartHigh='high', argument.VariableStartLow='low', argument.CatStartValue='value', argument.CatStartLabel='valueLabelStart', argument.Interval='interval', argument.Role='role', argument.VariableStartHighLow='from'",
+        "grep -rn of each of these constants across R/ shows zero uses outside strings.R",
+        "None of these constant values ('variableStartType', 'high', 'low', 'value', 'valueLabelStart', 'interval', 'role', 'from') exist as column names in either worksheet",
+        "The actual typeStart column (source type) maps to argument.VariableStartType conceptually but the constant value is wrong ('variableStartType' vs 'typeStart')",
+        "catStartLabel column in VD maps conceptually to argument.CatStartLabel but constant value is 'valueLabelStart' not 'catStartLabel'"
+      ],
+      "why_design_issue": "Dead constants with wrong values create false documentation of the schema. A developer using pkg.globals$argument.CatStartLabel to access the column would get NULL (column not found) rather than the catStartLabel column they wanted. This is a legacy of an earlier schema design that was renamed but the constant values were not updated.",
+      "severity": "medium",
+      "candidate_fix": "Remove the eight dead constants from strings.R. If typeStart and catStartLabel need pkg.globals entries for the 3-step derive functions, add them with correct values: argument.TypeStart='typeStart', argument.CatStartLabel='catStartLabel'. Document which constants are engine-required vs utility.",
+      "effort": "S"
+    },
+    {
+      "title": "DerivedVar:: non-Func rows are silently ignored by the engine; their role as label-definition rows is undocumented",
+      "area": "recoding-semantics",
+      "evidence": [
+        "variable_details.csv: 299 rows have variableStart starting with 'DerivedVar::'; 64 have Func:: in recEnd (functional dispatch), 235 have numeric or NA:: values in recEnd (documentation only)",
+        "R/recode-with-table.R lines 843–850: recode_derived_variables sets fun_variable_rows = rows where recEnd contains 'Func::'; all other DerivedVar rows are never processed for recoding",
+        "R/label-utils.R lines 153–158: create_label_list_element processes ALL rows including DerivedVar non-Func rows to build the values label map — this is their only role",
+        "Example: ADL_der has 5 rows (1 Func:: + 4 numeric/NA::); the 4 non-Func rows define category labels 1, 2, NA::a, NA::b but contribute no recode logic",
+        "No comment or documentation in the worksheet schema or YAML schema explains this dual-purpose pattern"
+      ],
+      "why_design_issue": "The same column layout (variableStart=DerivedVar::, recStart=N/A, recEnd=number) means two entirely different things depending on whether recEnd starts with 'Func::'. Contributors cannot tell whether a DerivedVar row is functional or decorative without reading engine source code. This makes worksheet audits error-prone and blocks any v4 schema redesign that separates transformation logic from label metadata.",
+      "severity": "high",
+      "candidate_fix": "Add an explicit marker distinguishing the two row types — e.g. a new 'rowRole' column with values 'transform', 'label', 'func_dispatch', or document a clear naming convention in both the YAML schema and a worksheet authoring guide. Alternatively, separate the label-definition rows into a distinct table (variable_labels.csv) and remove the DerivedVar hack entirely in v4.",
+      "effort": "M"
+    },
+    {
+      "title": "dummyVariable encodes compound semantics (variable name + category count + recEnd value) with no formal grammar",
+      "area": "recoding-semantics",
+      "evidence": [
+        "variable_details.csv: dummyVariable has three structural patterns: (1) {variable}_cat{N}_{recEnd} for categorical rows (1700 rows), (2) {variable}_cat{N}_NA{a|b} for missing rows (949 rows), (3) {variable}_catN/A_Func::{funcname} for derived function rows (24 rows)",
+        "Pattern (3) embeds colons and slashes: 'ADL_der_catN/A_Func::assess_adl' — this would violate R variable name rules and could cause issues in CSV parsers that use it as an identifier",
+        "YAML schema (variable_details_schema.fields.dummyVariable.notes) says 'No colons in dummy names — use _NAa not _NA::a' but the Func:: rows systematically violate this",
+        "The YAML schema claims dummyVariable is a unique row identifier with constraints.unique=true but does not enforce the Func:: naming convention",
+        "Check-worksheet does not validate dummyVariable uniqueness or pattern conformance"
+      ],
+      "why_design_issue": "If dummyVariable is used as a stable row key for git diffs and CSV ordering (as the YAML states), embedding mutable compound fields (the function name) makes it fragile: renaming a derive function requires updating all dummyVariable values for that variable. The Func:: pattern in dummyVariable also contradicts the documented naming convention in the same YAML file.",
+      "severity": "medium",
+      "candidate_fix": "For Func:: rows, change the dummyVariable convention to {variable}_catN/A_func (dropping the function name from the identifier). Update the YAML schema notes to explicitly describe all three patterns and add a check_worksheet validation rule for dummyVariable uniqueness. In v4, consider using a monotone integer rowId instead of a compound key.",
+      "effort": "M"
+    },
+    {
+      "title": "variableStart uses three syntactically distinct notations with no documented grammar and conflated meanings",
+      "area": "recoding-semantics",
+      "evidence": [
+        "1301 rows use [varName] bracket notation: e.g. '[ADL_005]' — means 'use this variable name across all databases'",
+        "2239 rows use database::varName CSV list: e.g. 'cchs2001_p::RACA_6A, cchs2003_p::RACC_6A' — means per-database source variable mapping",
+        "299 rows use DerivedVar::[var1, var2] notation: e.g. 'DerivedVar::[PAC_4A_cont, PAC_4B_cont]' — means 'compute from previously-recoded variables'",
+        "R/recode-with-table.R get_data_variable_name (lines 369–412): parses by checking for presence of data_name in the string, then splits on '::' — this is unanchored substring matching that will silently mismatch if a database name is a substring of another",
+        "No formal grammar or validator for variableStart notation exists; the YAML schema notes reference 'metadata_registry.yaml transformation_patterns' but this is conceptual documentation only",
+        "A single row can mix notations: e.g. 'cchs2001_p::[PAC_4A_cont, PAC_4B_cont], cchs2003_p::[PAC_4A_cont, PAC_4B_cont]' embeds bracket notation inside db:: notation"
+      ],
+      "why_design_issue": "The parser in get_data_variable_name uses grepl(data_name, var_start_names) which is a substring match — if database 'cchs2009_m' appears in a cell that also contains 'cchs2009_2010_m', both will match. The mixed notation also means a v4 schema parser needs to handle at least 4 distinct syntactic patterns from a single field, making validation and migration difficult.",
+      "severity": "high",
+      "candidate_fix": "Define and document a formal grammar for variableStart in the YAML schema, with explicit regex patterns for each form. Fix the parser to tokenize on commas first, then parse each token — this prevents the substring matching bug. In v4, consider normalising to a tidy long form (one row per database per source variable) rather than packing multiple databases into a comma list.",
+      "effort": "L"
+    },
+    {
+      "title": "databaseStart is a comma-separated list in both worksheets but has different semantics per worksheet, and contains two typo variants of cchs2007_2008",
+      "area": "naming-conventions",
+      "evidence": [
+        "variables.csv databaseStart: describes which databases the harmonized variable covers (one row per harmonized variable)",
+        "variable_details.csv databaseStart: describes which databases apply to this specific recode row (multiple rows per variable)",
+        "Both columns share the same name despite different semantics — in variables.csv it is a summary-level field; in VD it is a per-row filter used by the engine",
+        "variable_details.csv unique databaseStart tokens: 'cchs2007_2008m' (10 rows, missing underscore before m/p suffix) alongside correct 'cchs2007_2008_m' — affects DEN_132",
+        "variables.csv unique databaseStart tokens: same typos present",
+        "engine matching: grepl(database_name, variable_details$databaseStart) — unanchored substring means cchs2007_2008_m would also match cchs2007_2008m rows, masking the typo"
+      ],
+      "why_design_issue": "The naming collision between the two worksheets for a semantically different concept is a reader and tooling hazard. The typo forms (cchs2007_2008m/p) will silently match the correct form in the current engine due to unanchored grepl, so they work but are incorrect and will break any v4 parser that tokenizes properly.",
+      "severity": "medium",
+      "candidate_fix": "Rename variables.csv databaseStart to databaseCoverage or coverageDatabases to distinguish the summary field from the per-row filter field. Fix the two typo identifiers (cchs2007_2008m -> cchs2007_2008_m, cchs2007_2008p -> cchs2007_2008_p) in both worksheets. Add a check_worksheet rule that validates each token against the known database registry.",
+      "effort": "S"
+    },
+    {
+      "title": "recEnd vocabulary mixes recode targets, control-flow tokens, and dispatch pointers with no type field to distinguish them",
+      "area": "recoding-semantics",
+      "evidence": [
+        "recEnd contains: numeric category codes (2181 rows), NA::a/NA::b tagged-NA pointers (1495 rows), Func:: function dispatch pointers (64 rows), and 'copy' pass-through tokens (99 rows)",
+        "The engine dispatches on recEnd content via grepl('Func::'), then grepl('map::'), then treats everything else as a value to recode to",
+        "copy semantics: recEnd='copy' with recStart=[range] means 'copy original value if source is in range' (validation/pass-through); recStart='copy' with recEnd='copy' means 'full unconditional copy' — same keyword, different behaviour depending on recStart",
+        "Three special cases of recStart='copy' (SMK_06C, SMK_09C, SMK_10C): these appear to mean 'this row is a full pass-through alias'; no other rows use this pattern",
+        "NA::a vs NA::b semantics: NA::a = not applicable (valid skip), NA::b = missing/refused; this distinction is nowhere documented in the worksheet schema",
+        "recStart='N/A' (224 rows) is a sentinel for derived/Func rows where no source range applies; 'N/A' conflicts with a possible legitimate source category value"
+      ],
+      "why_design_issue": "The recEnd column carries three distinct data types (value, token, pointer) distinguished only by prefix inspection. This makes automated validation, documentation generation, and v4 schema migration require re-parsing every cell. The copy/copy and N/A patterns are undocumented conventions that must be reverse-engineered from engine code. The NA::a/NA::b semantic distinction is fundamental to the CCHS missing data architecture but is not defined anywhere in the schema.",
+      "severity": "high",
+      "candidate_fix": "Add a 'recType' column to variable_details.csv with enum values: 'value' (numeric recode), 'NA_a' (not-applicable missing), 'NA_b' (refused/unknown missing), 'copy' (pass-through), 'func' (function dispatch). This makes the row type machine-readable without parsing recEnd content. Document NA::a = valid skip (not applicable), NA::b = refused/don't know in both the YAML schema and a worksheet authoring guide. Remove the recStart='copy'/recEnd='copy' idiom in favour of explicit 'copy' recType rows.",
+      "effort": "M"
+    },
+    {
+      "title": "typeStart column is never read by the engine and has one value inconsistency ('NA' vs 'N/A')",
+      "area": "documentation-only-columns",
+      "evidence": [
+        "grep across all R/ files finds typeStart only in strings.R (as argument.VariableStartType='variableStartType', which itself is wrong — actual column is typeStart)",
+        "typeStart values: 'cat' (2986), 'cont' (597), 'N/A' (255), 'NA' (1) — the one 'NA' row is an inconsistency with the N/A convention",
+        "The YAML schema defines typeStart with enum [cat, cont, N/A] — 'NA' is not in the enum",
+        "typeStart appears designed to document the source variable's type but provides no information to the engine (the engine derives type from the source data, not the worksheet)"
+      ],
+      "why_design_issue": "A column present in every row of a 3839-row worksheet that is never read by the engine adds 56 KB of data with zero runtime benefit. The 'NA' vs 'N/A' inconsistency also suggests the column is not being validated. If typeStart is kept as documentation, it needs an enforced enum and a check_worksheet rule.",
+      "severity": "low",
+      "candidate_fix": "Add typeStart enum validation to check_worksheet (allowed values: cat, cont, N/A). Fix the one 'NA' row to 'N/A'. Explicitly document in the YAML schema that typeStart is documentation-only and not read by the engine. Consider moving it to a documentation-tier section of the schema to make its non-operational status explicit.",
+      "effort": "S"
+    },
+    {
+      "title": "numValidCat is never used by the engine and has 12 empty values",
+      "area": "documentation-only-columns",
+      "evidence": [
+        "grep across all R/ finds no uses of numValidCat outside the column name definition in YAML",
+        "12 rows have empty numValidCat (not 'N/A', not a number — empty string)",
+        "Values include 'N/A' for continuous variables and numeric strings for categorical — inconsistent with YAML schema pattern '^([0-9]+|N/A)$' which would reject empty string",
+        "check_worksheet does not validate numValidCat pattern"
+      ],
+      "why_design_issue": "numValidCat was intended as a consistency check (number of non-missing categories should match the rows with numeric recEnd) but since it is never programmatically verified, it serves no purpose beyond potentially misleading documentation. The 12 empty values and the engine never reading it suggest it has decayed from a useful check into dead weight.",
+      "severity": "low",
+      "candidate_fix": "Either add a check_worksheet rule that validates numValidCat equals the count of rows with numeric recEnd for each variable, making it a live data-quality check; or deprecate and remove the column in v4 in favour of computing category counts from the rows themselves.",
+      "effort": "S"
+    },
+    {
+      "title": "catStartLabel is never read by the engine but is nearly fully populated; its relationship to variableStartShortLabel is unclear",
+      "area": "documentation-only-columns",
+      "evidence": [
+        "grep finds catStartLabel only in strings.R as argument.CatStartLabel='valueLabelStart' (wrong value — references non-existent 'valueLabelStart' column)",
+        "catStartLabel is 99.9% populated (3836/3839 rows), almost entirely with meaningful content",
+        "variableStartShortLabel is fully populated (3839/3839); in 3463 rows it differs from catStartLabel",
+        "catStartLabel describes the source category; variableStartShortLabel describes the source variable — two different things despite overlapping semantics in documentation",
+        "No YAML schema entry defines the relationship between catStartLabel and variableStartShortLabel"
+      ],
+      "why_design_issue": "Having two 'source label' columns with overlapping but distinct semantics (one per-category, one per-variable) that are both documentation-only adds confusion about which to read for codebook generation or provenance documentation. The wrong pkg.globals constant further makes catStartLabel inaccessible to code that looks it up by the constants.",
+      "severity": "low",
+      "candidate_fix": "Document in the YAML schema the exact distinction: catStartLabel = the label for the specific source category value in this row; variableStartShortLabel = the short label for the source variable overall. Fix pkg.globals$argument.CatStartLabel to 'catStartLabel'. If both are needed for codebook generation, add a code example in the schema notes. In v4, consider whether catStartLabel is redundant with a lookup from the source database's own codebook.",
+      "effort": "S"
+    },
+    {
+      "title": "ICES.confirmation column has six distinct free-text values, two spellings of the same concept, and an unexplained 'DGM' value",
+      "area": "documentation-only-columns",
+      "evidence": [
+        "variable_details.csv ICES.confirmation values: '' (732), 'NA' (2497), 'DGM' (28), 'ICES' (15), 'ICES altered' (171), 'ICES confirmed' (214), 'ICES specifc' (10, typo), 'ICES specific' (158), 'Yes' (5), 'yes' (9)",
+        "variables.csv ICES.confirmation values: '' (80), 'NA' (293), 'ICES confirmed' (4), 'Yes' (41)",
+        "No enum constraint defined in either YAML schema",
+        "'DGM' appears only on SMKG040 rows — likely refers to 'Data Governance and Management' approval but is never explained",
+        "check_worksheet does not validate ICES.confirmation values",
+        "Column is never read by the engine (grep confirms zero uses)"
+      ],
+      "why_design_issue": "An uncontrolled free-text field with institution-specific codes and typos that is never read by the engine represents a maintenance burden with no functional return. The institutional-context coupling (ICES = Institute for Clinical Evaluative Sciences) makes the column meaningless to any cchsflow user outside that institution, and its presence in a CRAN-facing package embeds institutional internal workflow into the public schema.",
+      "severity": "medium",
+      "candidate_fix": "Replace ICES.confirmation with a generic 'dataLinkageApproval' column with a documented enum (e.g. confirmed, specific, altered, not_applicable) and add check_worksheet enum validation. Move institution-specific workflow tracking (ICES, DGM) to a project-level overlay file not shipped in the package. Fix the 10 'ICES specifc' typos.",
+      "effort": "M"
+    },
+    {
+      "title": "Observation..MD. column name is R-mangled (dot-encoding of space and period) and contains mixed-type data",
+      "area": "naming-conventions",
+      "evidence": [
+        "variables.csv column 16 as read by Python: 'Observation..MD.' — the double dot comes from R's make.names() encoding of 'Observation. MD.' (space + period)",
+        "Column values: 'NA' (314), '' (90), 'active' (11), and three unique free-text notes including 'SMKDSTY_fun is used to harmonize...'",
+        "The 'active' values appear to be a status flag; the free-text values appear to be clinical/methodological notes",
+        "Column name cannot be accessed in R with $Observation..MD. without backtick quoting or check.names=FALSE",
+        "Never read by the engine (grep confirms zero uses)"
+      ],
+      "why_design_issue": "A column named with embedded dots that require special handling to access is hostile to users building on the worksheets. The column conflates status tracking ('active') with narrative notes in the same field, suggesting it was created ad hoc as a personal workspace rather than designed as part of the schema.",
+      "severity": "medium",
+      "candidate_fix": "Rename to 'observationNotes' (camelCase, matching the rest of the schema). Separate the 'active' values (which belong in 'status') from the free-text notes. In v4, eliminate this column entirely — its content is a subset of what reviewNotes and notes already cover.",
+      "effort": "S"
+    },
+    {
+      "title": "notes field in variables.csv carries embedded machine-readable tags ({recommended:X}, {sub_subject:X}) with no schema definition",
+      "area": "documentation-only-columns",
+      "evidence": [
+        "variables.csv notes column: 19 rows contain {recommended:primary} or {recommended:secondary} tags; 60 rows contain {sub_subject:X} tags",
+        "R/variable-discovery.R lines 109–114: get_harmonized_variables() parses these tags via grepl('\\{recommended:X\\}', vars$notes) — the only machine parsing of notes content in the codebase",
+        "The YAML schema for variables.csv describes notes as 'Additional comments or documentation' — does not mention the structured tag format",
+        "notes column also contains plain human prose for the same rows, mixing parseable and non-parseable content",
+        "The discovery function falls back to the 'description' field if 'notes' is missing — these two fields serve overlapping purposes"
+      ],
+      "why_design_issue": "Embedding a structured sub-language in a free-text 'notes' field without a schema creates a hidden API contract. If the tag format changes, the variable-discovery function silently breaks with no test coverage. Mixing machine-readable tags and human prose in the same field prevents safe round-trip editing (e.g. in Excel). The fallback to 'description' also suggests notes/description field semantics are not clearly separated.",
+      "severity": "medium",
+      "candidate_fix": "Move {recommended:X} to its own 'recommended' column with enum values (primary, secondary, null). Move {sub_subject:X} to a 'subSubject' column. Document these as first-class schema fields in variables.yaml with enum constraints and check_worksheet validation. Update variable-discovery.R to read from the dedicated columns. Clarify in the YAML schema whether notes vs description carries different types of content.",
+      "effort": "M"
+    },
+    {
+      "title": "description field in variables.csv has mixed content: narrative descriptions, version numbers, and 'NA' strings",
+      "area": "documentation-only-columns",
+      "evidence": [
+        "10 SLP_* variables have version numbers ('2.1.0', '2.2.0') in the description field",
+        "298 rows have 'NA' string (not empty, not blank — literal 'NA') — R's read.csv treats these as R NA causing fill-rate miscounting",
+        "57 rows have genuine narrative descriptions",
+        "63 rows have empty description",
+        "description is never read by the engine (grep confirms zero uses); variable-discovery.R uses it as a fallback for the notes-field search"
+      ],
+      "why_design_issue": "A column that contains version numbers, NA strings, and narrative text at different rows has no consistent semantics. The 10 rows with version numbers suggest description was used as a version tracking field at some point, confusing its purpose. The 'NA' string convention (instead of empty) causes R to silently read the field as missing, making any programmatic use unreliable.",
+      "severity": "low",
+      "candidate_fix": "Establish a clear definition for description: it should contain a 1-2 sentence human-readable description of the variable's purpose. Move the version numbers to the version column. Replace 'NA' strings with empty values. Add guidance in the YAML schema that description must not contain machine-readable tags (those belong in notes or dedicated columns).",
+      "effort": "S"
+    },
+    {
+      "title": "Status column is never enforced by the engine; 'discontinued' rows are silently processed alongside 'active' rows",
+      "area": "documentation-only-columns",
+      "evidence": [
+        "variable_details.csv status values: 'active' (3824), 'pending_review' (8), 'discontinued' (7)",
+        "The 7 'discontinued' rows all belong to HWTDBMI_der_cat4 — this variable is deprecated but its rows remain in the worksheet and are processed by the engine when that database is used",
+        "R/recode-with-table.R recode_call() and recode_columns() contain no status check before dispatching rows",
+        "variables.csv status: 'active' (403), '' (10), 'NA' (4), 'pending' (1) — 'pending' is not in the VD enum (pending_review vs pending)",
+        "YAML schema for VD status lists 'discontinued' as 'No longer supported, removed from active use' — but the engine does not enforce removal"
+      ],
+      "why_design_issue": "If status='discontinued' is supposed to mean the rows are inactive, the engine must filter them out; if it does not, 'discontinued' is only a documentation flag that gives false confidence that a variable has been removed. This is especially important for a package producing epidemiological outputs — silently including discontinued variable rows in analyses could introduce errors. The 'pending' vs 'pending_review' enum inconsistency between the two worksheets also makes status unreliable as a lifecycle signal.",
+      "severity": "high",
+      "candidate_fix": "The engine should filter out status='discontinued' rows before processing (or warn loudly). Alternatively, deprecated variable rows should be physically removed from the worksheet with a migration note in the CHANGELOG. Harmonize the status enum across both worksheets: add 'pending_review' to variables.csv schema; convert the one 'pending' value. Document whether 'discontinued' rows are filtered or suppressed.",
+      "effort": "M"
+    },
+    {
+      "title": "review and versionNotes columns are ad hoc workflow tracking fields with no schema, present in both worksheets with different content",
+      "area": "documentation-only-columns",
+      "evidence": [
+        "variable_details.csv review column values: '' (1125), 'NA' (2628), 'CEP-003: PA harmonization...' (18 rows), 'No typeStart' (68 rows)",
+        "variables.csv versionNotes: 31 rows have content (CEP references, change summaries); 309 have 'NA', 78 are empty",
+        "versionNotes appears in both worksheets but YAML schema for neither worksheet defines its semantics",
+        "The 'review' column does not appear in variables.csv at all — only in variable_details.csv — but is not in the variables.yaml schema either",
+        "reviewNotes column (both worksheets) contains 403/418 rows filled in variables.csv and 978/3839 in VD — appears to be a human-readable review comment",
+        "Neither versionNotes nor review is ever read by the engine"
+      ],
+      "why_design_issue": "Three different columns (notes, reviewNotes, versionNotes) in variables.csv and four (notes, reviewNotes, versionNotes, review) in variable_details.csv all carry narrative text with overlapping and undocumented purposes. This creates a situation where important provenance information is scattered and hard to extract, while the total column overhead in the public package is inflated with internal workflow records.",
+      "severity": "low",
+      "candidate_fix": "Define clear semantics for each text column: notes = brief operational note for end users; reviewNotes = harmonization decision rationale (reviewers); versionNotes = change summary linking to CEP/issue. Remove the ad hoc 'review' column from variable_details (its content can be absorbed into reviewNotes). Add these definitions to the YAML schemas. Consider whether versionNotes belongs in a CHANGELOG rather than the worksheets.",
+      "effort": "M"
+    },
+    {
+      "title": "Era-suffix naming conventions are inconsistently applied: _A/_B legacy forms coexist with _pre2015/_2015plus/_2003plus",
+      "area": "naming-conventions",
+      "evidence": [
+        "variables.csv: 7 variables use _A suffix (ALCDTTM_A, INCGHH_A, INCGPER_A, INJ_05_A, RACG5_A) and 2 use _B (INCGHH_B, INCGPER_B)",
+        "variables.csv: 3 variables use _pre2015 (SDCDCGT_pre2015, SLPG01_pre2015, SMK_10A_pre2015) and 3 use _2015plus (SDCDCGT_2015plus, SLPG01_2015plus, SMK_10A_2015plus) and 2 use _2003plus",
+        "cchsflow project MEMORY.md explicitly notes: 'Deprecate _A/_B suffixes -> year-based (_pre2015, _2015plus, _2003plus)' but old forms were not removed",
+        "The _A/_B convention is undocumented in the YAML schema; _pre2015/_2015plus is undocumented in the YAML schema",
+        "Neither convention appears in variables.yaml as a naming rule"
+      ],
+      "why_design_issue": "A user browsing variables.csv cannot tell whether _A and _pre2015 mean the same thing (pre-2015 era) or different things without cross-referencing commit history. The coexistence of both conventions makes the variable namespace harder to search and understand, and any tooling that groups era-specific variants needs to handle both patterns.",
+      "severity": "medium",
+      "candidate_fix": "Complete the migration from _A/_B to _pre2015/_2015plus for the remaining 9 variables. Add a naming convention section to variables.yaml (or a separate naming guide) that defines the _pre2015/_2015plus/_2003plus suffix semantics. Add a check_worksheet rule that warns on _A/_B suffixes after a migration grace period.",
+      "effort": "M"
+    },
+    {
+      "title": "databaseStart and variableStart shared between worksheets with different semantics creates tooling hazard",
+      "area": "schema-definition",
+      "evidence": [
+        "Both variables.csv and variable_details.csv have columns named 'databaseStart' and 'variableStart'",
+        "In variables.csv (one row per harmonized variable): databaseStart = comma-separated list of all databases this variable covers; variableStart = earliest database::sourceVar (summary-level coverage metadata)",
+        "In variable_details.csv (multiple rows per variable): databaseStart = comma-separated list of databases for this specific recode row; variableStart = per-row source database::variable mapping (engine input)",
+        "Comparison of same variable across sheets shows values often differ: active_transport variables.csv databaseStart ends with cchs2009_2010... while VD first row databaseStart ends differently",
+        "The engine reads databaseStart ONLY from variable_details.csv; the variables.csv copy is documentation-only and can drift out of sync",
+        "ADL_01_cat4 variables.csv databaseStart has a stray empty token (', ,') not present in VD"
+      ],
+      "why_design_issue": "Shared column names with different semantics across the two worksheets forces any consumer to know which worksheet they are reading to interpret the same column name correctly. The potential for sync drift between the summary databaseStart in variables.csv and the operational databaseStart in variable_details.csv means database coverage documentation can silently diverge from actual engine behaviour.",
+      "severity": "medium",
+      "candidate_fix": "Rename variables.csv columns to databaseCoverage (all databases this variable appears in) and sourceVariableStart (earliest source variable mapping). This makes the summary vs operational distinction explicit. Add a check_worksheet rule that validates variables.csv databaseCoverage is a superset of the union of databaseStart values for the same variable in variable_details.csv.",
+      "effort": "M"
+    }
+  ]
+}

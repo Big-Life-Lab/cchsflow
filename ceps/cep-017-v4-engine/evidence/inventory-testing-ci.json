@@ -1,0 +1,135 @@
+{
+  "summary": "cchsflow v3 testing is structurally sound on the surface (28 active testthat files, ~4,600 lines, edition 3, table-driven helpers, a fresh list-mode regression test) but the safety net has three broken load-bearing pieces and no CI to notice. (1) The ONLY end-to-end regression tests for the 983-line rec_with_table engine (4 golden-output tests against frozen 2001/2003/2005/2015-2016 standards) all fail with 0 passing: the frozen worksheet inside tests/testdata/rec_with_table_test_data.RData still references Func::adl_fun and other legacy names that commit b7723dd5 moved into R/legacy/, a subdirectory R never sources; the engine resolves Func:: names at runtime via get() (R/recode-with-table.R:979) so the frozen table cannot execute. There is no committed regeneration script for the golden RData. (2) check_worksheet() hard-crashes on ANY variable_details sheet -- including the production inst/extdata/variable_details.csv -- because PR #148 (b7b2e7f3, 2026-02-13) replaced the flat variable_details.yaml schema with a recodeflow-style file nested under a variable_details_schema: key without updating load_schema(); schema$expected_column_order is NULL, and purrr::keep errors on logical(0). This is both the cause of the 3 test-check-worksheet.R errors and a broken CI gate: check-csv.yml is the only workflow on this branch and exec/check-worksheets.R now errors instead of reporting formatting diagnostics. Even after unwrapping, the new 21-column schema (templateVariable added; ICES.confirmation, versionNotes, review missing) diverges from the 23-column production header. (3) test-bmi.R's 6 errors are deprecation-contract tests for aliases (bmi_fun, adjusted_bmi_fun, bmi_fun_cat, calculate_bmi_D, adjust_bmi_D, categorize_bmi_D) that no longer exist in the loaded namespace -- three live only in unsourced R/legacy/bmi-legacy.R and three exist nowhere in the working tree. Surrounding all of this: the v3 lineage diverged from main on 2025-06-03, one day before R-CMD-check.yaml landed on main, and never received it -- a year of v3 development with zero automated test execution or R CMD check; no coverage tracking of any kind (no covr, codecov.yml, badge, or workflow); bundled 200-row PUMF fixtures stop at cchs2017_2018_p with no Master fixtures and zero test references to the 2019-2020/2021-2022/2022/2023 eras the branch is actively harmonizing; the BMI test run emits 103 warnings from a sys.call()-based variable-name heuristic that silently falls back to a hard-coded HWTGBMI_der missing-pattern; and one test uses sample() without a seed. For v4: commit a golden-data generator, make worksheet-schema consistency itself a tested invariant, restore R-CMD-check on dev branches before refactoring, and add covr as the refactor's safety baseline.",
+  "issues": [
+    {
+      "title": "Golden-output regression net for rec_with_table is completely dead (4 errors, 0 passing)",
+      "area": "testing-ci",
+      "evidence": [
+        "tests/testthat/test-recode-with-table.R:1 loads tests/testdata/rec_with_table_test_data.RData; all 4 tests (2001, 2003, 2005, 2015 standards) error",
+        "Rscript run of test_file: \"Error in get(custom_function_name): object 'adl_fun' not found\" at cchsflow/R/recode-with-table.R:979 (do.call(get(custom_function_name), row_values)); final tally [ FAIL 4 | WARN 0 | SKIP 0 | PASS 0 ]",
+        "Frozen RData contents (inspected via load into new env): 337-variable frozen worksheet whose recEnd values include Func::adl_fun, Func::bmi_fun, Func::adjusted_bmi_fun, Func::immigration_fun, Func::low_drink_*_fun, Func::resp_condition_fun1-3 -- all legacy names; golden standards are 200x165 frames",
+        "Current inst/extdata/variable_details.csv contains 0 occurrences of adl_fun (grep -c = 0); replacement names are Func::assess_adl, Func::calculate_bmi, etc.",
+        "adl_fun now lives only in R/legacy/adl-legacy.R; R does not source subdirectories of R/, and devtools::load_all() confirms it is absent from the namespace (commit b7723dd5 'Rewrite ADL and alcohol functions onto canonical 3-step architecture')",
+        "No regeneration script exists: grep for rec_with_table_test_data across R/, exec/, tests/ finds only the two test files that load it; RData was hand-regenerated at least twice (git log: 44c8b5de 2022-05-09, e7717b4e 2026-03-29, bd0df3ac 2026-04-29)"
+      ],
+      "why_design_issue": "These four tests are the only end-to-end verification that the 983-line legacy engine produces correct harmonized output, and they have silently rotted to 0 passing. The design couples three things that change at different speeds in one opaque binary blob: a frozen copy of the worksheets, frozen expected outputs, and (implicitly, via get()-based runtime name resolution) the package's exported function names. Any rename of a DV function invalidates the frozen worksheet without any tooling to detect or regenerate it. For a v4 engine refactor, the single most important artifact -- a trustworthy golden baseline to diff the new engine against -- does not currently exist.",
+      "severity": "high",
+      "candidate_fix": "Commit a generator script (e.g. exec/regenerate-golden-data.R) that snapshots the CURRENT shipped worksheets plus rec_with_table() outputs for every supported cycle, and document when regeneration is legitimate (worksheet change) vs forbidden (engine change). Regenerate now, after the legacy migration, so v4 has a frozen v3 baseline. Replace the single expect_mapequal on a 200x165 frame with per-variable comparison so a failure names the offending variable. Drop suppressWarnings() or assert on the warning set. Longer term, resolve Func:: names against an explicit registry rather than get() on the search path so frozen tables fail loudly and informatively.",
+      "effort": "M"
+    },
+    {
+      "title": "check_worksheet() crashes on every variable_details sheet -- 3 test errors AND the branch's only CI gate errors on the production CSV",
+      "area": "testing-ci",
+      "evidence": [
+        "Rscript run of tests/testthat/test-check-worksheet.R: 3 errors at lines 120, 235, 312 -- exactly the three tests that pass file_type='variable_details'; all 9 'variables' tests pass. Error: purrr::keep '.p() must return a single TRUE or FALSE, not an empty logical vector' from .check_column_order (R/check-worksheet.R:131-148)",
+        "R/check-worksheet.R:21 reads schema$expected_column_order; R/load-schema.R:33 returns yaml::read_yaml() unmodified",
+        "inst/metadata/schemas/core/variables.yaml has expected_column_order at top level (flat); inst/metadata/schemas/core/variable_details.yaml nests it under variable_details_schema: (top-level keys: schema_version, schema_date, description, registry_file, variable_details_schema) -- so schema$expected_column_order is NULL for variable_details",
+        "Reproduced against production data: check_worksheet('inst/extdata/variable_details.csv', 'variable_details') -> 'ERROR: In index: 1 ... .p() must return a single TRUE or FALSE' (verified with devtools::load_all). exec/check-worksheets.R calls this unguarded, so the check-csv.yml workflow (the ONLY workflow on this branch, path-triggered on the two worksheet CSVs) dies with an R error instead of formatting diagnostics",
+        "Regression introduced by commit b7b2e7f3 'Bringing in changes from PR #148' (2026-02-13): the pre-PR schema was flat and matched production (included ICES.confirmation)",
+        "Second-layer divergence: even unwrapped, the new schema lists 21 columns (adds templateVariable; drops ICES.confirmation, versionNotes, review) vs the production CSV header's 23 columns (verified with python csv/yaml parse), so fixing the unwrap alone would make the CI gate fail every worksheet PR with bogus column-order errors"
+      ],
+      "why_design_issue": "The validation tool's contract (return a list of structured errors, never throw) is broken by an untested schema-loading seam: two schema files with inconsistent shapes feed one loader that does no validation of what it loaded. Nothing tests that the shipped schemas can validate the shipped worksheets -- the unit tests use synthetic CSVs and the schema was swapped out from under them. The team's primary quality gate for its primary asset (the worksheets) has been broken on this lineage since February, and the failure mode is an inscrutable purrr internal error rather than a diagnostic.",
+      "severity": "high",
+      "candidate_fix": "Short term: make load_schema() unwrap the nested variable_details_schema key (or flatten the YAML), and reconcile expected_column_order with the production 23-column header. Add two cheap invariant tests: (a) load_schema(type)$expected_column_order is a non-empty character vector for both types; (b) check_worksheet() on the shipped inst/extdata CSVs returns an empty error list. For v4: single schema format shared with recodeflow, validated on load, with a contract test pinning schema <-> production-worksheet consistency.",
+      "effort": "S"
+    },
+    {
+      "title": "No R-CMD-check or test-suite CI on the entire v3 lineage -- only a path-filtered CSV formatting check",
+      "area": "testing-ci",
+      "evidence": [
+        ".github/workflows/ on branch fix/v3-smoking-worksheet-sync contains only check-csv.yml (git ls-tree HEAD confirms single file), which triggers solely on changes to inst/extdata/variables.csv and variable_details.csv",
+        "main has .github/workflows/R-CMD-check.yaml (runs rcmdcheck on push/PR), added 2025-06-04 (commit 771523aa)",
+        "git merge-base HEAD main = 00ba2cce (2025-06-03) -- the v3 line diverged ONE DAY before R-CMD-check landed on main and never received it; the 2026-04-22 merge of main into v3-smoking (8cd20be8) is NOT an ancestor of HEAD (verified with git merge-base --is-ancestor)",
+        "Consequence is visible in the suite itself: 13 test errors across three files (engine golden tests at 0 passing, validation tool crashing on production data, BMI alias tests referencing deleted functions) accumulated without any red CI",
+        "check-csv.yml installs local::. so it does exercise package installation, but only on PRs touching the two CSVs, and per the previous finding the check script it runs currently errors"
+      ],
+      "why_design_issue": "A year of active v3 development (smoking/BMI/ADL/alcohol rewrites, worksheet expansion to 2023, engine fixes) ran with zero automated execution of R CMD check or the test suite. Tests only matter if something runs them; every other finding in this audit is downstream of this gap. Heading into a v4 refactor without branch CI means regressions in the refactor will be discovered the same way these were -- by archaeology.",
+      "severity": "high",
+      "candidate_fix": "Cherry-pick or recreate R-CMD-check.yaml on the v3 working branches now, with on: push/pull_request unfiltered by path (or at minimum a testthat-only workflow if full check is too slow with bundled data). Allow a known-failures baseline temporarily (testthat::test_dir with expected-failure list) so CI can land before all 13 errors are fixed, then ratchet to green. Make check-csv.yml also trigger on changes to R/check-worksheet.R, R/load-schema.R, and inst/metadata/schemas/** since those define the gate's behaviour.",
+      "effort": "S"
+    },
+    {
+      "title": "test-bmi.R: 6 errors from deprecation-contract tests for aliases that no longer exist; R/legacy/ subdirectory is never loaded",
+      "area": "testing-ci",
+      "evidence": [
+        "Rscript run of test_file: 6 errors, all 'could not find function' -- bmi_fun (test-bmi.R:182), adjusted_bmi_fun (:188), bmi_fun_cat (:194), calculate_bmi_D (:199), adjust_bmi_D (:209), categorize_bmi_D (:219); 46 assertions pass",
+        "bmi_fun, adjusted_bmi_fun, bmi_fun_cat are defined only in R/legacy/bmi-legacy.R (lines 145, 191, 248) with #' @export tags -- but R packages collate only top-level R/*.R, so devtools::load_all() and R CMD build never source R/legacy/; NAMESPACE (regenerated, 125 exports) contains none of them",
+        "calculate_bmi_D, adjust_bmi_D, categorize_bmi_D exist nowhere in the working tree (grep across R/ and tests/ finds only the test file)",
+        "tests/testthat/legacy/README.md documents the archive strategy and says legacy tests 'will likely fail' and are not run -- but the ACTIVE test-bmi.R still asserts the deprecated aliases work and emit 'deprecated' warnings, contradicting the archive decision",
+        "git status shows man/bmi_fun.Rd, man/adjusted_bmi_fun.Rd, man/bmi_fun_cat.Rd deleted -- docs were removed but the active tests were not"
+      ],
+      "why_design_issue": "The package has no settled deprecation contract: the test suite promises soft deprecation (aliases callable with a 'deprecated' warning), the code delivers hard removal (functions unsourceable in R/legacy/), and the worksheet delivers renames. Tests asserting a contract nobody implements are worse than no tests -- they normalize a red suite. The R/legacy/ pattern also misuses package mechanics (roxygen @export tags on never-sourced files) and will draw an R CMD check NOTE for a non-standard subdirectory in R/.",
+      "severity": "medium",
+      "candidate_fix": "Decide the v3->v4 deprecation policy explicitly. Either (a) ship thin shims in a top-level R/deprecated.R that call the new functions with lifecycle/.Deprecated warnings -- the existing tests then pass unchanged -- or (b) declare a clean break: delete the six alias tests, document removals in NEWS.md, and move R/legacy/ out of R/ (e.g. inst/legacy/ or a git tag) so the build is standard. Given the worksheets already reference only new names, (b) plus shims for the handful of CRAN-documented functions is the least work.",
+      "effort": "S"
+    },
+    {
+      "title": "Test runs drowned in warning noise from sys.call()-based variable-name guessing with a silent hard-coded BMI fallback",
+      "area": "testing-ci",
+      "evidence": [
+        "Single run of test-bmi.R: [ FAIL 6 | WARN 103 | SKIP 0 | PASS 46 ] -- 103 warnings of the form \"Could not get pattern for 'b', using BMI fallback\" (note the garbage variable name 'b', harvested from tagged_na('b') arguments)",
+        "R/missing-data-functions.R:218-237: extract_variable_name() deparses sys.call(-1)[[2]] to guess the data variable name, returning 'HWTGBMI_der' as fallback; R/missing-data-functions.R:125-134: get_missing_config() catches the lookup failure and warns, then substitutes the HWTGBMI_der missing-pattern for whatever variable was actually being cleaned",
+        "tests/testthat/test-recode-with-table.R:3 wraps the entire golden-test engine call in suppressWarnings(), so even when those tests ran, warning regressions were invisible",
+        "Tests currently pass under the fallback only because the HWTGBMI_der pattern coincides with the generic CCHS triple-digit missing scheme -- the assertions cannot distinguish 'correct pattern looked up' from 'fallback happened to match'"
+      ],
+      "why_design_issue": "This is the 3-step architecture's metadata lookup failing in its primary supported context (vectors and mutate columns, where no worksheet variable name is recoverable from the call stack) and being papered over with a warning plus a default that is usually-coincidentally right. From a testing standpoint it has two costs: 103-warning noise per file makes new genuine warnings undetectable, and the silent fallback means green tests do not prove the metadata path works. NSE call-stack introspection as an API for data-variable identity is untestable by construction.",
+      "severity": "medium",
+      "candidate_fix": "For v4, make variable identity an explicit argument (clean_variables(x, variable = 'HWTGBMI_der') or config object) and delete extract_variable_name(); the fallback should be opt-in, not automatic. In the test suite, set options(warn) discipline: add a testthat reporter check or expect_no_warning() wrappers on the happy paths, and remove blanket suppressWarnings() from the golden tests so the warning census becomes a regression signal.",
+      "effort": "M"
+    },
+    {
+      "title": "No code-coverage tracking anywhere in the project",
+      "area": "testing-ci",
+      "evidence": [
+        "DESCRIPTION Suggests: testthat, kableExtra, DT, rmarkdown, knitr, pkgdown -- no covr",
+        "find . -name 'codecov*' and -name '.covrignore' return nothing; no coverage step in check-csv.yml (the only workflow); main's R-CMD-check.yaml has no coverage job either",
+        "README.md badges: lifecycle, CRAN status, license, DOI, downloads -- no coverage or even build-status badge",
+        "Scale of untracked surface: 43 files in R/ including the 983-line recode-with-table.R engine, ~4,616 lines of tests across 28 files"
+      ],
+      "why_design_issue": "The v4 plan is to replace a legacy engine with a new architecture while preserving behaviour. Without a coverage baseline there is no way to know which engine branches (rowwise DerivedVar dispatch, list-mode, tagged_na handling, log/notes paths) the existing suite actually exercises, so 'tests pass after refactor' is a much weaker claim than it sounds -- especially with the golden tests currently at 0 passing. Coverage is also the cheapest way to find the engine paths that have NO test at all before deciding what v4 must reimplement.",
+      "severity": "medium",
+      "candidate_fix": "Add covr to Suggests and a test-coverage.yaml workflow (r-lib/actions example) uploading to Codecov; record a one-off local covr::package_coverage() baseline now (before v4) and attach the per-file report to CEP-017 so refactor scope can target untested engine paths explicitly. Gate: v4 engine PRs must not reduce engine-file coverage.",
+      "effort": "S"
+    },
+    {
+      "title": "Fixture strategy frozen in 2018: no fixtures for 2019-2023 eras or Master files that v3 actively harmonizes; goldens cover 4 cycles",
+      "area": "testing-ci",
+      "evidence": [
+        "data/ bundles 15 sample RData files, each 200 rows (verified cchs2001_p: 200x614): cchs2001_p through cchs2017_2018_p plus three deprecated _s share files -- nothing newer than 2017-2018 and no Master (_m) fixtures at all",
+        "Branch commits extend worksheets to 2023 ('Ensured age and sex variables present in all 2001-2023 PUMF and Master cycles', d50d7aa2; 'Extended ... to 2019-2020 and 2022 PUMF', eda1756b), yet grep for 2019_2020|2021_2022|cchs2022|cchs2023 across tests/testthat/*.R returns zero hits",
+        "Golden engine tests cover only cchs2001_p, cchs2003_p, cchs2005_p, cchs2015_2016_p -- 4 of 15 bundled databases, none from the eras where v3 made its riskiest mapping changes (2015+ renames, 2022-2023 CSS/SPU restructure)",
+        "200-row samples under-represent rare codes: project memory records FVC ~1% valid in 2017-2018 (~2 usable rows), so category-level recode correctness for sparse variables is untestable with bundled data",
+        "Master harmonization (the v3 headline feature, e.g. SPU_25A/25B month-year cessation pairs) has no in-package test data shape at all since real Master microdata cannot be redistributed"
+      ],
+      "why_design_issue": "The integration-test surface is defined by what fixtures exist, and that surface stopped in 2018 while the worksheets moved on to 2023 and to Master files. Every new-era mapping added on this branch is verified only by external processes (MCP triangulation, Gem cross-checks, manual review) with no executable regression artifact, so future worksheet edits can silently break 2019-2023 rows. The fixture mechanism (real subsampled PUMF rows) also cannot extend to Master, structurally exempting the most important new code paths from testing.",
+      "severity": "medium",
+      "candidate_fix": "Generate synthetic fixtures from metadata instead of subsampling real data: a generator that reads variable_details.csv (recStart ranges + missing codes) and emits small per-era frames -- including Master-shaped frames -- guaranteeing every category and missing code of every in-scope variable appears at least once. Ship them in tests/testdata (not data/, which conflates user-facing demo data with test fixtures), extend the regenerated golden tests to one fixture per supported era, and keep the 200-row real samples for documentation/vignettes only.",
+      "effort": "L"
+    },
+    {
+      "title": "Non-deterministic test: label check samples half the variables with no seed",
+      "area": "testing-ci",
+      "evidence": [
+        "tests/testthat/test-label-utils.R:6-8: list_of_vars_to_check <- sample(1:max_num_of_vars, floor(max_num_of_vars)/2, replace = TRUE) -- no set.seed(), sampling WITH replacement, so each run checks a different ~half (with duplicates) of the 165 golden-frame variables",
+        "Same file loads the frozen rec_with_table_test_data.RData (line 1), so it additionally inherits the golden-data staleness coupling described above"
+      ],
+      "why_design_issue": "A test that checks a random subset can pass on one run and fail on the next for the same code, which trains the team to re-run rather than investigate -- particularly corrosive given there is no CI to establish a stable baseline. Sampling here buys nothing: checking all 165 labels is microseconds.",
+      "severity": "low",
+      "candidate_fix": "Iterate over all variables in the frame (drop sample() entirely), or if runtime ever mattered, withr::with_seed() a fixed seed. One-line change.",
+      "effort": "S"
+    },
+    {
+      "title": "testthat 3e infrastructure underused: empty _snaps/, archived legacy tests, and helper conventions drifting",
+      "area": "testing-ci",
+      "evidence": [
+        "tests/testthat/_snaps/ exists but is empty -- no snapshot tests despite edition 3 being configured (DESCRIPTION Config/testthat/edition: 3) and the domain (165-column harmonized frames, structured error lists from check_worksheet) being a natural snapshot fit",
+        "tests/testthat/legacy/ holds archived test files inside the testthat directory; testthat ignores subdirectories so they do not run, but the README there explicitly tells humans not to run them while active test-bmi.R contradicts the same archive decision (see BMI finding)",
+        "tests/testthat/helper-utils.R implements a hand-rolled table-driven test_derived_function() helper -- sound idea, but failures report only 'Error in row i' without the expected/actual variable context that patrick/parameterized snapshot tests would give"
+      ],
+      "why_design_issue": "These are symptoms of a test architecture that grew by accretion: edition 3 features adopted nominally but not used where they pay off most. Snapshot tests on check_worksheet()'s structured error lists would have caught the schema regression immediately (snapshot would have shown the crash), and snapshotting small rec_with_table outputs would give reviewable, diffable goldens instead of an opaque 215 KiB RData blob.",
+      "severity": "low",
+      "candidate_fix": "In the v4 test plan: move golden comparisons to expect_snapshot_value()/CSV-backed snapshots per variable-era so diffs are human-reviewable in PRs; snapshot check_worksheet() error lists; relocate tests/testthat/legacy/ out of the testthat tree (e.g. inst/legacy-tests/ or delete -- git preserves history) to remove the do-not-run footgun.",
+      "effort": "M"
+    }
+  ]
+}

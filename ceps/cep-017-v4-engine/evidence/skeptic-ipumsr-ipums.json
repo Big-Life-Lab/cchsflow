@@ -1,0 +1,93 @@
+{
+  "family": "ipumsr-ipums",
+  "verified_date": "2026-06-11",
+  "sources_checked": [
+    "https://tech.popdata.org/ipumsr/reference/index.html",
+    "https://github.com/ipums/ipumsr/releases",
+    "https://tech.popdata.org/ipumsr/articles/ipums-read.html",
+    "https://international.ipums.org/international/harmonization.shtml",
+    "https://usa.ipums.org/usa/chapter4/chapter4.shtml",
+    "https://cps.ipums.org/cps/unharmonized_variables.shtml",
+    "https://cps.ipums.org/cps-action/revisions",
+    "https://tech.popdata.org/ipumsr/reference/lbl_relabel.html",
+    "https://tech.popdata.org/ipumsr/articles/ipums-api-micro.html",
+    "https://tech.popdata.org/ipumsr/reference/define_extract_micro.html",
+    "https://international.ipums.org/international-action/variables/173949",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC5827695/",
+    "https://rdrr.io/cran/ipumsr/f/vignettes/value-labels.Rmd",
+    "https://blog.popdata.org/cpsunharmonized/",
+    "https://czep.net/21/ipums-into-postgres.html",
+    "https://ipumspy.readthedocs.io/en/latest/reading_data.html",
+    "https://cran.r-project.org/web/packages/ipumsr/index.html",
+    "https://www.ipums.org/overview"
+  ],
+
+  "verdict": {
+    "verified": [
+      "ipumsr v0.10.0 is the current version — confirmed on CRAN (published 2026-03-13) and GitHub releases",
+      "ipumsr is on CRAN — confirmed at https://cran.r-project.org/web/packages/ipumsr/index.html",
+      "ipumsr GitHub repo is at https://github.com/ipums/ipumsr — confirmed",
+      "ipumsr reads DDI XML codebooks via read_ipums_ddi() — confirmed by ipums-read.html vignette",
+      "ipumsr attaches value labels as haven::labelled vectors — confirmed, documentation states 'ipumsr uses the labelled class from the {haven} package'",
+      "lbl_na_if() exists in ipumsr — confirmed in value-labels.Rmd vignette and reference index",
+      "lbl_relabel() exists in ipumsr — confirmed in reference docs",
+      "lbl_collapse() exists in ipumsr — confirmed in value-labels.Rmd vignette",
+      "lbl_* helper functions (lbl_na_if, lbl_relabel, lbl_collapse, lbl_clean, lbl_add, lbl_add_vals, lbl_define, lbl()) all exist — confirmed",
+      "ipumsr provides a programmatic API for defining, submitting, and downloading extracts — confirmed; define_extract_micro(), submit_extract(), read_ipums_micro() all exist",
+      "define_extract_micro() exists and works as described — confirmed via reference page",
+      "IPUMS composite digit coding confirmed — international harmonization page explicitly describes leading digits encoding broad categories, trailing digits encoding rare detail",
+      "IPUMS provides both harmonized and unharmonized/source variables — confirmed for CPS; dual-track is real",
+      "IPUMS uses UH_ prefix for unharmonized variables — confirmed; CPS uses UH_RACE_B1 etc.",
+      "IPUMS Comparability tab exists as first-class documentation — confirmed for international CLASSWK variable (variable 173949 page)",
+      "CPS revision log exists at cps.ipums.org/cps-action/revisions — confirmed; page is live and contains dated entries",
+      "IPUMS International covers 100+ countries — confirmed (104 countries per search results, 'over 100 countries' per ipums.org/overview)",
+      "IPUMS data spans hundreds of years (150+ years for USA data, back to 1790s) — confirmed",
+      "IPUMS has hundreds of millions of records — confirmed; well over 1 billion person-records in aggregate",
+      "PMC article PMC5827695 exists and is about IPUMS — confirmed: 'Interoperable and accessible census and survey data from IPUMS', doi 10.1038/sdata.2018.7",
+      "czep.net/21/ipums-into-postgres.html exists and describes loading IPUMS data into PostgreSQL using ipumsr — confirmed",
+      "ipumspy (Python client) exists and is documented at ipumspy.readthedocs.io — confirmed",
+      "IPUMS CCHS data does not exist in IPUMS — confirmed by absence; no search results link IPUMS and CCHS; CCHS is Statistics Canada data not distributed through IPUMS"
+    ],
+    "refuted_or_needs_nuance": [
+      "Claim: UH_RACE_N convention — PARTIALLY INACCURATE NAMING. The actual convention is UH_RACE_B1, UH_RACE_B2... (letter+number suffix, where letter = file type: B=Basic Monthly, A=ASEC). The claim writes 'UH_RACE_N' as if N is a generic placeholder, which is a shorthand not matching the documented convention. The blog post and unharmonized variables page both confirm the letter+number format. Minor imprecision, not a hallucination.",
+      "Claim: CPS revision logs are 'queryable by variable, date, and change type' — INACCURATE. The revision log at cps.ipums.org/cps-action/revisions is a static HTML page with only yearly anchor navigation. It is NOT queryable or filterable by variable or change type. The description 'queryable' overstates the actual capability. The log exists but is human-readable-only, not machine-queryable.",
+      "Claim: IPUMS harmonization uses 'metadata-driven correspondence tables (not bespoke code)' — UNVERIFIABLE FROM CITED SOURCES. The harmonization.shtml page does not describe the implementation method (metadata tables vs code). The composite digit coding is confirmed, but the internal 'correspondence table' implementation claim is not documented in publicly available sources. This is an architectural inference, not a documented fact.",
+      "Claim: 'Comparability tab' for documenting limits on cross-era pooling — MOSTLY CORRECT BUT 'TAB' OVERSTATED. The CLASSWK variable page has a Comparability section, but it is a section of a webpage, not a separate structured tab in the sense of a database field. The comparability information is real but presented as free-text HTML documentation, not a structured queryable field — the same limitation the claim uses as contrast for cchsflow.",
+      "Claim: scale '150+ years' as a general IPUMS claim — CORRECT FOR USA BUT OVERSTATED FOR GENERAL CLAIM. USA data goes back to 1850 (IPUMS USA) and NHGIS to 1790. But IPUMS International censuses largely cover 20th-21st century. '150 years' as a system-wide characterization is misleading; it applies only to US-focused products."
+    ],
+    "not_hallucinated": [
+      "All named lbl_* functions exist in ipumsr",
+      "All named API functions (define_extract_micro, submit_extract, read_ipums_micro) exist",
+      "ipumsr v0.10.0 is real and current",
+      "PMC5827695 is a real article about IPUMS",
+      "czep.net blog post is real",
+      "ipumspy is real",
+      "IPUMS composite digit coding is documented",
+      "CPS revision log page exists",
+      "IPUMS Comparability documentation exists"
+    ],
+    "recommendation_verdict": "The IMITATE recommendation is sound. All core claims about the ipumsr package are verified. The architectural lessons drawn (haven::labelled output, metadata-encoded recodes for simple variables, universe statements, harmonization_class schema columns, changelog table, dual-track naming) are well-grounded in real IPUMS design. The one overstatement — calling the CPS revision log 'queryable' — slightly weakens the changelog recommendation, since IPUMS itself does not actually ship a machine-readable changelog; it ships a browsable HTML log. The cchsflow v4 changelog recommendation should thus be framed as 'do better than IPUMS' (machine-readable CSV) rather than 'imitate IPUMS'. The core finding that CCHS data is not in IPUMS and ipumsr cannot be adopted directly is correct."
+  },
+
+  "per_claim_detail": {
+    "ipumsr_version_0_10_0": "VERIFIED — CRAN shows 0.10.0 published 2026-03-13",
+    "ipumsr_reads_ddi_xml": "VERIFIED — read_ipums_ddi() documented",
+    "haven_labelled_vectors": "VERIFIED — explicitly stated in package vignette",
+    "lbl_na_if": "VERIFIED",
+    "lbl_relabel": "VERIFIED",
+    "lbl_collapse": "VERIFIED",
+    "programmatic_api_extract": "VERIFIED — define_extract_micro, submit_extract, read_ipums_micro all confirmed",
+    "composite_digit_coding": "VERIFIED — documented on international harmonization page",
+    "dual_track_harmonized_unharmonized": "VERIFIED — CPS has both harmonized and UH_ prefixed unharmonized variables",
+    "UH_RACE_N_convention": "IMPRECISE — actual naming is UH_RACE_B1/B2... not UH_RACE_N; 'N' is not used as suffix",
+    "comparability_tab": "VERIFIED IN SUBSTANCE — comparability documentation exists; 'tab' language slightly overstates structure",
+    "cps_revision_log_queryable": "REFUTED — log exists but is static HTML, not filterable/queryable by variable or change type",
+    "metadata_correspondence_tables": "UNVERIFIABLE — internal implementation not documented in cited sources; composite coding documented but not described as metadata-driven",
+    "100_plus_countries": "VERIFIED — 104 countries per IPUMS International",
+    "150_plus_years": "PARTIALLY VERIFIED — true for IPUMS USA (1850+) and NHGIS (1790+); not true for International which is mostly 20th-21st century",
+    "hundreds_of_millions_records": "VERIFIED — over 1 billion person-records in aggregate",
+    "no_cchs_in_ipums": "VERIFIED — CCHS is Statistics Canada data; no evidence of CCHS in IPUMS",
+    "ipumspy_exists": "VERIFIED — documented at ipumspy.readthedocs.io",
+    "pmc5827695_article": "VERIFIED — 'Interoperable and accessible census and survey data from IPUMS', Scientific Data 2018"
+  }
+}

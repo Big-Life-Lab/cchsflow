@@ -187,41 +187,42 @@ dominated by a 3MB logo PDF and the worksheets shipped twice.
    history; either way, stop committing build products and adopt
    delta-friendly worksheet discipline.
 
-## Open-issue triage (partial -- the dedicated agent was cut off)
+## Open-issue triage (complete; verified June 11)
 
 | Issue | Verdict |
 |---|---|
 | #184 R CMD INSTALL fails (stale NAMESPACE) | Resolved by the fix branch (NAMESPACE regenerated in d636573a; R CMD check now 0 errors). Close on merge. |
 | #185 smoking Func::/feeders out of sync | Resolved by the fix branch (worksheet repair d636573a; all 70+ Func:: targets verified to resolve; ADL/alcohol feeder order verified). Close on merge. |
 | #132 adl_score_5_fun counts 2s instead of 1s | Resolved in v3: rewritten `score_adl()` counts 1=needs help; tests assert direction. Close at release with migration note. |
-| #138 negative pack years | Likely resolved by `calculate_pack_years()` pmax guards + constants clamps; add the specific regression case (occasional smoker, age 50-54, started >=50) before closing. |
-| #159 haven_labelled input | Real bug, wrong diagnosis: tibble single-bracket indexing in label_data() (see headline 5). |
-| #135 switch to recodeflow utilities | Strategic -- the reunification question; input to the engine-options analysis. |
-| Remaining 12 | Pending the resumed issues-triage agent. |
+| #138 negative pack years | **Still real -- correction to the June 10 triage.** Reproduced live: never-daily status 3, age 52, age-first-cigarette midpoint 55 returns -0.15; the duration term in `.calculate_pack_years_core()` has no pmax guard. Fix: `pmax(age - age_first_cig, 0)` plus the regression case. v3 blocker. |
+| #139 immigration_der misclassification | **Still real, verified.** Non-immigrants born outside Canada fall through to NA::b; needs two case_when arms before the NA-propagation block. v3 blocker. |
+| #159 haven_labelled input | Real bug, wrong diagnosis (verified): tibble single-bracket indexing in label_data(), not haven_labelled itself. v3 patch: `[[` indexing (optionally zap_labels at entry); v4: a typed input-normalization stage. |
+| #173 NULL-handling standardization | Valid; standardize via a `prepare_inputs()` helper across DV functions. v3.x/v4. |
+| #178 SDCGLHM/SDCDFOLS mappings | Valid worksheet gap (P2); needs Gem verification before rows are written. |
+| #182, #175, #172, #131 | Resolved by v3 -- close on merge. |
+| #135 switch to recodeflow utilities | Answered by the reunification recommendation (option B): yes, in v4. See [2026-06-11_engine-comparison-and-reunification.md](2026-06-11_engine-comparison-and-reunification.md). |
+| #99 sedentary, #69 survey year, #57 frequency tool, #179 SDCD* successors | v4/backlog inputs (CEP candidates; #69 is worksheet-only, low effort). |
 
-## Coverage and verification status
+## Coverage and verification status (updated June 11, evening)
 
-The evidence sweep was interrupted by an org spend limit after 42 agents
-(~4.8 hours). Status:
+The evidence program is complete: all ten sweep dimensions, the
+adversarial verification pass, the engine comparison, and the ecosystem
+benchmark.
 
-- **Complete (findings on disk):** dependencies-namespace,
-  engine-internals, api-surface-ux, data-artifacts,
-  labels-metadata-layer, missing-data-architecture.
-- **Not run:** worksheet-schema (partially covered by the engine and
-  data-artifacts sweeps), testing-ci (the baseline is characterized in
-  the architecture review: pre-existing errors in test-bmi.R (6),
-  test-check-worksheet.R (3), test-recode-with-table.R (4, zero passing)),
-  docs-vignettes (partially covered by the api-surface sweep), and the
-  full issues-triage (critical subset done above).
-- **Adversarial verification phase: not run.** Findings here are
-  single-pass with cited evidence; several are independently corroborated
-  by the June 10 architecture review and live repro scripts
-  (`/tmp/v4-research/labels-repro*.R`), but the planned refutation pass
-  is pending. Treat severity rankings as provisional.
-- **Also not run:** the recodeflow-vs-cchsflow engine comparison and the
-  eight-family ecosystem benchmark.
-
-**To resume:** the workflow journal caches all completed agents. When
-capacity returns, re-invoke the workflow with
-`resumeFromRunId: wf_5d1616cd-804` (script at the path recorded in the
-session); only the interrupted agents re-run.
+- **All ten dimensions on disk** (`evidence/inventory-*.json`), including
+  the June 11 additions: worksheet-schema (19 issues, e.g. the
+  rec_with_table docstring still documents the pre-rename column names
+  toType/fromType/recFrom/recTo), testing-ci (root causes of the
+  pre-existing test errors), docs-vignettes, and the full issues triage.
+- **Adversarial verification: complete.** 41 verdicts
+  (`evidence/verification-verdicts.json`): 38 findings confirmed real,
+  3 refuted and removed from consideration (two worksheet-schema claims --
+  the YAML-nesting crash and the DerivedVar-silently-ignored claim -- and
+  the haven_labelled framing of #159). All 35 findings from the June 10
+  sweep were confirmed. Severity rankings can now be treated as reviewed.
+- **Engine comparison: complete** (`evidence/engines-*.md`), synthesized
+  in [2026-06-11_engine-comparison-and-reunification.md](2026-06-11_engine-comparison-and-reunification.md).
+- **Ecosystem benchmark: complete** (`evidence/bench-*.md` with skeptic
+  verdicts in `evidence/skeptic-*.json`; skeptics confirmed the
+  load-bearing claims, refuting only minor factual details). Synthesis
+  into the consolidated v4 requirements is the remaining writing task.

@@ -1,0 +1,146 @@
+{
+  "task": "skeptic-metadata-standards",
+  "prepared": "2026-06-11",
+  "claims_verified": [
+    {
+      "id": "dcat-v3-recommendation-date",
+      "claim": "DCAT v3 became a W3C Recommendation on 22 August 2024",
+      "verdict": "VERIFIED",
+      "source": "https://www.w3.org/news/2024/data-catalog-vocabulary-dcat-version-3-is-a-w3c-recommendation/",
+      "notes": "Exact date confirmed: 22 August 2024."
+    },
+    {
+      "id": "dcat-v3-dataset-series-version",
+      "claim": "DCAT v3 adds dcat:version and dcat:DatasetSeries",
+      "verdict": "VERIFIED",
+      "source": "https://www.w3.org/TR/vocab-dcat-3/",
+      "notes": "Both confirmed: dcat:DatasetSeries class and dcat:version, dcat:previousVersion, dcat:hasCurrentVersion, dcat:hasVersion properties are new in DCAT v3."
+    },
+    {
+      "id": "ddiwR-version-date",
+      "claim": "DDIwR v0.19, CRAN Dec 2024",
+      "verdict": "VERIFIED",
+      "source": "https://cran.r-project.org/package=DDIwR",
+      "notes": "Version 0.19 published 2024-12-10. CRAN PDF header confirms 'Package DDIwR July 21, 2025' but that is the PDF date; the actual package version 0.19 published Dec 10, 2024 per CRAN index."
+    },
+    {
+      "id": "ddiwR-codebook-2-6",
+      "claim": "DDIwR handles DDI Codebook 2.6 mapping and can export DDI XML from a labelled R data frame",
+      "verdict": "VERIFIED",
+      "source": "https://rdrr.io/cran/DDIwR/man/exportDDI.html",
+      "notes": "Confirmed: exportDDI() states 'only DDI codebook version 2.6 is exported'. The package handles value labels, missing codes, and conversion from R data frames via exportDDI()."
+    },
+    {
+      "id": "ddi-catgry-missing",
+      "claim": "DDI Codebook has catgry element with missing='Y' flag, labl short/long, notes, varFormat for units",
+      "verdict": "VERIFIED",
+      "source": "https://ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/field_level_documentation_files/schemas/codebook_xsd/elements/catgry.html",
+      "notes": "All confirmed: catgry has a 'missing' attribute indicating missing data categories; labl child element for labels; varFormat element for variable format including units. These are DDI 2.5 schema elements backward-compatible with 2.6."
+    },
+    {
+      "id": "dcat-describes-datasets-not-variables",
+      "claim": "DCAT describes datasets and catalogs, not variables",
+      "verdict": "VERIFIED",
+      "source": "https://www.w3.org/TR/vocab-dcat-3/",
+      "notes": "DCAT is explicitly an RDF vocabulary for data catalogs and datasets. It has no variable-level constructs."
+    },
+    {
+      "id": "frictionless-r-ropensci-v1-2-1",
+      "claim": "frictionless R package (rOpenSci, v1.2.1 May 2025)",
+      "verdict": "VERIFIED",
+      "source": "https://cran.r-project.org/web/packages/frictionless/index.html",
+      "notes": "Version 1.2.1, published 2025-05-23. rOpenSci maintained. Confirmed."
+    },
+    {
+      "id": "frictionless-constraints-enum-factor-levels",
+      "claim": "frictionless R package uses constraints$enum as factor levels",
+      "verdict": "VERIFIED with nuance",
+      "source": "https://docs.ropensci.org/frictionless/articles/table-schema.html",
+      "notes": "Confirmed: read_resource() uses constraints$enum to set column as factor with enum values as levels. HOWEVER: enum is NOT validated for constraint compliance - the package does not check that values fall within the enum set. The claim implies validation; actually it only converts to factor type."
+    },
+    {
+      "id": "tableschema-r-cran-apr-2025",
+      "claim": "tableschema.r (CRAN Apr 2025) handles full constraint validation",
+      "verdict": "REFUTED",
+      "source": "https://cran.r-project.org/web/packages/tableschema.r/index.html",
+      "notes": "CRITICAL: tableschema.r was ARCHIVED on CRAN on 2025-02-20 due to unresolved issues. It is no longer actively maintained on CRAN. The claim that it is stable and well-maintained (CRAN Apr 2025) is incorrect - it was removed from CRAN before that date. Development version installable from GitHub only."
+    },
+    {
+      "id": "croissant-ml-datasets-schema-org",
+      "claim": "Croissant targets ML training datasets (Hugging Face, Kaggle, OpenML), extends schema.org, has no R tooling",
+      "verdict": "VERIFIED",
+      "source": "https://mlcommons.org/2024/03/croissant_metadata_announce/",
+      "notes": "Confirmed: Croissant is MLCommons format for ML datasets, integrated into Hugging Face, Kaggle, OpenML (note: NOT Dataverse as one source mentioned, but the three named are correct). Extends schema.org using JSON-LD. No R package exists."
+    },
+    {
+      "id": "croissant-irrelevant-to-cchsflow",
+      "claim": "Croissant is irrelevant to cchsflow",
+      "verdict": "VERIFIED",
+      "source": "https://arxiv.org/html/2403.19546v1",
+      "notes": "Croissant targets ML training datasets for split/label annotations (train/test/validation splits, feature annotations for ML). cchsflow is a harmonization codebook for population health surveys - completely different use case."
+    },
+    {
+      "id": "linkml-no-r-package-python-only",
+      "claim": "LinkML has no R package and is Python-only",
+      "verdict": "VERIFIED",
+      "source": "https://linkml.io/linkml/howtos/port-linkml.html",
+      "notes": "Confirmed: LinkML toolchain is Python-only. Generators exist for TypeScript, Java, Rust but not R. The porting page confirms R is not a supported target."
+    },
+    {
+      "id": "schemasheets-linkml-spreadsheet-tool",
+      "claim": "Schemasheets tool (LinkML ecosystem) converts spreadsheets to LinkML YAML",
+      "verdict": "VERIFIED",
+      "source": "https://github.com/linkml/schemasheets",
+      "notes": "Confirmed: Schemasheets is a real tool in the LinkML ecosystem. sheets2linkml converts spreadsheet schemas to LinkML YAML. Python-based."
+    },
+    {
+      "id": "ipumsr-ddi-workflow",
+      "claim": "ipumsr demonstrates mature use of DDI for population health survey harmonization: read_ipums_ddi() parses DDI XML for variable labels, value labels, universe definitions, then read_ipums_micro() applies them",
+      "verdict": "VERIFIED",
+      "source": "https://tech.popdata.org/ipumsr/reference/read_ipums_ddi.html",
+      "notes": "Confirmed: read_ipums_ddi() reads DDI codebook XML to ipums_ddi object with variable labels, value labels, parsing instructions. read_ipums_micro() then applies them. IPUMS collections include population health surveys. This is the correct model cited."
+    },
+    {
+      "id": "ddi-4-beta-rdf-json-ld",
+      "claim": "DDI 4.0 beta (2025) adds RDF and JSON-LD representations alongside XML",
+      "verdict": "PARTIALLY VERIFIED - naming imprecision",
+      "source": "https://ddialliance.org/news/ddi-lifecycle-v4.0-beta-4-review",
+      "notes": "The product is DDI LIFECYCLE 4.0 beta (not simply 'DDI 4.0'). DDI Codebook 2.6 is a separate product still in final public review (Jan-Feb 2026). DDI Lifecycle 4.0 beta adds RDF (OWL/Turtle), XML Schema, JSON Schema, ShEx, SHACL serializations. JSON-LD is used by Colectica Portal implementation but is not listed as a first-class serialization format in the spec itself. The claim is substantively correct but the 'DDI 4.0' label conflates DDI Lifecycle 4.0 (new) with DDI Codebook (separate track at 2.6)."
+    },
+    {
+      "id": "ddiwR-codebook-labelled-r-dataframe",
+      "claim": "DDIwR already handles the mapping and can export DDI XML from a labelled R data frame",
+      "verdict": "VERIFIED",
+      "source": "https://rdrr.io/cran/DDIwR/man/exportDDI.html",
+      "notes": "Confirmed: exportDDI() takes a DDI class object built from R data; convert() handles labeled R datasets with haven/declared-style missing values."
+    },
+    {
+      "id": "linkml-gigascience-dec-2025",
+      "claim": "LinkML GigaScience article doi/10.1093/gigascience/giaf152",
+      "verdict": "VERIFIED",
+      "source": "https://academic.oup.com/gigascience/advance-article/doi/10.1093/gigascience/giaf152/8378082",
+      "notes": "Confirmed: Article 'LinkML: An Open Data Modeling Framework' published in GigaScience with DOI 10.1093/gigascience/giaf152. Accepted December 2025, published December 12, 2025. Article focuses on Python tooling; R is not mentioned."
+    },
+    {
+      "id": "ddi-codebook-2-6-status",
+      "claim": "DDI Codebook 2.6 (implied: finalized/current standard)",
+      "verdict": "NUANCE: still in public review as of early 2026",
+      "source": "https://ddialliance.org/news/final-public-review-ddi-codebook-version-2.6",
+      "notes": "DDI Codebook 2.6 was in final public review Jan 28 - Feb 28, 2026 (release candidate stage). As of June 2026, outcome of that vote is not yet confirmed by these sources. DDIwR 0.19 implements the 2.6 schema regardless of formal ratification status."
+    },
+    {
+      "id": "frictionless-replaces-ad-hoc-check-worksheet",
+      "claim": "Frictionless Table Schema would replace check_worksheet() column-count checks with a standards-compliant validator",
+      "verdict": "PARTIALLY VERIFIED with caveat",
+      "source": "https://docs.ropensci.org/frictionless/articles/table-schema.html",
+      "notes": "The frictionless R package handles column names, types, and foreign-key relationships via datapackage.json. However, it does NOT validate that column values fall within enum constraints at read time - it only uses enum to set factor levels. Full constraint validation (required, pattern, enum enforcement) would need tableschema.r, which is archived. The maintained frictionless package does not do constraint enforcement beyond type parsing."
+    }
+  ],
+  "summary": {
+    "verified_count": 15,
+    "refuted_count": 1,
+    "nuanced_count": 3,
+    "key_finding": "The single hard refutation is tableschema.r: the claim says it is stable and well-maintained (CRAN Apr 2025) but it was archived from CRAN on 2025-02-20. This weakens the recommended frictionless validation layer for enum constraint enforcement - the maintained frictionless package only uses enum for factor-level parsing, not validation. The frictionless package itself is solid and rOpenSci-maintained. All other major claims check out: DCAT v3 date, DDIwR 0.19/Dec 2024/Codebook 2.6 export, Croissant scope, LinkML Python-only, Schemasheets existence, ipumsr DDI workflow, DCAT:DatasetSeries + dcat:version, DDI catgry/missing/labl elements.",
+    "recommendation_impact": "The 'wrap' recommendation remains sound. The tableschema.r issue means enum constraint validation in R requires a workaround (GitHub-only install, or writing custom checks, or accepting that frictionless only parses but does not validate enums). The DDI Codebook 2.6 vs DDI Lifecycle 4.0 naming should be clarified in documentation: these are two separate DDI tracks."
+  }
+}

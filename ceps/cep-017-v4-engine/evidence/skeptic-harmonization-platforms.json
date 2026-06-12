@@ -1,0 +1,134 @@
+{
+  "verdict_date": "2026-06-11",
+  "analyst": "skeptic-agent",
+  "claims_assessed": [
+    {
+      "claim": "Rmonize v2.0.0, CRAN 2025-06-30",
+      "status": "PARTIALLY_VERIFIED",
+      "detail": "Version 2.0.0 confirmed on CRAN. Release date is 2025-06-30 per CRAN index page; NEWS.md shows release date as June 26, 2025. Minor discrepancy (June 26 vs June 30) - one is authoring date, one is CRAN publication date. Effectively verified.",
+      "sources": ["https://cran.r-project.org/web/packages/Rmonize/index.html", "https://github.com/maelstrom-research/Rmonize/blob/main/NEWS.md"]
+    },
+    {
+      "claim": "Rmonize uses two coordinated tables: DataSchema and DPE (Data Processing Elements)",
+      "status": "VERIFIED",
+      "detail": "Confirmed. CRAN description and documentation explicitly describe DataSchema (target variable definitions) and Data Processing Elements (one row per DataSchema variable per input dataset).",
+      "sources": ["https://cran.r-project.org/web/packages/Rmonize/index.html", "https://maelstrom-research.github.io/Rmonize-documentation/dpe/index.html"]
+    },
+    {
+      "claim": "Rmonize has an 8-type enum for rule types: direct_mapping, recode, case_when, operation, other, impossible, undetermined, id_creation",
+      "status": "REFUTED_DETAIL",
+      "detail": "Rmonize's DPE has a 'rule_category' column (NOT 'rule_type') with 9 values, not 8: id_creation, direct_mapping, recode, case_when, paste, operation, other, impossible, undetermined. The skeptic pass omits 'paste' from the list. The column name is 'rule_category', not 'rule_type'. The count is 9, not 8.",
+      "sources": ["https://maelstrom-research.github.io/Rmonize-documentation/dpe/index.html"]
+    },
+    {
+      "claim": "psHarmonize v0.3.6, CRAN 2025-10-16",
+      "status": "VERIFIED",
+      "detail": "Version 0.3.6 confirmed on CRAN with publication date 2025-10-16.",
+      "sources": ["https://cran.r-project.org/web/packages/psHarmonize/index.html"]
+    },
+    {
+      "claim": "psHarmonize uses a 3-type system",
+      "status": "REFUTED",
+      "detail": "psHarmonize's harmonization sheet (code_type column) has exactly 2 modification types: 'recode category' and 'function'. The documentation explicitly states 'There are two different types of modifications you can choose from.' Not 3 types.",
+      "sources": ["https://cran.r-project.org/web/packages/psHarmonize/vignettes/Harmonization_sheet.html", "https://cran.r-project.org/web/packages/psHarmonize/vignettes/psHarmonize.html"]
+    },
+    {
+      "claim": "psHarmonize has a coding_notes column",
+      "status": "VERIFIED",
+      "detail": "Confirmed. The harmonization sheet includes a 'coding_notes' column used for documenting transformation decisions (e.g., 'No change needed', 'Convert from inches to cm').",
+      "sources": ["https://github.com/NUDACC/psHarmonize"]
+    },
+    {
+      "claim": "retroharmonize v0.2.8, CRAN 2026-05-21, unstable — archived Jan–May 2026",
+      "status": "VERIFIED",
+      "detail": "Version 0.2.8 confirmed on CRAN, published May 21, 2026. Package was archived on 2026-01-30 (due to dependency on archived 'dataset' package) and restored/re-published May 21, 2026. The characterization 'archived Jan–May 2026' is accurate.",
+      "sources": ["https://cran.r-project.org/web/packages/retroharmonize/index.html"]
+    },
+    {
+      "claim": "retroharmonize takes a programmatic/metadata-object approach for ex-post survey harmonization from DDI/SPSS sources",
+      "status": "VERIFIED",
+      "detail": "Confirmed from CRAN description and package documentation. Uses comprehensive S3 classes. DDI/SPSS source handling is part of its design.",
+      "sources": ["https://cran.r-project.org/web/packages/retroharmonize/index.html", "https://retroharmonize.dataobservatory.eu/"]
+    },
+    {
+      "claim": "Opal uses server-side JavaScript-based derived variables",
+      "status": "VERIFIED",
+      "detail": "Confirmed. Opal uses the Magma JavaScript API (via Rhino JS engine) for derived variables. 'A derived variable is a variable which values are computed using a script that is expressed using the Magma Javascript API.'",
+      "sources": ["https://opaldoc.obiba.org/en/latest/magma-user-guide/index.html"]
+    },
+    {
+      "claim": "Opal has an embedded per-variable VCS with REST API access to full script history",
+      "status": "VERIFIED",
+      "detail": "Confirmed via GitHub issue #1816 which explicitly defines REST API endpoints for per-variable VCS: GET commits for a view, GET commits for a specific variable script, GET commit details with diffs, GET script at specific commit blob.",
+      "sources": ["https://github.com/obiba/opal/issues/1816"]
+    },
+    {
+      "claim": "Rmonize is peer-reviewed (IJE guidelines paper, PMC5407152)",
+      "status": "PARTIALLY_VERIFIED_WITH_CAVEAT",
+      "detail": "PMC5407152 is confirmed as the Maelstrom Research guidelines for rigorous retrospective data harmonization, published in IJE 2016. However, this paper describes the *guidelines/methodology*, not Rmonize the R package specifically. Rmonize is the software implementation of those guidelines. The citation is legitimate but the framing 'peer-reviewed (IJE guidelines paper)' conflates the guidelines paper with the R package.",
+      "sources": ["https://pmc.ncbi.nlm.nih.gov/articles/PMC5407152/"]
+    },
+    {
+      "claim": "Rmonize is GPL-3 licensed",
+      "status": "VERIFIED",
+      "detail": "Confirmed from CRAN index page.",
+      "sources": ["https://cran.r-project.org/web/packages/Rmonize/index.html"]
+    },
+    {
+      "claim": "The Maelstrom five processing-model taxonomy includes: algorithmic transformation, calibration, standardization, latent variable, imputation",
+      "status": "VERIFIED",
+      "detail": "Confirmed from Maelstrom Research data-processing-methods page. The five models are: (1) Algorithmic Transformation, (2) Simple Calibration Model, (3) Standardization Model, (4) Latent Variable Model, (5) Multiple Imputation Models.",
+      "sources": ["https://www.maelstrom-research.org/page/data-processing-methods"]
+    },
+    {
+      "claim": "PMC5837212 is Opal/Mica paper in IJE",
+      "status": "VERIFIED",
+      "detail": "PMC5837212 is confirmed as the Opal and Mica software profile paper published in International Journal of Epidemiology (2017).",
+      "sources": ["https://pmc.ncbi.nlm.nih.gov/articles/PMC5837212/"]
+    },
+    {
+      "claim": "Rmonize embeds R code directly in DPE cells for recode, case_when, and operation rules",
+      "status": "VERIFIED",
+      "detail": "Confirmed. The DPE algorithm column contains R code expressions directly in cells.",
+      "sources": ["https://maelstrom-research.github.io/Rmonize-documentation/dpe/index.html"]
+    },
+    {
+      "claim": "arxiv 2411.10342 is about retroharmonize",
+      "status": "REFUTED",
+      "detail": "arxiv 2411.10342v1 describes an EHRs Data Harmonization Platform built on recodeflow (a Shiny app). It is NOT about retroharmonize, though it mentions retroharmonize as a related tool.",
+      "sources": ["https://arxiv.org/html/2411.10342v1"]
+    },
+    {
+      "claim": "cell.com patterns paper S2666-3899(24)00128-4 is about psHarmonize",
+      "status": "UNCONFIRMABLE",
+      "detail": "URL returned HTTP 403 Forbidden. However, web search results indicate this Cell Patterns paper is about psHarmonize (title matches psHarmonize paper). Cannot directly verify content.",
+      "sources": []
+    }
+  ],
+  "summary": {
+    "verified": [
+      "Rmonize v2.0.0 on CRAN (June 2025), GPL-3",
+      "Rmonize DataSchema + DPE two-table architecture",
+      "Rmonize uses R code directly in DPE algorithm cells",
+      "psHarmonize v0.3.6 on CRAN (2025-10-16)",
+      "psHarmonize coding_notes column exists",
+      "retroharmonize v0.2.8 on CRAN (2026-05-21), archived Jan 30 2026 and restored May 21 2026",
+      "Opal uses JavaScript (Magma JS / Rhino engine) for derived variables",
+      "Opal has per-variable VCS with REST API (via GitHub issue #1816)",
+      "Maelstrom five processing-model taxonomy (algorithmic, calibration, standardization, latent variable, imputation)",
+      "PMC5407152 = Maelstrom IJE guidelines paper (2016)",
+      "PMC5837212 = Opal/Mica IJE software profile (2017)"
+    ],
+    "refuted_or_corrected": [
+      "Rule type column is 'rule_category' NOT 'rule_type' (different column name)",
+      "Rmonize has 9 rule categories, not 8: id_creation, direct_mapping, recode, case_when, paste, operation, other, impossible, undetermined — 'paste' was omitted from the skeptic pass's list",
+      "psHarmonize has 2 code_type values ('recode category' and 'function'), NOT 3 types",
+      "arxiv 2411.10342 describes an EHRs platform built on recodeflow, not retroharmonize"
+    ],
+    "caveats": [
+      "PMC5407152 is the Maelstrom guidelines paper, not a paper specifically about Rmonize the R package — the framing conflates the methodology paper with the software",
+      "retroharmonize 'unstable' description is fair but the package is now active again on CRAN as of May 21, 2026",
+      "cell.com patterns paper could not be fetched (403) but is likely correctly attributed to psHarmonize based on search results"
+    ]
+  }
+}

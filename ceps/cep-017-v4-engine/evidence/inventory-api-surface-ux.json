@@ -1,225 +1,185 @@
 {
-  "summary": "cchsflow v3 (working tree, branch fix/v3-smoking-worksheet-sync) exports 125 symbols spanning three API generations: 51 verb-prefixed v3 functions (43 calculate_*, 2 assess_*, 3 categorize_*, 3 score_*/adjust_*), 27 legacy *_fun functions, 6 functions named literally after CCHS variables (e.g. DPSDSF(DPSDSF)), 18 get_* accessors, 1 set_*, ~24 engine/cache/worksheet internals (is_equal, if_else2, cache_pattern, apply_database_heuristics, ...) and 1 engine entry point (rec_with_table, 11 parameters). The most embarrassing findings: 18 exported calculate_* functions are pure 'DOCUMENTATION ONLY' stubs whose only body is stop(); rec_with_table's roxygen documents the wrong defaults for two of its 11 parameters (append_to_data, notes); the pkgdown reference index still lists ~25 deleted v2 topics (bmi_fun, adl_fun, ALW_1...) while omitting every new v3 export; and parameter naming is split 22 CCHS-coded vs 12 semantic vs 1 mixed across the v3 DV functions, with near-collision export pairs like calculate_SMKG203_cont vs calculate_SMKG203_continuous. Error messaging uses base stop()/warning() exclusively (91/32 calls, zero cli/rlang despite cli sitting unused in Depends), with messages like 'Invalid Argument was passed', the typo 'varLalbel', grammar errors ('more then once', 'cant change'), vectorized paste() bugs, and a routine-operation warning ('Priority rules YAML files not found') fired because the YAML the code looks for is not shipped. 32 of 125 exports have no @examples. These findings directly support the v4 goals of a thin engine, one naming convention, and a much smaller public surface.",
+  "dimension": "api-surface-ux",
+  "summary": "cchsflow's working-tree NAMESPACE exports 125 symbols (task brief said 127; two were dropped in the uncommitted repair). The surface is a three-generation accretion: 27 legacy *_fun/_fun1/_fun2 exports, 51 verb-prefixed v3 exports (calculate_/assess_/categorize_/score_/adjust_), 6 bare CCHS-name doc placeholders, ~30 engine/cache internals (is_equal, if_else2, cache_pattern, apply_database_heuristics...), and 24 exported functions that are not functions at all -- 18 unconditionally stop('DOCUMENTATION ONLY') and 6 have empty bodies. rec_with_table has 11 parameters of which 3 (else_value, append_to_data, custom_function_path) are used in zero of 291 repo call sites and 2 have doc-vs-code default mismatches. Error messaging is pre-cli/rlang base-R paste(): typos ('varLalbel', 'more then once'), raw source indentation printed to console, vectorized paste() warning mash, and one bare 'Invalid Argument was passed'; the package's own man pages wrap examples in suppressWarnings() 23 times. DV dispatch is positional (unname + do.call), making worksheet argument order a silent-corruption hazard. Docs infra is broken: _pkgdown.yml still indexes deleted functions (bmi_fun et al.), omits 90/125 current exports, and vignettes still teach bmi_fun. 32 exports have no examples and 49 only \\dontrun. These findings directly substantiate the recodeflow scoping complaints (too many parameters, not enough logging/why-failure context) and define the v4 API cleanup scope.",
   "issues": [
     {
-      "title": "18 exported calculate_* functions are 'DOCUMENTATION ONLY' stubs whose only body is stop()",
-      "area": "api-surface-ux",
+      "title": "24 exported 'functions' are documentation-only placeholders (18 always error, 6 empty bodies)",
+      "area": "API surface / exports",
       "evidence": [
-        "/Users/dmanuel/github/cchsflow/R/smoking-status.R:196-198 calculate_SMK_005 <- function(data, output_format = \"tagged_na\") { stop(\"DOCUMENTATION ONLY: Use rec_with_table(data, 'SMK_005') for implementation\") }",
-        "grep 'stop(\"DOCUMENTATION ONLY' R/*.R -> 18 hits: smoke-intensity.R:209,250,286,322 (SMK_204, SMK_208, SMK_05B, SMK_05C); smoke-stop.R:74,120,153,183 (SMK_06A_cat4, SMK_09A_2003plus, *_complete_stub, *_daily_stub); smoke-start.R:102,163,304,546,592 (SMKG040_cat, SMKG203_cat, SMKG207_cat, SMK_207, SMK_203); smoking-status.R:93,145,197,250,306 (SMKDSTY_cat5, SMKDSTY_cat3, SMK_005, SMK_030, SMK_01A)",
-        "All 18 appear in NAMESPACE export() lines and have man/*.Rd pages; e.g. /Users/dmanuel/github/cchsflow/NAMESPACE exports calculate_SMK_005, calculate_SMKDSTY_cat5, calculate_SMKG203_cat",
-        "Stubs carry full roxygen with @param/@return/@examples (\\dontrun) describing behaviour the function does not have, e.g. R/smoking-status.R:153-197"
+        "R/smoking-status.R:92-93 calculate_SMKDSTY_cat5 <- function(data, output_format=...) { stop(\"DOCUMENTATION ONLY: Use rec_with_table(data, 'SMKDSTY_cat5') for implementation\") }",
+        "18 stop('DOCUMENTATION ONLY') stubs, all exported: smoking-status.R:93,145,197,250,306; smoke-stop.R:74,120,153,183; smoke-start.R:102,163,304,546,592; smoke-intensity.R:209,250,286,322",
+        "R/depression.R:27-29 'DPSDSF <- function(DPSDSF) { # this is for documentation purposes only }' -- exported, empty body, roxygen says 'NOTE: this is not a function'",
+        "R/life-satisfaction.R:44-46 GEN_02A2 <- function(GEN_02A, GEN_02A2) {}; R/occupation.R:36-38,82,124 LBFA_31A/_a/_b same pattern; 14 occurrences of 'documentation purposes only'/'not a function' across R/",
+        "Two exports carry a '_stub' suffix in the public API: calculate_time_quit_smoking_complete_stub (R/smoke-stop.R:149), calculate_time_quit_smoking_daily_stub (R/smoke-stop.R:180)",
+        "Net: 24/125 exports (19%) error or no-op when called; functions are also named identically to their own first parameter (DPSDSF(DPSDSF))"
       ],
-      "why_design_issue": "Roughly 14% of the public API (18/125) is fake: calling a documented, exported function with the signature it advertises throws an error. Errors are being used as a documentation channel because the package has no other way to document worksheet-routed derived variables. This violates the basic contract of an R export, confuses autocompletion-driven discovery, and would draw immediate criticism in a CRAN or JOSS-style review.",
+      "why_design_issue": "An exported function is a contract that it can be called. Users autocomplete calculate_SMK_204(), call it, and get an unconditional error; DPSDSF() silently returns NULL. This abuses the function namespace as a documentation system for worksheet-implemented variables, inflates the API ~19%, and forces every stub to fake a signature (data, output_format) it never uses.",
       "severity": "high",
-      "candidate_fix": "In v4, document worksheet-routed variables as roxygen data/topic pages (@name + NULL, like the existing variable docs in R/data.R) or pkgdown articles, not as exported functions. If a callable is genuinely wanted, make the stub delegate to rec_with_table(data, '<var>') instead of stopping. Remove the 18 stubs from NAMESPACE either way.",
+      "candidate_fix": "v4: document worksheet-implemented variables as data/topic docs (roxygen @name + @docType or pkgdown articles auto-generated from variables.csv), not exported closures. Delete the 18 stop-stubs and 6 empty bodies from NAMESPACE; keep .Rd topics via @name pages so ?SMKDSTY_cat5 still works.",
       "effort": "M"
     },
     {
-      "title": "Three API generations coexist in one namespace with no deprecation markers, and the deleted v2 functions have no shims",
-      "area": "api-surface-ux",
+      "title": "Three coexisting naming generations across the 125 exports, mirrored inside the worksheet",
+      "area": "API surface / naming convention",
       "evidence": [
-        "NAMESPACE grouping (125 exports): 43 calculate_*, 2 assess_*, 3 categorize_*, 3 score_*/adjust_*, 27 legacy *_fun (pack_years_fun, smoke_simple_fun, age_cat_fun, SMKDSTY_fun, EDUDR04_fun, ...), 18 get_*, 1 set_*, 6 CCHS-variable-named functions (DPSDPP, DPSDSF, GEN_02A2, LBFA_31A, LBFA_31A_a, LBFA_31A_b), plus engine/cache exports",
-        "Duplicate logic exported under both generations: R/smoking.R:266 pack_years_fun alongside R/smoke-pack-years.R:120 calculate_pack_years; smoke_simple_fun alongside calculate_smoke_simple; time_quit_smoking_fun alongside calculate_time_quit_smoking; SMKG203_fun alongside calculate_SMKG203_from_combined (R/smoking.R:803 is a documented alias wrapper)",
-        "grep '.Deprecated' R/*.R -> only one hit: R/smoking-status.R:506 (calculate_SMKDSTY_original). None of the 27 *_fun exports carries a deprecation notice",
-        "ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md decision log: 'v3.0.0 release takes option B -- deprecation shims (R/deprecated-aliases.R) for renamed v2 functions' -- but R/deprecated-aliases.R does not exist in the working tree, while v2 exports bmi_fun, adl_fun, binge_drinker_fun, immigration_fun, low_drink_*_fun, resp_condition_fun1/2/3 are hard-deleted (man/bmi_fun.Rd etc. deleted per git status; 0 hits in NAMESPACE)",
-        "The user-facing worksheet mixes vocabularies: inst/extdata/variable_details.csv contains both Func::calculate_bmi and Func::age_cat_fun / Func::diet_score_fun / Func::smoke_simple_fun"
+        "NAMESPACE: 43 calculate_*, 8 assess_/categorize_/score_/adjust_*, 27 *_fun|_fun1|_fun2|_fun_cat (e.g. pack_years_fun, CCC_091_fun1, multiple_conditions_fun3), 1 *_der (food_insecurity_der), 6 bare CCHS names (DPSDPP, DPSDSF, GEN_02A2, LBFA_31A, LBFA_31A_a, LBFA_31A_b)",
+        "Both generations of the same concept exported simultaneously: pack_years_fun (R/smoking.R:266, CCHS-code params) AND calculate_pack_years (R/smoke-pack-years.R:120, semantic params); smoke_simple_fun AND calculate_smoke_simple; time_quit_smoking_fun AND calculate_time_quit_smoking",
+        "inst/extdata/variable_details.csv recEnd Func:: references mix vocabularies: 46 distinct functions, ~17 *_fun-style (active_transport1_fun, diet_score_fun, RACDPAL_fun) vs ~28 verb-style (calculate_bmi, assess_adl, categorize_immigration)",
+        "Numbered-variant suffixes carry no meaning to users: CCC_091_fun1 vs CCC_091_fun2, COPD_Emph_der_fun1/2, multiple_conditions_fun1/2/3, resp_condition_fun (suffix-less survivor after fun1/2/3 deleted per git status man/resp_condition_fun[123].Rd)"
       ],
-      "why_design_issue": "Users cannot tell which of two (sometimes five) exported names for the same concept is current. v2 code calling bmi_fun() now fails with 'could not find function' despite the documented decision to ship shims. The worksheet itself — the package's central artifact — exposes the inconsistency, so even non-programmer users reading variable_details.csv see two naming conventions.",
+      "why_design_issue": "Users cannot predict a function name (is BMI bmi_fun, calculate_bmi, or HWTGBMI?), and the worksheet's Func:: strings hard-couple both generations into the engine via get(), so neither can be removed without a coordinated worksheet+NAMESPACE migration. Numbered _fun1/_fun2 variants encode era logic in opaque suffixes the team has already agreed to deprecate (era-split naming feedback).",
       "severity": "high",
-      "candidate_fix": "Implement the already-decided R/deprecated-aliases.R: thin wrappers with .Deprecated() for every removed/renamed v2 function. Mark all remaining *_fun exports deprecated in roxygen (@keywords internal + lifecycle note) with a v4 removal date. Migrate worksheet Func:: references to the verb-prefixed names in one sweep so variable_details.csv shows a single vocabulary.",
-      "effort": "M"
-    },
-    {
-      "title": "Engine and cache internals leak into the public API (~24 exports), inflating the surface to 125 symbols",
-      "area": "api-surface-ux",
-      "evidence": [
-        "NAMESPACE exports engine helpers: is_equal (R/recode-with-table.R:33, a 3-line NA-safe '==' used internally), if_else2 (R/utility-functions.R:30, used 216 times in R/), merge_rec_data",
-        "NAMESPACE exports 15 missing-pattern-cache symbols: has_cached_pattern, get_cached_pattern, cache_pattern, clear_missing_patterns_cache, clear_complete_patterns_cache, get_missing_pattern, get_missing_pattern_auto, get_missing_pattern_bulk, get_complete_pattern, get_copy_mappings, get_else_mappings, get_variable_missing_pattern, auto_detect_database, apply_database_heuristics, extract_years_from_database_names (all in R/missing-pattern-cache.R; none has @examples)",
-        "ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md 'Engine API shortlist' names ~11 primitives to promote and says 'Keep internal: recode pipeline internals until rebuilt. Dev-only: check_worksheet(), fix_worksheet(), load_schema(), variable-discovery' — yet all of these are currently exported",
-        "Subject-specific convenience wrapper exported: R/variable-discovery.R:347 get_smoking_variables(recommended, source) — no equivalent for any other domain"
-      ],
-      "why_design_issue": "A 125-symbol surface for a harmonization package whose core workflow is one function plus ~30 DV functions makes the reference index unscannable and creates compatibility obligations for functions that were never designed as API (cache invalidation helpers, year-parsing heuristics). apply_database_heuristics and extract_years_from_database_names are implementation details of auto-detection; exporting them freezes internals the v4 refactor needs to change.",
-      "severity": "high",
-      "candidate_fix": "Adopt the CEP-017 shortlist: keep clean_variables, any_missing, assign_missing, get_priority_missing, get_missing_pattern, get_complete_pattern, get_variables, get_variable_details and label utilities public; demote the rest of the cache/heuristic/discovery layer to @keywords internal (or an explicit cchsflow:::dev namespace) in v4 with one deprecation cycle. Drop get_smoking_variables in favour of get_harmonized_variables(subject = ...).",
-      "effort": "M"
-    },
-    {
-      "title": "rec_with_table has 11 parameters; at least 4 are unused anywhere in the package's own vignettes/tests, and one (custom_function_path) sources arbitrary code with a comment that contradicts the code",
-      "area": "api-surface-ux",
-      "evidence": [
-        "/Users/dmanuel/github/cchsflow/R/recode-with-table.R:154-165 signature: data, variables, database_name, variable_details, else_value, append_to_data, log, notes, var_labels, custom_function_path, attach_data_name (11 params). recodeflow's copy has grown to 15 (/Users/dmanuel/github/recodeflow/R/recode-with-table.R:218-233 adds id_role_name, name_of_environment_to_load, append_non_db_columns, tables)",
-        "Call-site frequency across vignettes/ and tests/: log=21, var_labels=4, notes=3, attach_data_name=2, else_value=0, append_to_data=0, custom_function_path=0, database_name= (named form) 0",
-        "R/recode-with-table.R:166-169: comment says 'If custom Functions are passed create new environment and source' but the code is bare source(custom_function_path) — sources into the global environment, no new environment is created",
-        "R/recode-with-table.R:180-183: database_name = NULL falls back to deparse(substitute(data)) — the database is guessed from the caller's variable name; rec_with_table(my_df) silently sets database_name='my_df', which matches nothing in variable_details and downgrades to per-variable warnings",
-        "/tmp/recodeflow-pr43/index.qmd:39 user feedback: 'The function having too many parameters (complex API) etc.'",
-        "Polymorphic 'variables' param: R/recode-with-table.R:104-105 '@param variables character vector containing variable names to recode or a variables csv containing additional variable info' (vector OR data frame)"
-      ],
-      "why_design_issue": "The single front-door function carries four parameters with no demonstrated use, one parameter that does NSE guessing of a critical key (database_name), one that silently mutates the global environment, and one whose type changes its meaning. This is exactly the 'complex API' the recodeflow scoping complains about, and every extra parameter is a compatibility constraint on the planned v4 decomposition into detect/recode/derive/label stages.",
-      "severity": "high",
-      "candidate_fix": "For v4: split rec_with_table into pipeline stages (per CEP-017 phase 5) and shrink the orchestrator to data / variables / database_name / variable_details plus an options object or ... for the long tail. Drop custom_function_path (users can source() themselves; if kept, evaluate in a child environment as the comment promises). Make database_name required or validated with an informative error instead of deparse(substitute()) guessing. Give 'variables' one type and add a separate worksheet argument.",
+      "candidate_fix": "v4: single verb_noun convention (the calculate_/assess_/categorize_ family), one exported function per concept; era variants become internal dispatch or year-suffixed names (_pre2015/_2015plus). Keep *_fun as deprecated shims for one release with lifecycle::deprecate_warn, and migrate worksheet Func:: strings in the same change-set.",
       "effort": "L"
     },
     {
-      "title": "rec_with_table roxygen documents the wrong defaults for two of its parameters",
-      "area": "api-surface-ux",
+      "title": "rec_with_table: 11 parameters, 3 never used anywhere in the repo, 2 with doc-vs-code default mismatches",
+      "area": "rec_with_table parameter complexity",
       "evidence": [
-        "R/recode-with-table.R:113-114: '@param append_to_data Logical, if \\code{TRUE} (default), recoded variables will be appended to the data.' vs R/recode-with-table.R:160: 'append_to_data = FALSE'",
-        "R/recode-with-table.R:117-118: '@param notes Logical, if \\code{FALSE} (default), will not print the content inside the Note column' vs R/recode-with-table.R:162: 'notes = TRUE'",
-        "vignettes/get_started-ish text contradicts the roxygen too: a vignette states 'append_to_data defaults to FALSE' (grep hit 'vignettes:221'), so the vignette and the help page disagree"
+        "R/recode-with-table.R:154-165 signature: data, variables, database_name, variable_details, else_value, append_to_data, log, notes, var_labels, custom_function_path, attach_data_name (11 params)",
+        "Usage across 291 rec_with_table() call sites in vignettes/ + tests/: log= 22, var_labels= 4, notes= 3, attach_data_name= 2, else_value= 0, append_to_data= 0, custom_function_path= 0",
+        "Doc/default mismatch 1: R/recode-with-table.R:113-114 '@param append_to_data Logical, if TRUE (default)' vs line 160 'append_to_data = FALSE'",
+        "Doc/default mismatch 2: R/recode-with-table.R:117-118 '@param notes Logical, if FALSE (default), will not print' vs line 162 'notes = TRUE'",
+        "/tmp/recodeflow-pr43/index.qmd:39 lists 'The function having too many parameters (complex API)' as a named v-next driver",
+        "R/recode-with-table.R:167-169: custom_function_path is implemented as bare source(path) -- comment claims 'create new environment and source' but source() defaults to the global environment"
       ],
-      "why_design_issue": "The flagship function's help page misstates its own defaults in both directions. A user reading ?rec_with_table will expect appended output and silent notes and get the opposite. Documentation that contradicts code on the single most-used entry point erodes trust in all the other docs.",
+      "why_design_issue": "More than half the parameter list is dead weight or wrong: 3 of 11 options have zero observed usage, and the two most behaviour-changing flags (append_to_data, notes) are documented with inverted defaults, so a user reading ?rec_with_table gets the opposite of what the code does. custom_function_path silently pollutes the caller's global environment.",
       "severity": "high",
-      "candidate_fix": "One-line roxygen fixes for both @param entries (and an audit of the remaining nine for drift), plus a testthat test that formals(rec_with_table) match the documented defaults to prevent regression.",
-      "effort": "S"
-    },
-    {
-      "title": "Parameter naming is split across the v3 DV functions: 22 CCHS-coded vs 12 semantic vs 1 mixed, with no rule",
-      "area": "api-surface-ux",
-      "evidence": [
-        "Semantic: R/bmi.R:82 calculate_bmi(height_m, weight_kg, output_format); R/percent-time-canada.R:59 calculate_pct_time(age, born_in_canada, years_in_canada); R/immigration.R:56 categorize_immigration(immigrant_status, born_canada, ethnicity, years); R/smoke-pack-years.R:120 calculate_pack_years(smoking_status, age, age_start_smoking, cigs_per_day, time_quit_smoking, ...)",
-        "CCHS-coded: R/adl.R:89 assess_adl(ADL_01..ADL_05, output_format); R/alcohol.R:182 calculate_binge_drinking(DHH_SEX, ALW_1, ALW_2A1..ALW_2A7, output_format); R/smoking-cessation.R calculate_time_quit_smoking_complete(SMKDSTY_cat5, SMK_10_gate, SMK_06A_cont, SMK_09A_cont, SMK_10A_cont, ...)",
-        "Mixed within one signature: R/smoking-status.R:604 calculate_smoke_simple(SMKDSTY_cat5, time_quit_smoking, output_format)",
-        "Full tally from signature scan: 22 DV exports with all-CCHS params, 12 all-semantic, 1 mixed",
-        "ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md open question 5: 'Parameter naming. Semantic (height_m) or CCHS-coded (SMK_005) for function signatures -- one convention, documented.'"
-      ],
-      "why_design_issue": "A user calling calculate_bmi types height_m; a user calling assess_adl must know StatCan's ADL_01 coding; calculate_smoke_simple makes them do both in one call. Source-agnostic semantic names are part of the package's own v3 design language (per the cchsflow-derive standards), so the CCHS-coded half is an unfinished migration. Mixed conventions also block generic tooling (e.g. mapping worksheet variableStart lists to function args by name).",
-      "severity": "medium",
-      "candidate_fix": "Decide CEP-017 open question 5 (semantic names recommended, with the CCHS source variable documented per-@param), then rename arguments in the CCHS-coded 22 during the v4 deprecation cycle. Because the engine currently dispatches DerivedVar:: rows positionally, argument renames are non-breaking for worksheet use; only direct callers need shims.",
+      "candidate_fix": "Immediate: fix the two @param default descriptions (S). v4: core signature rec_with_table(data, variables, database, variable_details) with secondary options moved to a control object or dedicated verbs (attach labels via label step; logging via logger config per the recodeflow logging scope); replace custom_function_path with an explicit functions= named list evaluated in a child environment.",
       "effort": "M"
     },
     {
-      "title": "Near-collision export names for the same concept: calculate_SMKG203_cont vs _continuous vs _from_combined (and the SMKG207 trio), 4-5 exports per concept",
-      "area": "api-surface-ux",
+      "title": "Error/warning messages are pre-cli base paste(): typos, printed source indentation, vectorized message mash, non-actionable text",
+      "area": "error/warning message quality",
       "evidence": [
-        "R/smoke-start.R:224 calculate_SMKG203_cont(SMK_005, SMKG040_cont, output_format) — v3 3-step implementation",
-        "R/smoking.R:787 calculate_SMKG203_continuous(SMKG005, SMKG040) — different inputs (grouped PUMF), different missing-data idiom (if_else2), no output_format",
-        "R/smoking.R:803 calculate_SMKG203_from_combined(SMK_005, SMK_040) — wrapper around legacy SMKG203_fun",
-        "Plus SMKG203_fun and the DOCUMENTATION-ONLY stub calculate_SMKG203_cat (R/smoke-start.R:163): five exported symbols for age-started-smoking-daily",
-        "Same pattern for SMKG207: calculate_SMKG207_cont / _continuous / _from_combined / SMKG207_fun / _cat stub"
+        "Zero cli::/rlang::abort()/error-class usage in R/ (grep across 123 stop()/warning() calls found none)",
+        "1. R/recode-with-table.R:297-300 stop('The passed labels was not a named vector please follow\\n the c(var_name = varLalbel) format') -- typo 'varLalbel', run-on, embedded newline+10-space indent printed verbatim",
+        "2. R/recode-with-table.R:394-409 stop(paste('The row\\n ', row, 'for the variable', ..., 'Does not contain the database being checked(', data_name, ') in its variable start the default is also missing...')) -- broken spacing, raw indentation, unclear remedy",
+        "3. R/recode-with-table.R:497-504 stop(paste(single_from, 'was detected more then once in', ...)) -- typo 'then'",
+        "4. R/recode-with-table.R:529-536 stop(paste(variable, ' contains', n, 'rows of else only one else value is allowed')) -- run-on, double space",
+        "5. R/recode-with-table.R:750 stop('Invalid Argument was passed') -- no argument name, no function, no expected values",
+        "6. R/recode-with-table.R:233-241 stop('The passed number of data does not match the passed number of\\n data_names. ... Aborting operation!') -- multi-line literal prints leading whitespace",
+        "7. R/recode-with-table.R:279-284 warning(paste(missing_vars, 'is missing from variable details therefore cannot be recoded')) -- paste() vectorizes over missing_vars producing repeated mashed text; 'is' vs 'are'",
+        "8. R/recode-with-table.R:870-878 warning(paste(variable, 'could not be derived because', feeder_vars, 'was never specified...\\n')) -- vectorized over feeder_vars, embedded \\n and indentation",
+        "9. R/number-conditions.R (CCC_091_fun1) lines 38-46: warning(paste('In CCC_91A:', CCC_91A, ..., sep = '')) -- sep='' concatenates words together AND fires once per data row via rowwise dispatch (warning floods on real datasets)",
+        "10. Contrast (good, v3): R/missing-pattern-cache.R:85 stop(\"Variable '\", variable_name, \"' not found in cache. Use has_cached_pattern() first.\") -- actionable; shows the package already has the better style in newer files",
+        "Consequence: package suppresses its own diagnostics -- 23 man/*.Rd wrap examples in suppressWarnings(); 65 suppressWarnings/suppressMessages across vignettes/R/man"
       ],
-      "why_design_issue": "'_cont' and '_continuous' differing only by abbreviation but taking different input variables is a discoverability trap — autocomplete shows both and nothing in the names indicates that one expects PUMF grouped codes and the other Master raw codes. Users will call the wrong one and get plausible-looking wrong values rather than errors.",
-      "severity": "medium",
-      "candidate_fix": "Collapse each concept to one exported function whose name encodes the input domain explicitly (e.g. calculate_SMKG203_cont(source = c('master','pumf')) or _from_pumf/_from_master suffixes), deprecate the rest. At minimum, cross-reference the variants in a shared @family roxygen tag and document which input universe each expects.",
-      "effort": "M"
-    },
-    {
-      "title": "output_format is inconsistently available (41 of 51 DV functions) and its documented vocabulary drifts between 'original' and 'standard'",
-      "area": "api-surface-ux",
-      "evidence": [
-        "Signature scan: 41 DV exports take output_format; 10 do not (calculate_SMKDSTY_original, calculate_SMKG040, calculate_SMKG203_continuous, calculate_SMKG203_from_combined, calculate_SMKG207_continuous, calculate_SMKG207_from_combined, calculate_pct_time, calculate_time_quit_smoking, categorize_immigration, categorize_pct_time)",
-        "Functions without output_format hard-code tagged_na: R/percent-time-canada.R:64 'TRUE ~ tagged_na(\"b\")'; R/immigration.R categorize_immigration returns integer codes via case_when with no missing-format control",
-        "Accepted values in code: R/clean-variables.R:71 stop(\"output_format must be 'tagged_na' or 'original'\") (5 'original' / 5 'tagged_na' validation hits)",
-        "Stub docs advertise a third value: R/smoking-status.R:185 '@param output_format Character. Output format for missing values (\"tagged_na\" or \"standard\")'"
-      ],
-      "why_design_issue": "output_format is the v3 mechanism for users who cannot work with haven tagged NAs (e.g. exporting to CSV, non-haven pipelines). Ten functions strand those users with no escape hatch, and the documentation invents a value ('standard') the validator rejects, so a user who copies the documented value gets an error. This contradicts v4 goal 3 ('users can request original codes through the standard workflow').",
-      "severity": "medium",
-      "candidate_fix": "Add output_format to the 10 missing functions (mechanical: they all end in tagged_na() calls); fix the stub docs to 'tagged_na'/'original'; centralize the allowed-values constant so docs and validators cannot drift; have rec_with_table pass output_format through (already a CEP-017 phase-1 item).",
-      "effort": "S"
-    },
-    {
-      "title": "Error/warning messages are base-R only and frequently unactionable, ungrammatical, or buggy; cli is in Depends but never used",
-      "area": "api-surface-ux",
-      "evidence": [
-        "Counts: 91 stop() and 32 warning() calls in R/*.R; grep 'cli::|rlang::abort|cli_abort' R/*.R -> 0 hits; DESCRIPTION Depends includes cli (grep 'cli::' R/ -> 0 namespaced calls)",
-        "R/recode-with-table.R:750 stop(\"Invalid Argument was passed\") — no argument name, no value, no call context",
-        "R/recode-with-table.R:297-300 stop(\"The passed labels was not a named vector please follow\\n          the c(var_name = varLalbel) format\") — typo 'varLalbel', embedded newline+indentation prints literally",
-        "R/recode-with-table.R:497-505 stop(paste(single_from, \"was detected more then once in\", variable_being_checked, ...)) — 'then' for 'than'; no row/database context",
-        "R/label-utils.R:111-118 stop(paste(..., \"does not contain all identical\", pkg.globals$argument.ToType, \"variable cant change variable type for different values\")) — run-on, missing apostrophe, leaks internal column-constant name into the message",
-        "R/recode-with-table.R:870-877 warning(paste(variable_being_processed, \"could not be derived because\", feeder_vars, \"was never specified...\")) — uses the full feeder_vars vector instead of the computed non_func_missing_variables, so paste() vectorizes and the warning repeats once per feeder var, naming variables that are NOT missing",
-        "R/recode-with-table.R:279-285 warning(paste(missing_vars, \"is missing from variable details therefore cannot be recoded\")) — vectorized paste over missing_vars mangles multi-variable warnings",
-        "R/recode-with-table.R:233-241 stop(paste(\"The passed number of data does not match the passed number of\\n          data_names...Aborting operation!\")) — multi-line literal with embedded source indentation",
-        "Counter-example showing the codebase can do better: R/missing-pattern-cache.R:46-49 names the parameter, gives an example value, and suggests the next call ('Use get_variable_details(...) to see available databases.')"
-      ],
-      "why_design_issue": "The recodeflow scoping's top user complaint is 'Users not knowing why a function failure has taken place' (/tmp/recodeflow-pr43/index.qmd:36). The engine's failure messages omit which database/row/variable combination failed, contain typos and grammar errors that look unprofessional in console output, and in two places are functionally wrong (vectorized paste, wrong variable). Declaring cli in Depends while never calling it both bloats the dependency footprint and advertises a standard the package doesn't follow.",
+      "why_design_issue": "The recodeflow scoping doc's top complaint is 'users not knowing why a function failure has taken place'. Messages with typos, raw indentation, vectorized mash and 'Invalid Argument was passed' make failures undiagnosable, and the per-row warning pattern trains users (and the package's own examples) to suppressWarnings(), hiding real data problems in a health-data harmonization tool where silent miscoding is a methodological-defensibility risk.",
       "severity": "high",
-      "candidate_fix": "Adopt cli::cli_abort()/cli_warn() (already a dependency) with rlang-style messages for v4: every engine error states variable, database, worksheet row, and a next action. Fix the feeder_vars/non_func_missing_variables bug and the two vectorized paste() sites now (S-effort bug fixes independent of v4). Add a style rule: no multi-line string literals in conditions.",
+      "candidate_fix": "v4: adopt cli::cli_abort/cli_warn with error classes (cchsflow_error_missing_variable, etc.), one aggregated warning per variable (not per row) carrying counts and affected databases, and a structured log per the recodeflow logging scope. Short term: fix typos and de-vectorize paste() calls in rec_with_table (S).",
       "effort": "M"
     },
     {
-      "title": "Routine operation emits scary fallback warnings: priority-rules YAML is referenced but not shipped, and unknown variables silently borrow the BMI missing pattern",
-      "area": "api-surface-ux",
+      "title": "DerivedVar dispatch strips argument names: worksheet column order silently maps to positional formals",
+      "area": "API contract for DV functions",
       "evidence": [
-        "R/missing-data-functions.R:166-197 load_priority_rules() looks for inst/metadata/schemas/cchs/missing_priority_rules.yaml and .../core/missing_priority_rules.yaml; ls inst/metadata/schemas/ shows only core/{variable_details.yaml,variables.yaml} — neither rules file exists, and the cchs/ directory is absent entirely",
-        "R/missing-data-functions.R:197 warning(\"Priority rules YAML files not found, using built-in general fallback\") — fires once per session for every user of get_priority_missing()-based DV functions",
-        "R/missing-data-functions.R:130-134 get_missing_config() on lookup failure: warning(\"Could not get pattern for '\", variable_name, \"', using BMI fallback\"); get_missing_pattern(\"HWTGBMI_der\") — an unrelated variable's missing pattern is substituted",
-        "R/missing-data-functions.R:105 same hard-coded fallback: config <- get_missing_config(\"HWTGBMI_der\")  # Known variable with standard pattern",
-        "ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md open question 2: 'Ship the missing missing_priority_rules.yaml or fold priorities into the schema above?'"
+        "R/recode-with-table.R:978-980: row_values <- unname(row_values); do.call(get(custom_function_name), row_values)",
+        "get(custom_function_name) resolves by bare string lookup on the search path -- no namespace qualification, no existence pre-check with informative error",
+        "Contract is only documented by convention: DerivedVar::[HWTGHTM, HWTGWTK] order must equal calculate_bmi(height_m, weight_kg) formals order; swapping them computes weight/height^2 silently",
+        "DV functions cannot be argument-defaulted safely: calculate_pack_years (R/smoke-pack-years.R:120-129) has 4 optional NULL params + output_format that positional dispatch can clobber if worksheet passes more vars than expected"
       ],
-      "why_design_issue": "Every normal user sees 'YAML files not found' warnings for behaviour that is actually the designed default — training users to ignore warnings. Worse, 'using BMI fallback' is a silent semantic substitution: a smoking variable inherits BMI's NA(a)/NA(b) code ranges, which can misclassify missing values, and the warning text gives no hint why BMI is involved or what to do. Warnings should mark abnormal situations; defaults should be silent and declared.",
-      "severity": "medium",
-      "candidate_fix": "Ship the YAML (or delete the lookup and bless the built-in rules as the documented default, per CEP-017 question 2) so the warning path disappears. Replace the BMI fallback with an explicit error ('no missing pattern declared for <var> in <database>; add a worksheet row or pass pattern=') — failing loudly is safer than borrowing another variable's missing codes.",
-      "effort": "S"
-    },
-    {
-      "title": "pkgdown reference index is stale: lists ~25 deleted v2 topics, omits all ~60 new v3 exports; vignettes still teach bmi_fun",
-      "area": "api-surface-ux",
-      "evidence": [
-        "_pkgdown.yml reference 'Derived variable functions' lists bmi_fun, adjusted_bmi_fun, bmi_fun_cat, pct_time_fun, pct_time_fun_cat, resp_condition_fun1/2/3, binge_drinker_fun, adl_fun, adl_score_5_fun, low_drink_short_fun, low_drink_long_fun, low_drink_score_fun, low_drink_score_fun1, immigration_fun (_pkgdown.yml:61-92) — none exist (man/bmi_fun.Rd, man/adl_fun.Rd, man/immigration_fun.Rd etc. deleted per git status; 0 NAMESPACE hits)",
-        "_pkgdown.yml 'Potentially problematic variables' lists ALW_1, ALW_2A1..ALW_2A7, ALWDWKY, ALWDDLY, ALCDTYP, ALCDTTM (_pkgdown.yml:100-117) — all their .Rd files are deleted per git status",
-        "No calculate_*, assess_*, categorize_*, clean_variables, rec-engine getters or cache functions appear anywhere in _pkgdown.yml reference (grep 'calculate_' _pkgdown.yml -> 0 hits)",
-        "vignettes/derived_variables.Rmd:21 still describes 'Func::bmi_fun' as the worksheet mechanism and :42 shows bmi_fun source; inst/extdata/variable_details.csv now contains 0 'bmi_fun' references (it uses Func::calculate_bmi)",
-        "vignettes/tagged_na_usage.Rmd:92 links to https://big-life-lab.github.io/cchsflow/reference/bmi_fun.html which will 404"
-      ],
-      "why_design_issue": "pkgdown fails the build (or silently drops topics, depending on settings) when reference entries point to missing topics, so the v3 site either cannot build or publishes a reference index describing the v2 API. The tutorial vignettes teach a function and worksheet syntax that no longer exists in the package — the first thing a new v3 user follows is wrong.",
+      "why_design_issue": "The only protection against transposed inputs is human review of CSV cell order against function source. For a package whose purpose is correctness of harmonized estimates, an order-typo produces plausible wrong numbers rather than an error -- the worst failure mode. It also blocks evolving signatures (any new parameter must go last forever).",
       "severity": "high",
-      "candidate_fix": "Regenerate _pkgdown.yml reference sections from the current NAMESPACE grouped by the v3 taxonomy (engine; DV functions by domain; worksheet tools; missing-data primitives; datasets), and sweep vignettes for deleted names (grep for the 25 removed topics). Add 'pkgdown::check_pkgdown()' to CI so reference/NAMESPACE drift fails fast.",
-      "effort": "S"
-    },
-    {
-      "title": "32 of 125 exports have no @examples; the whole cache/discovery sub-API is documented in one-liners",
-      "area": "api-surface-ux",
-      "evidence": [
-        "Roxygen scan: 93/125 exports have @examples; 32 do not. All 15 missing-pattern-cache.R exports lack examples (has_cached_pattern, get_cached_pattern, cache_pattern, clear_missing_patterns_cache, clear_complete_patterns_cache, auto_detect_database, apply_database_heuristics, extract_years_from_database_names, get_missing_pattern, get_missing_pattern_auto, get_missing_pattern_bulk, get_complete_pattern, get_copy_mappings, get_else_mappings, get_variable_missing_pattern)",
-        "Also without examples: calculate_SMK_204/_208/_05B/_05C (smoke-intensity.R), calculate_SMKG040, calculate_SMKG203_continuous/_from_combined, calculate_SMKG207_continuous/_from_combined, calculate_time_quit_smoking (smoking.R), get_smoking_variables, list_subjects (variable-discovery.R), get_variable_type/_limits/_bounds (worksheet-getters.R), load_worksheet_metadata/_schemas (worksheet-loaders.R)",
-        "Weak roxygen sample: R/variable-discovery.R:341-353 get_smoking_variables has a title and bare @param lines only — no @description, no @details, no example",
-        "Contrast: CEP-017 shortlist wants get_missing_pattern/get_complete_pattern promoted to the stable engine API — currently they ship with no usage example at all"
-      ],
-      "why_design_issue": "The functions v4 plans to promote as the public engine primitives are precisely the ones with the weakest documentation. Exported functions without examples fail the discoverability test (and R CMD check NOTEs on some configurations); a user who finds get_missing_pattern() in the index has no runnable starting point.",
-      "severity": "medium",
-      "candidate_fix": "Documentation pass scoped to the CEP-017 'promote' list first (~11 functions): add @description, runnable @examples against bundled sample data, and @family tags linking the missing-data primitives. Functions being demoted to internal can instead drop from the index (@keywords internal), which removes most of the remaining 32.",
+      "candidate_fix": "v4 engine: match worksheet variable names to function formals by name (do.call with named list), validate setequal(names, formals) at recode time, and error with the offending variable list. Where DV functions use semantic param names, add an explicit args-mapping column or require named DerivedVar::[height_m = HWTGHTM, ...] syntax.",
       "effort": "M"
     },
     {
-      "title": "Six exported functions are named identically to CCHS variables and to their own first argument (DPSDSF <- function(DPSDSF))",
-      "area": "api-surface-ux",
+      "title": "pkgdown index and vignettes reference deleted functions; 90/125 current exports missing from reference index",
+      "area": "documentation infrastructure",
       "evidence": [
-        "R/depression.R:27 DPSDSF <- function(DPSDSF) — function, argument, and CCHS variable share one name; DPSDPP likewise",
-        "R/life-satisfaction.R:44 GEN_02A2 <- function(GEN_02A, GEN_02A2)",
-        "R/occupation.R:36 LBFA_31A <- function(LBFA_31A); plus exports LBFA_31A_a, LBFA_31A_b",
-        "_pkgdown.yml files these under 'Potentially problematic variables' — function exports indexed as if they were variables"
+        "_pkgdown.yml:64-88 still lists bmi_fun, adjusted_bmi_fun, bmi_fun_cat, resp_condition_fun1, binge_drinker_fun, adl_fun, low_drink_short_fun, low_drink_long_fun, low_drink_score_fun, low_drink_score_fun1 -- all of whose man/*.Rd are deleted in the working tree (git status: D man/bmi_fun.Rd, D man/adl_fun.Rd, ...)",
+        "90 of 125 exports absent from _pkgdown.yml reference section, including the entire v3 surface (calculate_bmi, assess_adl, clean_variables, rec_with_table helpers, all 18 getters)",
+        "vignettes/derived_variables.Rmd:21,42 teaches 'Func::bmi_fun' and reproduces bmi_fun source -- function no longer exists",
+        "vignettes/tagged_na_usage.Rmd:92 hard-links https://big-life-lab.github.io/cchsflow/reference/bmi_fun.html -- will 404 after rebuild"
       ],
-      "why_design_issue": "A symbol that is simultaneously a function name, a parameter name, and a dataset column name defeats every discovery mechanism: ?LBFA_31A is ambiguous between variable doc and function doc, autocomplete offers a function where users expect data, and code like LBFA_31A(LBFA_31A) reads as a recursive call. These exist only as DerivedVar:: targets for the engine and should never have been user-facing.",
-      "severity": "medium",
-      "candidate_fix": "In v4 rename to the verb taxonomy (e.g. recode_LBFA_31A or fold into the worksheet as plain recode rows where the logic is a passthrough), mark internal, and keep aliases one cycle. The engine looks functions up by name string, so the worksheet Func:: cell and the function rename happen together in one commit.",
+      "why_design_issue": "pkgdown build fails (or silently drops topics) when the reference index cites missing topics, so the public docs site cannot be rebuilt from this tree; the flagship derived-variables vignette teaches an API that errors. This is the embarrassment scenario: docs contradict the package on its own headline feature.",
+      "severity": "high",
+      "candidate_fix": "Regenerate _pkgdown.yml reference section from NAMESPACE groups (one section per naming family), update the two vignettes to calculate_bmi and the v3 3-step story, and add a CI step that runs pkgdown::check_pkgdown().",
       "effort": "S"
     },
     {
-      "title": "if_else2 remains exported and undocumented-as-deprecated while the v4 plan retires it; 216 in-package uses",
-      "area": "api-surface-ux",
+      "title": "Inconsistent parameter vocabulary across DV functions: semantic names vs raw CCHS codes, and uneven output_format",
+      "area": "parameter naming consistency",
       "evidence": [
-        "R/utility-functions.R:1-35: full roxygen with examples, @export, no deprecation language",
-        "grep -c if_else2 R/*.R -> 216 call sites",
-        "ceps/cep-017-v4-engine/2026-06-10_v4-scope-outline.md goal 1: 'Retire if_else2() (264 calls, 15 files); every derived-variable function follows the canonical 3-step pattern'",
-        "Semantics are a silent footgun the docs undersell: NA condition coerced to FALSE means missing input silently selects the 'b' branch (R/utility-functions.R:30-35)"
+        "Semantic: calculate_bmi(height_m, weight_kg) R/bmi.R:82; adjust_bmi(sex, height_m, weight_kg) R/bmi.R:187; calculate_pct_time(age, born_in_canada, years_in_canada) R/percent-time-canada.R:59; categorize_immigration(immigrant_status, born_canada, ethnicity, ...) R/immigration.R:56; calculate_pack_years(smoking_status, age, age_start_smoking, ...) R/smoke-pack-years.R:120",
+        "Raw CCHS codes in the same generation: calculate_binge_drinking(DHH_SEX, ALW_1, ALW_2A1..ALW_2A7) R/alcohol.R:182-184; assess_adl(ADL_01..ADL_05) R/adl.R:89; calculate_SMKG203_cont(SMK_005, SMKG040_cont) R/smoke-start.R:224",
+        "Same concept, two vocabularies: pack_years_fun(SMKDSTY_original, DHHGAGE_cont, time_quit_smoking, SMKG203_cont, ...) R/smoking.R:266 vs calculate_pack_years(smoking_status, age, ...) -- both exported",
+        "output_format='tagged_na' present on most v3 functions but absent on 10 of 51 verb-named exports: calculate_pct_time, categorize_pct_time, categorize_immigration, calculate_time_quit_smoking, calculate_SMKDSTY_original, calculate_SMKG040, calculate_SMKG203_continuous/_from_combined, calculate_SMKG207_continuous/_from_combined",
+        "Getter duplicates with divergent param names: get_variable_limits(variable_name, use_rdata) R/worksheet-getters.R:140 vs get_variable_bounds(var_name, variable_details) R/worksheet-getters.R:183-185 where roxygen line 180 admits variable_details is '(ignored, uses get_variable_limits)'"
       ],
-      "why_design_issue": "Exporting a missing-data shortcut whose whole behaviour (NA -> FALSE) contradicts the package's tagged-NA philosophy invites external users to build on a function the team has already decided to remove. Every new external dependency on if_else2 raises the v4 migration cost.",
+      "why_design_issue": "A DV author cannot infer whether to write height_m or HWTGHTM; the choice also changes how readable the worksheet DerivedVar:: row is and (given positional dispatch) gives no safety either way. An exported function with a documented-as-ignored parameter (get_variable_bounds) violates least surprise. Uneven output_format means some functions can emit tagged_na while siblings cannot, complicating downstream missing-data handling.",
+      "severity": "medium",
+      "candidate_fix": "v4 convention: semantic snake_case parameters on all DV functions (CCHS code mapping lives in the worksheet), output_format on every DV function or centralized in the engine's post-step. Collapse get_variable_bounds into get_variable_limits with a deprecation shim and remove the ignored parameter.",
+      "effort": "M"
+    },
+    {
+      "title": "Near-duplicate exports: calculate_SMKG203_cont vs calculate_SMKG203_continuous (and 207 pair) with different signatures",
+      "area": "API surface / duplication",
+      "evidence": [
+        "R/smoke-start.R:224 calculate_SMKG203_cont <- function(SMK_005, SMKG040_cont, output_format = 'tagged_na')",
+        "R/smoking.R:787 calculate_SMKG203_continuous <- function(SMKG005, SMKG040)",
+        "R/smoke-start.R:371 calculate_SMKG207_cont <- function(SMK_030, SMKG040_cont, output_format = 'tagged_na') vs R/smoking.R:817 calculate_SMKG207_continuous <- function(SMKG005, SMKG030, SMKG040)",
+        "All four exported; only the _cont pair is referenced from variable_details.csv Func:: cells; the _continuous pair has no examples (man/calculate_SMKG203_continuous.Rd lacks \\examples)"
+      ],
+      "why_design_issue": "Two exported functions whose names differ only by abbreviation, computing the same harmonized variable from different feeder sets, is a trap: users will pick by autocomplete and get era-inappropriate logic. It also doubles maintenance for the smoking module that v3 just cleaned up.",
+      "severity": "medium",
+      "candidate_fix": "Keep the worksheet-wired _cont pair; fold _continuous logic into it (or rename to express its distinct feeder era, e.g. _from_SMKG005) and deprecate the loser. Decide before v4 freeze so worksheet Func:: strings only migrate once.",
+      "effort": "S"
+    },
+    {
+      "title": "Engine and cache internals exported: ~30 infrastructure functions in the user-facing API",
+      "area": "API surface / encapsulation",
+      "evidence": [
+        "Cache layer (10 exports): cache_pattern, has_cached_pattern, get_cached_pattern, get_complete_pattern, get_missing_pattern, get_missing_pattern_auto, get_missing_pattern_bulk, get_variable_missing_pattern, clear_missing_patterns_cache, clear_complete_patterns_cache (R/missing-pattern-cache.R)",
+        "Heuristics/plumbing: apply_database_heuristics, auto_detect_database, extract_years_from_database_names, find_variable_in_data, assign_missing (NAMESPACE)",
+        "Engine micro-utils: is_equal(v1, v2) recode-with-table.R:33, if_else2(x, a, b) utility-functions.R:30 -- param names v1/v2/x/a/b, roxygen title 'is equal'; if_else2 is slated for deprecation in the team's derive-function standards yet still exported and load-bearing in legacy DV functions",
+        "32 exported functions have man pages with no \\examples at all (mostly this infra tier); none of the cache exports appear in _pkgdown.yml",
+        "Net: a CRAN-style API review would count ~30/125 exports (24%) as internals"
+      ],
+      "why_design_issue": "Every export is a compatibility promise; exporting the cache and heuristics layers freezes v4's freedom to redesign exactly the subsystems the refactor targets. Users browsing 125 functions cannot find the ~15 they need (rec_with_table, merge_rec_data, set_data_labels, the DV functions, worksheet getters).",
+      "severity": "medium",
+      "candidate_fix": "v4: re-export only the user workflow tier; mark cache/heuristics @keywords internal (callable via ::: for power users), and replace is_equal/if_else2 usage with dplyr::case_when per the v3 standards before removal.",
+      "effort": "M"
+    },
+    {
+      "title": "rec_with_table magic defaults: deparse(substitute()) database detection, chatty messages, global-env sourcing",
+      "area": "rec_with_table UX",
+      "evidence": [
+        "R/recode-with-table.R:180-183: if database_name is NULL, database_name <- deparse(substitute(data)) -- breaks under pipes (cchs2001_p |> rec_with_table() yields a non-name), wrappers, and any data frame not named exactly like a cchsflow database id",
+        "R/recode-with-table.R:171-182: three message() calls fire on a default invocation ('No variable_details detected.\\n              Loading cchsflow variable_details') with embedded 14-space indentation printed to console",
+        "R/recode-with-table.R:166-169: comment 'If custom Functions are passed create new environment and source' but code is source(custom_function_path) into the global environment",
+        "Failure mode when name-guess misses: per-variable warnings at recode-with-table.R:394-409 rather than a single 'database_name not recognized; expected one of ...' error"
+      ],
+      "why_design_issue": "Implicit name capture is fragile magic: the same call works or fails depending on what the user named their object, and the failure surfaces as dozens of confusing per-variable warnings instead of one clear error. Console noise on the happy path trains users to ignore messages.",
+      "severity": "medium",
+      "candidate_fix": "v4: make database_name required (or detect from a data attribute set by a cchsflow loader); validate it against unique(databaseStart) and fail fast with the valid set; demote default-loading messages to a single rlang::inform with cli formatting; source custom functions into a new.env(parent = baseenv()).",
+      "effort": "S"
+    },
+    {
+      "title": "Examples coverage: 32 exports with no examples, 49 with only \\dontrun, 23 man pages suppressing the package's own warnings",
+      "area": "roxygen / documentation quality",
+      "evidence": [
+        "32 exported functions' .Rd have no \\examples section: includes user-facing tools get_variable_limits, get_variable_bounds, get_missing_pattern, get_smoking_variables, list_subjects, load_worksheet_metadata, calculate_time_quit_smoking (full list in audit)",
+        "49 exported functions' examples contain \\dontrun{} (never executed by R CMD check), so example rot is undetected -- e.g. all 18 DOCUMENTATION ONLY stubs",
+        "23 man/*.Rd wrap examples in suppressWarnings(), e.g. man page for CCC_091_fun1 (R/number-conditions.R:27-29 roxygen: suppressWarnings(rec_with_table(...)))",
+        "Doc-stating-falsehoods: R/worksheet-getters.R:180 '@param variable_details ... (ignored, uses get_variable_limits)'; rec_with_table append_to_data/notes default inversions (recode-with-table.R:113-118 vs 160-162)"
+      ],
+      "why_design_issue": "Untested examples and warning-suppressed examples mean the documented workflow is neither verified nor clean; new users copying the canonical example learn to silence diagnostics on day one. Missing examples on the consumer-tools tier (worksheet getters, variable discovery) undercuts the CEP-015 goal of making those tools discoverable.",
+      "severity": "medium",
+      "candidate_fix": "v4 definition-of-done per exported function: runnable example against bundled cchs*_p sample data, no suppressWarnings; convert \\dontrun to \\donttest where runtime is the only concern; add a covr/pkgdown CI gate that fails on exported topics without examples.",
+      "effort": "M"
+    },
+    {
+      "title": "Package metadata drift: DESCRIPTION still v2.1.0 dated 2022 while exporting the v3 surface",
+      "area": "API surface / versioning",
+      "evidence": [
+        "DESCRIPTION: Version: 2.1.0, Date: 2022-05-05 in a tree whose NAMESPACE exports the v3 calculate_/assess_/clean_variables architecture",
+        "No lifecycle badges or deprecation markers anywhere (no lifecycle import in DESCRIPTION Depends/Imports block read; zero .Deprecated/lifecycle:: hits in R/)"
+      ],
+      "why_design_issue": "Users and renv lockfiles cannot distinguish the legacy 2.1.0 API from the radically larger v3 surface; with no lifecycle signalling, every one of the 125 exports looks equally supported, which makes the planned v4 removals feel like unannounced breakage.",
       "severity": "low",
-      "candidate_fix": "Add a lifecycle 'deprecated' badge and @description warning now (no code change), pointing to dplyr::case_when + any_missing/get_priority_missing as the replacement; schedule .Deprecated() for the first v4 pre-release.",
-      "effort": "S"
-    },
-    {
-      "title": "DESCRIPTION puts 9 packages in Depends (attaching them to the user's search path); cli is unused, and Version still reads 2.1.0/2022",
-      "area": "api-surface-ux",
-      "evidence": [
-        "DESCRIPTION Depends: R (>= 3.5.0), haven, dplyr, sjlabelled, stringr, magrittr, yaml, readr, purrr, cli",
-        "Namespaced-call counts in R/: cli 0, readr 1, yaml 4, purrr 22 — none of these needs to be attached; dplyr/haven/stringr/magrittr/sjlabelled are imported via NAMESPACE importFrom anyway",
-        "DESCRIPTION Version: 2.1.0, Date: 2022-05-05 — despite the working tree being the v3 API",
-        "CLAUDE local project standards require R >= 4.2.0 for StatsCan/ICES compatibility; DESCRIPTION still declares R >= 3.5.0"
-      ],
-      "why_design_issue": "library(cchsflow) currently force-attaches eight other packages into the user's search path, risking masking conflicts (dplyr::filter etc.) the user never asked for — the classic Depends-vs-Imports antipattern. Declaring cli without using it adds an install requirement for nothing. A 2.1.0/2022 version string on a v3 API misleads anyone triaging bug reports.",
-      "severity": "medium",
-      "candidate_fix": "Move everything except R itself from Depends to Imports (add the handful of needed importFrom/:: calls); drop cli until the messaging refactor actually adopts it (or adopt it, see error-message issue); bump Version to a 2.99.x/3.0.0-dev scheme and update Date; align the R floor with the documented 4.2.0 standard.",
+      "candidate_fix": "Bump to a 2.9.x/3.0.0-dev version on the v3 branch, add lifecycle to Imports, and badge every *_fun, _stub, and doc-only export as deprecated/experimental now so v4 removals are forewarned.",
       "effort": "S"
     }
   ]

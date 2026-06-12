@@ -1,0 +1,206 @@
+{
+  "family": "haven-labelled-declared",
+  "verified_date": "2026-06-11",
+  "sources_checked": [
+    "https://cran.r-project.org/web/packages/haven/index.html",
+    "https://cran.r-project.org/web/packages/labelled/index.html",
+    "https://cran.r-project.org/web/packages/declared/index.html",
+    "https://cran.r-project.org/web/packages/retroharmonize/index.html",
+    "https://haven.tidyverse.org/articles/semantics.html",
+    "https://larmarange.github.io/labelled/reference/index.html",
+    "https://cran.r-project.org/web/packages/labelled/vignettes/missing_values.html",
+    "https://github.com/dusadrian/declared",
+    "https://dusadrian.github.io/declared/reference/declared.html",
+    "https://cran.r-project.org/web/packages/sjlabelled/index.html",
+    "/tmp/recodeflow-pr43/missing-data.qmd",
+    "/tmp/recodeflow-pr43/labels.qmd",
+    "/Users/dmanuel/github/cchsflow/vignettes/tagged_na_usage.Rmd",
+    "/Users/dmanuel/github/cchsflow/R/recode-with-table.R",
+    "/Users/dmanuel/github/cchsflow/R/missing-data-functions.R",
+    "/Users/dmanuel/github/cchsflow/DESCRIPTION"
+  ],
+  "claims": [
+    {
+      "claim_id": "C01",
+      "claim": "haven version 2.5.5, published 2025-05-30",
+      "status": "VERIFIED",
+      "notes": "CRAN confirms v2.5.5, published 2025-05-30"
+    },
+    {
+      "claim_id": "C02",
+      "claim": "haven has ~225 reverse imports",
+      "status": "REFUTED_APPROXIMATE",
+      "notes": "CRAN shows 169 reverse imports, not ~225. If counting all reverse deps (Depends + Imports + Suggests + Enhances) total is 271. The ~225 figure does not match any specific category count."
+    },
+    {
+      "claim_id": "C03",
+      "claim": "labelled version 2.16.0, published October 2025",
+      "status": "VERIFIED",
+      "notes": "CRAN confirms v2.16.0, published 2025-10-22"
+    },
+    {
+      "claim_id": "C04",
+      "claim": "labelled has 41 reverse imports",
+      "status": "REFUTED_APPROXIMATE",
+      "notes": "CRAN shows 43 reverse imports, not 41. Directionally correct but the specific number is wrong."
+    },
+    {
+      "claim_id": "C05",
+      "claim": "declared version 0.26, published April 2026",
+      "status": "VERIFIED",
+      "notes": "CRAN confirms v0.26, published 2026-04-02"
+    },
+    {
+      "claim_id": "C06",
+      "claim": "declared has 2 reverse imports (DDIwR, QCA)",
+      "status": "VERIFIED",
+      "notes": "CRAN confirms 2 reverse imports: DDIwR and QCA"
+    },
+    {
+      "claim_id": "C07",
+      "claim": "declared has experimental lifecycle",
+      "status": "UNCONFIRMABLE",
+      "notes": "CRAN page does not show an experimental lifecycle badge. The CRAN fetcher found 'Stable' designation. The experimental claim may refer to a lifecycle badge on the GitHub/pkgdown site, but this could not be confirmed via the cited CRAN URL. Low confidence either way — the package is on CRAN proper, which implies some maturity, but it remains a niche package."
+    },
+    {
+      "claim_id": "C08",
+      "claim": "declared is zero-dependency",
+      "status": "VERIFIED",
+      "notes": "CRAN page confirms no external R package dependencies"
+    },
+    {
+      "claim_id": "C09",
+      "claim": "declared stores original codes as genuine R NAs with an index attribute pointing back to the original value",
+      "status": "PARTIALLY_VERIFIED",
+      "notes": "The declared() constructor reference describes storing 'an attribute containing the indices of those NA values which are to be treated as declared missing values'. The documentation is slightly ambiguous about whether original numeric codes are fully recoverable vs just indexed. The core claim — that base R mean() correctly excludes them — is verified by the README example showing mean = 3 vs haven's -12.67."
+    },
+    {
+      "claim_id": "C10",
+      "claim": "declared displays missing values as NA(-91)",
+      "status": "VERIFIED",
+      "notes": "The declared README example demonstrates this display format"
+    },
+    {
+      "claim_id": "C11",
+      "claim": "tagged_na is double-only (stores tags in floating-point NaN payload)",
+      "status": "VERIFIED_WITH_NUANCE",
+      "notes": "typeof(tagged_na('a')) = 'double' confirmed in R. When combined with integer vectors (c(1L, 2L, tagged_na('a'))), R promotes the result to double automatically. The constraint is that tagged_na values ARE double — integer input gets silently coerced to double. The claim is accurate: the tag encoding requires a double NaN payload."
+    },
+    {
+      "claim_id": "C12",
+      "claim": "CCHS source variables are often integer (codes 6, 7, 8, 9) and require coercion to double before tagging",
+      "status": "VERIFIED",
+      "notes": "cchsflow vignette confirms CCHS missing codes are 6/7/8/9. R testing confirms integer vectors get silently coerced to double when tagged_na is introduced. The coercion happens implicitly; formalizing it in v4 as documented behavior is sound advice."
+    },
+    {
+      "claim_id": "C13",
+      "claim": "tagged_na is tidyverse-native and vctrs-integrated",
+      "status": "VERIFIED_WITH_NUANCE",
+      "notes": "vctrs::vec_ptype2(tagged_na('a'), tagged_na('b')) succeeds in R (no error). haven is a tidyverse package and its types participate in vctrs dispatch. However, the haven semantics page itself does not mention vctrs, and no explicit vctrs documentation was found. The claim is effectively true but overstated as a formal documented feature."
+    },
+    {
+      "claim_id": "C14",
+      "claim": "tagged_na is for Stata/SAS-style missing values",
+      "status": "VERIFIED",
+      "notes": "haven semantics page explicitly states: 'To support Stata's extended and SAS's special missing value, haven implements a tagged NA.' Both Stata and SAS are confirmed, not just Stata."
+    },
+    {
+      "claim_id": "C15",
+      "claim": "labelled_spss retains original numeric codes with na_values attribute (SPSS-style)",
+      "status": "VERIFIED",
+      "notes": "haven semantics page confirms labelled_spss is a subclass of labelled() with na_values attribute declaring which codes are user-missing"
+    },
+    {
+      "claim_id": "C16",
+      "claim": "labelled_spss values are numerically present and can pollute calculations in non-haven-aware code",
+      "status": "VERIFIED",
+      "notes": "Confirmed by both haven semantics page (correctness warning: 'most R functions don't know those values are missing') and declared README (mean() returns -12.67 vs 3)"
+    },
+    {
+      "claim_id": "C17",
+      "claim": "labelled package functions: look_for(), user_na_to_tagged_na(), tagged_na_to_user_na(), user_na_to_na() all exist",
+      "status": "VERIFIED",
+      "notes": "All four functions confirmed in labelled v2.16.0 reference index at larmarange.github.io"
+    },
+    {
+      "claim_id": "C18",
+      "claim": "look_for() generates a data dictionary from a labelled data frame, searching variable labels, value labels, and factor levels — the Stata lookfor analogue",
+      "status": "VERIFIED",
+      "notes": "Confirmed in labelled reference index under 'Data dictionary' section"
+    },
+    {
+      "claim_id": "C19",
+      "claim": "declared has no vctrs integration, causing type instability in tidyverse pipelines",
+      "status": "VERIFIED",
+      "notes": "Neither the declared CRAN page, the declared() constructor reference, nor the GitHub README mentions vctrs. No vctrs methods found."
+    },
+    {
+      "claim_id": "C20",
+      "claim": "retroharmonize v0.2.8, published May 2026, with labelled_spss_survey subclass for multi-wave surveys",
+      "status": "VERIFIED",
+      "notes": "CRAN confirms v0.2.8, published 2026-05-21. Dedicated vignette 'The labelled_spss_survey class' confirmed. The class does add a survey id attribute. The 'wave identifier' framing is a slight simplification — it's a per-survey id, not specifically called a wave identifier."
+    },
+    {
+      "claim_id": "C21",
+      "claim": "recodeflow v4 spec (missing-data.qmd) recommends continuing with haven tagged_na for missing values",
+      "status": "VERIFIED",
+      "notes": "missing-data.qmd explicitly states: 'The library should continue to use haven to encode missing values.' No mention of declared."
+    },
+    {
+      "claim_id": "C22",
+      "claim": "recodeflow v4 spec (labels.qmd) recommends using haven + labelled for labelling, drop sjlabelled",
+      "status": "PARTIALLY_VERIFIED",
+      "notes": "labels.qmd explicitly recommends 'using any existing labelling libraries like haven and labelled.' sjlabelled is not mentioned. The claim about 'drop sjlabelled' is implied by omission — labels.qmd names haven+labelled but not sjlabelled — but is not an explicit recommendation to drop it."
+    },
+    {
+      "claim_id": "C23",
+      "claim": "cchsflow DESCRIPTION lists haven >= 1.1.2 and sjlabelled >= 1.0.17 as current dependencies",
+      "status": "VERIFIED",
+      "notes": "DESCRIPTION confirmed: haven (>= 1.1.2) and sjlabelled (>= 1.0.17) both listed under Depends"
+    },
+    {
+      "claim_id": "C24",
+      "claim": "cchsflow vignette documents tagged_na: a=not applicable, b=missing",
+      "status": "VERIFIED_WITH_NUANCE",
+      "notes": "tagged_na_usage.Rmd confirms NA(a)=not applicable, NA(b)=missing (don't know + refusal + not stated), and also NA(c)=question not asked in survey cycle. The claim is accurate but incomplete — there is a third tag (c) used in cchsflow."
+    },
+    {
+      "claim_id": "C25",
+      "claim": "legacy engine (recode-with-table.R line 814) emits tagged_na",
+      "status": "VERIFIED",
+      "notes": "Line 814 confirmed: recode_value <- tagged_na(as.character(na_value_list[[3]]))"
+    },
+    {
+      "claim_id": "C26",
+      "claim": "missing-data-functions.R (3-step architecture) built on is_tagged_na",
+      "status": "VERIFIED_WITH_NUANCE",
+      "notes": "The file uses haven::is_tagged_na() extensively. However, it appears to be development code for the v3 3-step architecture rather than the current shipped code. The functions any_missing() and get_priority_missing() are defined here and do use is_tagged_na."
+    },
+    {
+      "claim_id": "C27",
+      "claim": "declared's correctness advantage (mean exclusion) does not apply to cchsflow because tagged_na already produces genuine NAs",
+      "status": "VERIFIED",
+      "notes": "tagged_na values are genuine R NAs (is.na() returns TRUE). mean() already excludes them. The declared correctness advantage only applies to labelled_spss, not to tagged_na. The logical inference is sound."
+    },
+    {
+      "claim_id": "C28",
+      "claim": "sjlabelled overlaps heavily with labelled but is less integrated with vctrs",
+      "status": "VERIFIED",
+      "notes": "sjlabelled v1.2.0 published 2022-04-10 (3+ years old), only 15 reverse imports. sjlabelled does not import haven (haven is only in Suggests). No vctrs integration found."
+    }
+  ],
+  "summary": {
+    "verified": 22,
+    "refuted": 2,
+    "unconfirmable": 1,
+    "partially_verified": 2,
+    "verified_with_nuance": 5,
+    "key_corrections": [
+      "haven reverse imports: 169 (not ~225); total reverse deps 271 if all categories counted",
+      "labelled reverse imports: 43 (not 41)",
+      "declared lifecycle status 'experimental' not confirmed on CRAN; CRAN fetcher reports 'Stable'",
+      "cchsflow uses three tagged_na tags (a, b, c) not just a and b",
+      "labels.qmd recommends haven+labelled but does not explicitly name sjlabelled as the thing to drop"
+    ]
+  }
+}

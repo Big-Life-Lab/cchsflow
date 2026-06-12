@@ -1,0 +1,190 @@
+{
+  "summary": "Documentation audit of cchsflow v3 working tree (branch fix/v3-smoking-worksheet-sync). The 9 vignettes, _pkgdown.yml, README, NEWS.md and DESCRIPTION all still describe the v2.1.0 (2022) package: they teach removed functions (bmi_fun, Pack_years_fun with if_else2/ifelse2), reference deleted man topics, run examples against worksheet variables that no longer exist (DHHGAGE_A/B), and state 2001-2018 coverage when v3 worksheets span 2001-2023 including _m master databases. _pkgdown.yml lists 28 reference topics with no man page (pkgdown build fails) while 90 of 125 current exports are absent from the index. NEWS.md's newest entry is mislabelled 2.0.1 (the 2022-05-05 v2.1.0 release) with nothing since. DESCRIPTION lacks a VignetteBuilder field, so the vignettes have never shipped in the installed package - docs exist only on the pkgdown site. Against the Divio framework (the gap the recodeflow scoping explicitly flags at /tmp/recodeflow-pr43/index.qmd:37-38), the vignettes partially cover tutorial/how-to/reference/explanation for the v2 consumer, but v3's defining features - the 3-step derived-variable architecture, clean_variables, missing-pattern utilities, worksheet schemas, master-file support, and the 16 new worksheet columns - have zero user-facing documentation; the architecture rationale lives only in CEPs, .claude skills, and untracked docs/superpowers debris.",
+  "issues": [
+    {
+      "title": "_pkgdown.yml reference index is broken: 28 topics have no man page and 90 of 125 exports are unindexed",
+      "area": "pkgdown",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/_pkgdown.yml:64-97 lists bmi_fun, adjusted_bmi_fun, bmi_fun_cat, pct_time_fun, resp_condition_fun1/2/3, binge_drinker_fun, adl_fun, adl_score_5_fun, low_drink_short_fun, low_drink_long_fun, low_drink_score_fun, low_drink_score_fun1, immigration_fun, pct_time_fun_cat",
+        "/Users/dmanuel/github/cchsflow/_pkgdown.yml:101-112 lists ALW_1...ALCDTTM whose Rd files are deleted (git status: D man/ALW_1.Rd, D man/ALCDTYP.Rd, etc.)",
+        "Cross-check script output: 28 _pkgdown.yml reference items have no man/ topic; 90 of 125 NAMESPACE exports (all calculate_*, assess_*, categorize_*, clean_variables, any_missing, get_priority_missing, check_worksheet schema loaders, cache utilities) are missing from the reference index",
+        "/Users/dmanuel/github/cchsflow/NAMESPACE:3-127 vs _pkgdown.yml:52-158"
+      ],
+      "why_design_issue": "pkgdown errors on reference entries that have no documentation topic, so the v3 doc site cannot be rebuilt at all. The index is also organized around v2's flat 'derived variable functions' list, which cannot express v3's layered design (engine vs cleaning vs DV functions vs worksheet tooling vs metadata utilities) - a symptom of the docs never being treated as part of the architecture.",
+      "severity": "high",
+      "candidate_fix": "Regenerate the reference section from NAMESPACE, grouped by v3 layers (recoding engine; metadata-driven cleaning; derived-variable functions by subject; worksheet validation; missing-pattern utilities; datasets). Mark internal helpers @keywords internal instead of indexing them. Add pkgdown::check_pkgdown() to CI so the index can never drift from exports again.",
+      "effort": "M"
+    },
+    {
+      "title": "Vignettes teach removed v2 functions and the deprecated if_else2 monolith pattern",
+      "area": "vignettes",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/vignettes/derived_variables.Rmd:21 says HWTGBMI_der uses 'Func::bmi_fun' but the v3 worksheet row recEnd is 'Func::calculate_bmi' (verified by reading inst/extdata/variable_details.csv: unique recEnd for HWTGBMI_der = Func::calculate_bmi, NA::a, NA::b)",
+        "/Users/dmanuel/github/cchsflow/vignettes/derived_variables.Rmd:32-47 defines if_else2 then a bmi_fun whose body calls undefined 'ifelse2' (typo, would error if ever invoked)",
+        "/Users/dmanuel/github/cchsflow/vignettes/how_to_add_variables.Rmd:200-233 presents Pack_years_fun built entirely on undefined 'ifelse2' as THE template for contributing derived functions, contradicting v3 derive standards (case_when, clean_variables, no if_else2)",
+        "/Users/dmanuel/github/cchsflow/vignettes/tagged_na_usage.Rmd:92 links to reference/bmi_fun.html (man/bmi_fun.Rd deleted; export removed from NAMESPACE)",
+        "/Users/dmanuel/github/cchsflow/vignettes/how_to_add_variables.Rmd:235 and tagged_na_usage.Rmd:82 link to reference/pack_years_fun.html (legacy v2 export slated for deprecation)"
+      ],
+      "why_design_issue": "The contributor-facing docs actively teach the architecture v3 replaced. Anyone following how_to_add_variables.Rmd today will submit a v2-style nested-ifelse2 function, creating review churn and undermining the 3-step architecture. The Func::bmi_fun claim is now factually wrong about the package's own metadata.",
+      "severity": "high",
+      "candidate_fix": "Rewrite derived_variables.Rmd and the derived-function half of how_to_add_variables.Rmd around the v3 3-step pattern, using calculate_bmi/adjust_bmi/categorize_bmi as the worked example (clean_variables -> case_when with any_missing/get_priority_missing -> output validation). Fix all reference/ links to the new names.",
+      "effort": "M"
+    },
+    {
+      "title": "get_started.Rmd examples silently fail against v3 worksheets (DHHGAGE_A/_B removed) plus multiple factual errors",
+      "area": "vignettes",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/vignettes/get_started.Rmd:276-284 uses rec_with_table(cchs2001_p, 'DHHGAGE_A') and 'DHHGAGE_B'; runtime check on the working tree returns warning 'DHHGAGE_A is missing from variable details therefore cannot be recoded' and DHHGAGE_A/DHHGAGE_B are absent from inst/extdata/variables.csv (era-split _A/_B names were deprecated in favour of year-based suffixes)",
+        "/Users/dmanuel/github/cchsflow/vignettes/get_started.Rmd:49 'PUMF for all general household survey (.1 versions) between 2001 and 2013' - package ships test data to 2017-2018 and worksheets cover to 2023",
+        "/Users/dmanuel/github/cchsflow/vignettes/get_started.Rmd:50-51 'cchs2000_p' (no such object; typo for cchs2001_p) and 'isthe' typo",
+        "/Users/dmanuel/github/cchsflow/vignettes/get_started.Rmd:140 advises '?BMI_fun' - topic does not exist (was bmi_fun in v2; calculate_bmi in v3)",
+        "/Users/dmanuel/github/cchsflow/vignettes/get_started.Rmd:108-111 counts length(unique(variable_details$notes)) and calls it 'variables with notes' (counts distinct note strings, not variables)"
+      ],
+      "why_design_issue": "The package's primary tutorial produces empty output for its Example 4 because chunk options suppress the warning ({r, warning=FALSE}), so the breakage is invisible until a user copies the code. A tutorial that fails against the package's own worksheets is the clearest signal that docs are not exercised in CI.",
+      "severity": "high",
+      "candidate_fix": "Update Example 4 to the year-based era names actually in variables.csv (e.g. DHHGAGE_pre2015-style names or DHHGAGE_cont), fix the typos and ?calculate_bmi pointer, and turn on vignette building in CI so example regressions fail the build.",
+      "effort": "S"
+    },
+    {
+      "title": "Worksheet reference vignettes document the v2 schema: 16 of 23 variable_details columns, 9 of 18 variables columns, no _m master databases",
+      "area": "vignettes",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/vignettes/variable_details.Rmd:54-162 documents 16 columns; inst/extdata/variable_details.csv has 23 (undocumented: ICES.confirmation, version, lastUpdated, status, reviewNotes, versionNotes, review)",
+        "/Users/dmanuel/github/cchsflow/vignettes/variables_sheet.Rmd:52 says 'there are 7 columns' then lists 9; actual variables.csv has 18 (undocumented: notes, description, version, lastUpdated, reviewNotes, ICES.confirmation, 'Observation..MD.', status, versionNotes)",
+        "/Users/dmanuel/github/cchsflow/vignettes/variable_details.Rmd:72 documents only _p (PUMF) and _s (Shared) databaseStart suffixes; v3 worksheets contain 13 _m master databases (cchs2001_m ... cchs2023_m) per unique databaseStart scan of variables.csv",
+        "/Users/dmanuel/github/cchsflow/vignettes/variables_sheet.Rmd:29 hard-codes 'CCHS cycles from 2001 to 2018'; variable_details.Rmd:54 'CCHS cycles from 2007 to 2018'",
+        "/Users/dmanuel/github/cchsflow/vignettes/variable_details.Rmd:84 instructs writing 'cchs2001::DHH_SEX' where the 2001 source variable is DHHA_SEX (should be cchs2001_p::DHHA_SEX) - wrong in v2 too",
+        "/Users/dmanuel/github/cchsflow/vignettes/variable_details.Rmd:128-133 uses recFrom/recTo column names that do not exist (actual: recStart/recEnd)",
+        "/Users/dmanuel/github/cchsflow/vignettes/variable_details.Rmd:140 links to dead http://bllflow.projectbiglife.ca"
+      ],
+      "why_design_issue": "These two vignettes are the de-facto schema reference for the package's central artifact. v3's headline additions - master-file harmonization and worksheet governance columns (version/status/review) - are invisible to users, and the documented authoring instructions contain errors (wrong source variable, phantom recFrom/recTo names) that propagate into contributor PRs. Meanwhile machine-readable schemas now exist at inst/metadata/schemas/core/*.yaml but the prose docs are maintained by hand in parallel.",
+      "severity": "high",
+      "candidate_fix": "Regenerate the column documentation from inst/metadata/schemas/core/variables.yaml and variable_details.yaml (single source of truth), add a section on _m master vs _p PUMF vs _s share databases and the era-naming convention, and fix the DHHA_SEX and recStart/recEnd errors.",
+      "effort": "M"
+    },
+    {
+      "title": "Divio gap: no documentation system for distinct user types, and v3's architecture has zero user-facing explanation",
+      "area": "documentation-system",
+      "evidence": [
+        "/tmp/recodeflow-pr43/index.qmd:37-38: 'The documentation not catering to different types of users (not using the divio style of documentation)' listed as a core user-feedback issue motivating the next version",
+        "Divio mapping of the 9 vignettes: tutorial = get_started.Rmd (mixed with reference material, e.g. lines 206-233 argument reference); how-to = how_to_harmonize.Rmd, how_to_add_variables.Rmd, worksheet_formatting.Rmd; reference = variables_sheet.Rmd, variable_details.Rmd; explanation = derived_variables.Rmd, tagged_na_usage.Rmd, duplicate_datasets.Rmd. Consumer and contributor content interleaved in the same articles (how_to_add_variables.Rmd serves only contributors but sits beside consumer articles with no signposting; _pkgdown.yml:26-44 navbar is a flat 8-item menu)",
+        "90 of 125 exports (the entire v3 surface: clean_variables, any_missing, get_priority_missing, get_missing_pattern_*, load_worksheet_schemas, get_variables/get_variable_details, auto_detect_database...) appear in no vignette: grep of vignettes/*.Rmd finds zero mentions of clean_variables, calculate_bmi, assess_adl, or any v3 function name",
+        "Architecture rationale exists only in non-user-facing locations: ceps/ (CEP review artifacts), /tmp/cchsflow-recovered-specs/, untracked docs/superpowers/{plans,specs}/ (git ls-files docs/ returns 0 tracked files; docs/ gitignored in commit 620ca0f3, 2025-06-03)",
+        "No migration guide exists for the v2->v3 mass renames (bmi_fun->calculate_bmi, adl_fun->assess_adl, low_drink_*->calculate_drinking_risk_*, immigration_fun->categorize_immigration) - nothing in vignettes/, README.md, or NEWS.md mentions any rename"
+      ],
+      "why_design_issue": "This is the exact complaint the recodeflow v4 scoping commits to fixing, and the current state would block that goal: three distinct audiences (researchers consuming harmonized data; contributors authoring worksheet rows and DV functions; developers of the engine) share one undifferentiated article list, and the largest API expansion in the package's history is documented only in internal artifacts. Users who upgrade will find every function they used renamed with no guide.",
+      "severity": "high",
+      "candidate_fix": "Adopt an explicit Divio structure in _pkgdown.yml navbar (Tutorials / How-to / Reference / Explanation, with consumer vs contributor sub-sections). Promote the 3-step architecture explanation from CEP/spec material into an 'Architecture' explanation article. Add a v2->v3 migration how-to with a rename table. Decide a single home for contributor/developer docs (tracked, rendered) instead of ceps + .claude skills + untracked docs/.",
+      "effort": "L"
+    },
+    {
+      "title": "NEWS.md frozen at 2022 with the v2.1.0 release mislabelled as 2.0.1",
+      "area": "NEWS",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/NEWS.md:1-2: top entry '# cchsflow 2.0.1' dated 2022-05-05, but DESCRIPTION:4-5 says Version 2.1.0, Date 2022-05-05 and git tag v2.1.0 exists - the 2.1.0 release notes carry a 2.0.1 heading (duplicate of NEWS.md:53)",
+        "No NEWS entry exists after 2022-05-05; absent: 3-step DV architecture, ~70 new calculate_*/assess_*/categorize_* exports, check_worksheet/fix_worksheet, clean_variables, 2019-2023 database coverage, _m master support, function renames/removals (git status shows 20+ deleted man pages and 40+ new ones)"
+      ],
+      "why_design_issue": "NEWS is the contract with upgrading users. A wrong version heading on the current CRAN release plus silence over four years of breaking changes means there is no changelog trail for the v2->v3 break - which the v4 effort will need to reconstruct anyway for deprecation messaging.",
+      "severity": "medium",
+      "candidate_fix": "Correct the duplicated heading to '# cchsflow 2.1.0'. Draft a v3.0.0 section now (breaking renames table, new architecture, new database coverage, worksheet tooling) while the history is recoverable from CEPs and git log; keep it updated as v3 lands.",
+      "effort": "S"
+    },
+    {
+      "title": "README stale: 2001-2018 coverage claim, March 2022 attribution, dead roadmap link, master-branch URLs",
+      "area": "README",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/README.md:15 'span survey cycles (currently, 2001 to 2018)' - v3 worksheets cover 2001-2023 including 2019_2020/2021/2022/2023 master and PUMF entries (unique databaseStart scan)",
+        "/Users/dmanuel/github/cchsflow/README.md:166-171 'CCHS 2001 to 2018 PUMF, accessed March 2022'",
+        "/Users/dmanuel/github/cchsflow/README.md:146 roadmap links to github.com/Big-Life-Lab/cchsflow/projects (classic Projects, retired by GitHub)",
+        "/Users/dmanuel/github/cchsflow/README.md:109-110 links to /blob/master/inst/extdata/... but the default branch is main (no master in git branch -r)",
+        "/Users/dmanuel/github/cchsflow/README.md:4-5 badge text says 'Lifecycle: development' while the badge image/URL says stable",
+        "/Users/dmanuel/github/cchsflow/README.md:141 ODESI link uses legacy odesi2.scholarsportal.info domain (vignettes use https://odesi.ca)"
+      ],
+      "why_design_issue": "The README is the package's front door on both GitHub and CRAN; every quantitative claim in it (cycle coverage, data vintage) is now wrong, and it makes no mention of the v3 capabilities the team has spent a year building. For a harmonization package whose value proposition is currency with StatCan releases, advertising 2018 as the ceiling undersells the work.",
+      "severity": "medium",
+      "candidate_fix": "Refresh coverage claims (2001-2023, master + PUMF + share), update attribution dates, fix branch URLs to main, replace the projects link with the active GitHub Project, align the lifecycle badge, and add a short 'what's new in v3' section.",
+      "effort": "S"
+    },
+    {
+      "title": "DESCRIPTION has no VignetteBuilder field - the 9 vignettes have never shipped in the installed package",
+      "area": "packaging-docs",
+      "evidence": [
+        "grep -n 'VignetteBuilder' DESCRIPTION -> no match (working tree); same for git show v2.1.0:DESCRIPTION (CRAN release)",
+        "/Users/dmanuel/github/cchsflow/.Rbuildignore:6 excludes '^Vignettes$' (capital V - matches nothing; the real vignettes/ dir is included in builds but cannot be built without the field)",
+        "DESCRIPTION:63-69 has knitr and rmarkdown in Suggests, so the intent to build vignettes existed",
+        "DESCRIPTION:4-5 Version 2.1.0 / Date 2022-05-05 unchanged on the v3 branch; DESCRIPTION:50-51 Description text still says 'currently, 2001 to 2018'"
+      ],
+      "why_design_issue": "Users who install cchsflow get no vignettes (browseVignettes('cchsflow') is empty); all documentation requires the pkgdown website. That contradicts the project's local-first principle and means offline/LMIC users have only Rd pages. The case-typo .Rbuildignore line suggests vignette shipping broke silently years ago and nothing in CI checks it.",
+      "severity": "medium",
+      "candidate_fix": "Add 'VignetteBuilder: knitr' to DESCRIPTION, fix or remove the '^Vignettes$' .Rbuildignore line, confirm R CMD build produces inst/doc, and add R CMD check with vignette building to the v3 branch CI (only check-csv.yml exists in .github/workflows on this branch).",
+      "effort": "S"
+    },
+    {
+      "title": "tagged_na vignette contradicts itself and the code on 'question not asked' (NA(a) vs NA(c))",
+      "area": "vignettes",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/vignettes/tagged_na_usage.Rmd:39-41 text: variables 'entirely missing from a specific cycle ... recoded to NA(a)'",
+        "/Users/dmanuel/github/cchsflow/vignettes/tagged_na_usage.Rmd:51 table in the same section: 'NA(c) | question not asked in the survey cycle'",
+        "/Users/dmanuel/github/cchsflow/R/merge-data.R:49 implements haven::tagged_na('c') for this case - the table is right, the prose is wrong",
+        "/Users/dmanuel/github/cchsflow/vignettes/tagged_na_usage.Rmd:37-38 'recodes the four CCHS category missing data categories values into two NA values' - there are three (a, b, c)"
+      ],
+      "why_design_issue": "Missing-data semantics are the methodological core of harmonization across cycles; the canonical explanation article giving two different answers for the same case will cause analysts to miscount denominators. The v4 scoping (missing-data.qmd) plans to rework tagged_na handling, so the baseline doc must at least be internally consistent.",
+      "severity": "medium",
+      "candidate_fix": "Correct the prose to NA(c) and 'three NA values', and add one example showing merge_rec_data() producing NA(c) for a variable absent from a cycle.",
+      "effort": "S"
+    },
+    {
+      "title": "how_to_harmonize.Rmd: literal 'Vignette Title' index entry and a documented workflow that errors (data('sample_variables'))",
+      "area": "vignettes",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/vignettes/how_to_harmonize.Rmd:5: %\\VignetteIndexEntry{Vignette Title} - unedited template placeholder",
+        "/Users/dmanuel/github/cchsflow/vignettes/how_to_harmonize.Rmd:116-119: data('sample_variables'); data('sample_variable_details') - these are not package data objects; data/ contains only cchs*_p/_s.RData, variables.RData, variable_details.RData; the samples exist only as inst/extdata/sample_*.csv",
+        "/Users/dmanuel/github/cchsflow/vignettes/how_to_harmonize.Rmd:27 caveat stops at 'cycles before 2014 with cycles from 2015 onward'; examples stop at 2017-2018 although worksheets now reach 2023 (lines 31-51)"
+      ],
+      "why_design_issue": "The placeholder title would appear verbatim in any vignette index once vignettes ship, and Option 2 of the article teaches a code path that throws 'data set sample_variables not found' (the chunk is eval=F so it is never caught). Documentation that cannot be executed signals there is no doc-testing step in the workflow.",
+      "severity": "medium",
+      "candidate_fix": "Fix the IndexEntry, replace data() calls with read.csv(system.file('extdata', 'sample_variables.csv', package='cchsflow')) (or promote the samples to real package data), and extend the examples/caveats to the 2019-2023 cycles.",
+      "effort": "S"
+    },
+    {
+      "title": "Vignettes depend on source-tree relative paths instead of installed-package resources",
+      "area": "vignettes",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/vignettes/variables_sheet.Rmd:25: read.csv(file.path(getwd(), '../inst/extdata/variables.csv'))",
+        "/Users/dmanuel/github/cchsflow/vignettes/how_to_add_variables.Rmd:38-39: read.csv(file.path(getwd(), '../inst/extdata/sample_variables.csv')) and sample_variable_details.csv",
+        "/Users/dmanuel/github/cchsflow/vignettes/variable_details.Rmd:177: read.csv(file.path(getwd(), '../inst/extdata/sample_variable_details.csv'))",
+        "how_to_add_variables.Rmd:241,255,265,282 then index fixed row numbers (9, 10:12, 13:20, 21:30) of the sample sheet - fragile against any sample edit (sample_variable_details.csv currently has exactly 30 rows)"
+      ],
+      "why_design_issue": "These paths only resolve when knitting inside the source repo, which is one reason vignettes cannot be turned on in R CMD build without rework. Hard-coded row indices into an undocumented sample sheet make the worked examples silently show the wrong rows when the sample changes.",
+      "severity": "low",
+      "candidate_fix": "Switch to system.file('extdata', ..., package='cchsflow') (works installed and via load_all) and select example rows by variable name rather than position.",
+      "effort": "S"
+    },
+    {
+      "title": "No pkgdown publishing pipeline on the v3 branch; local docs/ is untracked debris from intermediate v3 states",
+      "area": "pkgdown",
+      "evidence": [
+        ".github/workflows/ on this branch contains only check-csv.yml; main has only R-CMD-check.yaml; no pkgdown workflow exists on either",
+        "docs/ was gitignored in commit 620ca0f3 (2025-06-03 'add docs to .gitignore'); git ls-files docs/ returns 0 files, yet the working tree carries a partial site: docs/reference/ has 67 orphan HTML files mixing abandoned era-suffix names (bmi_fun_D.html, adl_fun_B.html, SMKG040_fun_A.html) and renamed-away functions (assess_binge_drinking.html, categorize_quit_time.html) with no index.html",
+        "_pkgdown.yml:1 'destination: docs' still points builds at the gitignored directory"
+      ],
+      "why_design_issue": "There is no reproducible path from the v3 source to a published documentation site: builds are manual, output is gitignored, and the leftover artifacts show at least two abandoned naming schemes (_A/_B/_D era suffixes, assess_binge_drinking) that never matched the shipped API. The live site meanwhile still documents v2.1.0. For v4 this means documentation deployment must be designed, not just content.",
+      "severity": "medium",
+      "candidate_fix": "Add a pkgdown GitHub Actions workflow (build on push to main, deploy to gh-pages), delete the local docs/ debris, and run pkgdown::check_pkgdown() plus vignette builds in PR CI so site breakage blocks merges.",
+      "effort": "M"
+    },
+    {
+      "title": "duplicate_datasets vignette omits the share (_s) test datasets and all post-2018 file types",
+      "area": "vignettes",
+      "evidence": [
+        "/Users/dmanuel/github/cchsflow/vignettes/duplicate_datasets.Rmd:16-29 lists 12 supported PUMF datasets; data/ ships 15 (also cchs2009_s, cchs2010_s, cchs2012_s, added in NEWS 2.0.1 2022-05-05)",
+        "No vignette explains the PUMF (_p) vs share (_s) vs master (_m) data-file taxonomy that drives databaseStart in v3 worksheets (variable_details.Rmd:72 covers only _p/_s suffix naming)",
+        "Vignette stops at 2017-2018; no mention that 2021 has no standalone PUMF and 2022 does - exactly the overlap/duplication questions this article exists to answer"
+      ],
+      "why_design_issue": "This is the explanation article for 'which dataset should I use', and it is silent on every file type added since 2022. The master/PUMF/share distinction is now the most consequential dataset-selection decision in v3 and has no home in the docs.",
+      "severity": "low",
+      "candidate_fix": "Extend the article with the _m/_p/_s taxonomy, the 2019-2020/2021-2022/2022/2023 release quirks, and the share-file deprecation status; cross-link from variable_details.Rmd databaseStart docs.",
+      "effort": "S"
+    }
+  ]
+}

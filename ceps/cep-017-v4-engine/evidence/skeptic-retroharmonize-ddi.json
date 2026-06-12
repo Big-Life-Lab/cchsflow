@@ -1,0 +1,54 @@
+{
+  "task": "skeptic-pass-retroharmonize-ddi",
+  "date_verified": "2026-06-11",
+  "verified": [
+    "retroharmonize solves ex-post harmonization of labelled survey microdata across multiple waves using a crosswalk-table paradigm (confirmed by official docs and vignettes)",
+    "retroharmonize carries a custom labelled_spss_survey S3 class that inherits from haven_labelled_spss and carries per-survey provenance attributes (variable labels, value labels, survey id, source names) (confirmed by labelled_spss_survey vignette)",
+    "retroharmonize is designed for programs like Eurobarometer and Afrobarometer (confirmed by survey_harmonization vignette: 'tested on Eurobarometer, Afrobarometer and Arab Barometer')",
+    "DDIwR reads/writes DDI Codebook XML and converts data between SPSS, Stata, SAS, R, and Excel with metadata preservation (confirmed by CRAN page and rdocumentation)",
+    "Neither retroharmonize nor DDIwR creates derived or computed variables (confirmed by inspection of reference index and docs: no computed/derived variable functionality)",
+    "crosswalk_table_create() exists and auto-generates a pre-populated stub from survey metadata (confirmed by crosswalk vignette: creates stubs with identical source/target columns from metadata_create() output)",
+    "retroharmonize was CRAN-archived from 2026-01-30 due to dependency on archived 'dataset' package (confirmed by CRAN search results and web search)",
+    "retroharmonize was restored to CRAN on 2026-05-21 as version 0.2.8 (confirmed by CRAN index page showing publication date 2026-05-21 and active downloads)",
+    "The 'dataset' package was also restored (current version 0.4.5, published 2026-06-03, active on CRAN)",
+    "retroharmonize crosswalk works only with exact numeric code matches, not interval-range notation (confirmed by crosswalk vignette examples showing only discrete value mapping, no [lo,hi] syntax)",
+    "cchsflow Func:: dispatch is documented in variable_details (confirmed by web search finding DerivedVar:: and Func:: in variable_details.csv and derived_variables vignette)",
+    "retroharmonize's per-survey-per-variable crosswalk row model would produce very large tables for multi-wave surveys (architecture fact about the data model, consistent with crosswalk docs)",
+    "The 'declared' package is associated with retroharmonize's ecosystem — the eurobarometer companion package uses it as a dependency with plans to move to retroharmonize (confirmed by eurobarometer.dataobservatory.eu search result)"
+  ],
+  "refuted": [
+    "REFUTED (inaccurate): 'Afrobarometer (5 rounds)' — the Afrobarometer vignette uses 3 rounds (rounds 5, 6, 7), not 5. Seven rounds of Afrobarometer exist total.",
+    "REFUTED (wrong codes): retroharmonize uses 99997/99998/99999 for do_not_know/declined/inap — actual codes from source are: do_not_know=99996, declined=99998, inap=99999. The 99997 code does not appear; do_not_know maps to 99996 not 99997.",
+    "UNCONFIRMED (not directly verifiable from cited sources): 'Eurobarometer (80+ files)' — Eurobarometer has 92+ waves but the claim of '80+ files' is not stated in retroharmonize documentation. The survey_harmonization vignette does not specify file counts. The number is plausible (Eurobarometer has been running since 1974) but cannot be attributed to retroharmonize documentation as stated.",
+    "PARTIALLY INACCURATE: retroharmonize dependency on 'declared' — the current retroharmonize 0.2.8 CRAN dependencies list does NOT include 'declared' as a direct dependency. 'declared' appears only in the companion eurobarometer package's experimental modernisation. The claim that v4 should avoid 'declared' is still reasonable advice, but the framing implies 'declared' is a current retroharmonize dependency, which is not confirmed.",
+    "NEEDS QUALIFICATION: crosswalk_table_create() described as 'auto-populating from file metadata / DDI XML' — it actually generates stubs from metadata_create() output (which is derived from reading survey files), not directly from DDI XML. The claim to wrap DDIwR for DDI XML auto-population is a recommendation, not a current retroharmonize feature.",
+    "DDI Codebook 2.6 version — the claim that DDIwR reads/writes 'DDI Codebook 2.6 XML' specifically: the DDIwR CRAN page and GitHub page do not explicitly state the DDI Codebook version. The claim may be correct but is not directly verified from the cited sources.",
+    "PARTIALLY INACCURATE: 'retroharmonize ... is actively maintained (v0.2.8, May 2026)' — technically accurate (v0.2.8 published 2026-05-21) but the framing omits that it was archived for ~4 months (2026-01-30 to 2026-05-21) due to a cascading dependency failure, which is itself a risk the passage acknowledges."
+  ],
+  "notes": {
+    "cran_archive_dates": "retroharmonize archived 2026-01-30, restored 2026-05-21 (v0.2.8). dataset package restored 2026-06-03 (v0.4.5). Both currently active.",
+    "missing_value_codes": "Actual codes from harmonize_na_values.R: do_not_know=99996, declined=99998, inap=99999. Claim of 99997/99998/99999 is wrong for do_not_know (is 99996, not 99997).",
+    "afrobarometer_rounds": "Vignette uses rounds 5, 6, 7 (3 rounds). Seven total rounds exist. Claim of '5 rounds' is wrong.",
+    "eurobarometer_file_count": "'80+ files' is not sourced from retroharmonize docs. Eurobarometer has 92+ waves historically; the 80+ count for files tested with retroharmonize is plausible but unverified from the cited sources.",
+    "crosswalk_table_create": "Function confirmed to exist and create stubs from metadata. It works from metadata_create() output, not raw DDI XML directly. The 'auto-populate from DDI XML' framing in recommendation section is aspirational.",
+    "derived_variables": "Confirmed: neither retroharmonize nor DDIwR supports derived/computed multi-input variables. cchsflow's Func:: dispatch is unique in R-package ecosystems for spreadsheet-driven multi-input harmonization.",
+    "declared_dependency": "Not a current direct dependency of retroharmonize 0.2.8. Appears only in companion eurobarometer package under experimental development.",
+    "overall_verdict": "The WHAT IT SOLVES, LESSONS, and RECOMMENDATION sections are largely sound. The main factual errors are: (1) Afrobarometer '5 rounds' should be 3 (vignette) or 7 (total available); (2) missing value code 99997 for do_not_know is wrong (actual: 99996); (3) 'declared' is not a current retroharmonize dependency. The archive timeline claim (2026-01-30 to 2026-05-21) is confirmed."
+  },
+  "sources_checked": [
+    "https://cran.r-project.org/web/packages/retroharmonize/index.html",
+    "https://cran.r-project.org/web/packages/DDIwR/",
+    "https://retroharmonize.dataobservatory.eu/articles/crosswalk.html",
+    "https://retroharmonize.dataobservatory.eu/articles/labelled_spss_survey.html",
+    "https://retroharmonize.dataobservatory.eu/articles/survey_harmonization.html",
+    "https://retroharmonize.dataobservatory.eu/articles/afrobarometer.html",
+    "https://retroharmonize.dataobservatory.eu/reference/index.html",
+    "https://rdrr.io/cran/retroharmonize/src/R/harmonize_na_values.R",
+    "https://www.rdocumentation.org/packages/DDIwR/versions/0.19",
+    "https://github.com/dusadrian/DDIwR",
+    "https://github.com/rOpenGov/retroharmonize",
+    "https://journals.sagepub.com/doi/full/10.1177/20597991221077923",
+    "https://arxiv.org/html/2411.10342v1",
+    "https://cran.r-project.org/web/packages/dataset/"
+  ]
+}

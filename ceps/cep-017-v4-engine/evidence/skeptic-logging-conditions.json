@@ -1,0 +1,54 @@
+{
+  "task": "Skeptic pass on logging-conditions claims",
+  "date": "2026-06-11",
+  "verdict": {
+    "verified": [
+      "cli_abort/cli_warn/cli_inform wrap rlang::abort/warn/inform and pass ... through to those functions (confirmed by github.com/r-lib/cli R/rlang.R source)",
+      "rlang::warn() and rlang::inform() accept .frequency ('always'/'regularly'/'once') and .frequency_id parameters for per-session deduplication",
+      "rlang::abort() does NOT support .frequency / .frequency_id — errors do not deduplicate",
+      "reset_warning_verbosity() exists in rlang (added v1.0.3, 2022-06-27); accepts an id parameter to reset frequency tracking for a specific condition",
+      "class parameter works in rlang::abort/warn/inform to create classed conditions (renamed from 'subclass' in rlang 0.4.2)",
+      "class= can be passed to cli_abort/cli_warn/cli_inform via ... (they pass all ... to the corresponding rlang function), so class hierarchy works even though it is not in the explicit signature",
+      "withCallingHandlers is non-exiting: execution resumes in the signalling context after the handler returns",
+      "tryCatch is exiting: execution resumes at the tryCatch call site, not the signalling context",
+      "cnd_muffle() exists in rlang; used within calling handlers to prevent condition bubbling; is equivalent to base::suppressWarnings/suppressMessages for those types",
+      "logger package is active on CRAN (v0.4.0, released 2024-10-22; v0.4.2 also referenced)",
+      "log_warnings() exists in logger: sets a hook to intercept standard warning() calls and log them via log_warn()",
+      "logger does NOT have an appender_memory function — confirmed absent from the full function index",
+      "lgr AppenderBuffer inherits from AppenderMemory (superclass chain: Appender -> AppenderMemory -> AppenderBuffer)",
+      "lgr AppenderMemory has $data and $dt active bindings returning a data.frame or data.table; AppenderBuffer inherits these through AppenderMemory",
+      "rOpenSci guidance recommends package-level option (e.g. packagename.quiet) rather than per-function parameter for verbosity control",
+      "rOpenSci also recommends graduated levels ('none'/'inform'/'debug') not just binary toggle",
+      "cli is listed in R package DESCRIPTION as Suggests for rlang, meaning rlang is NOT an Imports/Depends of cli — it is an optional/suggested dependency only",
+      "cnd_muffle() is only useful within calling handlers (not exiting handlers) — confirmed by rlang docs and adv-r"
+    ],
+    "refuted": [
+      "REFUTED: 'rlang is already an implicit Depends through cli' — cli lists rlang only in Suggests, not Imports or Depends. rlang is an OPTIONAL dependency of cli, not an implicit hard dependency. A package importing cli does NOT automatically get rlang.",
+      "REFUTED/QUALIFIED: The spec says lgr's AppenderBuffer 'retains LogEvent objects as a data.frame accessible via $data' — the $data active binding is on AppenderMemory (lgr's parent class), not AppenderBuffer directly. AppenderBuffer inherits it but the spec conflates AppenderBuffer with the AppenderMemory.$data feature. Technically works but the attribution is imprecise.",
+      "REFUTED: logger has 'no equivalent appender_memory' is correct as stated, but the spec then says 'lgr's AppenderBuffer retains LogEvent objects as a data.frame accessible via $data' — the CRAN lgr vignette and reference pages confirm $data is on AppenderMemory, and AppenderBuffer extends it. However the original spec claim about AppenderBuffer and $data as a clean direct feature is overstated; it is inherited.",
+      "UNCONFIRMABLE: 'cli (already in DESCRIPTION Depends)' — the spec refers to cchsflow's DESCRIPTION, which was not checked, so this claim cannot be verified or refuted from public sources alone. It is a project-local claim."
+    ],
+    "notes": {
+      "class_via_dots": "cli_abort/cli_warn/cli_inform do NOT have an explicit 'class' parameter in their function signatures, but class= IS passable via ... because it is forwarded verbatim to rlang::abort/warn/inform, which do accept class=. The claim that 'cli_abort/cli_warn/cli_inform accept class and .frequency' is functionally correct for class (via ...) and for .frequency on cli_warn/cli_inform (also via ...), but misleading about .frequency on cli_abort since rlang::abort does not support .frequency.",
+      "frequency_on_abort": "The spec says 'accept class and .frequency' uniformly for all three cli_ functions. This is incorrect for .frequency: rlang::abort does not support .frequency/.frequency_id, only rlang::warn and rlang::inform do. Errors do not deduplicate.",
+      "lgr_data_binding": "The $data active binding is confirmed on AppenderMemory (lgr) which AppenderBuffer inherits from. The spec's claim about AppenderBuffer.$data is correct in practice (inheritance) but the source is AppenderMemory, not AppenderBuffer directly.",
+      "rlang_dependency_of_cli": "CRITICAL: The spec's recommendation to 'make rlang an explicit Imports to use cnd_muffle(), reset_warning_verbosity(), and withCallingHandlers() reliably' is CORRECT as a recommendation. But the premise that 'rlang is already an implicit Depends through cli' is FALSE — cli only Suggests rlang. Packages depending on cli cannot rely on rlang being present without declaring it explicitly. The recommendation to add rlang to Imports is valid; the stated reason (it is already implicit) is wrong.",
+      "rOpenSci_verbose_option": "The spec recommends 'cchsflow.verbose (default TRUE)' — rOpenSci actually recommends a .quiet option (default FALSE) in the usethis.quiet pattern, or graduated levels. The name convention (verbose vs quiet) differs, and rOpenSci explicitly recommends graduated levels not just boolean. The spec's pattern is close but the convention is inverted vs. the rOpenSci example.",
+      "logger_log_warnings": "log_warnings() in logger intercepts standard warning() calls via a hook. Confirmed. But the spec claims 'logger::log_warnings() can also intercept legacy warning() calls during the transition' — this is accurate.",
+      "sources_checked": [
+        "https://cli.r-lib.org/reference/cli_abort.html",
+        "https://rlang.r-lib.org/reference/abort.html",
+        "https://github.com/r-lib/cli/blob/main/DESCRIPTION",
+        "https://github.com/r-lib/cli/blob/main/R/rlang.R",
+        "https://daroczig.github.io/logger/reference/index.html",
+        "https://rdrr.io/cran/logger/man/log_warnings.html",
+        "https://cran.r-project.org/web/packages/lgr/vignettes/lgr.html",
+        "https://s-fleck.github.io/lgr/reference/AppenderBuffer.html",
+        "https://adv-r.hadley.nz/conditions.html",
+        "https://devguide.ropensci.org/pkg_building.html",
+        "https://rlang.r-lib.org/news/index.html",
+        "https://rlang.r-lib.org/reference/topic-condition-formatting.html"
+      ]
+    }
+  }
+}

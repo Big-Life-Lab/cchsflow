@@ -1,0 +1,53 @@
+{
+  "pass": "pkg-design-practices",
+  "date": "2026-06-11",
+  "verdict": "mostly_verified_with_notable_inaccuracies",
+  "verified": [
+    "R Packages 2e recommends 'almost always use Imports, not Depends' - confirmed at r-pkgs.org/description.html",
+    "lifecycle package provides deprecate_soft() and deprecate_warn() - confirmed at lifecycle.r-lib.org",
+    "deprecate_soft() warns only on direct external calls, not on package-internal uses - confirmed",
+    "Four lifecycle badges exist: stable, experimental, deprecated, superseded - confirmed",
+    "Superseded functions do NOT emit warnings (unlike deprecated) - confirmed at lifecycle.r-lib.org/articles/stages.html",
+    "Deprecated functions ARE scheduled for removal and DO emit warnings - confirmed",
+    "Tidy design guide cites base::ifelse() as the canonical type-instability violation - confirmed at design.tidyverse.org/out-type-stability.html",
+    "dplyr::do() is marked [Superseded] since dplyr 1.0.0 (2020) - confirmed at dplyr.tidyverse.org/reference/do.html",
+    "dplyr 1.0.0 was released June 2020 - confirmed",
+    "cchsflow DESCRIPTION has 9 packages in Depends (excluding R itself): haven, dplyr, sjlabelled, stringr, magrittr, yaml, readr, purrr, cli - verified in DESCRIPTION file",
+    "Depends packages collectively export exactly 996 symbols - verified via getNamespaceExports() on installed versions",
+    "sjlabelled and haven have 6 conflicting exported names (masking problem): zap_labels, as_factor, read_spss, read_sas, write_sas, read_stata - verified",
+    "recode-with-table.R is 983 lines - verified",
+    "rowwise(), select(), and do() at lines 939-941 are the 3 unqualified dplyr calls, covered by importFrom - verified",
+    "importFrom(dplyr,do) and importFrom(dplyr,rowwise) exist in NAMESPACE - verified",
+    "DESCRIPTION pins dplyr >= 0.8.2 which predates dplyr 1.0.0 (pre-supersession) - verified",
+    "cchsflow NAMESPACE has exactly 125 exports - verified",
+    "Exactly 27 *_fun exports exist in NAMESPACE - verified",
+    "if_else2() wraps base::ifelse() and inherits type-instability - verified in R/utility-functions.R",
+    "Exactly 210 if_else2() call sites (non-definition lines) in R/*.R - verified",
+    "glue::glue() is used 8 times in R/check-worksheet.R - verified",
+    "glue is NOT declared in DESCRIPTION Imports or Suggests - verified",
+    "stats is NOT declared in DESCRIPTION - verified (but stats is a base R package, special rules apply)",
+    "withr is NOT declared in DESCRIPTION Suggests - verified",
+    "withr is used only in tests/testthat/helper-create-test-csv.R - verified",
+    "rOpenSci recommends snake_case strongly over other styles - confirmed at devguide.ropensci.org",
+    "Tidy design guide recommends verb-first naming (imperative mood) and snake_case - confirmed",
+    "Engine uses do.call(get(custom_function_name), row_values) for string-based DV dispatch - verified at line 980",
+    "R Packages 2e published 2023 by Hadley Wickham and Jenny Bryan - confirmed",
+    "case_when is type-stable in practice: output type is the common type of all RHS expressions regardless of which conditions match - verified empirically"
+  ],
+  "refuted": [
+    "REFUTED (partial): The claim 'importFrom(dplyr,do) and importFrom(dplyr,rowwise) entries import functions that dplyr itself marks [Superseded] since 1.0.0' is incorrect for rowwise(). dplyr 1.0.0 NEWS explicitly states rowwise() 'is no longer questioning' = became STABLE. Only do() is [Superseded]. rowwise() is currently stable per dplyr docs.",
+    "REFUTED (attribution): The claim 'Tidy design guide cites... dplyr::case_when is type-stable' - the tidy design page at design.tidyverse.org/out-type-stability.html does NOT mention case_when() at all. case_when is type-stable in practice, but the cited source does not make this claim. The inference is valid but not from the cited source.",
+    "REFUTED (attribution): The claim that 'verb-first snake_case prefixes' is the naming convention from all three sources including rOpenSci is inaccurate. rOpenSci recommends object_verb() pattern (noun first), not verb-first. Only tidy design recommends verb-first. The claim that 'calculate_/assess_ family is correct per all three naming sources' overstates rOpenSci's recommendation.",
+    "OVERSTATED: The claim that undeclared glue and stats are 'R CMD check WARNINGs (not Notes) and hard CRAN blockers' overstates severity for stats. stats is a base R package (Priority: base) - undeclared use via stats::setNames() is typically a NOTE not a WARNING. The WARNING severity is more defensible for non-base packages like glue and withr.",
+    "MATH INCONSISTENCY: The claim 'Trim the exported API from 125 to roughly 50 by flipping @export to @keywords internal on the ~36 plumbing exports' has inconsistent arithmetic. 125 - 36 = 89, not ~50. Strict infrastructure plumbing is ~18 exports; extended plumbing (including _fun exports) is ~62 removals needed to reach ~50. The '~36' figure appears to be an undercount of what trimming to ~50 would require."
+  ],
+  "notes": {
+    "996_symbols": "The exact count of 996 exported symbols across the 9 Depends packages was verified empirically with getNamespaceExports() - this is a precisely accurate figure given installed package versions",
+    "rowwise_status": "dplyr rowwise() is currently STABLE. The dplyr 1.0.0 blog post says rowwise() was revamped and is 'no longer questioning'. The do() + rowwise() coupling in recode-with-table.R is still a valid risk because do() IS superseded and the pattern as a whole should be replaced, but the framing that both are [Superseded] is incorrect.",
+    "case_when_claim": "case_when's type stability is a correct and important design principle - the issue is attribution. The tidy design page documents ifelse() as the violation; case_when as the fix is an inference from the R community's established practice, not stated in the cited source.",
+    "ropensci_naming": "rOpenSci recommends object_verb() (e.g., str_detect not detect_str). The calculate_ prefix used in cchsflow is verb-first, which aligns with tidy design but is the opposite order from rOpenSci's recommendation. Both sources agree on snake_case.",
+    "glue_stats_withr_severity": "For stats (base package), R CMD check behavior is typically NOTE for undeclared :: usage, not WARNING. For glue (non-base CRAN package), using glue::glue() without glue in Imports/Suggests would generate a WARNING at --as-cran. The claim correctly identifies these as issues but the severity label 'WARNINGs' is accurate for glue/withr but not for stats.",
+    "deprecate_soft_mechanics": "The deprecate_soft() description is accurate and well-grounded. Using it for if_else2 means: (1) package-internal calls to if_else2 do NOT generate warnings, (2) end users who call if_else2() directly in their own .GlobalEnv code WILL get warned. This is the correct tool for the use case described.",
+    "sources_verified": "All cited URLs resolve and contain content broadly consistent with the claims. The lifecycle.r-lib.org, design.tidyverse.org, devguide.ropensci.org, and r-pkgs.org sources all exist and support the core design recommendations."
+  }
+}
