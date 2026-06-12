@@ -1,8 +1,8 @@
 # Design Issues Inventory
 
 **Date:** June 11, 2026
-**Status:** Draft -- six of ten planned sweep dimensions complete (see
-"Coverage and verification status" below)
+**Status:** Complete -- all ten sweep dimensions, adversarially verified
+(see "Coverage and verification status" below)
 **Method:** Multi-agent evidence sweep of the cchsflow working tree (v3 +
 the ADL/alcohol repair), each finding cited to file:line and, where noted,
 reproduced live. Full machine-readable findings in `evidence/*.json`;
@@ -10,8 +10,9 @@ high-severity details with evidence and fixes in
 `evidence/high-severity-details.txt`.
 
 This is the "design issues that never made a lot of sense" inventory
-requested for v4 scoping: 78 confirmed-style findings across six
-dimensions, ranked by severity, each with a candidate fix and effort
+requested for v4 scoping: 131 evidence-cited findings across ten
+dimensions (76 in the original six summarized below; the worksheet-schema,
+testing-ci, docs-vignettes, and issues-triage findings live in evidence/), ranked by severity, each with a candidate fix and effort
 estimate (S/M/L).
 
 ## Headline findings
@@ -80,7 +81,7 @@ the v3 release window:
 
 | Fix | Evidence | Effort |
 |---|---|---|
-| List-mode loop bug: pass `data_name`, not `database_name` | recode-with-table.R:188-203 | S |
+| List-mode loop bug: pass `data_name`, not `database_name` | recode-with-table.R:188-203 | **Done** (63450ba3, with regression test; ports to recodeflow at consolidation) |
 | Declare `glue` + `stats` in Imports; `withr` in Suggests | check-worksheet.R:274ff; alcohol.R:93 | S |
 | `rec_with_table()` roxygen documents wrong defaults for `append_to_data` and `notes` | recode-with-table.R:113-118 vs 160-162 | S |
 | Tibble support: `[[` instead of `[ , ]` in `label_data()` | label-utils.R:184-211; closes the real cause of #159 | S |
@@ -91,7 +92,7 @@ the v3 release window:
 
 ## Per-dimension summaries
 
-### Engine internals (21 issues: 4 high, 11 medium, 6 low)
+### Engine internals (21 issues: 4 high, 10 medium, 7 low)
 
 Beyond headline items 1-3: a plain dataframe is mis-routed into the list
 branch when `ncol(data) == length(database_name)`; database matching is
@@ -117,7 +118,7 @@ contradictory fallback patterns for unknown variables; the Level 5
 helpers run element-wise R loops (~0.3-0.6 s per call per 100k rows, ~14
 calls per derived variable).
 
-### Labels and metadata layer (11 issues: 4 high, 6 medium, 1 low)
+### Labels and metadata layer (11 issues: 4 high, 5 medium, 2 low)
 
 The dimension furthest from its own scoping targets. Headline items 3 and
 5, plus: value labels are attached in a nonstandard sjlabelled-on-factor
@@ -130,7 +131,7 @@ also why `set_data_labels()` crashes on era-varying labels); labelling is
 fused to recoding with hidden type coercion and no opt-out; labels do not
 survive `bind_rows` or base subsetting.
 
-### API surface and UX (15 issues: 7 high, 7 medium, 1 low)
+### API surface and UX (12 issues: 6 high, 5 medium, 1 low)
 
 Headline item 6, plus: three API generations coexist (43 `calculate_*`,
 27 legacy `*_fun`, 6 functions named identically to CCHS variables) with
@@ -152,7 +153,7 @@ namespace environments with inconsistent construction (one without
 never-loaded content inside R/ that R CMD check flags; no
 `globalVariables()` declaration for NSE column references.
 
-### Data artifacts (10 issues: 4 high, 4 medium, 2 low)
+### Data artifacts (11 issues: 3 high, 7 medium, 1 low)
 
 Headline items 9 and 10, plus: shipped sample data covers none of the
 2019-2023 cycles v3 newly harmonizes, so the headline feature cannot be
@@ -216,10 +217,13 @@ benchmark.
   pre-existing test errors), docs-vignettes, and the full issues triage.
 - **Adversarial verification: complete.** 41 verdicts
   (`evidence/verification-verdicts.json`): 38 findings confirmed real,
-  3 refuted and removed from consideration (two worksheet-schema claims --
-  the YAML-nesting crash and the DerivedVar-silently-ignored claim -- and
-  the haven_labelled framing of #159). All 35 findings from the June 10
-  sweep were confirmed. Severity rankings can now be treated as reviewed.
+  3 refuted (the DerivedVar-silently-ignored claim, the haven_labelled
+  framing of #159, and the check_worksheet YAML-nesting claim -- though
+  that last refutation was itself overturned by direct execution on June
+  12: `check_worksheet()` on variable_details.csv does crash, so the
+  finding stands and lands in Track 0 of the requirements). All 35
+  findings from the June 10 sweep were confirmed. Severity rankings can
+  be treated as reviewed.
 - **Engine comparison: complete** (`evidence/engines-*.md`), synthesized
   in [2026-06-11_engine-comparison-and-reunification.md](2026-06-11_engine-comparison-and-reunification.md).
 - **Ecosystem benchmark: complete** (`evidence/bench-*.md` with skeptic

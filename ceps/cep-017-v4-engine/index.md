@@ -13,9 +13,14 @@ modularization and missing-data metadata).
 The evidence program is complete (all ten inventory dimensions,
 41-verdict adversarial verification, engine comparison, eight-family
 ecosystem benchmark with skeptic passes -- raw material in evidence/).
-The consolidated requirements draft is written; remaining work is team
-review and the decisions it calls out (priority order, NA representation,
-the recodeflow consolidation).
+All documents were adversarially reviewed by a six-lens panel
+(evidence/review-*.md: evidence-grounding, lead-developer perspective,
+feasibility, completeness, user impact, internal consistency) and revised
+June 12: governance/CRAN-gate section, Track 0 (testing/CI
+pre-conditions), Track 8 (documentation), sequencing constraints, and the
+user-migration commitments were added on panel findings. Remaining work
+is team review and the decisions the documents call out (priority order,
+NA representation, the recodeflow consolidation and its minimal v1.0.0).
 
 Provenance: the review synthesizes a June 2026 code review of the v3 branch,
 the test suite, worksheet metadata, and design documents recovered from the

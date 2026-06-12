@@ -1,6 +1,8 @@
 # Engine Comparison and Reunification Recommendation
 
-**Date:** June 11, 2026
+**Date:** June 11, 2026 (revised June 12 after the adversarial review
+panel; see `evidence/review-yulric-perspective.md` and
+`evidence/review-feasibility-effort.md`)
 **Status:** Draft recommendation for team decision (issue #135, recodeflow PR #43)
 **Evidence:** `evidence/engines-core-diff.md`, `evidence/engines-features.md`,
 `evidence/engines-schema-diff.md` (function-by-function comparison of
@@ -34,10 +36,12 @@ layer.
 
 **Both share the same core defects**, inherited from the common ancestor:
 the literal-`"NA(b)"`-string vs `tagged_na` split (the NA-formatting
-function is byte-identical in both repos), per-row positional dispatch of
-derived-variable functions (recodeflow swapped `do()` for a `for` loop but
-it is still one scalar call per row), and no formal recStart/recEnd
-grammar.
+function is functionally identical in both repos), per-row positional
+dispatch of derived-variable functions (recodeflow replaced `do()` with a
+`for` loop, but vectorized named-argument dispatch is net-new work for
+both repos), and no formal recStart/recEnd grammar. The list-mode
+database bug is already fixed on the cchsflow side (63450ba3) and ports
+to recodeflow with the consolidation.
 
 ## Options
 
@@ -69,19 +73,30 @@ on.
 1. **v3.0.0 ships as-is** on cchsflow's local engine -- no dependency
    change in the release that is already staged.
 2. **v4 engine work happens in recodeflow**, which becomes v1.0.0 (per
-   Doug's versioning comment on PR #43). The three shared-defect fixes land
-   there once: a single NA representation at the engine boundary
-   (haven_labelled + tagged_na, factors as explicit opt-in), vectorized
-   named-argument dispatch for derived variables, and a validated
-   recStart/recEnd grammar.
-3. **cchsflow's levels 3-6 migrate down in generic form** -- the pattern
-   cache, cleaning mechanics, and range parser take a configuration object
-   instead of CCHS defaults; cchsflow supplies the CCHS configuration and
-   keeps `check_worksheet()`'s CCHS conventions, the DV library, content,
-   and CEPs.
+   Doug's versioning comment on PR #43). Panel correction: **v1.0.0 does
+   not exist yet** -- recodeflow is at v0.1.2 with no milestone -- so the
+   recommendation defines it minimally: the three shared-defect fixes
+   (single NA representation at the boundary: haven_labelled +
+   tagged_na, factors as explicit opt-in; vectorized named-argument
+   dispatch; validated recStart/recEnd grammar) plus what is already
+   merged on dev. Logging, versioning, catalog, and the generic
+   missing-data layer are v1.1+ and do not gate cchsflow v4. A CRAN
+   pre-flight is part of the milestone: recodeflow currently has
+   undeclared Imports (checkmate, purrr, glue) and sjlabelled in Depends;
+   these must clear R CMD check before any cchsflow dependency lands.
+3. **cchsflow v4 keeps its levels 3-6 missing-data layer**, refactored
+   behind a clean internal API boundary; the migration "down in generic
+   form" (configuration object instead of CCHS defaults) is **deferred to
+   recodeflow v1.1** as an extraction rather than a rewrite. (Panel
+   verdict: the generic form is L-effort with an unsolved
+   configuration-interface design; it does not belong on the v4 critical
+   path. Authorship when it happens: cchsflow team authors, Yulric
+   reviews -- team to confirm.) cchsflow keeps `check_worksheet()`'s CCHS
+   conventions, the DV library, content, and CEPs throughout.
 4. **cchsflow v4 depends on recodeflow (>= 1.0.0)** via Imports. The
-   125-export surface shrinks to the deliberate tier (engine re-exports,
-   DV functions, discovery tools).
+   125-export surface shrinks to a deliberate tier, enumerated as a
+   Track-1 deliverable (retained exports, shims with lifecycle stages,
+   removals) before any code moves.
 
 **Risks to manage:** recodeflow's release cadence becomes cchsflow's
 critical path (mitigation: Yulric owns the engine lane and the scoping is
@@ -95,6 +110,16 @@ inventory becomes a shared backlog with explicit repo assignment).
 **What this means for PR #43:** harvest the scoping (both layers,
 including the preserved catalog.qmd) into recodeflow's v1.0.0
 requirements, then close it -- it has done its job.
+
+**Supersession:** this recommendation replaces the five-phase
+in-cchsflow engine sequence in
+[2026-06-10_three-step-architecture-review.md](2026-06-10_three-step-architecture-review.md);
+those transformations now happen inside the recodeflow v1.0.0 milestone.
+The worksheet column-convention divergence between the repos (the
+pkg.env/pkg.globals label-mapping split documented in
+`evidence/engines-core-diff.md` section 3) is an explicit migration item
+of the consolidation, with one convention chosen and the worksheet
+migration path documented.
 
 ## Division of the confirmed design-issue inventory
 
