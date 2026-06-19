@@ -7,7 +7,7 @@
 label_data(label_list, data_to_label)
 }
 \arguments{
-\item{label_list}{the label list object that contains extracted labels
+\item{label_list}{The label list that contains labels
 from variable details}
 
 \item{data_to_label}{The data that is to be labeled}
@@ -16,5 +16,5 @@ from variable details}
 Returns labeled data
 }
 \description{
-Attaches labels to the DataToLabel to preserve metadata
+Labels a dataframe according to a given label list.
 }

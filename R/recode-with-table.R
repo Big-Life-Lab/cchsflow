@@ -192,7 +192,7 @@ rec_with_table <-
           data[[data_name]] <- recode_call(
             variables = variables,
             data = data[[data_name]],
-            database_name = database_name,
+            database_name = data_name,
             print_note = notes,
             else_value = else_value,
             variable_details = variable_details,

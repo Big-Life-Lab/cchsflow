@@ -10,7 +10,6 @@ calculate_time_quit_smoking_complete(
   SMK_06A_cont,
   SMK_09A_cont,
   SMK_10A_cont,
-  SMKDVSTP,
   output_format = "tagged_na"
 )
 }
@@ -25,8 +24,6 @@ calculate_time_quit_smoking_complete(
 
 \item{SMK_10A_cont}{Numeric vector. Years since quit completely (gradual)}
 
-\item{SMKDVSTP}{Numeric vector. Master continuous years since quit completely}
-
 \item{output_format}{Character. Output format ("tagged_na" or "original")}
 }
 \value{
@@ -36,45 +33,43 @@ Numeric vector of continuous years since completely quit (0-80+), with:
 }
 \description{
 Pathway-aware years since the respondent completely quit smoking. Uses
-SMKDVSTP (StatCan derived continuous) on Master when available, falling
-back to pathway-aware PUMF midpoint logic.
+cat5 smoking status and the quit-timing gate to route to the appropriate
+continuous input (SMK_06A_cont / SMK_09A_cont / SMK_10A_cont). Not
+supported: 2001 (SMK_10A missing), 2022 (_cont feeders skip 2022), and
+cchs2023_p (SMK_10A_cont is Master-only in 2023).
 }
 \details{
 **Implementation method**: 3-step architecture
 - **Step 1**: clean_variables() - Clean all inputs
-- **Step 2**: Master priority + PUMF pathway-aware logic
+- **Step 2**: Pathway-aware logic (cat5 + gate routing)
 - **Step 3**: Output cleaning
 
 **Routing logic**:
-1. SMKDVSTP available (Master 2003+): use directly
-2. Former occasional (SMKDSTY_cat5 == 4): use SMK_06A_cont
-3. Former daily, direct quit (cat5 == 3, gate == 1): use SMK_09A_cont
-4. Former daily, gradual reducer (cat5 == 3, gate == 2): use SMK_10A_cont
-5. Former daily, 2001 fallback (no gate): use SMK_09A_cont as proxy
+1. Former occasional (SMKDSTY_cat5 == 4): use SMK_06A_cont
+2. Former daily, direct quit (cat5 == 3, gate == 1): use SMK_09A_cont
+3. Former daily, gradual reducer (cat5 == 3, gate == 2): use SMK_10A_cont
+4. Former daily, no gate available: use SMK_09A_cont as proxy
 }
 \examples{
 \dontrun{
-# Master path - SMKDVSTP available
-calculate_time_quit_smoking_complete(
-  SMKDSTY_cat5 = 3, SMK_10_gate = 1,
-  SMK_06A_cont = NA, SMK_09A_cont = NA, SMK_10A_cont = NA,
-  SMKDVSTP = 7.0
-)
-# Returns: 7.0
-
-# PUMF - former occasional
+# Former occasional
 calculate_time_quit_smoking_complete(
   SMKDSTY_cat5 = 4, SMK_10_gate = NA,
-  SMK_06A_cont = 5.0, SMK_09A_cont = NA, SMK_10A_cont = NA,
-  SMKDVSTP = NA
+  SMK_06A_cont = 5.0, SMK_09A_cont = NA, SMK_10A_cont = NA
 )
 # Returns: 5.0
 
-# PUMF - former daily, gradual reducer
+# Former daily, direct quit
+calculate_time_quit_smoking_complete(
+  SMKDSTY_cat5 = 3, SMK_10_gate = 1,
+  SMK_06A_cont = NA, SMK_09A_cont = 3.5, SMK_10A_cont = NA
+)
+# Returns: 3.5
+
+# Former daily, gradual reducer
 calculate_time_quit_smoking_complete(
   SMKDSTY_cat5 = 3, SMK_10_gate = 2,
-  SMK_06A_cont = NA, SMK_09A_cont = 5.0, SMK_10A_cont = 2.0,
-  SMKDVSTP = NA
+  SMK_06A_cont = NA, SMK_09A_cont = 5.0, SMK_10A_cont = 2.0
 )
 # Returns: 2.0 (when they quit completely, not when they stopped daily)
 }

@@ -4,15 +4,12 @@
 \alias{calculate_time_quit_smoking}
 \title{Combined time since quit smoking}
 \usage{
-calculate_time_quit_smoking(SMK_09A_cont, SMK_06A_cont, SMKDVSTP)
+calculate_time_quit_smoking(SMK_09A_cont, SMK_06A_cont)
 }
 \arguments{
 \item{SMK_09A_cont}{Years since stopped daily (from worksheet midpoint recode)}
 
 \item{SMK_06A_cont}{Years since quit occasional (from worksheet midpoint recode)}
-
-\item{SMKDVSTP}{Derived smoking status (for context; primary routing uses
-availability of SMK_09A_cont and SMK_06A_cont)}
 }
 \value{
 Continuous years since quit; NA::a for current/never smokers,
@@ -21,6 +18,5 @@ Continuous years since quit; NA::a for current/never smokers,
 \description{
 Combines cessation timing from multiple sources with priority
   logic. Provides a single continuous "years since quit" value regardless
-  of smoking history pathway. Uses SMKDVSTP (derived smoking status) to
-  confirm former-smoker status.
+  of smoking history pathway.
 }

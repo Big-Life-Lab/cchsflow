@@ -188,12 +188,13 @@ process_missing_codes <- function(var_data, pattern, output_format) {
   }
   
   # Coerce character/factor inputs to numeric (rec_with_table passes factor
-
-  # levels as character strings; gold-tier functions expect numeric)
+  # levels as character strings; gold-tier functions expect numeric).
+  # Recognized CCHS missing-data labels become tagged NAs so the a/b
+  # distinction survives factor round-trips.
   if (is.factor(var_data)) {
-    var_data <- as.numeric(levels(var_data))[var_data]
+    var_data <- coerce_cchs_label_strings(as.character(var_data))
   } else if (is.character(var_data)) {
-    var_data <- suppressWarnings(as.numeric(var_data))
+    var_data <- coerce_cchs_label_strings(var_data)
   }
 
   # Step 1: Convert input codes to tagged_na (for processing)
@@ -286,61 +287,134 @@ convert_tagged_na_to_original_codes <- function(tagged_data, pattern) {
 #' Apply Else Logic to Out-of-Range Values
 #'
 #' Processes values that fall outside valid ranges using else mappings.
-#' This function handles the core else functionality by checking values against
-#' copy_mappings (valid ranges) and applying else_mappings rules.
+#' The valid input set is the union of copy_mappings (pass-through ranges for
+#' continuous variables) and value_mappings (categorical valid codes for
+#' categorical variables); values outside it receive the worksheet's else rule.
+#' Vectorized: each mapping spec is parsed once and applied to the whole vector.
 #'
 #' @param tagged_data Vector with tagged_na values from missing code conversion
 #' @param original_data Vector with original raw data for else logic reference
-#' @param complete_pattern List with copy_mappings and else_mappings from Level 4
+#' @param complete_pattern List with copy/value/else mappings from Level 4
 #' @return Vector with else logic applied to out-of-range values
 #' @noRd
 apply_else_logic <- function(tagged_data, original_data, complete_pattern) {
-  
-  # Early return if no else mappings or copy mappings available
-  if (is.null(complete_pattern$else_mappings) || 
-      is.null(complete_pattern$copy_mappings) ||
+
+  # value_mappings may be absent in patterns cached before it existed
+  valid_specs <- c(complete_pattern$copy_mappings, complete_pattern$value_mappings)
+
+  if (is.null(complete_pattern$else_mappings) ||
       length(complete_pattern$else_mappings) == 0 ||
-      length(complete_pattern$copy_mappings) == 0) {
+      length(valid_specs) == 0) {
     return(tagged_data)
   }
-  
-  result <- tagged_data
-  
-  # Check each value that hasn't been converted to tagged_na yet
-  for (i in seq_along(result)) {
-    
-    # Skip if already converted to tagged_na
-    if (haven::is_tagged_na(result[i])) {
-      next
+
+  # Resolve the first actionable else rule once
+  else_value <- resolve_else_value(complete_pattern$else_mappings)
+  if (is.null(else_value)) {
+    return(tagged_data)
+  }
+
+  # Candidates: not already tagged in this pass, and not NA in the raw input
+  candidate <- !haven::is_tagged_na(tagged_data) & !is.na(original_data)
+  if (!any(candidate)) {
+    return(tagged_data)
+  }
+
+  in_valid <- rep(FALSE, length(original_data))
+  for (spec in valid_specs) {
+    in_valid <- in_valid | values_in_range_spec(original_data, spec)
+  }
+
+  out_of_range <- which(candidate & !in_valid)
+  if (length(out_of_range) > 0) {
+    tagged_data[out_of_range] <- else_value
+  }
+
+  return(tagged_data)
+}
+
+#' Resolve the First Actionable Else Rule
+#'
+#' @param else_mappings List of else rules from complete_pattern
+#' @return Replacement value (tagged NA or numeric), or NULL if no rule applies
+#' @noRd
+resolve_else_value <- function(else_mappings) {
+  for (else_rule in else_mappings) {
+    action <- else_rule$action
+    if (is.null(action)) {
+      action <- else_rule$recEnd
     }
-    
-    current_value <- original_data[i]
-    
-    # Skip if current value is NA
-    if (is.na(current_value)) {
-      next
-    }
-    
-    # Check if value falls within any valid range (copy_mappings)
-    in_valid_range <- FALSE
-    
-    for (copy_mapping in complete_pattern$copy_mappings) {
-      if (is_value_in_range(current_value, copy_mapping)) {
-        in_valid_range <- TRUE
-        break
-      }
-    }
-    
-    # If not in valid range, apply else logic
-    if (!in_valid_range) {
-      else_result <- apply_else_rule(current_value, complete_pattern$else_mappings)
-      if (!is.null(else_result)) {
-        result[i] <- else_result
-      }
+    if (is.null(action)) next
+
+    if (action == "NA::a") {
+      return(haven::tagged_na("a"))
+    } else if (action == "NA::b") {
+      return(haven::tagged_na("b"))
+    } else if (action %in% c("skip", "SKIP")) {
+      return(NULL)
+    } else if (grepl("^-?[0-9.]+$", action)) {
+      return(as.numeric(action))
     }
   }
-  
-  return(result)
+  NULL
+}
+
+#' Vectorized Range-Spec Membership
+#'
+#' Vector counterpart of is_value_in_range(): parses the spec once and tests
+#' the whole vector. NA elements return FALSE.
+#'
+#' @param values Numeric vector to test
+#' @param range_spec One copy_mapping or value_mapping spec
+#' @return Logical vector, NA-safe (NA values give FALSE)
+#' @noRd
+values_in_range_spec <- function(values, range_spec) {
+  no_match <- rep(FALSE, length(values))
+  if (is.null(range_spec)) return(no_match)
+
+  testable <- !is.na(values)
+  result <- no_match
+
+  if (!is.null(range_spec$min) && !is.null(range_spec$max)) {
+    result[testable] <- values[testable] >= range_spec$min &
+      values[testable] <= range_spec$max
+    return(result)
+  }
+
+  if (!is.null(range_spec$recStart) && is.character(range_spec$recStart)) {
+    if (range_spec$recStart == "copy") {
+      result[testable] <- TRUE
+      return(result)
+    }
+    parsed <- parse_range_notation(range_spec$recStart)
+    if (!is.null(parsed) && parsed$type %in% c("continuous", "integer")) {
+      lower_ok <- if (isFALSE(parsed$min_inclusive)) values[testable] > parsed$min else values[testable] >= parsed$min
+      upper_ok <- if (isFALSE(parsed$max_inclusive)) values[testable] < parsed$max else values[testable] <= parsed$max
+      result[testable] <- lower_ok & upper_ok
+      return(result)
+    }
+    if (!is.null(parsed) && parsed$type == "single_value") {
+      result[testable] <- values[testable] == parsed$value
+      return(result)
+    }
+    if (!is.null(range_spec$recStart_values) && length(range_spec$recStart_values) > 0) {
+      result[testable] <- values[testable] %in% range_spec$recStart_values
+      return(result)
+    }
+    return(no_match)
+  }
+
+  if (!is.null(range_spec$values)) {
+    result[testable] <- values[testable] %in% range_spec$values
+    return(result)
+  }
+
+  if (!is.null(range_spec$recStart_values) && length(range_spec$recStart_values) > 0) {
+    result[testable] <- values[testable] %in% range_spec$recStart_values
+    return(result)
+  }
+
+  no_match
 }
 
 #' Check if Value is in Valid Range
@@ -459,6 +533,64 @@ apply_else_rule <- function(value, else_mappings) {
 # ==============================================================================
 # UTILITY FUNCTIONS
 # ==============================================================================
+
+#' Coerce CCHS Label Strings to Numeric with Tagged NAs
+#'
+#' Converts character input to numeric while mapping recognized CCHS
+#' missing-data labels to tagged NAs. Handles values arriving as labelled
+#' strings (e.g. from sjlabelled exports) or as rec_with_table() factor
+#' levels ("NA(a)", "NA(b)"), where plain as.numeric() would silently
+#' collapse the not-applicable / not-stated distinction to NA.
+#'
+#' @param x Character vector
+#' @return Numeric vector with tagged NAs for recognized labels; other
+#'   non-numeric strings become plain NA
+#' @noRd
+coerce_cchs_label_strings <- function(x) {
+  labels <- tolower(trimws(x))
+  result <- suppressWarnings(as.numeric(x))
+
+  na_a_labels <- c("not applicable", "valid skip", "na(a)", "na::a")
+  na_b_labels <- c(
+    "missing", "not stated", "don't know", "dont know", "refusal",
+    "na(b)", "na::b"
+  )
+
+  result[labels %in% na_a_labels] <- haven::tagged_na("a")
+  result[labels %in% na_b_labels] <- haven::tagged_na("b")
+
+  result
+}
+
+#' Normalize Input Lengths for Derived Variable Functions
+#'
+#' Validates that all inputs share a common length, recycling length-1
+#' (scalar) inputs to the longest length. Mismatched multi-element vectors
+#' raise an error rather than silently flooding the result with NAs.
+#'
+#' @param vars Named list of input vectors
+#' @return List with `vars` (recycled inputs) and `n` (common length)
+#' @noRd
+normalize_input_lengths <- function(vars) {
+  lengths <- vapply(vars, length, integer(1))
+  n <- max(lengths)
+
+  if (n == 0) {
+    return(list(vars = vars, n = 0L))
+  }
+
+  if (!all(lengths %in% c(1L, n))) {
+    stop(
+      "All input vectors (", paste(names(vars), collapse = ", "),
+      ") must have the same length (or length 1, which is recycled)"
+    )
+  }
+
+  needs_recycling <- lengths == 1L & n > 1L
+  vars[needs_recycling] <- lapply(vars[needs_recycling], rep_len, n)
+
+  list(vars = vars, n = n)
+}
 
 #' Pass-through for worksheet-routed derived variables
 #'

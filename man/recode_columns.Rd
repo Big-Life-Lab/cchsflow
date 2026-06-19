@@ -34,3 +34,4 @@ Returns recoded and labeled data
 Recodes columns from passed row and returns just table with those columns
 and same rows as the data
 }
+\keyword{internal}

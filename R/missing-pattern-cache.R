@@ -186,16 +186,18 @@ map_recStart_to_recEnd <- function(mapping_rows) {
       na_a_codes = numeric(0),
       na_b_codes = numeric(0),
       copy_mappings = list(),
+      value_mappings = list(),
       else_mappings = list(),
       skip_entries = list()
     ))
   }
-  
+
   # Initialize result structure
   result <- list(
     na_a_codes = numeric(0),      # Missing codes for NA::a (backward compatibility)
     na_b_codes = numeric(0),      # Missing codes for NA::b (backward compatibility)
     copy_mappings = list(),       # recStart → copy directives
+    value_mappings = list(),      # categorical recEnd codes (valid value set)
     else_mappings = list(),       # else → recEnd mappings
     skip_entries = list()         # Func::, DerivedVar::, etc.
   )
@@ -255,8 +257,20 @@ map_recStart_to_recEnd <- function(mapping_rows) {
       next
     }
     
-    # Handle standard numeric mappings (for future extension)
-    # These don't affect missing data detection but could be useful later
+    # Handle numeric recodes for CATEGORICAL targets (typeEnd == "cat").
+    # The recEnd codes enumerate the variable's valid category set, which
+    # apply_else_logic() checks (with copy_mappings) before routing values
+    # to the else rule. Continuous targets are deliberately excluded: their
+    # recEnd values (e.g. DHHGAGE_cont's category-to-midpoint rows) do not
+    # enumerate the domain of the cleaned values that functions see.
+    if (grepl("^-?[0-9.]+$", rec_end)) {
+      type_end <- tolower(trimws(as.character(row$typeEnd)))
+      if (length(type_end) == 1 && !is.na(type_end) && type_end == "cat") {
+        result$value_mappings[[length(result$value_mappings) + 1]] <- list(
+          values = as.numeric(rec_end)
+        )
+      }
+    }
   }
   
   # Clean up and sort codes for backward compatibility
@@ -435,7 +449,11 @@ auto_detect_database <- function(variable_name, database_config = NULL, variable
     # Auto-detect database type if configuration not provided
     if (is.null(database_config)) {
       if (!exists("auto_detect_database_type") || !exists("load_database_config")) {
-        warning("Database configuration functions not available. Using default CCHS configuration.")
+        # Warn once per session, not once per call
+        if (!exists("config_fallback_warned", envir = .database_warnings_cache)) {
+          assign("config_fallback_warned", TRUE, envir = .database_warnings_cache)
+          warning("Database configuration functions not available. Using default CCHS configuration.")
+        }
         # Provide fallback configuration
         database_config <- list(
           priority_databases = c("cchs2001_p", "cchs2003_p", "cchs2005_p"),
