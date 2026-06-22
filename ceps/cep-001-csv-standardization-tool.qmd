@@ -1,0 +1,257 @@
+---
+title: "CEP 1 - Worksheet Standardization Tool"
+author: "Yulric Sequeira"
+date: "2025-10-16"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contents"
+    number-sections: true
+    code-fold: true
+---
+
+::: {.callout-note}
+## CEP Metadata
+
+| Field | Value |
+|-------|-------|
+| CEP | 1 |
+| Title | Worksheet Standardization Tool |
+| Author | Yulric Sequeira |
+| Created | 2025-10-16 |
+:::
+
+## Abstract
+
+This CEP proposes the development of a standardization tool for the
+variables and variable details sheet. The tool will check and fix formatting
+inconsistencies that arise from using different editing tools and operating
+systems, ensuring clean and semantic diffs in version control.
+
+## Motivation
+
+The cchsflow repository maintains two critical CSV worksheets that define
+variable metadata:
+
+- `inst/extdata/variables.csv` - Variable definitions and metadata
+- `inst/extdata/variable_details.csv` - Recoding rules for the variables
+
+These worksheets are frequently modified by contributors using various
+tools (Microsoft Excel, LibreOffice Calc, Notepad, etc.) across different
+operating systems. This diversity leads to several problems:
+
+::: {.callout-warning}
+## Key Issues
+
+1. **Inconsistent Quoting**: Different CSV editors apply different quoting
+   strategies:
+   - Some tools quote all fields regardless of content
+   - Others only quote fields containing special characters (commas,
+     quotes, newlines)
+
+2. **Line Ending Variations**: Operating systems use different line ending
+   conventions:
+   - Unix/Linux/macOS use LF (`\n`)
+   - Windows uses CRLF (`\r\n`)
+
+3. **Structural Inconsistencies**: Manual editing can introduce structural
+   problems:
+   - Unsorted rows when sorting is expected (e.g., by `variable` column)
+   - Empty header columns added accidentally
+   - Trailing delimiters or extra commas
+   - The column order being changed
+
+4. **Poor Git Diffs**: These formatting differences cause Git to report
+   that entire files have changed when semantically only a single cell was
+   modified (e.g., fixing a spelling mistake). This makes code review
+   difficult and error-prone.
+
+5. **Human Error**: Commit messages stating "fixed typo in variable X" are
+   not sufficient to catch errors when the diff shows thousands of lines
+   changed.
+:::
+
+The proposed tool will:
+
+- Enforce consistent formatting standards for each CSV file
+- Integrate into both CI/CD pipelines and local development workflows
+- Prevent formatting issues from being introduced into the repository
+
+This will lead to:
+
+- More meaningful semantic diffs in pull requests
+- Reduced cognitive load during code review by showing only actual content
+  changes
+
+## Specification
+
+### Tool Design
+
+::: {.callout-tip}
+## Checker Tool
+
+- **Purpose**: Validate CSV files against formatting standards without
+  modifying them
+- **Use Case**: **1.** CI/CD pipeline integration (GitHub Actions); **2.** Local
+  development; and **3.** The fixer tool
+- **Forms**: The tool should come in two forms: **1.** As a function which
+  returns the errors in a machine actionable format to be used by the fixer
+  tool; and **2.** An R script that uses the above mentioned function and
+  displays the returned errors in a human readable manner.
+- **Behavior**:
+  - Reads CSV files
+  - Checks formatting against defined standards
+  - Reports all violations found
+  - Exits with non-zero status code if violations exist when used in script form
+- **Output**: Detailed report of all issues found
+:::
+
+::: {.callout-tip}
+## Fixer Tool
+
+- **Purpose**: Automatically correct formatting violations
+- **Use Case**: Local development
+- **Behavior**:
+  - Check CSV files using the checker tool
+  - Applies all formatting corrections
+  - Writes corrected files back to disk
+  - Reports all changes made
+- **Output**: Summary of corrections applied
+:::
+
+### File Standards
+
+* **Line Endings**: LF (`\n`)
+* **Quoting**: Minimal (only when required by CSV spec)
+* **Row Sorting**: Rows sorted by `variable` column (ascending, case-sensitive).
+  This only applies to the variables sheet.
+* **Structure**: No trailing empty columns
+* **Column Order**: For the variables sheet the following order should be used,
+  * variable
+  * label
+  * labelLong
+  * variableType
+  * databaseStart
+  * variableStart
+  * subject
+  * section
+  * units
+  * description
+  * version
+  * lastUpdated
+  * reviewNotes
+  * ICES.confirmation
+  * Observation..MD.
+  * status
+
+  For the variable details sheet the following order should be used,
+  * variable
+  * dummyVariable
+  * typeEnd
+  * databaseStart
+  * variableStart
+  * ICES.confirmation
+  * typeStart
+  * recEnd
+  * numValidCat
+  * catLabel
+  * catLabelLong
+  * units
+  * recStart
+  * catStartLabel
+  * variableStartShortLabel
+  * variableStartLabel
+  * notes
+  * version
+  * lastUpdated
+  * status
+  * reviewNotes
+  * review
+
+### Validation Checks
+
+1. **File Existence**: Verify that target CSV files exist
+2. **Invalid CSV File**: Verify that the file is valid CSV
+3. **Line Ending Consistency**: Check all lines use the correct line
+   ending for the file
+4. **Quote Style Compliance**: Verify quoting matches the standard for the
+   file
+5. **Row Sorting**: Verify rows are sorted by the `variable` column
+6. **Trailing Empty Columns**: Detect trailing columns with empty header names
+7. **Column Order**: Verify columns are ordered correctly
+
+### Tool Outputs
+
+::: {.panel-tabset}
+
+#### Checker
+
+The functional form of the tool should return the errors in the variables and
+variable details sheet in a machine actionable format. Each error should include
+enough metadata to enable the fixer tool to identify the location and fix the
+error. Finally, each error should also include a human readable message that
+describes it using all the metadata and provides actionable next steps that the
+user can take to fix it.
+
+The output of the script form of the tool should be made to standard out. A
+failure should result in all the errors being displayed to the user and the tool
+exiting with a non-zero exit code to fail CI/CD runs of the tool. Finally, the
+user should also be made aware of a sucessful run of the tool.
+
+#### Fixer
+
+The fixer tool should output a summary of the fixes made to the user to standard
+out.
+
+:::
+### Integration Points
+
+#### CI/CD Integration (GitHub Actions) {.unnumbered}
+
+```{.yaml filename=".github/workflows/check-csv.yml"}
+# Pseudocode workflow
+- name: Check CSV formatting
+  run: |
+    Rscript exec/check-worksheets.R
+```
+
+The check will run on all pull requests that modify either CSV file and
+will fail the CI build if formatting violations are detected.
+
+#### Local Development {.unnumbered}
+
+```{.r}
+# Check files
+Rscript exec/check-worksheets.R
+
+# Fix files
+Rscript exec/fix-worksheets.R
+```
+
+## Rationale
+
+### Why R?
+
+The repository is primarily R-based, and the tool will need to integrate
+with existing R workflows and packages. Using R ensures:
+
+- Native integration with the existing codebase
+- Familiarity for all contributors
+- Easy distribution via the package itself
+
+### Why Sort by Variable Column?
+
+Sorting provides:
+
+- Predictable file structure
+- Easier manual navigation
+- Consistent merge behavior
+- Better diff output (insertions/deletions are localized)
+
+## References
+
+- [RFC 4180: Common Format and MIME Type for CSV Files](https://tools.ietf.org/html/rfc4180)
+- [Git Diff Documentation](https://git-scm.com/docs/git-diff)
+- [R readr Package Documentation](https://readr.tidyverse.org/)
+

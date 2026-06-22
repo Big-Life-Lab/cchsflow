@@ -5,7 +5,7 @@
 \title{Daily energy expenditure in leisure activity}
 \usage{
 energy_exp_fun(
-  DHHGAGE_cont,
+  age,
   PAA_045,
   PAA_050,
   PAA_075,
@@ -19,7 +19,7 @@ energy_exp_fun(
 )
 }
 \arguments{
-\item{DHHGAGE_cont}{continuous age variable.}
+\item{age}{continuous age variable.}
 
 \item{PAA_045}{number of hours of sports, fitness, or recreational activity 
 that make you sweat or breathe harder for CCHS 2015-2018 for 18+ years old.}

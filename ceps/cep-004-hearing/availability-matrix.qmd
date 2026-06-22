@@ -1,0 +1,323 @@
+---
+title: "CEP-004: Hearing and vision availability matrix"
+format:
+  html:
+    toc: true
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+  eval: true
+---
+
+## Overview
+
+This document generates respondent count matrices for hearing and vision variables, with focus on Ontario for dementia research.
+
+## Setup
+
+```{r setup}
+library(haven)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+pumf_dir <- "../../working_data_and_documentation/pumf-rdata"
+
+# Helper function to load RData files
+load_pumf_data <- function(file_path) {
+  if (!file.exists(file_path)) return(NULL)
+  env <- new.env()
+  load(file_path, envir = env)
+  # Return the first object in the environment
+  get(ls(env)[1], envir = env)
+}
+
+# Age group labels (consistent across cycles for 2007+)
+age_labels <- c(
+  "1" = "12-14", "2" = "15-17", "3" = "18-19", "4" = "20-24",
+  "5" = "25-29", "6" = "30-34", "7" = "35-39", "8" = "40-44",
+  "9" = "45-49", "10" = "50-54", "11" = "55-59", "12" = "60-64",
+  "13" = "65-69", "14" = "70-74", "15" = "75-79", "16" = "80+"
+)
+
+# Dementia-relevant age groups (50+)
+dementia_ages <- c(10, 11, 12, 13, 14, 15, 16)
+```
+
+## Cycle configuration
+
+```{r cycle_config}
+cycles <- list(
+  "2001" = list(
+    file = "CCHS_2001.RData",
+    prov = "GEOAGPRV",
+    age = "DHHAGAGE",
+    hearing = "HUIAGHER",
+    vision = "HUIAGVIS"
+  ),
+  "2003" = list(
+    file = "CCHS_2003.RData",
+    prov = "GEOCGPRV",
+    age = "DHHCGAGE",
+    hearing = "HUICGHER",
+    vision = "HUICGVIS",
+    ontario_note = "NO ONTARIO DATA"
+  ),
+  "2009_2010" = list(
+    file = "CCHS_2009_2010.RData",
+    prov = "GEOGPRV",
+    age = "DHHGAGE",
+    hearing = "HUIGHER",
+    vision = "HUIGVIS"
+  ),
+  "2013_2014" = list(
+    file = "CCHS_2013_2014.RData",
+    prov = "GEOGPRV",
+    age = "DHHGAGE",
+    hearing = "HUIGHER",
+    vision = "HUIGVIS"
+  ),
+  "2017_2018" = list(
+    file = "CCHS_2017_2018.RData",
+    prov = "GEO_PRV",
+    age = "DHHGAGE",
+    hearing = "WDM_010",
+    vision = "WDM_005",
+    scale = "WDM"
+  )
+)
+```
+
+## Availability matrix: Canada-wide
+
+```{r canada_matrix}
+generate_canada_matrix <- function(cycles, pumf_dir) {
+  results <- list()
+
+  for (cycle_name in names(cycles)) {
+    cfg <- cycles[[cycle_name]]
+    file_path <- file.path(pumf_dir, cfg$file)
+
+    if (!file.exists(file_path)) {
+      results[[cycle_name]] <- data.frame(
+        cycle = cycle_name,
+        total_n = NA,
+        hearing_n = NA,
+        vision_n = NA
+      )
+      next
+    }
+
+    data <- load_pumf_data(file_path)
+    total_n <- nrow(data)
+
+    # Hearing
+    hearing_n <- if (cfg$hearing %in% names(data)) {
+      h <- data[[cfg$hearing]]
+      max_val <- if (!is.null(cfg$scale) && cfg$scale == "WDM") 4 else 6
+      sum(!is.na(h) & h >= 1 & h <= max_val)
+    } else NA
+
+    # Vision
+    vision_n <- if (cfg$vision %in% names(data)) {
+      v <- data[[cfg$vision]]
+      max_val <- if (!is.null(cfg$scale) && cfg$scale == "WDM") 4 else 6
+      sum(!is.na(v) & v >= 1 & v <= max_val)
+    } else NA
+
+    results[[cycle_name]] <- data.frame(
+      cycle = cycle_name,
+      total_n = total_n,
+      hearing_n = hearing_n,
+      hearing_pct = round(100 * hearing_n / total_n, 1),
+      vision_n = vision_n,
+      vision_pct = round(100 * vision_n / total_n, 1)
+    )
+  }
+
+  df <- do.call(rbind, results)
+  rownames(df) <- NULL
+  df
+}
+
+canada_matrix <- generate_canada_matrix(cycles, pumf_dir)
+kable(canada_matrix, caption = "Canada-wide availability (all ages)")
+```
+
+## Availability matrix: Ontario by age group
+
+```{r ontario_age_matrix}
+generate_ontario_age_matrix <- function(cycles, pumf_dir, age_labels, dementia_ages) {
+  results <- list()
+
+  for (cycle_name in names(cycles)) {
+    cfg <- cycles[[cycle_name]]
+    file_path <- file.path(pumf_dir, cfg$file)
+
+    if (!file.exists(file_path)) next
+
+    data <- load_pumf_data(file_path)
+
+    # Filter to Ontario
+    if (!cfg$prov %in% names(data)) next
+    ontario <- data[data[[cfg$prov]] == 35, ]
+
+    if (nrow(ontario) == 0) {
+      # No Ontario data for this cycle
+      for (age_code in dementia_ages) {
+        results[[paste(cycle_name, age_code)]] <- data.frame(
+          cycle = cycle_name,
+          age_group = age_labels[as.character(age_code)],
+          ontario_n = 0,
+          hearing_n = 0,
+          vision_n = 0,
+          note = if (!is.null(cfg$ontario_note)) cfg$ontario_note else ""
+        )
+      }
+      next
+    }
+
+    # Analyze by age group
+    for (age_code in dementia_ages) {
+      age_subset <- ontario[ontario[[cfg$age]] == age_code, ]
+      n <- nrow(age_subset)
+
+      # Hearing
+      hearing_n <- if (cfg$hearing %in% names(age_subset) && n > 0) {
+        h <- age_subset[[cfg$hearing]]
+        max_val <- if (!is.null(cfg$scale) && cfg$scale == "WDM") 4 else 6
+        sum(!is.na(h) & h >= 1 & h <= max_val)
+      } else 0
+
+      # Vision
+      vision_n <- if (cfg$vision %in% names(age_subset) && n > 0) {
+        v <- age_subset[[cfg$vision]]
+        max_val <- if (!is.null(cfg$scale) && cfg$scale == "WDM") 4 else 6
+        sum(!is.na(v) & v >= 1 & v <= max_val)
+      } else 0
+
+      results[[paste(cycle_name, age_code)]] <- data.frame(
+        cycle = cycle_name,
+        age_group = age_labels[as.character(age_code)],
+        ontario_n = n,
+        hearing_n = hearing_n,
+        vision_n = vision_n,
+        note = if (!is.null(cfg$ontario_note)) cfg$ontario_note else ""
+      )
+    }
+  }
+
+  df <- do.call(rbind, results)
+  rownames(df) <- NULL
+  df
+}
+
+ontario_matrix <- generate_ontario_age_matrix(cycles, pumf_dir, age_labels, dementia_ages)
+kable(ontario_matrix, caption = "Ontario availability by 5-year age group (50+)")
+```
+
+## Summary table: Age cutoffs
+
+```{r age_cutoff_summary}
+generate_cutoff_summary <- function(cycles, pumf_dir, age_labels) {
+  cutoffs <- list(
+    "50+" = c(10, 11, 12, 13, 14, 15, 16),
+    "55+" = c(11, 12, 13, 14, 15, 16),
+    "60+" = c(12, 13, 14, 15, 16)
+  )
+
+  results <- list()
+
+  for (cycle_name in names(cycles)) {
+    cfg <- cycles[[cycle_name]]
+    file_path <- file.path(pumf_dir, cfg$file)
+
+    if (!file.exists(file_path)) next
+
+    data <- load_pumf_data(file_path)
+
+    # Ontario only
+    if (!cfg$prov %in% names(data)) next
+    ontario <- data[data[[cfg$prov]] == 35, ]
+
+    for (cutoff_name in names(cutoffs)) {
+      age_codes <- cutoffs[[cutoff_name]]
+      subset <- ontario[ontario[[cfg$age]] %in% age_codes, ]
+      n <- nrow(subset)
+
+      hearing_n <- if (cfg$hearing %in% names(subset) && n > 0) {
+        h <- subset[[cfg$hearing]]
+        max_val <- if (!is.null(cfg$scale) && cfg$scale == "WDM") 4 else 6
+        sum(!is.na(h) & h >= 1 & h <= max_val)
+      } else 0
+
+      results[[paste(cycle_name, cutoff_name)]] <- data.frame(
+        cycle = cycle_name,
+        cutoff = cutoff_name,
+        ontario_n = n,
+        hearing_valid = hearing_n,
+        note = if (!is.null(cfg$ontario_note)) cfg$ontario_note else ""
+      )
+    }
+  }
+
+  df <- do.call(rbind, results)
+  rownames(df) <- NULL
+  df
+}
+
+cutoff_summary <- generate_cutoff_summary(cycles, pumf_dir, age_labels)
+kable(cutoff_summary, caption = "Ontario hearing availability by age cutoff")
+```
+
+## Heatmap visualization
+
+```{r heatmap, fig.width=10, fig.height=6}
+library(ggplot2)
+
+if (exists("ontario_matrix") && nrow(ontario_matrix) > 0) {
+  # Create heatmap of hearing availability
+  ggplot(ontario_matrix, aes(x = cycle, y = age_group, fill = hearing_n)) +
+    geom_tile(color = "white") +
+    geom_text(aes(label = hearing_n), color = "black", size = 3) +
+    scale_fill_gradient(low = "white", high = "steelblue",
+                        name = "Valid\nrespondents") +
+    labs(
+      title = "Hearing variable availability: Ontario by cycle and age group",
+      subtitle = "Note: 2003 has NO Ontario data for HUI hearing/vision",
+      x = "CCHS Cycle",
+      y = "Age Group"
+    ) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+```
+
+## Critical notes
+
+### 2003 Ontario exclusion
+
+The 2003 PUMF HUI grouped variables (HUICGHER, HUICGVIS) contain **NO Ontario data**. This is a data collection artifact, not a processing error. Available provinces are:
+
+-   Atlantic provinces
+-   Quebec
+
+For Ontario dementia research, the 2003 cycle must be excluded.
+
+### 2017-2018 Washington Group
+
+The 2017-2018 cycle uses Washington Group measures instead of HUI:
+
+-   WDM_005 (vision) replaces HUIGVIS
+-   WDM_010 (hearing) replaces HUIGHER
+
+The scale is 4-point (1-4) instead of 6-point (1-6). See L2_semantic_mapping.md for crosswalk.
+
+### Missing cycles
+
+HUI hearing/vision variables are NOT available in:
+
+-   2005 (HUIE_07A is available but not full HUI)
+-   2011-2012
+-   2015-2016

@@ -14,10 +14,10 @@ SMKDSTY_fun(SMK_005, SMK_030, SMK_01A)
 \item{SMK_01A}{smoked 100 or more cigarettes in lifetime}
 }
 \value{
-value for smoker type in the SMKDSTY_A variable
+value for smoker type in the SMKDSTY_original variable
 }
 \description{
-This function creates a derived variable (SMKDSTY_A) for 
+This function creates a derived variable (SMKDSTY_original) for 
 smoker type with 5 categories:
 
 \itemize{
@@ -42,21 +42,21 @@ status across all cycles.
 # SMKDSTY_fun() is specified in variable_details.csv along with the 
 # CCHS variables and cycles included.
 
-# To transform SMKDSTY_A across cycles, use rec_with_table() for each
-# CCHS cycle and specify SMKDSTY_A.
-# For CCHS 2001-2014, only specify SMKDSTY_A for smoker type.
-# For CCHS 2015-2018, specify the parameters and SMKDSTY_A for smoker type.
+# To transform SMKDSTY_original across cycles, use rec_with_table() for each
+# CCHS cycle and specify SMKDSTY_original.
+# For CCHS 2001-2014, only specify SMKDSTY_original for smoker type.
+# For CCHS 2015-2018, specify the parameters and SMKDSTY_original for smoker type.
 
 library(cchsflow)
 
 smoker_type_2009_2010 <- rec_with_table(
-  cchs2009_2010_p, "SMKDSTY_A")
+  cchs2009_2010_p, "SMKDSTY_original")
 
 head(smoker_type_2009_2010)
 
 smoker_type_2017_2018 <- rec_with_table(
   cchs2017_2018_p,c(
-    "SMK_01A", "SMK_005","SMK_030","SMKDSTY_A"
+    "SMK_01A", "SMK_005","SMK_030","SMKDSTY_original"
   )
 )
 

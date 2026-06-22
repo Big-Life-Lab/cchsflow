@@ -28,3 +28,4 @@ the data equivalent of variable_being_checked
 Retrieves the name of the column inside data to
 use for calculations
 }
+\keyword{internal}

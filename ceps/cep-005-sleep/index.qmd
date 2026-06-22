@@ -1,0 +1,137 @@
+---
+title: "CEP-005: Sleep variables"
+---
+
+## Overview
+
+This CEP documents the harmonization of sleep variables in cchsflow for the Canadian Community Health Survey (CCHS).
+
+**PR:** [#161 - Sleep variables](https://github.com/big-life-lab/cchsflow/pull/161)
+
+**Status:** Ready for merge
+
+## Sleep variables in scope
+
+| Variable | Description | Type | Cycles |
+|----------|-------------|------|--------|
+| SLPG01 | Hours sleep | Categorical | 2011+ PUMF |
+| SLPG01_A | Hours sleep | Categorical | 2001, 2007-2008 PUMF |
+| SLPG01_B | Hours sleep | Categorical | 2011-2014 Master |
+| SLPG01_C | Hours sleep | Categorical | 2001, 2015-2016 Master |
+| SLPG01_cont | Hours sleep | Continuous | All available cycles |
+| SLP_02 | Trouble sleeping | Categorical | 2007+ (5-point scale) |
+| SLP_02_A | Trouble sleeping | Categorical | 2001 (3-point scale) |
+| SLP_03 | Sleep refreshing | Categorical | 2007+ (5-point scale) |
+| SLP_03_A | Sleep refreshing | Categorical | 2001 (3-point scale) |
+| SLP_04 | Difficulty staying awake | Categorical | 2007+ (5-point scale) |
+| SLP_04_A | Difficulty staying awake | Categorical | 2001 (3-point scale) |
+
+## Critical finding: Ontario sleep data gap
+
+::: {.callout-warning}
+## 13-year gap confirmed
+
+Ontario sleep data has a **13-year gap (2003-2014)** in both PUMF and Ontario Linked/Share files. This was confirmed by three independent sources:
+
+1. **PUMF direct analysis** - .RData file validation
+2. **GoogleLM cross-check** - Statistics Canada documentation review
+3. **ICES Dictionary v1.0.0** - 14,005 variable availability matrix
+:::
+
+### Ontario sleep data availability
+
+| Epoch | Years | PUMF | ONT_LINK/SHARE | Variables | Scale |
+|-------|-------|------|----------------|-----------|-------|
+| Early era | 2001-2002 | 2001 only | Both years | GENA_03-06, GENB_03-05 | 3-point |
+| **Gap** | **2003-2014** | **None** | **None** | **Missing** | **N/A** |
+| Modern era | 2015-2018 | 2015-16 only | Both years | SLP_005, SLP_010-020 | 5-point |
+
+### Why the gap exists
+
+- Sleep was **Optional Content** from 2007-2018
+- **Ontario did NOT select** the sleep module for 2007-2014 and 2017-2018
+- **Ontario DID select** the sleep module for 2015-2016 only
+- This applies to both PUMF and Master/Linked files
+
+## Cycles without sleep data (Canada-wide PUMF)
+
+Sleep variables are **NOT available** in the following PUMF cycles for any province:
+
+- 2003
+- 2005
+- 2009-2010
+
+This was verified via DDI XML review.
+
+## Scale incompatibility
+
+The sleep quality variables have incompatible response scales between 2001 and 2007+:
+
+| Era | Scale | Response options | Direction |
+|-----|-------|------------------|-----------|
+| 2001 | 3-point | Most of the time / Sometimes / Never | Lower = worse |
+| 2007+ | 5-point | None / A little / Some / Most / All | Higher = worse |
+
+::: {.callout-important}
+## Scales are inverted
+
+2001: 1 = "Most of the time" (worst)
+2007+: 1 = "None of the time" (best)
+
+**Do not pool** 2001 with 2007+ data without careful harmonization.
+:::
+
+### Harmonization recommendation
+
+Create binary variable "Any trouble sleeping":
+- **2001**: 1 & 2 ("Most" + "Sometimes") = Yes; 3 ("Never") = No
+- **2007+**: 2-5 ("A little" to "All") = Yes; 1 ("None") = No
+
+## Variable naming evolution
+
+| Era | Hours | Trouble | Refreshing | Awake |
+|-----|-------|---------|------------|-------|
+| 2001 | GENA_03 | GENA_04 | GENA_05 | GENA_06 |
+| 2002 | GENB_03 | GENB_04 | GENB_05 | Not found |
+| 2007-2008 | SLP_01 | SLP_02 | SLP_03 | SLP_04 |
+| 2011-2014 | SLPG01 | SLP_02 | SLP_03 | SLP_04 |
+| 2015-2018 | SLPG005 | SLP_010 | SLP_015 | SLP_020 |
+
+## Documents
+
+- [Availability matrix](availability-matrix.qmd) - PUMF availability by cycle with Ontario age-group estimates
+- [Integration test](integration-test.qmd) - rec_with_table() validation
+- [PR notes](PR-notes.qmd) - Review findings and recommendations
+- [Ontario availability confirmed](ontario-sleep-availability-confirmed.md) - Full documentation of findings
+
+## Recommendations for Ontario dementia research
+
+### PUMF analysis
+
+| Cycle | Ontario sleep data | Notes |
+|-------|-------------------|-------|
+| 2001 | **Available** | 3-point scale (~9,400 Ontario 50+) |
+| 2003 | Not in PUMF | Canada-wide exclusion |
+| 2005 | Not in PUMF | Canada-wide exclusion |
+| 2007-2008 | **NOT available** | Ontario excluded from optional module |
+| 2009-2010 | Not in PUMF | Canada-wide exclusion |
+| 2011-2012 | **NOT available** | Ontario excluded from optional module |
+| 2013-2014 | **NOT available** | Ontario excluded from optional module |
+| 2015-2016 | **Available** | 5-point scale (~14,400 Ontario 50+) |
+| 2017-2018 | **NOT available** | Ontario excluded from optional module |
+
+### ICES Linked/Share file analysis
+
+| Cycle | Ontario sleep data | Dataset |
+|-------|-------------------|---------|
+| 2001 | **Available** | CCHS2001_ONT_LINK_11 |
+| 2002 | **Available** | CCHS2002_ONT_LINK_12 |
+| 2003-2014 | **NOT available** | N/A |
+| 2015-2016 | **Available** | CCHS201516_ONT_SHARE |
+| 2017-2018 | **Available** | CCHS201718_ONT_SHARE |
+
+::: {.callout-note}
+## ICES advantage
+
+ICES Linked/Share files provide 2002 and 2017-2018 Ontario sleep data not available in PUMF.
+:::

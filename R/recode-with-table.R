@@ -147,7 +147,7 @@ is_equal <- function(v1, v2) {
 #' tail(combined_bmi)
 #' @importFrom haven tagged_na
 #' @importFrom stringr str_match
-#' @importFrom dplyr rowwise select do
+#' @importFrom dplyr rowwise select do case_when
 #' @importFrom magrittr %>%
 #' @export
 
@@ -192,7 +192,7 @@ rec_with_table <-
           data[[data_name]] <- recode_call(
             variables = variables,
             data = data[[data_name]],
-            database_name = database_name,
+            database_name = data_name,
             print_note = notes,
             else_value = else_value,
             variable_details = variable_details,
@@ -928,7 +928,7 @@ recode_derived_variables <-
       }
       
       # Obtain the function for each row
-      row_being_checked <- variable_rows[row_num, ]
+      row_being_checked <- fun_variable_rows[row_num, ]
       func_cell <-
         as.character(row_being_checked[[pkg.globals$argument.CatValue]])
       function_being_used <-

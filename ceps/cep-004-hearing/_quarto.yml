@@ -1,0 +1,39 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+    - "!AGENT_TASK_*.md"
+    - "!_domain_overview.md"
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+
+website:
+  title: "CEP-004: Hearing and Vision Variables"
+  sidebar:
+    style: docked
+    contents:
+      - text: "Overview"
+        href: index.qmd
+      - section: "Documentation"
+        contents:
+          - text: "L0: Documentation assessment"
+            href: L0-documentation-assessment.qmd
+          - text: "L1: Variable concordance"
+            href: L1-variable-concordance.qmd
+          - text: "L2: Semantic mapping"
+            href: L2-semantic-mapping.qmd
+      - section: "Validation"
+        contents:
+          - text: "Integration test"
+            href: integration-test.qmd
+          - text: "Availability matrix"
+            href: availability-matrix.qmd
+      - section: "PR Review"
+        contents:
+          - text: "PR #160 notes"
+            href: PR-notes.qmd

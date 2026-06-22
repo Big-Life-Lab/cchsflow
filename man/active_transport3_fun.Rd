@@ -2,7 +2,7 @@
 % Please edit documentation in R/active-transportation.R
 \name{active_transport3_fun}
 \alias{active_transport3_fun}
-\title{Daily active transportation (2015-2018)}
+\title{Daily active transportation (2015-2020)}
 \usage{
 active_transport3_fun(PAYDVTTR, PAADVTRV)
 }
@@ -19,11 +19,11 @@ Continuous variable for active transportation (active_transport)
 \description{
 This function creates a derived variable for daily time spent 
 traveling in active ways. This includes walking and biking. This function is 
-used for CCHS 2015-2018.
+used for CCHS 2015-2020.
 }
 \examples{
 # Using active_transport3_fun() to determine daily time spent 
-# traveling in active ways values across CCHS 2015-2018.
+# traveling in active ways values across CCHS 2015-2020.
 
 # active_transport3_fun() is specified in variable_details.csv along with the CCHS
 # variables and cycles included.

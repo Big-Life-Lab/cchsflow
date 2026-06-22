@@ -15,7 +15,7 @@ multiple_conditions_fun2(
 )
 }
 \arguments{
-\item{CCC_121}{variable indicating if respondent has heart disease (1 = 
+\item{CCC_121}{variable indicating if respondent has heart disease (1 =
 respondent has heart disease, 2 = respondent does not have heart disease)}
 
 \item{CCC_131}{variable indicating if respondent has active cancer (1 =
@@ -38,7 +38,7 @@ survey cycle.}
 respiratory condition. (1 = respondent is over the age of 35 and has
 a respiratory condition, 2 = respondent is under the age of 35 and has a
 respiratory conditions, 3 = respondent does not have a respiratory
-condition). See \code{\link{resp_condition_fun1}} for
+condition). See \code{\link{resp_condition_fun}} for
 documentation on how variable was derived.}
 
 \item{CCC_051}{variable indicating if respondent has arthritis or
@@ -61,43 +61,51 @@ This function generates a derived variable (number_conditions)
 mood disorder (CCC_280) was not asked to respondents in the 2001
  CCHS survey cycle. This mean respondents in this cycle will only be able to
  have a maximum of 6 chronic conditions as opposed to 7 for respondents in
- other cycles. \code{\link{multiple_conditions_fun1}} is used for CCHS cycles
- from 2003 to 2014.
+ other cycles. \code{\link{multiple_conditions_fun1}} is used for the 2001
+ CCHS cycle.
 }
 \examples{
- # Using rec_with_table() to generate multiple_conditions in a CCHS
- # cycle.
- 
- # multiple_conditions_fun2() is specified in variable_details.csv along with
- # the CCHS variables and cycles included.
- 
- # To generate multiple_conditions, use rec_with_table() and specify the
- # multiple_conditions, along with the variables that are derived from it.
- # Since resp_condition_der is also a derived variable, you will have to
- # specify the variables that are derived from it. In this example, data
- # from the 2010 CCHS will be used, so DHHGAGE_cont, CCC_091, and CCC_031
- # will be specified along with resp_condition_der.
- 
+# Using rec_with_table() to generate multiple_conditions in a CCHS
+# cycle.
+
+# multiple_conditions_fun2() is specified in variable_details.csv along with
+# the CCHS variables and cycles included.
+
+# To generate multiple_conditions, use rec_with_table() and specify the
+# multiple_conditions, along with the variables that are derived from it.
+# Since resp_condition_der is also a derived variable, you will have to
+# specify the variables that are derived from it. In this example, data
+# from the 2010 CCHS will be used, so DHHGAGE_cont, CCC_091, and CCC_031
+# will be specified along with resp_condition_der.
+
 library(cchsflow)
- conditions_2009_2010 <- suppressWarnings(rec_with_table(cchs2009_2010_p,
- c("DHHGAGE_cont", "CCC_091",
- "CCC_031", "CCC_121","CCC_131","CCC_151", "CCC_171","CCC_280",
- "resp_condition_der","CCC_051", "number_conditions")))
- 
- head(conditions_2009_2010)
- 
- # Generating multiple_conditions with user inputted values
- # Let's say you are an individual that has heart disease, bowel disorder,
- # and arthritis. multiple_conditions_fun2() can be used to count the number
- # of chronic conditions you have
- 
+conditions_2009_2010 <- suppressWarnings(rec_with_table(
+  cchs2009_2010_p,
+  c(
+    "DHHGAGE_cont", "CCC_091",
+    "CCC_031", "CCC_121", "CCC_131", "CCC_151", "CCC_171", "CCC_280",
+    "resp_condition_der", "CCC_051", "number_conditions"
+  )
+))
+
+head(conditions_2009_2010)
+
+# Generating multiple_conditions with user inputted values
+# Let's say you are an individual that has heart disease, bowel disorder,
+# and arthritis. multiple_conditions_fun2() can be used to count the number
+# of chronic conditions you have
+
 library(cchsflow)
- num_conditions <- multiple_conditions_fun2(CCC_121 = 1, CCC_131 = 2, 
- CCC_151 = 2, CCC_171 = 1, CCC_280 = 2, resp_condition_der = 3, CCC_051 = 1) 
+num_conditions <- multiple_conditions_fun2(
+  CCC_121 = 1, CCC_131 = 2,
+  CCC_151 = 2, CCC_171 = 1, CCC_280 = 2, resp_condition_der = 3, CCC_051 = 1
+)
 
 print(num_conditions)
 
 }
 \seealso{
 \code{\link{multiple_conditions_fun1}}
+
+\code{\link{multiple_conditions_fun3}}
 }

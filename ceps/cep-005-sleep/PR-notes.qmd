@@ -1,0 +1,54 @@
+---
+title: "PR #161 review notes"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+## Summary
+
+PR #161 adds Master file cycles for sleep variables. The review found **no critical errors** requiring fixes. The worksheets correctly:
+1. Exclude cycles without sleep data (2003, 2005, 2009-2010)
+2. Handle scale incompatibility between 2001 (3-point) and 2007+ (5-point)
+3. Map era-specific source variable names correctly
+
+## Sleep variable availability
+
+| Cycle | PUMF sleep data | Notes |
+|-------|-----------------|-------|
+| 2001 | Yes | GENA_03-06; 3-point scale |
+| 2003 | **No** | Not in PUMF |
+| 2005 | **No** | Not in PUMF |
+| 2007-2008 | Yes | SLP_01-04; 5-point scale |
+| 2009-2010 | **No** | Not in PUMF |
+| 2011-2012 | Yes | SLPG01, SLP_02-04 |
+| 2013-2014 | Yes | SLPG01, SLP_02-04 |
+| 2015-2016 | Yes | SLPG005, SLP_010-020 |
+| 2017-2018 | Yes | SLPG005, SLP_010-020 |
+
+## Scale incompatibility
+
+The worksheets correctly handle the scale difference:
+
+- **2001 (3-point):** Most of the time / Sometimes / Never → harmonized to `SLP_02_A`, `SLP_03_A`, `SLP_04_A`
+- **2007+ (5-point):** None / A little / Some / Most / All → harmonized to `SLP_02`, `SLP_03`, `SLP_04`
+
+## Variable naming verified
+
+| Era | Hours | Trouble | Refreshing | Awake |
+|-----|-------|---------|------------|-------|
+| 2001 | GENA_03 | GENA_04 | GENA_05 | GENA_06 |
+| 2007-2008 | SLP_01 | SLP_02 | SLP_03 | SLP_04 |
+| 2011-2014 | SLPG01 | SLP_02 | SLP_03 | SLP_04 |
+| 2015-2018 | SLPG005 | SLP_010 | SLP_015 | SLP_020 |
+
+## Verification notes
+
+1. **SLPG01_C source variable (SLP_009):** The worksheet references `cchs2015_2016_m::SLP_009` for Master files. This is consistent with ICES naming conventions where individual hour categories use sequential SLP_XXX codes (SLP_007 = 3-4h, SLP_008 = 4-5h, SLP_009 = 5-6h, etc.), different from PUMF's grouped SLPG005 variable.
+
+2. **Missing cycles:** Verified via DDI XML grep that 2003, 2005, and 2009-2010 PUMF files do not contain sleep variables. The worksheets correctly exclude these cycles.
+
+## Recommendation
+
+**Approve and merge PR #161.** No worksheet fixes required.
