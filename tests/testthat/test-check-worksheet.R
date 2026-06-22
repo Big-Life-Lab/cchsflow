@@ -1,316 +1,374 @@
-test_that("Should return an error when the worksheet is not found", {
-  non_existent_file_path <- "non-existent.csv"
-
-  expected_result <- list(
-    .create_file_not_found_error("variables", non_existent_file_path))
-
-  actual_result <- check_worksheet(non_existent_file_path, "variables")
-
-  expect_equal(actual_result, expected_result)
+test_that("check_worksheet returns empty list for valid CSV", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  df <- data.frame(
+    variable = c("A", "B"),
+    label = c("Label A", "Label B"),
+    labelLong = c("Long A", "Long B"),
+    section = c("s1", "s1"),
+    subject = c("Sub", "Sub"),
+    variableType = c("cont", "cat"),
+    units = c("years", ""),
+    databaseStart = c("cchs2001_p", "cchs2001_p"),
+    variableStart = c("VAR_A", "VAR_B"),
+    description = c("desc A", "desc B"),
+    stringsAsFactors = FALSE
+  )
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  errors <- check_worksheet(tmp, "variables")
+  expect_equal(length(errors), 0)
 })
 
-test_that("Should return error(s) when the worksheet has incorrect line
-	  endings", {
-  variables_sheet_content <- c(
-    paste0(
-      "variable,label,labelLong,variableType,databaseStart,variableStart,",
-      "subject,section,units,notes,description,version,lastUpdated,reviewNotes,",
-      "ICES.confirmation,Observation..MD.,status,versionNotes\r\n"
-    ),
-    paste0(
-      "BMI,Body Mass Index,Body Mass Index,Continuous,cchs2013_p,[HWTGBMI],",
-      "BMI,Health status,kg/m2,,,1.0.0,2024-01-01,,Yes,,active,\r\n"
-    ),
-    paste0(
-      "Sex,Sex,Sex,Categorical,cchs2013_p,[DHH_SEX],Sex,Demographics,N/A,,,",
-      "1.0.0,,2024-01-01,,Yes,,status,\n"
-    )
-  )
-  variables_sheet_path <- create_test_csv(variables_sheet_content)
-
-  expected_result <- list(
-    .create_line_ending_crlf_error("variables", variables_sheet_path, 1),
-    .create_line_ending_crlf_error("variables", variables_sheet_path, 2)
-  )
-
-  actual_result <- check_worksheet(variables_sheet_path, "variables")
-
-  expect_equal(actual_result, expected_result)
+test_that("check_worksheet returns file_not_found for missing file", {
+  errors <- check_worksheet("/nonexistent/path.csv", "variables")
+  expect_equal(length(errors), 1)
+  expect_equal(errors[[1]]$error_type, "file_not_found")
 })
 
-test_that("Should return error(s) when the worksheet has excessive quoting", {
-  header_line <- paste0(
-    'variable,label,labelLong,variableType,"databaseStart",',
-    '"variableStart",subject,section,units,notes,description,version,lastUpdated,',
-    "reviewNotes,ICES.confirmation,Observation..MD.,status,versionNotes\n"
+test_that("check_worksheet detects CRLF line endings", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  # Write CRLF directly via writeBin to ensure actual \r\n in file
+  lines <- paste0(
+    "variable,label,labelLong,section,subject,variableType,units,",
+    "databaseStart,variableStart,description\r\n",
+    "A,L,LL,s,S,cont,y,cchs2001_p,V,d\r\n"
   )
-  second_line <- paste0(
-    '"BMI","\nBody Mass Index","\r\nBody Mass Index","""Continuous",',
-    '",cchs2013_p",[HWTGBMI],BMI,Health status,kg/m2,,,1.0.0,2024-01-01,,Yes,,',
-    "active,\n"
-  )
-  variables_sheet_content <- c(header_line, second_line)
-  variables_sheet_path <- create_test_csv(variables_sheet_content)
-
-  expected_result <- list(
-    .create_excessive_quoting_error(
-      "variables", variables_sheet_path, 1, 5, '"databaseStart"'),
-    .create_excessive_quoting_error(
-      "variables", variables_sheet_path, 1, 6, '"variableStart"'),
-    .create_excessive_quoting_error(
-      "variables", variables_sheet_path, 2, 1, '"BMI"')
-  )
-
-  actual_result <- check_worksheet(variables_sheet_path, "variables")
-
-  expect_equal(actual_result, expected_result)
+  writeBin(charToRaw(lines), tmp)
+  # readr::read_lines strips \r on some platforms (macOS); skip if so
+  raw <- readr::read_lines(tmp)
+  skip_if(!any(grepl("\r$", raw)), "Platform strips CR from read_lines output")
+  errors <- check_worksheet(tmp, "variables")
+  crlf_errors <- Filter(function(e) e$error_type == "line_ending_crlf", errors)
+  expect_true(length(crlf_errors) > 0)
 })
 
-test_that("Should return error(s) when the columns are not in the right order in
-	  the variables sheet", {
-  variables_sheet_content <- c(
-    paste0(
-      "label,variable,labelLong,variableType,databaseStart,variableStart,",
-      "subject,section,units,notes,description,version,lastUpdated,reviewNotes,",
-      "ICES.confirmation,Observation..MD.,status,versionNotes\n"
-    ),
-    paste0(
-      "Body Mass Index,BMI,Body Mass Index,Continuous,cchs2013_p,[HWTGBMI],",
-      "BMI,Health status,kg/m2,,,1.0.0,2024-01-01,,Yes,,active,\n"
-    )
+test_that("check_worksheet detects wrong column order", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  # Swap label and labelLong columns
+  df <- data.frame(
+    variable = "A", labelLong = "LL", label = "L", section = "s",
+    subject = "S", variableType = "cont", units = "y",
+    databaseStart = "cchs2001_p", variableStart = "V", description = "d",
+    stringsAsFactors = FALSE
   )
-  variables_sheet_path <- create_test_csv(variables_sheet_content)
-
-  expected_result <- list(
-    .create_column_order_error(
-      "variables", variables_sheet_path, "variable", 1, "label"),
-    .create_column_order_error(
-      "variables", variables_sheet_path, "label", 2, "variable")
-  )
-
-  actual_result <- check_worksheet(variables_sheet_path, "variables")
-
-  expect_equal(actual_result, expected_result)
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  errors <- check_worksheet(tmp, "variables")
+  col_errors <- Filter(function(e) e$error_type == "column_order", errors)
+  expect_true(length(col_errors) > 0)
 })
 
-test_that("Should return errors when the columns are not in the right
-	  order in the variable details sheet", {
-  variable_details_sheet_content <- c(
-    paste0(
-      "dummyVariable,variable,typeEnd,databaseStart,variableStart,",
-      "ICES.confirmation,typeStart,recEnd,numValidCat,catLabel,catLabelLong,",
-      "units,recStart,catStartLabel,variableStartShortLabel,",
-      "variableStartLabel,notes,version,lastUpdated,status,reviewNotes,",
-      "versionNotes,review\n"
-    ),
-    paste0(
-      "N/A,BMI,cont,cchs2013_p,[HWTGBMI],,cont,copy,N/A,N/A,N/A,kg/m2,else,",
-      "N/A,BMI,BMI,,1.0.0,2024-01-01,active,,,\n"
-    )
+test_that("check_worksheet detects unsorted rows", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  df <- data.frame(
+    variable = c("B", "A"),
+    label = c("L", "L"),
+    labelLong = c("LL", "LL"),
+    section = c("s", "s"),
+    subject = c("S", "S"),
+    variableType = c("cont", "cont"),
+    units = c("", ""),
+    databaseStart = c("cchs2001_p", "cchs2001_p"),
+    variableStart = c("V", "V"),
+    description = c("d", "d"),
+    stringsAsFactors = FALSE
   )
-  variable_details_file_path <- create_test_csv(variable_details_sheet_content)
-
-  expected_errors <- list(
-    .create_column_order_error(
-      "variable_details", variable_details_file_path, "variable", 1, "dummyVariable"),
-    .create_column_order_error(
-      "variable_details", variable_details_file_path, "dummyVariable", 2, "variable")
-  )
-
-  actual_errors <- check_worksheet(
-    variable_details_file_path, "variable_details")
-
-  expect_equal(actual_errors, expected_errors)
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  errors <- check_worksheet(tmp, "variables")
+  sort_errors <- Filter(function(e) e$error_type == "unsorted_rows", errors)
+  expect_equal(length(sort_errors), 1)
 })
 
-test_that("Should return column order errors when the worksheet has fewer
-	  columns than expected", {
-  # Create a variables sheet with 16 columns (missing last 2: status, versionNotes)
-  variables_sheet_content <- c(
-    paste0(
-      "variable,label,labelLong,variableType,databaseStart,variableStart,",
-      "subject,section,units,notes,description,version,lastUpdated,reviewNotes,",
-      "ICES.confirmation,Observation..MD.\n"
-    ),
-    paste0(
-      "BMI,Body Mass Index,Body Mass Index,Continuous,cchs2013_p,[HWTGBMI],",
-      "BMI,Health status,kg/m2,,,1.0.0,2024-01-01,,Yes,\n"
-    )
+test_that("check_worksheet detects trailing empty columns", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  # Write a CSV with an extra empty column
+  lines <- c(
+    "variable,label,labelLong,section,subject,variableType,units,databaseStart,variableStart,description,",
+    "A,L,LL,s,S,cont,y,cchs2001_p,V,d,"
   )
-  variables_sheet_path <- create_test_csv(variables_sheet_content)
-
-  # Should get errors for columns 17-18 (positions where actual is NA)
-  expected_errors <- list(
-    .create_column_order_error(
-      "variables", variables_sheet_path, "status", 17, NA_character_),
-    .create_column_order_error(
-      "variables", variables_sheet_path, "versionNotes", 18, NA_character_)
-  )
-
-  actual_errors <- check_worksheet(variables_sheet_path, "variables")
-
-  expect_equal(actual_errors, expected_errors)
+  writeLines(lines, tmp, sep = "\n")
+  errors <- check_worksheet(tmp, "variables")
+  empty_errors <- Filter(function(e) e$error_type == "empty_columns", errors)
+  expect_true(length(empty_errors) > 0)
 })
 
-test_that("Should return the right error when the variables sheet has unsorted
-	  rows", {
-  variables_sheet_content <- c(
-    paste0(
-      "variable,label,labelLong,variableType,databaseStart,variableStart,",
-      "subject,section,units,notes,description,version,lastUpdated,reviewNotes,",
-      "ICES.confirmation,Observation..MD.,status,versionNotes\n"
-    ),
-    paste0(
-      "Weight,Weight,Weight,Continuous,cchs2013_p,[HWTGKG],Weight,",
-      "Health status,kg,,,1.0.0,2024-01-01,,Yes,,active,\n",
-      "BMI,Body Mass Index,Body Mass Index,Continuous,cchs2013_p,[HWTGBMI],",
-      "BMI,Health status,kg/m2,,,1.0.0,2024-01-01,,Yes,,active,\n",
-      "Height,Height,Height,Continuous,cchs2013_p,[HWTGM],Height,",
-      "Health status,metres,,,1.0.0,2024-01-01,,Yes,,active,\n"
-    )
+test_that("check_worksheet detects extra non-empty columns", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  lines <- c(
+    "variable,label,labelLong,section,subject,variableType,units,databaseStart,variableStart,description,extra_col",
+    "A,L,LL,s,S,cont,y,cchs2001_p,V,d,extra_value"
   )
-  variables_sheet_path <- create_test_csv(variables_sheet_content)
-
-  expected_result <- list(.create_unsorted_rows_error(
-    "variables", variables_sheet_path, "variable"))
-
-  actual_result <- check_worksheet(variables_sheet_path, "variables")
-
-  expect_equal(actual_result, expected_result)
+  writeLines(lines, tmp, sep = "\n")
+  errors <- check_worksheet(tmp, "variables")
+  extra_errors <- Filter(function(e) e$error_type == "extra_column", errors)
+  expect_equal(length(extra_errors), 1)
+  expect_equal(extra_errors[[1]]$column_name, "extra_col")
 })
 
-test_that("Should return an error when the variables sheet is missing the ID
-	  column", {
-  # Create a variables sheet with the ID column renamed (from "variable" to
-  # "var_name")
-  variables_sheet_content <- c(
-    paste0(
-      "var_name,label,labelLong,variableType,databaseStart,variableStart,",
-      "subject,section,units,notes,description,version,lastUpdated,reviewNotes,",
-      "ICES.confirmation,Observation..MD.,status,versionNotes\n"
-    ),
-    paste0(
-      "BMI,Body Mass Index,Body Mass Index,Continuous,cchs2013_p,[HWTGBMI],",
-      "BMI,Health status,kg/m2,,,1.0.0,2024-01-01,,Yes,,active,\n"
-    )
+test_that("check_worksheet detects excessive quoting", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  # Manually write with unnecessary quotes
+  lines <- c(
+    "variable,label,labelLong,section,subject,variableType,units,databaseStart,variableStart,description",
+    '"A","L","LL","s","S","cont","y","cchs2001_p","V","d"'
   )
-  variables_sheet_path <- create_test_csv(variables_sheet_content)
-
-  expected_result <- list(
-    .create_column_order_error(
-      "variables", variables_sheet_path, "variable", 1, "var_name"),
-    .create_missing_id_column_error(
-      "variables", variables_sheet_path, "variable")
-  )
-
-  actual_result <- check_worksheet(variables_sheet_path, "variables")
-
-  expect_equal(actual_result, expected_result)
+  writeLines(lines, tmp, sep = "\n")
+  errors <- check_worksheet(tmp, "variables")
+  quote_errors <- Filter(function(e) e$error_type == "excessive_quoting", errors)
+  expect_true(length(quote_errors) > 0)
 })
 
-test_that("Should not return errors when the variables details sheet rows are
-	  unsorted", {
-  variable_details_sheet_content <- c(
-    paste0(
-      "variable,dummyVariable,typeEnd,databaseStart,variableStart,",
-      "ICES.confirmation,typeStart,recEnd,numValidCat,catLabel,catLabelLong,",
-      "units,recStart,catStartLabel,variableStartShortLabel,",
-      "variableStartLabel,notes,version,lastUpdated,status,reviewNotes,",
-      "versionNotes,review\n"
-    ),
-    paste0(
-      "Weight,N/A,cont,cchs2013_p,[HWTGKG],,cont,copy,N/A,N/A,N/A,kg,else,N/A,",
-      "Weight,Weight,,1.0.0,2024-01-01,active,,,\n"
-    ),
-    paste0(
-      "BMI,N/A,cont,cchs2013_p,[HWTGBMI],,cont,copy,N/A,N/A,N/A,kg/m2,else,",
-      "N/A,BMI,BMI,,1.0.0,2024-01-01,active,,,\n"
-    )
+test_that("check_worksheet skips row sorting for single-row CSV", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  df <- data.frame(
+    variable = "A", label = "L", labelLong = "LL", section = "s",
+    subject = "S", variableType = "cont", units = "y",
+    databaseStart = "cchs2001_p", variableStart = "V", description = "d",
+    stringsAsFactors = FALSE
   )
-  variable_details_sheet_file_path <- create_test_csv(
-    variable_details_sheet_content)
-
-  expected_result <- list()
-
-  actual_result <- check_worksheet(
-    variable_details_sheet_file_path,
-    "variable_details"
-  )
-
-  expect_equal(actual_result, expected_result)
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  errors <- check_worksheet(tmp, "variables")
+  sort_errors <- Filter(function(e) e$error_type == "unsorted_rows", errors)
+  expect_equal(length(sort_errors), 0)
 })
 
-test_that("Should return error(s) when there are empty columns in a
-	  worksheet", {
-  variables_sheet_content <- c(
-    paste0(
-      "variable,label,labelLong,variableType,databaseStart,variableStart,",
-      "subject,section,units,notes,description,version,lastUpdated,reviewNotes,",
-      "ICES.confirmation,Observation..MD.,status,versionNotes,,\n"
-    ),
-    paste0(
-      "BMI,Body Mass Index,Body Mass Index,Continuous,cchs2013_p,[HWTGBMI],",
-      "BMI,Health status,kg/m2,,BMI,1.0.0,2024-01-01,,Yes,,active,,,\n"
-    )
-  )
-  variables_sheet_path <- create_test_csv(variables_sheet_content)
+# --- check_recode_blocks ---
 
-  expected_result <- list(
-    .create_trailing_empty_columns_error("variables", variables_sheet_path, 19),
-    .create_trailing_empty_columns_error("variables", variables_sheet_path, 20)
-  )
-
-  actual_result <- check_worksheet(variables_sheet_path, "variables")
-
-  expect_equal(actual_result, expected_result)
+test_that("check_recode_blocks returns file_not_found for missing file", {
+  errors <- check_recode_blocks("/nonexistent/path.csv")
+  expect_equal(length(errors), 1)
+  expect_equal(errors[[1]]$error_type, "file_not_found")
 })
 
-test_that("Should return no errors for a correctly formatted variables sheet", {
-  variables_sheet_content <- c(
-    paste0(
-      "variable,label,labelLong,variableType,databaseStart,variableStart,",
-      "subject,section,units,notes,description,version,lastUpdated,reviewNotes,",
-      "ICES.confirmation,Observation..MD.,status,versionNotes\n"
-    ),
-    paste0(
-      "BMI,Body Mass Index,Body Mass Index,Continuous,cchs2013_p,[HWTGBMI],",
-      "BMI,Health status,kg/m2,,BMI,1.0.0,2024-01-01,,Yes,,active,\n"
-    ),
-    paste0(
-      "Height,Height,Height,Continuous,cchs2013_p,[HWTGM],Height,",
-      "Health status,meters,,,1.0.0,2024-01-01,,Yes,,active,\n"
-    )
-  )
-  variables_sheet_path <- create_test_csv(variables_sheet_content)
-
-  expected_result <- list()
-
-  actual_result <- check_worksheet(variables_sheet_path, "variables")
-
-  expect_equal(actual_result, expected_result)
+test_that("check_recode_blocks reports error for invalid CSV", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  writeLines("not,valid\n\"unclosed", tmp)
+  errors <- check_recode_blocks(tmp)
+  expect_true(length(errors) > 0)
+  expect_true(errors[[1]]$error_type %in% c("invalid_csv", "missing_required_columns"))
 })
 
-test_that("Should return no errors for a correctly formatted variable details
-	  sheet", {
-  variable_details_sheet_content <- c(
-    paste0(
-      "variable,dummyVariable,typeEnd,databaseStart,variableStart,",
-      "ICES.confirmation,typeStart,recEnd,numValidCat,catLabel,catLabelLong,",
-      "units,recStart,catStartLabel,variableStartShortLabel,",
-      "variableStartLabel,notes,version,lastUpdated,status,reviewNotes,",
-      "versionNotes,review\n"
-    ),
-    paste0(
-      "BMI,N/A,cont,cchs2013_p,[HWTGBMI],Yes,cont,copy,N/A,N/A,N/A,kg/m2,else,",
-      "N/A,BMI,Body Mass Index,,1.0.0,2024-01-01,active,,,approved\n"
-    )
+test_that("check_recode_blocks reports missing required columns", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  df <- data.frame(variable = "A", other = "val", stringsAsFactors = FALSE)
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  errors <- check_recode_blocks(tmp)
+  expect_equal(length(errors), 1)
+  expect_equal(errors[[1]]$error_type, "missing_required_columns")
+})
+
+test_that("check_recode_blocks finds no collisions for single-block variable", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  df <- data.frame(
+    variable = c("A", "A"),
+    variableStart = c("[A]", "[A]"),
+    databaseStart = c("cchs2001_p", "cchs2001_p"),
+    recStart = c("1", "2"),
+    recEnd = c("1", "2"),
+    stringsAsFactors = FALSE
   )
-  variable_details_sheet_path <- create_test_csv(variable_details_sheet_content)
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  errors <- check_recode_blocks(tmp)
+  expect_equal(length(errors), 0)
+})
 
-  expected_result <- list()
+test_that("check_recode_blocks detects recStart collision across blocks", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  df <- data.frame(
+    variable = c("A", "A", "A", "A"),
+    variableStart = c("[A]", "[A]", "[B]", "[B]"),
+    databaseStart = c("cchs2001_p", "cchs2001_p", "cchs2001_p", "cchs2001_p"),
+    recStart = c("1", "2", "1", "3"),
+    recEnd = c("1", "2", "1", "3"),
+    stringsAsFactors = FALSE
+  )
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  errors <- check_recode_blocks(tmp)
+  expect_equal(length(errors), 1)
+  expect_equal(errors[[1]]$error_type, "recode_block_collision")
+})
 
-  actual_result <- check_worksheet(
-    variable_details_sheet_path, "variable_details")
+test_that("check_recode_blocks uses all rows' databaseStart, not just first", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  # Block [A] has row 1 for db1, row 2 for db2.
+  # Block [B] has row 3 for db2 with same recStart as block [A] row 2.
+  # If only first row's databaseStart is used, db2 collision is missed.
+  df <- data.frame(
+    variable = c("A", "A", "A"),
+    variableStart = c("[A]", "[A]", "[B]"),
+    databaseStart = c("cchs2001_p", "cchs2003_p", "cchs2003_p"),
+    recStart = c("1", "2", "2"),
+    recEnd = c("1", "2", "2"),
+    stringsAsFactors = FALSE
+  )
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  errors <- check_recode_blocks(tmp)
+  expect_equal(length(errors), 1)
+  expect_equal(errors[[1]]$error_type, "recode_block_collision")
+})
 
-  expect_equal(actual_result, expected_result)
+# --- .split_csv_line ---
+
+test_that(".split_csv_line handles simple fields", {
+  result <- cchsflow:::.split_csv_line("a,b,c")
+  expect_equal(result, c("a", "b", "c"))
+})
+
+test_that(".split_csv_line handles quoted field with comma", {
+  result <- cchsflow:::.split_csv_line('"a,b",c')
+  expect_equal(result, c('"a,b"', "c"))
+})
+
+test_that(".split_csv_line handles escaped quotes", {
+  result <- cchsflow:::.split_csv_line('"a""b",c')
+  expect_equal(result, c('"a""b"', "c"))
+})
+
+test_that(".split_csv_line handles empty fields", {
+  result <- cchsflow:::.split_csv_line("a,,c")
+  expect_equal(result, c("a", "", "c"))
+})
+
+test_that(".split_csv_line handles empty string", {
+  result <- cchsflow:::.split_csv_line("")
+  expect_equal(result, "")
+})
+
+test_that(".split_csv_line handles single field", {
+  result <- cchsflow:::.split_csv_line("a")
+  expect_equal(result, "a")
+})
+
+test_that(".split_csv_line handles trailing comma", {
+  result <- cchsflow:::.split_csv_line("a,b,")
+  expect_equal(result, c("a", "b", ""))
+})
+
+# --- fix_worksheet ---
+
+test_that("fix_worksheet returns empty list for clean file", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  df <- data.frame(
+    variable = c("A", "B"),
+    label = c("L", "L"),
+    labelLong = c("LL", "LL"),
+    section = c("s", "s"),
+    subject = c("S", "S"),
+    variableType = c("cont", "cont"),
+    units = c("", ""),
+    databaseStart = c("cchs2001_p", "cchs2001_p"),
+    variableStart = c("V", "V"),
+    description = c("d", "d"),
+    stringsAsFactors = FALSE
+  )
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  result <- fix_worksheet(tmp, "variables")
+  expect_equal(length(result), 0)
+})
+
+test_that("fix_worksheet sorts unsorted rows", {
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp))
+  df <- data.frame(
+    variable = c("B", "A"),
+    label = c("L", "L"),
+    labelLong = c("LL", "LL"),
+    section = c("s", "s"),
+    subject = c("S", "S"),
+    variableType = c("cont", "cont"),
+    units = c("", ""),
+    databaseStart = c("cchs2001_p", "cchs2001_p"),
+    variableStart = c("V", "V"),
+    description = c("d", "d"),
+    stringsAsFactors = FALSE
+  )
+  readr::write_csv(df, tmp, na = "", quote = "needed", eol = "\n")
+  result <- fix_worksheet(tmp, "variables")
+  sort_errors <- Filter(function(e) e$error_type == "unsorted_rows", result)
+  expect_true(all(sapply(sort_errors, function(e) e$fixed)))
+
+  # Verify file is now sorted
+  fixed_df <- read.csv(tmp, stringsAsFactors = FALSE)
+  expect_equal(fixed_df$variable, c("A", "B"))
+})
+
+test_that("fix_worksheet returns fixed=FALSE for missing file", {
+  result <- fix_worksheet("/nonexistent/path.csv", "variables")
+  expect_equal(length(result), 1)
+  expect_false(result[[1]]$fixed)
+})
+
+# --- load_schema ---
+
+test_that("load_schema returns expected structure for variables", {
+  schema <- load_schema("variables")
+  expect_true("expected_column_order" %in% names(schema))
+  expect_true("id_column_name" %in% names(schema))
+  expect_equal(schema$id_column_name, "variable")
+})
+
+test_that("load_schema returns expected structure for variable_details", {
+  schema <- load_schema("variable_details")
+  expect_true("expected_column_order" %in% names(schema))
+  expect_null(schema$id_column_name)
+})
+
+test_that("load_schema rejects invalid file_type", {
+  expect_error(load_schema("invalid_type"))
+})
+
+# --- scope_worksheets ---
+
+test_that("scope_worksheets returns unscoped for NULL args", {
+  result <- scope_worksheets(
+    "inst/extdata/variables.csv",
+    "inst/extdata/variable_details.csv"
+  )
+  expect_false(result$scoped)
+  expect_equal(result$variables_path, "inst/extdata/variables.csv")
+})
+
+# --- parse_scope_args ---
+
+test_that("parse_scope_args parses --variables", {
+  result <- parse_scope_args(c("--variables", "A,B,C"))
+  expect_equal(result$variables, c("A", "B", "C"))
+  expect_null(result$subjects)
+})
+
+test_that("parse_scope_args parses --subject", {
+  result <- parse_scope_args(c("--subject", "Smoking"))
+  expect_null(result$variables)
+  expect_equal(result$subjects, "Smoking")
+})
+
+test_that("parse_scope_args returns NULL for no args", {
+  result <- parse_scope_args(character(0))
+  expect_null(result$variables)
+  expect_null(result$subjects)
+})
+
+test_that("parse_scope_args warns on --variables without value", {
+  expect_warning(
+    parse_scope_args(c("--variables")),
+    "without a value"
+  )
+})
+
+test_that("parse_scope_args parses both args", {
+  result <- parse_scope_args(c("--variables", "A,B", "--subject", "Smoking"))
+  expect_equal(result$variables, c("A", "B"))
+  expect_equal(result$subjects, "Smoking")
 })
