@@ -4,4 +4,5 @@
 .Ruserdata
 *.DS_Store
 docs/
-..Rcheck/
+.Rcheck/
+.claude/
