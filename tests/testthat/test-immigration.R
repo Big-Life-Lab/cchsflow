@@ -134,40 +134,64 @@ test_that("propagates NA(a) from years", {
   expect_equal(categorize_immigration(1, 2, 2, tagged_na("a")), tagged_na("a"))
 })
 
-# All 6 categories — PUMF style (ethnicity 1/2, SDCGRES_cont midpoints 4.5/15)
+# All 8 categories — PUMF style (ethnicity 1/2, SDCGRES_cont midpoints 4.5/15)
+
 test_that("category 1: White Canada-born", {
   expect_equal(categorize_immigration(2, 1, 1, 4.5), 1L)
 })
 
-test_that("category 2: Visible minority Canada-born (PUMF-style ethnicity)", {
+test_that("category 2: Visible minority Canada-born", {
   expect_equal(categorize_immigration(2, 1, 2, 4.5), 2L)
 })
 
-test_that("category 3: White immigrant, recent", {
+test_that("category 3: White immigrant, recent (<10 years)", {
   expect_equal(categorize_immigration(1, 2, 1, 4.5), 3L)
 })
 
-test_that("category 4: Visible minority immigrant, recent (PUMF-style)", {
+test_that("category 4: Visible minority immigrant, recent (<10 years)", {
   expect_equal(categorize_immigration(1, 2, 2, 4.5), 4L)
 })
 
-test_that("category 5: White immigrant, established", {
+test_that("category 5: White immigrant, established (10+ years)", {
   expect_equal(categorize_immigration(1, 2, 1, 15), 5L)
 })
 
-test_that("category 6: Visible minority immigrant, established (PUMF-style)", {
+test_that("category 6: Visible minority immigrant, established (10+ years)", {
   expect_equal(categorize_immigration(1, 2, 2, 15), 6L)
 })
 
+test_that("category 7: White non-immigrant born outside Canada", {
+  expect_equal(categorize_immigration(2, 2, 1, tagged_na("a")), 7L)
+})
+
+test_that("category 8: Visible minority non-immigrant born outside Canada", {
+  expect_equal(categorize_immigration(2, 2, 2, tagged_na("a")), 8L)
+})
+
+# Categories 7-8: years value doesn't matter (non-immigrant, so years is irrelevant)
+
+test_that("category 7 works regardless of years value", {
+  expect_equal(categorize_immigration(2, 2, 1, tagged_na("b")), 7L)
+})
+
+test_that("category 8 works regardless of years value", {
+  expect_equal(categorize_immigration(2, 2, 2, tagged_na("b")), 8L)
+})
+
 # Master style (SDCDCGT_cat7: ethnicity 1-7, SDCDRES raw continuous years)
+
 test_that("category 2: Visible minority Canada-born (master 7-cat ethnicity)", {
-  expect_equal(categorize_immigration(2, 1, 5, 4.5), 2L)  # cat5 = Japanese/Korean/etc
+  expect_equal(categorize_immigration(2, 1, 5, 4.5), 2L)
 })
 
 test_that("category 4: Visible minority immigrant, recent (master 7-cat ethnicity)", {
-  expect_equal(categorize_immigration(1, 2, 3, 5), 4L)  # cat3 = Chinese, 5 years
+  expect_equal(categorize_immigration(1, 2, 3, 5), 4L)
 })
 
 test_that("category 6: Visible minority immigrant, established (master 7-cat)", {
-  expect_equal(categorize_immigration(1, 2, 7, 12), 6L)  # cat7 = South Asian/Arab/West Asian, 12 years
+  expect_equal(categorize_immigration(1, 2, 7, 12), 6L)
+})
+
+test_that("category 8: Visible minority non-immigrant born outside Canada (master 7-cat)", {
+  expect_equal(categorize_immigration(2, 2, 5, tagged_na("a")), 8L)
 })

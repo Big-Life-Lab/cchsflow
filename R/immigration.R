@@ -65,6 +65,9 @@ categorize_immigration <- function(immigrant_status, born_canada, ethnicity,
     # Immigrant, born outside Canada, established (10+ years)
     immigrant_status == 1 & born_canada == 2 & ethnicity == 1 & years >= 10 ~ 5L,
     immigrant_status == 1 & born_canada == 2 & ethnicity >  1 & years >= 10 ~ 6L,
+    # Non-immigrant, born outside Canada: years not applicable
+    immigrant_status == 2 & born_canada == 2 & ethnicity == 1 ~ 7L,
+    immigrant_status == 2 & born_canada == 2 & ethnicity >  1 ~ 8L,
     # NA(a) propagation
     haven::is_tagged_na(immigrant_status, "a") |
       haven::is_tagged_na(born_canada,       "a") |
