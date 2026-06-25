@@ -850,8 +850,20 @@ calculate_SMKG207_from_combined <- function(SMK_005, SMK_030, SMK_040) {
 #' @return Continuous years since quit; NA::a for current/never smokers,
 #'   NA::b for missing
 #' @export
-calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont,
+calculate_time_quit_smoking <- function(SMK_09A_cont = NULL, SMK_06A_cont = NULL,
                                         output_format = "tagged_na") {
+  # Handle all-NULL inputs (variable not collected in this cycle)
+  if (is.null(SMK_09A_cont) && is.null(SMK_06A_cont)) {
+    return(haven::tagged_na("c"))
+  }
+  n <- max(length(SMK_09A_cont), length(SMK_06A_cont))
+  optional <- expand_null_inputs(list(
+    SMK_09A_cont = SMK_09A_cont,
+    SMK_06A_cont = SMK_06A_cont
+  ), n)
+  SMK_09A_cont <- optional$SMK_09A_cont
+  SMK_06A_cont <- optional$SMK_06A_cont
+
   # === STEP 1: DATA CLEANING ===
   cleaned <- clean_variables(vars = list(
     SMK_09A_cont = SMK_09A_cont,

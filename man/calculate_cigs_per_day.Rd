@@ -5,9 +5,9 @@
 \title{Unified Daily Smoking Intensity - cigs_per_day}
 \usage{
 calculate_cigs_per_day(
-  SMKDSTY_original,
-  SMK_204,
-  SMK_208,
+  SMKDSTY_original = NULL,
+  SMK_204 = NULL,
+  SMK_208 = NULL,
   output_format = "tagged_na"
 )
 }

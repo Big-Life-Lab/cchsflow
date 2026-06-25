@@ -4,7 +4,11 @@
 \alias{assess_quit_pathway}
 \title{Assess Smoking Cessation Pathway}
 \usage{
-assess_quit_pathway(SMKDSTY_cat5, SMK_10_gate, output_format = "tagged_na")
+assess_quit_pathway(
+  SMKDSTY_cat5 = NULL,
+  SMK_10_gate = NULL,
+  output_format = "tagged_na"
+)
 }
 \arguments{
 \item{SMKDSTY_cat5}{Numeric vector. 5-category smoking status}

@@ -5,8 +5,8 @@
 \title{Combined time since quit smoking}
 \usage{
 calculate_time_quit_smoking(
-  SMK_09A_cont,
-  SMK_06A_cont,
+  SMK_09A_cont = NULL,
+  SMK_06A_cont = NULL,
   output_format = "tagged_na"
 )
 }

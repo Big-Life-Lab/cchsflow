@@ -11,7 +11,11 @@ These tests are preserved for reference but are **not run** as part of the main 
 ### Currently Archived:
 - **`test-alcohol-legacy.R`** - Tests for legacy alcohol functions (`binge_drinker_fun`, `low_drink_*_fun`, etc.)
 - **`test-bmi-legacy.R`** - Tests for legacy BMI functions (`bmi_fun`, `adjusted_bmi_fun`, `bmi_fun_cat`, etc.)
-- **`test-adl-legacy.R`** - Tests for legacy ADL functions (`adl_fun`, `adl_score_5_fun`, etc.)
+- **`test-physical-activity-legacy.R`** - Tests for legacy energy expenditure functions (`energy_exp_fun`, `energy_exp_fun_cat`)
+- **`test-diet-legacy.R`** - Tests for legacy diet score functions (`diet_score_fun`, `diet_score_fun_cat`)
+- **`test-education-legacy.R`** - Tests for legacy education function (`EDUDR04_fun`)
+- **`test-respiratory-condition-legacy.R`** - Tests for legacy CCC_091 functions (`CCC_091_fun1`, `CCC_091_fun2`)
+- **`test-immigration-legacy.R`** - Tests for legacy immigration function (`immigration_fun`)
 
 ### Test Failures Expected
 

@@ -141,12 +141,15 @@ test_that("calculate_SMKDSTY_cat6 handles missing SMK_030 for occasional smoker"
   expect_equal(result, 3L)
 })
 
-test_that("calculate_SMKDSTY_cat6 requires all three inputs", {
+test_that("calculate_SMKDSTY_cat6 handles NULL input gracefully", {
+  # One NULL input with others provided — expands NULL to NA, function still works
+  result <- calculate_SMKDSTY_cat6(SMK_005 = 1, SMK_030 = 1)
+  expect_false(is.null(result))
+})
 
-  expect_error(
-    calculate_SMKDSTY_cat6(SMK_005 = 1, SMK_030 = 1),
-    "SMK_005, SMK_030, and SMK_01A are required"
-  )
+test_that("calculate_SMKDSTY_cat6 returns NA(c) when all inputs NULL", {
+  result <- calculate_SMKDSTY_cat6()
+  expect_true(haven::is_tagged_na(result, "c"))
 })
 
 # =============================================================================

@@ -190,6 +190,43 @@ dplyr::case_when(
 )
 ```
 
+## NULL input handling
+
+Functions with optional parameters (variables not present in certain CCHS
+cycles) use `= NULL` defaults. The `expand_null_inputs()` helper in
+`R/clean-variables.R` converts NULLs to NA vectors of the correct length.
+
+### All-NULL convention
+
+When **all** inputs are NULL — meaning the entire variable set wasn't
+collected in that survey cycle — the function returns `haven::tagged_na("c")`.
+This is distinct from NA::a (not applicable at respondent level) and NA::b
+(question asked but unanswered). NA::c means "not collected" at the survey
+level.
+
+```r
+# Pattern for functions with optional parameters
+my_function <- function(var1 = NULL, var2 = NULL, output_format = "tagged_na") {
+  # All-NULL: variable not collected in this cycle
+  if (is.null(var1) && is.null(var2)) {
+    return(haven::tagged_na("c"))
+  }
+  # Expand remaining NULLs to NA vectors
+  n <- max(length(var1), length(var2))
+  optional <- expand_null_inputs(list(var1 = var1, var2 = var2), n)
+  var1 <- optional$var1
+  var2 <- optional$var2
+  # ... Step 1/2/3 continues ...
+}
+```
+
+### When to add NULL defaults
+
+- **Add** `= NULL` when a parameter represents a variable that may not exist
+  in all CCHS cycles (optional feeder)
+- **Don't add** when all parameters are required for the calculation to
+  produce any meaningful result
+
 ## Quality tiers
 
 ### Bronze — ship it

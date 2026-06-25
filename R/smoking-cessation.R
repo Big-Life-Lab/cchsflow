@@ -385,7 +385,20 @@ calculate_time_quit_smoking_daily <- function(SMKDSTY_cat5, SMK_09A_cont,
 #' }
 #'
 #' @export
-assess_quit_pathway <- function(SMKDSTY_cat5, SMK_10_gate, output_format = "tagged_na") {
+assess_quit_pathway <- function(SMKDSTY_cat5 = NULL, SMK_10_gate = NULL,
+                                output_format = "tagged_na") {
+
+  # Handle all-NULL inputs (variable not collected in this cycle)
+  if (is.null(SMKDSTY_cat5) && is.null(SMK_10_gate)) {
+    return(haven::tagged_na("c"))
+  }
+  n <- max(length(SMKDSTY_cat5), length(SMK_10_gate))
+  optional <- expand_null_inputs(list(
+    SMKDSTY_cat5 = SMKDSTY_cat5,
+    SMK_10_gate = SMK_10_gate
+  ), n)
+  SMKDSTY_cat5 <- optional$SMKDSTY_cat5
+  SMK_10_gate <- optional$SMK_10_gate
 
   # Handle empty input vectors
   if (length(SMKDSTY_cat5) == 0) return(numeric(0))

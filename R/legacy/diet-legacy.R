@@ -3,7 +3,7 @@
 # and categorize_diet_score() from R/diet.R instead.
 
 #'
-#' @export
+#'
 diet_score_fun <- function(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG,
                            FVCDJUI, DHH_SEX) {
   calculate_diet_score(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG,
@@ -11,7 +11,7 @@ diet_score_fun <- function(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG,
 }
 
 #'
-#' @export
+#'
 diet_score_fun_cat <- function(diet_score) {
   categorize_diet_score(diet_score)
 }

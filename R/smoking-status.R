@@ -435,10 +435,18 @@ calculate_SMK_01A <- function(data, output_format = "tagged_na") {
 calculate_SMKDSTY_cat6 <- function(SMK_005 = NULL, SMK_030 = NULL, SMK_01A = NULL,
                                    output_format = "tagged_na") {
 
-  # Validate required inputs
-  if (is.null(SMK_005) || is.null(SMK_030) || is.null(SMK_01A)) {
-    stop("SMK_005, SMK_030, and SMK_01A are required for SMKDSTY_cat6 calculation")
+  # Handle all-NULL inputs (variable not collected in this cycle)
+  if (is.null(SMK_005) && is.null(SMK_030) && is.null(SMK_01A)) {
+    return(haven::tagged_na("c"))
   }
+  # Expand remaining NULLs
+  n <- max(length(SMK_005), length(SMK_030), length(SMK_01A))
+  optional <- expand_null_inputs(list(
+    SMK_005 = SMK_005, SMK_030 = SMK_030, SMK_01A = SMK_01A
+  ), n)
+  SMK_005 <- optional$SMK_005
+  SMK_030 <- optional$SMK_030
+  SMK_01A <- optional$SMK_01A
 
   # === STEP 1: Clean input variables using Level 6 infrastructure ===
   clean_vars_list <- list(
@@ -604,10 +612,17 @@ calculate_SMKDSTY_original <- function(...) {
 calculate_smoke_simple <- function(SMKDSTY_cat5 = NULL, time_quit_smoking = NULL,
                                    output_format = "tagged_na") {
   
-  # Validate required inputs
-  if (is.null(SMKDSTY_cat5) || is.null(time_quit_smoking)) {
-    stop("SMKDSTY_cat5 and time_quit_smoking are required for smoke_simple calculation")
+  # Handle all-NULL inputs (variable not collected in this cycle)
+  if (is.null(SMKDSTY_cat5) && is.null(time_quit_smoking)) {
+    return(haven::tagged_na("c"))
   }
+  # Expand remaining NULLs
+  n <- max(length(SMKDSTY_cat5), length(time_quit_smoking))
+  optional <- expand_null_inputs(list(
+    SMKDSTY_cat5 = SMKDSTY_cat5, time_quit_smoking = time_quit_smoking
+  ), n)
+  SMKDSTY_cat5 <- optional$SMKDSTY_cat5
+  time_quit_smoking <- optional$time_quit_smoking
   
   # === STEP 1: Clean input variables using Level 6 infrastructure ===
   clean_vars_list <- list(

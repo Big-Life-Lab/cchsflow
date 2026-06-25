@@ -118,10 +118,25 @@
 #'
 #' @note v3.0.0-alpha, last updated: 2026-01-09, status: active - Unified daily intensity
 #' @export
-calculate_cigs_per_day <- function(SMKDSTY_original,
-                                   SMK_204,
-                                   SMK_208,
+calculate_cigs_per_day <- function(SMKDSTY_original = NULL,
+                                   SMK_204 = NULL,
+                                   SMK_208 = NULL,
                                    output_format = "tagged_na") {
+
+  # Handle all-NULL inputs (variable not collected in this cycle)
+  if (is.null(SMKDSTY_original) && is.null(SMK_204) && is.null(SMK_208)) {
+    return(haven::tagged_na("c"))
+  }
+  # Determine vector length and expand NULLs
+  n <- max(length(SMKDSTY_original), length(SMK_204), length(SMK_208))
+  optional <- expand_null_inputs(list(
+    SMKDSTY_original = SMKDSTY_original,
+    SMK_204 = SMK_204,
+    SMK_208 = SMK_208
+  ), n)
+  SMKDSTY_original <- optional$SMKDSTY_original
+  SMK_204 <- optional$SMK_204
+  SMK_208 <- optional$SMK_208
 
   # Handle empty input vectors
   if (length(SMKDSTY_original) == 0) return(numeric(0))

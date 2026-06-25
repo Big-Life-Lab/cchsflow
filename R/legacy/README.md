@@ -21,9 +21,29 @@ These files are preserved for reference and comparison purposes only. They are *
   - `bmi_fun()`, `adjusted_bmi_fun()`, `bmi_fun_cat()`, etc.  
   - Replaced by: `calculate_bmi()`, `adjust_bmi()`, `categorize_bmi()`
 
-### Additional Legacy Functions
+- **`physical-activity-legacy.R`** - Legacy energy expenditure functions
+  - `energy_exp_fun()`, `energy_exp_fun_cat()`
+  - Replaced by: `calculate_energy_exp()`, `categorize_energy_exp()`
 
-**Note**: There are other legacy functions scattered throughout the codebase (smoking, respiratory, and others) that may need to be consolidated here in future cleanup. These may be available in development branches and should be evaluated for inclusion.
+- **`diet-legacy.R`** - Legacy diet score functions
+  - `diet_score_fun()`, `diet_score_fun_cat()`
+  - Replaced by: `calculate_diet_score()`, `categorize_diet_score()`
+
+- **`education-legacy.R`** - Legacy education derived function
+  - `EDUDR04_fun()`
+  - Replaced by: `derive_EDUDR04_2015plus()`
+
+- **`respiratory-condition-legacy.R`** - Legacy CCC_091 functions
+  - `CCC_091_fun1()`, `CCC_091_fun2()`
+  - Replaced by: `derive_CCC_091_2001to2003()`, `derive_CCC_091_2005to2008()`
+
+- **`immigration-legacy.R`** - Legacy immigration function
+  - `immigration_fun()`
+  - Replaced by: `categorize_immigration()`
+
+- **`percent-time-canada-legacy.R`** - Legacy percent time functions
+  - `pct_time_fun()`, `pct_time_fun_cat()`
+  - Replaced by: `calculate_pct_time()`, `categorize_pct_time()`
 
 ## Modern Function Workflow
 
