@@ -1,63 +1,63 @@
-# CCC_091_fun1-------------------------------
+# derive_CCC_091_2001to2003-------------------------------
 
-test_that("CCC_091_fun1 returns 1 when CCC_91A is positive", {
-  expect_equal(CCC_091_fun1(1, 2), 1)
+test_that("derive_CCC_091_2001to2003 returns 1 when CCC_91A is positive", {
+  expect_equal(derive_CCC_091_2001to2003(1, 2), 1)
 })
 
-test_that("CCC_091_fun1 returns 1 when CCC_91B is positive", {
-  expect_equal(CCC_091_fun1(2, 1), 1)
+test_that("derive_CCC_091_2001to2003 returns 1 when CCC_91B is positive", {
+  expect_equal(derive_CCC_091_2001to2003(2, 1), 1)
 })
 
-test_that("CCC_091_fun1 returns 2 when neither is positive", {
-  expect_equal(CCC_091_fun1(2, 2), 2)
+test_that("derive_CCC_091_2001to2003 returns 2 when neither is positive", {
+  expect_equal(derive_CCC_091_2001to2003(2, 2), 2)
 })
 
-test_that("CCC_091_fun1 returns NA(a) when both are NA(a)", {
-  expect_warning(out <- CCC_091_fun1("NA(a)", "NA(a)"))
-  expect_equal(out, "NA(a)")
+test_that("derive_CCC_091_2001to2003 returns NA(a) when both are NA(a)", {
+  expect_warning(out <- derive_CCC_091_2001to2003(haven::tagged_na("a"), haven::tagged_na("a")))
+  expect_equal(out, haven::tagged_na("a"))
 })
 
-test_that("CCC_091_fun1 warns and returns 1 when CCC_91A is out of range but CCC_91B is positive", {
-  expect_warning(out <- CCC_091_fun1(0, 1))
+test_that("derive_CCC_091_2001to2003 warns and returns 1 when CCC_91A is out of range but CCC_91B is positive", {
+  expect_warning(out <- derive_CCC_091_2001to2003(0, 1))
   expect_equal(out, 1)
 })
 
-test_that("CCC_091_fun1 warns and returns NA(b) when both args are out of range", {
-  expect_warning(out <- CCC_091_fun1(0, 0))
-  expect_equal(out, "NA(b)")
+test_that("derive_CCC_091_2001to2003 warns and returns NA(b) when both args are out of range", {
+  expect_warning(out <- derive_CCC_091_2001to2003(0, 0))
+  expect_equal(out, haven::tagged_na("b"))
 })
 
-# CCC_091_fun2-------------------------------
+# derive_CCC_091_2005to2008-------------------------------
 
-test_that("CCC_091_fun2 returns 1 when CCC_91A is positive", {
-  expect_equal(CCC_091_fun2(1, 2, 2), 1)
+test_that("derive_CCC_091_2005to2008 returns 1 when CCC_91A is positive", {
+  expect_equal(derive_CCC_091_2005to2008(1, 2, 2), 1)
 })
 
-test_that("CCC_091_fun2 returns 1 when CCC_91E is positive", {
-  expect_equal(CCC_091_fun2(2, 1, 2), 1)
+test_that("derive_CCC_091_2005to2008 returns 1 when CCC_91E is positive", {
+  expect_equal(derive_CCC_091_2005to2008(2, 1, 2), 1)
 })
 
-test_that("CCC_091_fun2 returns 1 when CCC_91F is positive", {
-  expect_equal(CCC_091_fun2(2, 2, 1), 1)
+test_that("derive_CCC_091_2005to2008 returns 1 when CCC_91F is positive", {
+  expect_equal(derive_CCC_091_2005to2008(2, 2, 1), 1)
 })
 
-test_that("CCC_091_fun2 returns 2 when none are positive", {
-  expect_equal(CCC_091_fun2(2, 2, 2), 2)
+test_that("derive_CCC_091_2005to2008 returns 2 when none are positive", {
+  expect_equal(derive_CCC_091_2005to2008(2, 2, 2), 2)
 })
 
-test_that("CCC_091_fun2 returns NA(a) when all are NA(a)", {
-  expect_warning(out <- CCC_091_fun2("NA(a)", "NA(a)", "NA(a)"))
-  expect_equal(out, "NA(a)")
+test_that("derive_CCC_091_2005to2008 returns NA(a) when all are NA(a)", {
+  expect_warning(out <- derive_CCC_091_2005to2008(haven::tagged_na("a"), haven::tagged_na("a"), haven::tagged_na("a")))
+  expect_equal(out, haven::tagged_na("a"))
 })
 
-test_that("CCC_091_fun2 warns and returns 1 when CCC_91E is out of range but CCC_91A is positive", {
-  expect_warning(out <- CCC_091_fun2(1, 0, 2))
+test_that("derive_CCC_091_2005to2008 warns and returns 1 when CCC_91E is out of range but CCC_91A is positive", {
+  expect_warning(out <- derive_CCC_091_2005to2008(1, 0, 2))
   expect_equal(out, 1)
 })
 
-test_that("CCC_091_fun2 warns and returns NA(b) when all args are out of range", {
-  expect_warning(out <- CCC_091_fun2(0, 0, 0))
-  expect_equal(out, "NA(b)")
+test_that("derive_CCC_091_2005to2008 warns and returns NA(b) when all args are out of range", {
+  expect_warning(out <- derive_CCC_091_2005to2008(0, 0, 0))
+  expect_equal(out, haven::tagged_na("b"))
 })
 
 # resp_condition_fun-------------------------------

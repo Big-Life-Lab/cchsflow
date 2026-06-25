@@ -98,37 +98,71 @@
 #' tail(combined_energy_exp)
 #' @export
 
-energy_exp_fun <-
-  function(age, PAA_045, PAA_050, PAA_075, PAA_080, PAADVDYS, 
-           PAADVVIG, PAYDVTOA, PAYDVADL, PAYDVVIG, PAYDVDYS){
-    # Leisure activity for adults
-    leisure_adult <- 
-      if_else2(age >= 18 & !is.na(PAA_045) & !is.na(PAA_050) & 
-               !is.na(PAA_075) & !is.na(PAA_080),
-                ((PAA_045)*60 +(PAA_050) +(PAA_075)*60 +(PAA_080)), 
-               if_else2(PAA_045 == "NA(a)"|PAA_050 == "NA(a)"|
-                        PAA_075 == "NA(a)"|PAA_080 == "NA(a)", 
-                        tagged_na("a"), tagged_na("b")))
-    
-    # Leisure activity for youth
-    leisure_youth <- 
-      if_else2(age < 18 & !is.na(PAYDVTOA) & !is.na(PAYDVADL), 
-               ((PAYDVTOA) + (PAYDVADL)),
-               if_else2(PAYDVTOA == "NA(a)"|PAYDVADL == "NA(a)", 
-                        tagged_na("a"), tagged_na("b")))
-    
-    # Energy expenditure calculation
-    physical_activity <-
-      if_else2(!is.na(PAYDVVIG) & !is.na(leisure_youth) & !is.na(PAYDVDYS),
-               (((leisure_youth) - (PAYDVVIG))*3 + (PAYDVVIG)*6)/7*PAYDVDYS/60,
-      if_else2(!is.na(PAADVDYS) & !is.na(PAADVVIG) & !is.na(leisure_adult),
-               ((((leisure_adult) - (PAADVVIG))*3 + (PAADVVIG)*6)/7*(PAADVDYS)/60), 
-                    if_else2(leisure_youth == "NA(a)"|
-                             PAYDVDYS == "NA(a)"|PAYDVVIG == "NA(a)"|
-                             leisure_adult == "NA(a)"|PAADVDYS == "NA(a)"|
-                             PAADVVIG == "NA(a)", 
-                             tagged_na("a"), tagged_na("b"))))
-    return(physical_activity)
+calculate_energy_exp <-
+  function(age, PAA_045, PAA_050, PAA_075, PAA_080, PAADVDYS,
+           PAADVVIG, PAYDVTOA, PAYDVADL, PAYDVVIG, PAYDVDYS,
+           output_format = "tagged_na") {
+    # === STEP 1: DATA CLEANING ===
+    cleaned <- clean_variables(vars = list(
+      DHHGAGE_cont = age,
+      PAA_045 = PAA_045, PAA_050 = PAA_050,
+      PAA_075 = PAA_075, PAA_080 = PAA_080,
+      PAADVDYS = PAADVDYS, PAADVVIG = PAADVVIG,
+      PAYDVTOA = PAYDVTOA, PAYDVADL = PAYDVADL,
+      PAYDVVIG = PAYDVVIG, PAYDVDYS = PAYDVDYS
+    ), output_format = "tagged_na")
+
+    age_c <- cleaned$DHHGAGE_cont
+
+    # === STEP 2: CORE CALCULATION ===
+    # Adult leisure activity (age >= 18)
+    leisure_adult <- dplyr::case_when(
+      age_c >= 18 & !any_missing(cleaned$PAA_045, cleaned$PAA_050,
+                                  cleaned$PAA_075, cleaned$PAA_080) ~
+        cleaned$PAA_045 * 60 + cleaned$PAA_050 +
+        cleaned$PAA_075 * 60 + cleaned$PAA_080,
+      any_missing(cleaned$PAA_045, cleaned$PAA_050,
+                  cleaned$PAA_075, cleaned$PAA_080) ~
+        get_priority_missing(cleaned$PAA_045, cleaned$PAA_050,
+                             cleaned$PAA_075, cleaned$PAA_080,
+                             output_format = output_format),
+      .default = assign_missing("not_applicable", "energy_exp", output_format)
+    )
+
+    # Youth leisure activity (age < 18)
+    leisure_youth <- dplyr::case_when(
+      age_c < 18 & !any_missing(cleaned$PAYDVTOA, cleaned$PAYDVADL) ~
+        cleaned$PAYDVTOA + cleaned$PAYDVADL,
+      any_missing(cleaned$PAYDVTOA, cleaned$PAYDVADL) ~
+        get_priority_missing(cleaned$PAYDVTOA, cleaned$PAYDVADL,
+                             output_format = output_format),
+      .default = assign_missing("not_applicable", "energy_exp", output_format)
+    )
+
+    # Energy expenditure: youth path first, then adult
+    result <- dplyr::case_when(
+      # Youth path
+      !any_missing(cleaned$PAYDVVIG, leisure_youth, cleaned$PAYDVDYS) ~
+        ((leisure_youth - cleaned$PAYDVVIG) * 3 +
+         cleaned$PAYDVVIG * 6) / 7 * cleaned$PAYDVDYS / 60,
+      # Adult path
+      !any_missing(cleaned$PAADVDYS, cleaned$PAADVVIG, leisure_adult) ~
+        ((leisure_adult - cleaned$PAADVVIG) * 3 +
+         cleaned$PAADVVIG * 6) / 7 * cleaned$PAADVDYS / 60,
+      # Missing propagation
+      any_missing(leisure_youth, cleaned$PAYDVDYS, cleaned$PAYDVVIG,
+                  leisure_adult, cleaned$PAADVDYS, cleaned$PAADVVIG) ~
+        get_priority_missing(leisure_youth, leisure_adult,
+                             output_format = output_format),
+      .default = assign_missing("not_stated", "energy_exp", output_format)
+    )
+
+    # === STEP 3: OUTPUT VALIDATION ===
+    output_cleaned <- clean_variables(vars = list(
+      energy_exp = result
+    ), output_format = output_format)
+
+    return(output_cleaned$energy_exp)
   }
 
 #' @title Categorize energy expenditure into 3 activity levels
@@ -155,9 +189,28 @@ energy_exp_fun <-
 #' energy_exp_fun_cat(4.0)  # 3 (Active)
 #'
 #' @export
-energy_exp_fun_cat <- function(energy_exp) {
-  if_else2(energy_exp >= 0 & energy_exp < 1.5, 1,
-  if_else2(energy_exp >= 1.5 & energy_exp < 3, 2,
-  if_else2(energy_exp >= 3, 3,
-  if_else2(haven::is_tagged_na(energy_exp, "a"), "NA(a)", "NA(b)"))))
+categorize_energy_exp <- function(energy_exp, output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    energy_exp = energy_exp
+  ), output_format = "tagged_na")
+
+  ee <- cleaned$energy_exp
+
+  # === STEP 2: CATEGORIZATION ===
+  result <- dplyr::case_when(
+    any_missing(ee) ~
+      get_priority_missing(ee, output_format = output_format),
+    ee >= 0 & ee < 1.5 ~ 1,
+    ee >= 1.5 & ee < 3 ~ 2,
+    ee >= 3 ~ 3,
+    .default = assign_missing("not_stated", "energy_exp_cat3", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    energy_exp_cat3 = result
+  ), output_format = output_format)
+
+  return(output_cleaned$energy_exp_cat3)
 }

@@ -592,6 +592,25 @@ normalize_input_lengths <- function(vars) {
   list(vars = vars, n = n)
 }
 
+#' Expand NULL optional inputs to NA vectors
+#'
+#' Replaces the common pattern of manually expanding NULL optional parameters
+#' to NA vectors of the correct length. Used in Step 1 of derived variable
+#' functions that have optional inputs (e.g., calculate_pack_years).
+#'
+#' @param vars Named list of optional input variables (may contain NULLs)
+#' @param n Integer length for the NA vectors (from primary required inputs)
+#' @return Named list with NULLs replaced by rep(NA_real_, n)
+#' @noRd
+expand_null_inputs <- function(vars, n) {
+  for (name in names(vars)) {
+    if (is.null(vars[[name]])) {
+      vars[[name]] <- rep(NA_real_, n)
+    }
+  }
+  vars
+}
+
 #' Pass-through for worksheet-routed derived variables
 #'
 #' Standard implementation for derived variables where the worksheet handles

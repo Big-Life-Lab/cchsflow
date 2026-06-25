@@ -7,12 +7,12 @@
 .create_missing_id_column_error(file_type, file_path, id_column_name)
 }
 \arguments{
+\item{file_type}{The type of worksheet. Can be "variables" or
+"variable_details".}
+
 \item{file_path}{Path to the worksheet}
 
 \item{id_column_name}{Name of the expected ID column}
-
-\item{file_type:}{The type of worksheet. Can be "variables" or
-"variable_details".}
 }
 \value{
 A named list

@@ -32,31 +32,32 @@
 #' @seealso \code{\link{CCC_091_fun2}}
 #'
 #' @export
-CCC_091_fun1 <- function(CCC_91A, CCC_91B) {
-  `%notin%` <- Negate(`%in%`)
-  if ((CCC_91A %notin% 1:2) | (CCC_91B %notin% 1:2)) {
-    warning(
-      paste(
-        "In CCC_91A:", CCC_91A, ", CCC_91B:", CCC_91B,
-        "one or more arguments was outside the 1:2 allowed range however",
-        "the condition is still calculated",
-        sep = ""
-      ),
-      call. = FALSE
-    )
-  }
-  CCC_091 <-
-    if_else2(
-      CCC_91A == 1 | CCC_91B == 1, 1,
-      if_else2(
-        CCC_91A == 2 & CCC_91B == 2, 2,
-        if_else2(
-          CCC_91A == "NA(a)" & CCC_91B == "NA(a)", "NA(a)",
-          "NA(b)"
-        )
-      )
-    )
-  return(CCC_091)
+derive_CCC_091_2001to2003 <- function(CCC_91A, CCC_91B,
+                                       output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    CCC_91A = CCC_91A,
+    CCC_91B = CCC_91B
+  ), output_format = "tagged_na")
+
+  a <- cleaned$CCC_91A
+  b <- cleaned$CCC_91B
+
+  # === STEP 2: DERIVE CCC_091 ===
+  result <- dplyr::case_when(
+    a == 1 | b == 1 ~ 1L,
+    a == 2 & b == 2 ~ 2L,
+    any_missing(a, b) ~
+      get_priority_missing(a, b, output_format = output_format),
+    .default = assign_missing("not_stated", "CCC_091", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    CCC_091 = result
+  ), output_format = output_format)
+
+  return(output_cleaned$CCC_091)
 }
 
 #' @title CCC_091_fun2
@@ -95,31 +96,34 @@ CCC_091_fun1 <- function(CCC_91A, CCC_91B) {
 #' @seealso \code{\link{CCC_091_fun1}}
 #'
 #' @export
-CCC_091_fun2 <- function(CCC_91A, CCC_91E, CCC_91F) {
-  `%notin%` <- Negate(`%in%`)
-  if ((CCC_91A %notin% 1:2) | (CCC_91E %notin% 1:2) | (CCC_91F %notin% 1:2)) {
-    warning(
-      paste(
-        "In CCC_91A:", CCC_91A, ", CCC_91E:", CCC_91E, ", CCC_91F:", CCC_91F,
-        "one or more arguments was outside the 1:2 allowed range however",
-        "the condition is still calculated",
-        sep = ""
-      ),
-      call. = FALSE
-    )
-  }
-  CCC_091 <-
-    if_else2(
-      CCC_91A == 1 | CCC_91E == 1 | CCC_91F == 1, 1,
-      if_else2(
-        CCC_91A == 2 & CCC_91E == 2 & CCC_91F == 2, 2,
-        if_else2(
-          CCC_91A == "NA(a)" & CCC_91E == "NA(a)" & CCC_91F == "NA(a)",
-          "NA(a)", "NA(b)"
-        )
-      )
-    )
-  return(CCC_091)
+derive_CCC_091_2005to2008 <- function(CCC_91A, CCC_91E, CCC_91F,
+                                       output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    CCC_91A = CCC_91A,
+    CCC_91E = CCC_91E,
+    CCC_91F = CCC_91F
+  ), output_format = "tagged_na")
+
+  a <- cleaned$CCC_91A
+  e <- cleaned$CCC_91E
+  f <- cleaned$CCC_91F
+
+  # === STEP 2: DERIVE CCC_091 ===
+  result <- dplyr::case_when(
+    a == 1 | e == 1 | f == 1 ~ 1L,
+    a == 2 & e == 2 & f == 2 ~ 2L,
+    any_missing(a, e, f) ~
+      get_priority_missing(a, e, f, output_format = output_format),
+    .default = assign_missing("not_stated", "CCC_091", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    CCC_091 = result
+  ), output_format = output_format)
+
+  return(output_cleaned$CCC_091)
 }
 
 #' @title resp_condition_fun

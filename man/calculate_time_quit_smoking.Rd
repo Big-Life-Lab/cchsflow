@@ -4,12 +4,18 @@
 \alias{calculate_time_quit_smoking}
 \title{Combined time since quit smoking}
 \usage{
-calculate_time_quit_smoking(SMK_09A_cont, SMK_06A_cont)
+calculate_time_quit_smoking(
+  SMK_09A_cont,
+  SMK_06A_cont,
+  output_format = "tagged_na"
+)
 }
 \arguments{
 \item{SMK_09A_cont}{Years since stopped daily (from worksheet midpoint recode)}
 
 \item{SMK_06A_cont}{Years since quit occasional (from worksheet midpoint recode)}
+
+\item{output_format}{Output missing data format: "tagged_na" (default) or "original".}
 }
 \value{
 Continuous years since quit; NA::a for current/never smokers,
@@ -18,5 +24,6 @@ Continuous years since quit; NA::a for current/never smokers,
 \description{
 Combines cessation timing from multiple sources with priority
   logic. Provides a single continuous "years since quit" value regardless
-  of smoking history pathway.
+  of smoking history pathway. Priority: SMK_09A_cont (daily) over
+  SMK_06A_cont (occasional).
 }

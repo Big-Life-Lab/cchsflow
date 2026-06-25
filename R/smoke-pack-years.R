@@ -132,10 +132,16 @@ calculate_pack_years <- function(smoking_status,
   n <- length(smoking_status)
 
   # Handle NULL optional inputs - convert to NA vectors
-  if (is.null(cigs_occasional)) cigs_occasional <- rep(NA_real_, n)
-  if (is.null(days_per_month)) days_per_month <- rep(NA_real_, n)
-  if (is.null(age_first_cigarette)) age_first_cigarette <- rep(NA_real_, n)
-  if (is.null(smoked_100_lifetime)) smoked_100_lifetime <- rep(NA_real_, n)
+  optional <- expand_null_inputs(list(
+    cigs_occasional = cigs_occasional,
+    days_per_month = days_per_month,
+    age_first_cigarette = age_first_cigarette,
+    smoked_100_lifetime = smoked_100_lifetime
+  ), n)
+  cigs_occasional <- optional$cigs_occasional
+  days_per_month <- optional$days_per_month
+  age_first_cigarette <- optional$age_first_cigarette
+  smoked_100_lifetime <- optional$smoked_100_lifetime
 
   # === STEP 1: DATA CLEANING ===
   # List names must match variable_details.csv for pattern lookup.

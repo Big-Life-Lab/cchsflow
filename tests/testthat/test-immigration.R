@@ -77,24 +77,24 @@ test_that("calculate_pct_time works with vector inputs (master continuous)", {
 # categorize_pct_time
 
 test_that("categorize_pct_time has expected output when input is out of range", {
-  expect_equal(categorize_pct_time(-1), "NA(b)")
+  expect_true(haven::is_tagged_na(categorize_pct_time(-1), "b"))
 })
 
 test_that("categorize_pct_time has expected output when input is in range", {
-  expect_equal(categorize_pct_time(1), "1")
+  expect_equal(categorize_pct_time(1), 1)
 })
 
 test_that("categorize_pct_time returns 10 at upper boundary", {
-  expect_equal(categorize_pct_time(100), "10")
+  expect_equal(categorize_pct_time(100), 10)
 })
 
 test_that("categorize_pct_time handles tagged_na(a)", {
-  expect_equal(categorize_pct_time(tagged_na("a")), "NA(a)")
+  expect_true(haven::is_tagged_na(categorize_pct_time(tagged_na("a")), "a"))
 })
 
 test_that("categorize_pct_time works with vector inputs", {
   result <- categorize_pct_time(c(5, 25, 55, 85, 100))
-  expect_equal(result, c("1", "3", "6", "9", "10"))
+  expect_equal(result, c(1, 3, 6, 9, 10))
 })
 
 

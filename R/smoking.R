@@ -842,24 +842,37 @@ calculate_SMKG207_from_combined <- function(SMK_005, SMK_030, SMK_040) {
 #' @title Combined time since quit smoking
 #' @description Combines cessation timing from multiple sources with priority
 #'   logic. Provides a single continuous "years since quit" value regardless
-#'   of smoking history pathway.
+#'   of smoking history pathway. Priority: SMK_09A_cont (daily) over
+#'   SMK_06A_cont (occasional).
 #' @param SMK_09A_cont Years since stopped daily (from worksheet midpoint recode)
 #' @param SMK_06A_cont Years since quit occasional (from worksheet midpoint recode)
+#' @param output_format Output missing data format: "tagged_na" (default) or "original".
 #' @return Continuous years since quit; NA::a for current/never smokers,
 #'   NA::b for missing
 #' @export
-calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont) {
-  if_else2(
-    !is.na(SMK_09A_cont) & SMK_09A_cont != "NA(a)" & SMK_09A_cont != "NA(b)",
-    SMK_09A_cont,
-    if_else2(
-      !is.na(SMK_06A_cont) & SMK_06A_cont != "NA(a)" & SMK_06A_cont != "NA(b)",
-      SMK_06A_cont,
-      if_else2(
-        SMK_09A_cont == "NA(a)" | SMK_06A_cont == "NA(a)",
-        tagged_na("a"),
-        tagged_na("b")
-      )
-    )
+calculate_time_quit_smoking <- function(SMK_09A_cont, SMK_06A_cont,
+                                        output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    SMK_09A_cont = SMK_09A_cont,
+    SMK_06A_cont = SMK_06A_cont
+  ), output_format = "tagged_na")
+
+  # === STEP 2: PRIORITY ROUTING ===
+  result <- dplyr::case_when(
+    # Priority 1: daily cessation time available
+    !any_missing(cleaned$SMK_09A_cont) ~ cleaned$SMK_09A_cont,
+    # Priority 2: occasional cessation time available
+    !any_missing(cleaned$SMK_06A_cont) ~ cleaned$SMK_06A_cont,
+    # Both missing — propagate with priority
+    .default = get_priority_missing(cleaned$SMK_09A_cont, cleaned$SMK_06A_cont,
+                                     output_format = output_format)
   )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    time_quit_smoking = result
+  ), output_format = output_format)
+
+  return(output_cleaned$time_quit_smoking)
 }

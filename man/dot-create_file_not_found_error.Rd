@@ -7,10 +7,10 @@
 .create_file_not_found_error(file_type, file_path)
 }
 \arguments{
-\item{file_path}{The invalid path}
-
-\item{file_type:}{The type of worksheet. Can be "variables" or
+\item{file_type}{The type of worksheet. Can be "variables" or
 "variable_details".}
+
+\item{file_path}{The invalid path}
 }
 \value{
 A named list

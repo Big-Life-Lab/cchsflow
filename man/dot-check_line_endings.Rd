@@ -4,20 +4,22 @@
 \alias{.check_line_endings}
 \title{Check whether a worksheet has the correct line endings}
 \usage{
-.check_line_endings(parsed_csv, error_ctx)
+.check_line_endings(raw_lines, error_ctx)
 }
 \arguments{
+\item{raw_lines}{Character vector of lines from readr::read_lines()}
+
 \item{error_ctx}{Information used when creating the error object. A named
 list with the following fields:
 * file_type: The type of worksheet the CSV contains. Can be "variables" or
   "variable_details".
 * file_path: The file path to the worksheet}
-
-\item{csv_text}{A string containing the worksheet contents}
 }
 \value{
 The list of line ending errors found in the worksheet
 }
 \description{
-Check whether a worksheet has the correct line endings
+Uses vectorised grep on raw lines for performance. The raw file is read
+with readr::read_lines() which strips LF but preserves trailing CR if
+present, so CRLF lines end with \\r.
 }

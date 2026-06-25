@@ -13,6 +13,9 @@
 )
 }
 \arguments{
+\item{file_type}{The type of worksheet. Can be "variables" or
+"variable_details".}
+
 \item{file_path}{Path to the worksheet}
 
 \item{expected_column}{The column expected at the offending position}
@@ -20,9 +23,6 @@
 \item{col_num}{The position of the column with the wrong header}
 
 \item{actual_column}{The actual column value}
-
-\item{file_type:}{The type of worksheet. Can be "variables" or
-"variable_details".}
 }
 \value{
 A named list

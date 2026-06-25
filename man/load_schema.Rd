@@ -13,7 +13,9 @@ load_schema(file_type)
 List containing schema configuration:
   \itemize{
     \item expected_column_order: Character vector of column names in expected order
-    \item id_column_name: Name of the ID column used for row sorting (variables only)
+    \item id_column_name: Name of the ID column used for row sorting, or NULL
+      if not defined in the schema (present in variables.yaml, absent in
+      variable_details.yaml)
   }
 }
 \description{

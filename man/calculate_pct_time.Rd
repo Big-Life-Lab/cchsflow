@@ -4,60 +4,36 @@
 \alias{calculate_pct_time}
 \title{Calculate percent time in Canada}
 \usage{
-calculate_pct_time(age, born_in_canada, years_in_canada)
+calculate_pct_time(
+  age,
+  born_in_canada,
+  years_in_canada,
+  output_format = "tagged_na"
+)
 }
 \arguments{
-\item{age}{continuous age variable.}
+\item{age}{Continuous age (DHHGAGE_cont for PUMF, DHH_AGE for Master).}
 
-\item{born_in_canada}{whether or not someone was born in Canada
-(1 - born in Canada, 2 - born outside Canada).}
+\item{born_in_canada}{Country of birth: 1 = Canada, 2 = outside Canada
+(SDCGCBG for PUMF, SDCGCB for Master).}
 
-\item{years_in_canada}{continuous years in Canada. For PUMF data, this is
-derived from the categorical SDCGRES via midpoint conversion in
-variable_details.csv. For master data, this is the actual continuous
-years from SDCDRES.}
+\item{years_in_canada}{Continuous years in Canada (SDCGRES_cont for PUMF,
+SDCDRES for Master).}
+
+\item{output_format}{Output missing data format: "tagged_na" (default) or "original".}
 }
 \value{
-Numeric value between 0 and 100 that represents percentage of a
- respondent's time in Canada. Returns \code{tagged_na("b")} for invalid or
- missing inputs.
+Numeric value between 0 and 100 representing percentage of life
+  in Canada, or tagged NA for missing/not applicable.
 }
 \description{
 Calculates the percentage of a respondent's life spent in
- Canada. Used by pct_time_der for both PUMF and master databases. The
- worksheet maps different feeder variables for each database type, but
- the calculation is the same: for respondents born outside Canada,
+ Canada. For respondents born outside Canada,
  percent time = years in Canada / age * 100.
-
- For PUMF data, the categorical time-in-Canada variable (SDCGRES) is
- converted to continuous midpoints upstream via the SDCGRES_cont intermediate
- variable in variable_details.csv (1 = 4.5 years, 2 = 15 years). For master
- data, continuous years (SDCDRES) are passed directly.
+ For respondents born in Canada, returns 100.
 }
 \examples{
-# Using rec_with_table() across CCHS cycles (PUMF)
-library(cchsflow)
-pct_time2009_2010 <- rec_with_table(
-  cchs2009_2010_p, c(
-    "DHHGAGE_cont", "SDCGCBG",
-    "SDCGRES_cont", "pct_time_der"
-  )
-)
-head(pct_time2009_2010)
-
-pct_time2011_2012 <- rec_with_table(
-  cchs2011_2012_p, c(
-    "DHHGAGE_cont", "SDCGCBG",
-    "SDCGRES_cont", "pct_time_der"
-  )
-)
-tail(pct_time2011_2012)
-
-combined_pct_time <- merge_rec_data(pct_time2009_2010, pct_time2011_2012)
-head(combined_pct_time)
-tail(combined_pct_time)
-
-# Scalar usage (pass continuous years directly)
+# Scalar usage
 calculate_pct_time(age = 27, born_in_canada = 2, years_in_canada = 4.5)
 
 # Vector usage

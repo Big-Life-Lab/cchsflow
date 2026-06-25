@@ -13,8 +13,13 @@ check_worksheet(file_path, file_type = c("variables", "variable_details"))
 "variable_details".}
 }
 \value{
-A list of errors found. Each error is a named list containing
-information about the error.
+A list of error objects. Each is a named list with at minimum:
+\itemize{
+  \item error_type: Character string identifying the error class
+  \item file_type: "variables" or "variable_details"
+  \item file_path: Path to the checked file
+  \item message: Human-readable description
+}
 }
 \description{
 Check a CSV worksheet for formatting errors

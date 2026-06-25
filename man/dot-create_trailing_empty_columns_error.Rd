@@ -7,12 +7,12 @@
 .create_trailing_empty_columns_error(file_type, file_path, col_num)
 }
 \arguments{
+\item{file_type}{The type of worksheet. Can be "variables" or
+"variable_details".}
+
 \item{file_path}{Path to the worksheet}
 
 \item{col_num}{Position of the trailing empty column}
-
-\item{file_type:}{The type of worksheet. Can be "variables" or
-"variable_details".}
 }
 \value{
 A named list

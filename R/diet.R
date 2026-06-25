@@ -1,207 +1,163 @@
-#' @title Diet score
+#' @title Calculate diet score
 #'
-#' @description This function creates a derived diet variable (diet_score)
-#'  based on consumption of fruit, salad, potatoes, carrots, other vegetables
-#'  and juice. 2 baseline points plus summation of total points for diet
-#'  attributes. Negative overall scores are recoded to 0, resulting in a range
-#'  from 0 to 10.
-#' 
-#' \itemize{
-#'   \item 1 point per daily fruit and vegetable consumption, excluding fruit 
-#'   juice (maximum 8 points).
-#'   \item -2 points for high potato intake (>=7 (males),
-#'    >=5 (females) times/week)
-#'   \item -2 points for no carrot intake
-#'   \item -2 points per daily frequency of fruit juice consumption greater than 
-#'   once/day (maximum -10 points)
-#'  }
+#' @description Calculates a diet score based on consumption of fruit, salad,
+#'  potatoes, carrots, other vegetables and juice. 2 baseline points plus
+#'  summation of total points for diet attributes. Negative scores recoded to 0,
+#'  resulting in a range from 0 to 10.
 #'
-#' @details 
-#'  While diet score can be calculated for all survey respondents, in
-#'  the 2005 CCHS survey cycle, fruit and vegetable consumption was an optional
-#'  section in which certain provinces had opted in to be asked to respondents.
-#'  In this survey cycle, fruit and vegetable consumption was asked to
-#'  respondents in British Columbia, Ontario, Alberta, and Prince Edward Island.
-#'  As such, diet score has a large number of missing respondents for this 
-#'  cycle.
+#' @details
+#'   \itemize{
+#'     \item 1 point per daily fruit and vegetable consumption, excluding fruit
+#'       juice consumption, capped at 8 daily servings
+#'     \item -2 points per daily frequency of fruit juice consumption greater than
+#'       1 daily serving
+#'     \item -2 points if daily potato consumption exceeds the sex-specific limit
+#'       (1 serving for males, 5/7 for females)
+#'     \item -2 points if zero carrot consumption
+#'   }
 #'
-#' @param FVCDFRU daily consumption of fruit
+#' @param FVCDFRU Daily fruit consumption (servings/day)
+#' @param FVCDSAL Daily salad consumption (servings/day)
+#' @param FVCDPOT Daily potato consumption (servings/day)
+#' @param FVCDCAR Daily carrot consumption (servings/day)
+#' @param FVCDVEG Daily other vegetable consumption (servings/day)
+#' @param FVCDJUI Daily fruit juice consumption (servings/day)
+#' @param DHH_SEX Sex: 1 = Male, 2 = Female
+#' @param output_format Output missing data format: "tagged_na" (default) or "original".
 #'
-#' @param FVCDSAL daily consumption of green salad
+#' @return Numeric diet score between 0 and 10, or tagged NA for missing/not applicable.
 #'
-#' @param FVCDPOT daily consumption of potatoes
+#' @examples
+#' # Scalar usage
+#' calculate_diet_score(2, 1, 0.5, 0.5, 1, 0.5, 1)
 #'
-#' @param FVCDCAR daily consumption of carrots
-#'
-#' @param FVCDVEG daily consumption of other vegetables
-#'
-#' @param FVCDJUI daily consumption of fruit juice
-#' 
-#' @param DHH_SEX sex; 1 = male, 2 = female
-#'
-#' @examples 
-#' # Using the diet_score_fun function to create the derived diet variable  
-#' # across CCHS cycles.
-#' # diet_score_fun() is specified in the variable_details.csv.
-#'
-#' # To create a harmonized diet_score variable across CCHS cycles, use 
-#' # rec_with_table() for each CCHS cycle and specify diet_score_fun and the
-#' # required base variables.
-#' # Using merge_rec_data(), you can combine diet_score across cycles.
-#'
-#' library(cchsflow)
-#'
-#' diet_score2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-#'     "DHH_SEX", "diet_score"
-#'   )
-#' )
-#'
-#' head(diet_score2009_2010)
-#'
-#' diet_score2011_2012 <- rec_with_table(
-#'   cchs2011_2012_p,c(
-#'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-#'     "DHH_SEX", "diet_score"
-#'   )
-#' )
-#'
-#' tail(diet_score2011_2012)
-#'
-#' combined_diet_score <- suppressWarnings(merge_rec_data(diet_score2009_2010,
-#'  diet_score2011_2012))
-#'
-#' head(combined_diet_score)
-#' tail(combined_diet_score)
 #' @export
-diet_score_fun <-
-  function(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI, DHH_SEX) {
-    all_diet_score_parameters <- c(
-      FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI
+calculate_diet_score <-
+  function(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI, DHH_SEX,
+           output_format = "tagged_na") {
+    # === STEP 1: DATA CLEANING ===
+    cleaned <- clean_variables(vars = list(
+      FVCDFRU = FVCDFRU, FVCDSAL = FVCDSAL, FVCDPOT = FVCDPOT,
+      FVCDCAR = FVCDCAR, FVCDVEG = FVCDVEG, FVCDJUI = FVCDJUI,
+      DHH_SEX = DHH_SEX
+    ), output_format = "tagged_na")
+
+    fru <- cleaned$FVCDFRU
+    sal <- cleaned$FVCDSAL
+    pot <- cleaned$FVCDPOT
+    car <- cleaned$FVCDCAR
+    veg <- cleaned$FVCDVEG
+    jui <- cleaned$FVCDJUI
+    sex <- cleaned$DHH_SEX
+
+    # === STEP 2: CORE CALCULATION ===
+    # Check for missing inputs
+    all_missing <- any_missing(fru, sal, pot, car, veg, jui)
+
+    # Total fruit and vegetables, excluding fruit juice (capped at 8)
+    total_fruitveg <- dplyr::case_when(
+      all_missing ~ NA_real_,
+      TRUE ~ pmin(fru + sal + pot + car + veg, 8)
     )
-    if(sum(haven::is_tagged_na(all_diet_score_parameters, "a")) > 0) {
-      return(haven::tagged_na("a"))
-    }
-    if(sum(haven::is_tagged_na(all_diet_score_parameters, "b")) > 0) {
-      return(haven::tagged_na("b"))
-    }
-    
-    if("NA(b)" %in% c(FVCDFRU, FVCDSAL, FVCDPOT, FVCDCAR, FVCDVEG, FVCDJUI)) {
-      return("NA(b)")
-    }
-    
-    # Total fruit and vegetables, excluding fruit juice
-      total_fruitveg <- 
-        if_else2(!is.na(FVCDFRU) & !is.na(FVCDSAL) & !is.na(FVCDPOT) & 
-                   !is.na(FVCDCAR)  & !is.na(FVCDVEG), FVCDFRU + FVCDSAL + 
-                   FVCDPOT + FVCDCAR + FVCDVEG, NA)
-    
-    # Maximum total fruit and vegetables = 8
-      max_fruitveg <-
-        if_else2(is.na(total_fruitveg), NA,
-                 if_else2(total_fruitveg>8, 8, total_fruitveg))
-    
-    # High potato intake flag
-      daily_pot_limit <-
-        if_else2(DHH_SEX==1, 1,
-                 if_else2(DHH_SEX==2, 5/7, NA))
-      FVCDPOT_high <-
-        if_else2(is.na(FVCDPOT), NA,
-                 if_else2(FVCDPOT>=(daily_pot_limit), 1, 0))
+
+    # High potato intake flag (sex-specific limit)
+    daily_pot_limit <- dplyr::case_when(
+      sex == 1 ~ 1,
+      sex == 2 ~ 5 / 7,
+      TRUE ~ NA_real_
+    )
+    FVCDPOT_high <- dplyr::case_when(
+      is.na(pot) ~ NA_real_,
+      pot >= daily_pot_limit ~ 1,
+      TRUE ~ 0
+    )
 
     # No carrot intake flag
-      FVCDCAR_nil <-
-        if_else2(is.na(FVCDCAR), NA,
-                 if_else2(FVCDCAR==0, 1, 0))
+    FVCDCAR_nil <- dplyr::case_when(
+      is.na(car) ~ NA_real_,
+      car == 0 ~ 1,
+      TRUE ~ 0
+    )
 
-    # High juice intake flag
-      FVCDJUI_high <-
-        if_else2(is.na(FVCDJUI), NA,
-                 if_else2(FVCDJUI <=1, 0, FVCDJUI - 1))
+    # High juice intake penalty
+    FVCDJUI_high <- dplyr::case_when(
+      is.na(jui) ~ NA_real_,
+      jui <= 1 ~ 0,
+      TRUE ~ jui - 1
+    )
 
-   diet_raw_score <- if_else2(!is.na(max_fruitveg) & !is.na(FVCDPOT_high) & 
-                     !is.na(FVCDCAR_nil) & !is.na(FVCDJUI_high),  2 +
-                       max_fruitveg - (2*FVCDPOT_high) - (2*FVCDCAR_nil) - 
-                       (2*FVCDJUI_high), NA)
-   
-  diet_score <- if_else2(diet_raw_score <0, 0,
-            if_else2(diet_raw_score >10, 10,
-                    if_else2(!is.na(diet_raw_score), diet_raw_score,
-                             tagged_na("b"))))
-   return(diet_score)
+    # Raw score
+    diet_raw <- dplyr::case_when(
+      is.na(total_fruitveg) | is.na(FVCDPOT_high) |
+        is.na(FVCDCAR_nil) | is.na(FVCDJUI_high) ~ NA_real_,
+      TRUE ~ 2 + total_fruitveg - (2 * FVCDPOT_high) -
+        (2 * FVCDCAR_nil) - (2 * FVCDJUI_high)
+    )
+
+    # Clamp to [0, 10]
+    result <- dplyr::case_when(
+      all_missing ~
+        get_priority_missing(fru, sal, pot, car, veg, jui,
+                             output_format = output_format),
+      is.na(diet_raw) ~
+        assign_missing("not_stated", "diet_score", output_format),
+      diet_raw < 0 ~ 0,
+      diet_raw > 10 ~ 10,
+      TRUE ~ diet_raw
+    )
+
+    # === STEP 3: OUTPUT VALIDATION ===
+    output_cleaned <- clean_variables(vars = list(
+      diet_score = result
+    ), output_format = output_format)
+
+    return(output_cleaned$diet_score)
   }
 
 
-#' @title Categorized diet score
-#' 
-#' @description This function creates a categorical derived diet variable 
-#' (diet_score_cat3) that categorizes derived diet score (diet_score).
-#' 
-#' @details The diet score is based on consumption of fruit, salad, potatoes, 
-#' carrots, other vegetables and juice. 2 baseline points plus summation of 
-#' total points for diet attributes. Negative overall scores are recoded to 0, 
-#' resulting in a range from 0 to 10.The categories were based on the 
-#' Mortality Population Risk Tool (Douglas Manuel et al. 2016). 
-#' 
-#' diet_score_cat3 uses the derived variable diet_score. diet_score uses 
-#' sex, and fruit and vegetable variables that have been transformed by 
-#' cchsflow (see documentation on diet_score). In order to categorize diet 
-#' across CCHS cycles, sex, and fruit and vegetable variables must be 
-#' transformed and harmonized.
-#' 
-#' @param diet_score derived variable that calculates diet score.
-#' See \code{\link{diet_score_fun}} for documentation on how variable 
-#' was derived.
-#' 
-#' @return value for diet score categories using diet_score_cat3 variable.
-#' 
-#' @examples 
-#' # Using the diet_score_fun_cat function to categorize the derived diet 
-#' # variable across CCHS cycles.
-#' # diet_score_fun_cat() is specified in the variable_details.csv.
+#' @title Categorize diet score
 #'
-#' # To create a harmonized diet_score_cat3 variable across CCHS cycles, use 
-#' # rec_with_table() for each CCHS cycle.
-#' # Since diet_score is also a derived variable, you will have to specify 
-#' # the variables that are derived from it.
-#' # Using merge_rec_data(), you can combine diet_score_cat3 across cycles.
+#' @description Categorizes the derived diet score into 3 levels:
+#'   poor (0 to <2), fair (2 to <8), and adequate (8 to 10).
 #'
-#' library(cchsflow)
+#' @param diet_score Derived diet score (0-10). See \code{\link{calculate_diet_score}}.
+#' @param output_format Output missing data format: "tagged_na" (default) or "original".
 #'
-#' diet_score_cat2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-#'     "DHH_SEX", "diet_score", "diet_score_cat3"
-#'   )
-#' )
+#' @return Integer 1-3 for diet category, or tagged NA:
+#'   \enumerate{
+#'     \item Poor diet (score 0 to <2)
+#'     \item Fair diet (score 2 to <8)
+#'     \item Adequate diet (score 8 to 10)
+#'   }
 #'
-#' head(diet_score_cat2009_2010)
+#' @examples
+#' categorize_diet_score(1)   # 1 (poor)
+#' categorize_diet_score(5)   # 2 (fair)
+#' categorize_diet_score(9)   # 3 (adequate)
 #'
-#' diet_score_cat2011_2012 <- rec_with_table(
-#'   cchs2011_2012_p,c(
-#'     "FVCDFRU", "FVCDSAL", "FVCDPOT", "FVCDCAR", "FVCDVEG", "FVCDJUI", 
-#'     "DHH_SEX", "diet_score", "diet_score_cat3"
-#'   )
-#' )
-#'
-#' tail(diet_score_cat2011_2012)
-#'
-#' combined_diet_score_cat <- suppressWarnings(merge_rec_data(
-#' diet_score_cat2009_2010, diet_score_cat2011_2012))
-#'
-#' head(combined_diet_score_cat)
-#' tail(combined_diet_score_cat)
 #' @export
+categorize_diet_score <- function(diet_score, output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    diet_score = diet_score
+  ), output_format = "tagged_na")
 
-diet_score_fun_cat <-
-  function(diet_score){
-    # Poor diet
-    if_else2(diet_score >=0 & diet_score < 2, 1,
-    # Fair diet 
-    if_else2(diet_score >=2 & diet_score < 8, 2,
-    # Adequate diet 
-    if_else2(diet_score >=8 & diet_score <= 10, 3,
-    # No response
-    if_else2(haven::is_tagged_na(diet_score, "a"), "NA(a)", "NA(b)"))))
-  }
+  ds <- cleaned$diet_score
+
+  # === STEP 2: CATEGORIZATION ===
+  result <- dplyr::case_when(
+    any_missing(ds) ~
+      get_priority_missing(ds, output_format = output_format),
+    ds >= 0 & ds < 2 ~ 1,
+    ds >= 2 & ds < 8 ~ 2,
+    ds >= 8 & ds <= 10 ~ 3,
+    .default = assign_missing("not_stated", "diet_score_cat3", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    diet_score_cat3 = result
+  ), output_format = output_format)
+
+  return(output_cleaned$diet_score_cat3)
+}

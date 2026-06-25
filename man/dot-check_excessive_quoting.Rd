@@ -4,20 +4,23 @@
 \alias{.check_excessive_quoting}
 \title{Check a worksheet for excessive quoting}
 \usage{
-.check_excessive_quoting(parsed_csv, error_ctx)
+.check_excessive_quoting(raw_lines, error_ctx)
 }
 \arguments{
+\item{raw_lines}{Character vector of lines from readr::read_lines()}
+
 \item{error_ctx}{Information used when creating the error object. A named
 list with the following fields:
 * file_type: The type of worksheet the CSV contains. Can be "variables" or
   "variable_details".
 * file_path: The file path to the worksheet}
-
-\item{csv_text}{String containing the worksheet contents}
 }
 \value{
 list of errors
 }
 \description{
-Check a worksheet for excessive quoting
+Scans raw CSV lines for quoted fields that don't require quoting. A field
+needs quoting only if it contains a comma, double-quote, newline, or
+carriage return. Uses vectorised pre-filter: only lines containing a
+double-quote are inspected field-by-field.
 }

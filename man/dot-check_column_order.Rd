@@ -2,7 +2,7 @@
 % Please edit documentation in R/check-worksheet.R
 \name{.check_column_order}
 \alias{.check_column_order}
-\title{Check the columns order in a worksheet}
+\title{Check that columns appear in their expected positions}
 \usage{
 .check_column_order(csv_data, expected_columns, error_ctx)
 }
@@ -21,5 +21,5 @@ list with the following fields:
 The list of column order errors found in the worksheet
 }
 \description{
-Check the columns order in a worksheet
+Check that columns appear in their expected positions
 }
