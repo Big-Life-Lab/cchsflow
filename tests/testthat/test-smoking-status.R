@@ -128,7 +128,7 @@ test_that("calculate_SMKDSTY_cat6 handles missing SMK_005", {
   result <- calculate_SMKDSTY_cat6(
     SMK_005 = tagged_na("b"), SMK_030 = 1, SMK_01A = 1
   )
-  expect_true(is.na(result))
+  expect_equal(result, "NA(b)")
 })
 
 test_that("calculate_SMKDSTY_cat6 handles missing SMK_030 for occasional smoker", {

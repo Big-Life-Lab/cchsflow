@@ -53,45 +53,45 @@ test_that("derive_EDUDR04_2015plus returns 1 for grade 9-10, no HS, no post-sec"
 # --- NA(a): Valid skip ---
 
 test_that("derive_EDUDR04_2015plus returns NA(a) when all inputs are valid skip codes", {
-  expect_equal(derive_EDUDR04_2015plus(6, 6, 6, 96), haven::tagged_na("a"))
+  expect_equal(derive_EDUDR04_2015plus(6, 6, 6, 96), "NA(a)")
 })
 
 test_that("derive_EDUDR04_2015plus returns NA(a) with NA(a) string inputs", {
-  expect_equal(derive_EDUDR04_2015plus(haven::tagged_na("a"), haven::tagged_na("a"), haven::tagged_na("a"), haven::tagged_na("a")), haven::tagged_na("a"))
+  expect_equal(derive_EDUDR04_2015plus(haven::tagged_na("a"), haven::tagged_na("a"), haven::tagged_na("a"), haven::tagged_na("a")), "NA(a)")
 })
 
 # --- NA(b): Missing ---
 
 test_that("derive_EDUDR04_2015plus returns NA(b) when EHG2_02 is DK (7)", {
-  expect_equal(derive_EDUDR04_2015plus(3, 7, 2, 96), haven::tagged_na("b"))
+  expect_equal(derive_EDUDR04_2015plus(3, 7, 2, 96), "NA(b)")
 })
 
 test_that("derive_EDUDR04_2015plus returns NA(b) when EHG2_02 is refusal (8)", {
-  expect_equal(derive_EDUDR04_2015plus(3, 8, 2, 96), haven::tagged_na("b"))
+  expect_equal(derive_EDUDR04_2015plus(3, 8, 2, 96), "NA(b)")
 })
 
 test_that("derive_EDUDR04_2015plus returns NA(b) when EHG2_03 is refusal (8)", {
-  expect_equal(derive_EDUDR04_2015plus(3, 1, 8, 96), haven::tagged_na("b"))
+  expect_equal(derive_EDUDR04_2015plus(3, 1, 8, 96), "NA(b)")
 })
 
 test_that("derive_EDUDR04_2015plus returns NA(b) when EHG2_04 is not stated (99)", {
-  expect_equal(derive_EDUDR04_2015plus(3, 1, 1, 99), haven::tagged_na("b"))
+  expect_equal(derive_EDUDR04_2015plus(3, 1, 1, 99), "NA(b)")
 })
 
 test_that("derive_EDUDR04_2015plus returns NA(b) when EHG2_04 is DK (97)", {
-  expect_equal(derive_EDUDR04_2015plus(3, 1, 1, 97), haven::tagged_na("b"))
+  expect_equal(derive_EDUDR04_2015plus(3, 1, 1, 97), "NA(b)")
 })
 
 test_that("derive_EDUDR04_2015plus returns NA(b) when EHG2_01 DK and no HS diploma", {
-  expect_equal(derive_EDUDR04_2015plus(7, 2, 2, 96), haven::tagged_na("b"))
+  expect_equal(derive_EDUDR04_2015plus(7, 2, 2, 96), "NA(b)")
 })
 
 test_that("derive_EDUDR04_2015plus returns NA(b) with NA(b) string input on EHG2_02", {
-  expect_equal(derive_EDUDR04_2015plus(3, haven::tagged_na("b"), 2, 96), haven::tagged_na("b"))
+  expect_equal(derive_EDUDR04_2015plus(3, haven::tagged_na("b"), 2, 96), "NA(b)")
 })
 
 test_that("derive_EDUDR04_2015plus returns NA(b) with NA(b) string input on EHG2_04", {
-  expect_equal(derive_EDUDR04_2015plus(3, 1, 1, haven::tagged_na("b")), haven::tagged_na("b"))
+  expect_equal(derive_EDUDR04_2015plus(3, 1, 1, haven::tagged_na("b")), "NA(b)")
 })
 
 # --- Vector inputs ---
@@ -104,11 +104,11 @@ test_that("derive_EDUDR04_2015plus works with vector inputs", {
     EHG2_04 = c(96, 96, 1, 6, 96)
   )
   expect_equal(length(result), 5)
-  expect_equal(result[1], 1)      # less than secondary
-  expect_equal(result[2], 2)      # HS grad, no post-sec
-  expect_equal(result[3], 3)      # some post-sec
-  expect_equal(result[4], 4)      # post-sec grad (bachelor's)
-  expect_equal(result[5], haven::tagged_na("a"))  # valid skip
+  expect_equal(result[1], "1")    # less than secondary (character due to mixed vector)
+  expect_equal(result[2], "2")    # HS grad, no post-sec
+  expect_equal(result[3], "3")    # some post-sec
+  expect_equal(result[4], "4")    # post-sec grad (bachelor's)
+  expect_equal(result[5], "NA(a)")  # valid skip
 })
 
 # --- Edge cases ---

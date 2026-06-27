@@ -119,7 +119,7 @@ assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
     vars = list(ADL_der = result),
     output_format = output_format
   )
-  out$ADL_der
+  prep_cat_output(out$ADL_der)
 }
 
 #' Activities of Daily Living (ADL) 5-item help score
@@ -205,7 +205,7 @@ score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
     vars = list(ADL_score_5 = result),
     output_format = output_format
   )
-  out$ADL_score_5
+  prep_cat_output(out$ADL_score_5)
 }
 
 #' Activities of Daily Living (ADL) 6-item help score
@@ -290,5 +290,5 @@ score_adl_6 <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06,
     vars = list(ADL_score_6 = result),
     output_format = output_format
   )
-  out$ADL_score_6
+  prep_cat_output(out$ADL_score_6)
 }

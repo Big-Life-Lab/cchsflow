@@ -47,21 +47,21 @@ test_that("categorize_energy_exp returns 3 for 10.0", {
 # --- NA(a): not applicable ---
 
 test_that("categorize_energy_exp returns NA(a) for tagged_na a", {
-  expect_equal(categorize_energy_exp(haven::tagged_na("a")), haven::tagged_na("a"))
+  expect_equal(categorize_energy_exp(haven::tagged_na("a")), "NA(a)")
 })
 
 # --- NA(b): missing ---
 
 test_that("categorize_energy_exp returns NA(b) for tagged_na b", {
-  expect_equal(categorize_energy_exp(haven::tagged_na("b")), haven::tagged_na("b"))
+  expect_equal(categorize_energy_exp(haven::tagged_na("b")), "NA(b)")
 })
 
-test_that("categorize_energy_exp returns NA(b) for regular NA", {
-  expect_equal(categorize_energy_exp(NA_real_), haven::tagged_na("b"))
+test_that("categorize_energy_exp returns NA for regular NA", {
+  expect_true(is.na(categorize_energy_exp(NA_real_)))
 })
 
 test_that("categorize_energy_exp returns NA(b) for negative values", {
-  expect_equal(categorize_energy_exp(-1), haven::tagged_na("b"))
+  expect_equal(categorize_energy_exp(-1), "NA(b)")
 })
 
 # --- Vector inputs ---
@@ -73,7 +73,7 @@ test_that("categorize_energy_exp works with vector inputs", {
 
 test_that("categorize_energy_exp handles mixed vector with NA", {
   result <- categorize_energy_exp(c(0.5, haven::tagged_na("a"), 3.0))
-  expect_equal(result[1], 1)
-  expect_equal(result[2], haven::tagged_na("a"))
-  expect_equal(result[3], 3)
+  expect_equal(result[1], "1")       # character due to mixed vector
+  expect_equal(result[2], "NA(a)")
+  expect_equal(result[3], "3")
 })

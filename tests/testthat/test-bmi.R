@@ -155,7 +155,7 @@ test_that("categorize_bmi() handles missing inputs", {
   expect_true(is.na(result_na))
 
   result_tagged <- categorize_bmi(bmi = tagged_na("b"))
-  expect_true(is.na(result_tagged))
+  expect_equal(result_tagged, "NA(b)")
 })
 
 test_that("categorize_bmi() works with vectors", {

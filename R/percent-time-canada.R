@@ -116,5 +116,5 @@ categorize_pct_time <- function(pct_time_der, output_format = "tagged_na") {
     pct_time_der_cat10 = result
   ), output_format = output_format)
 
-  return(output_cleaned$pct_time_der_cat10)
+  return(prep_cat_output(output_cleaned$pct_time_der_cat10))
 }

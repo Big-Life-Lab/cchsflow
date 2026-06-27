@@ -212,5 +212,5 @@ categorize_energy_exp <- function(energy_exp, output_format = "tagged_na") {
     energy_exp_cat3 = result
   ), output_format = output_format)
 
-  return(output_cleaned$energy_exp_cat3)
+  return(prep_cat_output(output_cleaned$energy_exp_cat3))
 }

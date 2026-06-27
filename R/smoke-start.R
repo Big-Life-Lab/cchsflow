@@ -757,5 +757,5 @@ calculate_age_first_cigarette <- function(age_first_cigarette = NULL,
 #' @export
 calculate_smoked_100_lifetime <- function(smoked_100_lifetime = NULL,
                                           output_format = "tagged_na") {
-  derive_passthrough(smoked_100_lifetime, "smoked_100_lifetime", output_format)
+  prep_cat_output(derive_passthrough(smoked_100_lifetime, "smoked_100_lifetime", output_format))
 }

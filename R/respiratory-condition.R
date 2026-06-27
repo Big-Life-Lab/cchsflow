@@ -57,7 +57,7 @@ derive_CCC_091_2001to2003 <- function(CCC_91A, CCC_91B,
     CCC_091 = result
   ), output_format = output_format)
 
-  return(output_cleaned$CCC_091)
+  return(prep_cat_output(output_cleaned$CCC_091))
 }
 
 #' @title CCC_091_fun2
@@ -123,7 +123,7 @@ derive_CCC_091_2005to2008 <- function(CCC_91A, CCC_91E, CCC_91F,
     CCC_091 = result
   ), output_format = output_format)
 
-  return(output_cleaned$CCC_091)
+  return(prep_cat_output(output_cleaned$CCC_091))
 }
 
 #' @title resp_condition_fun

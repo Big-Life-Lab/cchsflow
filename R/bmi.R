@@ -311,5 +311,5 @@ categorize_bmi <- function(bmi, output_format = "tagged_na") {
     vars = list(HWTGBMI_der_cat4 = result),
     output_format = output_format
   )
-  output_cleaned$HWTGBMI_der_cat4
+  prep_cat_output(output_cleaned$HWTGBMI_der_cat4)
 }

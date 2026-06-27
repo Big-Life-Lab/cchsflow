@@ -78,5 +78,5 @@ derive_EDUDR04_2015plus <- function(EHG2_01, EHG2_02, EHG2_03, EHG2_04,
     EDUDR04 = result
   ), output_format = output_format)
 
-  return(output_cleaned$EDUDR04)
+  return(prep_cat_output(output_cleaned$EDUDR04))
 }

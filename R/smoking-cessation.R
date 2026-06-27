@@ -437,7 +437,7 @@ assess_quit_pathway <- function(SMKDSTY_cat5 = NULL, SMK_10_gate = NULL,
     quit_pathway = result
   ), output_format = output_format)
 
-  return(output_cleaned$quit_pathway)
+  return(prep_cat_output(output_cleaned$quit_pathway))
 }
 
 # ------------------------------------------------------------------------------

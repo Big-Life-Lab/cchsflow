@@ -77,7 +77,7 @@ test_that("calculate_pct_time works with vector inputs (master continuous)", {
 # categorize_pct_time
 
 test_that("categorize_pct_time has expected output when input is out of range", {
-  expect_true(haven::is_tagged_na(categorize_pct_time(-1), "b"))
+  expect_equal(categorize_pct_time(-1), "NA(b)")
 })
 
 test_that("categorize_pct_time has expected output when input is in range", {
@@ -89,7 +89,7 @@ test_that("categorize_pct_time returns 10 at upper boundary", {
 })
 
 test_that("categorize_pct_time handles tagged_na(a)", {
-  expect_true(haven::is_tagged_na(categorize_pct_time(tagged_na("a")), "a"))
+  expect_equal(categorize_pct_time(tagged_na("a")), "NA(a)")
 })
 
 test_that("categorize_pct_time works with vector inputs", {
@@ -102,36 +102,36 @@ test_that("categorize_pct_time works with vector inputs", {
 
 # Out-of-range inputs → NA(b)
 test_that("returns NA(b) for out-of-range immigrant_status", {
-  expect_equal(categorize_immigration(-1, 2, 2, 4.5), tagged_na("b"))
+  expect_equal(categorize_immigration(-1, 2, 2, 4.5), "NA(b)")
 })
 
 test_that("returns NA(b) for out-of-range born_canada", {
-  expect_equal(categorize_immigration(1, -2, 2, 4.5), tagged_na("b"))
+  expect_equal(categorize_immigration(1, -2, 2, 4.5), "NA(b)")
 })
 
 test_that("returns NA(b) for out-of-range ethnicity", {
-  expect_equal(categorize_immigration(1, 2, -2, 4.5), tagged_na("b"))
+  expect_equal(categorize_immigration(1, 2, -2, 4.5), "NA(b)")
 })
 
 test_that("propagates NA(b) from years", {
-  expect_equal(categorize_immigration(1, 2, 2, tagged_na("b")), tagged_na("b"))
+  expect_equal(categorize_immigration(1, 2, 2, tagged_na("b")), "NA(b)")
 })
 
 # NA(a) propagation
 test_that("propagates NA(a) from immigrant_status", {
-  expect_equal(categorize_immigration(tagged_na("a"), 2, 2, 4.5), tagged_na("a"))
+  expect_equal(categorize_immigration(tagged_na("a"), 2, 2, 4.5), "NA(a)")
 })
 
 test_that("propagates NA(a) from born_canada", {
-  expect_equal(categorize_immigration(1, tagged_na("a"), 2, 4.5), tagged_na("a"))
+  expect_equal(categorize_immigration(1, tagged_na("a"), 2, 4.5), "NA(a)")
 })
 
 test_that("propagates NA(a) from ethnicity", {
-  expect_equal(categorize_immigration(1, 2, tagged_na("a"), 4.5), tagged_na("a"))
+  expect_equal(categorize_immigration(1, 2, tagged_na("a"), 4.5), "NA(a)")
 })
 
 test_that("propagates NA(a) from years", {
-  expect_equal(categorize_immigration(1, 2, 2, tagged_na("a")), tagged_na("a"))
+  expect_equal(categorize_immigration(1, 2, 2, tagged_na("a")), "NA(a)")
 })
 
 # All 8 categories — PUMF style (ethnicity 1/2, SDCGRES_cont midpoints 4.5/15)

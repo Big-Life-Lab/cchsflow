@@ -494,7 +494,7 @@ calculate_SMKDSTY_cat6 <- function(SMK_005 = NULL, SMK_030 = NULL, SMK_01A = NUL
   output_clean <- clean_variables(vars = list(SMKDSTY_original = SMKDSTY_cat6_result),
                                  output_format = output_format)
 
-  return(output_clean$SMKDSTY_original)
+  return(prep_cat_output(output_clean$SMKDSTY_original))
 }
 
 #' @title Type of Smoker - SMKDSTY_original (deprecated alias)
@@ -681,6 +681,6 @@ calculate_smoke_simple <- function(SMKDSTY_cat5 = NULL, time_quit_smoking = NULL
   output_clean <- clean_variables(vars = list(smoke_simple = smoke_simple_result), 
                                  output_format = output_format)
   
-  return(output_clean$smoke_simple)
+  return(prep_cat_output(output_clean$smoke_simple))
 }
 

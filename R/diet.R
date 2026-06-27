@@ -159,5 +159,5 @@ categorize_diet_score <- function(diet_score, output_format = "tagged_na") {
     diet_score_cat3 = result
   ), output_format = output_format)
 
-  return(output_cleaned$diet_score_cat3)
+  return(prep_cat_output(output_cleaned$diet_score_cat3))
 }

@@ -14,7 +14,7 @@ test_that("derive_CCC_091_2001to2003 returns 2 when neither is positive", {
 
 test_that("derive_CCC_091_2001to2003 returns NA(a) when both are NA(a)", {
   expect_warning(out <- derive_CCC_091_2001to2003(haven::tagged_na("a"), haven::tagged_na("a")))
-  expect_equal(out, haven::tagged_na("a"))
+  expect_equal(out, "NA(a)")
 })
 
 test_that("derive_CCC_091_2001to2003 warns and returns 1 when CCC_91A is out of range but CCC_91B is positive", {
@@ -24,7 +24,7 @@ test_that("derive_CCC_091_2001to2003 warns and returns 1 when CCC_91A is out of 
 
 test_that("derive_CCC_091_2001to2003 warns and returns NA(b) when both args are out of range", {
   expect_warning(out <- derive_CCC_091_2001to2003(0, 0))
-  expect_equal(out, haven::tagged_na("b"))
+  expect_equal(out, "NA(b)")
 })
 
 # derive_CCC_091_2005to2008-------------------------------
@@ -47,7 +47,7 @@ test_that("derive_CCC_091_2005to2008 returns 2 when none are positive", {
 
 test_that("derive_CCC_091_2005to2008 returns NA(a) when all are NA(a)", {
   expect_warning(out <- derive_CCC_091_2005to2008(haven::tagged_na("a"), haven::tagged_na("a"), haven::tagged_na("a")))
-  expect_equal(out, haven::tagged_na("a"))
+  expect_equal(out, "NA(a)")
 })
 
 test_that("derive_CCC_091_2005to2008 warns and returns 1 when CCC_91E is out of range but CCC_91A is positive", {
@@ -57,7 +57,7 @@ test_that("derive_CCC_091_2005to2008 warns and returns 1 when CCC_91E is out of 
 
 test_that("derive_CCC_091_2005to2008 warns and returns NA(b) when all args are out of range", {
   expect_warning(out <- derive_CCC_091_2005to2008(0, 0, 0))
-  expect_equal(out, haven::tagged_na("b"))
+  expect_equal(out, "NA(b)")
 })
 
 # resp_condition_fun-------------------------------

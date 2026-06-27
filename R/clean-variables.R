@@ -660,6 +660,29 @@ derive_passthrough <- function(value, variable_name, output_format = "tagged_na"
   return(cleaned[[variable_name]])
 }
 
+#' Encode tagged NAs as factor-safe strings
+#'
+#' Converts tagged NAs in a numeric vector to their string equivalents
+#' ("NA(a)", "NA(b)", "NA(c)") so they survive factor conversion in
+#' recodeflow's rec_with_table(). Only touches elements that are tagged
+#' NAs — if no tagged NAs are present, returns the vector unchanged.
+#'
+#' @param x Numeric vector, possibly containing tagged NAs.
+#' @return The original vector if no tagged NAs are present; otherwise a
+#'   character vector with tagged NA positions replaced by "NA(a)" etc.
+#'   (valid codes coerce to character as a side effect of R's type rules).
+#' @noRd
+prep_cat_output <- function(x) {
+  idx_a <- haven::is_tagged_na(x, "a")
+  idx_b <- haven::is_tagged_na(x, "b")
+  idx_c <- haven::is_tagged_na(x, "c")
+  if (!any(idx_a | idx_b | idx_c)) return(x)
+  out <- as.character(x)
+  out[idx_a] <- "NA(a)"
+  out[idx_b] <- "NA(b)"
+  out[idx_c] <- "NA(c)"
+  out
+}
 
 #' Range notation parser for variable_details.csv
 #'

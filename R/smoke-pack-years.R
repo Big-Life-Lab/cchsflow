@@ -255,7 +255,7 @@ calculate_pack_years_categorical <- function(pack_years_der,
     pack_years_cat = result
   ), output_format = output_format)
 
-  return(output_cleaned$pack_years_cat)
+  return(prep_cat_output(output_cleaned$pack_years_cat))
 }
 
 

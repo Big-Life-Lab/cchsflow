@@ -93,7 +93,7 @@ assess_drinking_risk <- function(cleaned, risk_type, derived_var,
     vars = stats::setNames(list(result), derived_var),
     output_format = output_format
   )
-  out[[derived_var]]
+  prep_cat_output(out[[derived_var]])
 }
 
 # ==============================================================================
@@ -224,7 +224,7 @@ calculate_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2,
     vars = list(binge_drinker = result),
     output_format = output_format
   )
-  out$binge_drinker
+  prep_cat_output(out$binge_drinker)
 }
 
 #' Short-term (acute) drinking risk under the Low-Risk Guidelines

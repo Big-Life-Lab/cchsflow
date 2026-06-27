@@ -60,38 +60,38 @@ test_that("calculate_binge_drinking() handles basic valid inputs correctly", {
     ALW_2A1 = 0, ALW_2A2 = 0, ALW_2A3 = 0, ALW_2A4 = 0,
     ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0
   )
-  expect_true(is_tagged_na(result_no_drinks, "a")) # not applicable
+  expect_equal(result_no_drinks, "NA(a)") # not applicable
 })
 
 test_that("calculate_binge_drinking() handles out of range inputs correctly", {
-  # Test case: sex out of range (should return tagged_na("b"))
+  # Test case: sex out of range (should return "NA(b)")
   result_invalid_sex <- calculate_binge_drinking(
     DHH_SEX = -1, # invalid sex
     ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_sex, "b"))
+  expect_equal(result_invalid_sex, "NA(b)")
 
   # Test case: ALW_1 out of range
   result_invalid_alw1 <- calculate_binge_drinking(
     DHH_SEX = 1, ALW_1 = -1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_alw1, "b")) # invalid/missing for invalid ALW_1
+  expect_equal(result_invalid_alw1, "NA(b)") # invalid/missing for invalid ALW_1
 
   # Test case: ALW_2A1 out of range
   result_invalid_alw2a1 <- calculate_binge_drinking(
     DHH_SEX = 1, ALW_1 = 1, ALW_2A1 = -1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_alw2a1, "b"))
+  expect_equal(result_invalid_alw2a1, "NA(b)")
 
   # Test case: ALW_2A2 out of range
   result_invalid_alw2a2 <- calculate_binge_drinking(
     DHH_SEX = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = -1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_alw2a2, "b"))
+  expect_equal(result_invalid_alw2a2, "NA(b)")
 })
 
 test_that("calculate_binge_drinking() handles vector inputs correctly", {
@@ -109,9 +109,9 @@ test_that("calculate_binge_drinking() handles vector inputs correctly", {
     ALW_2A7 = c(0, 0, 0) # All: 0 drinks
   )
 
-  expect_equal(result_vector[1], 1L) # Person 1: binge drinker
-  expect_equal(result_vector[2], 2L) # Person 2: not binge drinker (max 2 drinks/day for female)
-  expect_true(is_tagged_na(result_vector[3], "a")) # Person 3: not applicable (no drinks)
+  expect_equal(result_vector[1], "1") # Person 1: binge drinker (character due to mixed vector)
+  expect_equal(result_vector[2], "2") # Person 2: not binge drinker (max 2 drinks/day for female)
+  expect_equal(result_vector[3], "NA(a)") # Person 3: not applicable (no drinks)
 })
 
 # =============================================================================
@@ -150,31 +150,31 @@ test_that("calculate_drinking_risk_short() handles basic valid inputs correctly"
     ALW_2A1 = 0, ALW_2A2 = 0, ALW_2A3 = 0, ALW_2A4 = 0,
     ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0
   )
-  expect_true(is_tagged_na(result_no_drinks, "a")) # not applicable
+  expect_equal(result_no_drinks, "NA(a)") # not applicable
 })
 
 test_that("calculate_drinking_risk_short() handles out of range inputs correctly", {
-  # Test case: sex out of range (should return tagged_na("b"))
+  # Test case: sex out of range (should return "NA(b)")
   result_invalid_sex <- calculate_drinking_risk_short(
     DHH_SEX = -1, # invalid sex
     ALWDWKY = 10, ALC_1 = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_sex, "b"))
+  expect_equal(result_invalid_sex, "NA(b)")
 
   # Test case: ALWDWKY out of range
   result_invalid_alwdwky <- calculate_drinking_risk_short(
     DHH_SEX = 1, ALWDWKY = -1, ALC_1 = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_alwdwky, "b"))
+  expect_equal(result_invalid_alwdwky, "NA(b)")
 
   # Test case: ALC_1 out of range
   result_invalid_alc1 <- calculate_drinking_risk_short(
     DHH_SEX = 1, ALWDWKY = 10, ALC_1 = -1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_alc1, "b"))
+  expect_equal(result_invalid_alc1, "NA(b)")
 })
 
 test_that("calculate_drinking_risk_short() handles vector inputs correctly", {
@@ -193,10 +193,10 @@ test_that("calculate_drinking_risk_short() handles vector inputs correctly", {
     ALW_2A7 = c(0, 1, 0, 0)
   )
 
-  expect_equal(result_vector[1], 1L) # Person 1: high risk (male, >3 drinks/day)
-  expect_equal(result_vector[2], 2L) # Person 2: low risk (female, ≤2 drinks/day)
-  expect_true(is_tagged_na(result_vector[3], "a")) # Person 3: not applicable (no drinks)
-  expect_equal(result_vector[4], 1L) # Person 4: high risk (female, >2 drinks/day)
+  expect_equal(result_vector[1], "1") # Person 1: high risk (male, >3 drinks/day) (character due to mixed vector)
+  expect_equal(result_vector[2], "2") # Person 2: low risk (female, ≤2 drinks/day)
+  expect_equal(result_vector[3], "NA(a)") # Person 3: not applicable (no drinks)
+  expect_equal(result_vector[4], "1") # Person 4: high risk (female, >2 drinks/day)
 })
 
 # =============================================================================
@@ -235,31 +235,31 @@ test_that("calculate_drinking_risk_long() handles basic valid inputs correctly",
     ALW_2A1 = 0, ALW_2A2 = 0, ALW_2A3 = 0, ALW_2A4 = 0,
     ALW_2A5 = 0, ALW_2A6 = 0, ALW_2A7 = 0
   )
-  expect_true(is_tagged_na(result_no_drinks, "a")) # not applicable
+  expect_equal(result_no_drinks, "NA(a)") # not applicable
 })
 
 test_that("calculate_drinking_risk_long() handles out of range inputs correctly", {
-  # Test case: sex out of range (should return tagged_na("b"))
+  # Test case: sex out of range (should return "NA(b)")
   result_invalid_sex <- calculate_drinking_risk_long(
     DHH_SEX = -1, # invalid sex
     ALWDWKY = 10, ALC_1 = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_sex, "b"))
+  expect_equal(result_invalid_sex, "NA(b)")
 
   # Test case: ALWDWKY out of range
   result_invalid_alwdwky <- calculate_drinking_risk_long(
     DHH_SEX = 1, ALWDWKY = -1, ALC_1 = 1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_alwdwky, "b"))
+  expect_equal(result_invalid_alwdwky, "NA(b)")
 
   # Test case: ALC_1 out of range
   result_invalid_alc1 <- calculate_drinking_risk_long(
     DHH_SEX = 1, ALWDWKY = 10, ALC_1 = -1, ALW_1 = 1, ALW_2A1 = 1, ALW_2A2 = 1, ALW_2A3 = 1,
     ALW_2A4 = 1, ALW_2A5 = 1, ALW_2A6 = 1, ALW_2A7 = 1
   )
-  expect_true(is_tagged_na(result_invalid_alc1, "b"))
+  expect_equal(result_invalid_alc1, "NA(b)")
 })
 
 test_that("calculate_drinking_risk_long() handles vector inputs correctly", {
@@ -278,10 +278,10 @@ test_that("calculate_drinking_risk_long() handles vector inputs correctly", {
     ALW_2A7 = c(2, 0, 0, 0)
   )
 
-  expect_equal(result_vector[1], 1L) # Person 1: high risk (male, >14 drinks/week)
-  expect_equal(result_vector[2], 2L) # Person 2: low risk (female, ≤9 drinks/week)
-  expect_true(is_tagged_na(result_vector[3], "a")) # Person 3: not applicable (no drinks)
-  expect_equal(result_vector[4], 2L) # Person 4: low risk (female, 12 drinks/week < 15 threshold, 2 drinks/day < 3 threshold)
+  expect_equal(result_vector[1], "1") # Person 1: high risk (male, >14 drinks/week) (character due to mixed vector)
+  expect_equal(result_vector[2], "2") # Person 2: low risk (female, ≤9 drinks/week)
+  expect_equal(result_vector[3], "NA(a)") # Person 3: not applicable (no drinks)
+  expect_equal(result_vector[4], "2") # Person 4: low risk (female, 12 drinks/week < 15 threshold, 2 drinks/day < 3 threshold)
 })
 
 # =============================================================================
@@ -397,24 +397,25 @@ test_that("alcohol functions work correctly in cchsflow workflows", {
 
   # Verify results are reasonable
   # Person 1: Male, 3 drinks/day -> not binge (≤4), short risk (>3/day), long risk (15/week)
-  expect_equal(test_data$binge_drinker[1], 2L) # not binge
-  expect_equal(test_data$short_term_risk[1], 2L) # low short-term risk (≤3 drinks/day for male)
-  expect_equal(test_data$long_term_risk[1], 2L) # low long-term risk (15 drinks/week < 20 threshold AND 3 drinks/day < 4 threshold for male)
+  # All elements are character due to mixed vector with tagged NAs
+  expect_equal(test_data$binge_drinker[1], "2") # not binge
+  expect_equal(test_data$short_term_risk[1], "2") # low short-term risk (≤3 drinks/day for male)
+  expect_equal(test_data$long_term_risk[1], "2") # low long-term risk (15 drinks/week < 20 threshold AND 3 drinks/day < 4 threshold for male)
 
   # Person 2: Female, 1 drink/day -> not binge, low risk both
-  expect_equal(test_data$binge_drinker[2], 2L) # not binge
-  expect_equal(test_data$short_term_risk[2], 2L) # low short-term risk
-  expect_equal(test_data$long_term_risk[2], 2L) # low long-term risk
+  expect_equal(test_data$binge_drinker[2], "2") # not binge
+  expect_equal(test_data$short_term_risk[2], "2") # low short-term risk
+  expect_equal(test_data$long_term_risk[2], "2") # low long-term risk
 
   # Person 3: No drinks -> all not applicable
-  expect_true(is_tagged_na(test_data$binge_drinker[3], "a"))
-  expect_true(is_tagged_na(test_data$short_term_risk[3], "a"))
-  expect_true(is_tagged_na(test_data$long_term_risk[3], "a"))
+  expect_equal(test_data$binge_drinker[3], "NA(a)")
+  expect_equal(test_data$short_term_risk[3], "NA(a)")
+  expect_equal(test_data$long_term_risk[3], "NA(a)")
 
   # Person 5: Male, 5 drinks/day -> binge, high risk both
-  expect_equal(test_data$binge_drinker[5], 1L) # binge drinker
-  expect_equal(test_data$short_term_risk[5], 1L) # high short-term risk
-  expect_equal(test_data$long_term_risk[5], 1L) # high long-term risk
+  expect_equal(test_data$binge_drinker[5], "1") # binge drinker
+  expect_equal(test_data$short_term_risk[5], "1") # high short-term risk
+  expect_equal(test_data$long_term_risk[5], "1") # high long-term risk
 })
 
 # =============================================================================

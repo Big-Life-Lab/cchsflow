@@ -55,7 +55,7 @@ categorize_immigration <- function(immigrant_status, born_canada, ethnicity,
     years <- as.numeric(years)
   })
 
-  dplyr::case_when(
+  result <- dplyr::case_when(
     # Canada-born (non-immigrant): years not consulted
     immigrant_status == 2 & born_canada == 1 & ethnicity == 1 ~ 1L,
     immigrant_status == 2 & born_canada == 1 & ethnicity >  1 ~ 2L,
@@ -75,4 +75,5 @@ categorize_immigration <- function(immigrant_status, born_canada, ethnicity,
       haven::is_tagged_na(years, "a") ~ haven::tagged_na("a"),
     TRUE ~ haven::tagged_na("b")
   )
+  prep_cat_output(result)
 }
