@@ -53,8 +53,13 @@ fix_worksheet <- function(
     purrr::keep(errors, ~ .x$error_type == "empty_columns")
   )
 
-  column_order_fixed_data <- .fix_column_order_errors(
+  extra_columns_fixed_data <- .fix_extra_column_errors(
     empty_columns_fixed_data,
+    purrr::keep(errors, ~ .x$error_type == "extra_column")
+  )
+
+  column_order_fixed_data <- .fix_column_order_errors(
+    extra_columns_fixed_data,
     purrr::keep(errors, ~ .x$error_type == "column_order")
   )
 
@@ -82,6 +87,7 @@ fix_worksheet <- function(
 
   fixed_types <- c(
     if ("empty_columns" %in% error_types) "empty_columns",
+    if ("extra_column" %in% error_types) "extra_column",
     if ("column_order" %in% error_types) "column_order",
     if ("unsorted_rows" %in% error_types) "unsorted_rows",
     if ("line_ending_crlf" %in% error_types) "line_ending_crlf",
@@ -107,6 +113,23 @@ fix_worksheet <- function(
   empty_col_positions <- purrr::map_int(empty_column_errors, ~ .x$col_num)
   cols_to_keep <- colnames(csv_data)[-empty_col_positions]
   return(csv_data[, cols_to_keep])
+}
+
+#' Remove extra columns not defined in the schema
+#'
+#' @param csv_data A data frame containing the CSV data.
+#' @param extra_column_errors A list of extra column error objects from
+#'   \code{check_worksheet}.
+#'
+#' @return The data frame with extra columns removed.
+#'
+#' @keywords internal
+.fix_extra_column_errors <- function(csv_data, extra_column_errors) {
+  if (length(extra_column_errors) == 0) {
+    return(csv_data)
+  }
+  extra_col_names <- purrr::map_chr(extra_column_errors, ~ .x$column_name)
+  return(csv_data[, !colnames(csv_data) %in% extra_col_names, drop = FALSE])
 }
 
 #' Reorder columns to match expected order in a CSV worksheet
