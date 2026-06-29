@@ -97,40 +97,29 @@ test_that("resp_condition_fun has expected output when
   expect_equal(resp_condition_fun(40, 1, 1), 1)
 })
 
-# COPD_Emph_der_fun1--------------------------------
-test_that("COPD_Emph_der_fun1 has expected output when
-          age is out of range", {
-  expect_equal(COPD_Emph_der_fun1(-1, 1, 1), "NA(b)")
+# categorize_CCC_091 --------------------------------
+
+test_that("categorize_CCC_091 returns 1 for age >= 35 with condition", {
+  expect_equal(categorize_CCC_091(40, 1), 1L)
 })
 
-test_that("COPD_Emph_der_fun1 has expected output when
-          CCC_91E is out of range", {
-  expect_warning(out <- COPD_Emph_der_fun1(20, -1, 1))
-  expect_equal(out, 2)
+test_that("categorize_CCC_091 returns 2 for age < 35 with condition", {
+  expect_equal(categorize_CCC_091(25, 1), 2L)
 })
 
-test_that("COPD_Emph_der_fun1 has expected output when
-          CCC_91F is out of range", {
-  expect_warning(out <- COPD_Emph_der_fun1(20, 1, -1))
-  expect_equal(out, 2)
+test_that("categorize_CCC_091 returns 3 for no condition", {
+  expect_equal(categorize_CCC_091(40, 2), 3L)
 })
 
-test_that("COPD_Emph_der_fun1 has expected output when
-          all parameters are in range", {
-  expect_equal(COPD_Emph_der_fun1(20, 1, 1), 2)
+test_that("categorize_CCC_091 returns NA(a) for NA(a) input", {
+  expect_equal(categorize_CCC_091(40, haven::tagged_na("a")), "NA(a)")
 })
 
-# COPD_Emph_der_fun2--------------------------------
-test_that("COPD_Emph_der_fun2 has expected output when
-          age is out of range", {
-  expect_equal(COPD_Emph_der_fun2(-1, 1), "NA(b)")
+test_that("categorize_CCC_091 returns NA(b) for NA(b) input", {
+  expect_equal(categorize_CCC_091(40, haven::tagged_na("b")), "NA(b)")
 })
 
-test_that("COPD_Emph_der_fun2 has expected output when
-          CCC_091 is out of range", {
-  expect_equal(COPD_Emph_der_fun2(20, -1), "NA(b)")
-})
-test_that("COPD_Emph_der_fun2 has expected output when
-          all parameters are in range", {
-  expect_equal(COPD_Emph_der_fun2(20, 1), 2)
+test_that("categorize_CCC_091 handles boundary at age 35", {
+  expect_equal(categorize_CCC_091(35, 1), 1L)
+  expect_equal(categorize_CCC_091(34, 1), 2L)
 })

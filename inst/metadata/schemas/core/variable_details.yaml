@@ -15,3 +15,5 @@ expected_column_order:
   - "variableStartShortLabel"
   - "variableStartLabel"
   - "notes"
+
+id_column_name: "variable"

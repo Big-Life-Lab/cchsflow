@@ -126,6 +126,61 @@ derive_CCC_091_2005to2008 <- function(CCC_91A, CCC_91E, CCC_91F,
   return(prep_cat_output(output_cleaned$CCC_091))
 }
 
+# ==============================================================================
+# CCC_091_der — Age-stratified COPD/emphysema/bronchitis (3 categories)
+# ==============================================================================
+
+#' @title Age-stratified COPD/emphysema/bronchitis indicator
+#'
+#' @description Creates a 3-category derived variable from CCC_091
+#'   (COPD/emphysema/bronchitis) stratified by age 35 threshold.
+#'
+#' @param age Continuous age variable (DHHGAGE_cont for PUMF, DHH_AGE for
+#'   Master). Worksheet routes the appropriate source.
+#' @param CCC_091 Harmonized COPD/emphysema/bronchitis indicator (1 = yes,
+#'   2 = no). Available for all cycles via direct question or derivation.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Categorical variable (CCC_091_der) with 3 levels:
+#'   \enumerate{
+#'     \item Age >= 35 with COPD/emphysema/bronchitis
+#'     \item Age < 35 with COPD/emphysema/bronchitis
+#'     \item No COPD/emphysema/bronchitis
+#'   }
+#'
+#' @note v3.0.0, last updated: 2026-06-29, status: active. Replaces
+#'   COPD_Emph_der_fun1/fun2 which used inconsistent source variables
+#'   across eras.
+#' @export
+categorize_CCC_091 <- function(age, CCC_091, output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    DHHGAGE_cont = age,
+    CCC_091 = CCC_091
+  ), output_format = "tagged_na")
+
+  a <- cleaned$DHHGAGE_cont
+  c091 <- cleaned$CCC_091
+
+  # === STEP 2: DOMAIN LOGIC ===
+  result <- dplyr::case_when(
+    any_missing(a, c091) ~
+      get_priority_missing(a, c091, output_format = output_format),
+    a >= 35 & c091 == 1 ~ 1L,
+    a < 35  & c091 == 1 ~ 2L,
+    c091 == 2           ~ 3L,
+    .default = assign_missing("not_stated", "CCC_091_der", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    CCC_091_der = result
+  ), output_format = output_format)
+
+  prep_cat_output(output_cleaned$CCC_091_der)
+}
+
 #' @title resp_condition_fun
 #'
 #' @description This function is used to create a derived variable
@@ -228,197 +283,4 @@ resp_condition_fun <-
         )
       )
     return(resp_condition)
-  }
-
-#' @title COPD_Emph_der_fun1
-#'
-#' @description This is one of 2 functions used to create a derived variable
-#'  (COPD_Emph_der) that determines if a respondents has either COPD or
-#'  Emphysema. 2 different functions have been created to account for the fact
-#'  that different respiratory variables are used across CCHS cycles. This
-#'  function is for CCHS cycles (2005-2008) that use COPD and Emphysema as
-#'  a combined variable.
-#'
-#' @param age continuous age variable.
-#'
-#' @param CCC_91E variable indicating if respondent has Emphysema
-#'
-#' @param CCC_91F variable indicating if respondent has COPD
-#'
-#' @return a categorical variable (COPD_Emph_der) with 3 levels:
-#'
-#'  \enumerate{
-#'  \item respondent is over the age of 35 and has a respiratory condition
-#'  \item respondent is under the age of 35 and has a respiratory condition
-#'  \item respondent does not have a respiratory condition
-#'  }
-#'
-#' @examples
-#' # COPD_Emph_der_fun1() to create values across CCHS cycles
-#' # (2005-2008) COPD_Emph_der_fun1() is specified in
-#' # variable_details.csv along with the CCHS variables and cycles included.
-#'
-#' # To transform COPD_Emph_der, use rec_with_table() for each CCHS cycle
-#' # and specify COPD_Emph_der, along with the various respiratory
-#' # variables. Then by using merge_rec_data() you can combine COPD_Emph_der
-#' # across cycles.
-#'
-#' library(cchsflow)
-#'
-#' COPD2005 <- suppressWarnings(rec_with_table(
-#'   cchs2005_p, c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F",
-#'     "COPD_Emph_der"
-#'   )
-#' ))
-#'
-#' head(COPD2005)
-#'
-#' COPD2007_2008 <- suppressWarnings(rec_with_table(
-#'   cchs2007_2008_p, c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F",
-#'     "COPD_Emph_der"
-#'   )
-#' ))
-#'
-#' tail(COPD2007_2008)
-#'
-#' combined_COPD <- suppressWarnings(merge_rec_data(COPD2005, COPD2007_2008))
-#'
-#' head(combined_COPD)
-#' tail(combined_COPD)
-#' @seealso \code{\link{COPD_Emph_der_fun2}}
-#'
-#' @export
-#'
-COPD_Emph_der_fun1 <-
-  function(age, CCC_91E, CCC_91F) {
-    `%notin%` <- Negate(`%in%`)
-    # Argument verification
-    if ((CCC_91E %notin% 1:2) |
-      (CCC_91F %notin% 1:2)) {
-      warning(
-        paste(
-          "In age:",
-          age,
-          ", CCC_91E:",
-          CCC_91E,
-          ", CCC_91F:",
-          CCC_91F,
-          "one or more of the arguments was outside the 1:2 allowed
-          range however the condition is still calculated",
-          sep = ""
-        ),
-        call. = FALSE
-      )
-    }
-
-    COPD_Emph <-
-      if_else2(
-        ((age > 0 & age >= 35) &
-          (CCC_91E == 1 | CCC_91F == 1)), 1,
-        if_else2(
-          ((age > 0 & age < 35) &
-            (CCC_91E == 1 | CCC_91F == 1)), 2,
-          if_else2(
-            ((age > 0 & age < 35) &
-              (CCC_91E == 2 & CCC_91F == 2)), 3,
-            if_else2(
-              ((age > 0 & age >= 35) &
-                (CCC_91E == 2 & CCC_91F == 2)), 3,
-              if_else2(
-                (CCC_91E == "NA(a)" & CCC_91F == "NA(a)"), "NA(a)", "NA(b)"
-              )
-            )
-          )
-        )
-      )
-    return(COPD_Emph)
-  }
-
-#' @title COPD_Emph_der_fun2
-#'
-#' @description This is one of 2 functions used to create a derived variable
-#'  (COPD_Emph_der) that determines if a respondents has either COPD or
-#'  Emphysema. 2 different functions have been created to account for the fact
-#'  that different respiratory variables are used across CCHS cycles. This
-#'  function is for CCHS cycles (2001-2003, 2009-2014) that use COPD and
-#'  Emphysema as a combined variable.
-#'
-#' @param age continuous age variable.
-#'
-#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
-#'
-#' @return a categorical variable (COPD_Emph_der) with 3 levels:
-#'
-#'  \enumerate{
-#'  \item respondent is over the age of 35 and has a respiratory condition
-#'  \item respondent is under the age of 35 and has a respiratory condition
-#'  \item respondent does not have a respiratory condition
-#'  }
-#'
-#' @examples
-#' # COPD_Emph_der_fun2() to create values across CCHS cycles
-#' # (2001-2003, 2009-2014) COPD_Emph_der_fun2() is specified in
-#' # variable_details.csv along with the CCHS variables and cycles included.
-#'
-#' # To transform COPD_Emph_der, use rec_with_table() for each CCHS cycle
-#' # and specify COPD_Emph_der, along with the various respiratory
-#' # variables. Then by using merge_rec_data() you can combine COPD_Emph_der
-#' # across cycles.
-#'
-#' library(cchsflow)
-#'
-#' COPD2001 <- suppressWarnings(rec_with_table(
-#'   cchs2001_p, c(
-#'     "DHHGAGE_cont", "CCC_091",
-#'     "COPD_Emph_der"
-#'   )
-#' ))
-#'
-#' head(COPD2001)
-#'
-#' COPD2014 <- suppressWarnings(rec_with_table(
-#'   cchs2007_2008_p, c(
-#'     "DHHGAGE_cont", "CCC_091",
-#'     "COPD_Emph_der"
-#'   )
-#' ))
-#'
-#' tail(COPD2014)
-#'
-#' combined_COPD <- suppressWarnings(merge_rec_data(COPD2001, COPD2014))
-#'
-#' head(combined_COPD)
-#' tail(combined_COPD)
-#' @seealso \code{\link{COPD_Emph_der_fun2}}
-#'
-#' @export
-#'
-
-COPD_Emph_der_fun2 <-
-  function(age, CCC_091) {
-    `%notin%` <- Negate(`%in%`)
-    COPD_Emph <-
-      if_else2(
-        (age > 0 & age >= 35) &
-          (CCC_091 == 1), 1,
-        if_else2(
-          ((age > 0 & age < 35) &
-            (CCC_091 == 1)), 2,
-          if_else2(
-            ((age > 0 & age < 35) &
-              (CCC_091 == 2)), 3,
-            if_else2(
-              ((age > 0 & age >= 35) &
-                (CCC_091 == 2)), 3,
-              if_else2(
-                (CCC_091 == "NA(a)"),
-                "NA(a)", "NA(b)"
-              )
-            )
-          )
-        )
-      )
-    return(COPD_Emph)
   }
