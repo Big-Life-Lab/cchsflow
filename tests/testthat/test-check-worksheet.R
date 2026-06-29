@@ -322,7 +322,7 @@ test_that("load_schema returns expected structure for variables", {
 test_that("load_schema returns expected structure for variable_details", {
   schema <- load_schema("variable_details")
   expect_true("expected_column_order" %in% names(schema))
-  expect_null(schema$id_column_name)
+  expect_equal(schema$id_column_name, "variable")
 })
 
 test_that("load_schema rejects invalid file_type", {
