@@ -324,7 +324,9 @@ Even if 2022+ maps to different raw CCHS sources, `variables.csv` still referenc
 
 ### units
 
-`units` must be consistent across all rows in a variable block — value rows, NA::a rows, NA::b rows. If any row has `units=years`, all rows in that block must also have `units=years`. Use `N/A` for categorical variables with no meaningful unit.
+`units` must be consistent across all rows in a variable block — value rows, NA::a rows, NA::b rows. If any row has `units=years`, all rows in that block must also have `units=years`.
+
+When a categorical variable is derived from a continuous counterpart (e.g., `pack_years_cat` from `pack_years_der`), the categorical variable must use the same `units` as its continuous source. The `variables.csv` units column must also match `variable_details.csv`. Use lowercase for unit names (`years` not `Years`, `hours` not `Hours`).
 
 ---
 

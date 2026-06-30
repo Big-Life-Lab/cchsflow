@@ -448,22 +448,10 @@ auto_detect_database <- function(variable_name, database_config = NULL, variable
     
     # Auto-detect database type if configuration not provided
     if (is.null(database_config)) {
-      if (!exists("auto_detect_database_type") || !exists("load_database_config")) {
-        # Warn once per session, not once per call
-        if (!exists("config_fallback_warned", envir = .database_warnings_cache)) {
-          assign("config_fallback_warned", TRUE, envir = .database_warnings_cache)
-          warning("Database configuration functions not available. Using default CCHS configuration.")
-        }
-        # Provide fallback configuration
-        database_config <- list(
-          priority_databases = c("cchs2001_p", "cchs2003_p", "cchs2005_p"),
-          default_database = "cchs2001_p"
-        )
-        db_type <- "cchs"
-      } else {
-        db_type <- auto_detect_database_type(all_databases)
-        database_config <- load_database_config(db_type)
-      }
+      database_config <- list(
+        priority_databases = c("cchs2001_p", "cchs2003_p", "cchs2005_p"),
+        default_database = "cchs2001_p"
+      )
     }
     
     # If only one database, use it
@@ -868,10 +856,13 @@ get_missing_pattern <- function(variable_name, database = NULL, database_config 
 #' @return List with na_a_codes and na_b_codes elements (scalar), or named list of patterns (vector)
 #' @export
 get_missing_pattern_auto <- function(variable_name, database = NULL, database_type = "cchs", assume_consistent = TRUE) {
-  
-  # Load appropriate configuration
-  config <- load_database_config(database_type)
-  
+
+  # Default CCHS configuration
+  config <- list(
+    priority_databases = c("cchs2001_p", "cchs2003_p", "cchs2005_p"),
+    default_database = "cchs2001_p"
+  )
+
   # Call portable version with configuration
   return(get_missing_pattern(variable_name, database, config, assume_consistent))
 }

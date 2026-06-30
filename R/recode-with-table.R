@@ -3,9 +3,7 @@
 #' @importFrom rlang enquos
 #' @importFrom stats setNames
 . <- NULL
-utils::globalVariables(c(
-  "variable", "auto_detect_database_type", "load_database_config", "data"
-))
+utils::globalVariables(c("variable", "data"))
 #' @title is equal
 #' @description Function to compare even with NA present
 #' This function returns TRUE wherever elements are the same, including NA's,
