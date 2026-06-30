@@ -173,7 +173,7 @@ parse_database_lists <- function(database_lists) {
 
 #' Map recStart to recEnd with Special Terms Support
 #'
-#' Enhanced function that processes all recStart→recEnd mappings including 
+#' Enhanced function that processes all recStart->recEnd mappings including 
 #' special terms (copy, else, Func::) and missing data patterns.
 #'
 #' @param mapping_rows Data.frame. All rows with recStart/recEnd data
@@ -196,9 +196,9 @@ map_recStart_to_recEnd <- function(mapping_rows) {
   result <- list(
     na_a_codes = numeric(0),      # Missing codes for NA::a (backward compatibility)
     na_b_codes = numeric(0),      # Missing codes for NA::b (backward compatibility)
-    copy_mappings = list(),       # recStart → copy directives
+    copy_mappings = list(),       # recStart -> copy directives
     value_mappings = list(),      # categorical recEnd codes (valid value set)
-    else_mappings = list(),       # else → recEnd mappings
+    else_mappings = list(),       # else -> recEnd mappings
     skip_entries = list()         # Func::, DerivedVar::, etc.
   )
   
@@ -819,12 +819,12 @@ get_missing_pattern <- function(variable_name, database = NULL, database_config 
       stop("No metadata found for variable '", variable_name, "' in database '", database, "'")
     }
     
-    # Step 4: Process all recStart→recEnd mappings (including special terms)
+    # Step 4: Process all recStart->recEnd mappings (including special terms)
     mapping_rows <- raw_data[!is.na(raw_data$recStart) & !is.na(raw_data$recEnd), ]
     
     if (nrow(mapping_rows) == 0) {
       # No mapping data defined - return empty pattern
-      warning("No recStart→recEnd mappings found for variable '", variable_name, 
+      warning("No recStart->recEnd mappings found for variable '", variable_name, 
               "' in database '", database, "'. Returning empty pattern.")
       pattern <- list(na_a_codes = numeric(0), na_b_codes = numeric(0))
     } else {
