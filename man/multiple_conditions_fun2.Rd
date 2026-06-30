@@ -65,6 +65,7 @@ mood disorder (CCC_280) was not asked to respondents in the 2001
  CCHS cycle.
 }
 \examples{
+\dontrun{
 # Using rec_with_table() to generate multiple_conditions in a CCHS
 # cycle.
 
@@ -102,6 +103,7 @@ num_conditions <- multiple_conditions_fun2(
 )
 
 print(num_conditions)
+}
 
 }
 \seealso{

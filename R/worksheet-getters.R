@@ -86,7 +86,7 @@ get_variables <- function(variable_name, ..., use_rdata = FALSE) {
   # Apply tidyselect if provided
   dots <- enquos(...)
   if (length(dots) > 0) {
-    rows <- rows %>% select(variable, !!!dots)
+    rows <- rows %>% dplyr::select(variable, !!!dots)
   }
   
   return(rows)
@@ -207,8 +207,8 @@ get_variable_bounds <- function(var_name, variable_details = NULL) {
 #' 
 #' # With filtering and piping
 #' get_variable_details("HWTGBMI_der", type_filter = "cont") %>%
-#'   filter(databaseStart == "cchs2001_p") %>%
-#'   select(starts_with("rec"))
+#'   dplyr::filter(databaseStart == "cchs2001_p") %>%
+#'   dplyr::select(dplyr::starts_with("rec"))
 get_variable_details <- function(variable_name, ..., 
                                 database_filter = NULL, type_filter = NULL, 
                                 use_rdata = FALSE) {
@@ -293,7 +293,7 @@ get_variable_details <- function(variable_name, ...,
   # Apply tidyselect if provided
   dots <- enquos(...)
   if (length(dots) > 0) {
-    rows <- rows %>% select(variable, !!!dots)
+    rows <- rows %>% dplyr::select(variable, !!!dots)
   }
   
   return(rows)

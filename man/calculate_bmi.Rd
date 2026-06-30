@@ -13,8 +13,6 @@ calculate_bmi(height_m, weight_kg, output_format = "tagged_na")
 
 \item{output_format}{Output missing data format: "tagged_na" (default) or
 "original".}
-
-\item{...}{Arguments passed from deprecated aliases.}
 }
 \value{
 Numeric vector of BMI values (kg/m^2). Missing inputs produce

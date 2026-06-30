@@ -11,8 +11,6 @@ categorize_bmi(bmi, output_format = "tagged_na")
 
 \item{output_format}{Output missing data format: "tagged_na" (default) or
 "original".}
-
-\item{...}{Arguments passed from deprecated aliases.}
 }
 \value{
 Integer vector: 1 = underweight (< 18.5), 2 = normal (18.5-24.9),

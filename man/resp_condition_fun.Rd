@@ -31,38 +31,8 @@ This function is used to create a derived variable
  (CCC_091) and Asthma (CCC_031) across all CCHS cycles.
 }
 \examples{
-# Using resp_condition_fun() to create values across CCHS cycles
-# (2009-2014) resp_condition_fun() is specified in
-# variable_details.csv along with the CCHS variables and cycles included.
+resp_condition_fun(40, 1, 1)  # 1 (over 35, has condition)
+resp_condition_fun(25, 1, 1)  # 2 (under 35, has condition)
+resp_condition_fun(40, 2, 2)  # 3 (no condition)
 
-# To transform resp_condition_der, use rec_with_table() for each CCHS cycle
-# and specify resp_condition_der, along with the various respiratory
-# variables. Then by using merge_rec_data() you can combine
-# resp_condition_der across cycles.
-
-library(cchsflow)
-
-resp2009_2010 <- suppressWarnings(rec_with_table(
-  cchs2009_2010_p, c(
-    "DHHGAGE_cont", "CCC_091", "CCC_031",
-    "resp_condition_der"
-  )
-))
-
-head(resp2009_2010)
-
-resp2011_2012 <- suppressWarnings(rec_with_table(
-  cchs2011_2012_p, c(
-    "DHHGAGE_cont", "CCC_091", "CCC_031",
-    "resp_condition_der"
-  )
-))
-
-tail(resp2011_2012)
-
-combined_resp <-
-  suppressWarnings(merge_rec_data(resp2009_2010, resp2011_2012))
-
-head(combined_resp)
-tail(combined_resp)
 }

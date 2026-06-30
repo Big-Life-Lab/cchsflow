@@ -2,7 +2,7 @@
 % Please edit documentation in R/respiratory-condition.R
 \name{derive_CCC_091_2005to2008}
 \alias{derive_CCC_091_2005to2008}
-\title{CCC_091_fun2}
+\title{Derive CCC_091 for 2005-2008 cycles}
 \usage{
 derive_CCC_091_2005to2008(
   CCC_91A,
@@ -12,40 +12,33 @@ derive_CCC_091_2005to2008(
 )
 }
 \arguments{
-\item{CCC_91A}{variable indicating if respondent has chronic bronchitis}
+\item{CCC_91A}{Chronic bronchitis indicator (1 = Yes, 2 = No).}
 
-\item{CCC_91E}{variable indicating if respondent has emphysema}
+\item{CCC_91E}{Emphysema indicator (1 = Yes, 2 = No).}
 
-\item{CCC_91F}{variable indicating if respondent has COPD}
+\item{CCC_91F}{COPD indicator (1 = Yes, 2 = No).}
+
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-a categorical variable (CCC_091) with 2 levels:
-
+Categorical variable (CCC_091) with 2 levels:
  \enumerate{
- \item respondent has COPD, emphysema, or chronic bronchitis
- \item respondent does not have COPD, emphysema, or chronic bronchitis
+ \item Has COPD, emphysema, or chronic bronchitis
+ \item Does not have COPD, emphysema, or chronic bronchitis
  }
 }
 \description{
-This is one of 2 functions used to derive CCC_091
- (COPD/emphysema/chronic bronchitis) for CCHS cycles (2005-2008) in which
- the concept is split across three separate questions: CCC_91A (chronic
- bronchitis), CCC_91E (emphysema), and CCC_91F (COPD). A respondent is
- considered to have the condition if they answered yes to any question.
+Derives CCC_091 (COPD/emphysema/chronic bronchitis) for
+ CCHS cycles 2005-2008, where the concept is split across CCC_91A
+ (chronic bronchitis), CCC_91E (emphysema), and CCC_91F (COPD).
 }
 \examples{
-# Using CCC_091_fun2() to derive CCC_091 for 2005/2007-08 cycles.
-# CCC_091_fun2() is specified in variable_details.csv along with the
-# CCHS variables and cycles included.
+derive_CCC_091_2005to2008(1, 2, 2)  # 1 (has condition)
+derive_CCC_091_2005to2008(2, 2, 2)  # 2 (no condition)
 
-library(cchsflow)
-
-CCC_091_2005 <- suppressWarnings(rec_with_table(
-  cchs2005_p, c("CCC_91A", "CCC_91E", "CCC_91F", "CCC_091")
-))
-
-head(CCC_091_2005)
 }
 \seealso{
-\code{\link{CCC_091_fun1}}
+\code{\link{derive_CCC_091_2001to2003}},
+  \code{\link{categorize_CCC_091}}
 }

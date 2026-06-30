@@ -2,43 +2,36 @@
 % Please edit documentation in R/respiratory-condition.R
 \name{derive_CCC_091_2001to2003}
 \alias{derive_CCC_091_2001to2003}
-\title{CCC_091_fun1}
+\title{Derive CCC_091 for 2001-2003 cycles}
 \usage{
 derive_CCC_091_2001to2003(CCC_91A, CCC_91B, output_format = "tagged_na")
 }
 \arguments{
-\item{CCC_91A}{variable indicating if respondent has chronic bronchitis}
+\item{CCC_91A}{Chronic bronchitis indicator (1 = Yes, 2 = No).}
 
-\item{CCC_91B}{variable indicating if respondent has emphysema or COPD}
+\item{CCC_91B}{Emphysema or COPD indicator (1 = Yes, 2 = No).}
+
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-a categorical variable (CCC_091) with 2 levels:
-
+Categorical variable (CCC_091) with 2 levels:
  \enumerate{
- \item respondent has COPD, emphysema, or chronic bronchitis
- \item respondent does not have COPD, emphysema, or chronic bronchitis
+ \item Has COPD, emphysema, or chronic bronchitis
+ \item Does not have COPD, emphysema, or chronic bronchitis
  }
 }
 \description{
-This is one of 2 functions used to derive CCC_091
- (COPD/emphysema/chronic bronchitis) for CCHS cycles (2001-2003) in which
- the concept is split across two separate questions: CCC_91A (chronic
- bronchitis) and CCC_91B (emphysema/COPD combined). A respondent is
- considered to have the condition if they answered yes to either question.
+Derives CCC_091 (COPD/emphysema/chronic bronchitis) for
+ CCHS cycles 2001-2003, where the concept is split across CCC_91A
+ (chronic bronchitis) and CCC_91B (emphysema/COPD combined).
 }
 \examples{
-# Using CCC_091_fun1() to derive CCC_091 for 2001/2003 cycles.
-# CCC_091_fun1() is specified in variable_details.csv along with the
-# CCHS variables and cycles included.
+derive_CCC_091_2001to2003(1, 2)  # 1 (has condition)
+derive_CCC_091_2001to2003(2, 2)  # 2 (no condition)
 
-library(cchsflow)
-
-CCC_091_2001 <- suppressWarnings(rec_with_table(
-  cchs2001_p, c("CCC_91A", "CCC_91B", "CCC_091")
-))
-
-head(CCC_091_2001)
 }
 \seealso{
-\code{\link{CCC_091_fun2}}
+\code{\link{derive_CCC_091_2005to2008}},
+  \code{\link{categorize_CCC_091}}
 }

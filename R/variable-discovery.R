@@ -55,7 +55,7 @@
 #' @param section Character. Filter by section (e.g., "Health behaviour").
 #'   Optional.
 #' @param recommended Character. Filter by recommendation tag: "primary",
-#'   "secondary", or NULL for all. Looks for `{recommended:X}` in notes field.
+#'   "secondary", or NULL for all. Looks for \code{\{recommended:X\}} in notes field.
 #' @param source Character. Which CSV to query: "main" (inst/extdata/variables.csv)
 #'   or "cep" (CEP worksheets). Default "main".
 #' @param cep_path Character. Path to CEP directory if source = "cep".

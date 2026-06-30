@@ -7,13 +7,13 @@
 set_data_labels(data_to_label, variable_details, variables_sheet = NULL)
 }
 \arguments{
+\item{data_to_label}{A dataframe of CCHS data that lacks labels.}
+
 \item{variable_details}{A dataframe containing the details of each variable, 
 with category labels in the 'catLabel' column.}
 
 \item{variables_sheet}{(Optional) A dataframe containing variable labels in 
 the 'label' column.}
-
-\item{data_to_lab.el}{A dataframe of CCHS data that lacks labels.}
 }
 \value{
 The dataframe with labelled CCHS variables.
@@ -42,7 +42,7 @@ bmi2003 <- rec_with_table(
   )
 )
 
-combined_bmi <- bind_rows(bmi2001, bmi2003)
+combined_bmi <- dplyr::bind_rows(bmi2001, bmi2003)
 
 get_label(combined_bmi)
 

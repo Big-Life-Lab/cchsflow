@@ -16,8 +16,6 @@ handled automatically.}
 
 \item{output_format}{Output missing data format: "tagged_na" (default) or
 "original".}
-
-\item{...}{Arguments passed from deprecated aliases.}
 }
 \value{
 Numeric vector of bias-corrected BMI values.

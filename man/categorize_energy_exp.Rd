@@ -8,6 +8,9 @@ categorize_energy_exp(energy_exp, output_format = "tagged_na")
 }
 \arguments{
 \item{energy_exp}{Continuous energy expenditure in kcal/kg/day.}
+
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
 A categorical variable with 3 levels:
@@ -26,8 +29,8 @@ Categorizes the continuous energy expenditure variable
   kcal/kg/day).
 }
 \examples{
-energy_exp_fun_cat(0.5)  # 1 (Inactive)
-energy_exp_fun_cat(2.0)  # 2 (Moderately active)
-energy_exp_fun_cat(4.0)  # 3 (Active)
+categorize_energy_exp(0.5)  # 1 (Inactive)
+categorize_energy_exp(2.0)  # 2 (Moderately active)
+categorize_energy_exp(4.0)  # 3 (Active)
 
 }

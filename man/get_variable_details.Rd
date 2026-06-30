@@ -40,6 +40,6 @@ get_variable_details(c("HWTGBMI_der", "ALCDTTM"))
 
 # With filtering and piping
 get_variable_details("HWTGBMI_der", type_filter = "cont") \%>\%
-  filter(databaseStart == "cchs2001_p") \%>\%
-  select(starts_with("rec"))
+  dplyr::filter(databaseStart == "cchs2001_p") \%>\%
+  dplyr::select(dplyr::starts_with("rec"))
 }

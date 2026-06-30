@@ -49,8 +49,11 @@ CCHS 2015-2018 for 12-17 years old.}
 \item{PAYDVVIG}{total minutes - vigorous physical activity - 7 d for CCHS 
 2015-2018 for 12-17 years old.}
 
-\item{PAYDVDYS}{total days physically active - 7 day for CCHS 2015-2018 for 
+\item{PAYDVDYS}{total days physically active - 7 day for CCHS 2015-2018 for
 12-17 years old.}
+
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
 Continuous variable for energy expenditure (energy_exp)

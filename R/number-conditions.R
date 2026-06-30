@@ -42,6 +42,7 @@
 #'  "5+" category.
 #'
 #' @examples
+#' \dontrun{
 #' # Using rec_with_table() to generate multiple_conditions in a CCHS
 #' # cycle.
 #'
@@ -79,6 +80,7 @@
 #' )
 #'
 #' print(num_conditions)
+#' }
 #'
 #' @seealso \code{\link{multiple_conditions_fun2}}
 #' @export
@@ -164,6 +166,7 @@ multiple_conditions_fun1 <-
 #'  "5+" category.
 #'
 #' @examples
+#' \dontrun{
 #' # Using rec_with_table() to generate multiple_conditions in a CCHS
 #' # cycle.
 #'
@@ -201,6 +204,7 @@ multiple_conditions_fun1 <-
 #' )
 #'
 #' print(num_conditions)
+#' }
 #'
 #' @seealso \code{\link{multiple_conditions_fun1}}
 #' @seealso \code{\link{multiple_conditions_fun3}}
@@ -286,6 +290,7 @@ multiple_conditions_fun2 <-
 #'  "5+" category.
 #'
 #' @examples
+#' \dontrun{
 #' library(cchsflow)
 #' conditions_2015_2016 <- suppressWarnings(rec_with_table(
 #'   cchs2015_2016_p,
@@ -297,6 +302,7 @@ multiple_conditions_fun2 <-
 #' ))
 #'
 #' head(conditions_2015_2016)
+#' }
 #'
 #' @seealso \code{\link{multiple_conditions_fun1}}
 #' @seealso \code{\link{multiple_conditions_fun2}}

@@ -56,9 +56,11 @@
 #' @param PAYDVVIG total minutes - vigorous physical activity - 7 d for CCHS 
 #' 2015-2018 for 12-17 years old.
 #' 
-#' @param PAYDVDYS total days physically active - 7 day for CCHS 2015-2018 for 
+#' @param PAYDVDYS total days physically active - 7 day for CCHS 2015-2018 for
 #' 12-17 years old.
-#' 
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
 #' @return Continuous variable for energy expenditure (energy_exp)
 #' 
 #' @examples
@@ -173,6 +175,8 @@ calculate_energy_exp <-
 #'   kcal/kg/day).
 #'
 #' @param energy_exp Continuous energy expenditure in kcal/kg/day.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
 #' @return A categorical variable with 3 levels:
 #'   \enumerate{
@@ -184,9 +188,9 @@ calculate_energy_exp <-
 #'   or \code{"NA(b)"} otherwise (missing).
 #'
 #' @examples
-#' energy_exp_fun_cat(0.5)  # 1 (Inactive)
-#' energy_exp_fun_cat(2.0)  # 2 (Moderately active)
-#' energy_exp_fun_cat(4.0)  # 3 (Active)
+#' categorize_energy_exp(0.5)  # 1 (Inactive)
+#' categorize_energy_exp(2.0)  # 2 (Moderately active)
+#' categorize_energy_exp(4.0)  # 3 (Active)
 #'
 #' @export
 categorize_energy_exp <- function(energy_exp, output_format = "tagged_na") {

@@ -20,7 +20,7 @@ Case-insensitive.}
 Optional.}
 
 \item{recommended}{Character. Filter by recommendation tag: "primary",
-"secondary", or NULL for all. Looks for `{recommended:X}` in notes field.}
+"secondary", or NULL for all. Looks for \code{\{recommended:X\}} in notes field.}
 
 \item{source}{Character. Which CSV to query: "main" (inst/extdata/variables.csv)
 or "cep" (CEP worksheets). Default "main".}

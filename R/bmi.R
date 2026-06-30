@@ -74,7 +74,6 @@ BMI_CORRECTION_FEMALE <- list(intercept = -0.12374, slope = 1.05129)
 #' World Health Organization. (2000). Obesity: preventing and managing the
 #' global epidemic. WHO Technical Report Series, 894.
 #'
-#' @param ... Arguments passed from deprecated aliases.
 #'
 #' @seealso [adjust_bmi()] for bias-corrected BMI, [categorize_bmi()] for
 #'   WHO categories.
@@ -179,7 +178,6 @@ calculate_bmi <- function(height_m, weight_kg, output_format = "tagged_na") {
 #' and weight in a nationally representative sample of Canadian adults.
 #' *Obesity*, 16(10), 2326-2332.
 #'
-#' @param ... Arguments passed from deprecated aliases.
 #'
 #' @seealso [calculate_bmi()] for standard BMI, [categorize_bmi()] for
 #'   WHO categories.
@@ -282,7 +280,6 @@ adjust_bmi <- function(sex, height_m, weight_kg,
 #' World Health Organization. (2000). Obesity: preventing and managing the
 #' global epidemic. WHO Technical Report Series, 894.
 #'
-#' @param ... Arguments passed from deprecated aliases.
 #'
 #' @seealso [calculate_bmi()], [adjust_bmi()]
 #' @export

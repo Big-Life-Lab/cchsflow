@@ -42,12 +42,12 @@ for population-level smoking analysis.
 }
 
 **Logic mapping from legacy implementation**:
-- **Non-smoker (0)**: SMKDSTY_cat5 = 5 (never smoked) → 0
-- **Current smoker (1)**: SMKDSTY_cat5 ∈ {1,2} (daily/occasional) → 1
-- **Former ≤5yrs/occasional (2)**: 
-  - SMKDSTY_cat5 = 4 (former occasional) → 2, OR
-  - SMKDSTY_cat5 = 3 (former daily) AND time_quit_smoking ≤ 5 → 2
-- **Former >5yrs (3)**: SMKDSTY_cat5 = 3 AND time_quit_smoking > 5 → 3
+- **Non-smoker (0)**: SMKDSTY_cat5 = 5 (never smoked) -> 0
+- **Current smoker (1)**: SMKDSTY_cat5 in 1,2 (daily/occasional) -> 1
+- **Former <=5yrs/occasional (2)**:
+  - SMKDSTY_cat5 = 4 (former occasional) -> 2, OR
+  - SMKDSTY_cat5 = 3 (former daily) AND time_quit_smoking <= 5 -> 2
+- **Former >5yrs (3)**: SMKDSTY_cat5 = 3 AND time_quit_smoking > 5 -> 3
 
 **Missing data handling**: Uses Level 5-6 infrastructure with any_missing() and get_priority_missing()
 
@@ -60,12 +60,12 @@ for population-level smoking analysis.
 \dontrun{
 # Example 1: Vector inputs - All 4 smoking categories
 simple_status <- calculate_smoke_simple(
-  SMKDSTY_cat5 = c(5, 1, 2, 3, 3, 4),         # Never, Daily, Occasional, Former daily x2, Former occasional
-  time_quit_smoking = c(NA, NA, NA, 3, 8, 2),  # Years quit (NA for current/never)
+  SMKDSTY_cat5 = c(5, 1, 2, 3, 3, 4),
+  time_quit_smoking = c(NA, NA, NA, 3, 8, 2),
   output_format = "tagged_na"
 )
 # Returns: c(0, 1, 1, 2, 3, 2)
-# 0=Never, 1=Current daily, 1=Current occasional, 2=Former daily ≤5yrs, 3=Former daily >5yrs, 2=Former occasional
+# 0=Never, 1=Current, 2=Former <=5yrs, 3=Former >5yrs
 
 # Example 2: Scalar inputs - Single respondent
 former_daily_recent <- calculate_smoke_simple(
@@ -99,7 +99,10 @@ missing_example <- calculate_smoke_simple(
 
 # Use with rec_with_table() for harmonized input variables:
 # harmonized_data <- rec_with_table(cchs_data, c("SMKDSTY_cat5", "time_quit_smoking"))
-# simple_smoking <- calculate_smoke_simple(harmonized_data$SMKDSTY_cat5, harmonized_data$time_quit_smoking)
+# simple_smoking <- calculate_smoke_simple(
+#   harmonized_data$SMKDSTY_cat5,
+#   harmonized_data$time_quit_smoking
+# )
 }
 
 }

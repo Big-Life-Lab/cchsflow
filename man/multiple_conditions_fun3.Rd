@@ -60,6 +60,7 @@ Bowel disorder (CCC_171) was not collected in the PUMF for
  \code{\link{multiple_conditions_fun2}} is used for 2003-2014 cycles.
 }
 \examples{
+\dontrun{
 library(cchsflow)
 conditions_2015_2016 <- suppressWarnings(rec_with_table(
   cchs2015_2016_p,
@@ -71,6 +72,7 @@ conditions_2015_2016 <- suppressWarnings(rec_with_table(
 ))
 
 head(conditions_2015_2016)
+}
 
 }
 \seealso{
