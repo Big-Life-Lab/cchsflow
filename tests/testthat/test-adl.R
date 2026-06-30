@@ -450,7 +450,9 @@ test_that("ADL functions exist with correct signatures", {
 })
 
 test_that("R/adl.R has proper @note version metadata", {
-  function_content <- readLines("../../R/adl.R")
+  adl_path <- system.file("R", "adl.R", package = "cchsflow")
+  skip_if(adl_path == "", "Source file not available in installed package")
+  function_content <- readLines(adl_path)
   note_lines <- function_content[grep("@note", function_content)]
 
   expect_gt(length(note_lines), 0)

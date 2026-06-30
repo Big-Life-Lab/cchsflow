@@ -176,49 +176,7 @@ test_that("categorize_bmi() works in dataframe context via mutate", {
 
 # ===========================================================================
 # Deprecated aliases — backwards compatibility
+# Legacy aliases (bmi_fun, adjusted_bmi_fun, bmi_fun_cat) exist in
+# R/legacy/bmi-legacy.R but are not exported. Tests removed as part of
+# CRAN submission cleanup (re: #189).
 # ===========================================================================
-
-test_that("bmi_fun() delegates to calculate_bmi()", {
-  expect_warning(result <- bmi_fun(1.75, 70), "deprecated")
-  expect_equal(result, calculate_bmi(height_m = 1.75, weight_kg = 70),
-               tolerance = 1e-6)
-})
-
-test_that("adjusted_bmi_fun() delegates to adjust_bmi()", {
-  expect_warning(result <- adjusted_bmi_fun(1, 1.75, 70), "deprecated")
-  expect_equal(result, adjust_bmi(sex = 1, height_m = 1.75, weight_kg = 70),
-               tolerance = 1e-6)
-})
-
-test_that("bmi_fun_cat() delegates to categorize_bmi()", {
-  expect_warning(result <- bmi_fun_cat(25), "deprecated")
-  expect_equal(result, categorize_bmi(bmi = 25))
-})
-
-test_that("calculate_bmi_D() delegates to calculate_bmi()", {
-  expect_warning(
-    result <- calculate_bmi_D(1.75, 70),
-    "deprecated"
-  )
-  expect_equal(result,
-    calculate_bmi(height_m = 1.75, weight_kg = 70),
-    tolerance = 1e-6)
-})
-
-test_that("adjust_bmi_D() delegates to adjust_bmi()", {
-  expect_warning(
-    result <- adjust_bmi_D(1, 1.75, 70),
-    "deprecated"
-  )
-  expect_equal(result,
-    adjust_bmi(sex = 1, height_m = 1.75, weight_kg = 70),
-    tolerance = 1e-4)
-})
-
-test_that("categorize_bmi_D() delegates to categorize_bmi()", {
-  expect_warning(
-    result <- categorize_bmi_D(27),
-    "deprecated"
-  )
-  expect_equal(result, categorize_bmi(bmi = 27))
-})

@@ -10,7 +10,7 @@ test_that("labels are properly applied to random variables", {
                                  variable_details,
                                  variables)
   for (var_name_index in (list_of_vars_to_check)) {
-    first <- as.character(get_label(labeled2001[[var_names[[var_name_index]]]]))
+    first <- as.character(sjlabelled::get_label(labeled2001[[var_names[[var_name_index]]]]))
     second <- as.character(variables[
       variables$variable == var_names[[var_name_index]], "label"])
     expect_equal(first, second)
