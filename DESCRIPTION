@@ -36,15 +36,18 @@ Authors@R: c(
           email = "dmanuel@ohri.ca"))
 Depends:
   R (>= 3.5.0),
+  magrittr
+Imports:
   haven (>= 1.1.2),
   dplyr (>= 0.8.2),
   sjlabelled (>= 1.0.17),
   stringr (>= 1.2.0),
-  magrittr,
   yaml,
   readr,
   purrr,
-  cli
+  glue,
+  utils,
+  rlang
 Description: Supporting the use of the Canadian Community Health Survey 
              (CCHS) by transforming variables from each cycle into harmonized, 
              consistent versions that span survey cycles (currently, 2001 to 
@@ -60,8 +63,9 @@ LazyData: true
 URL: https://big-life-lab.github.io/cchsflow/, https://github.com/Big-Life-Lab/cchsflow
 BugReports: https://github.com/Big-Life-Lab/cchsflow/issues
 RoxygenNote: 7.3.3
-Suggests: 
+Suggests:
     testthat (>= 3.0.0),
+    withr,
     kableExtra,
     DT,
     rmarkdown,
