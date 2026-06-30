@@ -53,7 +53,7 @@ derive_EDUDR04_2015plus <- function(EHG2_01, EHG2_02, EHG2_03, EHG2_04,
   result <- dplyr::case_when(
     # All valid skip — education module not asked
     any_missing(e1) & any_missing(e2) & any_missing(e3) & any_missing(e4) ~
-      assign_missing("not_applicable", "EDUDR04", output_format),
+      get_priority_missing(e1, e2, e3, e4, output_format = output_format),
     # EHG2_02 or EHG2_03 missing — can't determine education level
     any_missing(e2) | any_missing(e3) ~
       assign_missing("not_stated", "EDUDR04", output_format),
