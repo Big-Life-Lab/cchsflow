@@ -2,7 +2,7 @@
 % Please edit documentation in R/bmi.R
 \name{adjust_bmi}
 \alias{adjust_bmi}
-\title{Calculate bias-corrected BMI}
+\title{Adjust BMI for self-reporting bias}
 \usage{
 adjust_bmi(sex, height_m, weight_kg, output_format = "tagged_na")
 }
@@ -14,74 +14,42 @@ handled automatically.}
 
 \item{weight_kg}{Weight in kilograms.}
 
-\item{output_format}{Output missing data format: "tagged_na" (default) or
-"original".}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector of bias-corrected BMI values.
+Numeric vector of bias-corrected BMI values (kg/m^2). Missing
+  data: \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
 Applies sex-specific correction from Connor Gorber et al. (2008) to
-account for self-reporting bias in height and weight. Source-agnostic —
+account for self-reporting bias in height and weight. Source-agnostic --
 works with both PUMF and Master data via worksheet routing.
 }
 \details{
-## Correction formulas
-
 Connor Gorber et al. (2008) derived sex-specific linear corrections
 from measured vs self-reported anthropometrics:
+Male: -1.07575 + 1.07592 * BMI;
+Female: -0.12374 + 1.05129 * BMI.
 
-- Male: -1.07575 + 1.07592 * BMI
-- Female: -0.12374 + 1.05129 * BMI
-
-## PUMF vs Master
-
-This function is source-agnostic. The worksheet routes different source
-variables to the same parameters depending on database type:
-
-| Parameter | PUMF source | Master source |
-|-----------|-------------|---------------|
-| sex       | DHH_SEX     | DHH_SEX       |
-| height_m  | HWTGHTM (grouped) | HWTDHTM (continuous) |
-| weight_kg | HWTGWTK (grouped) | HWTDWTK (continuous) |
+This function is source-agnostic. The worksheet routes HWTGHTM / HWTGWTK
+(PUMF, grouped) or HWTDHTM / HWTDWTK (Master, continuous) to the same
+height_m / weight_kg parameters. Missing-data handling follows the v3
+3-step architecture with priority not applicable > not stated.
 }
 \examples{
-# Scalar — male
+# Scalar
 adjust_bmi(sex = 1, height_m = 1.75, weight_kg = 70)
-
-# Scalar — female
-adjust_bmi(sex = 2, height_m = 1.65, weight_kg = 60)
 
 # Vector
 adjust_bmi(
-  sex = c(1, 2, 1),
-  height_m = c(1.75, 1.65, 1.80),
-  weight_kg = c(70, 60, 80)
+  sex = c(1, 2),
+  height_m = c(1.75, 1.65),
+  weight_kg = c(70, 60)
 )
 
-# Dataframe
-library(dplyr)
-data.frame(sex = c(1, 2), ht = c(1.75, 1.65), wt = c(70, 60)) \%>\%
-  mutate(adj_bmi = adjust_bmi(sex, ht, wt))
-
-# Standalone with rec_with_table
-\dontrun{
-result <- rec_with_table(
-  cchs2015_2016_p,
-  variables = variables,
-  variable_details = variable_details,
-  log = TRUE
-)
-result$HWTGCOR_der
-}
-
-}
-\references{
-Connor Gorber, S., et al. (2008). The accuracy of self-reported height
-and weight in a nationally representative sample of Canadian adults.
-*Obesity*, 16(10), 2326-2332.
 }
 \seealso{
-[calculate_bmi()] for standard BMI, [categorize_bmi()] for
-  WHO categories.
+\code{\link{calculate_bmi}}, \code{\link{categorize_bmi}}
 }

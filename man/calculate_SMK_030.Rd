@@ -2,54 +2,38 @@
 % Please edit documentation in R/smoking-status.R
 \name{calculate_SMK_030}
 \alias{calculate_SMK_030}
-\title{Smoked Daily - Lifetime - SMK_030 (2 categories)}
+\title{Assess lifetime daily smoking history (SMK_030)}
 \usage{
 calculate_SMK_030(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of daily smoking history (1-2, plus missing value codes)
+Integer vector (1 = yes, 2 = no). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMK_030 variable across CCHS cycles 2015-2023.
-This variable asks whether occasional/former smokers ever smoked daily
-and serves as a key component for SMKDSTY_original reconstruction.
+Harmonize CCHS variable SMK_030 (ever smoked daily in lifetime) across
+cycles 2015-2023. Implemented via rec_with_table(), not direct R logic.
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2015-2021: SMK_030 (direct variable)
-  - 2022-2023: SPU_05 (different underlying source, same harmonized name)
-- **Harmonization**: Simple 1:1 mapping with source variable transition
-
-**Categories (2)**:
-\itemize{
-  \item 1 = Yes
-  \item 2 = No
-}
-
-**Variable evolution**:
-- **2015-2021**: Direct survey question SMK_030 "Smoked daily - lifetime"
-- **2022-2023**: Maps to SPU_05 variable (same question, different variable name)
-  - Asked of occasional/former smokers to determine daily smoking history
-  - Critical for distinguishing "former daily" vs "never daily" categories
-
-**Usage**: 
-- Second input for SMKDSTY_original complex reconstruction function
-- Determines occasional smoker subcategories (former daily vs never daily)
-- Used in conjunction with SMK_005 to classify smoking patterns
+SMK_030 asks occasional and former smokers whether they ever smoked
+daily. It distinguishes "former daily" from "never daily" smokers and
+is the second gate variable for SMKDSTY_cat6 reconstruction. Source
+is SMK_030 (2015-2021) or SPU_05 (2022-2023).
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMK_030")
-daily_history <- harmonized_data$SMK_030
+harmonized <- rec_with_table(cchs_data, "SMK_030")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMKDSTY_cat6}},
+  \code{\link{calculate_SMK_005}}, \code{\link{calculate_SMK_01A}}
 }

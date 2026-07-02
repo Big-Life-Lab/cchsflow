@@ -2,7 +2,7 @@
 % Please edit documentation in R/percent-time-canada.R
 \name{calculate_pct_time}
 \alias{calculate_pct_time}
-\title{Calculate percent time in Canada}
+\title{Calculate percent of life spent in Canada}
 \usage{
 calculate_pct_time(
   age,
@@ -14,32 +14,44 @@ calculate_pct_time(
 \arguments{
 \item{age}{Continuous age (DHHGAGE_cont for PUMF, DHH_AGE for Master).}
 
-\item{born_in_canada}{Country of birth: 1 = Canada, 2 = outside Canada
-(SDCGCBG for PUMF, SDCGCB for Master).}
+\item{born_in_canada}{Country of birth (1 = Canada, 2 = outside Canada).}
 
-\item{years_in_canada}{Continuous years in Canada (SDCGRES_cont for PUMF,
-SDCDRES for Master).}
+\item{years_in_canada}{Continuous years in Canada.}
 
-\item{output_format}{Output missing data format: "tagged_na" (default) or "original".}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric value between 0 and 100 representing percentage of life
-  in Canada, or tagged NA for missing/not applicable.
+Numeric vector: percentage of life in Canada (0-100). Missing
+  data: \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Calculates the percentage of a respondent's life spent in
- Canada. For respondents born outside Canada,
- percent time = years in Canada / age * 100.
- For respondents born in Canada, returns 100.
+Calculates the percentage of a respondent's life spent in Canada.
+For respondents born outside Canada, percent time = years in
+Canada / age * 100. For respondents born in Canada, returns 100.
+}
+\details{
+Source-agnostic: the worksheet routes DHHGAGE_cont / SDCGCBG /
+SDCGRES_cont (PUMF) or DHH_AGE / SDCGCB / SDCDRES (Master) to the
+same semantic parameters. Values outside 0-100 (indicating
+inconsistent inputs) are recoded to not stated. Missing-data handling
+follows the v3 3-step architecture with priority not applicable > not
+stated.
 }
 \examples{
-# Scalar usage
+# Scalar
 calculate_pct_time(age = 27, born_in_canada = 2, years_in_canada = 4.5)
 
-# Vector usage
+# Vector
 calculate_pct_time(
   age = c(27, 40, 35),
   born_in_canada = c(2, 1, 2),
   years_in_canada = c(4.5, 4.5, 15)
 )
+
+}
+\seealso{
+\code{\link{categorize_pct_time}},
+  \code{\link{categorize_immigration}}
 }

@@ -2,42 +2,40 @@
 % Please edit documentation in R/smoke-intensity.R
 \name{calculate_SMK_208}
 \alias{calculate_SMK_208}
-\title{Cigarettes per Day - SMK_208 (former daily smokers)}
+\title{Derive cigarettes per day for former daily smokers (SMK_208)}
 \usage{
 calculate_SMK_208(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector with cigarettes per day (1-99, plus missing codes)
+Numeric vector of cigarettes per day (1-99). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Harmonizes SMK_208 variable across CCHS cycles 2001-2023.
-This variable captures recalled daily cigarette consumption for former daily smokers.
+Harmonize SMK_208 (recalled daily cigarette count for former daily
+smokers) across CCHS cycles 2001-2023. Implemented via
+rec_with_table().
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**:
-  - 2001: SMKA_208
-  - 2003: SMKC_208
-  - 2005: SMKE_208
-  - 2007-2014: SMK_208
-  - 2015-2021: SMK_075
-  - 2022-2023: SPU_20
+Source variables vary by era: SMKA_208 (2001), SMKC_208 (2003),
+SMKE_208 (2005), SMK_208 (2007-2014), SMK_075 (2015-2021),
+SPU_20 (2022-2023). Universe: former daily smokers
+(SMKDSTY_original in 2, 4). For unified daily intensity analysis,
+prefer \code{\link{calculate_cigs_per_day}}.
+}
+\examples{
+\dontrun{
+harmonized <- rec_with_table(cchs_data, "SMK_208")
+}
 
-**Values**: Continuous (1-99 cigarettes per day when they smoked daily)
-
-**Universe**: Former daily smokers (SMKDSTY_original %in% c(2, 4))
-
-**Recommendation**: Use `cigs_per_day` for unified daily intensity analysis.
-SMK_208 is available as a secondary variable for specific use cases requiring
-separation of current vs former daily intensity.
 }
 \seealso{
-\code{\link{calculate_cigs_per_day}} for unified daily intensity
+\code{\link{calculate_cigs_per_day}},
+  \code{\link{calculate_SMK_204}}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking-status.R
 \name{calculate_SMKDSTY_cat6}
 \alias{calculate_SMKDSTY_cat6}
-\title{Type of Smoker - SMKDSTY_cat6 (6 categories, harmonized)}
+\title{Derive 6-category smoking status (SMKDSTY_cat6)}
 \usage{
 calculate_SMKDSTY_cat6(
   SMK_005 = NULL,
@@ -12,128 +12,54 @@ calculate_SMKDSTY_cat6(
 )
 }
 \arguments{
-\item{SMK_005}{Numeric scalar/vector. Current smoking status (1=Daily, 2=Occasionally, 3=Not at all)}
+\item{SMK_005}{Numeric. Current smoking status
+(1 = daily, 2 = occasionally, 3 = not at all).}
 
-\item{SMK_030}{Numeric scalar/vector. Ever smoked daily (1=Yes, 2=No)}
+\item{SMK_030}{Numeric. Ever smoked daily (1 = yes, 2 = no).}
 
-\item{SMK_01A}{Numeric scalar/vector. Lifetime 100+ cigarettes (1=Yes, 2=No)}
+\item{SMK_01A}{Numeric. Lifetime 100+ cigarettes (1 = yes, 2 = no).}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of smoking type classifications (1-6, plus missing value codes)
+Integer vector of smoking type (1 = daily, 2 = occasional
+  former daily, 3 = occasional never daily, 4 = former daily,
+  5 = former occasional, 6 = never smoked). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Complex derived variable using 3-step architecture
-
-Creates harmonized SMKDSTY_cat6 variable for CCHS cycles 2015+ by applying
-the pre-2015 SMKDSTY logic to harmonized variables SMK_005, SMK_030, and SMK_01A.
-For 2001-2014, uses direct SMKDSTY variable via rec_with_table().
+Reconstruct the pre-2015 SMKDSTY 6-category smoking classification
+for CCHS 2015+ cycles using three harmonized gate variables.
 }
 \details{
-**Implementation Method**: Complex derivation for 2015+ cycles
-- **Input variables**: SMK_005 (current status), SMK_030 (ever daily), SMK_01A (100+ cigs)
-- **Architecture**: 3-step pattern with clean_variables() → domain logic → clean_variables()
-- **Logic source**: CCHS 2013-2014 SMKDSTY specifications applied to harmonized variables
+For 2015+ cycles, CCHS replaced the single SMKDSTY variable with
+component questions. This function applies the 2013-2014 SMKDSTY
+specification to harmonized inputs: SMK_005 (current status),
+SMK_030 (ever smoked daily), and SMK_01A (100+ lifetime cigarettes).
+For 2001-2014, use rec_with_table() directly.
 
-**Categories (6)**:
-\itemize{
-  \item 1 = Daily smoker
-  \item 2 = Occasional smoker (former daily smoker)
-  \item 3 = Occasional smoker (never a daily smoker)
-  \item 4 = Former daily smoker (non-smoker now)
-  \item 5 = Former occasional smoker (at least 1 whole cigarette, non-smoker now)
-  \item 6 = Never smoked (a whole cigarette)
-}
-
-**PUMF coverage**: 2001-2021, 2023 (2022 gap due to questionnaire redesign where
-SPU_05 was only asked of daily smokers, preventing cat2 vs cat3 derivation)
-
-**Master coverage**: 2001-2023 (full coverage)
-
-**Logic mapping adapted from legacy implementation**:
-- **Daily smoker**: SMK_005 = 1 → 1
-- **Occasional (former daily)**: SMK_005 = 2 AND SMK_030 = 1 → 2
-- **Occasional (never daily)**: SMK_005 = 2 AND (SMK_030 = 2 OR SMK_030 missing) → 3
-- **Former daily**: SMK_005 = 3 AND SMK_030 = 1 → 4
-- **Former occasional**: SMK_005 = 3 AND SMK_030 = 2 AND SMK_01A = 1 → 5
-- **Never smoked**: SMK_005 = 3 AND SMK_01A = 2 → 6
-
-**Missing data handling**: Uses Level 5-6 infrastructure with any_missing() and get_priority_missing()
-
-**Input compatibility**:
-- **Scalar**: Single values for individual respondents
-- **Vector**: Element-wise processing for multiple respondents
-- **Database**: Works with data.frame columns (e.g., `data$SMK_005`)
-- **Mixed types**: Handles numeric codes (999) and tagged_na inputs
+PUMF coverage: 2001-2021, 2023 (2022 gap because SPU_05 was only
+asked of daily smokers). Master coverage: 2001-2023. Missing data
+is handled via any_missing() and get_priority_missing().
 }
 \examples{
-\dontrun{
-# Example 1: Vector inputs - All 6 smoking status categories
-smoking_status <- calculate_SMKDSTY_cat6(
-  SMK_005 = c(1, 2, 2, 3, 3, 3),      # Current smoking status
-  SMK_030 = c(1, 1, 2, 1, 2, 2),      # Ever smoked daily
-  SMK_01A = c(1, 1, 1, 1, 1, 2),      # 100+ cigarettes lifetime
-  output_format = "tagged_na"
-)
-# Returns: c(1, 2, 3, 4, 5, 6)
-# 1=Daily, 2=Occasional(former daily), 3=Occasional(never daily),
-# 4=Former daily, 5=Former occasional, 6=Never smoked
+# Scalar input
+calculate_SMKDSTY_cat6(SMK_005 = 1, SMK_030 = 1, SMK_01A = 1)
 
-# Example 2: Scalar inputs - Single respondent
-single_respondent <- calculate_SMKDSTY_cat6(
-  SMK_005 = 2,                        # Occasionally
-  SMK_030 = 1,                        # Yes, smoked daily before
-  SMK_01A = 1,                        # Yes, 100+ cigarettes
-  output_format = "original"
-)
-# Returns: 2 (Occasional smoker, former daily)
-
-# Example 3: Database-like usage with data.frame
-cchs_data <- data.frame(
-  respondent_id = 1001:1003,
-  SMK_005 = c(1, 999, 2),            # Daily, Missing, Occasionally
-  SMK_030 = c(1, 1, 999),            # Yes, Yes, Missing
-  SMK_01A = c(1, 1, 1)               # All have 100+ cigarettes
+# Vector input
+calculate_SMKDSTY_cat6(
+  SMK_005 = c(1, 2, 3),
+  SMK_030 = c(1, 1, 1),
+  SMK_01A = c(1, 1, 1)
 )
 
-cchs_data$SMKDSTY_cat6 <- calculate_SMKDSTY_cat6(
-  cchs_data$SMK_005,
-  cchs_data$SMK_030,
-  cchs_data$SMK_01A,
-  output_format = "tagged_na"
-)
-# Creates new column with: c(1, tagged_na("b"), 3)
-# Note: Missing SMK_030 with SMK_005=2 gives category 3 (never daily)
-
-# Example 4: Handling missing data - different output formats
-missing_example_tagged <- calculate_SMKDSTY_cat6(
-  SMK_005 = c(1, 999, 2),            # 999 = missing code
-  SMK_030 = c(1, 1, 999),            # 999 = missing SMK_030
-  SMK_01A = c(1, 1, 1),
-  output_format = "tagged_na"        # Modern format
-)
-# Returns: c(1, tagged_na("b"), 3)
-
-missing_example_original <- calculate_SMKDSTY_cat6(
-  SMK_005 = c(1, 999, 2),
-  SMK_030 = c(1, 1, 999),
-  SMK_01A = c(1, 1, 1),
-  output_format = "original"         # Legacy compatibility
-)
-# Returns: c(1, NA, 3) - Same logic, different format
-
-# Example 5: Mixed input types (tagged_na + numeric)
-mixed_inputs <- calculate_SMKDSTY_cat6(
-  SMK_005 = c(1, haven::tagged_na("b"), 2),
-  SMK_030 = c(1, 1, 2),
-  SMK_01A = c(1, 1, 1),
-  output_format = "tagged_na"
-)
-# Returns: c(1, tagged_na("b"), 3) - Handles pre-tagged inputs
-
-# For 2001-2014 cycles, use direct variable harmonization:
-# harmonized_data <- rec_with_table(cchs_data, "SMKDSTY_cat6")
 }
-
+\seealso{
+\code{\link{calculate_SMKDSTY_cat5}},
+  \code{\link{calculate_SMKDSTY_cat3}},
+  \code{\link{calculate_SMK_005}},
+  \code{\link{calculate_SMK_030}},
+  \code{\link{calculate_SMK_01A}}
 }

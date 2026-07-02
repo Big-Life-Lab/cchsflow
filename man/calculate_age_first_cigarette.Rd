@@ -2,7 +2,8 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_age_first_cigarette}
 \alias{calculate_age_first_cigarette}
-\title{Unified Age Smoked First Whole Cigarette - age_first_cigarette}
+\title{Calculate unified age smoked first whole cigarette
+  (age_first_cigarette)}
 \usage{
 calculate_age_first_cigarette(
   age_first_cigarette = NULL,
@@ -10,52 +11,34 @@ calculate_age_first_cigarette(
 )
 }
 \arguments{
-\item{age_first_cigarette}{Numeric vector. Continuous age first smoked a
-whole cigarette. Source depends on database type: SMK_01C (Master) or
-SMKG01C_cont (PUMF). NULL if not available.}
+\item{age_first_cigarette}{Numeric. Continuous age first smoked a
+whole cigarette. Worksheet routes SMKG01C_cont or SMK_01C.
+NULL if not available.}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector of continuous age values (8-95), with:
-- NA::a for never-smokers / not applicable
-- NA::b for missing/refused
+Numeric vector of age first smoked (8-95). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Creates unified age_first_cigarette derived variable across
-  CCHS cycles.
-
-Receives a single continuous age input — the worksheet routes the
-appropriate source variable depending on database type:
-- **PUMF**: SMKG01C_cont (midpoint estimation from grouped categories)
-- **Master**: SMK_01C (exact continuous age)
+Pass-through wrapper that provides a self-documenting variable name
+for age first smoked a whole cigarette. The worksheet routes the
+appropriate source: SMKG01C_cont (PUMF) or SMK_01C (Master).
 }
 \details{
-**Implementation method**: 3-step architecture (single-source pass-through)
-- **Step 1**: clean_variables() - Clean continuous age input
-- **Step 2**: Direct pass-through (source routing handled by worksheet)
-- **Step 3**: Output cleaning with age_first_cigarette metadata
-
-**Coverage**:
-- PUMF: 2001-2021 via SMKG01C_cont (midpoint imputation)
-- Master: 2001-2023 via SMK_01C (exact continuous)
-
-**Universe**: Ever smoked 100+ cigarettes in lifetime (SMK_01A == 1).
+Universe: respondents who have smoked 100+ cigarettes in lifetime
+(SMK_01A == 1). Coverage: PUMF 2001-2021 (midpoint), Master
+2001-2023 (exact continuous). Uses 3-step pass-through architecture.
 }
 \examples{
-\dontrun{
-# Single value
-calculate_age_first_cigarette(14)    # Returns: 14
+# Scalar
+calculate_age_first_cigarette(14)
 
-# Vector input with missing values
-calculate_age_first_cigarette(c(14, 16, NA, 12))
-# Returns: c(14, 16, NA::b, 12)
-
-# Tagged NA pass-through
-calculate_age_first_cigarette(tagged_na("a"))  # NA::a (not applicable)
-
-# NULL input (variable not in dataset)
-calculate_age_first_cigarette(NULL)  # NA::b (not stated)
 }
-
+\seealso{
+\code{\link{calculate_age_start_smoking}},
+  \code{\link{calculate_smoked_100_lifetime}}
 }

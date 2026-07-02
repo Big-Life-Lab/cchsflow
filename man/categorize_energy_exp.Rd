@@ -2,35 +2,40 @@
 % Please edit documentation in R/physical-activity.R
 \name{categorize_energy_exp}
 \alias{categorize_energy_exp}
-\title{Categorize energy expenditure into 3 activity levels}
+\title{Categorize energy expenditure into activity levels}
 \usage{
 categorize_energy_exp(energy_exp, output_format = "tagged_na")
 }
 \arguments{
-\item{energy_exp}{Continuous energy expenditure in kcal/kg/day.}
+\item{energy_exp}{Continuous energy expenditure in kcal/kg/day. See
+\code{\link{calculate_energy_exp}}.}
 
 \item{output_format}{Output missing data format: "tagged_na" (default)
 or "original".}
 }
 \value{
-A categorical variable with 3 levels:
-  \enumerate{
-    \item Inactive (< 1.5 kcal/kg/day)
-    \item Moderately active (1.5 to < 3.0 kcal/kg/day)
-    \item Active (>= 3.0 kcal/kg/day)
-  }
-  Returns \code{"NA(a)"} if energy_exp is tagged NA(a) (not applicable),
-  or \code{"NA(b)"} otherwise (missing).
+Integer vector: 1 = inactive (< 1.5), 2 = moderately active
+  (1.5 to < 3.0), 3 = active (>= 3.0). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Categorizes the continuous energy expenditure variable
-  (energy_exp) into 3 physical activity levels using CCHS cutpoints:
-  inactive (< 1.5), moderately active (1.5 to < 3.0), and active (>= 3.0
-  kcal/kg/day).
+Categorizes continuous energy expenditure into 3 physical activity
+levels using CCHS cutpoints: inactive, moderately active, and active.
+}
+\details{
+The cutpoints follow the standard CCHS physical activity
+classification: < 1.5 kcal/kg/day = inactive, 1.5 to < 3.0 =
+moderately active, >= 3.0 = active. Missing-data handling follows
+the v3 3-step architecture with priority not applicable > not stated.
 }
 \examples{
-categorize_energy_exp(0.5)  # 1 (Inactive)
-categorize_energy_exp(2.0)  # 2 (Moderately active)
-categorize_energy_exp(4.0)  # 3 (Active)
+# Scalar
+categorize_energy_exp(0.5)  # 1 (inactive)
+categorize_energy_exp(2.0)  # 2 (moderately active)
+categorize_energy_exp(4.0)  # 3 (active)
 
+}
+\seealso{
+\code{\link{calculate_energy_exp}}
 }

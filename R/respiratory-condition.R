@@ -1,21 +1,27 @@
-#' @title Derive CCC_091 for 2001-2003 cycles
+#' @title Derive COPD/emphysema/bronchitis indicator for 2001-2003 cycles
 #'
-#' @description Derives CCC_091 (COPD/emphysema/chronic bronchitis) for
-#'  CCHS cycles 2001-2003, where the concept is split across CCC_91A
-#'  (chronic bronchitis) and CCC_91B (emphysema/COPD combined).
+#' @description
+#' Derives CCC_091 (COPD/emphysema/chronic bronchitis) for CCHS cycles
+#' 2001-2003, where the concept is split across two source variables.
 #'
-#' @param CCC_91A Chronic bronchitis indicator (1 = Yes, 2 = No).
-#' @param CCC_91B Emphysema or COPD indicator (1 = Yes, 2 = No).
+#' @details
+#' In CCHS 2001-2003, chronic bronchitis (CCC_91A) and emphysema/COPD
+#' (CCC_91B) are asked as separate questions. This function combines
+#' them into a single indicator: positive if either condition is
+#' reported. Missing-data handling follows the v3 3-step architecture
+#' with priority not applicable > not stated.
+#'
+#' @param CCC_91A Chronic bronchitis indicator (1 = yes, 2 = no).
+#' @param CCC_91B Emphysema or COPD indicator (1 = yes, 2 = no).
 #' @param output_format Output missing data format: "tagged_na" (default)
 #'   or "original".
 #'
-#' @return Categorical variable (CCC_091) with 2 levels:
-#'  \enumerate{
-#'  \item Has COPD, emphysema, or chronic bronchitis
-#'  \item Does not have COPD, emphysema, or chronic bronchitis
-#'  }
+#' @return Integer vector: 1 = has COPD/emphysema/bronchitis, 2 = does
+#'   not. Missing data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
+#' # Scalar
 #' derive_CCC_091_2001to2003(1, 2)  # 1 (has condition)
 #' derive_CCC_091_2001to2003(2, 2)  # 2 (no condition)
 #'
@@ -51,25 +57,31 @@ derive_CCC_091_2001to2003 <- function(CCC_91A, CCC_91B,
   return(prep_cat_output(output_cleaned$CCC_091))
 }
 
-#' @title Derive CCC_091 for 2005-2008 cycles
+#' @title Derive COPD/emphysema/bronchitis indicator for 2005-2008 cycles
 #'
-#' @description Derives CCC_091 (COPD/emphysema/chronic bronchitis) for
-#'  CCHS cycles 2005-2008, where the concept is split across CCC_91A
-#'  (chronic bronchitis), CCC_91E (emphysema), and CCC_91F (COPD).
+#' @description
+#' Derives CCC_091 (COPD/emphysema/chronic bronchitis) for CCHS cycles
+#' 2005-2008, where the concept is split across three source variables.
 #'
-#' @param CCC_91A Chronic bronchitis indicator (1 = Yes, 2 = No).
-#' @param CCC_91E Emphysema indicator (1 = Yes, 2 = No).
-#' @param CCC_91F COPD indicator (1 = Yes, 2 = No).
+#' @details
+#' In CCHS 2005-2008, chronic bronchitis (CCC_91A), emphysema (CCC_91E),
+#' and COPD (CCC_91F) are asked as separate questions. This function
+#' combines them into a single indicator: positive if any condition is
+#' reported. Missing-data handling follows the v3 3-step architecture
+#' with priority not applicable > not stated.
+#'
+#' @param CCC_91A Chronic bronchitis indicator (1 = yes, 2 = no).
+#' @param CCC_91E Emphysema indicator (1 = yes, 2 = no).
+#' @param CCC_91F COPD indicator (1 = yes, 2 = no).
 #' @param output_format Output missing data format: "tagged_na" (default)
 #'   or "original".
 #'
-#' @return Categorical variable (CCC_091) with 2 levels:
-#'  \enumerate{
-#'  \item Has COPD, emphysema, or chronic bronchitis
-#'  \item Does not have COPD, emphysema, or chronic bronchitis
-#'  }
+#' @return Integer vector: 1 = has COPD/emphysema/bronchitis, 2 = does
+#'   not. Missing data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
+#' # Scalar
 #' derive_CCC_091_2005to2008(1, 2, 2)  # 1 (has condition)
 #' derive_CCC_091_2005to2008(2, 2, 2)  # 2 (no condition)
 #'
@@ -111,28 +123,42 @@ derive_CCC_091_2005to2008 <- function(CCC_91A, CCC_91E, CCC_91F,
 # CCC_091_der — Age-stratified COPD/emphysema/bronchitis (3 categories)
 # ==============================================================================
 
-#' @title Age-stratified COPD/emphysema/bronchitis indicator
+#' @title Categorize COPD/emphysema/bronchitis by age group
 #'
-#' @description Creates a 3-category derived variable from CCC_091
-#'   (COPD/emphysema/bronchitis) stratified by age 35 threshold.
+#' @description
+#' Creates a 3-category derived variable from CCC_091 (COPD/emphysema/
+#' bronchitis) stratified by the age-35 threshold.
+#'
+#' @details
+#' Clinically, COPD diagnosed before age 35 may reflect different
+#' aetiology (e.g. alpha-1 antitrypsin deficiency) than later-onset
+#' disease. The age-35 cutpoint follows the original CCHS derived
+#' variable convention. Source-agnostic: the worksheet routes
+#' DHHGAGE_cont (PUMF) or DHH_AGE (Master) to the age parameter.
+#' Missing-data handling follows the v3 3-step architecture with
+#' priority not applicable > not stated.
 #'
 #' @param age Continuous age variable (DHHGAGE_cont for PUMF, DHH_AGE for
-#'   Master). Worksheet routes the appropriate source.
+#'   Master).
 #' @param CCC_091 Harmonized COPD/emphysema/bronchitis indicator (1 = yes,
-#'   2 = no). Available for all cycles via direct question or derivation.
+#'   2 = no).
 #' @param output_format Output missing data format: "tagged_na" (default)
 #'   or "original".
 #'
-#' @return Categorical variable (CCC_091_der) with 3 levels:
-#'   \enumerate{
-#'     \item Age >= 35 with COPD/emphysema/bronchitis
-#'     \item Age < 35 with COPD/emphysema/bronchitis
-#'     \item No COPD/emphysema/bronchitis
-#'   }
+#' @return Integer vector: 1 = age >= 35 with condition, 2 = age < 35
+#'   with condition, 3 = no condition. Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
-#' @note v3.0.0, last updated: 2026-06-29, status: active. Replaces
-#'   COPD_Emph_der_fun1/fun2 which used inconsistent source variables
-#'   across eras.
+#' @examples
+#' # Scalar
+#' categorize_CCC_091(40, 1)  # 1 (age >= 35 with condition)
+#' categorize_CCC_091(25, 1)  # 2 (age < 35 with condition)
+#' categorize_CCC_091(40, 2)  # 3 (no condition)
+#'
+#' @seealso \code{\link{derive_CCC_091_2001to2003}},
+#'   \code{\link{derive_CCC_091_2005to2008}}
+#'
 #' @export
 categorize_CCC_091 <- function(age, CCC_091, output_format = "tagged_na") {
   # === STEP 1: DATA CLEANING ===

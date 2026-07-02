@@ -7,35 +7,32 @@
 categorize_bmi(bmi, output_format = "tagged_na")
 }
 \arguments{
-\item{bmi}{Continuous BMI value (from [calculate_bmi()] or any source).}
+\item{bmi}{Continuous BMI value (from \code{\link{calculate_bmi}} or any
+source).}
 
-\item{output_format}{Output missing data format: "tagged_na" (default) or
-"original".}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
 Integer vector: 1 = underweight (< 18.5), 2 = normal (18.5-24.9),
-  3 = overweight (25.0-29.9), 4 = obese (>= 30.0).
+  3 = overweight (25.0-29.9), 4 = obese (>= 30.0). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
 Maps continuous BMI to the standard 4-category WHO classification.
-Source-agnostic — works with BMI from any source (PUMF, Master, or
+Source-agnostic -- works with BMI from any source (PUMF, Master, or
 external data).
 }
 \details{
-## WHO BMI classification
-
 Uses the standard WHO adult BMI classification (WHO, 2000):
+1 = underweight (< 18.5), 2 = normal weight (18.5-24.9),
+3 = overweight (25.0-29.9), 4 = obese (>= 30.0).
 
-| Category | BMI range | Code |
-|----------|-----------|------|
-| Underweight | < 18.5 | 1 |
-| Normal weight | 18.5-24.9 | 2 |
-| Overweight | 25.0-29.9 | 3 |
-| Obese | >= 30.0 | 4 |
-
-This function accepts BMI from any source — the `bmi` parameter is
-fully semantic. The worksheet routes HWTGBMI_der (PUMF) or
-HWTDBMI_der (Master) to the same function.
+This function accepts BMI from any source. The worksheet routes
+HWTGBMI_der (PUMF) or HWTDBMI_der (Master) to the same bmi parameter.
+Missing-data handling follows the v3 3-step architecture with priority
+not applicable > not stated.
 }
 \examples{
 # Scalar
@@ -44,27 +41,7 @@ categorize_bmi(bmi = 27.3)
 # Vector
 categorize_bmi(bmi = c(16, 22, 27, 35))
 
-# Dataframe
-library(dplyr)
-data.frame(bmi = c(16.5, 22.0, 27.3, 35.0)) \%>\%
-  mutate(bmi_cat = categorize_bmi(bmi))
-
-# Standalone with rec_with_table
-\dontrun{
-result <- rec_with_table(
-  cchs2015_2016_p,
-  variables = variables,
-  variable_details = variable_details,
-  log = TRUE
-)
-result$HWTGBMI_der_cat4
-}
-
-}
-\references{
-World Health Organization. (2000). Obesity: preventing and managing the
-global epidemic. WHO Technical Report Series, 894.
 }
 \seealso{
-[calculate_bmi()], [adjust_bmi()]
+\code{\link{calculate_bmi}}, \code{\link{adjust_bmi}}
 }

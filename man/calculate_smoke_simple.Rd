@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking-status.R
 \name{calculate_smoke_simple}
 \alias{calculate_smoke_simple}
-\title{Simplified Smoking Status - smoke_simple (4 categories)}
+\title{Derive simplified 4-category smoking status (smoke_simple)}
 \usage{
 calculate_smoke_simple(
   SMKDSTY_cat5 = NULL,
@@ -11,98 +11,45 @@ calculate_smoke_simple(
 )
 }
 \arguments{
-\item{SMKDSTY_cat5}{Numeric scalar/vector. 5-category smoking status (1=Daily, 2=Occasional, 3=Former daily, 4=Former occasional, 5=Never)}
+\item{SMKDSTY_cat5}{Numeric. 5-category smoking status
+(1 = daily, 2 = occasional, 3 = former daily, 4 = former
+occasional, 5 = never).}
 
-\item{time_quit_smoking}{Numeric scalar/vector. Approximate years since quitting smoking (continuous)}
+\item{time_quit_smoking}{Numeric. Years since quitting (continuous).}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of simplified smoking classifications (0-3, plus missing value codes)
+Integer vector (0 = never smoker, 1 = current smoker,
+  2 = former quit 5 years or less / former occasional,
+  3 = former quit more than 5 years). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Complex derived variable using 3-step architecture
-
-Creates harmonized smoke_simple variable across CCHS cycles 2003-2018 by combining
-SMKDSTY_cat5 smoking status with time_quit_smoking to create simplified categories
-for population-level smoking analysis.
+Combine 5-category smoking status with cessation timing to produce a
+simplified 4-category variable for population-level analysis.
 }
 \details{
-**Implementation Method**: Complex derivation requiring two input variables
-- **Input variables**: SMKDSTY_cat5 (5-category smoking status), time_quit_smoking (years since quit)
-- **Architecture**: 3-step pattern with clean_variables() → domain logic → clean_variables()
-- **Logic source**: Legacy smoke_simple_fun() from smoking-legacy-v2-1-0.R:138-176
-
-**Categories (4)**:
-\itemize{
-  \item 0 = Non-smoker (never smoked)
-  \item 1 = Current smoker (daily and occasional)  
-  \item 2 = Former daily smoker quit ≤5 years OR former occasional smoker
-  \item 3 = Former daily smoker quit >5 years
-}
-
-**Logic mapping from legacy implementation**:
-- **Non-smoker (0)**: SMKDSTY_cat5 = 5 (never smoked) -> 0
-- **Current smoker (1)**: SMKDSTY_cat5 in 1,2 (daily/occasional) -> 1
-- **Former <=5yrs/occasional (2)**:
-  - SMKDSTY_cat5 = 4 (former occasional) -> 2, OR
-  - SMKDSTY_cat5 = 3 (former daily) AND time_quit_smoking <= 5 -> 2
-- **Former >5yrs (3)**: SMKDSTY_cat5 = 3 AND time_quit_smoking > 5 -> 3
-
-**Missing data handling**: Uses Level 5-6 infrastructure with any_missing() and get_priority_missing()
-
-**Research applications**: 
-- Population smoking prevalence studies
-- Simplified exposure categories for epidemiological analysis
-- Health outcome risk stratification
+This derived variable merges SMKDSTY_cat5 with time_quit_smoking to
+separate recent quitters (5 years or less) from long-term quitters.
+Former occasional smokers are grouped with recent quitters. The
+function uses the 3-step architecture (clean, derive, clean) and
+handles missing data via get_priority_missing().
 }
 \examples{
-\dontrun{
-# Example 1: Vector inputs - All 4 smoking categories
-simple_status <- calculate_smoke_simple(
-  SMKDSTY_cat5 = c(5, 1, 2, 3, 3, 4),
-  time_quit_smoking = c(NA, NA, NA, 3, 8, 2),
-  output_format = "tagged_na"
-)
-# Returns: c(0, 1, 1, 2, 3, 2)
-# 0=Never, 1=Current, 2=Former <=5yrs, 3=Former >5yrs
+# Scalar input
+calculate_smoke_simple(SMKDSTY_cat5 = 3, time_quit_smoking = 4)
 
-# Example 2: Scalar inputs - Single respondent
-former_daily_recent <- calculate_smoke_simple(
-  SMKDSTY_cat5 = 3,              # Former daily smoker
-  time_quit_smoking = 4,         # Quit 4 years ago
-  output_format = "original"
-)
-# Returns: 2 (Former daily smoker quit ≤5 years)
-
-# Example 3: Database-like usage
-cchs_data <- data.frame(
-  respondent_id = 2001:2005,
-  SMKDSTY_cat5 = c(1, 3, 3, 4, 5),           # Daily, Former daily x2, Former occasional, Never
-  time_quit_smoking = c(NA, 2, 10, 1, NA)     # Current/never have NA
+# Vector input
+calculate_smoke_simple(
+  SMKDSTY_cat5 = c(5, 1, 3, 4),
+  time_quit_smoking = c(NA, NA, 8, 2)
 )
 
-cchs_data$smoke_simple <- calculate_smoke_simple(
-  cchs_data$SMKDSTY_cat5,
-  cchs_data$time_quit_smoking,
-  output_format = "tagged_na"
-)
-# Creates: c(1, 2, 3, 2, 0) - Current daily, Former ≤5yrs, Former >5yrs, Former occasional, Never
-
-# Example 4: Missing data handling
-missing_example <- calculate_smoke_simple(
-  SMKDSTY_cat5 = c(1, 999, 3),              # Daily, Missing, Former daily
-  time_quit_smoking = c(NA, 5, 999),         # Current smoker NA, 5 years, Missing quit time
-  output_format = "tagged_na"
-)
-# Returns: c(1, tagged_na("b"), tagged_na("b"))
-
-# Use with rec_with_table() for harmonized input variables:
-# harmonized_data <- rec_with_table(cchs_data, c("SMKDSTY_cat5", "time_quit_smoking"))
-# simple_smoking <- calculate_smoke_simple(
-#   harmonized_data$SMKDSTY_cat5,
-#   harmonized_data$time_quit_smoking
-# )
 }
-
+\seealso{
+\code{\link{calculate_SMKDSTY_cat5}},
+  \code{\link{calculate_time_quit_smoking_complete}}
 }

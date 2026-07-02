@@ -36,10 +36,6 @@ Provides a graduated disability measure: 0 (independent) to
 score, with priority not applicable > not stated. See
 \code{\link{assess_adl}} for the task list and cross-cycle notes.
 }
-\note{
-v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-  implementation; replaces the abandoned helper-based draft.
-}
 \examples{
 # Scalar
 score_adl(2, 2, 2, 2, 2) # 0 (independent)
@@ -64,10 +60,6 @@ result <- rec_with_table(
 )
 }
 
-}
-\references{
-Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
-JAMA, 185(12), 914-919.
 }
 \seealso{
 \code{\link{assess_adl}}, \code{\link{score_adl_6}}

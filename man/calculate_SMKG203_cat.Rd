@@ -2,56 +2,38 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_SMKG203_cat}
 \alias{calculate_SMKG203_cat}
-\title{Age Started Smoking Daily - Daily Smoker - SMKG203_cat (categorical)}
+\title{Categorize age started daily smoking for daily smokers (SMKG203_cat)}
 \usage{
 calculate_SMKG203_cat(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of age group classifications (1-6, plus missing value codes)
+Integer vector of age group (1-6). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMKG203 categorical variables for CCHS cycles 2001-2014.
-This variable asks daily smokers when they started smoking daily, with categorical age groups.
-
-**Note**: Categorical versions have temporal variants:
-- **SMKG203_pre2005** (2001-2003): 10 categories with broader age bins
-- **SMKG203_2005plus** (2005-2014): 11 categories with finer age bins  
-Most applications should use continuous **SMKG203_cont** instead.
+Harmonize SMKG203 categorical age-started variables for daily smokers
+across CCHS cycles. Implemented via rec_with_table().
 }
 \details{
-**Implementation Method**: Complex derivation for 2015+ cycles
-- **Input variables**: SMK_005 (smoking status) + SMK_040/SPU_15 (age started)
-- **Logic**: Filter for former daily smokers (SMK_005 = 3 & SMK_030 = 1) then apply age categories
-- **Architecture**: 3-step pattern with clean_variables() � domain logic � clean_variables()
-
-**Categories (6)**:
-\itemize{
-  \item 1 = 10 years or under
-  \item 2 = 11-14 years
-  \item 3 = 15-17 years
-  \item 4 = 18-19 years
-  \item 5 = 20-24 years
-  \item 6 = 25 years or over
-}
-
-**Complex derivation logic**:
-- Apply to respondents where SMK_005 = 3 (not smoking) AND SMK_030 = 1 (formerly daily)
-- Use SMK_040 (2015-2021) or SPU_15 (2022-2023) for age data
-- Return missing for non-former-daily smokers
+Temporal variants exist: SMKG203_pre2005 (2001-2003, 10 categories)
+and SMKG203_2005plus (2005-2014, 11 categories). For 2015+, the
+function derives the value from SMK_005 and SMK_040/SPU_15. Most
+applications should prefer continuous SMKG203_cont instead.
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation (2001-2014)
-# or complex derivation function for 2015-2023
-harmonized_data <- rec_with_table(cchs_data, "SMKG203_pre2005")  # or SMKG203_2005plus
-age_started_daily_cat <- harmonized_data$SMKG203_pre2005
+harmonized <- rec_with_table(cchs_data, "SMKG203_2005plus")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMKG203_cont}},
+  \code{\link{calculate_SMKG040_cat}}
 }

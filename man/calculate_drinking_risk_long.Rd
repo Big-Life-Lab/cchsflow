@@ -65,10 +65,6 @@ male respondent). Missing-data handling follows the v3 3-step
 architecture with priority not applicable > not stated; out-of-range
 inputs receive the worksheet's else rule.
 }
-\note{
-v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-  implementation; replaces the abandoned helper-based draft.
-}
 \examples{
 # Scalar: male reaching the weekly threshold
 calculate_drinking_risk_long(1, 20, 1, 1, 3, 3, 3, 3, 3, 3, 2) # 1
@@ -93,11 +89,6 @@ result <- rec_with_table(
 )
 }
 
-}
-\references{
-Butt, P., et al. (2011). Alcohol and health in Canada: a summary of
-evidence and guidelines for low-risk drinking. Canadian Centre on
-Substance Abuse.
 }
 \seealso{
 \code{\link{calculate_binge_drinking}},

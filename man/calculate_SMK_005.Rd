@@ -2,53 +2,39 @@
 % Please edit documentation in R/smoking-status.R
 \name{calculate_SMK_005}
 \alias{calculate_SMK_005}
-\title{Type of Smoker Presently - SMK_005 (3 categories)}
+\title{Categorize current smoking behaviour (SMK_005)}
 \usage{
 calculate_SMK_005(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of current smoking status (1-3, plus missing value codes)
+Integer vector of current smoking status (1 = daily,
+  2 = occasionally, 3 = not at all). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMK_005 variable across CCHS cycles 2015-2023.
-This variable asks about current smoking behavior and serves as a key
-component for SMKDSTY_original reconstruction in the 2015-2023 period.
+Harmonize CCHS variable SMK_005 (type of smoker presently) across
+cycles 2015-2023. Implemented via rec_with_table(), not direct R logic.
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2015-2021: SMK_005 (direct variable)
-  - 2022-2023: Derived from SMKDVSTY (1→1, 2→2, [3-6]→3)
-- **Harmonization**: Simple 1:1 mapping (2015-2021) or derivation (2022-2023)
-
-**Categories (3)**:
-\itemize{
-  \item 1 = Daily
-  \item 2 = Occasionally  
-  \item 3 = Not at all
-}
-
-**Variable evolution**:
-- **2015-2021**: Direct survey question "Type of smoker presently"
-- **2022-2023**: Derived from SMKDVSTY to maintain harmonization
-  - SMKDVSTY 1 (Daily) → SMK_005 1 (Daily)
-  - SMKDVSTY 2 (Occasional) → SMK_005 2 (Occasionally)
-  - SMKDVSTY 3-6 (All non-smokers) → SMK_005 3 (Not at all)
-
-**Usage**: Primary input for SMKDSTY_original complex reconstruction function
+SMK_005 captures whether the respondent currently smokes daily,
+occasionally, or not at all. It serves as the primary gate variable
+for SMKDSTY_cat6 reconstruction in the 2015-2023 period. Source is
+SMK_005 direct (2015-2021) or derived from SMKDVSTY (2022-2023).
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMK_005")
-current_smoking <- harmonized_data$SMK_005
+harmonized <- rec_with_table(cchs_data, "SMK_005")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMKDSTY_cat6}},
+  \code{\link{calculate_SMK_030}}, \code{\link{calculate_SMK_01A}}
 }

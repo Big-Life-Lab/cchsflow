@@ -13,50 +13,49 @@ categorize_immigration(
 )
 }
 \arguments{
-\item{immigrant_status}{Immigrant status: 1 = immigrant, 2 = non-immigrant
-(SDCFIMM; covers both PUMF and Master).}
+\item{immigrant_status}{Immigrant status (1 = immigrant,
+2 = non-immigrant).}
 
-\item{born_canada}{Country of birth: 1 = Canada, 2 = outside Canada.
-Use SDCGCBG for PUMF cycles; SDCGCB for Master cycles.}
+\item{born_canada}{Country of birth (1 = Canada, 2 = outside Canada).}
 
-\item{ethnicity}{Ethnicity: 1 = White, any value > 1 = visible minority.
-Use SDCGCGT (2-category) for PUMF cycles or SDCDCGT_cat7 (7-category)
-for Master cycles — both use 1 = White, so the function handles either.}
+\item{ethnicity}{Ethnicity (1 = White, > 1 = visible minority).}
 
-\item{years}{Time in Canada in years (continuous). Values < 10 are treated
-as recent; values >= 10 as established. Use SDCGRES_cont (midpoints 4.5
-or 15 derived from categorical SDCGRES) for PUMF cycles; SDCDRES (raw
-continuous 0-97) for Master cycles. Not used for Canada-born respondents.}
+\item{years}{Time in Canada in years (continuous). Values < 10 are
+recent; values >= 10 are established.}
 
-\item{output_format}{Output missing data format: "tagged_na" (default) or "original".}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Integer 1-8, or tagged NA:
-  \itemize{
-    \item 1 — White, Canada-born
-    \item 2 — Visible minority, Canada-born
-    \item 3 — White immigrant, 0-9 years in Canada
-    \item 4 — Visible minority immigrant, 0-9 years in Canada
-    \item 5 — White immigrant, 10+ years in Canada
-    \item 6 — Visible minority immigrant, 10+ years in Canada
-    \item 7 — White, non-immigrant born outside Canada
-    \item 8 — Visible minority, non-immigrant born outside Canada
-  }
+Integer vector: 1 = White Canada-born, 2 = visible minority
+  Canada-born, 3 = White immigrant recent, 4 = visible minority
+  immigrant recent, 5 = White immigrant established, 6 = visible
+  minority immigrant established, 7 = White non-immigrant foreign-born,
+  8 = visible minority non-immigrant foreign-born. Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Derives an 8-category immigration classification combining
- immigrant status, country of birth, ethnicity (white / visible minority),
- and recency of arrival. Works for both PUMF and Master CCHS files; the
- worksheet supplies database-appropriate feeder variables for each cycle block.
+Derives an 8-category immigration classification combining immigrant
+status, country of birth, ethnicity (white / visible minority), and
+recency of arrival.
+}
+\details{
+Works for both PUMF and Master CCHS files; the worksheet supplies
+database-appropriate feeder variables for each cycle block. Ethnicity
+uses 1 = White regardless of source granularity (PUMF 2-category or
+Master 7-category). Years in Canada splits immigrants into recent
+(< 10 years) and established (>= 10 years); this parameter is not
+used for Canada-born respondents. Ethnicity is intentionally not
+cleaned via \code{clean_variables()} because it can be either the PUMF
+2-category or Master 7-category variable.
 }
 \examples{
-# PUMF style
-categorize_immigration(1, 2, 2, 4.5)  # -> 4 (VM immigrant, recent)
+# Scalar
+categorize_immigration(1, 2, 2, 4.5)  # 4 (VM immigrant, recent)
+categorize_immigration(2, 1, 1, 0)    # 1 (White, Canada-born)
 
-# Master style
-categorize_immigration(1, 2, 5, 15)   # -> 6 (VM immigrant, established)
-
-# Non-immigrant born outside Canada
-categorize_immigration(2, 2, 1, haven::tagged_na("a"))  # -> 7
-
+}
+\seealso{
+\code{\link{calculate_pct_time}}
 }

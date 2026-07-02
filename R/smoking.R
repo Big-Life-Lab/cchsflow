@@ -839,16 +839,39 @@ calculate_SMKG207_from_combined <- function(SMK_005, SMK_030, SMK_040) {
   smkg_age_midpoint(SMKG207)
 }
 
-#' @title Combined time since quit smoking
-#' @description Combines cessation timing from multiple sources with priority
-#'   logic. Provides a single continuous "years since quit" value regardless
-#'   of smoking history pathway. Priority: SMK_09A_cont (daily) over
-#'   SMK_06A_cont (occasional).
-#' @param SMK_09A_cont Years since stopped daily (from worksheet midpoint recode)
-#' @param SMK_06A_cont Years since quit occasional (from worksheet midpoint recode)
-#' @param output_format Output missing data format: "tagged_na" (default) or "original".
-#' @return Continuous years since quit; NA::a for current/never smokers,
-#'   NA::b for missing
+#' @title Calculate combined time since quit smoking
+#'
+#' @description
+#' Combine cessation timing from daily (SMK_09A_cont) and occasional
+#' (SMK_06A_cont) sources into a single continuous years-since-quit
+#' variable with priority routing.
+#'
+#' @details
+#' Takes the first non-missing value: SMK_09A_cont (former daily) has
+#' priority over SMK_06A_cont (former occasional). Current smokers and
+#' never smokers receive tagged_na("a") upstream via the worksheet.
+#' When both inputs are missing, propagates the highest-priority missing
+#' type. Missing-data handling follows the v3 3-step architecture with
+#' priority not applicable > not stated.
+#'
+#' @param SMK_09A_cont Numeric. Years since stopped daily smoking
+#'   (from worksheet midpoint recode). NULL if not available.
+#' @param SMK_06A_cont Numeric. Years since quit occasional smoking
+#'   (from worksheet midpoint recode). NULL if not available.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Numeric vector of years since quit smoking. Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
+#' @examples
+#' # Scalar: former daily smoker
+#' calculate_time_quit_smoking(SMK_09A_cont = 5.0, SMK_06A_cont = NA)
+#'
+#' @seealso \code{\link{calculate_time_quit_smoking_complete}},
+#'   \code{\link{calculate_time_quit_smoking_daily}}
+#'
 #' @export
 calculate_time_quit_smoking <- function(SMK_09A_cont = NULL, SMK_06A_cont = NULL,
                                         output_format = "tagged_na") {

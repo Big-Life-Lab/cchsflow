@@ -1,35 +1,42 @@
-#' @title Calculate diet score
+#' @title Calculate diet quality score
 #'
-#' @description Calculates a diet score based on consumption of fruit, salad,
-#'  potatoes, carrots, other vegetables and juice. 2 baseline points plus
-#'  summation of total points for diet attributes. Negative scores recoded to 0,
-#'  resulting in a range from 0 to 10.
+#' @description
+#' Calculates a diet quality score (0-10) based on daily consumption of
+#' fruit, salad, potatoes, carrots, other vegetables, and juice, with
+#' sex-specific penalties for excess potato and juice intake.
 #'
 #' @details
-#'   \itemize{
-#'     \item 1 point per daily fruit and vegetable consumption, excluding fruit
-#'       juice consumption, capped at 8 daily servings
-#'     \item -2 points per daily frequency of fruit juice consumption greater than
-#'       1 daily serving
-#'     \item -2 points if daily potato consumption exceeds the sex-specific limit
-#'       (1 serving for males, 5/7 for females)
-#'     \item -2 points if zero carrot consumption
-#'   }
+#' The scoring algorithm starts from a 2-point baseline and adds or
+#' subtracts based on dietary patterns:
+#' +1 point per daily fruit/vegetable serving (excluding juice, capped
+#' at 8); -2 points if daily juice consumption exceeds 1 serving;
+#' -2 points if daily potato consumption exceeds the sex-specific limit
+#' (1 serving for males, 5/7 for females); -2 points if zero carrot
+#' consumption. Negative totals are floored to 0.
 #'
-#' @param FVCDFRU Daily fruit consumption (servings/day)
-#' @param FVCDSAL Daily salad consumption (servings/day)
-#' @param FVCDPOT Daily potato consumption (servings/day)
-#' @param FVCDCAR Daily carrot consumption (servings/day)
-#' @param FVCDVEG Daily other vegetable consumption (servings/day)
-#' @param FVCDJUI Daily fruit juice consumption (servings/day)
-#' @param DHH_SEX Sex: 1 = Male, 2 = Female
-#' @param output_format Output missing data format: "tagged_na" (default) or "original".
+#' Missing-data handling follows the v3 3-step architecture: input codes
+#' are converted using variable_details.csv metadata, with priority
+#' not applicable > not stated.
 #'
-#' @return Numeric diet score between 0 and 10, or tagged NA for missing/not applicable.
+#' @param FVCDFRU Daily fruit consumption (servings/day).
+#' @param FVCDSAL Daily salad consumption (servings/day).
+#' @param FVCDPOT Daily potato consumption (servings/day).
+#' @param FVCDCAR Daily carrot consumption (servings/day).
+#' @param FVCDVEG Daily other vegetable consumption (servings/day).
+#' @param FVCDJUI Daily fruit juice consumption (servings/day).
+#' @param DHH_SEX Sex (1 = male, 2 = female).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Numeric diet score between 0 and 10. Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Scalar usage
+#' # Scalar
 #' calculate_diet_score(2, 1, 0.5, 0.5, 1, 0.5, 1)
+#'
+#' @seealso \code{\link{categorize_diet_score}}
 #'
 #' @export
 calculate_diet_score <-
@@ -115,25 +122,36 @@ calculate_diet_score <-
   }
 
 
-#' @title Categorize diet score
+#' @title Categorize diet quality score
 #'
-#' @description Categorizes the derived diet score into 3 levels:
-#'   poor (0 to <2), fair (2 to <8), and adequate (8 to 10).
+#' @description
+#' Categorizes the derived diet score into 3 levels: poor (0 to < 2),
+#' fair (2 to < 8), and adequate (8 to 10).
 #'
-#' @param diet_score Derived diet score (0-10). See \code{\link{calculate_diet_score}}.
-#' @param output_format Output missing data format: "tagged_na" (default) or "original".
+#' @details
+#' The cutpoints follow the scoring scheme from
+#' \code{\link{calculate_diet_score}}: scores below 2 indicate poor diet
+#' quality, 2-7 indicate fair quality, and 8-10 indicate adequate
+#' consumption of fruits and vegetables. Missing-data handling follows
+#' the v3 3-step architecture with priority not applicable > not stated.
 #'
-#' @return Integer 1-3 for diet category, or tagged NA:
-#'   \enumerate{
-#'     \item Poor diet (score 0 to <2)
-#'     \item Fair diet (score 2 to <8)
-#'     \item Adequate diet (score 8 to 10)
-#'   }
+#' @param diet_score Derived diet score (0-10). See
+#'   \code{\link{calculate_diet_score}}.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector: 1 = poor (< 2), 2 = fair (2 to < 8),
+#'   3 = adequate (8 to 10). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
+#' # Scalar
 #' categorize_diet_score(1)   # 1 (poor)
 #' categorize_diet_score(5)   # 2 (fair)
 #' categorize_diet_score(9)   # 3 (adequate)
+#'
+#' @seealso \code{\link{calculate_diet_score}}
 #'
 #' @export
 categorize_diet_score <- function(diet_score, output_format = "tagged_na") {

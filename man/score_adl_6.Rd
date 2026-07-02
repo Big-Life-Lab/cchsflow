@@ -46,10 +46,6 @@ ADL_06 (help managing finances) is available in CCHS 2003-2014 cycles
 only; use \code{\link{score_adl}} for 2001 or 2015+ analyses. Missing
 data handling matches the 5-item version.
 }
-\note{
-v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-  implementation; replaces the abandoned helper-based draft.
-}
 \examples{
 # Scalar
 score_adl_6(2, 2, 2, 2, 2, 2) # 0 (independent)
@@ -71,10 +67,6 @@ result <- rec_with_table(
 )
 }
 
-}
-\references{
-Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
-JAMA, 185(12), 914-919.
 }
 \seealso{
 \code{\link{assess_adl}}, \code{\link{score_adl}}

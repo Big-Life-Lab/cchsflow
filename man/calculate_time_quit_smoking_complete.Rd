@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking-cessation.R
 \name{calculate_time_quit_smoking_complete}
 \alias{calculate_time_quit_smoking_complete}
-\title{Calculate Years Since Completely Quit Smoking}
+\title{Calculate years since completely quit smoking}
 \usage{
 calculate_time_quit_smoking_complete(
   SMKDSTY_cat5,
@@ -14,64 +14,52 @@ calculate_time_quit_smoking_complete(
 )
 }
 \arguments{
-\item{SMKDSTY_cat5}{Numeric vector. 5-category smoking status}
+\item{SMKDSTY_cat5}{Numeric. 5-category smoking status
+(1 = daily, 2 = occasional, 3 = former daily, 4 = former
+occasional, 5 = never).}
 
-\item{SMK_10_gate}{Numeric vector. Quit timing gate (1 or 2)}
+\item{SMK_10_gate}{Numeric. Quit timing gate (1 = direct quit,
+2 = gradual reducer).}
 
-\item{SMK_06A_cont}{Numeric vector. Years since quit (former occasional)}
+\item{SMK_06A_cont}{Numeric. Years since quit, former occasional.}
 
-\item{SMK_09A_cont}{Numeric vector. Years since stopped daily}
+\item{SMK_09A_cont}{Numeric. Years since stopped daily smoking.}
 
-\item{SMK_10A_cont}{Numeric vector. Years since quit completely (gradual)}
+\item{SMK_10A_cont}{Numeric. Years since quit completely (gradual).}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector of continuous years since completely quit (0-80+), with:
-- NA::a for current smokers and never smokers
-- NA::b for missing/refused
+Numeric vector of years since completely quit (0-80+).
+  Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Pathway-aware years since the respondent completely quit smoking. Uses
-cat5 smoking status and the quit-timing gate to route to the appropriate
-continuous input (SMK_06A_cont / SMK_09A_cont / SMK_10A_cont). Not
-supported: 2001 (SMK_10A missing), 2022 (_cont feeders skip 2022), and
-cchs2023_p (SMK_10A_cont is Master-only in 2023).
+Derive pathway-aware years since the respondent completely stopped
+smoking, using 5-category status and the quit-timing gate to route
+to the correct continuous feeder variable.
 }
 \details{
-**Implementation method**: 3-step architecture
-- **Step 1**: clean_variables() - Clean all inputs
-- **Step 2**: Pathway-aware logic (cat5 + gate routing)
-- **Step 3**: Output cleaning
-
-**Routing logic**:
-1. Former occasional (SMKDSTY_cat5 == 4): use SMK_06A_cont
-2. Former daily, direct quit (cat5 == 3, gate == 1): use SMK_09A_cont
-3. Former daily, gradual reducer (cat5 == 3, gate == 2): use SMK_10A_cont
-4. Former daily, no gate available: use SMK_09A_cont as proxy
+The function routes former smokers to the appropriate cessation
+timing variable: SMK_06A_cont for former occasional smokers,
+SMK_09A_cont for former daily direct quitters (gate = 1),
+SMK_10A_cont for gradual reducers (gate = 2), and SMK_09A_cont as
+a proxy when the gate is missing. Current smokers and never smokers
+receive tagged_na("a"). Not supported: 2001 (SMK_10A missing),
+2022 (feeders skip 2022), cchs2023_p (SMK_10A_cont Master-only).
 }
 \examples{
-\dontrun{
-# Former occasional
+# Scalar: former occasional smoker
 calculate_time_quit_smoking_complete(
   SMKDSTY_cat5 = 4, SMK_10_gate = NA,
-  SMK_06A_cont = 5.0, SMK_09A_cont = NA, SMK_10A_cont = NA
+  SMK_06A_cont = 5.0, SMK_09A_cont = NA,
+  SMK_10A_cont = NA
 )
-# Returns: 5.0
 
-# Former daily, direct quit
-calculate_time_quit_smoking_complete(
-  SMKDSTY_cat5 = 3, SMK_10_gate = 1,
-  SMK_06A_cont = NA, SMK_09A_cont = 3.5, SMK_10A_cont = NA
-)
-# Returns: 3.5
-
-# Former daily, gradual reducer
-calculate_time_quit_smoking_complete(
-  SMKDSTY_cat5 = 3, SMK_10_gate = 2,
-  SMK_06A_cont = NA, SMK_09A_cont = 5.0, SMK_10A_cont = 2.0
-)
-# Returns: 2.0 (when they quit completely, not when they stopped daily)
 }
-
+\seealso{
+\code{\link{calculate_time_quit_smoking_daily}},
+  \code{\link{assess_quit_pathway}}
 }

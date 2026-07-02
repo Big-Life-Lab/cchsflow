@@ -49,45 +49,36 @@
 # SMKDSTY_cat5 - Smoking status (5 categories) - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Smoking Status Classification - SMKDSTY_cat5 (5 categories)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
-#' 
-#' Creates harmonized SMKDSTY_cat5 variable across CCHS cycles 2001-2023.
-#' This is a 5-category smoking status variable that collapses some categories
-#' from the 6-category versions for simplified analysis.
-#' 
-#' @details 
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**: 
-#'   - 2001-2014: SMKDSTY (SMKADSTY/SMKCDSTY/SMKEDSTY)
-#'   - 2015-2023: SMKDVSTY
-#' - **Harmonization**: Simple mapping with category consolidation
-#' 
-#' **Categories (5)**:
-#' \itemize{
-#'   \item 1 = Current daily smoker
-#'   \item 2 = Current occasional smoker
-#'   \item 3 = Former daily smoker
-#'   \item 4 = Former occasional
-#'   \item 5 = Never smoked
-#' }
-#' 
-#' **Category consolidation**:
-#' - Pre-2015: "Occasional" and "Always occasional" combined → Category 2
-#' - 2015+: "Former occasional" and "Experimental" combined → Category 4
-#' 
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values ("tagged_na" or "standard")
-#' 
-#' @return Vector of smoking status classifications (1-5, plus missing value codes)
-#' 
+#' @title Classify smoking status into 5 categories (SMKDSTY_cat5)
+#'
+#' @description
+#' Harmonize CCHS smoking status into a 5-category classification across
+#' cycles 2001-2023. Implemented via rec_with_table(), not direct R logic.
+#'
+#' @details
+#' This variable collapses the 6-category SMKDSTY into 5 categories by
+#' merging occasional-smoker subcategories. Source variables differ by era:
+#' SMKDSTY (2001-2014) and SMKDVSTY (2015-2023). Pre-2015 "occasional"
+#' and "always occasional" merge into category 2; post-2015 "former
+#' occasional" and "experimental" merge into category 4.
+#'
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector of smoking status (1 = daily, 2 = occasional,
+#'   3 = former daily, 4 = former occasional, 5 = never). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
 #' \dontrun{
-#' # Use rec_with_table() for actual implementation
-#' harmonized_data <- rec_with_table(cchs_data, "SMKDSTY_cat5")
-#' smoking_status_5cat <- harmonized_data$SMKDSTY_cat5
+#' harmonized <- rec_with_table(cchs_data, "SMKDSTY_cat5")
 #' }
-#' 
+#'
+#' @seealso \code{\link{calculate_SMKDSTY_cat3}},
+#'   \code{\link{calculate_SMKDSTY_cat6}}
+#'
 #' @export
 calculate_SMKDSTY_cat5 <- function(data, output_format = "tagged_na") {
   stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMKDSTY_cat5') for implementation")
@@ -98,48 +89,36 @@ calculate_SMKDSTY_cat5 <- function(data, output_format = "tagged_na") {
 # SMKDSTY_cat3 - Smoking status (3 categories) - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Smoking Status Classification - SMKDSTY_cat3 (3 categories)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
-#' 
-#' Creates harmonized SMKDSTY_cat3 variable across CCHS cycles 2001-2023.
-#' This is a 3-category smoking status variable that provides the most simplified
-#' classification for broad population analysis.
-#' 
-#' @details 
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**: 
-#'   - 2001-2014: SMKDSTY (SMKADSTY/SMKCDSTY/SMKEDSTY)
-#'   - 2015-2023: SMKDVSTY
-#' - **Harmonization**: Simple mapping with major category consolidation
-#' 
-#' **Categories (3)**:
-#' \itemize{
-#'   \item 1 = Current smoker
-#'   \item 2 = Former smoker
-#'   \item 3 = Never smoked
-#' }
-#' 
-#' **Category consolidation**:
-#' - **Current smoker (1)**: Combines Daily + Occasional categories
-#'   - Pre-2015: Daily (1) + Occasional (2) + Always occasional (3) → 1
-#'   - 2015+: Daily (1) + Occasional (2) → 1
-#' - **Former smoker (2)**: Combines all former smoking categories
-#'   - Pre-2015: Former daily (4) + Former occasional (5) → 2
-#'   - 2015+: Former daily (3) + Former occasional (4) + Experimental (5) → 2
-#' - **Never smoked (3)**: Remains as category 6 → 3
-#' 
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values ("tagged_na" or "standard")
-#' 
-#' @return Vector of smoking status classifications (1-3, plus missing value codes)
-#' 
+#' @title Classify smoking status into 3 categories (SMKDSTY_cat3)
+#'
+#' @description
+#' Harmonize CCHS smoking status into a 3-category classification across
+#' cycles 2001-2023. Implemented via rec_with_table(), not direct R logic.
+#'
+#' @details
+#' This is the most simplified smoking classification, collapsing all
+#' current smoker subtypes into one category and all former smoker
+#' subtypes into another. Source variables: SMKDSTY (2001-2014) and
+#' SMKDVSTY (2015-2023). Current smoker merges daily + occasional;
+#' former smoker merges all former categories including experimental.
+#'
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector of smoking status (1 = current smoker,
+#'   2 = former smoker, 3 = never smoked). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
 #' \dontrun{
-#' # Use rec_with_table() for actual implementation
-#' harmonized_data <- rec_with_table(cchs_data, "SMKDSTY_cat3")
-#' smoking_status_3cat <- harmonized_data$SMKDSTY_cat3
+#' harmonized <- rec_with_table(cchs_data, "SMKDSTY_cat3")
 #' }
-#' 
+#'
+#' @seealso \code{\link{calculate_SMKDSTY_cat5}},
+#'   \code{\link{calculate_SMKDSTY_cat6}}
+#'
 #' @export
 calculate_SMKDSTY_cat3 <- function(data, output_format = "tagged_na") {
   stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMKDSTY_cat3') for implementation")
@@ -150,48 +129,35 @@ calculate_SMKDSTY_cat3 <- function(data, output_format = "tagged_na") {
 # SMK_005 - Type of smoker presently (3 categories) - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Type of Smoker Presently - SMK_005 (3 categories)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
-#' 
-#' Creates harmonized SMK_005 variable across CCHS cycles 2015-2023.
-#' This variable asks about current smoking behavior and serves as a key
-#' component for SMKDSTY_original reconstruction in the 2015-2023 period.
-#' 
-#' @details 
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**: 
-#'   - 2015-2021: SMK_005 (direct variable)
-#'   - 2022-2023: Derived from SMKDVSTY (1→1, 2→2, [3-6]→3)
-#' - **Harmonization**: Simple 1:1 mapping (2015-2021) or derivation (2022-2023)
-#' 
-#' **Categories (3)**:
-#' \itemize{
-#'   \item 1 = Daily
-#'   \item 2 = Occasionally  
-#'   \item 3 = Not at all
-#' }
-#' 
-#' **Variable evolution**:
-#' - **2015-2021**: Direct survey question "Type of smoker presently"
-#' - **2022-2023**: Derived from SMKDVSTY to maintain harmonization
-#'   - SMKDVSTY 1 (Daily) → SMK_005 1 (Daily)
-#'   - SMKDVSTY 2 (Occasional) → SMK_005 2 (Occasionally)
-#'   - SMKDVSTY 3-6 (All non-smokers) → SMK_005 3 (Not at all)
-#' 
-#' **Usage**: Primary input for SMKDSTY_original complex reconstruction function
-#' 
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values ("tagged_na" or "standard")
-#' 
-#' @return Vector of current smoking status (1-3, plus missing value codes)
-#' 
+#' @title Categorize current smoking behaviour (SMK_005)
+#'
+#' @description
+#' Harmonize CCHS variable SMK_005 (type of smoker presently) across
+#' cycles 2015-2023. Implemented via rec_with_table(), not direct R logic.
+#'
+#' @details
+#' SMK_005 captures whether the respondent currently smokes daily,
+#' occasionally, or not at all. It serves as the primary gate variable
+#' for SMKDSTY_cat6 reconstruction in the 2015-2023 period. Source is
+#' SMK_005 direct (2015-2021) or derived from SMKDVSTY (2022-2023).
+#'
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector of current smoking status (1 = daily,
+#'   2 = occasionally, 3 = not at all). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
 #' \dontrun{
-#' # Use rec_with_table() for actual implementation
-#' harmonized_data <- rec_with_table(cchs_data, "SMK_005")
-#' current_smoking <- harmonized_data$SMK_005
+#' harmonized <- rec_with_table(cchs_data, "SMK_005")
 #' }
-#' 
+#'
+#' @seealso \code{\link{calculate_SMKDSTY_cat6}},
+#'   \code{\link{calculate_SMK_030}}, \code{\link{calculate_SMK_01A}}
+#'
 #' @export
 calculate_SMK_005 <- function(data, output_format = "tagged_na") {
   stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMK_005') for implementation")
@@ -202,49 +168,34 @@ calculate_SMK_005 <- function(data, output_format = "tagged_na") {
 # SMK_030 - Smoked daily - lifetime (2 categories) - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Smoked Daily - Lifetime - SMK_030 (2 categories)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
-#' 
-#' Creates harmonized SMK_030 variable across CCHS cycles 2015-2023.
-#' This variable asks whether occasional/former smokers ever smoked daily
-#' and serves as a key component for SMKDSTY_original reconstruction.
-#' 
-#' @details 
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**: 
-#'   - 2015-2021: SMK_030 (direct variable)
-#'   - 2022-2023: SPU_05 (different underlying source, same harmonized name)
-#' - **Harmonization**: Simple 1:1 mapping with source variable transition
-#' 
-#' **Categories (2)**:
-#' \itemize{
-#'   \item 1 = Yes
-#'   \item 2 = No
-#' }
-#' 
-#' **Variable evolution**:
-#' - **2015-2021**: Direct survey question SMK_030 "Smoked daily - lifetime"
-#' - **2022-2023**: Maps to SPU_05 variable (same question, different variable name)
-#'   - Asked of occasional/former smokers to determine daily smoking history
-#'   - Critical for distinguishing "former daily" vs "never daily" categories
-#' 
-#' **Usage**: 
-#' - Second input for SMKDSTY_original complex reconstruction function
-#' - Determines occasional smoker subcategories (former daily vs never daily)
-#' - Used in conjunction with SMK_005 to classify smoking patterns
-#' 
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values ("tagged_na" or "standard")
-#' 
-#' @return Vector of daily smoking history (1-2, plus missing value codes)
-#' 
+#' @title Assess lifetime daily smoking history (SMK_030)
+#'
+#' @description
+#' Harmonize CCHS variable SMK_030 (ever smoked daily in lifetime) across
+#' cycles 2015-2023. Implemented via rec_with_table(), not direct R logic.
+#'
+#' @details
+#' SMK_030 asks occasional and former smokers whether they ever smoked
+#' daily. It distinguishes "former daily" from "never daily" smokers and
+#' is the second gate variable for SMKDSTY_cat6 reconstruction. Source
+#' is SMK_030 (2015-2021) or SPU_05 (2022-2023).
+#'
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector (1 = yes, 2 = no). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
 #' \dontrun{
-#' # Use rec_with_table() for actual implementation
-#' harmonized_data <- rec_with_table(cchs_data, "SMK_030")
-#' daily_history <- harmonized_data$SMK_030
+#' harmonized <- rec_with_table(cchs_data, "SMK_030")
 #' }
-#' 
+#'
+#' @seealso \code{\link{calculate_SMKDSTY_cat6}},
+#'   \code{\link{calculate_SMK_005}}, \code{\link{calculate_SMK_01A}}
+#'
 #' @export
 calculate_SMK_030 <- function(data, output_format = "tagged_na") {
   stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMK_030') for implementation")
@@ -255,52 +206,36 @@ calculate_SMK_030 <- function(data, output_format = "tagged_na") {
 # SMK_01A - In lifetime, smoked 100 or more cigarettes (2 categories) - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Lifetime 100+ Cigarettes - SMK_01A (2 categories)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
-#' 
-#' Creates harmonized SMK_01A variable across CCHS cycles 2001-2023.
-#' This variable asks about lifetime cigarette consumption threshold (100+ cigarettes)
-#' and serves as the final component for SMKDSTY_original reconstruction and smoking classification.
-#' 
-#' @details 
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**: 
-#'   - 2001-2014: Cycle-specific variables (SMKA_01A, SMKC_01A, SMKE_01A, SMK_01A)
-#'   - 2015-2021: SMK_020 (direct variable)
-#'   - 2022-2023: CSS_15 (different underlying source, same harmonized structure)
-#' - **Harmonization**: Simple 1:1 mapping across all periods with source transitions
-#' 
-#' **Categories (2)**:
-#' \itemize{
-#'   \item 1 = Yes
-#'   \item 2 = No
-#' }
-#' 
-#' **Variable evolution**:
-#' - **2001-2014**: Cycle-specific variable names, consistent question
-#' - **2015-2021**: Standardized as SMK_020 "In lifetime, smoked 100 or more cigarettes"
-#' - **2022-2023**: Maps to CSS_15 variable (same question, different variable name)
-#'   - 100+ cigarette threshold distinguishes experimental from never smokers
-#'   - Critical for "former occasional" vs "never smoker" classification
-#' 
-#' **Usage**: 
-#' - Third input for SMKDSTY_original complex reconstruction function
-#' - Distinguishes experimental/former occasional smokers from never smokers
-#' - Used with SMK_005 and SMK_030 to determine final smoking status categories
-#' - Longest-running harmonized smoking variable (2001-2023 coverage)
-#' 
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values ("tagged_na" or "standard")
-#' 
-#' @return Vector of 100+ cigarette lifetime status (1-2, plus missing value codes)
-#' 
+#' @title Assess lifetime cigarette consumption threshold (SMK_01A)
+#'
+#' @description
+#' Harmonize CCHS variable SMK_01A (smoked 100+ cigarettes in lifetime)
+#' across cycles 2001-2023. Implemented via rec_with_table(), not direct
+#' R logic.
+#'
+#' @details
+#' SMK_01A distinguishes experimental/former occasional smokers from
+#' never smokers using the 100-cigarette threshold. It is the third
+#' gate variable for SMKDSTY_cat6 reconstruction and the longest-running
+#' harmonized smoking variable (2001-2023). Sources: cycle-specific
+#' variables (2001-2014), SMK_020 (2015-2021), CSS_15 (2022-2023).
+#'
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector (1 = yes, 2 = no). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
 #' \dontrun{
-#' # Use rec_with_table() for actual implementation
-#' harmonized_data <- rec_with_table(cchs_data, "SMK_01A")
-#' lifetime_100plus <- harmonized_data$SMK_01A
+#' harmonized <- rec_with_table(cchs_data, "SMK_01A")
 #' }
-#' 
+#'
+#' @seealso \code{\link{calculate_SMKDSTY_cat6}},
+#'   \code{\link{calculate_SMK_005}}, \code{\link{calculate_SMK_030}}
+#'
 #' @export
 calculate_SMK_01A <- function(data, output_format = "tagged_na") {
   stop("DOCUMENTATION ONLY: Use rec_with_table(data, 'SMK_01A') for implementation")
@@ -311,125 +246,52 @@ calculate_SMK_01A <- function(data, output_format = "tagged_na") {
 # SMKDSTY_cat6 - Type of smoker (6 categories) - COMPLEX DERIVATION
 # ================================================================================
 
-#' @title Type of Smoker - SMKDSTY_cat6 (6 categories, harmonized)
-#' @description Complex derived variable using 3-step architecture
+#' @title Derive 6-category smoking status (SMKDSTY_cat6)
 #'
-#' Creates harmonized SMKDSTY_cat6 variable for CCHS cycles 2015+ by applying
-#' the pre-2015 SMKDSTY logic to harmonized variables SMK_005, SMK_030, and SMK_01A.
-#' For 2001-2014, uses direct SMKDSTY variable via rec_with_table().
+#' @description
+#' Reconstruct the pre-2015 SMKDSTY 6-category smoking classification
+#' for CCHS 2015+ cycles using three harmonized gate variables.
 #'
 #' @details
-#' **Implementation Method**: Complex derivation for 2015+ cycles
-#' - **Input variables**: SMK_005 (current status), SMK_030 (ever daily), SMK_01A (100+ cigs)
-#' - **Architecture**: 3-step pattern with clean_variables() → domain logic → clean_variables()
-#' - **Logic source**: CCHS 2013-2014 SMKDSTY specifications applied to harmonized variables
+#' For 2015+ cycles, CCHS replaced the single SMKDSTY variable with
+#' component questions. This function applies the 2013-2014 SMKDSTY
+#' specification to harmonized inputs: SMK_005 (current status),
+#' SMK_030 (ever smoked daily), and SMK_01A (100+ lifetime cigarettes).
+#' For 2001-2014, use rec_with_table() directly.
 #'
-#' **Categories (6)**:
-#' \itemize{
-#'   \item 1 = Daily smoker
-#'   \item 2 = Occasional smoker (former daily smoker)
-#'   \item 3 = Occasional smoker (never a daily smoker)
-#'   \item 4 = Former daily smoker (non-smoker now)
-#'   \item 5 = Former occasional smoker (at least 1 whole cigarette, non-smoker now)
-#'   \item 6 = Never smoked (a whole cigarette)
-#' }
+#' PUMF coverage: 2001-2021, 2023 (2022 gap because SPU_05 was only
+#' asked of daily smokers). Master coverage: 2001-2023. Missing data
+#' is handled via any_missing() and get_priority_missing().
 #'
-#' **PUMF coverage**: 2001-2021, 2023 (2022 gap due to questionnaire redesign where
-#' SPU_05 was only asked of daily smokers, preventing cat2 vs cat3 derivation)
+#' @param SMK_005 Numeric. Current smoking status
+#'   (1 = daily, 2 = occasionally, 3 = not at all).
+#' @param SMK_030 Numeric. Ever smoked daily (1 = yes, 2 = no).
+#' @param SMK_01A Numeric. Lifetime 100+ cigarettes (1 = yes, 2 = no).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' **Master coverage**: 2001-2023 (full coverage)
-#'
-#' **Logic mapping adapted from legacy implementation**:
-#' - **Daily smoker**: SMK_005 = 1 → 1
-#' - **Occasional (former daily)**: SMK_005 = 2 AND SMK_030 = 1 → 2
-#' - **Occasional (never daily)**: SMK_005 = 2 AND (SMK_030 = 2 OR SMK_030 missing) → 3
-#' - **Former daily**: SMK_005 = 3 AND SMK_030 = 1 → 4
-#' - **Former occasional**: SMK_005 = 3 AND SMK_030 = 2 AND SMK_01A = 1 → 5
-#' - **Never smoked**: SMK_005 = 3 AND SMK_01A = 2 → 6
-#'
-#' **Missing data handling**: Uses Level 5-6 infrastructure with any_missing() and get_priority_missing()
-#'
-#' **Input compatibility**:
-#' - **Scalar**: Single values for individual respondents
-#' - **Vector**: Element-wise processing for multiple respondents
-#' - **Database**: Works with data.frame columns (e.g., `data$SMK_005`)
-#' - **Mixed types**: Handles numeric codes (999) and tagged_na inputs
-#'
-#' @param SMK_005 Numeric scalar/vector. Current smoking status (1=Daily, 2=Occasionally, 3=Not at all)
-#' @param SMK_030 Numeric scalar/vector. Ever smoked daily (1=Yes, 2=No)
-#' @param SMK_01A Numeric scalar/vector. Lifetime 100+ cigarettes (1=Yes, 2=No)
-#' @param output_format Character. Output format ("tagged_na" or "original")
-#'
-#' @return Vector of smoking type classifications (1-6, plus missing value codes)
+#' @return Integer vector of smoking type (1 = daily, 2 = occasional
+#'   former daily, 3 = occasional never daily, 4 = former daily,
+#'   5 = former occasional, 6 = never smoked). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' \dontrun{
-#' # Example 1: Vector inputs - All 6 smoking status categories
-#' smoking_status <- calculate_SMKDSTY_cat6(
-#'   SMK_005 = c(1, 2, 2, 3, 3, 3),      # Current smoking status
-#'   SMK_030 = c(1, 1, 2, 1, 2, 2),      # Ever smoked daily
-#'   SMK_01A = c(1, 1, 1, 1, 1, 2),      # 100+ cigarettes lifetime
-#'   output_format = "tagged_na"
-#' )
-#' # Returns: c(1, 2, 3, 4, 5, 6)
-#' # 1=Daily, 2=Occasional(former daily), 3=Occasional(never daily),
-#' # 4=Former daily, 5=Former occasional, 6=Never smoked
+#' # Scalar input
+#' calculate_SMKDSTY_cat6(SMK_005 = 1, SMK_030 = 1, SMK_01A = 1)
 #'
-#' # Example 2: Scalar inputs - Single respondent
-#' single_respondent <- calculate_SMKDSTY_cat6(
-#'   SMK_005 = 2,                        # Occasionally
-#'   SMK_030 = 1,                        # Yes, smoked daily before
-#'   SMK_01A = 1,                        # Yes, 100+ cigarettes
-#'   output_format = "original"
-#' )
-#' # Returns: 2 (Occasional smoker, former daily)
-#'
-#' # Example 3: Database-like usage with data.frame
-#' cchs_data <- data.frame(
-#'   respondent_id = 1001:1003,
-#'   SMK_005 = c(1, 999, 2),            # Daily, Missing, Occasionally
-#'   SMK_030 = c(1, 1, 999),            # Yes, Yes, Missing
-#'   SMK_01A = c(1, 1, 1)               # All have 100+ cigarettes
+#' # Vector input
+#' calculate_SMKDSTY_cat6(
+#'   SMK_005 = c(1, 2, 3),
+#'   SMK_030 = c(1, 1, 1),
+#'   SMK_01A = c(1, 1, 1)
 #' )
 #'
-#' cchs_data$SMKDSTY_cat6 <- calculate_SMKDSTY_cat6(
-#'   cchs_data$SMK_005,
-#'   cchs_data$SMK_030,
-#'   cchs_data$SMK_01A,
-#'   output_format = "tagged_na"
-#' )
-#' # Creates new column with: c(1, tagged_na("b"), 3)
-#' # Note: Missing SMK_030 with SMK_005=2 gives category 3 (never daily)
-#'
-#' # Example 4: Handling missing data - different output formats
-#' missing_example_tagged <- calculate_SMKDSTY_cat6(
-#'   SMK_005 = c(1, 999, 2),            # 999 = missing code
-#'   SMK_030 = c(1, 1, 999),            # 999 = missing SMK_030
-#'   SMK_01A = c(1, 1, 1),
-#'   output_format = "tagged_na"        # Modern format
-#' )
-#' # Returns: c(1, tagged_na("b"), 3)
-#'
-#' missing_example_original <- calculate_SMKDSTY_cat6(
-#'   SMK_005 = c(1, 999, 2),
-#'   SMK_030 = c(1, 1, 999),
-#'   SMK_01A = c(1, 1, 1),
-#'   output_format = "original"         # Legacy compatibility
-#' )
-#' # Returns: c(1, NA, 3) - Same logic, different format
-#'
-#' # Example 5: Mixed input types (tagged_na + numeric)
-#' mixed_inputs <- calculate_SMKDSTY_cat6(
-#'   SMK_005 = c(1, haven::tagged_na("b"), 2),
-#'   SMK_030 = c(1, 1, 2),
-#'   SMK_01A = c(1, 1, 1),
-#'   output_format = "tagged_na"
-#' )
-#' # Returns: c(1, tagged_na("b"), 3) - Handles pre-tagged inputs
-#'
-#' # For 2001-2014 cycles, use direct variable harmonization:
-#' # harmonized_data <- rec_with_table(cchs_data, "SMKDSTY_cat6")
-#' }
+#' @seealso \code{\link{calculate_SMKDSTY_cat5}},
+#'   \code{\link{calculate_SMKDSTY_cat3}},
+#'   \code{\link{calculate_SMK_005}},
+#'   \code{\link{calculate_SMK_030}},
+#'   \code{\link{calculate_SMK_01A}}
 #'
 #' @export
 calculate_SMKDSTY_cat6 <- function(SMK_005 = NULL, SMK_030 = NULL, SMK_01A = NULL,
@@ -497,17 +359,12 @@ calculate_SMKDSTY_cat6 <- function(SMK_005 = NULL, SMK_030 = NULL, SMK_01A = NUL
   return(prep_cat_output(output_clean$SMKDSTY_original))
 }
 
-#' @title Type of Smoker - SMKDSTY_original (deprecated alias)
-#' @description Deprecated alias for [calculate_SMKDSTY_cat6()]. Use
-#'   `calculate_SMKDSTY_cat6()` directly for new code.
-#' @param ... Arguments passed to [calculate_SMKDSTY_cat6()]
-#' @return Vector of smoking type classifications (1-6, plus missing value codes)
+#' @title Derive 6-category smoking status (deprecated alias)
 #'
-#' @examples
-#' \dontrun{
-#' # Deprecated: use calculate_SMKDSTY_cat6() instead
-#' calculate_SMKDSTY_original(SMK_005 = 1, SMK_030 = 2, SMK_01A = 1)
-#' }
+#' @description
+#' Deprecated. Use \code{\link{calculate_SMKDSTY_cat6}} instead.
+#'
+#' @param ... Arguments passed to \code{\link{calculate_SMKDSTY_cat6}}.
 #'
 #' @export
 calculate_SMKDSTY_original <- function(...) {
@@ -520,97 +377,45 @@ calculate_SMKDSTY_original <- function(...) {
 # smoke_simple - Simplified smoking status (4 categories) - COMPLEX DERIVATION
 # ================================================================================
 
-#' @title Simplified Smoking Status - smoke_simple (4 categories)
-#' @description Complex derived variable using 3-step architecture
-#' 
-#' Creates harmonized smoke_simple variable across CCHS cycles 2003-2018 by combining
-#' SMKDSTY_cat5 smoking status with time_quit_smoking to create simplified categories
-#' for population-level smoking analysis.
-#' 
-#' @details 
-#' **Implementation Method**: Complex derivation requiring two input variables
-#' - **Input variables**: SMKDSTY_cat5 (5-category smoking status), time_quit_smoking (years since quit)
-#' - **Architecture**: 3-step pattern with clean_variables() → domain logic → clean_variables()
-#' - **Logic source**: Legacy smoke_simple_fun() from smoking-legacy-v2-1-0.R:138-176
-#' 
-#' **Categories (4)**:
-#' \itemize{
-#'   \item 0 = Non-smoker (never smoked)
-#'   \item 1 = Current smoker (daily and occasional)  
-#'   \item 2 = Former daily smoker quit ≤5 years OR former occasional smoker
-#'   \item 3 = Former daily smoker quit >5 years
-#' }
-#' 
-#' **Logic mapping from legacy implementation**:
-#' - **Non-smoker (0)**: SMKDSTY_cat5 = 5 (never smoked) -> 0
-#' - **Current smoker (1)**: SMKDSTY_cat5 in 1,2 (daily/occasional) -> 1
-#' - **Former <=5yrs/occasional (2)**:
-#'   - SMKDSTY_cat5 = 4 (former occasional) -> 2, OR
-#'   - SMKDSTY_cat5 = 3 (former daily) AND time_quit_smoking <= 5 -> 2
-#' - **Former >5yrs (3)**: SMKDSTY_cat5 = 3 AND time_quit_smoking > 5 -> 3
-#' 
-#' **Missing data handling**: Uses Level 5-6 infrastructure with any_missing() and get_priority_missing()
-#' 
-#' **Research applications**: 
-#' - Population smoking prevalence studies
-#' - Simplified exposure categories for epidemiological analysis
-#' - Health outcome risk stratification
-#' 
-#' @param SMKDSTY_cat5 Numeric scalar/vector. 5-category smoking status (1=Daily, 2=Occasional, 3=Former daily, 4=Former occasional, 5=Never)
-#' @param time_quit_smoking Numeric scalar/vector. Approximate years since quitting smoking (continuous)
-#' @param output_format Character. Output format ("tagged_na" or "original")
-#' 
-#' @return Vector of simplified smoking classifications (0-3, plus missing value codes)
-#' 
+#' @title Derive simplified 4-category smoking status (smoke_simple)
+#'
+#' @description
+#' Combine 5-category smoking status with cessation timing to produce a
+#' simplified 4-category variable for population-level analysis.
+#'
+#' @details
+#' This derived variable merges SMKDSTY_cat5 with time_quit_smoking to
+#' separate recent quitters (5 years or less) from long-term quitters.
+#' Former occasional smokers are grouped with recent quitters. The
+#' function uses the 3-step architecture (clean, derive, clean) and
+#' handles missing data via get_priority_missing().
+#'
+#' @param SMKDSTY_cat5 Numeric. 5-category smoking status
+#'   (1 = daily, 2 = occasional, 3 = former daily, 4 = former
+#'   occasional, 5 = never).
+#' @param time_quit_smoking Numeric. Years since quitting (continuous).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector (0 = never smoker, 1 = current smoker,
+#'   2 = former quit 5 years or less / former occasional,
+#'   3 = former quit more than 5 years). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
-#' \dontrun{
-#' # Example 1: Vector inputs - All 4 smoking categories
-#' simple_status <- calculate_smoke_simple(
-#'   SMKDSTY_cat5 = c(5, 1, 2, 3, 3, 4),
-#'   time_quit_smoking = c(NA, NA, NA, 3, 8, 2),
-#'   output_format = "tagged_na"
+#' # Scalar input
+#' calculate_smoke_simple(SMKDSTY_cat5 = 3, time_quit_smoking = 4)
+#'
+#' # Vector input
+#' calculate_smoke_simple(
+#'   SMKDSTY_cat5 = c(5, 1, 3, 4),
+#'   time_quit_smoking = c(NA, NA, 8, 2)
 #' )
-#' # Returns: c(0, 1, 1, 2, 3, 2)
-#' # 0=Never, 1=Current, 2=Former <=5yrs, 3=Former >5yrs
-#' 
-#' # Example 2: Scalar inputs - Single respondent
-#' former_daily_recent <- calculate_smoke_simple(
-#'   SMKDSTY_cat5 = 3,              # Former daily smoker
-#'   time_quit_smoking = 4,         # Quit 4 years ago
-#'   output_format = "original"
-#' )
-#' # Returns: 2 (Former daily smoker quit ≤5 years)
-#' 
-#' # Example 3: Database-like usage
-#' cchs_data <- data.frame(
-#'   respondent_id = 2001:2005,
-#'   SMKDSTY_cat5 = c(1, 3, 3, 4, 5),           # Daily, Former daily x2, Former occasional, Never
-#'   time_quit_smoking = c(NA, 2, 10, 1, NA)     # Current/never have NA
-#' )
-#' 
-#' cchs_data$smoke_simple <- calculate_smoke_simple(
-#'   cchs_data$SMKDSTY_cat5,
-#'   cchs_data$time_quit_smoking,
-#'   output_format = "tagged_na"
-#' )
-#' # Creates: c(1, 2, 3, 2, 0) - Current daily, Former ≤5yrs, Former >5yrs, Former occasional, Never
-#' 
-#' # Example 4: Missing data handling
-#' missing_example <- calculate_smoke_simple(
-#'   SMKDSTY_cat5 = c(1, 999, 3),              # Daily, Missing, Former daily
-#'   time_quit_smoking = c(NA, 5, 999),         # Current smoker NA, 5 years, Missing quit time
-#'   output_format = "tagged_na"
-#' )
-#' # Returns: c(1, tagged_na("b"), tagged_na("b"))
-#' 
-#' # Use with rec_with_table() for harmonized input variables:
-#' # harmonized_data <- rec_with_table(cchs_data, c("SMKDSTY_cat5", "time_quit_smoking"))
-#' # simple_smoking <- calculate_smoke_simple(
-#' #   harmonized_data$SMKDSTY_cat5,
-#' #   harmonized_data$time_quit_smoking
-#' # )
-#' }
-#' 
+#'
+#' @seealso \code{\link{calculate_SMKDSTY_cat5}},
+#'   \code{\link{calculate_time_quit_smoking_complete}}
+#'
 #' @export
 calculate_smoke_simple <- function(SMKDSTY_cat5 = NULL, time_quit_smoking = NULL,
                                    output_format = "tagged_na") {

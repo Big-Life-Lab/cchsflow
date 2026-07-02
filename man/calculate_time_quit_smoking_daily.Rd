@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking-cessation.R
 \name{calculate_time_quit_smoking_daily}
 \alias{calculate_time_quit_smoking_daily}
-\title{Calculate Years Since Stopped Smoking Daily}
+\title{Calculate years since stopped smoking daily}
 \usage{
 calculate_time_quit_smoking_daily(
   SMKDSTY_cat5,
@@ -12,57 +12,45 @@ calculate_time_quit_smoking_daily(
 )
 }
 \arguments{
-\item{SMKDSTY_cat5}{Numeric vector. 5-category smoking status}
+\item{SMKDSTY_cat5}{Numeric. 5-category smoking status
+(1 = daily, 2 = occasional, 3 = former daily, 4 = former
+occasional, 5 = never).}
 
-\item{SMK_09A_cont}{Numeric vector. PUMF midpoint-imputed years since stopped daily}
+\item{SMK_09A_cont}{Numeric. PUMF midpoint-imputed years since
+stopped daily.}
 
-\item{SMK_09C}{Numeric vector. Master exact years since stopped daily}
+\item{SMK_09C}{Numeric. Master exact years since stopped daily
+(NULL if not available).}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector of continuous years since stopped smoking daily (0-80+), with:
-- NA::a for current smokers, never smokers, and former occasional-only smokers
-- NA::b for missing/refused
+Numeric vector of years since stopped daily (0-80+).
+  Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Continuous years since the respondent stopped smoking daily. Uses
-SMK_09C (Master exact years) when available, falling back to
-SMK_09A_cont (PUMF midpoint imputation).
+Derive continuous years since the respondent stopped daily smoking,
+preferring Master exact values (SMK_09C) with PUMF midpoint fallback
+(SMK_09A_cont).
 }
 \details{
-**Implementation method**: 3-step architecture
-- **Step 1**: clean_variables() - Clean all inputs
-- **Step 2**: Master priority + PUMF fallback
-- **Step 3**: Output cleaning
-
-**Routing logic**:
-1. SMK_09C available (Master 2001-2021): use directly (exact years)
-2. SMK_09A_cont available (PUMF, or Master fallback): use midpoint value
-3. Current/never/occasional-only smokers: NA::a (not applicable)
-
-**Universe**: Former daily smokers only. Former occasional smokers who
-never smoked daily receive NA::a.
+Routing: SMK_09C (Master 2001-2021 exact years) takes priority;
+SMK_09A_cont (PUMF midpoint imputation) is used as fallback. Only
+former daily smokers (SMKDSTY_cat5 == 3) receive valid values.
+Current smokers, never smokers, and former occasional-only smokers
+receive tagged_na("a").
 }
 \examples{
-\dontrun{
-# Master - exact years available
-calculate_time_quit_smoking_daily(
-  SMKDSTY_cat5 = 3, SMK_09A_cont = NA, SMK_09C = 7.0
-)
-# Returns: 7.0
-
-# PUMF - midpoint imputation
+# Scalar: former daily smoker with PUMF data
 calculate_time_quit_smoking_daily(
   SMKDSTY_cat5 = 3, SMK_09A_cont = 2.5, SMK_09C = NA
 )
-# Returns: 2.5
 
-# Former occasional (never daily) - not applicable
-calculate_time_quit_smoking_daily(
-  SMKDSTY_cat5 = 4, SMK_09A_cont = NA, SMK_09C = NA
-)
-# Returns: NA::a
 }
-
+\seealso{
+\code{\link{calculate_time_quit_smoking_complete}},
+  \code{\link{assess_quit_pathway}}
 }

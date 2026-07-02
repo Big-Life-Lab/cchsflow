@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoke-intensity.R
 \name{calculate_cigs_per_day}
 \alias{calculate_cigs_per_day}
-\title{Unified Daily Smoking Intensity - cigs_per_day}
+\title{Calculate unified daily cigarette intensity (cigs_per_day)}
 \usage{
 calculate_cigs_per_day(
   SMKDSTY_original = NULL,
@@ -12,93 +12,47 @@ calculate_cigs_per_day(
 )
 }
 \arguments{
-\item{SMKDSTY_original}{Numeric vector. Smoking status (6-category, pre-2015 definitions).
-1=Daily, 2=Occasional (former daily), 3=Occasional (never daily),
-4=Former daily, 5=Former occasional, 6=Never smoked.}
+\item{SMKDSTY_original}{Numeric. 6-category smoking status
+(1 = daily, 2 = occasional former daily, 3 = occasional never
+daily, 4 = former daily, 5 = former occasional, 6 = never).}
 
-\item{SMK_204}{Numeric vector. Cigarettes per day for current daily smokers.
-Valid range: 1-99 cigarettes.}
+\item{SMK_204}{Numeric. Cigarettes per day, current daily smokers
+(1-99).}
 
-\item{SMK_208}{Numeric vector. Cigarettes per day for former daily smokers.
-Valid range: 1-99 cigarettes.}
+\item{SMK_208}{Numeric. Cigarettes per day, former daily smokers
+(1-99).}
 
-\item{output_format}{Character. Output format for missing values.
-Options: "tagged_na" (default) or "original".}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector with unified cigarettes per day values.
-  - Valid values: 1-99 cigarettes
-  - NA::a: Not applicable (never-daily smokers)
-  - NA::b: Missing data
+Numeric vector of cigarettes per day (1-99). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Calculate unified cigarettes per day for ever-daily smokers
-
-Creates a unified `cigs_per_day` variable that combines SMK_204 (current daily
-smokers) and SMK_208 (former daily smokers) into a single derived variable.
-This follows the same unification pattern as `age_start_smoking` and
-`time_quit_smoking`.
+Combine SMK_204 (current daily) and SMK_208 (former daily) into a
+single cigarettes-per-day variable, routed by 6-category smoking status.
 }
 \details{
-**Rationale**: SMK_204 and SMK_208 are mutually exclusive by design:
-- **SMK_204**: Current daily smokers (status 1) - "How many cigarettes do you currently smoke per day?"
-- **SMK_208**: Former daily smokers (status 2, 4) - "When you smoked daily, how many cigarettes did you usually smoke per day?"
-
-Both measure the **same concept**: daily smoking intensity. The difference is only
-timing (current vs recalled). A unified variable simplifies the mental model and
-aligns with how `age_start_smoking` and `time_quit_smoking` work.
-
-**Routing Logic**:
-\itemize{
-  \item SMKDSTY_original == 1 (current daily) -> uses SMK_204
-  \item SMKDSTY_original == 2 (occasional, former daily) -> uses SMK_208
-  \item SMKDSTY_original == 4 (former daily, non-smoker now) -> uses SMK_208
-  \item SMKDSTY_original %in% c(3, 5, 6) (never daily) -> NA::a (not applicable)
-  \item Missing SMKDSTY_original -> NA::b (missing)
-}
-
-**Coverage**: Full PUMF 2001-2023, Full Master 2001-2023.
-}
-\note{
-v3.0.0-alpha, last updated: 2026-01-09, status: active - Unified daily intensity
+SMK_204 and SMK_208 are mutually exclusive: SMK_204 applies to current
+daily smokers (status 1), SMK_208 to former daily smokers (status 2
+and 4). Both capture the same concept (daily intensity) at different
+time points. This function unifies them into a single variable,
+following the same pattern as age_start_smoking and
+time_quit_smoking. Never-daily smokers (status 3, 5, 6) receive
+tagged_na("a"). Coverage: PUMF and Master 2001-2023.
 }
 \examples{
-\dontrun{
-# Current daily smoker (status 1) - uses SMK_204
-cigs <- calculate_cigs_per_day(
-  SMKDSTY_original = 1,
-  SMK_204 = 20,
-  SMK_208 = NA
-)
-# Returns: 20
+# Scalar: current daily smoker
+calculate_cigs_per_day(SMKDSTY_original = 1, SMK_204 = 20)
 
-# Former daily smoker (status 4) - uses SMK_208
-cigs <- calculate_cigs_per_day(
-  SMKDSTY_original = 4,
-  SMK_204 = NA,
-  SMK_208 = 15
-)
-# Returns: 15
-
-# Never-daily smoker (status 3) - not applicable
-cigs <- calculate_cigs_per_day(
-  SMKDSTY_original = 3,
-  SMK_204 = NA,
-  SMK_208 = NA
-)
-# Returns: NA::a (not applicable)
-
-# Vector inputs with mixed status values
-status <- c(1, 2, 3, 4, 5, 6)
-smk_204 <- c(20, NA, NA, NA, NA, NA)
-smk_208 <- c(NA, 15, NA, 25, NA, NA)
-result <- calculate_cigs_per_day(status, smk_204, smk_208)
-# Returns: c(20, 15, NA::a, 25, NA::a, NA::a)
-}
+# Scalar: former daily smoker
+calculate_cigs_per_day(SMKDSTY_original = 4, SMK_208 = 15)
 
 }
 \seealso{
-\code{\link{calculate_age_start_smoking}} for age started smoking unification,
-\code{\link{calculate_time_quit_smoking}} for time quit smoking unification,
-\code{\link{calculate_pack_years}} for pack-years calculation using intensity.
+\code{\link{calculate_SMK_204}},
+  \code{\link{calculate_SMK_208}},
+  \code{\link{calculate_pack_years}}
 }

@@ -2,65 +2,43 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_SMKG203_cont}
 \alias{calculate_SMKG203_cont}
-\title{Age Started Smoking Daily - Daily Smoker - SMKG203_cont (continuous)}
+\title{Derive continuous age started daily smoking for daily smokers
+  (SMKG203_cont)}
 \usage{
 calculate_SMKG203_cont(SMK_005, SMKG040_cont, output_format = "tagged_na")
 }
 \arguments{
-\item{SMK_005}{Numeric vector. Current smoking status}
+\item{SMK_005}{Numeric. Current smoking status
+(1 = daily, 2 = occasionally, 3 = not at all).}
 
-\item{SMKG040_cont}{Numeric vector. Continuous age started smoking daily}
+\item{SMKG040_cont}{Numeric. Continuous age started smoking daily
+(5-121 years).}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of continuous age values for daily smokers (5-121 years, plus missing codes)
+Numeric vector of age started daily smoking (5-121).
+  Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Creates harmonized SMKG203_cont variable across CCHS cycles 2015-2023.
-This variable provides continuous age when daily smokers started smoking daily.
+Filter SMKG040_cont by SMK_005 to produce a continuous age-started
+variable restricted to current daily smokers (SMK_005 == 1).
 }
 \details{
-**Implementation method**: 3-step architecture
-- **Step 1**: Clean_variables() - Clean SMK_005 and SMKG040_cont inputs
-- **Step 2**: Missing data functions + domain logic - Filter by SMK_005 = 1 (daily smoker)
-- **Step 3**: Categorical-to-continuous conversion using variable_details.csv
-
-**Legacy logic pattern** (from variable_details.csv):
-- Filter: SMK_005 == 1 → use SMKG040_cont 
-- Missing: SMK_005 == 'NA(a)' | SMKG040_cont == 'NA(a)' → return 'NA(a)'
-- Otherwise → return 'NA(b)'
-
-**Architecture improvements**:
-- Uses variable_details.csv recStart/recEnd mappings for conversion
-- Supports both 2001-2014 direct variables and 2015+ derivation
-
-**Input requirements**:
-- SMK_005: Current smoking status (1 = daily, 2 = occasional, 3 = not at all)
-- SMKG040_cont: Continuous age started smoking daily (5-121 years)
+Non-daily smokers receive tagged_na("a"). The function uses 3-step
+architecture: clean inputs, apply SMK_005 gate logic, clean output.
+Supports both 2001-2014 direct variables and 2015+ derivation.
 }
 \examples{
-\dontrun{
-# Scalar inputs - single respondent
-result_scalar <- calculate_SMKG203_cont(SMK_005 = 1, SMKG040_cont = 18.5)
-# Returns: 18.5 (daily smoker gets age)
+# Scalar: daily smoker
+calculate_SMKG203_cont(SMK_005 = 1, SMKG040_cont = 18.5)
 
-# Vector inputs - multiple respondents  
-smk_005 <- c(1, 2, 3, 1, 997, 999)  # daily, occasional, non-smoker, daily, missing, missing
-ages <- c(16.5, 20.0, 25.0, 22.0, 16.0, 30.0)
-result_vector <- calculate_SMKG203_cont(smk_005, ages)
-# Returns: c(16.5, NA::a, NA::a, 22.0, NA::b, NA::b)
-
-# Different output formats
-result_tagged <- calculate_SMKG203_cont(smk_005, ages, "tagged_na")
-# Returns tagged_na for missing (haven format)
-
-result_original <- calculate_SMKG203_cont(smk_005, ages, "original") 
-# Returns original CCHS missing codes (996, 999, etc.)
-
-# Integration with rec_with_table() for CCHS harmonization
-harmonized_data <- rec_with_table(cchs_data, "SMKG203_cont", 
-                                  custom_function = calculate_SMKG203_cont)
 }
-
+\seealso{
+\code{\link{calculate_SMKG207_cont}},
+  \code{\link{calculate_SMKG040_cont}},
+  \code{\link{calculate_age_start_smoking}}
 }

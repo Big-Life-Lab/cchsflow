@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_age_start_smoking}
 \alias{calculate_age_start_smoking}
-\title{Unified Age Started Smoking Daily - age_start_smoking}
+\title{Calculate unified age started smoking daily (age_start_smoking)}
 \usage{
 calculate_age_start_smoking(
   age_start_smoking = NULL,
@@ -10,53 +10,34 @@ calculate_age_start_smoking(
 )
 }
 \arguments{
-\item{age_start_smoking}{Numeric. Age started smoking daily (continuous).
-The worksheet routes the appropriate source variable:
-PUMF provides SMKG040_cont, Master provides SMK_040.}
+\item{age_start_smoking}{Numeric. Age started smoking daily
+(continuous). Worksheet routes SMKG040_cont or SMK_040.}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector of age started smoking daily (continuous, plus missing codes)
+Numeric vector of age started daily smoking. Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Creates unified age_start_smoking derived variable across
-  CCHS cycles.
-
-Receives a single continuous age input — the worksheet routes the
-appropriate source variable depending on database type:
-- **PUMF**: SMKG040_cont (midpoint estimation from grouped categories)
-- **Master**: SMK_040 (exact continuous age)
+Pass-through wrapper that provides a self-documenting variable name
+for age started daily smoking. The worksheet routes the appropriate
+source: SMKG040_cont (PUMF) or SMK_040 (Master).
 }
 \details{
-**Implementation method**: 3-step architecture (single-source pass-through)
-- **Step 1**: clean_variables() - Clean continuous age input
-- **Step 2**: Direct pass-through (source routing handled by worksheet)
-- **Step 3**: Output cleaning with age_start_smoking metadata
-
-**Coverage**:
-- PUMF: 2001-2021 via SMKG040_cont (midpoint imputation)
-- Master: 2001-2023 via SMK_040 (exact continuous)
-
-**Universe**: Ever-daily smokers (SMKDSTY 1, 2, 4)
-- Returns NA::a for never-daily smokers (SMKDSTY 3, 5, 6)
-- Returns NA::b for missing input data
+Universe: ever-daily smokers (SMKDSTY 1, 2, 4). Never-daily smokers
+receive tagged_na("a"). Coverage: PUMF 2001-2021 (midpoint), Master
+2001-2023 (exact continuous). Uses 3-step pass-through architecture.
 }
 \examples{
-\dontrun{
-# Single value
+# Scalar
 calculate_age_start_smoking(18)
-# Returns: 18
 
-# Vector with missing values
-calculate_age_start_smoking(c(18, 25, NA, 16))
-
-# Tagged NA pass-through (never-daily smoker)
-calculate_age_start_smoking(haven::tagged_na("a"))
-# Returns: NA::a (not applicable)
-
-# NULL input returns NA::b (missing)
-calculate_age_start_smoking(NULL)
 }
-
+\seealso{
+\code{\link{calculate_SMKG040_cont}},
+  \code{\link{calculate_cigs_per_day}},
+  \code{\link{calculate_pack_years}}
 }

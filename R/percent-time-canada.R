@@ -1,30 +1,42 @@
-#' @title Calculate percent time in Canada
+#' @title Calculate percent of life spent in Canada
 #'
-#' @description Calculates the percentage of a respondent's life spent in
-#'  Canada. For respondents born outside Canada,
-#'  percent time = years in Canada / age * 100.
-#'  For respondents born in Canada, returns 100.
+#' @description
+#' Calculates the percentage of a respondent's life spent in Canada.
+#' For respondents born outside Canada, percent time = years in
+#' Canada / age * 100. For respondents born in Canada, returns 100.
+#'
+#' @details
+#' Source-agnostic: the worksheet routes DHHGAGE_cont / SDCGCBG /
+#' SDCGRES_cont (PUMF) or DHH_AGE / SDCGCB / SDCDRES (Master) to the
+#' same semantic parameters. Values outside 0-100 (indicating
+#' inconsistent inputs) are recoded to not stated. Missing-data handling
+#' follows the v3 3-step architecture with priority not applicable > not
+#' stated.
 #'
 #' @param age Continuous age (DHHGAGE_cont for PUMF, DHH_AGE for Master).
-#' @param born_in_canada Country of birth: 1 = Canada, 2 = outside Canada
-#'   (SDCGCBG for PUMF, SDCGCB for Master).
-#' @param years_in_canada Continuous years in Canada (SDCGRES_cont for PUMF,
-#'   SDCDRES for Master).
-#' @param output_format Output missing data format: "tagged_na" (default) or "original".
+#' @param born_in_canada Country of birth (1 = Canada, 2 = outside Canada).
+#' @param years_in_canada Continuous years in Canada.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' @return Numeric value between 0 and 100 representing percentage of life
-#'   in Canada, or tagged NA for missing/not applicable.
+#' @return Numeric vector: percentage of life in Canada (0-100). Missing
+#'   data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Scalar usage
+#' # Scalar
 #' calculate_pct_time(age = 27, born_in_canada = 2, years_in_canada = 4.5)
 #'
-#' # Vector usage
+#' # Vector
 #' calculate_pct_time(
 #'   age = c(27, 40, 35),
 #'   born_in_canada = c(2, 1, 2),
 #'   years_in_canada = c(4.5, 4.5, 15)
 #' )
+#'
+#' @seealso \code{\link{categorize_pct_time}},
+#'   \code{\link{categorize_immigration}}
+#'
 #' @export
 calculate_pct_time <- function(age, born_in_canada, years_in_canada,
                                 output_format = "tagged_na") {
@@ -65,25 +77,35 @@ calculate_pct_time <- function(age, born_in_canada, years_in_canada,
   return(output_cleaned$pct_time_der)
 }
 
-#' @title Categorize percent time in Canada
+#' @title Categorize percent time in Canada into deciles
 #'
-#' @description Categorizes the derived percent time in Canada variable
-#'  (pct_time_der) into 10 percent intervals for pct_time_der_cat10.
+#' @description
+#' Categorizes the derived percent time in Canada variable into 10
+#' equal-width intervals (0-10, 11-20, ..., 91-100).
 #'
-#' @param pct_time_der Derived continuous percent time in Canada.
-#'   See \code{\link{calculate_pct_time}} for documentation on how variable
-#'   was derived.
-#' @param output_format Output missing data format: "tagged_na" (default) or "original".
+#' @details
+#' Each 10-percentage-point band maps to an integer code 1-10. This
+#' provides a standard grouping for cross-tabulation and modelling.
+#' Missing-data handling follows the v3 3-step architecture with priority
+#' not applicable > not stated.
 #'
-#' @return Integer 1-10 for categorical percent time in Canada,
-#'   or tagged NA for missing/not applicable.
+#' @param pct_time_der Derived continuous percent time in Canada (0-100).
+#'   See \code{\link{calculate_pct_time}}.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector: 1-10 for categorical percent time in Canada.
+#'   Missing data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Scalar usage
+#' # Scalar
 #' categorize_pct_time(55.5)
 #'
-#' # Vector usage
+#' # Vector
 #' categorize_pct_time(c(5, 25, 55, 85, 100))
+#'
+#' @seealso \code{\link{calculate_pct_time}}
 #'
 #' @export
 categorize_pct_time <- function(pct_time_der, output_format = "tagged_na") {

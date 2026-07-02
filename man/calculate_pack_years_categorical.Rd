@@ -2,56 +2,40 @@
 % Please edit documentation in R/smoke-pack-years.R
 \name{calculate_pack_years_categorical}
 \alias{calculate_pack_years_categorical}
-\title{Categorise Pack-Years into 5 Groups}
+\title{Categorize pack-years into 5 exposure groups}
 \usage{
 calculate_pack_years_categorical(pack_years_der, output_format = "tagged_na")
 }
 \arguments{
-\item{pack_years_der}{Numeric. Continuous pack-years from [calculate_pack_years()].}
+\item{pack_years_der}{Numeric. Continuous pack-years from
+\code{\link{calculate_pack_years}}.}
 
-\item{output_format}{Character. Output format for missing values
-("tagged_na" or "numeric").}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector with categories 0-4:
-  - 0: Never smoker (pack-years == 0)
-  - 1: Light (0 < pack-years < 10)
-  - 2: Moderate (10 <= pack-years < 20)
-  - 3: Heavy (20 <= pack-years < 30)
-  - 4: Very heavy (pack-years >= 30)
+Integer vector (0 = never, 1 = light, 2 = moderate,
+  3 = heavy, 4 = very heavy). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Converts continuous pack-years values into a 5-category ordinal variable.
-This function is called by `rec_with_table()` via the
-`Func::calculate_pack_years_categorical` reference in `variable_details.csv`.
+Convert continuous pack-years into a 5-category ordinal variable for
+epidemiological stratification.
 }
 \details{
-Cut-points are defined in `PACK_YEARS_CONSTANTS$pack_years_cat_breaks` and
-match the `recStart`/`recEnd` ranges in `variable_details.csv` for
-`pack_years_cat`. The cut-points are pending epidemiological review;
-the worksheet status is `pending_review`.
+Cut-points are defined in PACK_YEARS_CONSTANTS and match the
+recStart/recEnd ranges in variable_details.csv for pack_years_cat.
+Categories: 0 = never (0), 1 = light (0-10), 2 = moderate (10-20),
+3 = heavy (20-30), 4 = very heavy (30+). Cut-points are pending
+epidemiological review.
 }
 \examples{
-\dontrun{
-# Single values
-calculate_pack_years_categorical(0)      # 0 (never smoker)
-calculate_pack_years_categorical(5.2)    # 1 (light: 0-10)
-calculate_pack_years_categorical(15.0)   # 2 (moderate: 10-20)
-calculate_pack_years_categorical(25.0)   # 3 (heavy: 20-30)
-calculate_pack_years_categorical(40.0)   # 4 (very heavy: 30+)
-
-# Boundary values
-calculate_pack_years_categorical(9.999)  # 1 (light)
-calculate_pack_years_categorical(10.0)   # 2 (moderate)
-
-# Vector input with mixed categories
-calculate_pack_years_categorical(c(0, 5, 15, 25, 40, NA))
-
-# Tagged NA pass-through
-calculate_pack_years_categorical(tagged_na("a"))  # NA::a (not applicable)
-}
+# Scalar inputs
+calculate_pack_years_categorical(0)
+calculate_pack_years_categorical(15.0)
 
 }
 \seealso{
-[calculate_pack_years()], [PACK_YEARS_CONSTANTS]
+\code{\link{calculate_pack_years}}
 }

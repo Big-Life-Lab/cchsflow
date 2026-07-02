@@ -2,36 +2,39 @@
 % Please edit documentation in R/smoke-intensity.R
 \name{calculate_SMK_05C}
 \alias{calculate_SMK_05C}
-\title{Days Smoked per Month - SMK_05C}
+\title{Derive days smoked per month for occasional smokers (SMK_05C)}
 \usage{
 calculate_SMK_05C(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector with days per month (0-31, plus missing codes)
+Numeric vector of days per month (0-31). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Harmonizes SMK_05C variable across CCHS cycles 2001-2023.
-This variable captures the number of days in the past month when occasional
-smokers smoked at least one cigarette.
+Harmonize SMK_05C (days smoked in the past month for occasional
+smokers) across CCHS cycles 2001-2023. Implemented via
+rec_with_table().
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**:
-  - 2001: SMKA_05C
-  - 2003: SMKC_05C
-  - 2005: SMKE_05C
-  - 2007-2014: SMK_05C
-  - 2015-2021: SMK_055
-  - 2022-2023: CSS_35
+Source variables vary by era: SMKA_05C (2001), SMKC_05C (2003),
+SMKE_05C (2005), SMK_05C (2007-2014), SMK_055 (2015-2021),
+CSS_35 (2022-2023). Universe: current occasional smokers
+(SMKDSTY_original in 2, 3).
+}
+\examples{
+\dontrun{
+harmonized <- rec_with_table(cchs_data, "SMK_05C")
+}
 
-**Values**: Continuous (0-31 days)
-
-**Universe**: Current occasional smokers (SMKDSTY_original %in% c(2, 3))
+}
+\seealso{
+\code{\link{calculate_SMK_05B}},
+  \code{\link{calculate_cigs_per_day}}
 }

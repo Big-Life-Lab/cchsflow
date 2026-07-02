@@ -2,30 +2,40 @@
 % Please edit documentation in R/percent-time-canada.R
 \name{categorize_pct_time}
 \alias{categorize_pct_time}
-\title{Categorize percent time in Canada}
+\title{Categorize percent time in Canada into deciles}
 \usage{
 categorize_pct_time(pct_time_der, output_format = "tagged_na")
 }
 \arguments{
-\item{pct_time_der}{Derived continuous percent time in Canada.
-See \code{\link{calculate_pct_time}} for documentation on how variable
-was derived.}
+\item{pct_time_der}{Derived continuous percent time in Canada (0-100).
+See \code{\link{calculate_pct_time}}.}
 
-\item{output_format}{Output missing data format: "tagged_na" (default) or "original".}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Integer 1-10 for categorical percent time in Canada,
-  or tagged NA for missing/not applicable.
+Integer vector: 1-10 for categorical percent time in Canada.
+  Missing data: \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Categorizes the derived percent time in Canada variable
- (pct_time_der) into 10 percent intervals for pct_time_der_cat10.
+Categorizes the derived percent time in Canada variable into 10
+equal-width intervals (0-10, 11-20, ..., 91-100).
+}
+\details{
+Each 10-percentage-point band maps to an integer code 1-10. This
+provides a standard grouping for cross-tabulation and modelling.
+Missing-data handling follows the v3 3-step architecture with priority
+not applicable > not stated.
 }
 \examples{
-# Scalar usage
+# Scalar
 categorize_pct_time(55.5)
 
-# Vector usage
+# Vector
 categorize_pct_time(c(5, 25, 55, 85, 100))
 
+}
+\seealso{
+\code{\link{calculate_pct_time}}
 }

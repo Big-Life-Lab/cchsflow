@@ -11,32 +11,30 @@ calculate_bmi(height_m, weight_kg, output_format = "tagged_na")
 
 \item{weight_kg}{Weight in kilograms.}
 
-\item{output_format}{Output missing data format: "tagged_na" (default) or
-"original".}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector of BMI values (kg/m^2). Missing inputs produce
-  tagged NAs with priority: NA::b (not stated) over NA::a (not applicable).
+Numeric vector of BMI values (kg/m^2). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
 Calculates BMI from height and weight using the standard formula:
-weight (kg) / height (m)^2. Source-agnostic — works with both PUMF
+weight (kg) / height (m)^2. Source-agnostic -- works with both PUMF
 and Master data via worksheet routing.
 }
 \details{
-## PUMF vs Master
-
 This function is source-agnostic. The worksheet routes different source
-variables to the same parameters depending on database type:
+variables to the same parameters depending on database type: HWTGHTM /
+HWTGWTK for PUMF (grouped, midpoint-imputed) and HWTDHTM / HWTDWTK for
+Master (continuous). The BMI formula is identical; the precision
+difference comes from the input variables.
 
-| Parameter | PUMF source | Master source |
-|-----------|-------------|---------------|
-| height_m  | HWTGHTM (grouped) | HWTDHTM (continuous) |
-| weight_kg | HWTGWTK (grouped) | HWTDWTK (continuous) |
-
-PUMF values are midpoint-imputed from grouped categories; Master values
-are true continuous measurements. The BMI formula is identical — the
-precision difference comes from the input variables.
+Missing-data handling follows the v3 3-step architecture: input codes
+are converted using variable_details.csv metadata, with priority
+not applicable > not stated. Out-of-range inputs receive the
+worksheet's else rule.
 }
 \examples{
 # Scalar
@@ -44,32 +42,11 @@ calculate_bmi(height_m = 1.75, weight_kg = 70)
 
 # Vector
 calculate_bmi(
-  height_m = c(1.75, 1.60, NA),
-  weight_kg = c(70, 55, 70)
+  height_m = c(1.75, 1.60),
+  weight_kg = c(70, 55)
 )
 
-# Dataframe
-library(dplyr)
-data.frame(ht = c(1.75, 1.60), wt = c(70, 55)) \%>\%
-  mutate(bmi = calculate_bmi(ht, wt))
-
-# Standalone with rec_with_table
-\dontrun{
-result <- rec_with_table(
-  cchs2015_2016_p,
-  variables = variables,
-  variable_details = variable_details,
-  log = TRUE
-)
-result$HWTGBMI_der
-}
-
-}
-\references{
-World Health Organization. (2000). Obesity: preventing and managing the
-global epidemic. WHO Technical Report Series, 894.
 }
 \seealso{
-[adjust_bmi()] for bias-corrected BMI, [categorize_bmi()] for
-  WHO categories.
+\code{\link{adjust_bmi}}, \code{\link{categorize_bmi}}
 }

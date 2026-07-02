@@ -2,46 +2,37 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_SMK_203}
 \alias{calculate_SMK_203}
-\title{Age Started Smoking Regularly - SMK_203 (continuous)}
+\title{Derive age started smoking regularly (SMK_203)}
 \usage{
 calculate_SMK_203(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of continuous age values (numeric, plus missing value codes)
+Numeric vector of age started regular smoking. Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMK_203 variable across CCHS cycles 2001-2014.
-This variable asks when respondents started smoking regularly (not necessarily daily),
-providing continuous age values. Pre-2015 cycles only.
+Harmonize SMK_203 (continuous age started regular smoking) across
+CCHS cycles 2001-2014. Implemented via rec_with_table().
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2001-2014: Cycle-specific variables (SMK_203 direct)
-- **Harmonization**: Simple 1:1 mapping across early cycles
-- **Availability**: 2001-2014 only (discontinued in 2015+)
-
-**Values**: Continuous age values (numeric)
-- Range typically 5-80+ years
-- Asked about regular smoking (broader than daily smoking)
-- Complements SMK_207 (daily smoking) for smoking initiation patterns
-
-**Key difference from SMK_207**:
-- SMK_203: Age started smoking regularly (any regular pattern)
-- SMK_207: Age started smoking daily (specifically daily pattern)
+Available 2001-2014 only (discontinued in 2015+). Captures when
+respondents started smoking regularly, which is broader than daily
+smoking (see SMK_207). Range typically 5-80+ years.
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMK_203")
-age_started_smoking_regularly <- harmonized_data$SMK_203
+harmonized <- rec_with_table(cchs_data, "SMK_203")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMK_207}},
+  \code{\link{calculate_age_start_smoking}}
 }

@@ -2,42 +2,37 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_SMK_207}
 \alias{calculate_SMK_207}
-\title{Age Started Smoking Daily - SMK_207 (continuous)}
+\title{Derive age started smoking daily (SMK_207)}
 \usage{
 calculate_SMK_207(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of continuous age values (numeric, plus missing value codes)
+Numeric vector of age started daily smoking. Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMK_207 variable across CCHS cycles 2001-2014.
-This is the primary age started smoking daily variable for pre-2015 cycles,
-providing continuous age values.
+Harmonize SMK_207 (continuous age started daily smoking) across CCHS
+cycles 2001-2014. Implemented via rec_with_table().
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2001-2014: Cycle-specific variables (SMK_207 direct)
-- **Harmonization**: Simple 1:1 mapping across early cycles
-- **Availability**: 2001-2014 only (replaced by SMK_040/SPU_15 in 2015+)
-
-**Values**: Continuous age values (numeric)
-- Range typically 5-80+ years
-- Primary source for age started smoking daily analysis in pre-2015 data
-- Foundation variable for derived categorical versions
+Available 2001-2014 only (replaced by SMK_040/SPU_15 in 2015+).
+Source variables are cycle-specific (SMK_207 direct). Range
+typically 5-80+ years.
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMK_207")
-age_started_smoking_daily <- harmonized_data$SMK_207
+harmonized <- rec_with_table(cchs_data, "SMK_207")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMK_203}},
+  \code{\link{calculate_age_start_smoking}}
 }

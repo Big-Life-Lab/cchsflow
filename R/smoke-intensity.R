@@ -34,89 +34,46 @@
 # cigs_per_day - Unified Daily Smoking Intensity
 # ================================================================================
 
-#' @title Unified Daily Smoking Intensity - cigs_per_day
-#' @description Calculate unified cigarettes per day for ever-daily smokers
+#' @title Calculate unified daily cigarette intensity (cigs_per_day)
 #'
-#' Creates a unified `cigs_per_day` variable that combines SMK_204 (current daily
-#' smokers) and SMK_208 (former daily smokers) into a single derived variable.
-#' This follows the same unification pattern as `age_start_smoking` and
-#' `time_quit_smoking`.
+#' @description
+#' Combine SMK_204 (current daily) and SMK_208 (former daily) into a
+#' single cigarettes-per-day variable, routed by 6-category smoking status.
 #'
 #' @details
-#' **Rationale**: SMK_204 and SMK_208 are mutually exclusive by design:
-#' - **SMK_204**: Current daily smokers (status 1) - "How many cigarettes do you currently smoke per day?"
-#' - **SMK_208**: Former daily smokers (status 2, 4) - "When you smoked daily, how many cigarettes did you usually smoke per day?"
+#' SMK_204 and SMK_208 are mutually exclusive: SMK_204 applies to current
+#' daily smokers (status 1), SMK_208 to former daily smokers (status 2
+#' and 4). Both capture the same concept (daily intensity) at different
+#' time points. This function unifies them into a single variable,
+#' following the same pattern as age_start_smoking and
+#' time_quit_smoking. Never-daily smokers (status 3, 5, 6) receive
+#' tagged_na("a"). Coverage: PUMF and Master 2001-2023.
 #'
-#' Both measure the **same concept**: daily smoking intensity. The difference is only
-#' timing (current vs recalled). A unified variable simplifies the mental model and
-#' aligns with how `age_start_smoking` and `time_quit_smoking` work.
+#' @param SMKDSTY_original Numeric. 6-category smoking status
+#'   (1 = daily, 2 = occasional former daily, 3 = occasional never
+#'   daily, 4 = former daily, 5 = former occasional, 6 = never).
+#' @param SMK_204 Numeric. Cigarettes per day, current daily smokers
+#'   (1-99).
+#' @param SMK_208 Numeric. Cigarettes per day, former daily smokers
+#'   (1-99).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' **Routing Logic**:
-#' \itemize{
-#'   \item SMKDSTY_original == 1 (current daily) -> uses SMK_204
-#'   \item SMKDSTY_original == 2 (occasional, former daily) -> uses SMK_208
-#'   \item SMKDSTY_original == 4 (former daily, non-smoker now) -> uses SMK_208
-#'   \item SMKDSTY_original %in% c(3, 5, 6) (never daily) -> NA::a (not applicable)
-#'   \item Missing SMKDSTY_original -> NA::b (missing)
-#' }
-#'
-#' **Coverage**: Full PUMF 2001-2023, Full Master 2001-2023.
-#'
-#' @param SMKDSTY_original Numeric vector. Smoking status (6-category, pre-2015 definitions).
-#'   1=Daily, 2=Occasional (former daily), 3=Occasional (never daily),
-#'   4=Former daily, 5=Former occasional, 6=Never smoked.
-#' @param SMK_204 Numeric vector. Cigarettes per day for current daily smokers.
-#'   Valid range: 1-99 cigarettes.
-#' @param SMK_208 Numeric vector. Cigarettes per day for former daily smokers.
-#'   Valid range: 1-99 cigarettes.
-#' @param output_format Character. Output format for missing values.
-#'   Options: "tagged_na" (default) or "original".
-#'
-#' @return Numeric vector with unified cigarettes per day values.
-#'   - Valid values: 1-99 cigarettes
-#'   - NA::a: Not applicable (never-daily smokers)
-#'   - NA::b: Missing data
+#' @return Numeric vector of cigarettes per day (1-99). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' \dontrun{
-#' # Current daily smoker (status 1) - uses SMK_204
-#' cigs <- calculate_cigs_per_day(
-#'   SMKDSTY_original = 1,
-#'   SMK_204 = 20,
-#'   SMK_208 = NA
-#' )
-#' # Returns: 20
+#' # Scalar: current daily smoker
+#' calculate_cigs_per_day(SMKDSTY_original = 1, SMK_204 = 20)
 #'
-#' # Former daily smoker (status 4) - uses SMK_208
-#' cigs <- calculate_cigs_per_day(
-#'   SMKDSTY_original = 4,
-#'   SMK_204 = NA,
-#'   SMK_208 = 15
-#' )
-#' # Returns: 15
+#' # Scalar: former daily smoker
+#' calculate_cigs_per_day(SMKDSTY_original = 4, SMK_208 = 15)
 #'
-#' # Never-daily smoker (status 3) - not applicable
-#' cigs <- calculate_cigs_per_day(
-#'   SMKDSTY_original = 3,
-#'   SMK_204 = NA,
-#'   SMK_208 = NA
-#' )
-#' # Returns: NA::a (not applicable)
+#' @seealso \code{\link{calculate_SMK_204}},
+#'   \code{\link{calculate_SMK_208}},
+#'   \code{\link{calculate_pack_years}}
 #'
-#' # Vector inputs with mixed status values
-#' status <- c(1, 2, 3, 4, 5, 6)
-#' smk_204 <- c(20, NA, NA, NA, NA, NA)
-#' smk_208 <- c(NA, 15, NA, 25, NA, NA)
-#' result <- calculate_cigs_per_day(status, smk_204, smk_208)
-#' # Returns: c(20, 15, NA::a, 25, NA::a, NA::a)
-#' }
-#'
-#' @seealso
-#' \code{\link{calculate_age_start_smoking}} for age started smoking unification,
-#' \code{\link{calculate_time_quit_smoking}} for time quit smoking unification,
-#' \code{\link{calculate_pack_years}} for pack-years calculation using intensity.
-#'
-#' @note v3.0.0-alpha, last updated: 2026-01-09, status: active - Unified daily intensity
 #' @export
 calculate_cigs_per_day <- function(SMKDSTY_original = NULL,
                                    SMK_204 = NULL,
@@ -188,36 +145,34 @@ calculate_cigs_per_day <- function(SMKDSTY_original = NULL,
 # SMK_204 - Cigarettes per day (current daily smokers) - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Cigarettes per Day - SMK_204 (current daily smokers)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
+#' @title Derive cigarettes per day for current daily smokers (SMK_204)
 #'
-#' Harmonizes SMK_204 variable across CCHS cycles 2001-2023.
-#' This variable captures daily cigarette consumption for current daily smokers.
+#' @description
+#' Harmonize SMK_204 (daily cigarette count for current daily smokers)
+#' across CCHS cycles 2001-2023. Implemented via rec_with_table().
 #'
 #' @details
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**:
-#'   - 2001: SMKA_204
-#'   - 2003: SMKC_204
-#'   - 2005: SMKE_204
-#'   - 2007-2014: SMK_204
-#'   - 2015-2021: SMK_045
-#'   - 2022-2023: CSS_25
+#' Source variables vary by era: SMKA_204 (2001), SMKC_204 (2003),
+#' SMKE_204 (2005), SMK_204 (2007-2014), SMK_045 (2015-2021),
+#' CSS_25 (2022-2023). Universe: current daily smokers
+#' (SMKDSTY_original == 1). For unified daily intensity analysis,
+#' prefer \code{\link{calculate_cigs_per_day}}.
 #'
-#' **Values**: Continuous (1-99 cigarettes per day)
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' **Universe**: Current daily smokers (SMKDSTY_original == 1)
+#' @return Numeric vector of cigarettes per day (1-99). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
-#' **Recommendation**: Use `cigs_per_day` for unified daily intensity analysis.
-#' SMK_204 is available as a secondary variable for specific use cases requiring
-#' separation of current vs former daily intensity.
+#' @examples
+#' \dontrun{
+#' harmonized <- rec_with_table(cchs_data, "SMK_204")
+#' }
 #'
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values
-#'
-#' @return Numeric vector with cigarettes per day (1-99, plus missing codes)
-#'
-#' @seealso \code{\link{calculate_cigs_per_day}} for unified daily intensity
+#' @seealso \code{\link{calculate_cigs_per_day}},
+#'   \code{\link{calculate_SMK_208}}
 #'
 #' @export
 calculate_SMK_204 <- function(data, output_format = "tagged_na") {
@@ -229,36 +184,35 @@ calculate_SMK_204 <- function(data, output_format = "tagged_na") {
 # SMK_208 - Cigarettes per day (former daily smokers) - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Cigarettes per Day - SMK_208 (former daily smokers)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
+#' @title Derive cigarettes per day for former daily smokers (SMK_208)
 #'
-#' Harmonizes SMK_208 variable across CCHS cycles 2001-2023.
-#' This variable captures recalled daily cigarette consumption for former daily smokers.
+#' @description
+#' Harmonize SMK_208 (recalled daily cigarette count for former daily
+#' smokers) across CCHS cycles 2001-2023. Implemented via
+#' rec_with_table().
 #'
 #' @details
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**:
-#'   - 2001: SMKA_208
-#'   - 2003: SMKC_208
-#'   - 2005: SMKE_208
-#'   - 2007-2014: SMK_208
-#'   - 2015-2021: SMK_075
-#'   - 2022-2023: SPU_20
+#' Source variables vary by era: SMKA_208 (2001), SMKC_208 (2003),
+#' SMKE_208 (2005), SMK_208 (2007-2014), SMK_075 (2015-2021),
+#' SPU_20 (2022-2023). Universe: former daily smokers
+#' (SMKDSTY_original in 2, 4). For unified daily intensity analysis,
+#' prefer \code{\link{calculate_cigs_per_day}}.
 #'
-#' **Values**: Continuous (1-99 cigarettes per day when they smoked daily)
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' **Universe**: Former daily smokers (SMKDSTY_original %in% c(2, 4))
+#' @return Numeric vector of cigarettes per day (1-99). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
-#' **Recommendation**: Use `cigs_per_day` for unified daily intensity analysis.
-#' SMK_208 is available as a secondary variable for specific use cases requiring
-#' separation of current vs former daily intensity.
+#' @examples
+#' \dontrun{
+#' harmonized <- rec_with_table(cchs_data, "SMK_208")
+#' }
 #'
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values
-#'
-#' @return Numeric vector with cigarettes per day (1-99, plus missing codes)
-#'
-#' @seealso \code{\link{calculate_cigs_per_day}} for unified daily intensity
+#' @seealso \code{\link{calculate_cigs_per_day}},
+#'   \code{\link{calculate_SMK_204}}
 #'
 #' @export
 calculate_SMK_208 <- function(data, output_format = "tagged_na") {
@@ -270,31 +224,34 @@ calculate_SMK_208 <- function(data, output_format = "tagged_na") {
 # SMK_05B - Cigarettes per day (occasional smokers) - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Cigarettes per Day - SMK_05B (occasional smokers)
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
+#' @title Derive cigarettes per day for occasional smokers (SMK_05B)
 #'
-#' Harmonizes SMK_05B variable across CCHS cycles 2001-2023.
-#' This variable captures daily cigarette consumption on days when occasional
-#' smokers do smoke.
+#' @description
+#' Harmonize SMK_05B (cigarettes per day on smoking days for occasional
+#' smokers) across CCHS cycles 2001-2023. Implemented via
+#' rec_with_table().
 #'
 #' @details
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**:
-#'   - 2001: SMKA_05B
-#'   - 2003: SMKC_05B
-#'   - 2005: SMKE_05B
-#'   - 2007-2014: SMK_05B
-#'   - 2015-2021: SMK_050
-#'   - 2022-2023: CSS_30
+#' Source variables vary by era: SMKA_05B (2001), SMKC_05B (2003),
+#' SMKE_05B (2005), SMK_05B (2007-2014), SMK_050 (2015-2021),
+#' CSS_30 (2022-2023). Universe: current occasional smokers
+#' (SMKDSTY_original in 2, 3).
 #'
-#' **Values**: Continuous (1-99 cigarettes per day when smoking)
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' **Universe**: Current occasional smokers (SMKDSTY_original %in% c(2, 3))
+#' @return Numeric vector of cigarettes per day (1-99). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values
+#' @examples
+#' \dontrun{
+#' harmonized <- rec_with_table(cchs_data, "SMK_05B")
+#' }
 #'
-#' @return Numeric vector with cigarettes per day (1-99, plus missing codes)
+#' @seealso \code{\link{calculate_SMK_05C}},
+#'   \code{\link{calculate_cigs_per_day}}
 #'
 #' @export
 calculate_SMK_05B <- function(data, output_format = "tagged_na") {
@@ -306,31 +263,34 @@ calculate_SMK_05B <- function(data, output_format = "tagged_na") {
 # SMK_05C - Days smoked per month - DOCUMENTATION ONLY
 # ================================================================================
 
-#' @title Days Smoked per Month - SMK_05C
-#' @description DOCUMENTATION ONLY - Use rec_with_table() for implementation
+#' @title Derive days smoked per month for occasional smokers (SMK_05C)
 #'
-#' Harmonizes SMK_05C variable across CCHS cycles 2001-2023.
-#' This variable captures the number of days in the past month when occasional
-#' smokers smoked at least one cigarette.
+#' @description
+#' Harmonize SMK_05C (days smoked in the past month for occasional
+#' smokers) across CCHS cycles 2001-2023. Implemented via
+#' rec_with_table().
 #'
 #' @details
-#' **Implementation Method**: Direct harmonization via rec_with_table()
-#' - **Source variables**:
-#'   - 2001: SMKA_05C
-#'   - 2003: SMKC_05C
-#'   - 2005: SMKE_05C
-#'   - 2007-2014: SMK_05C
-#'   - 2015-2021: SMK_055
-#'   - 2022-2023: CSS_35
+#' Source variables vary by era: SMKA_05C (2001), SMKC_05C (2003),
+#' SMKE_05C (2005), SMK_05C (2007-2014), SMK_055 (2015-2021),
+#' CSS_35 (2022-2023). Universe: current occasional smokers
+#' (SMKDSTY_original in 2, 3).
 #'
-#' **Values**: Continuous (0-31 days)
+#' @param data Data frame containing CCHS data.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' **Universe**: Current occasional smokers (SMKDSTY_original %in% c(2, 3))
+#' @return Numeric vector of days per month (0-31). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
-#' @param data Data frame containing CCHS data
-#' @param output_format Character. Output format for missing values
+#' @examples
+#' \dontrun{
+#' harmonized <- rec_with_table(cchs_data, "SMK_05C")
+#' }
 #'
-#' @return Numeric vector with days per month (0-31, plus missing codes)
+#' @seealso \code{\link{calculate_SMK_05B}},
+#'   \code{\link{calculate_cigs_per_day}}
 #'
 #' @export
 calculate_SMK_05C <- function(data, output_format = "tagged_na") {

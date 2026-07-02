@@ -64,60 +64,48 @@
 # calculate_time_quit_smoking_complete - Years since completely quit smoking
 # ------------------------------------------------------------------------------
 
-#' Calculate Years Since Completely Quit Smoking
+#' @title Calculate years since completely quit smoking
 #'
-#' Pathway-aware years since the respondent completely quit smoking. Uses
-#' cat5 smoking status and the quit-timing gate to route to the appropriate
-#' continuous input (SMK_06A_cont / SMK_09A_cont / SMK_10A_cont). Not
-#' supported: 2001 (SMK_10A missing), 2022 (_cont feeders skip 2022), and
-#' cchs2023_p (SMK_10A_cont is Master-only in 2023).
+#' @description
+#' Derive pathway-aware years since the respondent completely stopped
+#' smoking, using 5-category status and the quit-timing gate to route
+#' to the correct continuous feeder variable.
 #'
 #' @details
-#' **Implementation method**: 3-step architecture
-#' - **Step 1**: clean_variables() - Clean all inputs
-#' - **Step 2**: Pathway-aware logic (cat5 + gate routing)
-#' - **Step 3**: Output cleaning
+#' The function routes former smokers to the appropriate cessation
+#' timing variable: SMK_06A_cont for former occasional smokers,
+#' SMK_09A_cont for former daily direct quitters (gate = 1),
+#' SMK_10A_cont for gradual reducers (gate = 2), and SMK_09A_cont as
+#' a proxy when the gate is missing. Current smokers and never smokers
+#' receive tagged_na("a"). Not supported: 2001 (SMK_10A missing),
+#' 2022 (feeders skip 2022), cchs2023_p (SMK_10A_cont Master-only).
 #'
-#' **Routing logic**:
-#' 1. Former occasional (SMKDSTY_cat5 == 4): use SMK_06A_cont
-#' 2. Former daily, direct quit (cat5 == 3, gate == 1): use SMK_09A_cont
-#' 3. Former daily, gradual reducer (cat5 == 3, gate == 2): use SMK_10A_cont
-#' 4. Former daily, no gate available: use SMK_09A_cont as proxy
+#' @param SMKDSTY_cat5 Numeric. 5-category smoking status
+#'   (1 = daily, 2 = occasional, 3 = former daily, 4 = former
+#'   occasional, 5 = never).
+#' @param SMK_10_gate Numeric. Quit timing gate (1 = direct quit,
+#'   2 = gradual reducer).
+#' @param SMK_06A_cont Numeric. Years since quit, former occasional.
+#' @param SMK_09A_cont Numeric. Years since stopped daily smoking.
+#' @param SMK_10A_cont Numeric. Years since quit completely (gradual).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' @param SMKDSTY_cat5 Numeric vector. 5-category smoking status
-#' @param SMK_10_gate Numeric vector. Quit timing gate (1 or 2)
-#' @param SMK_06A_cont Numeric vector. Years since quit (former occasional)
-#' @param SMK_09A_cont Numeric vector. Years since stopped daily
-#' @param SMK_10A_cont Numeric vector. Years since quit completely (gradual)
-#' @param output_format Character. Output format ("tagged_na" or "original")
-#'
-#' @return Numeric vector of continuous years since completely quit (0-80+), with:
-#' - NA::a for current smokers and never smokers
-#' - NA::b for missing/refused
+#' @return Numeric vector of years since completely quit (0-80+).
+#'   Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' \dontrun{
-#' # Former occasional
+#' # Scalar: former occasional smoker
 #' calculate_time_quit_smoking_complete(
 #'   SMKDSTY_cat5 = 4, SMK_10_gate = NA,
-#'   SMK_06A_cont = 5.0, SMK_09A_cont = NA, SMK_10A_cont = NA
+#'   SMK_06A_cont = 5.0, SMK_09A_cont = NA,
+#'   SMK_10A_cont = NA
 #' )
-#' # Returns: 5.0
 #'
-#' # Former daily, direct quit
-#' calculate_time_quit_smoking_complete(
-#'   SMKDSTY_cat5 = 3, SMK_10_gate = 1,
-#'   SMK_06A_cont = NA, SMK_09A_cont = 3.5, SMK_10A_cont = NA
-#' )
-#' # Returns: 3.5
-#'
-#' # Former daily, gradual reducer
-#' calculate_time_quit_smoking_complete(
-#'   SMKDSTY_cat5 = 3, SMK_10_gate = 2,
-#'   SMK_06A_cont = NA, SMK_09A_cont = 5.0, SMK_10A_cont = 2.0
-#' )
-#' # Returns: 2.0 (when they quit completely, not when they stopped daily)
-#' }
+#' @seealso \code{\link{calculate_time_quit_smoking_daily}},
+#'   \code{\link{assess_quit_pathway}}
 #'
 #' @export
 calculate_time_quit_smoking_complete <- function(SMKDSTY_cat5, SMK_10_gate,
@@ -198,55 +186,43 @@ calculate_time_quit_smoking_complete <- function(SMKDSTY_cat5, SMK_10_gate,
 # calculate_time_quit_smoking_daily - Years since stopped smoking daily
 # ------------------------------------------------------------------------------
 
-#' Calculate Years Since Stopped Smoking Daily
+#' @title Calculate years since stopped smoking daily
 #'
-#' Continuous years since the respondent stopped smoking daily. Uses
-#' SMK_09C (Master exact years) when available, falling back to
-#' SMK_09A_cont (PUMF midpoint imputation).
+#' @description
+#' Derive continuous years since the respondent stopped daily smoking,
+#' preferring Master exact values (SMK_09C) with PUMF midpoint fallback
+#' (SMK_09A_cont).
 #'
 #' @details
-#' **Implementation method**: 3-step architecture
-#' - **Step 1**: clean_variables() - Clean all inputs
-#' - **Step 2**: Master priority + PUMF fallback
-#' - **Step 3**: Output cleaning
+#' Routing: SMK_09C (Master 2001-2021 exact years) takes priority;
+#' SMK_09A_cont (PUMF midpoint imputation) is used as fallback. Only
+#' former daily smokers (SMKDSTY_cat5 == 3) receive valid values.
+#' Current smokers, never smokers, and former occasional-only smokers
+#' receive tagged_na("a").
 #'
-#' **Routing logic**:
-#' 1. SMK_09C available (Master 2001-2021): use directly (exact years)
-#' 2. SMK_09A_cont available (PUMF, or Master fallback): use midpoint value
-#' 3. Current/never/occasional-only smokers: NA::a (not applicable)
+#' @param SMKDSTY_cat5 Numeric. 5-category smoking status
+#'   (1 = daily, 2 = occasional, 3 = former daily, 4 = former
+#'   occasional, 5 = never).
+#' @param SMK_09A_cont Numeric. PUMF midpoint-imputed years since
+#'   stopped daily.
+#' @param SMK_09C Numeric. Master exact years since stopped daily
+#'   (NULL if not available).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' **Universe**: Former daily smokers only. Former occasional smokers who
-#' never smoked daily receive NA::a.
-#'
-#' @param SMKDSTY_cat5 Numeric vector. 5-category smoking status
-#' @param SMK_09A_cont Numeric vector. PUMF midpoint-imputed years since stopped daily
-#' @param SMK_09C Numeric vector. Master exact years since stopped daily
-#' @param output_format Character. Output format ("tagged_na" or "original")
-#'
-#' @return Numeric vector of continuous years since stopped smoking daily (0-80+), with:
-#' - NA::a for current smokers, never smokers, and former occasional-only smokers
-#' - NA::b for missing/refused
+#' @return Numeric vector of years since stopped daily (0-80+).
+#'   Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' \dontrun{
-#' # Master - exact years available
-#' calculate_time_quit_smoking_daily(
-#'   SMKDSTY_cat5 = 3, SMK_09A_cont = NA, SMK_09C = 7.0
-#' )
-#' # Returns: 7.0
-#'
-#' # PUMF - midpoint imputation
+#' # Scalar: former daily smoker with PUMF data
 #' calculate_time_quit_smoking_daily(
 #'   SMKDSTY_cat5 = 3, SMK_09A_cont = 2.5, SMK_09C = NA
 #' )
-#' # Returns: 2.5
 #'
-#' # Former occasional (never daily) - not applicable
-#' calculate_time_quit_smoking_daily(
-#'   SMKDSTY_cat5 = 4, SMK_09A_cont = NA, SMK_09C = NA
-#' )
-#' # Returns: NA::a
-#' }
+#' @seealso \code{\link{calculate_time_quit_smoking_complete}},
+#'   \code{\link{assess_quit_pathway}}
 #'
 #' @export
 calculate_time_quit_smoking_daily <- function(SMKDSTY_cat5, SMK_09A_cont,
@@ -325,64 +301,42 @@ calculate_time_quit_smoking_daily <- function(SMKDSTY_cat5, SMK_09A_cont,
 # assess_quit_pathway - Categorical quit pathway indicator
 # ------------------------------------------------------------------------------
 
-#' Assess Smoking Cessation Pathway
+#' @title Assess smoking cessation pathway
 #'
-#' Classifies former smokers by their cessation pathway based on smoking history.
-#' Uses SMKDSTY_cat5 (5-category smoking status) and SMK_10_gate (quit timing gate).
+#' @description
+#' Classify former smokers by their cessation pathway using 5-category
+#' smoking status and the quit-timing gate variable.
 #'
 #' @details
-#' **Implementation method**: 3-step architecture
-#' - **Step 1**: clean_variables() - Clean SMKDSTY_cat5 and SMK_10_gate inputs
-#' - **Step 2**: Missing data functions + domain logic - Classify quit pathway
-#' - **Step 3**: Output cleaning
+#' Pathway categories: 1 = direct quit (stopped daily and quit
+#' completely), 2 = gradual reducer (stopped daily, continued
+#' occasional, then quit), 3 = former occasional (never smoked
+#' daily). Current and never smokers receive tagged_na("a"). In 2001,
+#' SMK_10_gate is unavailable, so former daily smokers receive
+#' tagged_na("b").
 #'
-#' **Pathway categories**:
-#' \itemize{
-#'   \item 1 = Direct quit: Quit completely when stopped daily smoking
-#'   \item 2 = Gradual reducer: Stopped daily, continued occasional, then quit
-#'   \item 3 = Former occasional: Never smoked daily, quit occasional smoking
-#' }
+#' @param SMKDSTY_cat5 Numeric. 5-category smoking status
+#'   (1 = daily, 2 = occasional, 3 = former daily, 4 = former
+#'   occasional, 5 = never).
+#' @param SMK_10_gate Numeric. Quit timing gate
+#'   (1 = quit when stopped daily, 2 = quit later).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' **Input requirements**:
-#' - SMKDSTY_cat5: 5-category smoking status (1=daily, 2=occasional, 3=former daily,
-#'   4=former occasional, 5=never smoked)
-#' - SMK_10_gate: Gate variable indicating quit timing for former daily smokers
-#'   (1=quit when stopped daily, 2=quit later)
-#'
-#' **Era handling**:
-#' - 2001: SMK_10_gate not available, returns NA::b for former daily smokers
-#' - 2003+: Full pathway classification available
-#'
-#' @param SMKDSTY_cat5 Numeric vector. 5-category smoking status
-#' @param SMK_10_gate Numeric vector. Quit timing gate (1 or 2)
-#' @param output_format Character. Output format ("tagged_na" or "original")
-#'
-#' @return Integer vector of pathway codes (1-3), with:
-#' - NA::a for current smokers and never smokers (not applicable)
-#' - NA::b for missing/unknown or 2001 (pathway unknown)
+#' @return Integer vector of pathway codes (1 = direct quit,
+#'   2 = gradual reducer, 3 = former occasional). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' \dontrun{
-#' # Direct quit (former daily who quit when stopped daily)
+#' # Scalar: direct quit
 #' assess_quit_pathway(SMKDSTY_cat5 = 3, SMK_10_gate = 1)
-#' # Returns: 1L
 #'
-#' # Gradual reducer (former daily who continued occasional)
-#' assess_quit_pathway(SMKDSTY_cat5 = 3, SMK_10_gate = 2)
-#' # Returns: 2L
-#'
-#' # Former occasional (never smoked daily)
+#' # Scalar: former occasional
 #' assess_quit_pathway(SMKDSTY_cat5 = 4, SMK_10_gate = NA)
-#' # Returns: 3L
 #'
-#' # Current smoker (not applicable)
-#' assess_quit_pathway(SMKDSTY_cat5 = 1, SMK_10_gate = NA)
-#' # Returns: NA::a
-#'
-#' # 2001 cycle (no gate variable)
-#' assess_quit_pathway(SMKDSTY_cat5 = 3, SMK_10_gate = NA)
-#' # Returns: NA::b (pathway unknown)
-#' }
+#' @seealso \code{\link{calculate_time_quit_smoking_complete}},
+#'   \code{\link{calculate_time_quit_smoking_daily}}
 #'
 #' @export
 assess_quit_pathway <- function(SMKDSTY_cat5 = NULL, SMK_10_gate = NULL,

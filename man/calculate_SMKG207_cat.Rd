@@ -2,51 +2,39 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_SMKG207_cat}
 \alias{calculate_SMKG207_cat}
-\title{Age Started Smoking Daily - Former Daily Smoker - SMKG207_cat (categorical)}
+\title{Categorize age started daily smoking for former daily smokers
+  (SMKG207_cat)}
 \usage{
 calculate_SMKG207_cat(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of age group classifications (1-6, plus missing value codes)
+Integer vector of age group (1-6). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMKG207 categorical variables across CCHS cycles 2001-2014.
-This variable asks former daily smokers when they started smoking daily, with categorical age groups.
-
-**Note**: Categorical versions have temporal variants:
-- **SMKG207_pre2005** (2001-2003): 10 categories with broader age bins
-- **SMKG207_2005plus** (2005-2014): 11 categories with finer age bins
-Most applications should use continuous **SMKG207_cont** instead.
+Harmonize SMKG207 categorical age-started variables for former daily
+smokers across CCHS cycles 2001-2014. Implemented via rec_with_table().
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2001-2014: Cycle-specific variables (SMKG207_pre2005/B direct)
-- **Harmonization**: Simple 1:1 mapping across early cycles
-- **Availability**: 2001-2014 only (replaced by complex derivation in 2015+)
-
-**Categories (6)**:
-\itemize{
-  \item 1 = 10 years or under
-  \item 2 = 11-14 years
-  \item 3 = 15-17 years
-  \item 4 = 18-19 years
-  \item 5 = 20-24 years
-  \item 6 = 25 years or over
-}
+Temporal variants exist: SMKG207_pre2005 (2001-2003, 10 categories)
+and SMKG207_2005plus (2005-2014, 11 categories). Available 2001-2014
+only; replaced by complex derivation in 2015+. Most applications
+should prefer continuous SMKG207_cont instead.
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMKG207_pre2005")  # or SMKG207_2005plus 
-age_started_former_daily_pre2015 <- harmonized_data$SMKG207_pre2005
+harmonized <- rec_with_table(cchs_data, "SMKG207_2005plus")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMKG207_cont}},
+  \code{\link{calculate_SMKG040_cat}}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoke-pack-years.R
 \name{calculate_pack_years}
 \alias{calculate_pack_years}
-\title{Pack-Years Calculation}
+\title{Calculate cumulative pack-years of smoking exposure}
 \usage{
 calculate_pack_years(
   smoking_status,
@@ -18,9 +18,9 @@ calculate_pack_years(
 )
 }
 \arguments{
-\item{smoking_status}{Numeric. 6-category smoking status:
-1=daily, 2=occasional (former daily), 3=occasional (never daily),
-4=former daily, 5=former occasional, 6=never.}
+\item{smoking_status}{Numeric. 6-category smoking status
+(1 = daily, 2 = occasional former daily, 3 = occasional never
+daily, 4 = former daily, 5 = former occasional, 6 = never).}
 
 \item{age}{Numeric. Current age in years (continuous).}
 
@@ -30,88 +30,57 @@ calculate_pack_years(
 
 \item{time_quit_smoking}{Numeric. Years since quit smoking.}
 
-\item{cigs_occasional}{Numeric. Cigarettes per occasion (occasional smokers).
-Required for status 2 and 3. NULL if not available.}
+\item{cigs_occasional}{Numeric. Cigarettes per occasion (occasional
+smokers). NULL if not available.}
 
-\item{days_per_month}{Numeric. Days smoked per month (occasional smokers).
-Required for status 2 and 3. NULL if not available.}
+\item{days_per_month}{Numeric. Days smoked per month (occasional
+smokers). NULL if not available.}
 
-\item{age_first_cigarette}{Numeric. Age of first cigarette.
-Required for status 3 only. NULL if not available.}
+\item{age_first_cigarette}{Numeric. Age of first cigarette
+(status 3 only). NULL if not available.}
 
-\item{smoked_100_lifetime}{Numeric. Ever smoked 100+ cigarettes (1=yes, 2=no).
-Required for status 5 only. NULL if not available.}
+\item{smoked_100_lifetime}{Numeric. Smoked 100+ cigarettes
+(1 = yes, 2 = no; status 5 only). NULL if not available.}
 
-\item{output_format}{Character. Output format for missing values
-("tagged_na" or "numeric").}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector with pack-years values (continuous, range 0-165)
+Numeric vector of pack-years (0-165). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Calculates cumulative smoking exposure in pack-years. All parameters use
-semantic names — the worksheet routes the appropriate source variables
-depending on database type (PUMF vs Master).
+Derive pack-years from smoking status, age, intensity, and cessation
+timing. Source-agnostic: the worksheet routes PUMF or Master source
+variables to the same semantic parameters.
 }
 \details{
-## PUMF vs Master
-
-This function is source-agnostic. The worksheet routes different source
-variables to the same semantic parameters depending on database type.
-The function produces identical calculations; the difference is in the
-**precision of input variables**:
-
-| Input | PUMF | Master |
-|-------|------|--------|
-| age | Midpoint from grouped (~+/-2.5 yr) | True continuous |
-| age_start_smoking | Midpoint (~+/-3 yr) | True continuous |
-| cigs_per_day | Capped at 50 | Uncapped |
-| time_quit_smoking | Midpoint (~+/-1.5 yr) | Near-continuous |
-
-PUMF pack-years estimates have approximately 15-20% relative error compared
-to Master. For most epidemiological analyses this is acceptable; for precise
-dose-response modelling, Master files are preferred.
-
-## Formula by smoking status
-
-| Status | Description | Formula |
-|--------|-------------|---------|
-| 1 | Daily smoker | (age - age_start) * (cigs_per_day / 20) |
-| 2 | Occasional (former daily) | daily_period + occasional_period |
-| 3 | Occasional (never daily) | (cigs * days/30) / 20 * (age - age_first_cig) |
-| 4 | Former daily | (age - age_start - time_quit) * (cigs_per_day / 20) |
-| 5 | Former occasional | 0.0137 (100+ cigs) or 0.007 (under 100) |
-| 6 | Never smoker | 0 |
+Formula varies by 6-category smoking status: daily smokers use
+(age - age_start) * (cigs/20); former daily smokers subtract
+time_quit; occasional smokers use days-per-month weighting; former
+occasional smokers receive a minimum constant; never smokers
+receive 0. PUMF estimates carry roughly 15-20% relative error
+versus Master due to midpoint imputation and capped intensity.
 }
 \examples{
-\dontrun{
-# Daily smoker: 45yo, started at 20, 20 cigs/day
+# Scalar: daily smoker, 25 pack-years
 calculate_pack_years(
   smoking_status = 1, age = 45,
   age_start_smoking = 20, cigs_per_day = 20,
   time_quit_smoking = NA
 )
-# Returns: 25.0
 
-# Former daily: 55yo, started at 20, quit 10 years ago
-calculate_pack_years(
-  smoking_status = 4, age = 55,
-  age_start_smoking = 20, cigs_per_day = 20,
-  time_quit_smoking = 10
-)
-# Returns: 25.0
-
-# Never smoker
+# Scalar: never smoker
 calculate_pack_years(
   smoking_status = 6, age = 50,
   age_start_smoking = NA, cigs_per_day = NA,
   time_quit_smoking = NA
 )
-# Returns: 0
-}
 
 }
 \seealso{
-[calculate_age_start_smoking()], [calculate_cigs_per_day()],
-  [calculate_time_quit_smoking()]
+\code{\link{calculate_age_start_smoking}},
+  \code{\link{calculate_cigs_per_day}},
+  \code{\link{calculate_pack_years_categorical}}
 }

@@ -2,50 +2,40 @@
 % Please edit documentation in R/smoking-status.R
 \name{calculate_SMKDSTY_cat5}
 \alias{calculate_SMKDSTY_cat5}
-\title{Smoking Status Classification - SMKDSTY_cat5 (5 categories)}
+\title{Classify smoking status into 5 categories (SMKDSTY_cat5)}
 \usage{
 calculate_SMKDSTY_cat5(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of smoking status classifications (1-5, plus missing value codes)
+Integer vector of smoking status (1 = daily, 2 = occasional,
+  3 = former daily, 4 = former occasional, 5 = never). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMKDSTY_cat5 variable across CCHS cycles 2001-2023.
-This is a 5-category smoking status variable that collapses some categories
-from the 6-category versions for simplified analysis.
+Harmonize CCHS smoking status into a 5-category classification across
+cycles 2001-2023. Implemented via rec_with_table(), not direct R logic.
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2001-2014: SMKDSTY (SMKADSTY/SMKCDSTY/SMKEDSTY)
-  - 2015-2023: SMKDVSTY
-- **Harmonization**: Simple mapping with category consolidation
-
-**Categories (5)**:
-\itemize{
-  \item 1 = Current daily smoker
-  \item 2 = Current occasional smoker
-  \item 3 = Former daily smoker
-  \item 4 = Former occasional
-  \item 5 = Never smoked
-}
-
-**Category consolidation**:
-- Pre-2015: "Occasional" and "Always occasional" combined → Category 2
-- 2015+: "Former occasional" and "Experimental" combined → Category 4
+This variable collapses the 6-category SMKDSTY into 5 categories by
+merging occasional-smoker subcategories. Source variables differ by era:
+SMKDSTY (2001-2014) and SMKDVSTY (2015-2023). Pre-2015 "occasional"
+and "always occasional" merge into category 2; post-2015 "former
+occasional" and "experimental" merge into category 4.
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMKDSTY_cat5")
-smoking_status_5cat <- harmonized_data$SMKDSTY_cat5
+harmonized <- rec_with_table(cchs_data, "SMKDSTY_cat5")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMKDSTY_cat3}},
+  \code{\link{calculate_SMKDSTY_cat6}}
 }

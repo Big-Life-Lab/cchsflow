@@ -2,24 +2,13 @@
 % Please edit documentation in R/smoking-status.R
 \name{calculate_SMKDSTY_original}
 \alias{calculate_SMKDSTY_original}
-\title{Type of Smoker - SMKDSTY_original (deprecated alias)}
+\title{Derive 6-category smoking status (deprecated alias)}
 \usage{
 calculate_SMKDSTY_original(...)
 }
 \arguments{
-\item{...}{Arguments passed to [calculate_SMKDSTY_cat6()]}
-}
-\value{
-Vector of smoking type classifications (1-6, plus missing value codes)
+\item{...}{Arguments passed to \code{\link{calculate_SMKDSTY_cat6}}.}
 }
 \description{
-Deprecated alias for [calculate_SMKDSTY_cat6()]. Use
-  `calculate_SMKDSTY_cat6()` directly for new code.
-}
-\examples{
-\dontrun{
-# Deprecated: use calculate_SMKDSTY_cat6() instead
-calculate_SMKDSTY_original(SMK_005 = 1, SMK_030 = 2, SMK_01A = 1)
-}
-
+Deprecated. Use \code{\link{calculate_SMKDSTY_cat6}} instead.
 }

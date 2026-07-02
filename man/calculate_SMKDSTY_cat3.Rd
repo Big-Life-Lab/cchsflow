@@ -2,53 +2,40 @@
 % Please edit documentation in R/smoking-status.R
 \name{calculate_SMKDSTY_cat3}
 \alias{calculate_SMKDSTY_cat3}
-\title{Smoking Status Classification - SMKDSTY_cat3 (3 categories)}
+\title{Classify smoking status into 3 categories (SMKDSTY_cat3)}
 \usage{
 calculate_SMKDSTY_cat3(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of smoking status classifications (1-3, plus missing value codes)
+Integer vector of smoking status (1 = current smoker,
+  2 = former smoker, 3 = never smoked). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMKDSTY_cat3 variable across CCHS cycles 2001-2023.
-This is a 3-category smoking status variable that provides the most simplified
-classification for broad population analysis.
+Harmonize CCHS smoking status into a 3-category classification across
+cycles 2001-2023. Implemented via rec_with_table(), not direct R logic.
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2001-2014: SMKDSTY (SMKADSTY/SMKCDSTY/SMKEDSTY)
-  - 2015-2023: SMKDVSTY
-- **Harmonization**: Simple mapping with major category consolidation
-
-**Categories (3)**:
-\itemize{
-  \item 1 = Current smoker
-  \item 2 = Former smoker
-  \item 3 = Never smoked
-}
-
-**Category consolidation**:
-- **Current smoker (1)**: Combines Daily + Occasional categories
-  - Pre-2015: Daily (1) + Occasional (2) + Always occasional (3) → 1
-  - 2015+: Daily (1) + Occasional (2) → 1
-- **Former smoker (2)**: Combines all former smoking categories
-  - Pre-2015: Former daily (4) + Former occasional (5) → 2
-  - 2015+: Former daily (3) + Former occasional (4) + Experimental (5) → 2
-- **Never smoked (3)**: Remains as category 6 → 3
+This is the most simplified smoking classification, collapsing all
+current smoker subtypes into one category and all former smoker
+subtypes into another. Source variables: SMKDSTY (2001-2014) and
+SMKDVSTY (2015-2023). Current smoker merges daily + occasional;
+former smoker merges all former categories including experimental.
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMKDSTY_cat3")
-smoking_status_3cat <- harmonized_data$SMKDSTY_cat3
+harmonized <- rec_with_table(cchs_data, "SMKDSTY_cat3")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMKDSTY_cat5}},
+  \code{\link{calculate_SMKDSTY_cat6}}
 }

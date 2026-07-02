@@ -2,53 +2,38 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_SMKG040_cat}
 \alias{calculate_SMKG040_cat}
-\title{Age Started Smoking Daily - SMKG040_cat (6 categories)}
+\title{Categorize age started smoking daily (SMKG040_cat)}
 \usage{
 calculate_SMKG040_cat(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of age group classifications (1-6, plus missing value codes)
+Integer vector of age group (1-6). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMKG040_cat variable across CCHS cycles 2015-2023.
-This variable asks daily and former daily smokers when they started smoking daily,
-categorized into 6 age groups.
+Harmonize CCHS variable SMKG040_cat (age started daily smoking in
+6 categories) across cycles 2015-2023. Implemented via
+rec_with_table().
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2015-2021: SMK_040 (direct variable)
-  - 2022-2023: SPU_15 (different underlying source, same harmonized structure)
-- **Harmonization**: Simple 1:1 mapping with source variable transition
-
-**Categories (6)**:
-\itemize{
-  \item 1 = 10 years or under
-  \item 2 = 11-14 years
-  \item 3 = 15-17 years
-  \item 4 = 18-19 years
-  \item 5 = 20-24 years
-  \item 6 = 25 years or over
-}
-
-**Variable evolution**:
-- **2015-2021**: Direct survey question SMK_040 "Age started smoking daily"
-- **2022-2023**: Maps to SPU_15 variable (same question, different variable name)
-  - Asked of daily and former daily smokers only
-  - Provides age group categorization for smoking initiation patterns
+Asked of daily and former daily smokers. Source is SMK_040
+(2015-2021) or SPU_15 (2022-2023). Categories: 1 = 10 or under,
+2 = 11-14, 3 = 15-17, 4 = 18-19, 5 = 20-24, 6 = 25 or over.
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMKG040_cat")
-age_started_daily_cat <- harmonized_data$SMKG040_cat
+harmonized <- rec_with_table(cchs_data, "SMKG040_cat")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMKG040_cont}},
+  \code{\link{calculate_age_start_smoking}}
 }

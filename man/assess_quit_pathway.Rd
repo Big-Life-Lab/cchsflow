@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking-cessation.R
 \name{assess_quit_pathway}
 \alias{assess_quit_pathway}
-\title{Assess Smoking Cessation Pathway}
+\title{Assess smoking cessation pathway}
 \usage{
 assess_quit_pathway(
   SMKDSTY_cat5 = NULL,
@@ -11,65 +11,43 @@ assess_quit_pathway(
 )
 }
 \arguments{
-\item{SMKDSTY_cat5}{Numeric vector. 5-category smoking status}
+\item{SMKDSTY_cat5}{Numeric. 5-category smoking status
+(1 = daily, 2 = occasional, 3 = former daily, 4 = former
+occasional, 5 = never).}
 
-\item{SMK_10_gate}{Numeric vector. Quit timing gate (1 or 2)}
+\item{SMK_10_gate}{Numeric. Quit timing gate
+(1 = quit when stopped daily, 2 = quit later).}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Integer vector of pathway codes (1-3), with:
-- NA::a for current smokers and never smokers (not applicable)
-- NA::b for missing/unknown or 2001 (pathway unknown)
+Integer vector of pathway codes (1 = direct quit,
+  2 = gradual reducer, 3 = former occasional). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Classifies former smokers by their cessation pathway based on smoking history.
-Uses SMKDSTY_cat5 (5-category smoking status) and SMK_10_gate (quit timing gate).
+Classify former smokers by their cessation pathway using 5-category
+smoking status and the quit-timing gate variable.
 }
 \details{
-**Implementation method**: 3-step architecture
-- **Step 1**: clean_variables() - Clean SMKDSTY_cat5 and SMK_10_gate inputs
-- **Step 2**: Missing data functions + domain logic - Classify quit pathway
-- **Step 3**: Output cleaning
-
-**Pathway categories**:
-\itemize{
-  \item 1 = Direct quit: Quit completely when stopped daily smoking
-  \item 2 = Gradual reducer: Stopped daily, continued occasional, then quit
-  \item 3 = Former occasional: Never smoked daily, quit occasional smoking
-}
-
-**Input requirements**:
-- SMKDSTY_cat5: 5-category smoking status (1=daily, 2=occasional, 3=former daily,
-  4=former occasional, 5=never smoked)
-- SMK_10_gate: Gate variable indicating quit timing for former daily smokers
-  (1=quit when stopped daily, 2=quit later)
-
-**Era handling**:
-- 2001: SMK_10_gate not available, returns NA::b for former daily smokers
-- 2003+: Full pathway classification available
+Pathway categories: 1 = direct quit (stopped daily and quit
+completely), 2 = gradual reducer (stopped daily, continued
+occasional, then quit), 3 = former occasional (never smoked
+daily). Current and never smokers receive tagged_na("a"). In 2001,
+SMK_10_gate is unavailable, so former daily smokers receive
+tagged_na("b").
 }
 \examples{
-\dontrun{
-# Direct quit (former daily who quit when stopped daily)
+# Scalar: direct quit
 assess_quit_pathway(SMKDSTY_cat5 = 3, SMK_10_gate = 1)
-# Returns: 1L
 
-# Gradual reducer (former daily who continued occasional)
-assess_quit_pathway(SMKDSTY_cat5 = 3, SMK_10_gate = 2)
-# Returns: 2L
-
-# Former occasional (never smoked daily)
+# Scalar: former occasional
 assess_quit_pathway(SMKDSTY_cat5 = 4, SMK_10_gate = NA)
-# Returns: 3L
 
-# Current smoker (not applicable)
-assess_quit_pathway(SMKDSTY_cat5 = 1, SMK_10_gate = NA)
-# Returns: NA::a
-
-# 2001 cycle (no gate variable)
-assess_quit_pathway(SMKDSTY_cat5 = 3, SMK_10_gate = NA)
-# Returns: NA::b (pathway unknown)
 }
-
+\seealso{
+\code{\link{calculate_time_quit_smoking_complete}},
+  \code{\link{calculate_time_quit_smoking_daily}}
 }

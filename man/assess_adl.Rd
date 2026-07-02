@@ -49,10 +49,6 @@ priority not applicable > not stated when inputs mix missing types.
 Out-of-range inputs receive the worksheet's else rule
 (\code{haven::tagged_na("b")}).
 }
-\note{
-v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-  implementation; replaces the abandoned helper-based draft.
-}
 \examples{
 # Scalar
 assess_adl(1, 2, 2, 2, 2) # 1 (needs help with meals)
@@ -80,10 +76,6 @@ result <- rec_with_table(
 )
 }
 
-}
-\references{
-Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
-JAMA, 185(12), 914-919.
 }
 \seealso{
 \code{\link{score_adl}}, \code{\link{score_adl_6}}

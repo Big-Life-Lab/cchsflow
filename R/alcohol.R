@@ -171,13 +171,6 @@ assess_drinking_risk <- function(cleaned, risk_type, derived_var,
 #' @seealso \code{\link{calculate_drinking_risk_short}},
 #'   \code{\link{calculate_drinking_risk_long}}
 #'
-#' @references
-#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of
-#' evidence and guidelines for low-risk drinking. Canadian Centre on
-#' Substance Abuse.
-#'
-#' @note v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-#'   implementation; replaces the abandoned helper-based draft.
 #' @export
 calculate_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2,
                                      ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6,
@@ -278,13 +271,6 @@ calculate_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2,
 #' @seealso \code{\link{calculate_binge_drinking}},
 #'   \code{\link{calculate_drinking_risk_long}}
 #'
-#' @references
-#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of
-#' evidence and guidelines for low-risk drinking. Canadian Centre on
-#' Substance Abuse.
-#'
-#' @note v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-#'   implementation; replaces the abandoned helper-based draft.
 #' @export
 calculate_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1,
                                           ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4,
@@ -355,13 +341,6 @@ calculate_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1,
 #' @seealso \code{\link{calculate_binge_drinking}},
 #'   \code{\link{calculate_drinking_risk_short}}
 #'
-#' @references
-#' Butt, P., et al. (2011). Alcohol and health in Canada: a summary of
-#' evidence and guidelines for low-risk drinking. Canadian Centre on
-#' Substance Abuse.
-#'
-#' @note v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-#'   implementation; replaces the abandoned helper-based draft.
 #' @export
 calculate_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1,
                                          ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4,

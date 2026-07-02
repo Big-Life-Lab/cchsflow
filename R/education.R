@@ -1,35 +1,42 @@
-#' @title Derive 4-category education variable (EDUDR04) for 2015+ cycles
+#' @title Derive 4-category education variable for 2015+ cycles
 #'
-#' @description Derives the 4-category highest-education variable (EDUDR04) for
-#'   CCHS cycles 2015-2016 onwards, where the pre-2015 derived variable EDUDR04
-#'   is no longer provided. Reconstructs the equivalent 4-level classification
-#'   from the four raw education-module questions (EHG2_01 through EHG2_04).
+#' @description
+#' Derives the 4-category highest-education variable (EDUDR04) for CCHS
+#' cycles 2015-2016 onwards, where the pre-2015 derived variable EDUDR04
+#' is no longer provided.
 #'
-#' @param EHG2_01 Highest grade of elementary or high school. Codes:
-#'   1 = Grade 8 or lower; 2 = Grade 9-10; 3 = Grade 11-13;
-#'   6 = not applicable; 7/8/9 = don't know / refusal / not stated.
-#' @param EHG2_02 Completed high school diploma or equivalent. Codes:
-#'   1 = Yes; 2 = No; 6 = not applicable; 7/8/9 = missing.
-#' @param EHG2_03 Other education - certificate/diploma/degree. Codes:
-#'   1 = Yes; 2 = No; 6 = not applicable; 7/8/9 = missing.
-#' @param EHG2_04 Highest certificate, diploma or degree. Codes:
-#'   1-7 = credential levels; 96 = not applicable; 97-99 = missing.
-#' @param output_format Output missing data format: "tagged_na" (default) or "original".
+#' @details
+#' Reconstructs the equivalent 4-level classification from the four raw
+#' education-module questions (EHG2_01 through EHG2_04). Category logic
+#' is ordered by priority: post-secondary graduation first, then some
+#' post-secondary, then secondary graduation, then less than secondary.
+#' EHG2_01 missing does not block derivation when EHG2_02/03/04 are
+#' valid. Missing-data handling follows the v3 3-step architecture with
+#' priority not applicable > not stated.
 #'
-#' @return Integer 1-4, or tagged NA:
-#'   \enumerate{
-#'     \item Less than secondary school graduation
-#'     \item Secondary school graduation, no post-secondary
-#'     \item Some post-secondary education
-#'     \item Post-secondary graduation
-#'   }
+#' @param EHG2_01 Highest grade of elementary or high school (1 = Grade 8
+#'   or lower, 2 = Grade 9-10, 3 = Grade 11-13).
+#' @param EHG2_02 Completed high school diploma or equivalent (1 = yes,
+#'   2 = no).
+#' @param EHG2_03 Other education - certificate/diploma/degree (1 = yes,
+#'   2 = no).
+#' @param EHG2_04 Highest certificate, diploma or degree (1-7 = credential
+#'   levels).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector: 1 = less than secondary, 2 = secondary
+#'   graduation (no post-secondary), 3 = some post-secondary, 4 =
+#'   post-secondary graduation. Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Post-secondary graduate with bachelor's degree
-#' derive_EDUDR04_2015plus(3, 1, 1, 6)
+#' # Scalar
+#' derive_EDUDR04_2015plus(3, 1, 1, 6)  # post-secondary graduate
+#' derive_EDUDR04_2015plus(1, 2, 2, 96) # less than high school
 #'
-#' # Less than high school
-#' derive_EDUDR04_2015plus(1, 2, 2, 96)
+#' @seealso \code{\link{rec_with_table}}
 #'
 #' @export
 derive_EDUDR04_2015plus <- function(EHG2_01, EHG2_02, EHG2_03, EHG2_04,

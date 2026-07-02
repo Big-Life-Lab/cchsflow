@@ -30,91 +30,61 @@
 # MODULAR ARCHITECTURE - PRIMARY INTERFACE
 # ==============================================================================
 
-#' Pack-Years Calculation
+#' @title Calculate cumulative pack-years of smoking exposure
 #'
-#' Calculates cumulative smoking exposure in pack-years. All parameters use
-#' semantic names — the worksheet routes the appropriate source variables
-#' depending on database type (PUMF vs Master).
+#' @description
+#' Derive pack-years from smoking status, age, intensity, and cessation
+#' timing. Source-agnostic: the worksheet routes PUMF or Master source
+#' variables to the same semantic parameters.
 #'
-#' @param smoking_status Numeric. 6-category smoking status:
-#'   1=daily, 2=occasional (former daily), 3=occasional (never daily),
-#'   4=former daily, 5=former occasional, 6=never.
+#' @details
+#' Formula varies by 6-category smoking status: daily smokers use
+#' (age - age_start) * (cigs/20); former daily smokers subtract
+#' time_quit; occasional smokers use days-per-month weighting; former
+#' occasional smokers receive a minimum constant; never smokers
+#' receive 0. PUMF estimates carry roughly 15-20% relative error
+#' versus Master due to midpoint imputation and capped intensity.
+#'
+#' @param smoking_status Numeric. 6-category smoking status
+#'   (1 = daily, 2 = occasional former daily, 3 = occasional never
+#'   daily, 4 = former daily, 5 = former occasional, 6 = never).
 #' @param age Numeric. Current age in years (continuous).
 #' @param age_start_smoking Numeric. Age started smoking daily.
 #' @param cigs_per_day Numeric. Cigarettes per day when smoking daily.
 #' @param time_quit_smoking Numeric. Years since quit smoking.
-#' @param cigs_occasional Numeric. Cigarettes per occasion (occasional smokers).
-#'   Required for status 2 and 3. NULL if not available.
-#' @param days_per_month Numeric. Days smoked per month (occasional smokers).
-#'   Required for status 2 and 3. NULL if not available.
-#' @param age_first_cigarette Numeric. Age of first cigarette.
-#'   Required for status 3 only. NULL if not available.
-#' @param smoked_100_lifetime Numeric. Ever smoked 100+ cigarettes (1=yes, 2=no).
-#'   Required for status 5 only. NULL if not available.
-#' @param output_format Character. Output format for missing values
-#'   ("tagged_na" or "numeric").
+#' @param cigs_occasional Numeric. Cigarettes per occasion (occasional
+#'   smokers). NULL if not available.
+#' @param days_per_month Numeric. Days smoked per month (occasional
+#'   smokers). NULL if not available.
+#' @param age_first_cigarette Numeric. Age of first cigarette
+#'   (status 3 only). NULL if not available.
+#' @param smoked_100_lifetime Numeric. Smoked 100+ cigarettes
+#'   (1 = yes, 2 = no; status 5 only). NULL if not available.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' @return Numeric vector with pack-years values (continuous, range 0-165)
-#'
-#' @details
-#' ## PUMF vs Master
-#'
-#' This function is source-agnostic. The worksheet routes different source
-#' variables to the same semantic parameters depending on database type.
-#' The function produces identical calculations; the difference is in the
-#' **precision of input variables**:
-#'
-#' | Input | PUMF | Master |
-#' |-------|------|--------|
-#' | age | Midpoint from grouped (~+/-2.5 yr) | True continuous |
-#' | age_start_smoking | Midpoint (~+/-3 yr) | True continuous |
-#' | cigs_per_day | Capped at 50 | Uncapped |
-#' | time_quit_smoking | Midpoint (~+/-1.5 yr) | Near-continuous |
-#'
-#' PUMF pack-years estimates have approximately 15-20% relative error compared
-#' to Master. For most epidemiological analyses this is acceptable; for precise
-#' dose-response modelling, Master files are preferred.
-#'
-#' ## Formula by smoking status
-#'
-#' | Status | Description | Formula |
-#' |--------|-------------|---------|
-#' | 1 | Daily smoker | (age - age_start) * (cigs_per_day / 20) |
-#' | 2 | Occasional (former daily) | daily_period + occasional_period |
-#' | 3 | Occasional (never daily) | (cigs * days/30) / 20 * (age - age_first_cig) |
-#' | 4 | Former daily | (age - age_start - time_quit) * (cigs_per_day / 20) |
-#' | 5 | Former occasional | 0.0137 (100+ cigs) or 0.007 (under 100) |
-#' | 6 | Never smoker | 0 |
+#' @return Numeric vector of pack-years (0-165). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' \dontrun{
-#' # Daily smoker: 45yo, started at 20, 20 cigs/day
+#' # Scalar: daily smoker, 25 pack-years
 #' calculate_pack_years(
 #'   smoking_status = 1, age = 45,
 #'   age_start_smoking = 20, cigs_per_day = 20,
 #'   time_quit_smoking = NA
 #' )
-#' # Returns: 25.0
 #'
-#' # Former daily: 55yo, started at 20, quit 10 years ago
-#' calculate_pack_years(
-#'   smoking_status = 4, age = 55,
-#'   age_start_smoking = 20, cigs_per_day = 20,
-#'   time_quit_smoking = 10
-#' )
-#' # Returns: 25.0
-#'
-#' # Never smoker
+#' # Scalar: never smoker
 #' calculate_pack_years(
 #'   smoking_status = 6, age = 50,
 #'   age_start_smoking = NA, cigs_per_day = NA,
 #'   time_quit_smoking = NA
 #' )
-#' # Returns: 0
-#' }
 #'
-#' @seealso [calculate_age_start_smoking()], [calculate_cigs_per_day()],
-#'   [calculate_time_quit_smoking()]
+#' @seealso \code{\link{calculate_age_start_smoking}},
+#'   \code{\link{calculate_cigs_per_day}},
+#'   \code{\link{calculate_pack_years_categorical}}
 #'
 #' @export
 calculate_pack_years <- function(smoking_status,
@@ -180,50 +150,36 @@ calculate_pack_years <- function(smoking_status,
 # CATEGORICAL PACK-YEARS (5-CATEGORY SCHEME)
 # ==============================================================================
 
-#' Categorise Pack-Years into 5 Groups
+#' @title Categorize pack-years into 5 exposure groups
 #'
-#' Converts continuous pack-years values into a 5-category ordinal variable.
-#' This function is called by `rec_with_table()` via the
-#' `Func::calculate_pack_years_categorical` reference in `variable_details.csv`.
-#'
-#' @param pack_years_der Numeric. Continuous pack-years from [calculate_pack_years()].
-#' @param output_format Character. Output format for missing values
-#'   ("tagged_na" or "numeric").
-#'
-#' @return Numeric vector with categories 0-4:
-#'   - 0: Never smoker (pack-years == 0)
-#'   - 1: Light (0 < pack-years < 10)
-#'   - 2: Moderate (10 <= pack-years < 20)
-#'   - 3: Heavy (20 <= pack-years < 30)
-#'   - 4: Very heavy (pack-years >= 30)
+#' @description
+#' Convert continuous pack-years into a 5-category ordinal variable for
+#' epidemiological stratification.
 #'
 #' @details
-#' Cut-points are defined in `PACK_YEARS_CONSTANTS$pack_years_cat_breaks` and
-#' match the `recStart`/`recEnd` ranges in `variable_details.csv` for
-#' `pack_years_cat`. The cut-points are pending epidemiological review;
-#' the worksheet status is `pending_review`.
+#' Cut-points are defined in PACK_YEARS_CONSTANTS and match the
+#' recStart/recEnd ranges in variable_details.csv for pack_years_cat.
+#' Categories: 0 = never (0), 1 = light (0-10), 2 = moderate (10-20),
+#' 3 = heavy (20-30), 4 = very heavy (30+). Cut-points are pending
+#' epidemiological review.
+#'
+#' @param pack_years_der Numeric. Continuous pack-years from
+#'   \code{\link{calculate_pack_years}}.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector (0 = never, 1 = light, 2 = moderate,
+#'   3 = heavy, 4 = very heavy). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' \dontrun{
-#' # Single values
-#' calculate_pack_years_categorical(0)      # 0 (never smoker)
-#' calculate_pack_years_categorical(5.2)    # 1 (light: 0-10)
-#' calculate_pack_years_categorical(15.0)   # 2 (moderate: 10-20)
-#' calculate_pack_years_categorical(25.0)   # 3 (heavy: 20-30)
-#' calculate_pack_years_categorical(40.0)   # 4 (very heavy: 30+)
+#' # Scalar inputs
+#' calculate_pack_years_categorical(0)
+#' calculate_pack_years_categorical(15.0)
 #'
-#' # Boundary values
-#' calculate_pack_years_categorical(9.999)  # 1 (light)
-#' calculate_pack_years_categorical(10.0)   # 2 (moderate)
+#' @seealso \code{\link{calculate_pack_years}}
 #'
-#' # Vector input with mixed categories
-#' calculate_pack_years_categorical(c(0, 5, 15, 25, 40, NA))
-#'
-#' # Tagged NA pass-through
-#' calculate_pack_years_categorical(tagged_na("a"))  # NA::a (not applicable)
-#' }
-#'
-#' @seealso [calculate_pack_years()], [PACK_YEARS_CONSTANTS]
 #' @export
 calculate_pack_years_categorical <- function(pack_years_der,
                                               output_format = "tagged_na") {

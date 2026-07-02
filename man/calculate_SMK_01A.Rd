@@ -2,57 +2,40 @@
 % Please edit documentation in R/smoking-status.R
 \name{calculate_SMK_01A}
 \alias{calculate_SMK_01A}
-\title{Lifetime 100+ Cigarettes - SMK_01A (2 categories)}
+\title{Assess lifetime cigarette consumption threshold (SMK_01A)}
 \usage{
 calculate_SMK_01A(data, output_format = "tagged_na")
 }
 \arguments{
-\item{data}{Data frame containing CCHS data}
+\item{data}{Data frame containing CCHS data.}
 
-\item{output_format}{Character. Output format for missing values ("tagged_na" or "standard")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Vector of 100+ cigarette lifetime status (1-2, plus missing value codes)
+Integer vector (1 = yes, 2 = no). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-DOCUMENTATION ONLY - Use rec_with_table() for implementation
-
-Creates harmonized SMK_01A variable across CCHS cycles 2001-2023.
-This variable asks about lifetime cigarette consumption threshold (100+ cigarettes)
-and serves as the final component for SMKDSTY_original reconstruction and smoking classification.
+Harmonize CCHS variable SMK_01A (smoked 100+ cigarettes in lifetime)
+across cycles 2001-2023. Implemented via rec_with_table(), not direct
+R logic.
 }
 \details{
-**Implementation Method**: Direct harmonization via rec_with_table()
-- **Source variables**: 
-  - 2001-2014: Cycle-specific variables (SMKA_01A, SMKC_01A, SMKE_01A, SMK_01A)
-  - 2015-2021: SMK_020 (direct variable)
-  - 2022-2023: CSS_15 (different underlying source, same harmonized structure)
-- **Harmonization**: Simple 1:1 mapping across all periods with source transitions
-
-**Categories (2)**:
-\itemize{
-  \item 1 = Yes
-  \item 2 = No
-}
-
-**Variable evolution**:
-- **2001-2014**: Cycle-specific variable names, consistent question
-- **2015-2021**: Standardized as SMK_020 "In lifetime, smoked 100 or more cigarettes"
-- **2022-2023**: Maps to CSS_15 variable (same question, different variable name)
-  - 100+ cigarette threshold distinguishes experimental from never smokers
-  - Critical for "former occasional" vs "never smoker" classification
-
-**Usage**: 
-- Third input for SMKDSTY_original complex reconstruction function
-- Distinguishes experimental/former occasional smokers from never smokers
-- Used with SMK_005 and SMK_030 to determine final smoking status categories
-- Longest-running harmonized smoking variable (2001-2023 coverage)
+SMK_01A distinguishes experimental/former occasional smokers from
+never smokers using the 100-cigarette threshold. It is the third
+gate variable for SMKDSTY_cat6 reconstruction and the longest-running
+harmonized smoking variable (2001-2023). Sources: cycle-specific
+variables (2001-2014), SMK_020 (2015-2021), CSS_15 (2022-2023).
 }
 \examples{
 \dontrun{
-# Use rec_with_table() for actual implementation
-harmonized_data <- rec_with_table(cchs_data, "SMK_01A")
-lifetime_100plus <- harmonized_data$SMK_01A
+harmonized <- rec_with_table(cchs_data, "SMK_01A")
 }
 
+}
+\seealso{
+\code{\link{calculate_SMKDSTY_cat6}},
+  \code{\link{calculate_SMK_005}}, \code{\link{calculate_SMK_030}}
 }

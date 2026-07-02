@@ -2,7 +2,7 @@
 % Please edit documentation in R/respiratory-condition.R
 \name{derive_CCC_091_2005to2008}
 \alias{derive_CCC_091_2005to2008}
-\title{Derive CCC_091 for 2005-2008 cycles}
+\title{Derive COPD/emphysema/bronchitis indicator for 2005-2008 cycles}
 \usage{
 derive_CCC_091_2005to2008(
   CCC_91A,
@@ -12,28 +12,33 @@ derive_CCC_091_2005to2008(
 )
 }
 \arguments{
-\item{CCC_91A}{Chronic bronchitis indicator (1 = Yes, 2 = No).}
+\item{CCC_91A}{Chronic bronchitis indicator (1 = yes, 2 = no).}
 
-\item{CCC_91E}{Emphysema indicator (1 = Yes, 2 = No).}
+\item{CCC_91E}{Emphysema indicator (1 = yes, 2 = no).}
 
-\item{CCC_91F}{COPD indicator (1 = Yes, 2 = No).}
+\item{CCC_91F}{COPD indicator (1 = yes, 2 = no).}
 
 \item{output_format}{Output missing data format: "tagged_na" (default)
 or "original".}
 }
 \value{
-Categorical variable (CCC_091) with 2 levels:
- \enumerate{
- \item Has COPD, emphysema, or chronic bronchitis
- \item Does not have COPD, emphysema, or chronic bronchitis
- }
+Integer vector: 1 = has COPD/emphysema/bronchitis, 2 = does
+  not. Missing data: \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Derives CCC_091 (COPD/emphysema/chronic bronchitis) for
- CCHS cycles 2005-2008, where the concept is split across CCC_91A
- (chronic bronchitis), CCC_91E (emphysema), and CCC_91F (COPD).
+Derives CCC_091 (COPD/emphysema/chronic bronchitis) for CCHS cycles
+2005-2008, where the concept is split across three source variables.
+}
+\details{
+In CCHS 2005-2008, chronic bronchitis (CCC_91A), emphysema (CCC_91E),
+and COPD (CCC_91F) are asked as separate questions. This function
+combines them into a single indicator: positive if any condition is
+reported. Missing-data handling follows the v3 3-step architecture
+with priority not applicable > not stated.
 }
 \examples{
+# Scalar
 derive_CCC_091_2005to2008(1, 2, 2)  # 1 (has condition)
 derive_CCC_091_2005to2008(2, 2, 2)  # 2 (no condition)
 

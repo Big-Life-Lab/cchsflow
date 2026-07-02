@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoke-start.R
 \name{calculate_smoked_100_lifetime}
 \alias{calculate_smoked_100_lifetime}
-\title{Ever Smoked 100 or More Cigarettes in Lifetime - smoked_100_lifetime}
+\title{Assess lifetime 100-cigarette threshold (smoked_100_lifetime)}
 \usage{
 calculate_smoked_100_lifetime(
   smoked_100_lifetime = NULL,
@@ -10,51 +10,34 @@ calculate_smoked_100_lifetime(
 )
 }
 \arguments{
-\item{smoked_100_lifetime}{Numeric. 1=Yes (100+), 2=No, with missing codes.
-The worksheet routes SMK_01A from the appropriate database.}
+\item{smoked_100_lifetime}{Numeric. 1 = yes (100+), 2 = no.
+Worksheet routes SMK_01A from the appropriate database.}
 
-\item{output_format}{Character. Output format ("tagged_na" or "original")}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Numeric vector: 1=Yes, 2=No, with:
-- NA::a for not applicable (never tried a cigarette)
-- NA::b for missing/refused
+Integer vector (1 = yes, 2 = no). Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Creates unified smoked_100_lifetime derived variable across CCHS cycles.
-
-This is a pass-through wrapper for SMK_01A, providing a self-documenting
-variable name for standalone research use. The underlying source (SMK_01A)
-is already harmonised across cycles in the worksheets.
+Pass-through wrapper for SMK_01A providing a self-documenting
+variable name for whether the respondent has smoked 100 or more
+cigarettes in their lifetime.
 }
 \details{
-**Implementation method**: 3-step architecture (single-source pass-through)
-- **Step 1**: clean_variables() - Clean categorical input
-- **Step 2**: Direct pass-through (1=yes, 2=no)
-- **Step 3**: Output cleaning with smoked_100_lifetime metadata
-
-**Source**: SMK_01A across all cycles (already harmonised via worksheets).
-
-**Coverage**:
-- PUMF: 2001-2021
-- Master: 2001-2023
-
-**Universe**: Respondents who have smoked at least one whole cigarette.
+Source: SMK_01A, already harmonised across all cycles in the
+worksheets. Coverage: PUMF 2001-2021, Master 2001-2023. Universe:
+respondents who have smoked at least one whole cigarette. Uses
+3-step pass-through architecture.
 }
 \examples{
-\dontrun{
-# Single value
-calculate_smoked_100_lifetime(1)  # Returns: 1 (yes, 100+ cigarettes)
-calculate_smoked_100_lifetime(2)  # Returns: 2 (no)
+# Scalar
+calculate_smoked_100_lifetime(1)
 
-# Vector input with missing values
-calculate_smoked_100_lifetime(c(1, 2, 1, NA))
-
-# Tagged NA pass-through
-calculate_smoked_100_lifetime(haven::tagged_na("a"))  # NA::a (not applicable)
-
-# NULL input (no data available)
-calculate_smoked_100_lifetime(NULL)  # NA::b (not stated)
 }
-
+\seealso{
+\code{\link{calculate_age_first_cigarette}},
+  \code{\link{calculate_SMK_01A}}
 }

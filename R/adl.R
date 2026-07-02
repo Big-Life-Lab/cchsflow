@@ -79,12 +79,6 @@
 #'
 #' @seealso \code{\link{score_adl}}, \code{\link{score_adl_6}}
 #'
-#' @references
-#' Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
-#' JAMA, 185(12), 914-919.
-#'
-#' @note v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-#'   implementation; replaces the abandoned helper-based draft.
 #' @export
 assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
                        output_format = "tagged_na") {
@@ -166,12 +160,6 @@ assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
 #'
 #' @seealso \code{\link{assess_adl}}, \code{\link{score_adl_6}}
 #'
-#' @references
-#' Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
-#' JAMA, 185(12), 914-919.
-#'
-#' @note v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-#'   implementation; replaces the abandoned helper-based draft.
 #' @export
 score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
                       output_format = "tagged_na") {
@@ -250,12 +238,6 @@ score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
 #'
 #' @seealso \code{\link{assess_adl}}, \code{\link{score_adl}}
 #'
-#' @references
-#' Katz, S., et al. (1963). Studies of illness in the aged: The index of ADL.
-#' JAMA, 185(12), 914-919.
-#'
-#' @note v3.0.0, last updated: 2026-06-10, status: active. Canonical 3-step
-#'   implementation; replaces the abandoned helper-based draft.
 #' @export
 score_adl_6 <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06,
                         output_format = "tagged_na") {
