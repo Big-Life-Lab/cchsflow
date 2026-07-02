@@ -169,9 +169,9 @@ Rows within each era block must be sorted in this order:
 Row count depends on `typeEnd` and on whether the underlying R function can return `NA(a)` / `NA(b)`.
 
 **Continuous output** (`typeEnd=cont`) — up to 3 rows:
-1. `Func::` row — `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`, `recEnd=Func::function_name`
-2. `NA::a` row — `recEnd=NA::a`, `recStart=N/A`, `catLabel=not applicable`
-3. `NA::b` row — `recEnd=NA::b`, `recStart=N/A`, `catLabel=missing`
+1. `Func::` row — `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`, `catStartLabel=N/A`, `recEnd=Func::function_name`
+2. `NA::a` row — `recEnd=NA::a`, `recStart=N/A`, `catLabel=not applicable`, `catStartLabel=not applicable`
+3. `NA::b` row — `recEnd=NA::b`, `recStart=N/A`, `catLabel=missing`, `catStartLabel=missing`
 
 **Categorical output** (`typeEnd=cat`) — Func:: row, then N category rows, then NA rows:
 1. `Func::` row — `typeStart=N/A`, `recStart=N/A`, `catLabel=N/A`, `recEnd=Func::function_name`
@@ -326,7 +326,7 @@ Even if 2022+ maps to different raw CCHS sources, `variables.csv` still referenc
 
 `units` must be consistent across all rows in a variable block — value rows, NA::a rows, NA::b rows. If any row has `units=years`, all rows in that block must also have `units=years`.
 
-When a categorical variable is derived from a continuous counterpart (e.g., `pack_years_cat` from `pack_years_der`), the categorical variable must use the same `units` as its continuous source. The `variables.csv` units column must also match `variable_details.csv`. Use lowercase for unit names (`years` not `Years`, `hours` not `Hours`).
+When a categorical variable is derived from a continuous counterpart, it should only carry units if its categories are numeric ranges (e.g., `pack_years_cat` with "0-10 pack-years", "10-20 pack-years" uses `pack-years`). If categories are word-based labels (e.g., "Underweight", "Normal", "Obese"), use `N/A`. When units are carried, they must match the continuous source exactly. The `variables.csv` units column must also match `variable_details.csv`. Use lowercase for unit names (`years` not `Years`, `hours` not `Hours`).
 
 ---
 
