@@ -22,7 +22,7 @@ test_that("Should return an empty list when there are no errors in the
     ),
     paste0(
       "BMI,Body Mass Index,Body Mass Index,BMI,Health status,Continuous,",
-      "kg/m2,cchs,[HWTGBMI],Calculated BMI\n"
+      "kg/m2,cchs2001_p,[HWTGBMI],Calculated BMI\n"
     )
   )
   variables_sheet_path <- create_test_csv(variables_sheet_content)
@@ -52,7 +52,7 @@ test_that("Should not fix errors when the worksheet is missing the ID column", {
     ),
     paste0(
       "BMI,Body Mass Index,Body Mass Index,BMI,Health status,Continuous,",
-      "kg/m2,cchs2013_p,[HWTGBMI],Calculated BMI\n"
+      "kg/m2,cchs2013_2014_p,[HWTGBMI],Calculated BMI\n"
     )
   )
   variables_sheet_path <- create_test_csv(variables_sheet_content)
@@ -78,7 +78,7 @@ test_that("Should fix incorrect line endings", {
     ),
     paste0(
       "BMI,Body Mass Index,Body Mass Index,BMI,Health status,Continuous,",
-      "kg/m2,cchs,[HWTGBMI],Calculated BMI\r\n"
+      "kg/m2,cchs2001_p,[HWTGBMI],Calculated BMI\r\n"
     ),
     paste0(
       "Sex,Sex,Sex,Demographics,Demographics,Categorical,N/A,",
@@ -114,7 +114,7 @@ test_that("Should fix excessive quoting", {
   )
   second_line <- paste0(
     '"BMI","\nBody Mass Index","\r\nBody Mass Index","""BMI",',
-    '",Health status",Continuous,kg/m2,cchs,[HWTGBMI],Calculated BMI\n'
+    '",Health status",Continuous,kg/m2,cchs2001_p,[HWTGBMI],Calculated BMI\n'
   )
   variables_sheet_content <- c(header_line, second_line)
   test_file_path <- create_test_csv(variables_sheet_content)

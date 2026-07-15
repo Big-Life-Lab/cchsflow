@@ -124,16 +124,142 @@ check_worksheet <- function(
   excessive_quote_errors <- .check_excessive_quoting(
     raw_lines, list(file_path = file_path, file_type = file_type))
 
+  # Content checks driven by the schema: controlled vocabularies and the
+  # database-token registry (see inst/metadata/schemas/core/)
+  enum_errors <- if (!is.null(schema$column_enums)) {
+    .check_column_enums(
+      csv_result$data, schema$column_enums,
+      list(file_path = file_path, file_type = file_type)
+    )
+  } else {
+    list()
+  }
+
+  database_token_errors <- if (!is.null(schema$database_registry_file)) {
+    .check_database_tokens(
+      csv_result$data,
+      load_database_registry(schema$database_registry_file),
+      list(file_path = file_path, file_type = file_type)
+    )
+  } else {
+    list()
+  }
+
   all_errors <- purrr::flatten(list(
     line_ending_errors,
     excessive_quote_errors,
     column_order_errors,
     row_sorting_errors,
     empty_column_errors,
-    extra_column_errors
+    extra_column_errors,
+    enum_errors,
+    database_token_errors
   ))
 
   return(all_errors)
+}
+
+#' Check controlled-vocabulary columns against schema enums
+#'
+#' For every column declared under `column_enums` in the worksheet schema,
+#' flags cell values outside the declared vocabulary. Empty cells are
+#' violations too: fields that do not apply must carry the explicit "N/A"
+#' marker where the vocabulary includes it.
+#'
+#' @param csv_data Data frame of the worksheet
+#' @param column_enums Named list: column name -> character vector of
+#'   allowed values (from the schema YAML)
+#' @param error_ctx Named list with file_type and file_path
+#'
+#' @return List of enum violation errors (one per distinct offending value
+#'   per column, with the affected row numbers)
+.check_column_enums <- function(csv_data, column_enums, error_ctx) {
+  errors <- list()
+
+  for (column_name in names(column_enums)) {
+    if (!column_name %in% colnames(csv_data)) next
+    allowed <- as.character(column_enums[[column_name]])
+    values <- trimws(as.character(csv_data[[column_name]]))
+    values[is.na(values)] <- ""
+
+    bad <- !(values %in% allowed)
+    if (!any(bad)) next
+
+    for (offending in unique(values[bad])) {
+      rows <- which(bad & values == offending) + 1  # +1 for the header line
+      shown <- paste(utils::head(rows, 5), collapse = ", ")
+      if (length(rows) > 5) shown <- paste0(shown, ", ...")
+      errors[[length(errors) + 1]] <- list(
+        error_type = "invalid_enum_value",
+        file_type = error_ctx$file_type,
+        file_path = error_ctx$file_path,
+        column_name = column_name,
+        value = offending,
+        row_nums = rows,
+        message = glue::glue(
+          "Error in {.pretty_print_file_type(error_ctx$file_type)} at ",
+          "{error_ctx$file_path}. Column \"{column_name}\" has value ",
+          "\"{offending}\" outside its vocabulary ",
+          "({paste(allowed, collapse = ', ')}) on line(s) {shown}."
+        )
+      )
+    }
+  }
+
+  errors
+}
+
+#' Check databaseStart tokens against the database registry
+#'
+#' Splits every databaseStart cell on commas and flags tokens that are not
+#' in the registry of valid CCHS database identifiers. This catches typo
+#' identifiers (e.g. a missing underscore) that would otherwise become
+#' silent dead rows, because the engine matches databases by string.
+#'
+#' @param csv_data Data frame of the worksheet
+#' @param valid_databases Character vector from load_database_registry()
+#' @param error_ctx Named list with file_type and file_path
+#'
+#' @return List of invalid-token errors (one per distinct bad token, with
+#'   the affected row numbers)
+.check_database_tokens <- function(csv_data, valid_databases, error_ctx) {
+  if (!"databaseStart" %in% colnames(csv_data)) return(list())
+
+  cells <- as.character(csv_data$databaseStart)
+  errors <- list()
+  bad_rows <- list()
+
+  for (i in seq_along(cells)) {
+    cell <- cells[i]
+    if (is.na(cell) || trimws(cell) %in% c("", "N/A")) next
+    tokens <- trimws(unlist(strsplit(cell, ",", fixed = TRUE)))
+    tokens <- tokens[nzchar(tokens)]
+    for (token in tokens[!(tokens %in% valid_databases)]) {
+      bad_rows[[token]] <- c(bad_rows[[token]], i + 1)  # +1 for header line
+    }
+  }
+
+  for (token in names(bad_rows)) {
+    rows <- unique(bad_rows[[token]])
+    shown <- paste(utils::head(rows, 5), collapse = ", ")
+    if (length(rows) > 5) shown <- paste0(shown, ", ...")
+    errors[[length(errors) + 1]] <- list(
+      error_type = "invalid_database_token",
+      file_type = error_ctx$file_type,
+      file_path = error_ctx$file_path,
+      token = token,
+      row_nums = rows,
+      message = glue::glue(
+        "Error in {.pretty_print_file_type(error_ctx$file_type)} at ",
+        "{error_ctx$file_path}. databaseStart token \"{token}\" is not in ",
+        "the database registry ",
+        "(inst/metadata/schemas/core/database_registry.yaml) on line(s) ",
+        "{shown}. Fix the token, or add the new database to the registry."
+      )
+    )
+  }
+
+  errors
 }
 
 #' Check whether a worksheet has the correct line endings
@@ -663,4 +789,79 @@ check_recode_blocks <- function(file_path) {
   } else {
     return("Variable details sheet")
   }
+}
+
+#' Check cross-file key integrity between the two worksheets
+#'
+#' Verifies that every variable in variable_details.csv has a corresponding
+#' row in variables.csv (the foreign-key relationship between the two
+#' worksheets). A variable_details entry without a variables.csv row has no
+#' harmonized-variable metadata (labels, subject, type) and indicates either
+#' a missing variables.csv row or a typo in the variable name.
+#'
+#' @param variables_path Path to variables.csv
+#' @param variable_details_path Path to variable_details.csv
+#'
+#' @return A list of errors found. Each error is a named list with
+#'   error_type "orphaned_variable_details" and the affected variable name.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' check_cross_file_keys(
+#'   "inst/extdata/variables.csv",
+#'   "inst/extdata/variable_details.csv"
+#' )
+#' }
+check_cross_file_keys <- function(variables_path, variable_details_path) {
+  for (p in c(variables_path, variable_details_path)) {
+    if (!file.exists(p)) {
+      file_type <- if (identical(p, variables_path)) "variables" else "variable_details"
+      return(list(.create_file_not_found_error(file_type, p)))
+    }
+  }
+
+  vs <- tryCatch(
+    read.csv(variables_path, stringsAsFactors = FALSE, check.names = FALSE),
+    error = function(e) NULL
+  )
+  vd <- tryCatch(
+    read.csv(variable_details_path, stringsAsFactors = FALSE,
+             check.names = FALSE),
+    error = function(e) NULL
+  )
+  if (is.null(vs)) {
+    return(list(.create_invalid_csv_error("variables", variables_path,
+                                          "Unable to parse CSV")))
+  }
+  if (is.null(vd)) {
+    return(list(.create_invalid_csv_error(
+      "variable_details", variable_details_path, "Unable to parse CSV")))
+  }
+  if (!"variable" %in% names(vs) || !"variable" %in% names(vd)) {
+    return(list())  # column-order checks report the structural problem
+  }
+
+  known <- unique(trimws(vs$variable))
+  vd_vars <- trimws(vd$variable)
+  orphaned <- sort(unique(vd_vars[!(vd_vars %in% known) & nzchar(vd_vars)]))
+
+  purrr::map(orphaned, function(v) {
+    rows <- which(vd_vars == v) + 1
+    shown <- paste(utils::head(rows, 5), collapse = ", ")
+    if (length(rows) > 5) shown <- paste0(shown, ", ...")
+    list(
+      error_type = "orphaned_variable_details",
+      file_type = "variable_details",
+      file_path = variable_details_path,
+      variable = v,
+      row_nums = rows,
+      message = glue::glue(
+        "Variable \"{v}\" has rows in variable_details.csv (line(s) ",
+        "{shown}) but no row in variables.csv. Add the variables.csv row ",
+        "or fix the variable name."
+      )
+    )
+  })
 }

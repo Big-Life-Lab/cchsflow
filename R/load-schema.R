@@ -41,3 +41,45 @@ load_schema <- function(file_type) {
     }
   )
 }
+
+#' Load the database-token registry
+#'
+#' @description Loads the registry of valid CCHS database identifiers used to
+#'   validate databaseStart tokens in the worksheets. The registry file name
+#'   comes from the worksheet schema's `database_registry_file` key.
+#'
+#' @param registry_file File name of the registry YAML (default
+#'   "database_registry.yaml"), resolved inside the package's
+#'   metadata/schemas/core directory.
+#'
+#' @return Character vector of valid database identifiers.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' load_database_registry()
+#' }
+load_database_registry <- function(registry_file = "database_registry.yaml") {
+  registry_path <- system.file(
+    "metadata", "schemas", "core", registry_file,
+    package = "cchsflow",
+    mustWork = TRUE
+  )
+
+  registry <- tryCatch(
+    yaml::read_yaml(registry_path),
+    error = function(e) {
+      stop("Failed to load database registry. The file at ", registry_path,
+           " may be corrupted: ", e$message)
+    }
+  )
+
+  if (is.null(registry$valid_databases) ||
+      length(registry$valid_databases) == 0) {
+    stop("Database registry at ", registry_path,
+         " has no 'valid_databases' entries.")
+  }
+
+  as.character(registry$valid_databases)
+}

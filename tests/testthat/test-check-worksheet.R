@@ -7,7 +7,7 @@ test_that("check_worksheet returns empty list for valid CSV", {
     labelLong = c("Long A", "Long B"),
     section = c("s1", "s1"),
     subject = c("Sub", "Sub"),
-    variableType = c("cont", "cat"),
+    variableType = c("Continuous", "Categorical"),
     units = c("years", ""),
     databaseStart = c("cchs2001_p", "cchs2001_p"),
     variableStart = c("VAR_A", "VAR_B"),
@@ -32,7 +32,7 @@ test_that("check_worksheet detects CRLF line endings", {
   lines <- paste0(
     "variable,label,labelLong,section,subject,variableType,units,",
     "databaseStart,variableStart,description\r\n",
-    "A,L,LL,s,S,cont,y,cchs2001_p,V,d\r\n"
+    "A,L,LL,s,S,Continuous,y,cchs2001_p,V,d\r\n"
   )
   writeBin(charToRaw(lines), tmp)
   # readr::read_lines strips \r on some platforms (macOS); skip if so
@@ -49,7 +49,7 @@ test_that("check_worksheet detects wrong column order", {
   # Swap label and labelLong columns
   df <- data.frame(
     variable = "A", labelLong = "LL", label = "L", section = "s",
-    subject = "S", variableType = "cont", units = "y",
+    subject = "S", variableType = "Continuous", units = "y",
     databaseStart = "cchs2001_p", variableStart = "V", description = "d",
     stringsAsFactors = FALSE
   )
@@ -68,7 +68,7 @@ test_that("check_worksheet detects unsorted rows", {
     labelLong = c("LL", "LL"),
     section = c("s", "s"),
     subject = c("S", "S"),
-    variableType = c("cont", "cont"),
+    variableType = c("Continuous", "Continuous"),
     units = c("", ""),
     databaseStart = c("cchs2001_p", "cchs2001_p"),
     variableStart = c("V", "V"),
@@ -87,7 +87,7 @@ test_that("check_worksheet detects trailing empty columns", {
   # Write a CSV with an extra empty column
   lines <- c(
     "variable,label,labelLong,section,subject,variableType,units,databaseStart,variableStart,description,",
-    "A,L,LL,s,S,cont,y,cchs2001_p,V,d,"
+    "A,L,LL,s,S,Continuous,y,cchs2001_p,V,d,"
   )
   writeLines(lines, tmp, sep = "\n")
   errors <- check_worksheet(tmp, "variables")
@@ -100,7 +100,7 @@ test_that("check_worksheet detects extra non-empty columns", {
   on.exit(unlink(tmp))
   lines <- c(
     "variable,label,labelLong,section,subject,variableType,units,databaseStart,variableStart,description,extra_col",
-    "A,L,LL,s,S,cont,y,cchs2001_p,V,d,extra_value"
+    "A,L,LL,s,S,Continuous,y,cchs2001_p,V,d,extra_value"
   )
   writeLines(lines, tmp, sep = "\n")
   errors <- check_worksheet(tmp, "variables")
@@ -128,7 +128,7 @@ test_that("check_worksheet skips row sorting for single-row CSV", {
   on.exit(unlink(tmp))
   df <- data.frame(
     variable = "A", label = "L", labelLong = "LL", section = "s",
-    subject = "S", variableType = "cont", units = "y",
+    subject = "S", variableType = "Continuous", units = "y",
     databaseStart = "cchs2001_p", variableStart = "V", description = "d",
     stringsAsFactors = FALSE
   )
@@ -266,7 +266,7 @@ test_that("fix_worksheet returns empty list for clean file", {
     labelLong = c("LL", "LL"),
     section = c("s", "s"),
     subject = c("S", "S"),
-    variableType = c("cont", "cont"),
+    variableType = c("Continuous", "Continuous"),
     units = c("", ""),
     databaseStart = c("cchs2001_p", "cchs2001_p"),
     variableStart = c("V", "V"),
@@ -287,7 +287,7 @@ test_that("fix_worksheet sorts unsorted rows", {
     labelLong = c("LL", "LL"),
     section = c("s", "s"),
     subject = c("S", "S"),
-    variableType = c("cont", "cont"),
+    variableType = c("Continuous", "Continuous"),
     units = c("", ""),
     databaseStart = c("cchs2001_p", "cchs2001_p"),
     variableStart = c("V", "V"),
@@ -371,4 +371,93 @@ test_that("parse_scope_args parses both args", {
   result <- parse_scope_args(c("--variables", "A,B", "--subject", "Smoking"))
   expect_equal(result$variables, c("A", "B"))
   expect_equal(result$subjects, "Smoking")
+})
+
+# ==============================================================================
+# Schema-driven content checks: enums, database registry, cross-file keys
+# ==============================================================================
+
+test_that("check_worksheet flags values outside a column enum", {
+  bad <- data.frame(
+    variable = c("AAA", "BBB"),
+    dummyVariable = "N/A", typeEnd = c("cat", "catt"),
+    databaseStart = "cchs2001_p", variableStart = "cchs2001_p::X",
+    typeStart = c("cat", "kat"), recEnd = "1", numValidCat = "1",
+    catLabel = "x", catLabelLong = "x", units = "N/A", recStart = "1",
+    catStartLabel = "x", variableStartShortLabel = "x",
+    variableStartLabel = "x", notes = "",
+    stringsAsFactors = FALSE
+  )
+  path <- withr::local_tempfile(fileext = ".csv")
+  readr::write_csv(bad, path, na = "", quote = "needed")
+  errs <- check_worksheet(path, "variable_details")
+  enum_errs <- Filter(function(e) e$error_type == "invalid_enum_value", errs)
+  offending <- vapply(enum_errs, function(e) e$value, character(1))
+  expect_true("catt" %in% offending)
+  expect_true("kat" %in% offending)
+})
+
+test_that("check_worksheet flags databaseStart tokens missing from the registry", {
+  bad <- data.frame(
+    variable = "AAA",
+    dummyVariable = "N/A", typeEnd = "cat",
+    databaseStart = "cchs2001_p, cchs2007_2008p", variableStart = "cchs2001_p::X",
+    typeStart = "cat", recEnd = "1", numValidCat = "1",
+    catLabel = "x", catLabelLong = "x", units = "N/A", recStart = "1",
+    catStartLabel = "x", variableStartShortLabel = "x",
+    variableStartLabel = "x", notes = "",
+    stringsAsFactors = FALSE
+  )
+  path <- withr::local_tempfile(fileext = ".csv")
+  readr::write_csv(bad, path, na = "", quote = "needed")
+  errs <- check_worksheet(path, "variable_details")
+  token_errs <- Filter(function(e) e$error_type == "invalid_database_token", errs)
+  expect_length(token_errs, 1)
+  expect_equal(token_errs[[1]]$token, "cchs2007_2008p")
+})
+
+test_that("valid enum values and registry tokens produce no content errors", {
+  good <- data.frame(
+    variable = "AAA",
+    dummyVariable = "N/A", typeEnd = "cont",
+    databaseStart = "cchs2019_2020_m, cchs2023_p", variableStart = "[AAA]",
+    typeStart = "N/A", recEnd = "copy", numValidCat = "N/A",
+    catLabel = "x", catLabelLong = "x", units = "N/A", recStart = "copy",
+    catStartLabel = "x", variableStartShortLabel = "x",
+    variableStartLabel = "x", notes = "",
+    stringsAsFactors = FALSE
+  )
+  path <- withr::local_tempfile(fileext = ".csv")
+  readr::write_csv(good, path, na = "", quote = "needed")
+  errs <- check_worksheet(path, "variable_details")
+  content <- Filter(function(e) e$error_type %in%
+                      c("invalid_enum_value", "invalid_database_token"), errs)
+  expect_length(content, 0)
+})
+
+test_that("check_cross_file_keys flags orphaned variable_details entries", {
+  vs <- data.frame(
+    variable = "AAA", label = "a", labelLong = "a", section = "s",
+    subject = "s", variableType = "Categorical", units = "N/A",
+    databaseStart = "cchs2001_p", variableStart = "cchs2001_p::X",
+    description = "d", stringsAsFactors = FALSE
+  )
+  vd <- data.frame(
+    variable = c("AAA", "ZZZ_typo"),
+    dummyVariable = "N/A", typeEnd = "cat",
+    databaseStart = "cchs2001_p", variableStart = "cchs2001_p::X",
+    typeStart = "cat", recEnd = "1", numValidCat = "1",
+    catLabel = "x", catLabelLong = "x", units = "N/A", recStart = "1",
+    catStartLabel = "x", variableStartShortLabel = "x",
+    variableStartLabel = "x", notes = "",
+    stringsAsFactors = FALSE
+  )
+  vs_path <- withr::local_tempfile(fileext = ".csv")
+  vd_path <- withr::local_tempfile(fileext = ".csv")
+  readr::write_csv(vs, vs_path, na = "", quote = "needed")
+  readr::write_csv(vd, vd_path, na = "", quote = "needed")
+  errs <- check_cross_file_keys(vs_path, vd_path)
+  expect_length(errs, 1)
+  expect_equal(errs[[1]]$variable, "ZZZ_typo")
+  expect_equal(errs[[1]]$error_type, "orphaned_variable_details")
 })

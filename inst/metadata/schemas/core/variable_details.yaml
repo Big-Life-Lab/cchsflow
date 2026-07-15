@@ -17,3 +17,18 @@ expected_column_order:
   - "notes"
 
 id_column_name: "variable"
+
+# Controlled vocabularies - check_worksheet() flags any value outside these
+# lists. "N/A" marks rows where the field does not apply (DerivedVar and
+# Func:: rows). Extend deliberately.
+column_enums:
+  typeStart:
+    - "cat"
+    - "cont"
+    - "N/A"
+  typeEnd:
+    - "cat"
+    - "cont"
+
+# Registry of valid databaseStart tokens (shared with variables)
+database_registry_file: "database_registry.yaml"

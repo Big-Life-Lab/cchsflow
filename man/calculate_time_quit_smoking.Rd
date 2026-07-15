@@ -2,7 +2,7 @@
 % Please edit documentation in R/smoking.R
 \name{calculate_time_quit_smoking}
 \alias{calculate_time_quit_smoking}
-\title{Combined time since quit smoking}
+\title{Calculate combined time since quit smoking}
 \usage{
 calculate_time_quit_smoking(
   SMK_09A_cont = NULL,
@@ -11,19 +11,39 @@ calculate_time_quit_smoking(
 )
 }
 \arguments{
-\item{SMK_09A_cont}{Years since stopped daily (from worksheet midpoint recode)}
+\item{SMK_09A_cont}{Numeric. Years since stopped daily smoking
+(from worksheet midpoint recode). NULL if not available.}
 
-\item{SMK_06A_cont}{Years since quit occasional (from worksheet midpoint recode)}
+\item{SMK_06A_cont}{Numeric. Years since quit occasional smoking
+(from worksheet midpoint recode). NULL if not available.}
 
-\item{output_format}{Output missing data format: "tagged_na" (default) or "original".}
+\item{output_format}{Output missing data format: "tagged_na" (default)
+or "original".}
 }
 \value{
-Continuous years since quit; NA::a for current/never smokers,
-  NA::b for missing
+Numeric vector of years since quit smoking. Missing data:
+  \code{haven::tagged_na("a")} (not applicable),
+  \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
-Combines cessation timing from multiple sources with priority
-  logic. Provides a single continuous "years since quit" value regardless
-  of smoking history pathway. Priority: SMK_09A_cont (daily) over
-  SMK_06A_cont (occasional).
+Combine cessation timing from daily (SMK_09A_cont) and occasional
+(SMK_06A_cont) sources into a single continuous years-since-quit
+variable with priority routing.
+}
+\details{
+Takes the first non-missing value: SMK_09A_cont (former daily) has
+priority over SMK_06A_cont (former occasional). Current smokers and
+never smokers receive tagged_na("a") upstream via the worksheet.
+When both inputs are missing, propagates the highest-priority missing
+type. Missing-data handling follows the v3 3-step architecture with
+priority not applicable > not stated.
+}
+\examples{
+# Scalar: former daily smoker
+calculate_time_quit_smoking(SMK_09A_cont = 5.0, SMK_06A_cont = NA)
+
+}
+\seealso{
+\code{\link{calculate_time_quit_smoking_complete}},
+  \code{\link{calculate_time_quit_smoking_daily}}
 }

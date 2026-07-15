@@ -72,8 +72,20 @@ if (n_recode_block_errors > 0) {
 }
 cli_text("")
 
+cli_alert_info("Checking cross-file key integrity...")
+cross_file_errors <- check_cross_file_keys(
+  scope$variables_path, scope$variable_details_path)
+n_cross_file_errors <- length(cross_file_errors)
+if (n_cross_file_errors > 0) {
+  cli_alert_danger("Found {cli::no(n_cross_file_errors)} error{?s}")
+} else {
+  cli_alert_success("Found {cli::no(n_cross_file_errors)} error{?s}")
+}
+cli_text("")
+
 all_errors <- purrr::flatten(
-  list(variables_sheet_errors, variable_details_errors, recode_block_errors))
+  list(variables_sheet_errors, variable_details_errors, recode_block_errors,
+       cross_file_errors))
 
 # Report results
 n_all_errors <- length(all_errors)
