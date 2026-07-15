@@ -2,25 +2,14 @@
 % Please edit documentation in R/load-schema.R
 \name{load_cchs_missing_data}
 \alias{load_cchs_missing_data}
-\title{Load the database-token registry}
+\title{Load the CCHS missing-data pattern schema}
 \usage{
 load_cchs_missing_data()
 }
-\arguments{
-\item{registry_file}{File name of the registry YAML (default
-"database_registry.yaml"), resolved inside the package's
-metadata/schemas/core directory.}
-}
 \value{
-Character vector of valid database identifiers.
-
 Named list parsed from the YAML schema.
 }
 \description{
-Loads the registry of valid CCHS database identifiers used to
-  validate databaseStart tokens in the worksheets. The registry file name
-  comes from the worksheet schema's `database_registry_file` key.
-
 Loads the machine-actionable CCHS missing-data pattern
   definitions (inst/metadata/schemas/cchs/cchs_missing_data.yaml): the
   single/double/triple-digit code families with their decimal-era
@@ -32,11 +21,6 @@ Loads the machine-actionable CCHS missing-data pattern
   per-variable source of truth remains variable_details.csv.
 }
 \examples{
-\dontrun{
-load_database_registry()
-}
-Load the CCHS missing-data pattern schema
-
 \dontrun{
 schema <- load_cchs_missing_data()
 names(schema$pattern_definitions$patterns)

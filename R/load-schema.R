@@ -42,24 +42,6 @@ load_schema <- function(file_type) {
   )
 }
 
-#' Load the database-token registry
-#'
-#' @description Loads the registry of valid CCHS database identifiers used to
-#'   validate databaseStart tokens in the worksheets. The registry file name
-#'   comes from the worksheet schema's `database_registry_file` key.
-#'
-#' @param registry_file File name of the registry YAML (default
-#'   "database_registry.yaml"), resolved inside the package's
-#'   metadata/schemas/core directory.
-#'
-#' @return Character vector of valid database identifiers.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' load_database_registry()
-#' }
 #' Load the CCHS missing-data pattern schema
 #'
 #' @description Loads the machine-actionable CCHS missing-data pattern
@@ -97,6 +79,22 @@ load_cchs_missing_data <- function() {
   )
 }
 
+#' Load the database-token registry
+#'
+#' @description Loads the registry of valid CCHS database identifiers used to
+#'   validate databaseStart tokens in the worksheets. The registry file name
+#'   comes from the worksheet schema's `database_registry_file` key.
+#'
+#' @param registry_file File name of the registry YAML (default
+#'   "database_registry.yaml"), resolved inside the package's
+#'   metadata/schemas/core directory.
+#'
+#' @return Character vector of valid database identifiers.
+#'
+#' @examples
+#' \dontrun{
+#' load_database_registry()
+#' }
 load_database_registry <- function(registry_file = "database_registry.yaml") {
   registry_path <- system.file(
     "metadata", "schemas", "core", registry_file,
