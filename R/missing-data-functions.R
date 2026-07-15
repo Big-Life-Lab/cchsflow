@@ -190,7 +190,21 @@ load_priority_rules <- function() {
       warning("Could not load core priority rules: ", e$message)
     })
   }
-  
+
+  # Read the declared priority hierarchy from the CCHS missing-data schema:
+  # every pattern family declares not_applicable wins over missing_data
+  # (inst/metadata/schemas/cchs/cchs_missing_data.yaml)
+  if (is.null(rules)) {
+    tryCatch({
+      schema <- load_cchs_missing_data()
+      fams <- schema$pattern_definitions$patterns
+      if (length(fams) > 0 &&
+          !is.null(fams[[1]]$priority_hierarchy$not_applicable)) {
+        rules <- list(na_a = 1, na_b = 2)
+      }
+    }, error = function(e) NULL)
+  }
+
   # Built-in fallback (general data handling: "Not Applicable" > "Not Stated")
   if (is.null(rules)) {
     rules <- list(na_a = 1, na_b = 2)  # na_a higher priority as general fallback

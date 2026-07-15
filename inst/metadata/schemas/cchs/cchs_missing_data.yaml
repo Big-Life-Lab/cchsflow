@@ -2,6 +2,14 @@ schema_version: "1.0.0"
 schema_date: "2025-01-20"
 description: "CCHS missing data patterns and transformation rules - machine-actionable metadata reference"
 
+# All codes and ranges in this schema are in the SOURCE coding domain (raw
+# StatCan codes), not the harmonized/derived domain. Consumers: the
+# clean_variables() fallback pattern and load_priority_rules() read the
+# normative blocks (pattern_definitions, na_category_definitions);
+# variable_assignments is reference documentation only - the per-variable
+# source of truth is variable_details.csv.
+applies_to: "source_codes"
+
 # Cross-reference with human-readable documentation
 related_documentation:
   user_guide: "vignettes/missing_value_conventions.qmd"
@@ -201,7 +209,7 @@ implementation:
 # ============================================================================
 metadata:
   schema_authority: "cchsflow development team"
-  last_reviewed: "2025-01-20"
+  last_reviewed: "2026-07-15"
   next_review_due: "2025-07-20"
   version_history:
     "1.0.0": "Initial comprehensive specification with standardized pattern names (single/double/triple_digit_missing)"

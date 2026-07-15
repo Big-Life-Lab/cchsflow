@@ -127,8 +127,9 @@ clean_variables <- function(vars, output_format = "tagged_na", check_length = TR
     pattern <- tryCatch({
       get_complete_pattern(var_name)
     }, error = function(e) {
-      # Fallback to default CCHS pattern when metadata lookup fails
-      # This allows functions to work before worksheets are fully migrated
+      # Fallback to the declared CCHS pattern schema when metadata lookup
+      # fails. This allows functions to work before worksheets are fully
+      # migrated.
       warning_key <- paste0("pattern_fallback_", var_name)
       cache <- .get_pattern_warnings_cache()
       if (!exists(warning_key, envir = cache)) {
@@ -136,13 +137,7 @@ clean_variables <- function(vars, output_format = "tagged_na", check_length = TR
         warning("Using default CCHS pattern for '", var_name,
                 "' (metadata lookup failed). ", call. = FALSE)
       }
-      # Return default CCHS single-digit pattern (most common for categorical vars)
-      list(
-        na_a_codes = c(6, 96, 996),   # Not applicable
-        na_b_codes = c(7, 8, 9, 97, 98, 99, 997, 998, 999),  # Not stated/don't know/refusal
-        copy_mappings = list(list(min = 1, max = 95)),  # Valid range for most vars
-        else_mappings = list()
-      )
+      .default_cchs_pattern()
     })
     
     # Process data using pattern and output format
@@ -533,6 +528,46 @@ apply_else_rule <- function(value, else_mappings) {
 # ==============================================================================
 # UTILITY FUNCTIONS
 # ==============================================================================
+
+#' Default CCHS Missing Pattern from the Declared Schema
+#'
+#' Builds the fallback missing pattern from the CCHS missing-data schema
+#' (inst/metadata/schemas/cchs/cchs_missing_data.yaml): the union of all
+#' pattern families' codes by tag, including the early-cycle decimal
+#' variants. Used when a variable has no worksheet metadata. If the schema
+#' cannot be read, falls back to the equivalent hardcoded values so the
+#' cleaning path never fails on a schema problem.
+#'
+#' @return Pattern list with na_a_codes, na_b_codes, copy_mappings,
+#'   else_mappings
+#' @noRd
+.default_cchs_pattern <- function() {
+  na_a <- c(6, 96, 996)
+  na_b <- c(7, 8, 9, 97, 98, 99, 997, 998, 999)
+
+  tryCatch({
+    schema <- load_cchs_missing_data()
+    a <- numeric(0)
+    b <- numeric(0)
+    for (fam in schema$pattern_definitions$patterns) {
+      hier <- fam$priority_hierarchy
+      a <- c(a, unlist(hier$not_applicable$original_codes),
+             unlist(hier$not_applicable$decimal_codes))
+      b <- c(b, unlist(hier$missing_data$original_codes),
+             unlist(hier$missing_data$decimal_codes))
+    }
+    if (length(a) > 0) na_a <- sort(unique(as.numeric(a)))
+    if (length(b) > 0) na_b <- sort(unique(as.numeric(b)))
+  }, error = function(e) NULL)
+
+  list(
+    na_a_codes = na_a,
+    na_b_codes = na_b,
+    # Valid range for most variables; not declared in the schema
+    copy_mappings = list(list(min = 1, max = 95)),
+    else_mappings = list()
+  )
+}
 
 #' Coerce CCHS Label Strings to Numeric with Tagged NAs
 #'

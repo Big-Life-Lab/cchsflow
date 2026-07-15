@@ -60,6 +60,43 @@ load_schema <- function(file_type) {
 #' \dontrun{
 #' load_database_registry()
 #' }
+#' Load the CCHS missing-data pattern schema
+#'
+#' @description Loads the machine-actionable CCHS missing-data pattern
+#'   definitions (inst/metadata/schemas/cchs/cchs_missing_data.yaml): the
+#'   single/double/triple-digit code families with their decimal-era
+#'   variants and the not-applicable-over-missing priority hierarchy.
+#'
+#'   Consumers read the normative blocks only (`pattern_definitions` and
+#'   `transformation_rules$na_category_definitions`); the file's
+#'   variable-level assignments are reference documentation -- the
+#'   per-variable source of truth remains variable_details.csv.
+#'
+#' @return Named list parsed from the YAML schema.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' schema <- load_cchs_missing_data()
+#' names(schema$pattern_definitions$patterns)
+#' }
+load_cchs_missing_data <- function() {
+  schema_path <- system.file(
+    "metadata", "schemas", "cchs", "cchs_missing_data.yaml",
+    package = "cchsflow",
+    mustWork = TRUE
+  )
+
+  tryCatch(
+    yaml::read_yaml(schema_path),
+    error = function(e) {
+      stop("Failed to load the CCHS missing-data schema at ", schema_path,
+           ": ", e$message)
+    }
+  )
+}
+
 load_database_registry <- function(registry_file = "database_registry.yaml") {
   registry_path <- system.file(
     "metadata", "schemas", "core", registry_file,

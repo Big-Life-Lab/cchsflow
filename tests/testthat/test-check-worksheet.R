@@ -461,3 +461,26 @@ test_that("check_cross_file_keys flags orphaned variable_details entries", {
   expect_equal(errs[[1]]$variable, "ZZZ_typo")
   expect_equal(errs[[1]]$error_type, "orphaned_variable_details")
 })
+
+# ==============================================================================
+# CCHS missing-data schema consumption
+# ==============================================================================
+
+test_that("the fallback pattern comes from the CCHS missing-data schema", {
+  pat <- cchsflow:::.default_cchs_pattern()
+  expect_true(all(c(6, 96, 996, 999.6) %in% pat$na_a_codes))
+  expect_true(all(c(7, 8, 9, 97, 98, 99, 997, 998, 999, 999.7, 999.8, 999.9)
+                  %in% pat$na_b_codes))
+})
+
+test_that("priority rules resolve from the schema without a fallback warning", {
+  # Clear the session cache so load_priority_rules() re-resolves
+  rm(list = ls(envir = cchsflow:::.priority_rules_cache),
+     envir = cchsflow:::.priority_rules_cache)
+  expect_no_warning(rules <- cchsflow:::load_priority_rules())
+  expect_equal(rules$na_a, 1)
+  expect_equal(rules$na_b, 2)
+  # Behavioural check: not applicable wins over missing
+  pri <- get_priority_missing(haven::tagged_na("a"), haven::tagged_na("b"))
+  expect_true(haven::is_tagged_na(pri, "a"))
+})

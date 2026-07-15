@@ -13,3 +13,4 @@
 ^papers$
 ^\.claude$
 ^ceps$
+^.*\.DS_Store$
