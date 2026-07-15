@@ -1,0 +1,35 @@
+#139 categorize_immigration(2,2,1): ERR: argument "years" is missing, with no default -> classified/other
+ 
+L6 variables ( 12 ): SBE_005, ALCDTTM_former, DHH_OWN, CCCG102_2005plus, ADL_der, ADL_score_5, binge_drinker, pack_years_der, HWTGBMI_der, INCGHH_cont, SMKDGSTP_cont, DEN_132 
+
+=== L6 valid% matrix ===
+                SBE_005 ALCDTTM_former DHH_OWN CCCG102_2005plus ADL_der
+cchs2001_p           NA             NA   100.0               NA      NA
+cchs2003_p           NA             NA   100.0               NA      NA
+cchs2005_p           NA             NA    95.5              4.0      NA
+cchs2007_2008_p      NA           98.5    99.5              7.0      NA
+cchs2009_2010_p      NA           99.5    98.5              9.0      NA
+cchs2011_2012_p      NA           98.5    95.5             10.0      NA
+cchs2013_2014_p      NA           99.0    97.0              6.5      NA
+cchs2015_2016_p      NA           99.5    97.5              6.5      NA
+cchs2017_2018_p      59          100.0    98.5              8.0      NA
+                ADL_score_5 binge_drinker pack_years_der HWTGBMI_der
+cchs2001_p               NA            NA             NA          NA
+cchs2003_p               NA            NA             NA          NA
+cchs2005_p               NA            NA             NA          NA
+cchs2007_2008_p          NA            NA             NA          NA
+cchs2009_2010_p          NA            NA             NA          NA
+cchs2011_2012_p          NA            NA             NA          NA
+cchs2013_2014_p          NA            NA             NA          NA
+cchs2015_2016_p          NA            NA             NA          NA
+cchs2017_2018_p          NA            NA             NA          NA
+                INCGHH_cont SMKDGSTP_cont DEN_132
+cchs2001_p             91.5            NA     0.0
+cchs2003_p             81.5          28.5    71.5
+cchs2005_p             83.5          27.0    40.0
+cchs2007_2008_p        84.5          22.5    12.0
+cchs2009_2010_p        85.0          29.0    35.5
+cchs2011_2012_p       100.0          28.5    17.0
+cchs2013_2014_p       100.0          30.5    39.5
+cchs2015_2016_p       100.0          26.0    12.0
+cchs2017_2018_p       100.0          25.5    99.0

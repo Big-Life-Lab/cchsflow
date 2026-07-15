@@ -36,6 +36,9 @@ Provides a graduated disability measure: 0 (independent) to
 score, with priority not applicable > not stated. See
 \code{\link{assess_adl}} for the task list and cross-cycle notes.
 }
+\note{
+v3.0.0, last updated: 2026-07-15, status: active
+}
 \examples{
 # Scalar
 score_adl(2, 2, 2, 2, 2) # 0 (independent)

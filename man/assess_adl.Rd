@@ -49,6 +49,9 @@ priority not applicable > not stated when inputs mix missing types.
 Out-of-range inputs receive the worksheet's else rule
 (\code{haven::tagged_na("b")}).
 }
+\note{
+v3.0.0, last updated: 2026-07-15, status: active
+}
 \examples{
 # Scalar
 assess_adl(1, 2, 2, 2, 2) # 1 (needs help with meals)

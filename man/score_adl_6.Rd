@@ -46,6 +46,9 @@ ADL_06 (help managing finances) is available in CCHS 2003-2014 cycles
 only; use \code{\link{score_adl}} for 2001 or 2015+ analyses. Missing
 data handling matches the 5-item version.
 }
+\note{
+v3.0.0, last updated: 2026-07-15, status: active
+}
 \examples{
 # Scalar
 score_adl_6(2, 2, 2, 2, 2, 2) # 0 (independent)

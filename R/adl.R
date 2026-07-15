@@ -79,6 +79,7 @@
 #'
 #' @seealso \code{\link{score_adl}}, \code{\link{score_adl_6}}
 #'
+#' @note v3.0.0, last updated: 2026-07-15, status: active
 #' @export
 assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
                        output_format = "tagged_na") {
@@ -160,6 +161,7 @@ assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
 #'
 #' @seealso \code{\link{assess_adl}}, \code{\link{score_adl_6}}
 #'
+#' @note v3.0.0, last updated: 2026-07-15, status: active
 #' @export
 score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
                       output_format = "tagged_na") {
@@ -238,6 +240,7 @@ score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
 #'
 #' @seealso \code{\link{assess_adl}}, \code{\link{score_adl}}
 #'
+#' @note v3.0.0, last updated: 2026-07-15, status: active
 #' @export
 score_adl_6 <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06,
                         output_format = "tagged_na") {
