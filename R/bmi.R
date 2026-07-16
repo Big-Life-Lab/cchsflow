@@ -1,271 +1,234 @@
-#' @title Body Mass Index (BMI) derived variable
+# ==============================================================================
+# BMI (Body Mass Index) Functions
+# ==============================================================================
+#
+# Source-agnostic derived variable functions using the v3 3-step architecture.
+# These functions use semantic parameter names (height_m, weight_kg) and work
+# with both PUMF and Master data. The worksheet routes the appropriate source
+# variables (HWTGHTM/HWTGWTK for PUMF, HWTDHTM/HWTDWTK for Master) to the
+# same function parameters.
+#
+# This is the same pattern used by calculate_pack_years() in smoke-pack-years.R.
+
+# Connor Gorber et al. (2008) bias-correction coefficients
+BMI_CORRECTION_MALE <- list(intercept = -1.07575, slope = 1.07592)
+BMI_CORRECTION_FEMALE <- list(intercept = -0.12374, slope = 1.05129)
+
+#' @title Calculate Body Mass Index (BMI)
 #'
-#' @description This function creates a harmonized BMI variable. The BMI
-#'  variable provided by the CCHS calculates BMI using methods that vary across
-#'  cycles, leading to measurement error when using multiple CCHS cycles. In
-#'  certain CCHS cycles (2001-2003, 2007+), there are age restrictions in which
-#'  respondents under the age of 20 and over the age of 64 were not included.
-#'  Across all CCHS cycles, female respondents who identified as being pregnant
-#'  were excluded; and in certain CCHS cycles (2003-2007, 2013-2014), females
-#'  who did not answer the pregnancy question were coded as NS (not stated) for
-#'  HWTGBMI. As well, in certain CCHS cycles (2001-2003, 2009-2014), respondents
-#'  outside certain height and weight ranges (0.914-2.108m for height,
-#'  0-260kg for weight) were excluded from HWTGBMI.
+#' @description
+#' Calculates BMI from height and weight using the standard formula:
+#' weight (kg) / height (m)^2. Source-agnostic -- works with both PUMF
+#' and Master data via worksheet routing.
 #'
-#'  bmi_fun() creates a derived variable (HWTGBMI_der) that is harmonized across
-#'  all CCHS cycles. This function divides weight by the square of height.
+#' @details
+#' This function is source-agnostic. The worksheet routes different source
+#' variables to the same parameters depending on database type: HWTGHTM /
+#' HWTGWTK for PUMF (grouped, midpoint-imputed) and HWTDHTM / HWTDWTK for
+#' Master (continuous). The BMI formula is identical; the precision
+#' difference comes from the input variables.
 #'
-#' @details For HWTGBMI_der, there are no restrictions to age, height, weight,
-#'  or pregnancy status. While pregnancy was consistent across all CCHS cycles,
-#'  its variable (MAM_037) was not available in the PUMF CCHS datasets so it
-#'  could not be harmonized and included into the function.
+#' Missing-data handling follows the v3 3-step architecture: input codes
+#' are converted using variable_details.csv metadata, with priority
+#' not applicable > not stated. Out-of-range inputs receive the
+#' worksheet's else rule.
 #'
-#'  For any single CCHS survey year, it is appropriate to use the CCHS BMI
-#'  variable (HWTGBMI) that is also available on cchsflow. HWTGBMI_der is
-#'  recommended when using multiple survey cycles.
+#' @param height_m Height in metres.
+#' @param weight_kg Weight in kilograms.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#'  HWTGBMI_der uses the CCHS variables for height and weight that have been
-#'  transformed by cchsflow. In order to generate a value for BMI across CCHS
-#'  cycles, height and weight must be transformed and harmonized.
-#'
-#' @note In earlier CCHS cycles (2001 and 2003), height was collected in inches;
-#'  while in later CCHS cycles (2005+) it was collected in meters. To harmonize
-#'  values across cycles, height was converted to meters (to 3 decimal points).
-#'  Weight was collected in kilograms across all CCHS cycles, so no
-#'  transformations were required in the harmonization process.
-#'
-#' @param HWTGHTM CCHS variable for height (in meters)
-#'
-#' @param HWTGWTK CCHS variable for weight (in kilograms)
-#'
-#' @return numeric value for BMI in the HWTGBMI_der variable
+#' @return Numeric vector of BMI values (kg/m^2). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Using bmi_fun() to create BMI values between cycles
-#' # bmi_fun() is specified in variable_details.csv along with the
-#' # CCHS variables and cycles included.
+#' # Scalar
+#' calculate_bmi(height_m = 1.75, weight_kg = 70)
 #'
-#' # To transform the derived BMI variable, use rec_with_table() for each cycle
-#' # and specify HWTGBMI_der, along with height (HWTGHTM) and weight (HWTGWTK).
-#' # Then by using merge_rec_data(), you can combined HWTGBMI_der across
-#' # cycles.
-#'
-#' library(cchsflow)
-#' bmi2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "HWTGHTM",
-#'     "HWTGWTK", "HWTGBMI_der"
-#'   )
+#' # Vector
+#' calculate_bmi(
+#'   height_m = c(1.75, 1.60),
+#'   weight_kg = c(70, 55)
 #' )
 #'
-#' head(bmi2001)
+#' @seealso \code{\link{adjust_bmi}}, \code{\link{categorize_bmi}}
 #'
-#' bmi2011_2012 <- rec_with_table(
-#'   cchs2011_2012_p, c(
-#'     "HWTGHTM",
-#'     "HWTGWTK", "HWTGBMI_der"
-#'   )
-#' )
-#'
-#' tail(bmi2011_2012)
-#'
-#' combined_bmi <- merge_rec_data(bmi2001, bmi2011_2012)
-#' head(combined_bmi)
-#' tail(combined_bmi)
-#'
-#' # Using bmi_fun() to generate a BMI value with user inputted height and
-#' # weight values. bmi_fun() can also generate a value for BMI if you input a
-#' # value for height and weight. Let's say your height is 170cm (1.7m) and
-#' # your weight is 50kg, your BMI can be calculated as follows:
-#'
-#' library(cchsflow)
-#' BMI <- bmi_fun(HWTGHTM = 1.7, HWTGWTK = 50)
-#' print(BMI)
 #' @export
-bmi_fun <-
-  function(HWTGHTM, HWTGWTK) {
-    if_else2(
-      (!is.na(HWTGHTM)) & (!is.na(HWTGWTK)), (HWTGWTK / (HWTGHTM * HWTGHTM)),
-      tagged_na("b")
-    )
-  }
+calculate_bmi <- function(height_m, weight_kg, output_format = "tagged_na") {
+  # Step 1: Clean inputs — use PUMF variable names for pattern lookup.
+  # When called via rec_with_table(), inputs are already pre-cleaned by
+  # the feeder variable rows; Step 1 is a safety net for direct callers.
+  cleaned <- clean_variables(
+    vars = list(HWTGHTM = height_m, HWTGWTK = weight_kg),
+    output_format = "tagged_na"
+  )
 
-#' @title Adjusted Body Mass Index (BMI) derived variable
+  ht <- cleaned$HWTGHTM
+  wt <- cleaned$HWTGWTK
+
+  # Step 2: Domain logic
+  result <- dplyr::case_when(
+    any_missing(ht, wt) ~
+      get_priority_missing(ht, wt, output_format = output_format),
+    ht <= 0 ~
+      assign_missing("not_stated", "HWTGBMI_der", output_format),
+    .default = wt / (ht^2)
+  )
+
+  # Step 3: Clean output — validate range and convert to requested format
+  output_cleaned <- clean_variables(
+    vars = list(HWTGBMI_der = result),
+    output_format = output_format
+  )
+  output_cleaned$HWTGBMI_der
+}
+
+#' @title Adjust BMI for self-reporting bias
 #'
-#' @description This function creates a harmonized adjusted BMI variable. 
-#' A systematic review of the literature concluded that the use of 
-#' self-reported data among adults underestimates weight and overestimates 
-#' height, resulting in lower estimates of obesity than those obtained from 
-#' measured data. Using data from the 2005 Canadian Community Health Survey 
-#' (CCHS) subsample, where both measured and self-reported values were 
-#' collected, correction equations have been developed 
-#' (Connor Gorber et al. 2008). Differences between corrected estimates of 
-#' obesity from the CCHS and measured estimates from the Canadian Health 
-#' Measures Survey is monitored over time to determine if the bias in 
-#' self-reported values is changing and if new correction equations need to be 
-#' developed. Adjusted BMI variable is first introduced in the CCHS 2015 cycle.
+#' @description
+#' Applies sex-specific correction from Connor Gorber et al. (2008) to
+#' account for self-reporting bias in height and weight. Source-agnostic --
+#' works with both PUMF and Master data via worksheet routing.
 #'
-#'  adjusted_bmi_fun() creates a derived variable (HWTGCOR_der) that is 
-#'  harmonized across all CCHS cycles. This function takes the BMI by dividing 
-#'  weight by the square of height, and adds a correction value based on sex.
+#' @details
+#' Connor Gorber et al. (2008) derived sex-specific linear corrections
+#' from measured vs self-reported anthropometrics:
+#' Male: -1.07575 + 1.07592 * BMI;
+#' Female: -0.12374 + 1.05129 * BMI.
 #'
-#' @details For HWTGCOR_der, there are no restrictions to age, height, weight,
-#'  or pregnancy status. While pregnancy was consistent across all CCHS cycles,
-#'  its variable (MAM_037) was not available in the PUMF CCHS datasets so it
-#'  could not be harmonized and included into the function.
+#' This function is source-agnostic. The worksheet routes HWTGHTM / HWTGWTK
+#' (PUMF, grouped) or HWTDHTM / HWTDWTK (Master, continuous) to the same
+#' height_m / weight_kg parameters. Missing-data handling follows the v3
+#' 3-step architecture with priority not applicable > not stated.
 #'
-#'  HWTGCOR_der uses the CCHS variables for sex, height and weight that have been
-#'  transformed by cchsflow. In order to generate a value for adjusted BMI 
-#'  across CCHS cycles, sex, height and weight must be transformed and 
-#'  harmonized.
+#' @param sex Sex (1 = male, 2 = female). CCHS missing codes (6-9) are
+#'   handled automatically.
+#' @param height_m Height in metres.
+#' @param weight_kg Weight in kilograms.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' @note In earlier CCHS cycles (2001 and 2003), height was collected in inches;
-#'  while in later CCHS cycles (2005+) it was collected in meters. To harmonize
-#'  values across cycles, height was converted to meters (to 3 decimal points).
-#'  Weight was collected in kilograms across all CCHS cycles, so no
-#'  transformations were required in the harmonization process.
-#'
-#' @param HWTGHTM CCHS variable for height (in meters)
-#'
-#' @param HWTGWTK CCHS variable for weight (in kilograms)
-#'
-#' @param DHH_SEX CCHS variable for sex; 1 = male, 2 = female
-#' 
-#' @return numeric value for adjusted BMI in the HWTGCOR_der variable
+#' @return Numeric vector of bias-corrected BMI values (kg/m^2). Missing
+#'   data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Using adjusted_bmi_fun() to create adjusted BMI values between cycles
-#' # adjusted_bmi_fun() is specified in variable_details.csv along with the
-#' # CCHS variables and cycles included.
+#' # Scalar
+#' adjust_bmi(sex = 1, height_m = 1.75, weight_kg = 70)
 #'
-#' # To transform the derived BMI variable, use rec_with_table() for each cycle
-#' # and specify HWTGCOR_der, along with sex (DHH_SEX), height (HWTGHTM) and 
-#' # weight (HWTGWTK).Then by using merge_rec_data(), you can combined 
-#' # HWTGBMI_der across cycles.
-#'
-#' library(cchsflow)
-#' adjustedbmi2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "HWTGHTM",
-#'     "HWTGWTK", 
-#'     "DHH_SEX",
-#'     "HWTGCOR_der"
-#'   )
+#' # Vector
+#' adjust_bmi(
+#'   sex = c(1, 2),
+#'   height_m = c(1.75, 1.65),
+#'   weight_kg = c(70, 60)
 #' )
 #'
-#' head(adjustedbmi2001)
+#' @seealso \code{\link{calculate_bmi}}, \code{\link{categorize_bmi}}
 #'
-#' adjustedbmi2011_2012 <- rec_with_table(
-#'   cchs2011_2012_p, c(
-#'     "HWTGHTM",
-#'     "HWTGWTK", 
-#'     "DHH_SEX",
-#'     "HWTGCOR_der"
-#'   )
-#' )
-#'
-#' tail(adjustedbmi2011_2012)
-#'
-#' combined_bmi <- merge_rec_data(adjustedbmi2001, adjustedbmi2011_2012)
-#' head(combined_bmi)
-#' tail(combined_bmi)
-#'
-#' # adjusted_bmi_fun() can also generate a value for BMI if you input your sex, 
-#' # and a value for height and weight. Let's say your sex is male, height is 
-#' # 170cm (1.7m) and your weight is 50kg, your BMI can be calculated as follows:
-#'
-#' library(cchsflow)
-#' adjusted_BMI <- adjusted_bmi_fun(DHH_SEX = 1, HWTGHTM = 1.7, HWTGWTK = 50)
-#' print(adjusted_BMI)
 #' @export
+adjust_bmi <- function(sex, height_m, weight_kg,
+                       output_format = "tagged_na") {
+  # Step 1: Clean inputs
+  cleaned <- clean_variables(
+    vars = list(DHH_SEX = sex, HWTGHTM = height_m, HWTGWTK = weight_kg),
+    output_format = "tagged_na"
+  )
 
-adjusted_bmi_fun <-
-  function(DHH_SEX, HWTGHTM, HWTGWTK) {
-    # BMI adjusted for male
-    if_else2(
-      (!is.na(HWTGHTM)) & (!is.na(HWTGWTK)) & DHH_SEX==1, 
-      -1.07575 + 1.07592*(HWTGWTK / (HWTGHTM * HWTGHTM)),
-      # BMI adjusted for female
-      if_else2(
-        (!is.na(HWTGHTM)) & (!is.na(HWTGWTK)) & DHH_SEX==2, 
-        -0.12374 + 1.05129*(HWTGWTK / (HWTGHTM * HWTGHTM)),
-        tagged_na("b")
-      )
-    )
-  }
+  s <- cleaned$DHH_SEX
+  ht <- cleaned$HWTGHTM
+  wt <- cleaned$HWTGWTK
 
-#' @title Categorical BMI (international standard)
-#' 
-#' @description This function creates a categorical derived variable
-#' (HWTGBMI_der_cat4) that categorizes derived BMI (HWTGBMI_der).
-#' 
-#' @details The categories were based on international standards and are divided
-#' into four categories: underweight for BMI < 18.5 (1), normal weight for BMI 
-#' between 18.5 to 25 (2), overweight for BMI between 25 to 30 (3), and obese 
-#' for BMI over 30 (4). 
-#' 
-#' HWTGBMI_der_cat4 uses the derived variable HWTGBMI_der. HWTGBMI_der uses
-#' height and weight that have been transformed by cchsflow. In order to 
-#' categorize BMI across CCHS cycles, height and weight variables must be 
-#' transformed and harmonized.
-#' 
-#' @param HWTGBMI_der derived variable that calculates numeric value for BMI.
-#'  See \code{\link{bmi_fun}} for documentation on how variable
-#'  was derived.
-#'  
-#' @return value for BMI categories in the HWTGBMI_der_cat4 variable.
-#'  
-#' @examples  
-#' # Using bmi_fun_cat() to categorize BMI across CCHS cycles
-#' # bmi_fun_cat() is specified in variable_details.csv along with the 
-#' # CCHS variables and cycles included.
-#' 
-#' # To transform HWTGBMI_der_cat4 across all cycles, use rec_with_table() for 
-#' # each CCHS cycle.
-#' # Since HWTGBMI_der is also a derived variable, you will have to specify 
-#' # the variables that are derived from it.
-#' 
-#' library(cchsflow)
+  # Calculate raw BMI for valid height/weight (internal, no output cleaning)
+  raw_bmi <- dplyr::case_when(
+    any_missing(ht, wt) ~
+      get_priority_missing(ht, wt, output_format = "tagged_na"),
+    ht <= 0 ~ haven::tagged_na("b"),
+    .default = wt / (ht^2)
+  )
+
+  # Step 2: Apply sex-specific correction
+  result <- dplyr::case_when(
+    any_missing(raw_bmi) ~
+      get_priority_missing(raw_bmi, s, output_format = output_format),
+    any_missing(s) ~
+      get_priority_missing(s, output_format = output_format),
+    s == 1 ~
+      BMI_CORRECTION_MALE$intercept + BMI_CORRECTION_MALE$slope * raw_bmi,
+    s == 2 ~
+      BMI_CORRECTION_FEMALE$intercept + BMI_CORRECTION_FEMALE$slope * raw_bmi,
+    .default = assign_missing("not_stated", "HWTGCOR_der", output_format)
+  )
+
+  # Step 3: Clean output
+  output_cleaned <- clean_variables(
+    vars = list(HWTGCOR_der = result),
+    output_format = output_format
+  )
+  output_cleaned$HWTGCOR_der
+}
+
+#' @title Categorize BMI into WHO categories
 #'
-#' bmi_cat_2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "HWTGHTM",
-#'     "HWTGWTK",
-#'     "HWTGBMI_der",
-#'     "HWTGBMI_der_cat4"
-#'   )
-#' )
+#' @description
+#' Maps continuous BMI to the standard 4-category WHO classification.
+#' Source-agnostic -- works with BMI from any source (PUMF, Master, or
+#' external data).
 #'
-#' head(bmi_cat_2009_2010)
+#' @details
+#' Uses the standard WHO adult BMI classification (WHO, 2000):
+#' 1 = underweight (< 18.5), 2 = normal weight (18.5-24.9),
+#' 3 = overweight (25.0-29.9), 4 = obese (>= 30.0).
 #'
-#' bmi_cat_2011_2012 <- rec_with_table(
-#'   cchs2011_2012_p,c(
-#'     "HWTGHTM",
-#'     "HWTGWTK",
-#'     "HWTGBMI_der",
-#'     "HWTGBMI_der_cat4"
-#'   )
-#' )
+#' This function accepts BMI from any source. The worksheet routes
+#' HWTGBMI_der (PUMF) or HWTDBMI_der (Master) to the same bmi parameter.
+#' Missing-data handling follows the v3 3-step architecture with priority
+#' not applicable > not stated.
 #'
-#' tail(bmi_cat_2011_2012)
+#' @param bmi Continuous BMI value (from \code{\link{calculate_bmi}} or any
+#'   source).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' combined_bmi_cat <- suppressWarnings(merge_rec_data
-#' (bmi_cat_2009_2010,bmi_cat_2011_2012))
+#' @return Integer vector: 1 = underweight (< 18.5), 2 = normal (18.5-24.9),
+#'   3 = overweight (25.0-29.9), 4 = obese (>= 30.0). Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
-#' head(combined_bmi_cat)
-#' tail(combined_bmi_cat)
+#' @examples
+#' # Scalar
+#' categorize_bmi(bmi = 27.3)
+#'
+#' # Vector
+#' categorize_bmi(bmi = c(16, 22, 27, 35))
+#'
+#' @seealso \code{\link{calculate_bmi}}, \code{\link{adjust_bmi}}
+#'
 #' @export
+categorize_bmi <- function(bmi, output_format = "tagged_na") {
+  # Step 1: Clean input
+  cleaned <- clean_variables(
+    vars = list(HWTGBMI_der = bmi),
+    output_format = "tagged_na"
+  )
 
-bmi_fun_cat <-
-  function(HWTGBMI_der){
-    # Underweight
-    if_else2(HWTGBMI_der < 18.5, 1,
-    # Normal weight
-    if_else2(HWTGBMI_der >= 18.5 & HWTGBMI_der < 25, 2,
-    # Overweight
-    if_else2(HWTGBMI_der >= 25 & HWTGBMI_der < 30, 3,
-    # Obese
-    if_else2(HWTGBMI_der >= 30, 4,
-    # No response
-    if_else2(haven::is_tagged_na(HWTGBMI_der,"a"), "NA(a)", "NA(b)")))))
-  }
+  b <- cleaned$HWTGBMI_der
+
+  # Step 2: WHO category boundaries
+  result <- dplyr::case_when(
+    any_missing(b) ~
+      get_priority_missing(b, output_format = output_format),
+    b < 18.5 ~ 1L,
+    b < 25.0 ~ 2L,
+    b < 30.0 ~ 3L,
+    b >= 30.0 ~ 4L,
+    .default = assign_missing("not_stated", "HWTGBMI_der_cat4", output_format)
+  )
+
+  # Step 3: Clean output
+  output_cleaned <- clean_variables(
+    vars = list(HWTGBMI_der_cat4 = result),
+    output_format = output_format
+  )
+  prep_cat_output(output_cleaned$HWTGBMI_der_cat4)
+}

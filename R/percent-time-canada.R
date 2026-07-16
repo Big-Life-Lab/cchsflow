@@ -1,149 +1,142 @@
-#' @title Percent time in Canada
+#' @title Calculate percent of life spent in Canada
 #'
-#' @description This function creates a derived variable (pct_time_der) that
-#'  provides an estimated percentage of the time a person's life was spent in
-#'  Canada.
+#' @description
+#' Calculates the percentage of a respondent's life spent in Canada.
+#' For respondents born outside Canada, percent time = years in
+#' Canada / age * 100. For respondents born in Canada, returns 100.
 #'
-#' @param DHHGAGE_cont continuous age variable.
+#' @details
+#' Source-agnostic: the worksheet routes DHHGAGE_cont / SDCGCBG /
+#' SDCGRES_cont (PUMF) or DHH_AGE / SDCGCB / SDCDRES (Master) to the
+#' same semantic parameters. Values outside 0-100 (indicating
+#' inconsistent inputs) are recoded to not stated. Missing-data handling
+#' follows the v3 3-step architecture with priority not applicable > not
+#' stated.
 #'
-#' @param SDCGCBG whether or not someone was born in Canada (1 - born in Canada,
-#'  2 - born outside Canada)
+#' @param age Continuous age (DHHGAGE_cont for PUMF, DHH_AGE for Master).
+#' @param born_in_canada Country of birth (1 = Canada, 2 = outside Canada).
+#' @param years_in_canada Continuous years in Canada.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
 #'
-#' @param SDCGRES how long someone has lived in Canada. Note: in the PUMF CCHS
-#'  datasets, this is a categorical variable with two categories (1 - 0-9 years;
-#'  2 - 10+ years).
-#'
-#' @note Since SDCGRES is a categorical variable measuring length of time, we've
-#'  set midpoints in the function. A respondent identified as being in Canada
-#'  for 0-9 years is assigned a value of 4.5 years, and someone who has been in
-#'  Canada for over 10 years is assigned a value of 15 years.
-#'
-#' @return Numeric value between 0 and 100 that represents
-#'  percentage of a respondent's time in Canada
+#' @return Numeric vector: percentage of life in Canada (0-100). Missing
+#'   data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Using pct_time_fun() to create percent time values between CCHS cycles
-#' # pct_time_fun() is specified in variable_details.csv along with the CCHS
-#' # variables and cycles included.
+#' # Scalar
+#' calculate_pct_time(age = 27, born_in_canada = 2, years_in_canada = 4.5)
 #'
-#' # To transform pct_time_der across cycles, use rec_with_table() for each CCHS
-#' # cycle and specify pct_time_der, along with age (DHHGAGE_cont), whether or
-#' # not someone was born in Canada (SDCGCBG), how long someone has lived in
-#' # Canada (SDCGRES). Then by using merge_rec_data(), you can combine
-#' # pct_time_der across cycles
-#'
-#' library(cchsflow)
-#' pct_time2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "DHHGAGE_cont", "SDCGCBG",
-#'     "SDCGRES", "pct_time_der"
-#'   )
+#' # Vector
+#' calculate_pct_time(
+#'   age = c(27, 40, 35),
+#'   born_in_canada = c(2, 1, 2),
+#'   years_in_canada = c(4.5, 4.5, 15)
 #' )
-#' head(pct_time2009_2010)
 #'
-#' pct_time2011_2012 <- rec_with_table(
-#'   cchs2011_2012_p,  c(
-#'     "DHHGAGE_cont", "SDCGCBG",
-#'     "SDCGRES", "pct_time_der"
-#'   )
-#' )
-#' tail(pct_time2011_2012)
+#' @seealso \code{\link{categorize_pct_time}},
+#'   \code{\link{categorize_immigration}}
 #'
-#' combined_pct_time <- merge_rec_data(pct_time2009_2010, pct_time2011_2012)
-#' head(combined_pct_time)
-#' tail(combined_pct_time)
-#'
-#' # Using pct_time_fun() to generate a value for percent time spent in Canada
-#' # with user inputted values Let's say you are 27 years old who was born
-#' # outside of Canada and have been living in Canada for less than 10 years.
-#' # Your estimated percent time spent in Canada can be calculated as follows:
-#'
-#' pct_time <- pct_time_fun(DHHGAGE_cont = 27, SDCGCBG = 2, SDCGRES = 1)
-#'
-#' print(pct_time)
 #' @export
-pct_time_fun <-
-  function(DHHGAGE_cont, SDCGCBG, SDCGRES) {
-    if (is_equal(SDCGCBG, 1)) {
-      return(100)
-    }
-    DHHGAGE_cont <- if_else2(DHHGAGE_cont > 0, DHHGAGE_cont,
-                             return(tagged_na("b")))
-    SDCGRES <- if_else2(SDCGRES == 1, 4.5,
-                        if_else2(SDCGRES == 2, 15, return(tagged_na("b"))))
-    
-    if_else2(SDCGCBG == 2, (SDCGRES / DHHGAGE_cont * 100), tagged_na("b"))
-  }
+calculate_pct_time <- function(age, born_in_canada, years_in_canada,
+                                output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    DHHGAGE_cont = age,
+    SDCGCBG = born_in_canada,
+    SDCGRES_cont = years_in_canada
+  ), output_format = "tagged_na")
 
-#' @title Categorical percent time in Canada
+  age_c <- cleaned$DHHGAGE_cont
+  born <- cleaned$SDCGCBG
+  years <- cleaned$SDCGRES_cont
+
+  # === STEP 2: CORE CALCULATION ===
+  result <- dplyr::case_when(
+    any_missing(born, age_c) ~
+      get_priority_missing(born, age_c, output_format = output_format),
+    born == 1 ~ 100,
+    born == 2 & age_c > 0 & !any_missing(years) ~
+      years / age_c * 100,
+    .default = assign_missing("not_stated", "pct_time_der", output_format)
+  )
+
+  # Output validation: values outside [0, 100] indicate inconsistent inputs
+  result <- dplyr::case_when(
+    is.na(result) ~ result,
+    result < 0 | result > 100 ~
+      assign_missing("not_stated", "pct_time_der", output_format),
+    TRUE ~ result
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    pct_time_der = result
+  ), output_format = output_format)
+
+  return(output_cleaned$pct_time_der)
+}
+
+#' @title Categorize percent time in Canada into deciles
 #'
-#' @description This function creates a categorical derived variable 
-#' (pct_time_der_cat10) that categorizes the derived percent time in Canada 
-#' variable (pct_time_der).
-#' 
-#' @details The percent time in Canada provides an estimated percentage of the 
-#' time a person's life was spent in Canada.The categorical percent time in 
-#' Canada divides the continuous value into 10 percent intervals.
-#'  
-#' pct_time_der_cat10 uses the derived variable pct_time_der. pct_time_der uses 
-#' various variables that have been transformed by cchsflow (see documentation 
-#' on pct_time_der). In order to categorize percent time in Canada across CCHS 
-#' cycles, the variables must be transformed and harmonized.
+#' @description
+#' Categorizes the derived percent time in Canada variable into 10
+#' equal-width intervals (0-10, 11-20, ..., 91-100).
 #'
-#' @param pct_time_der derived continuous percent time in Canada.
-#' See \code{\link{pct_time_fun}} for documentation on how variable was derived.
-#' 
-#' @return value for categorical percent time in Canada  using pct_time_der 
-#' variable.
+#' @details
+#' Each 10-percentage-point band maps to an integer code 1-10. This
+#' provides a standard grouping for cross-tabulation and modelling.
+#' Missing-data handling follows the v3 3-step architecture with priority
+#' not applicable > not stated.
+#'
+#' @param pct_time_der Derived continuous percent time in Canada (0-100).
+#'   See \code{\link{calculate_pct_time}}.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector: 1-10 for categorical percent time in Canada.
+#'   Missing data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Using pct_time_fun_cat() to create categorical percent time values 
-#' # between CCHS cycles.
-#' # pct_time_fun_cat() is specified in variable_details.csv along with the CCHS
-#' # variables and cycles included.
+#' # Scalar
+#' categorize_pct_time(55.5)
 #'
-#' # To transform pct_time_der_cat10 across cycles, use rec_with_table() for 
-#' # each CCHS cycle.
-#' # Since pct_time_der is a derived variable, you will have to specify the 
-#' # variables that are derived from it.
-#' # Then by using merge_rec_data(), you can combine pct_time_der_cat10 across 
-#' # cycles.
+#' # Vector
+#' categorize_pct_time(c(5, 25, 55, 85, 100))
 #'
-#' library(cchsflow)
-#' pct_time_cat2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "DHHGAGE_cont", "SDCGCBG",
-#'     "SDCGRES", "pct_time_der", "pct_time_der_cat10"
-#'   )
-#' )
-#' head(pct_time_cat2009_2010)
-#'
-#' pct_time_cat2011_2012 <- rec_with_table(
-#'   cchs2011_2012_p,  c(
-#'     "DHHGAGE_cont", "SDCGCBG",
-#'     "SDCGRES", "pct_time_der", "pct_time_der_cat10"
-#'   )
-#' )
-#' tail(pct_time_cat2011_2012)
-#'
-#' combined_pct_time_cat <- merge_rec_data(pct_time_cat2009_2010, 
-#' pct_time_cat2011_2012)
-#' head(combined_pct_time_cat)
-#' tail(combined_pct_time_cat)
+#' @seealso \code{\link{calculate_pct_time}}
 #'
 #' @export
-#' 
-pct_time_fun_cat <-
-  function(pct_time_der){
-    if_else2(pct_time_der >= 0 & pct_time_der <= 10, 1,
-    if_else2(pct_time_der > 10 & pct_time_der <= 20, 2,
-    if_else2(pct_time_der > 20 & pct_time_der <= 30, 3,
-    if_else2(pct_time_der > 30 & pct_time_der <= 40, 4,
-    if_else2(pct_time_der > 40 & pct_time_der <= 50, 5,
-    if_else2(pct_time_der > 50 & pct_time_der <= 60, 6,
-    if_else2(pct_time_der > 60 & pct_time_der <= 70, 7,
-    if_else2(pct_time_der > 70 & pct_time_der <= 80, 8,
-    if_else2(pct_time_der > 80 & pct_time_der <= 90, 9,
-    if_else2(pct_time_der > 90 & pct_time_der <= 100, 10,
-    if_else2(haven::is_tagged_na(pct_time_der, "a"), "NA(a)", "NA(b)")))))))))))
-  }
+categorize_pct_time <- function(pct_time_der, output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    pct_time_der = pct_time_der
+  ), output_format = "tagged_na")
+
+  pct <- cleaned$pct_time_der
+
+  # === STEP 2: CATEGORIZATION ===
+  result <- dplyr::case_when(
+    any_missing(pct) ~
+      get_priority_missing(pct, output_format = output_format),
+    pct >= 0 & pct <= 10 ~ 1,
+    pct > 10 & pct <= 20 ~ 2,
+    pct > 20 & pct <= 30 ~ 3,
+    pct > 30 & pct <= 40 ~ 4,
+    pct > 40 & pct <= 50 ~ 5,
+    pct > 50 & pct <= 60 ~ 6,
+    pct > 60 & pct <= 70 ~ 7,
+    pct > 70 & pct <= 80 ~ 8,
+    pct > 80 & pct <= 90 ~ 9,
+    pct > 90 & pct <= 100 ~ 10,
+    .default = assign_missing("not_stated", "pct_time_der_cat10", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    pct_time_der_cat10 = result
+  ), output_format = output_format)
+
+  return(prep_cat_output(output_cleaned$pct_time_der_cat10))
+}

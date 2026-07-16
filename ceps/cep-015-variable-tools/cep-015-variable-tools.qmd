@@ -1,0 +1,374 @@
+---
+title: "CEP-015: Variable discovery and project tools"
+author: "Doug Manuel for the cchsflow development team"
+date: "2026-02-24"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contents"
+    number-sections: true
+---
+
+::: callout-note
+## CEP metadata
+
+| Field   | Value                                |
+|---------|--------------------------------------|
+| CEP     | 15                                   |
+| Title   | Variable discovery and project tools |
+| Authors | Doug Manuel                          |
+| Created | 2026-02-24                           |
+| Status  | Draft                                |
+| Branch  | skills/review-validation             |
+:::
+
+## Abstract
+
+This CEP specifies tools that help researchers and AI agents find, select, and use harmonised CCHS variables from cchsflow. The current cchsflow workflow assumes users know which variables they need and how to call `rec_with_table()`. In practice, users need to:
+
+1.  Discover which harmonised variables are available for their research question
+2.  Understand dependency chains — derived variables require feeder variables
+3.  Check cycle and database coverage for their target population
+4.  Generate project-specific worksheets with only the variables they need
+
+These tools complement the existing *producer-side* infrastructure (authoring, review, validation skills) with *consumer-side* capabilities.
+
+## Motivation
+
+### The dependency problem
+
+A researcher requesting `pack_years_der` implicitly needs 9+ feeder variables, some of which are themselves derived. Today, this dependency chain is encoded in `variableStart` fields using `DerivedVar::[feeder1, feeder2, ...]` notation, but there is no programmatic way to resolve the full transitive closure.
+
+If any feeder is missing from the project worksheet, `rec_with_table()` fails silently or produces unexpected results. This is the single most common source of user error.
+
+### The coverage problem
+
+Not all variables are available for all cycles or database types. A researcher planning a 2001-2023 trend analysis needs to know that `age_start_smoking` has no PUMF source for 2022-2023, or that PUMF pack-years have \~15-20% relative error versus Master. This information exists in worksheet metadata but requires manual inspection.
+
+### The project worksheet problem
+
+`rec_with_table()` processes all variables in the worksheets. For large projects, this is slow and produces many irrelevant variables. Users need a way to generate minimal project-specific worksheets containing only their target variables and transitive dependencies.
+
+## Existing work
+
+### Within cchsflow
+
+-   **`R/variable-discovery.R`** — metadata queries (`get_harmonized_variables()`, `get_source_mappings()`, `find_variable_in_data()`), recommended variable tags, subject/section filtering. Currently v1, smoking-focused.
+-   **`recommended` metadata tag** — `{recommended:primary}` / `{recommended:secondary}` in the `notes` field of `variables.csv`. Started for smoking but not applied broadly.
+-   **`R/table-generators.R`** — generates summary tables (cycle coverage, variable counts). Primarily for documentation, not user-facing.
+
+### Within cchsflow (runtime)
+
+-   **`recode_derived_variables()`** in `R/recode-with-table.R` (lines 820-966) — the existing runtime dependency resolver. Parses `DerivedVar::[...]` from `variableStart`, extracts feeders, detects circular dependencies via a `var_stack`, and recurses to resolve missing feeders. Tightly coupled to the recoding pipeline — cannot be called standalone for metadata queries.
+
+### In downstream projects
+
+Three big-life-lab repositories have independently implemented variable selection and dependency resolution. These are the primary consumers that CEP-015 aims to consolidate.
+
+**DemPoRT-V2-dev** — the most mature implementation (6+ R files):
+
+-   `R/get-dependency-tree.R` — recursive tree walker: `get_dependency_tree(variable_name, variables_sheet, database_name)` returns a nested list. Handles `DerivedVar::[...]` and database-specific overrides (`db_name::[VAR]`).
+-   `R/variable-start-utils.R` — `is_derived_var()` and `get_derived_vars()` helpers using `DerivedVar::\[(.+?)\]` regex.
+-   `R/get-start-var.R` — higher-level resolver that walks transformation chains (`rcs[...]`, `center[...]`, `interact[...]`, `dummy[...]`). Includes `parse_variable_start()` with bracket-aware comma splitting and `generate_sas_code_from_csv()` for ICES extraction.
+-   Role-based variable selection via `recodeflow:::select_vars_by_role()` and a `roles.csv` vocabulary (15 roles including `predictor`, `intermediate`, `imputation-predictor`).
+-   Project worksheets maintained separately: `demportdev-variables.csv` (292 rows), `cchsflow-variable-details.csv` (930 rows, copied from cchsflow), `demportdev-variable-details.csv` (35 project-specific rows), joined via `rbind()` at pipeline start.
+
+**MockData** (`v030-refactor` branch) — cleaner, modular implementation:
+
+-   `R/mockdata-parsers.R` — `parse_variable_start(variable_start, cycle)` handles 4 formats (db-prefixed, bracket, default, plain; returns NULL for DerivedVar). `parse_range_notation()` for recStart/recEnd parsing.
+-   `R/mockdata-helpers.R` — `get_cycle_variables()`, `get_raw_variables()`, `get_variable_details_for_raw()` for per-cycle variable resolution.
+-   `R/identify_derived_vars.R` — `identify_derived_vars()` pattern detection + `get_raw_var_dependencies()` non-recursive feeder extraction.
+
+**huipain** — simplest pattern: calls `recodeflow::rec_with_table()` per cycle with full cchsflow worksheets copied as-is. No custom dependency resolution.
+
+### External
+
+-   **cchs-metadata MCP** — provides StatCan source metadata (16,000+ variables, 251 datasets) but does not know about cchsflow harmonisation logic (dependency chains, recoding rules).
+
+## Evaluation
+
+Requirements were scored against seven criteria. The current project context: 381 variables, 3,698 variable_details rows, 225 DerivedVar entries, 17 recommended tags (smoking only), \~2,900 CRAN downloads/year, 7+ downstream repositories within big-life-lab (bllflow, cvd-trends-Canada, phiat-yll, raiflow, huipain, chmsflow, calibrationTutorial).
+
+| Req | Value | Success | Complexity | Maintenance | User proximity | Incremental | Alternative today |
+|---------|---------|---------|---------|---------|---------|---------|---------|
+| R1: Dependencies | **High** — 225 DerivedVars; silent failures are #1 user error; 5+ downstream projects affected | **High** — deterministic; `parse_variable_start()` exists | Medium — recursive resolution, cycle detection, PUMF/Master splits; \~200-300 lines | **Zero** — reads existing worksheets | **High** — directly prevents most common failure | Yes | Read CEP docs; trial and error |
+| R2: Coverage | Medium — useful for trend analyses, but `databaseStart` is human-readable | **High** — straightforward CSV cross-reference | Low — \~100-150 lines | **Zero** — reads existing worksheets | Medium — researchers can read `databaseStart` directly | Yes | Manual inspection of `databaseStart` |
+| R3: Project worksheets | **High** — 5+ downstream projects independently maintain subset scripts | **High** — CSV subsetting is well-defined; depends on R1 | Low-Medium — \~150 lines | Low — output format matches existing worksheets | **High** — produces an artifact they directly use | Needs R1 | Copy full worksheets, delete rows manually |
+| R4: Discovery | Low-Medium — incremental over existing `get_harmonized_variables()` | **High** — extending existing functions | Low — \~50-100 additional lines | Low — reads worksheets | Medium — helps new users; experienced users know their variables | Yes | `grep` on variables.csv |
+| R5: Recommended sets | **Low** — requires domain expertise for curation; 17 tags across 381 vars; bundles are project-specific | Medium — code is easy; curation is hard; who maintains definitions? | Low (code), **High** (curation) | **High** — bundles go stale as variables are added per CEP | Low-Medium — researchers define their own lists | Yes, but low value without broad tag coverage | Project-specific variable lists |
+| R6: MCP/CLI | Medium — serves AI agents, not humans directly | Medium — cross-repo coordination; scope boundary unclear | Medium-High — Python wrappers or reimplementation | Medium — two repos must stay in sync | Low (humans), High (AI agents) | Needs R1-R3 | AI agents read worksheets directly |
+| R7: Consumer skill | Medium — orchestrates existing tools | **High** — skills are lightweight | Low — a SKILL.md file | Low — thin wrapper | Medium — Claude Code users only | Needs R1-R3 | Ad hoc prompting |
+
+### Prioritisation
+
+**Core (Phase 1):** R1 (dependencies) and R3 (project worksheets) are the clear winners — high value, zero/low maintenance, directly address the most common failure mode across 5+ downstream projects. R2 (coverage) is low effort and complements R1. R4 (discovery) is incremental and can be included opportunistically.
+
+**Defer:** R5 (recommended sets) has the worst value-to-maintenance ratio. The curation problem is unsolved, only 17 of 381 variables are tagged, and bundles are inherently project-specific. Defer until R1-R3 reveal whether standardised bundles are actually useful.
+
+**Phase 3 only:** R6 (MCP/CLI) and R7 (consumer skill) depend entirely on Phase 1-2 stability. Don't plan details until the R functions are working and the API surface is validated by use.
+
+### Overall assessment: 7/10 — proceed with tight scope
+
+The dependency resolver + project worksheet generator combination addresses a documented, recurring pain point across 5+ downstream projects, with zero ongoing maintenance cost. Phase 1-2 is ~500 lines of R with clear inputs, deterministic outputs, and built-in test cases (225 DerivedVar entries, real downstream projects). The risk is not building the wrong thing — it is over-building. Keep Phase 1-2 tight, ship it, let Phase 3 demand materialise on its own. The ~2,900 annual CRAN downloads indicate a niche but real user base; the primary beneficiaries are big-life-lab's own research pipelines.
+
+## Scope
+
+### In scope
+
+1.  **Dependency resolver** — given target variable(s), resolve the full dependency graph
+2.  **Coverage checker** — report variable availability by cycle and database type
+3.  **Project worksheet generator** — produce minimal `variables.csv` and `variable_details.csv` for a set of target variables
+4.  **Variable discovery** — search and filter harmonised variables by domain, type, coverage
+5.  **Recommended variable sets** — deferred; curated bundles for common research use cases
+6.  **MCP and CLI integration** — Phase 3; expose key functions through the cchs-metadata MCP server and CLI
+7.  **Consumer skill** — Phase 3; Claude Code skill for researchers using cchsflow in analysis projects
+
+### Out of scope
+
+-   Changes to `rec_with_table()` core processing logic
+-   New harmonisation of CCHS variables (covered by existing CEPs)
+-   Data access or download tools (PUMF/Master files)
+-   Statistical analysis functions
+
+## Requirements
+
+### R1: Dependency resolution
+
+Given one or more target variables, return the complete set of variables needed, in dependency order.
+
+**Inputs:**
+
+-   `target_variables`: character vector of cchsflow variable names
+-   `databases`: optional character vector of target databases (e.g., `"cchs2017_2018_p"`)
+
+**Outputs:**
+
+-   Ordered list of variables from leaves (no dependencies) to roots (target variables)
+-   For each variable: its direct feeders, whether it's a DerivedVar, and which `Func::` function implements it
+-   Cycle of circular dependencies or missing feeders
+
+**Data source:** `variable_details.csv` — parse `variableStart` for `DerivedVar::[...]` patterns, resolve recursively.
+
+### R2: Coverage checking
+
+Given target variables and target databases, report availability and caveats.
+
+**Inputs:**
+
+-   `variables`: character vector
+-   `databases`: character vector (e.g., `c("cchs2001_p", "cchs2017_2018_p")`)
+
+**Outputs:**
+
+-   Matrix: variable x database → available / not available / available with caveats
+-   Caveats: PUMF precision warnings, optional module flags, Master-only indicators
+-   Maximum common coverage: largest set of databases where all target variables are available
+
+**Data source:** `variables.csv` `databaseStart` field, `variable_details.csv` for caveat metadata.
+
+### R3: Project worksheet generation
+
+Given target variables, generate minimal project-specific worksheets.
+
+**Inputs:**
+
+-   `target_variables`: character vector
+-   `databases`: optional — restrict to specific databases
+-   `output_dir`: path for generated files
+
+**Outputs:**
+
+-   `variables.csv` containing target variables + all transitive dependencies
+-   `variable_details.csv` containing all rows for included variables, filtered to requested databases
+-   Summary report: variable count, cycle coverage, known caveats
+
+**Depends on:** R1 (dependency resolution), R2 (coverage checking).
+
+### R4: Variable discovery enhancements
+
+Extend `variable-discovery.R` with:
+
+-   Search by label text (not just exact subject match)
+-   Filter by coverage (e.g., "available for 2001-2018 PUMF")
+-   Filter by variable type (categorical, continuous, derived)
+-   List dependencies for a variable (wrapper around R1)
+-   `recommended` tag applied across all variable domains (not just smoking)
+
+### R5: Recommended variable sets
+
+Two distinct concepts:
+
+**Domain importance** (per-variable): which variable is the primary choice within a subject. Already encoded as `{recommended:primary}` in `notes`. Stays inline until Phase 3 migration.
+
+-   Example: `SMKDSTY_A` is the primary smoking status variable; `SMKDSTY_B` is secondary (2015+ categories only)
+
+**Use-case bundles** (cross-domain): curated sets for common research purposes, stored in `variable_sets.csv`:
+
+-   **Smoking dose-response**: pack_years_der, SMKDSTY_cat3, DHHGAGE_cont, sex
+-   **Chronic disease risk factors**: smoking status, BMI, alcohol, physical activity
+-   **Demographics baseline**: age, sex, education, income, province
+
+Each bundle specifies target variables; the dependency resolver (R1) handles transitive expansion.
+
+### R6: MCP and CLI integration
+
+Expose R1-R4 through the cchs-metadata MCP server and CLI:
+
+-   `resolve_dependencies(variables)` — returns dependency graph
+-   `check_coverage(variables, databases)` — returns coverage matrix
+-   `generate_project_worksheets(variables, databases, output_dir)` — generates files
+
+These extend the existing MCP (which handles StatCan source metadata) with cchsflow harmonisation logic.
+
+### R7: Consumer skill
+
+Claude Code skill (`cchsflow-analysis` or `cchsflow-user`) that:
+
+-   Helps researchers find variables for their research question
+-   Generates the correct `rec_with_table()` call
+-   Warns about coverage gaps and precision caveats
+-   Produces project-specific worksheets
+-   Explains what harmonisation transforms are applied
+
+## Architecture considerations
+
+### Where should the logic live?
+
+| Component | Location | Rationale |
+|-------------------------|-----------------------|-------------------------|
+| Dependency resolver | R function in cchsflow | Reads cchsflow worksheets directly |
+| Coverage checker | R function in cchsflow | Reads cchsflow worksheets directly |
+| Project worksheet generator | R function in cchsflow | Writes cchsflow-format CSVs |
+| MCP tools | cchsflow-docs MCP server | Extends existing metadata server |
+| CLI commands | cchsflow-docs CLI | Extends existing CLI |
+| Consumer skill | `.claude/skills/` | Orchestrates R functions + MCP |
+
+The core logic (R1-R3) should be R functions in the cchsflow package itself — they operate on cchsflow data structures and should be testable with `devtools::test()`. The MCP/CLI layer calls these functions.
+
+### Dependency graph data structure
+
+The dependency graph is implicit in `variable_details.csv`. Each `DerivedVar::[a, b, c]` in `variableStart` declares edges. The resolver builds an explicit DAG:
+
+```         
+pack_years_der
+├── SMKDSTY_A (non-derived — leaf)
+├── DHHGAGE_cont (non-derived — leaf)
+├── age_start_smoking (DerivedVar)
+│   ├── SMKG040_cont (PUMF) or SMK_040 (Master)
+│   └── ... (resolved by database type)
+├── cigs_per_day (DerivedVar)
+│   ├── SMKDSTY_A (already in graph — shared dependency)
+│   ├── SMK_204 (leaf)
+│   └── SMK_208 (leaf)
+├── time_quit_smoking (DerivedVar)
+│   └── ...
+└── ...
+```
+
+### Handling PUMF/Master splits
+
+When a variable has separate PUMF and Master rows with different feeders (e.g., `age_start_smoking` routes to `SMKG040_cont` on PUMF, `SMK_040` on Master), the resolver needs to know which database type is targeted. If both, it includes the union of feeders.
+
+## Metadata architecture
+
+### Current state
+
+Metadata is currently embedded in worksheet fields:
+
+-   **Dependencies** — implicit in `variableStart` via `DerivedVar::[feeder1, feeder2, ...]` notation. No pre-computed graph; must be resolved by parsing at runtime.
+-   **Recommended tags** — `{recommended:primary}` / `{recommended:secondary}` in the free-text `notes` field of `variables.csv`. Applied only to smoking variables so far.
+-   **Coverage** — implicit in `databaseStart` (comma-separated list of databases). No matrix view; must be cross-referenced with `variable_details.csv` for caveats.
+
+### Design principle: functions first, then extract
+
+The dependency graph already exists — it's encoded in `variableStart`. Building a separate "dependency database" either materialises a cache (useful but not a new source of truth) or creates a second canonical source that must stay in sync with worksheets.
+
+The implementation therefore follows **functions first, extraction second**:
+
+1.  Build R functions that read directly from existing worksheets and resolve metadata at runtime
+2.  Once the functions work and the API surface is validated by real use, extract metadata into standalone form (structured CSV or database tables)
+
+This avoids designing a schema in the abstract and ensures the metadata structure reflects what consumers actually need.
+
+### Recommended sets: definition matters
+
+Before structuring recommended metadata, distinguish two concerns:
+
+-   **Domain importance** — primary/secondary within a subject (e.g., `SMKDSTY_A` is the primary smoking status variable). This is the current `{recommended:primary}` tag.
+-   **Use-case bundles** — curated sets for specific research purposes (e.g., "chronic disease risk factors" combines variables across domains). This is a different concept.
+
+Phase 1 uses simple `variable_sets.csv` for use-case bundles. Domain importance tags stay in `notes` until there are multiple consumers that benefit from structured form.
+
+### Future: standalone metadata
+
+Eventually, metadata should move out of inline `notes` tags into proper fields or tables:
+
+-   **Within cchsflow** — `variable_sets.csv` for recommended bundles, structured columns in `variables.csv` for domain importance
+-   **Within cchsflow-docs** — dependency graphs, coverage matrices, and recommended sets as DuckDB tables alongside StatCan metadata, exposed via MCP
+
+This migration should happen only after Phase 1 functions are working and the schema is validated by use. The cchsflow-docs database currently serves StatCan metadata ("what does StatCan publish?"); adding cchsflow metadata ("what does cchsflow do with it?") changes its scope and should be a deliberate decision.
+
+## Implementation phases
+
+### Phase 1: Core R functions (R1 + R2 + R4)
+
+Build the core logic as R functions that parse worksheet CSVs directly. Zero new data files — all metadata is read from existing worksheets at runtime.
+
+-   **Dependency resolver** — parse `DerivedVar::[...]` from `variable_details.csv`, resolve recursively, return topologically ordered variable list with feeder metadata
+-   **Coverage checker** — cross-reference `databaseStart` and `variable_details.csv` to produce variable x database availability matrix
+-   **Discovery enhancements** — extend `variable-discovery.R` with label search, coverage filter, dependency listing wrapper
+-   **Tests** for all functions, including edge cases (circular dependencies, missing feeders, PUMF/Master splits)
+
+This validates the logic, API surface, and metadata needs with real use before any schema extraction or new data files.
+
+### Phase 2: Project worksheet generation (R3)
+
+Build on Phase 1 functions:
+
+-   **Project worksheet generator** — given target variables, produce minimal `variables.csv` and `variable_details.csv` with all transitive dependencies, filtered to requested databases
+-   **Summary reports** — variable count, coverage gaps, caveats, feeder counts
+-   **Validation** — test with real downstream use cases (e.g., generate worksheets for a DemPoRT-like smoking + demographics subset)
+
+### Phase 3: Integration layer (R6 + R7), conditional
+
+Proceed only after Phases 1-2 are stable and used by at least one downstream project:
+
+-   **MCP/CLI tools** in cchsflow-docs — dependency resolution, coverage queries, project worksheet generation. Requires deciding the scope boundary (open question #1).
+-   **Consumer skill** — Claude Code skill orchestrating R functions and MCP tools for researchers
+-   **Metadata extraction** — migrate inline `{recommended:X}` tags to structured fields if multiple consumers benefit; materialise dependency graph and coverage matrix as database tables if the MCP integration warrants it
+-   **Recommended variable sets** (R5) — revisit once Phase 1-2 experience reveals whether standardised bundles are useful or whether project-specific lists remain the norm
+
+## Open questions
+
+1.  **Scope boundary for cchsflow-docs** — the MCP currently serves StatCan metadata. Adding cchsflow harmonisation metadata (dependencies, recommended sets) changes its purpose. Should this be a separate MCP, an extension of the existing one, or a shared database with distinct tables? (Phase 3 decision — not needed for Phases 1-2.)
+2.  **Should project worksheets be self-contained** or reference the main cchsflow installation? Self-contained is simpler for users but duplicates data; references are lighter but require cchsflow to be installed.
+3.  **How to handle version differences** — if a project uses an older cchsflow version with different variables, should the resolver warn or adapt?
+
+### Resolved
+
+-   **Cross-domain dependencies**: Yes, the resolver must handle them. `pack_years_der` depends on `DHHGAGE_cont` (Demographics). The dependency graph crosses subject boundaries by design.
+-   **Recommended tag migration timing**: Defer until Phase 3. Only migrate when multiple consumers exist and the schema is validated by Phase 1-2 use.
+-   **Recommended variable sets priority**: Deferred. The curation burden is high, only 17 of 381 variables are tagged, and downstream projects maintain their own lists. Revisit after Phases 1-2.
+
+## References
+
+### Within cchsflow
+
+-   `R/variable-discovery.R` — existing variable discovery functions (v3-smoking branch)
+-   `R/clean-variables.R` — worksheet infrastructure (clean_variables, derive_passthrough, parse_range_notation)
+-   `R/recode-with-table.R` lines 820-966 — existing runtime dependency resolver (`recode_derived_variables()`)
+-   `.claude/skills/cchsflow-worksheets/docs/derived-variable-functions.md` — 3-step architecture and feeder alignment
+
+### Downstream implementations to consolidate
+
+-   `DemPoRT-V2-dev/R/get-dependency-tree.R` — recursive dependency tree walker
+-   `DemPoRT-V2-dev/R/get-start-var.R` — `parse_variable_start()` with transformation chain resolution
+-   `DemPoRT-V2-dev/R/variable-start-utils.R` — `is_derived_var()`, `get_derived_vars()`
+-   `MockData/R/mockdata-parsers.R` (`v030-refactor`) — `parse_variable_start()`, `parse_range_notation()`
+-   `MockData/R/mockdata-helpers.R` — `get_cycle_variables()`, `get_raw_variables()`
+-   `MockData/R/identify_derived_vars.R` (`v030-refactor`) — `identify_derived_vars()`, `get_raw_var_dependencies()`
+
+### External
+
+-   cchs-metadata MCP server — `../cchsflow-docs/mcp-server/server.py`

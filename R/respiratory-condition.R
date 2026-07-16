@@ -1,17 +1,206 @@
-#' @title resp_condition_fun1
+#' @title Derive COPD/emphysema/bronchitis indicator for 2001-2003 cycles
 #'
-#' @description This is one of 3 functions used to create a derived variable
-#'  (resp_condition_der) that determines if a respondents has a respiratory
-#'  condition. 3 different functions have been created to account for the fact
-#'  that different respiratory variables are used across CCHS cycles. This
-#'  function is for CCHS cycles (2009-2014) that only use COPD and Emphysema as
-#'  a combined variable. Asthma is used across CCHS cycles as a separate
-#'  variable.
+#' @description
+#' Derives CCC_091 (COPD/emphysema/chronic bronchitis) for CCHS cycles
+#' 2001-2003, where the concept is split across two source variables.
 #'
-#' @param DHHGAGE_cont continuous age variable.
+#' @details
+#' In CCHS 2001-2003, chronic bronchitis (CCC_91A) and emphysema/COPD
+#' (CCC_91B) are asked as separate questions. This function combines
+#' them into a single indicator: positive if either condition is
+#' reported. Missing-data handling follows the v3 3-step architecture
+#' with priority not applicable > not stated.
 #'
-#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
-#' 
+#' @param CCC_91A Chronic bronchitis indicator (1 = yes, 2 = no).
+#' @param CCC_91B Emphysema or COPD indicator (1 = yes, 2 = no).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector: 1 = has COPD/emphysema/bronchitis, 2 = does
+#'   not. Missing data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
+#' @examples
+#' # Scalar
+#' derive_CCC_091_2001to2003(1, 2)  # 1 (has condition)
+#' derive_CCC_091_2001to2003(2, 2)  # 2 (no condition)
+#'
+#' @seealso \code{\link{derive_CCC_091_2005to2008}},
+#'   \code{\link{categorize_CCC_091}}
+#'
+#' @export
+derive_CCC_091_2001to2003 <- function(CCC_91A, CCC_91B,
+                                       output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    CCC_91A = CCC_91A,
+    CCC_91B = CCC_91B
+  ), output_format = "tagged_na")
+
+  a <- cleaned$CCC_91A
+  b <- cleaned$CCC_91B
+
+  # === STEP 2: DERIVE CCC_091 ===
+  result <- dplyr::case_when(
+    a == 1 | b == 1 ~ 1L,
+    a == 2 & b == 2 ~ 2L,
+    any_missing(a, b) ~
+      get_priority_missing(a, b, output_format = output_format),
+    .default = assign_missing("not_stated", "CCC_091", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    CCC_091 = result
+  ), output_format = output_format)
+
+  return(prep_cat_output(output_cleaned$CCC_091))
+}
+
+#' @title Derive COPD/emphysema/bronchitis indicator for 2005-2008 cycles
+#'
+#' @description
+#' Derives CCC_091 (COPD/emphysema/chronic bronchitis) for CCHS cycles
+#' 2005-2008, where the concept is split across three source variables.
+#'
+#' @details
+#' In CCHS 2005-2008, chronic bronchitis (CCC_91A), emphysema (CCC_91E),
+#' and COPD (CCC_91F) are asked as separate questions. This function
+#' combines them into a single indicator: positive if any condition is
+#' reported. Missing-data handling follows the v3 3-step architecture
+#' with priority not applicable > not stated.
+#'
+#' @param CCC_91A Chronic bronchitis indicator (1 = yes, 2 = no).
+#' @param CCC_91E Emphysema indicator (1 = yes, 2 = no).
+#' @param CCC_91F COPD indicator (1 = yes, 2 = no).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector: 1 = has COPD/emphysema/bronchitis, 2 = does
+#'   not. Missing data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
+#' @examples
+#' # Scalar
+#' derive_CCC_091_2005to2008(1, 2, 2)  # 1 (has condition)
+#' derive_CCC_091_2005to2008(2, 2, 2)  # 2 (no condition)
+#'
+#' @seealso \code{\link{derive_CCC_091_2001to2003}},
+#'   \code{\link{categorize_CCC_091}}
+#'
+#' @export
+derive_CCC_091_2005to2008 <- function(CCC_91A, CCC_91E, CCC_91F,
+                                       output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    CCC_91A = CCC_91A,
+    CCC_91E = CCC_91E,
+    CCC_91F = CCC_91F
+  ), output_format = "tagged_na")
+
+  a <- cleaned$CCC_91A
+  e <- cleaned$CCC_91E
+  f <- cleaned$CCC_91F
+
+  # === STEP 2: DERIVE CCC_091 ===
+  result <- dplyr::case_when(
+    a == 1 | e == 1 | f == 1 ~ 1L,
+    a == 2 & e == 2 & f == 2 ~ 2L,
+    any_missing(a, e, f) ~
+      get_priority_missing(a, e, f, output_format = output_format),
+    .default = assign_missing("not_stated", "CCC_091", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    CCC_091 = result
+  ), output_format = output_format)
+
+  return(prep_cat_output(output_cleaned$CCC_091))
+}
+
+# ==============================================================================
+# CCC_091_der — Age-stratified COPD/emphysema/bronchitis (3 categories)
+# ==============================================================================
+
+#' @title Categorize COPD/emphysema/bronchitis by age group
+#'
+#' @description
+#' Creates a 3-category derived variable from CCC_091 (COPD/emphysema/
+#' bronchitis) stratified by the age-35 threshold.
+#'
+#' @details
+#' Clinically, COPD diagnosed before age 35 may reflect different
+#' aetiology (e.g. alpha-1 antitrypsin deficiency) than later-onset
+#' disease. The age-35 cutpoint follows the original CCHS derived
+#' variable convention. Source-agnostic: the worksheet routes
+#' DHHGAGE_cont (PUMF) or DHH_AGE (Master) to the age parameter.
+#' Missing-data handling follows the v3 3-step architecture with
+#' priority not applicable > not stated.
+#'
+#' @param age Continuous age variable (DHHGAGE_cont for PUMF, DHH_AGE for
+#'   Master).
+#' @param CCC_091 Harmonized COPD/emphysema/bronchitis indicator (1 = yes,
+#'   2 = no).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Integer vector: 1 = age >= 35 with condition, 2 = age < 35
+#'   with condition, 3 = no condition. Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
+#' @examples
+#' # Scalar
+#' categorize_CCC_091(40, 1)  # 1 (age >= 35 with condition)
+#' categorize_CCC_091(25, 1)  # 2 (age < 35 with condition)
+#' categorize_CCC_091(40, 2)  # 3 (no condition)
+#'
+#' @seealso \code{\link{derive_CCC_091_2001to2003}},
+#'   \code{\link{derive_CCC_091_2005to2008}}
+#'
+#' @export
+categorize_CCC_091 <- function(age, CCC_091, output_format = "tagged_na") {
+  # === STEP 1: DATA CLEANING ===
+  cleaned <- clean_variables(vars = list(
+    DHHGAGE_cont = age,
+    CCC_091 = CCC_091
+  ), output_format = "tagged_na")
+
+  a <- cleaned$DHHGAGE_cont
+  c091 <- cleaned$CCC_091
+
+  # === STEP 2: DOMAIN LOGIC ===
+  result <- dplyr::case_when(
+    any_missing(a, c091) ~
+      get_priority_missing(a, c091, output_format = output_format),
+    a >= 35 & c091 == 1 ~ 1L,
+    a < 35  & c091 == 1 ~ 2L,
+    c091 == 2           ~ 3L,
+    .default = assign_missing("not_stated", "CCC_091_der", output_format)
+  )
+
+  # === STEP 3: OUTPUT VALIDATION ===
+  output_cleaned <- clean_variables(vars = list(
+    CCC_091_der = result
+  ), output_format = output_format)
+
+  prep_cat_output(output_cleaned$CCC_091_der)
+}
+
+#' @title resp_condition_fun
+#'
+#' @description This function is used to create a derived variable
+#'  (resp_condition_der) that determines if a respondent has a respiratory
+#'  condition. It uses the combined COPD, Emphysema, and Bronchitis variable
+#'  (CCC_091) and Asthma (CCC_031) across all CCHS cycles.
+#'
+#' @param age continuous age variable (DHHGAGE_cont for _p cycles, DHH_AGE for
+#'  _m cycles).
+#'
+#' @param CCC_091 variable indicating if respondent has COPD, emphysema, or
+#'  bronchitis
+#'
 #' @param CCC_031 variable indicating if respondent has asthma
 #'
 #' @return a categorical variable (resp_condition_der) with 3 levels:
@@ -23,53 +212,21 @@
 #'  }
 #'
 #' @examples
-#' # Using resp_condition_fun1() to create values across CCHS cycles
-#' # (2009-2014) resp_condition_fun1() is specified in
-#' # variable_details.csv along with the CCHS variables and cycles included.
-#'
-#' # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
-#' # and specify resp_condition_der, along with the various respiratory
-#' # variables. Then by using merge_rec_data() you can combine
-#' # resp_condition_der across cycles.
-#'
-#' library(cchsflow)
-#'
-#' resp2009_2010 <- suppressWarnings(rec_with_table(
-#'   cchs2009_2010_p,  c(
-#'     "DHHGAGE_cont", "CCC_091", "CCC_031",
-#'     "resp_condition_der"
-#'   )
-#' ))
-#'
-#' head(resp2009_2010)
-#'
-#' resp2011_2012 <- suppressWarnings(rec_with_table(
-#'   cchs2011_2012_p, c(
-#'     "DHHGAGE_cont", "CCC_091", "CCC_031",
-#'     "resp_condition_der"
-#'   )
-#' ))
-#'
-#' tail(resp2011_2012)
-#'
-#' combined_resp <-
-#'  suppressWarnings(merge_rec_data(resp2009_2010, resp2011_2012))
-#'
-#' head(combined_resp)
-#' tail(combined_resp)
-#' @seealso \code{\link{resp_condition_fun2}}, \code{\link{resp_condition_fun3}}
+#' resp_condition_fun(40, 1, 1)  # 1 (over 35, has condition)
+#' resp_condition_fun(25, 1, 1)  # 2 (under 35, has condition)
+#' resp_condition_fun(40, 2, 2)  # 3 (no condition)
 #'
 #' @export
-resp_condition_fun1 <-
-  function(DHHGAGE_cont, CCC_091, CCC_031) {
+resp_condition_fun <-
+  function(age, CCC_091, CCC_031) {
     `%notin%` <- Negate(`%in%`)
     # Argument verification
     if ((CCC_091 %notin% 1:2) |
-        (CCC_031 %notin% 1:2)) {
+      (CCC_031 %notin% 1:2)) {
       warning(
         paste(
-          "In DHHGAGE_cont:",
-          DHHGAGE_cont,
+          "In age:",
+          age,
           ", CCC_091:",
           CCC_091,
           ", CCC_031:",
@@ -77,449 +234,30 @@ resp_condition_fun1 <-
           "one or more of the respiratory arguments was outside the 1:2 allowed
           range however the condition is still calculated",
           sep = ""
-        ), call. = FALSE
+        ),
+        call. = FALSE
       )
     }
     resp_condition <-
       if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-           (CCC_091 == 1 | CCC_031 == 1)), 1,
+        ((age > 0 & age >= 35) &
+          (CCC_091 == 1 | CCC_031 == 1)), 1,
         if_else2(
-          ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-             (CCC_091 == 1 | CCC_031 == 1)), 2,
+          ((age > 0 & age < 35) &
+            (CCC_091 == 1 | CCC_031 == 1)), 2,
           if_else2(
-            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-               (CCC_091 == 2 | CCC_031 == 2)), 3,
+            ((age > 0 & age < 35) &
+              (CCC_091 == 2 | CCC_031 == 2)), 3,
             if_else2(
-              ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-                 (CCC_091 == 2 & CCC_031 == 2)), 3, 
-              if_else2((CCC_091 == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)",
-                       "NA(b)")
-            )
-          )
-        )
-      )
-    return(resp_condition)
-  }
-
-#' @title resp_condition_fun2
-#'
-#' @description This is one of 3 functions used to create a derived variable
-#'  (resp_condition_der) that determines if a respondents has a respiratory
-#'  condition. This function is for CCHS cycles (2005-2007) that use COPD &
-#'  Emphysema as separate variables, as well as Bronchitis. Asthma is used
-#'  across CCHS cycles as a separate variable.
-#'
-#' @param DHHGAGE_cont continuous age variable.
-#'
-#' @param CCC_91E variable indicating if respondent has emphysema
-#'
-#' @param CCC_91F variable indicating if respondent has COPD
-#'
-#' @param CCC_91A variable indicating if respondent has chronic bronchitis
-#' 
-#' @param CCC_031 variable indicating if respondent has asthma
-#'
-#' @return a categorical variable (resp_condition_der) with 3 levels:
-#'
-#'  \enumerate{
-#'  \item respondent is over the age of 35 and has a respiratory condition
-#'  \item respondent is under the age of 35 and has a respiratory condition
-#'  \item respondent does not have a respiratory condition
-#'  }
-#'
-#' @examples
-#'
-#' # Using resp_condition_fun2() to create values across CCHS cycles
-#' # (2005-2007) resp_condition_fun2() is specified in
-#' # variable_details.csv along with the CCHS variables and cycles included.
-#'
-#' # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
-#' # and specify resp_condition_der, along with the various respiratory
-#' # variables. Then by using merge_rec_data() you can combine
-#' # resp_condition_der across cycles.
-#'
-#' library(cchsflow)
-#'
-#' resp2005 <- suppressWarnings(rec_with_table(
-#'   cchs2005_p, c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
-#'     "resp_condition_der"
-#'   )
-#' ))
-#'
-#' head(resp2005)
-#'
-#' resp2007_2008 <- suppressWarnings(rec_with_table(
-#'   cchs2007_2008_p,  c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", "CCC_91A", "CCC_031",
-#'     "resp_condition_der"
-#'   )
-#' ))
-#'
-#' tail(resp2007_2008)
-#'
-#' combined_resp <- suppressWarnings(merge_rec_data(resp2005, resp2007_2008))
-#'
-#' head(combined_resp)
-#' tail(combined_resp)
-#' @seealso \code{\link{resp_condition_fun1}}, \code{\link{resp_condition_fun3}}
-#'
-#' @export
-resp_condition_fun2 <-
-  function(DHHGAGE_cont, CCC_91E, CCC_91F, CCC_91A, CCC_031) {
-    `%notin%` <- Negate(`%in%`)
-    # Argument verification
-    if ((CCC_91E %notin% 1:2) |
-        (CCC_91F %notin% 1:2) |
-        (CCC_91A %notin% 1:2) |
-        (CCC_031 %notin% 1:2)) {
-      warning(
-        paste(
-          "In DHHGAGE_cont:",
-          DHHGAGE_cont,
-          ", CCC_91E:",
-          CCC_91E,
-          ", CCC_91F:",
-          CCC_91F,
-          ", CCC_91A:",
-          CCC_91A,
-          ", CCC_031:",
-          CCC_031,
-          "one or more of the respiratory arguments was outside the 1:2 allowed
-          range however the condition is still calculated",
-          sep = ""
-        ), call. = FALSE
-      )
-    }
-
-    resp_condition <-
-      if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-           (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
-        if_else2(
-          ((DHHGAGE_cont >= 30 & DHHGAGE_cont < 35) &
-             (CCC_91E == 1 | CCC_91F == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
-          if_else2(
-            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
-               (CCC_91A == 1 | CCC_031 == 1)), 2,
-            if_else2(
-              ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
-                 (CCC_91A == 2 & CCC_031 == 2)), 3,
+              ((age > 0 & age >= 35) &
+                (CCC_091 == 2 & CCC_031 == 2)), 3,
               if_else2(
-                ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) &
-                   (CCC_91E == 2 & CCC_91F == 2 & CCC_91A == 2 &
-                      CCC_031 == 2)), 3,
-                if_else2((CCC_91E == "NA(a)" & CCC_91F == "NA(a)" &
-                            CCC_91A == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)",
-                         "NA(b)")
+                (CCC_091 == "NA(a)" & CCC_031 == "NA(a)"), "NA(a)",
+                "NA(b)"
               )
             )
           )
         )
       )
     return(resp_condition)
-  }
-
-#' @title resp_condition_fun3
-#'
-#' @description This is one of 3 functions used to create a derived variable
-#'  (resp_condition_der) that determines if a respondents has a respiratory
-#'  condition. This function for CCHS cycles (2001-2003) that use COPD and
-#'  Emphysema as a combined variable, as well as Bronchitis. Asthma is used
-#'  across CCHS cycles as a separate variable.
-#'
-#' @param DHHGAGE_cont continuous age variable.
-#'
-#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
-#'
-#' @param CCC_91A variable indicating if respondent has chronic bronchitis
-#'  
-#' @param CCC_031 variable indicating if respondent has asthma
-#'
-#' @return a categorical variable (resp_condition_der) with 3 levels:
-#'
-#'  \enumerate{
-#'  \item respondent is over the age of 35 and has a respiratory condition
-#'  \item respondent is under the age of 35 and has a respiratory condition
-#'  \item respondent does not have a respiratory condition
-#'  }
-#'
-#' @examples
-#' # Using resp_condition_fun3() to create values across CCHS cycles
-#' # (2001-2003) resp_condition_fun3() is specified in
-#' # variable_details.csv along with the CCHS variables and cycles included.
-#'
-#' # To transform resp_condition_der, use rec_with_table() for each CCHS cycle
-#' # and specify resp_condition_der, along with the various respiratory
-#' # variables. Then by using merge_rec_data() you can combine
-#' # resp_condition_der across cycles.
-#'
-#' library(cchsflow)
-#'
-#' resp2001 <- suppressWarnings(rec_with_table(
-#'   cchs2001_p, c(
-#'     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
-#'     "resp_condition_der"
-#'   )
-#' ))
-#'
-#' head(resp2001)
-#'
-#' resp2003 <- suppressWarnings(rec_with_table(
-#'   cchs2003_p,c(
-#'     "DHHGAGE_cont", "CCC_091", "CCC_91A", "CCC_031",
-#'     "resp_condition_der"
-#'   )
-#' ))
-#'
-#' tail(resp2003)
-#'
-#' combined_resp <- suppressWarnings(merge_rec_data(resp2001, resp2003))
-#'
-#' head(combined_resp)
-#' tail(combined_resp)
-#' @seealso \code{\link{resp_condition_fun1}}, \code{\link{resp_condition_fun2}}
-#'
-#' @export
-resp_condition_fun3 <-
-  function(DHHGAGE_cont, CCC_091, CCC_91A, CCC_031) {
-    `%notin%` <- Negate(`%in%`)
-    # Argument verification
-    if ((CCC_091 %notin% 1:2) |
-        (CCC_91A %notin% 1:2) |
-        (CCC_031 %notin% 1:2)) {
-      warning(
-        paste(
-          "In DHHGAGE_cont:",
-          DHHGAGE_cont,
-          ", CCC_091:",
-          CCC_091,
-          ", CCC_91A:",
-          CCC_91A,
-          ", CCC_031:",
-          CCC_031,
-          "one or more of the respiratory arguments was outside the 1:2 allowed
-          range however the condition is still calculated",
-          sep = ""
-        ), call. = FALSE
-      )
-    }
-
-    resp_condition <-
-      if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-           (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 1,
-        if_else2(
-          ((DHHGAGE_cont >= 30 & DHHGAGE_cont < 35) &
-             (CCC_091 == 1 | CCC_91A == 1 | CCC_031 == 1)), 2,
-          if_else2(
-            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
-               (CCC_91A == 1 | CCC_031 == 1)), 2,
-            if_else2(
-              ((DHHGAGE_cont > 0 & DHHGAGE_cont < 30) &
-                 (CCC_91A == 2 & CCC_031 == 2)), 3,
-              if_else2(
-                ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 30) & 
-                   (CCC_091 == 2 & CCC_91A == 2 & CCC_031 == 2)), 3,
-                if_else2((CCC_091 == "NA(a)" & CCC_91A == "NA(a)" &
-                            CCC_031 == "NA(a)"), 
-                         "NA(a)", "NA(b)")
-              )
-            )
-          )
-        )
-      )
-    return(resp_condition)
-  }
-
-#' @title COPD_Emph_der_fun1
-#'
-#' @description This is one of 2 functions used to create a derived variable
-#'  (COPD_Emph_der) that determines if a respondents has either COPD or 
-#'  Emphysema. 2 different functions have been created to account for the fact
-#'  that different respiratory variables are used across CCHS cycles. This
-#'  function is for CCHS cycles (2005-2008) that use COPD and Emphysema as
-#'  a combined variable. 
-#'
-#' @param DHHGAGE_cont continuous age variable.
-#'
-#' @param CCC_91E variable indicating if respondent has Emphysema
-#'
-#' @param CCC_91F variable indicating if respondent has COPD
-#'
-#' @return a categorical variable (COPD_Emph_der) with 3 levels:
-#'
-#'  \enumerate{
-#'  \item respondent is over the age of 35 and has a respiratory condition
-#'  \item respondent is under the age of 35 and has a respiratory condition
-#'  \item respondent does not have a respiratory condition
-#'  }
-#'
-#' @examples
-#' # COPD_Emph_der_fun1() to create values across CCHS cycles
-#' # (2005-2008) COPD_Emph_der_fun1() is specified in
-#' # variable_details.csv along with the CCHS variables and cycles included.
-#'
-#' # To transform COPD_Emph_der, use rec_with_table() for each CCHS cycle
-#' # and specify COPD_Emph_der, along with the various respiratory
-#' # variables. Then by using merge_rec_data() you can combine COPD_Emph_der
-#' # across cycles.
-#'
-#' library(cchsflow)
-#'
-#' COPD2005 <- suppressWarnings(rec_with_table(
-#'   cchs2005_p,  c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F",
-#'     "COPD_Emph_der"
-#'   )
-#' ))
-#'
-#' head(COPD2005)
-#'
-#' COPD2007_2008 <- suppressWarnings(rec_with_table(
-#'   cchs2007_2008_p, c(
-#'     "DHHGAGE_cont", "CCC_91E", "CCC_91F", 
-#'     "COPD_Emph_der"
-#'   )
-#' ))
-#'
-#' tail(COPD2007_2008)
-#'
-#' combined_COPD <- suppressWarnings(merge_rec_data(COPD2005, COPD2007_2008))
-#'
-#' head(combined_COPD)
-#' tail(combined_COPD)
-#' @seealso \code{\link{COPD_Emph_der_fun2}}
-#'
-#' @export
-#' 
-COPD_Emph_der_fun1 <-
-  function(DHHGAGE_cont, CCC_91E, CCC_91F) {
-    `%notin%` <- Negate(`%in%`)
-    # Argument verification
-    if ((CCC_91E %notin% 1:2) |
-        (CCC_91F %notin% 1:2)) {
-      warning(
-        paste(
-          "In DHHGAGE_cont:",
-          DHHGAGE_cont,
-          ", CCC_91E:",
-          CCC_91E,
-          ", CCC_91F:",
-          CCC_91F,
-          "one or more of the arguments was outside the 1:2 allowed
-          range however the condition is still calculated",
-          sep = ""
-        ), call. = FALSE
-      )
-    }
-    
-    COPD_Emph <-
-      if_else2(
-        ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-          (CCC_91E == 1 | CCC_91F == 1)), 1,
-        if_else2(
-          ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-             (CCC_91E == 1 | CCC_91F == 1)), 2,
-          if_else2(
-            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-               (CCC_91E == 2 & CCC_91F == 2)), 3,
-            if_else2(
-              ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-                 (CCC_91E == 2 & CCC_91F == 2)), 3,
-              if_else2(
-                (CCC_91E == "NA(a)" & CCC_91F == "NA(a)"), "NA(a)", "NA(b)")
-            )
-          )
-        )
-      )
-    return(COPD_Emph)
-  }
-
-#' @title COPD_Emph_der_fun2
-#'
-#' @description This is one of 2 functions used to create a derived variable
-#'  (COPD_Emph_der) that determines if a respondents has either COPD or 
-#'  Emphysema. 2 different functions have been created to account for the fact
-#'  that different respiratory variables are used across CCHS cycles. This
-#'  function is for CCHS cycles (2001-2003, 2009-2014) that use COPD and
-#'  Emphysema as a combined variable. 
-#'
-#' @param DHHGAGE_cont continuous age variable.
-#'
-#' @param CCC_091 variable indicating if respondent has either COPD or Emphysema
-#'
-#' @return a categorical variable (COPD_Emph_der) with 3 levels:
-#'
-#'  \enumerate{
-#'  \item respondent is over the age of 35 and has a respiratory condition
-#'  \item respondent is under the age of 35 and has a respiratory condition
-#'  \item respondent does not have a respiratory condition
-#'  }
-#'
-#' @examples
-#' # COPD_Emph_der_fun2() to create values across CCHS cycles
-#' # (2001-2003, 2009-2014) COPD_Emph_der_fun2() is specified in
-#' # variable_details.csv along with the CCHS variables and cycles included.
-#'
-#' # To transform COPD_Emph_der, use rec_with_table() for each CCHS cycle
-#' # and specify COPD_Emph_der, along with the various respiratory
-#' # variables. Then by using merge_rec_data() you can combine COPD_Emph_der
-#' # across cycles.
-#'
-#' library(cchsflow)
-#'
-#' COPD2001 <- suppressWarnings(rec_with_table(
-#'   cchs2001_p,  c(
-#'     "DHHGAGE_cont", "CCC_091",
-#'     "COPD_Emph_der"
-#'   )
-#' ))
-#'
-#' head(COPD2001)
-#'
-#' COPD2014 <- suppressWarnings(rec_with_table(
-#'   cchs2007_2008_p, c(
-#'     "DHHGAGE_cont", "CCC_091", 
-#'     "COPD_Emph_der"
-#'   )
-#' ))
-#'
-#' tail(COPD2014)
-#'
-#' combined_COPD <- suppressWarnings(merge_rec_data(COPD2001, COPD2014))
-#'
-#' head(combined_COPD)
-#' tail(combined_COPD)
-#' @seealso \code{\link{COPD_Emph_der_fun2}}
-#'
-#' @export
-#' 
-
-COPD_Emph_der_fun2 <-
-  function(DHHGAGE_cont, CCC_091) {
-    `%notin%` <- Negate(`%in%`)
-    COPD_Emph <-
-      if_else2(
-        (DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-          (CCC_091 == 1), 1,
-        if_else2(
-          ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-             (CCC_091 == 1)), 2,
-          if_else2(
-            ((DHHGAGE_cont > 0 & DHHGAGE_cont < 35) &
-               (CCC_091 == 2)), 3,
-            if_else2(
-              ((DHHGAGE_cont > 0 & DHHGAGE_cont >= 35) &
-                 (CCC_091 == 2)), 3,
-              if_else2(
-                (CCC_091 == "NA(a)"),
-                "NA(a)", "NA(b)"
-              )
-            )
-          )
-        )
-      )
-    return(COPD_Emph)
   }

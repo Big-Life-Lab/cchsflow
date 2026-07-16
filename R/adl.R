@@ -1,227 +1,279 @@
-#' @title Derived needs help with tasks
-#' 
-#' @description This derived variable (ADL_der) is based on the CCHS derived
-#'  variable ADLF6R which flags respondents who need help with tasks based on
-#'  their response to the various activities of daily living (ADL) variables.
-#' 
-#' @details The CCHS derived variable ADLF6R uses different ADL variables across
-#'  the various CCHS survey cycles. This newly derived variable (ADL_der) uses
-#'  ADL variables that are consistent across CCHS cycles.
-#'  
-#'  In the 2001 CCHS survey cycle, the ADLF6R variable examines the following
-#'  ADL variables:
-#'  \enumerate{
-#'   \item ADL_01 - Needs help preparing meals
-#'   \item ADL_02 - Needs help getting to appointments/errands
-#'   \item ADL_03 - Needs help doing housework
-#'   \item ADL_04 - Needs help doing personal care
-#'   \item ADL_05 - Needs help moving inside house
-#'   \item ADL_07 - Needs help doing heavy household chores
-#'  }  
-#' 
-#'  In the 2003-2005 CCHS survey cycles, the ADLF6R variable examines the
-#'  following ADL variables:
-#'  \enumerate{
-#'   \item ADL_01 - Needs help preparing meals
-#'   \item ADL_02 - Needs help getting to appointments/errands
-#'   \item ADL_03 - Needs help doing housework
-#'   \item ADL_04 - Needs help doing personal care
-#'   \item ADL_05 - Needs help moving inside house
-#'   \item ADL_06 - Needs help doing finances
-#'   \item ADL_07 - Needs help doing heavy household chores
-#'  }
-#'  
-#'  In the 2007-2014 CCHS survey cycles, the ADLF6R variable examines the
-#'  following ADL variables:
-#'  \enumerate{
-#'   \item ADL_01 - Needs help preparing meals
-#'   \item ADL_02 - Needs help getting to appointments/errands
-#'   \item ADL_03 - Needs help doing housework
-#'   \item ADL_04 - Needs help doing personal care
-#'   \item ADL_05 - Needs help moving inside house
-#'   \item ADL_06 - Needs help doing finances
-#'  }
-#'  
-#'  This newly derived variable (ADL_der) uses ADL_01 to ADL_05 which are
-#'  consistent across all survey cycles. For any single CCHS survey year,
-#'  it is appropriate to use ADLF6R. ADL_der is recommended when using multiple
-#'  survey cycles.     
-#' 
-#' @param ADL_01 Needs help preparing meals
-#' 
-#' @param ADL_02 Needs help getting to appointments/errands
-#' 
-#' @param ADL_03 Needs help doing housework
-#' 
-#' @param ADL_04 Needs help doing personal care
-#' 
-#' @param ADL_05 Needs help moving inside house
-#' 
-#' @return A derived variable (ADL_der) with 2 categories:
-#'  \enumerate{
-#'   \item - Needs help with tasks
-#'   \item - Does not need help with tasks
-#'  }
-#' 
-#' @examples 
-#' # Using adl_fun() to create ADL_der values across CCHS cycles
-#' # adl_fun() is specified in variable_details.csv along with the
-#' # CCHS variables and cycles included.
-#' 
-#' # To transform ADL_der, use rec_with_table() for each CCHS cycle
-#' # and specify ADL_der, along with the various ADL variables.
-#' # Then by using merge_rec_data() you can combine ADL_der across cycles.
-#' 
-#' library(cchsflow)
-#' adl2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der"
-#'   )
-#' )
-#' 
-#' head(adl2001)
-#' 
-#' adl2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der"
-#'   )
-#' )
-#' 
-#' tail(adl2009_2010)
-#' 
-#' combined_adl <- merge_rec_data(adl2001, adl2009_2010)
-#' 
-#' head(combined_adl)
-#' 
-#' tail(combined_adl)
-#' 
-#' # Using adl_fun() to generate to ADL_der based on user inputted values.
-#' # 
-#' # Let's say you do not need help preparing meals, you need help getting to
-#' # appointments or errands, you need help doing housework, do not need help
-#' # doing personal care, and do not need help moving inside the house. Using
-#' # adl_fun() we can check if you need help doing tasks
-#' 
-#' ADL_der <- adl_fun(2, 1, 1, 2, 2)
-#' 
-#' print(ADL_der)
-#' 
-#' @export
-adl_fun <- function (ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-  # Check to see if all values are in range
-  if_else2((ADL_01 %in% 1:2) & (ADL_02 %in% 1:2) & (ADL_03 %in% 1:2) &
-             (ADL_04 %in% 1:2) & (ADL_05 %in% 1:2),
-           # Examining if respondents needed help with any task
-           if_else2(ADL_01 == 1 | ADL_02 == 1 | ADL_03 == 1 | ADL_04 == 1 |
-                      ADL_05 == 1, 1,
-                    # Examining if respondents do not need help with any task
-                    if_else2(ADL_01 == 2 & ADL_02 == 2 & ADL_03 == 2 &
-                               ADL_04 == 2 & ADL_05 == 2, 2, "NA(b)")),
-           # Return NA if any ADL variable is out of range
-           "NA(b)"
-           )
+# ==============================================================================
+# ADL (Activities of Daily Living) derived variables
+# ==============================================================================
+#
+# Canonical v3 3-step architecture:
+#   Step 1 - clean_variables() with output_format = "tagged_na" (metadata-driven
+#            missing-code conversion and out-of-range validation)
+#   Step 2 - dplyr::case_when() with any_missing() as the first arm
+#   Step 3 - clean_variables() on the derived variable with the user's format
+#
+# Worksheet derived variables: ADL_der, ADL_score_5, ADL_score_6
+# Validation bounds come from variable_details.csv via clean_variables();
+# there are no hardcoded missing codes or bounds in this file.
 
-}
-
-#' @title The number of activities of daily living tasks that require help.
+#' Activities of Daily Living (ADL) help indicator
 #'
-#' @description A 6 category variable (ADL_score_5) representing the number of
-#'  activities of daily living tasks that require help. This variable tallies
-#'  the number of daily living tasks that a respondent requires help with based
-#'  on various ADL variables that a respondent answered yes or no to. The ADL
-#'  variables used are common across all CCHS cycles from 2001 to 2014.
+#' @description
+#' Creates a binary indicator for needing help with activities of daily
+#' living, using the 5 ADL tasks asked consistently across CCHS cycles.
 #'
-#' @param ADL_01 Needs help preparing meals.
-#' @param ADL_02 Needs help getting to appointments/errands.
-#' @param ADL_03 Needs help doing housework.
-#' @param ADL_04 Needs help doing personal care.
-#' @param ADL_05 Needs help moving inside house.
+#' @details
+#' The five core tasks (meal preparation, getting to appointments/errands,
+#' housework, personal care, moving inside the house) are available in all
+#' CCHS cycles from 2001 onward, making this indicator suitable for
+#' cross-cycle analyses. The original CCHS derived variable ADLF6R uses
+#' different components across cycles; this function deliberately uses the
+#' consistent 5-item subset.
 #'
-#' @return A derived variable (ADL_score_5) with 6 categories:
-#' \enumerate{
-#'   \item 0 - Needs help with 0 tasks
-#'   \item 1 - Needs help with at least 1 task
-#'   \item 2 - Needs help with at least 2 tasks
-#'   \item 3 - Needs help with at least 3 tasks
-#'   \item 4 - Needs help with at least 4 tasks
-#'   \item 5 - Needs help with at least 5 tasks
-#' }
+#' ADL questions are typically restricted to respondents with activity
+#' limitations; not-applicable responses are preserved as
+#' \code{haven::tagged_na("a")}.
 #'
+#' Missing-data handling follows the v3 3-step architecture: input codes
+#' (6, 7, 8, 9) are converted using variable_details.csv metadata, with
+#' priority not applicable > not stated when inputs mix missing types.
+#' Out-of-range inputs receive the worksheet's else rule
+#' (\code{haven::tagged_na("b")}).
+#'
+#' @param ADL_01 Help needed preparing meals (1 = yes, 2 = no). Accepts raw
+#'   CCHS codes, tagged NAs, or labelled strings.
+#' @param ADL_02 Help needed getting to appointments/errands (1 = yes, 2 = no).
+#' @param ADL_03 Help needed doing housework (1 = yes, 2 = no).
+#' @param ADL_04 Help needed doing personal care (1 = yes, 2 = no).
+#' @param ADL_05 Help needed moving inside the house (1 = yes, 2 = no).
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Numeric vector: 1 = needs help with at least one task,
+#'   2 = no help needed with any task. Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
 #'
 #' @examples
-#' # Use adl_score_5_fun() to create the variable ADL_score_5 across CCHS 
-#' # cycles adl_score_5_fun() is specified in variable_details.csv along with 
-#' # the CCHS variables and cycles included.
+#' # Scalar
+#' assess_adl(1, 2, 2, 2, 2) # 1 (needs help with meals)
+#' assess_adl(2, 2, 2, 2, 2) # 2 (no help needed)
 #'
-#' # To transform ADL_score_5, use rec_with_table() for each CCHS cycle
-#' # and specify ADL_score_5, along with the various ADL variables.
-#' # Then by using merge_rec_data() you can combine ADL_der across cycles.
+#' # Vector with CCHS missing codes
+#' assess_adl(
+#'   c(1, 2, 6, 7),
+#'   c(2, 2, 2, 2), c(2, 2, 2, 2), c(2, 2, 2, 2), c(2, 2, 2, 2)
+#' ) # 1, 2, tagged_na("a"), tagged_na("b")
 #'
-#' library(cchsflow)
-#' adl2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_score_5"
-#'   )
+#' # Dataframe
+#' library(dplyr)
+#' data.frame(
+#'   ADL_01 = c(1, 2), ADL_02 = c(2, 2), ADL_03 = c(2, 2),
+#'   ADL_04 = c(2, 2), ADL_05 = c(2, 2)
+#' ) %>%
+#'   mutate(adl_help = assess_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05))
+#'
+#' \dontrun{
+#' # Standard cchsflow workflow
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_der")
 #' )
+#' }
 #'
-#' head(adl2001)
+#' @seealso \code{\link{score_adl}}, \code{\link{score_adl_6}}
 #'
-#' adl2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_score_5"
-#'   )
-#' )
-#'
-#' tail(adl2009_2010)
-#'
-#' combined_adl <- merge_rec_data(adl2001, adl2009_2010)
-#'
-#' head(combined_adl)
-#'
-#' tail(combined_adl)
-#'
-#' # Using adl_score_5_fun() to generate to ADL_score_5 based on user inputted
-#' # values.
-#' # Let's say you do not need help preparing meals, you need help getting to
-#' # appointments or errands, you need help doing housework, do not need help
-#' # doing personal care, and do not need help moving inside the house. Using
-#' # adl_score_5_fun() we can check the number of tasks you need help with
-#'
-#' ADL_score_5 <- adl_score_5_fun(2, 1, 1, 2, 2)
-#'
-#' print(ADL_score_5)
-#'
+#' @note v3.0.0, last updated: 2026-07-15, status: active
 #' @export
-adl_score_5_fun <-
-  function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05) {
-    
-    # Create vector of ADL input variables
-    all_adl_vector <- c(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05)
-    # Count the number of missing values in vector
-    count_missing_adl <- sum(all_adl_vector == "NA(b)")
-    # Count the number of not applicable values in vector
-    count_not_applicable_adl <- sum(all_adl_vector == "NA(a)")
-    # Count the number of ADLs that require help (value of 1)
-    count_adl <- sum(all_adl_vector == 1)
-    
-    
-    # If the individual had missing data for any of the variables then set
-    # the score to missing
-    # If the individual has "not applicable" for any of the variables, then
-    # set the score to "not applicable"
-    # Otherwise set the score for each individual to the count of the number
-    # of tasks they needed help with
-    total_num_adls <- 5
-    ADL_score_5 <-
-      ifelse(
-        count_not_applicable_adl >= 1,
-        "NA(a)",
-        ifelse(
-          count_missing_adl >= 1,
-          "NA(b)",
-          count_adl
-        )
-      )
-    
-    return(ADL_score_5)
+assess_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
+                       output_format = "tagged_na") {
+  inputs <- normalize_input_lengths(list(
+    ADL_01 = ADL_01, ADL_02 = ADL_02, ADL_03 = ADL_03,
+    ADL_04 = ADL_04, ADL_05 = ADL_05
+  ))
+  if (inputs$n == 0) {
+    return(numeric(0))
   }
+
+  # Step 1: metadata-driven cleaning (always tagged_na so Step 2 detects missing)
+  cleaned <- clean_variables(vars = inputs$vars, output_format = "tagged_na")
+
+  # Step 2: domain logic
+  result <- dplyr::case_when(
+    any_missing(
+      cleaned$ADL_01, cleaned$ADL_02, cleaned$ADL_03,
+      cleaned$ADL_04, cleaned$ADL_05
+    ) ~
+      get_priority_missing(
+        cleaned$ADL_01, cleaned$ADL_02, cleaned$ADL_03,
+        cleaned$ADL_04, cleaned$ADL_05
+      ),
+    cleaned$ADL_01 == 1 | cleaned$ADL_02 == 1 | cleaned$ADL_03 == 1 |
+      cleaned$ADL_04 == 1 | cleaned$ADL_05 == 1 ~ 1,
+    .default = 2
+  )
+
+  # Step 3: validate against ADL_der metadata and apply the requested format
+  out <- clean_variables(
+    vars = list(ADL_der = result),
+    output_format = output_format
+  )
+  prep_cat_output(out$ADL_der)
+}
+
+#' Activities of Daily Living (ADL) 5-item help score
+#'
+#' @description
+#' Counts the number of ADL tasks (0-5) for which the respondent needs help,
+#' using the 5 tasks asked consistently across CCHS cycles.
+#'
+#' @details
+#' Provides a graduated disability measure: 0 (independent) to
+#' 5 (needs help with all tasks). Missing data in any item invalidates the
+#' score, with priority not applicable > not stated. See
+#' \code{\link{assess_adl}} for the task list and cross-cycle notes.
+#'
+#' @inheritParams assess_adl
+#'
+#' @return Numeric count 0-5. Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
+#' @examples
+#' # Scalar
+#' score_adl(2, 2, 2, 2, 2) # 0 (independent)
+#' score_adl(1, 2, 1, 2, 2) # 2 (help with two tasks)
+#'
+#' # Vector
+#' score_adl(c(1, 2), c(1, 2), c(2, 2), c(1, 2), c(2, 2)) # 3, 0
+#'
+#' # Dataframe
+#' library(dplyr)
+#' data.frame(
+#'   ADL_01 = c(1, 2), ADL_02 = c(1, 2), ADL_03 = c(2, 2),
+#'   ADL_04 = c(1, 2), ADL_05 = c(2, 2)
+#' ) %>%
+#'   mutate(adl_score = score_adl(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05))
+#'
+#' \dontrun{
+#' # Standard cchsflow workflow
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c("ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_score_5")
+#' )
+#' }
+#'
+#' @seealso \code{\link{assess_adl}}, \code{\link{score_adl_6}}
+#'
+#' @note v3.0.0, last updated: 2026-07-15, status: active
+#' @export
+score_adl <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05,
+                      output_format = "tagged_na") {
+  inputs <- normalize_input_lengths(list(
+    ADL_01 = ADL_01, ADL_02 = ADL_02, ADL_03 = ADL_03,
+    ADL_04 = ADL_04, ADL_05 = ADL_05
+  ))
+  if (inputs$n == 0) {
+    return(numeric(0))
+  }
+
+  # Step 1: metadata-driven cleaning
+  cleaned <- clean_variables(vars = inputs$vars, output_format = "tagged_na")
+
+  # Step 2: domain logic — count of tasks needing help
+  result <- dplyr::case_when(
+    any_missing(
+      cleaned$ADL_01, cleaned$ADL_02, cleaned$ADL_03,
+      cleaned$ADL_04, cleaned$ADL_05
+    ) ~
+      get_priority_missing(
+        cleaned$ADL_01, cleaned$ADL_02, cleaned$ADL_03,
+        cleaned$ADL_04, cleaned$ADL_05
+      ),
+    .default = (cleaned$ADL_01 == 1) + (cleaned$ADL_02 == 1) +
+      (cleaned$ADL_03 == 1) + (cleaned$ADL_04 == 1) + (cleaned$ADL_05 == 1)
+  )
+
+  # Step 3: validate against ADL_score_5 metadata and apply requested format
+  out <- clean_variables(
+    vars = list(ADL_score_5 = result),
+    output_format = output_format
+  )
+  prep_cat_output(out$ADL_score_5)
+}
+
+#' Activities of Daily Living (ADL) 6-item help score
+#'
+#' @description
+#' Counts the number of ADL tasks (0-6) for which the respondent needs help,
+#' extending the 5-item score with financial management.
+#'
+#' @details
+#' ADL_06 (help managing finances) is available in CCHS 2003-2014 cycles
+#' only; use \code{\link{score_adl}} for 2001 or 2015+ analyses. Missing
+#' data handling matches the 5-item version.
+#'
+#' @inheritParams assess_adl
+#' @param ADL_06 Help needed managing finances (1 = yes, 2 = no). Accepts raw
+#'   CCHS codes, tagged NAs, or labelled strings.
+#'
+#' @return Numeric count 0-6. Missing data:
+#'   \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
+#' @examples
+#' # Scalar
+#' score_adl_6(2, 2, 2, 2, 2, 2) # 0 (independent)
+#' score_adl_6(1, 2, 1, 2, 2, 1) # 3 (help with three tasks)
+#'
+#' # Vector
+#' score_adl_6(
+#'   c(1, 2), c(1, 2), c(2, 2), c(1, 2), c(2, 2), c(1, 2)
+#' ) # 4, 0
+#'
+#' \dontrun{
+#' # Standard cchsflow workflow (2003-2014 cycles)
+#' result <- rec_with_table(
+#'   cchs2007_2008_p,
+#'   c(
+#'     "ADL_01", "ADL_02", "ADL_03", "ADL_04", "ADL_05", "ADL_06",
+#'     "ADL_score_6"
+#'   )
+#' )
+#' }
+#'
+#' @seealso \code{\link{assess_adl}}, \code{\link{score_adl}}
+#'
+#' @note v3.0.0, last updated: 2026-07-15, status: active
+#' @export
+score_adl_6 <- function(ADL_01, ADL_02, ADL_03, ADL_04, ADL_05, ADL_06,
+                        output_format = "tagged_na") {
+  inputs <- normalize_input_lengths(list(
+    ADL_01 = ADL_01, ADL_02 = ADL_02, ADL_03 = ADL_03,
+    ADL_04 = ADL_04, ADL_05 = ADL_05, ADL_06 = ADL_06
+  ))
+  if (inputs$n == 0) {
+    return(numeric(0))
+  }
+
+  # Step 1: metadata-driven cleaning
+  cleaned <- clean_variables(vars = inputs$vars, output_format = "tagged_na")
+
+  # Step 2: domain logic — count of tasks needing help
+  result <- dplyr::case_when(
+    any_missing(
+      cleaned$ADL_01, cleaned$ADL_02, cleaned$ADL_03,
+      cleaned$ADL_04, cleaned$ADL_05, cleaned$ADL_06
+    ) ~
+      get_priority_missing(
+        cleaned$ADL_01, cleaned$ADL_02, cleaned$ADL_03,
+        cleaned$ADL_04, cleaned$ADL_05, cleaned$ADL_06
+      ),
+    .default = (cleaned$ADL_01 == 1) + (cleaned$ADL_02 == 1) +
+      (cleaned$ADL_03 == 1) + (cleaned$ADL_04 == 1) +
+      (cleaned$ADL_05 == 1) + (cleaned$ADL_06 == 1)
+  )
+
+  # Step 3: validate against ADL_score_6 metadata and apply requested format
+  out <- clean_variables(
+    vars = list(ADL_score_6 = result),
+    output_format = output_format
+  )
+  prep_cat_output(out$ADL_score_6)
+}

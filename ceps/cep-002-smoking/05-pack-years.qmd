@@ -1,0 +1,276 @@
+---
+title: "05 - Pack-Years Variables"
+author: "Doug Manuel, Maikol Diasparra, Caitlin St-Onge"
+date: "2026-01-08"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+| Attribute | Value |
+|-----------|-------|
+| **Subgroup** | 05-pack-years |
+| **Variables** | 2 |
+| **Purpose** | Cumulative smoking exposure for dose-response analysis |
+| **Dependencies** | 01-status, 02-initiation, 03-cessation, 04-intensity |
+| **Dependents** | None (end-point variable) |
+
+Pack-years is the key derived variable for smoking research. It combines information from all other subgroups to calculate cumulative exposure.
+
+## Variables
+
+```{r}
+#| label: tbl-packyears-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+source("../../R/table-generators.R")
+
+generate_variable_list_table("05-pack-years/variables_smk_packyears.csv") |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+## PUMF cycle coverage
+
+```{r}
+#| label: tbl-packyears-coverage
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_subject_coverage_matrix("05-pack-years") |>
+  knitr::kable(align = c("l", rep("c", 13)))
+```
+
+## Formula
+
+```
+pack_years = (cigarettes_per_day / 20) × years_smoked
+```
+
+Where:
+- `cigarettes_per_day` = `cigs_per_day` (unified variable, routes SMK_204/SMK_208 by status)
+- `years_smoked` = current_age - age_started - time_quit (if applicable)
+
+## Input variables
+
+| Component | Unified variable | Notes |
+|-----------|------------------|-------|
+| Smoking status | SMKDSTY_A | 6-category status determines routing |
+| Age started | age_start_smoking | Routes SMK_040/SMKG040_cont by file type |
+| CPD (daily) | cigs_per_day | Routes SMK_204/SMK_208 by status |
+| Time since quit | **time_quit_complete** | All former smokers (correctly handles SMK_10_gate) |
+| Current age | DHHGAGE_cont | PUMF grouped → continuous via midpoint |
+
+::: {.callout-tip}
+## Unified input variables
+
+The unified variables (`age_start_smoking`, `cigs_per_day`, `time_quit_complete`) automatically route to the correct source variable based on SMKDSTY_A smoking status and file type. This simplifies the pack-years calculation interface.
+:::
+
+::: {.callout-warning}
+## Use `time_quit_complete`, not `time_quit_smoking`
+
+**`time_quit_complete`** correctly handles the SMK_10_gate for "reducers" (former daily smokers who continued occasional before quitting completely). The older `time_quit_smoking` variable gives incorrect values for reducers - it uses SMK_09A (when stopped daily) instead of SMK_10A (when quit completely).
+
+**Availability:** `time_quit_complete` requires SMK_10_gate, which was not collected in 2001. For 2001-only analyses, use `time_quit_smoking` with documented limitation.
+:::
+
+## PUMF vs Master precision
+
+::: {.callout-warning}
+## Precision difference
+
+PUMF pack-years estimates have ~15-20% relative error compared to Master due to:
+
+| Input | PUMF error | Master error |
+|-------|------------|--------------|
+| Age | ~±2.5 years (grouped) | None |
+| Age started | ~±3 years (midpoint) | None |
+| CPD | Capped at 50 | None |
+| Time quit | ~±1.5 years (midpoint) | ~±0.5 years |
+:::
+
+### Error propagation example
+
+For a 50-year-old who started at 18, smokes 25 CPD, and quit at 45:
+
+| Source | Years smoked | Pack-years |
+|--------|--------------|------------|
+| Master (true) | 27 years | 33.75 |
+| PUMF (estimate) | 24-30 years | 30-38 |
+| Relative error | ~±11% | ~±12% |
+
+## Derivation logic
+
+```r
+pack_years_der <- function(data, ...) {
+
+ # Step 1: Determine smoking status
+ # - Current daily: calculate ongoing exposure
+ # - Current occasional: calculate with adjusted CPD
+ # - Former daily: calculate past exposure
+ # - Former occasional: calculate past exposure
+ # - Never: return 0
+
+ # Step 2: Calculate years smoked
+ # - Current: age - age_started
+ # - Former: age - age_started - time_quit
+
+ # Step 3: Calculate pack-years
+ # - (cpd / 20) × years_smoked
+
+ # Step 4: Validate output
+ # - Must be >= 0
+ # - Flag if > 165 (theoretical max: 3 packs/day × 55 years)
+}
+```
+
+## Special cases
+
+### Never smokers
+
+| Output | Value |
+|--------|-------|
+| pack_years_der | 0 |
+| smoking_years_der | 0 |
+
+### Occasional smokers
+
+```
+CPD_equivalent = (SMK_05B × SMK_05C) / 30
+pack_years = (CPD_equivalent / 20) × years_smoked
+```
+
+### Former occasional (never daily)
+
+Limited data available. Uses:
+- SMKG06C for quit year (when available)
+- Conservative estimates for duration
+
+### Missing inputs
+
+If any required input is missing:
+- Return NA with provenance tag indicating which input was missing
+- Do not impute missing values
+
+## Valid ranges and validation
+
+### Output ranges
+
+| Variable | Min | Max | Typical | Derivation of max |
+|----------|:---:|:---:|:-------:|-------------------|
+| pack_years_der | 0 | 165 | 0-60 | 3 packs/day × 55 years |
+| smoking_years_der | 0 | 80 | 0-50 | Age minus minimum start age |
+
+### Input ranges (enforced)
+
+| Input | Valid range | Source |
+|-------|-------------|--------|
+| age_started | 5-80 | 02-initiation |
+| cpd | 1-150 | 04-intensity |
+| time_quit | 0-80 | 03-cessation |
+| current_age | 12-100 | CCHS respondent age |
+
+### Cross-field constraints
+
+| Constraint | Formula | Violation action |
+|------------|---------|------------------|
+| Years smoked ≥ 0 | age - age_started - time_quit ≥ 0 | Set to NA(b) |
+| Years smoked ≤ age - 5 | years_smoked ≤ age - 5 | Cap at maximum |
+| Pack-years plausible | pack_years ≤ years_smoked × 7.5 | Flag for review |
+| CPD consistent | CPD > 0 for ever-smokers | Set to NA(b) |
+
+The pack-years plausibility check assumes maximum 3 packs/day (150 CPD ÷ 20 = 7.5 packs).
+
+### Quality flags
+
+Pack-years calculation sets quality flags for:
+
+| Condition | Severity | Action |
+|-----------|----------|--------|
+| Age started > current age | Error | Set to NA(b) |
+| Time quit > years smoked | Error | Set to NA(b) |
+| CPD > 60 | Warning | Keep value, flag |
+| Pack-years > 100 | Warning | Keep value, flag |
+| Missing required input | Error | Set to NA with provenance |
+
+### Distribution expectations
+
+Based on CCHS data, expected pack-years distribution:
+
+| Pack-years range | Expected % | Notes |
+|------------------|:----------:|-------|
+| 0 | ~50-60% | Never smokers |
+| 0.1-10 | ~15-20% | Light/short-term |
+| 10-30 | ~10-15% | Moderate |
+| 30-60 | ~5-10% | Heavy |
+| 60+ | ~1-3% | Very heavy |
+
+Values significantly outside this distribution may indicate data quality issues.
+
+## Era-specific considerations
+
+### 2001-2014 (Era 1)
+
+Full PUMF support using SMKG203_cont/SMKG207_cont for age started.
+
+### 2015-2021 (Era 2)
+
+Age started variables dropped from PUMF. Options:
+1. Use Master files (SMK_040)
+2. Use SMKG01C_cont (age first cigarette) as proxy
+3. Accept reduced precision
+
+### 2022+ (Era 3)
+
+Module split. Master files have CSS_*/SPU_* equivalents.
+
+## Validation status
+
+| Level | Status | Notes |
+|-------|--------|-------|
+| L0 | ✓ | Schema compliant |
+| L1 | ✓ | Database names validated |
+| L2 | ✓ | Source references verified |
+| L3 | ✓ | Formula verified |
+| L4 | ✓ | Edge cases documented |
+| L5 | ✓ | Integration tests (below) |
+
+## Integration testing
+
+::: {.callout-note}
+## Integration testing requires full cchsflow package
+
+The `pack_years_der` variable is a complex derived variable that requires the full cchsflow package infrastructure. Integration tests for this variable are available in the [appendix-integration-test.qmd](appendix-integration-test.qmd) which uses the complete package setup.
+
+**Expected validation criteria:**
+
+| Check | Expected result |
+|-------|-----------------|
+| Mean pack-years | 3-20 (population-wide, includes never smokers) |
+| Median pack-years | 0 (majority are never smokers) |
+| Max pack-years | ≤165 (theoretical bound) |
+| % with zero | 40-70% (never smokers) |
+| % with >60 PY | ≤5% (very heavy smokers) |
+
+**By smoking status expectations:**
+
+- Never smokers (SMKDSTY 6): pack_years = 0
+- Former smokers (SMKDSTY 4, 5): pack_years > 0
+- Current smokers (SMKDSTY 1, 2, 3): pack_years > 0 (ongoing exposure)
+:::
+
+## Appendix
+
+- [L0: Documentation assessment](05-pack-years/L0_documentation_assessment.md)
+- [L1: Variable concordance](05-pack-years/L1_variable_concordance.md)
+- [L2: Semantic mapping](05-pack-years/L2_semantic_mapping.md)
+- [L3: Worksheet authoring](05-pack-years/L3_worksheet_authoring.md)
+- [L4: DV specifications](05-pack-years/L4_dv_specifications.md)
+- [variables_smk_packyears.csv](05-pack-years/variables_smk_packyears.csv)
+- [variable_details_smk_packyears.csv](05-pack-years/variable_details_smk_packyears.csv)

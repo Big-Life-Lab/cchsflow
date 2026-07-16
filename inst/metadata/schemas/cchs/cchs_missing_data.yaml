@@ -1,0 +1,127 @@
+schema_version: "1.1.0"
+schema_date: "2026-07-15"
+description: "CCHS missing data patterns and priority rules - machine-actionable metadata"
+
+# All codes and ranges in this schema are in the SOURCE coding domain (raw
+# StatCan codes), not the harmonized/derived domain.
+applies_to: "source_codes"
+
+# Consumers (code that reads this file). The per-variable source of truth is
+# variable_details.csv; this schema supplies the pattern families, the
+# priority hierarchy, and the fallback pattern.
+consumers:
+  - "load_cchs_missing_data() in R/load-schema.R"
+  - ".default_cchs_pattern() in R/clean-variables.R"
+  - "load_priority_rules() in R/missing-data-functions.R"
+
+related_documentation:
+  user_guide: "vignettes/missing_value_conventions.qmd"
+
+# ============================================================================
+# MISSING DATA PATTERN DEFINITIONS (normative)
+# ============================================================================
+# Each family's priority_hierarchy is the single normative encoding of which
+# source codes map to which tagged-NA category. Tag values are symbolic
+# ("a", "b"); consumers construct haven::tagged_na() from them - this file
+# contains data, never executable code.
+pattern_definitions:
+  title: "CCHS Missing Data Code Patterns"
+  description: "Missing-code families follow StatCan field width: single digit (valid 1-5), double digit (valid 1-95), triple digit (continuous)."
+
+  patterns:
+    single_digit_missing:
+      description: "Binary/ternary variables with valid responses 1-5"
+      valid_response_range: [1, 5]
+      priority_hierarchy:
+        description: "Two-tier priority: not_applicable wins over missing_data"
+        not_applicable:
+          label: "Not applicable"
+          description: "Participant doesn't qualify for this question"
+          original_codes: [6]
+          tagged_na: ["a"]
+        missing_data:
+          label: "Missing data"
+          description: "Don't know (7), refusal (8), not stated (9)"
+          original_codes: [7, 8, 9]
+          tagged_na: ["b"]
+
+    double_digit_missing:
+      description: "Multi-category scales with valid responses 1-95"
+      valid_response_range: [1, 95]
+      critical_usage_note: "Required when max valid response > 5 (e.g., 6-category smoking status where 6 = never smoked is VALID)"
+      priority_hierarchy:
+        description: "Two-tier priority: not_applicable wins over missing_data"
+        not_applicable:
+          label: "Not applicable"
+          description: "Participant doesn't qualify for this question"
+          original_codes: [96]
+          tagged_na: ["a"]
+        missing_data:
+          label: "Missing data"
+          description: "Don't know (97), refusal (98), not stated (99)"
+          original_codes: [97, 98, 99]
+          tagged_na: ["b"]
+
+    triple_digit_missing:
+      description: "Continuous measurements with variable-specific valid ranges"
+      valid_response_range: "variable_specific"
+      priority_hierarchy:
+        description: "Two-tier priority: not_applicable wins over missing_data"
+        not_applicable:
+          label: "Not applicable"
+          description: "Participant doesn't qualify for this question"
+          original_codes: [996]
+          tagged_na: ["a"]
+          decimal_codes: [999.6]   # early-cycle variant
+        missing_data:
+          label: "Missing data"
+          description: "Don't know (997), refusal (998), not stated (999)"
+          original_codes: [997, 998, 999]
+          tagged_na: ["b"]
+          decimal_codes: [999.7, 999.8, 999.9]   # early-cycle variants
+
+# ============================================================================
+# NA CATEGORY SEMANTICS
+# ============================================================================
+# Epidemiological meaning and analysis guidance per tagged-NA category.
+# Codes are NOT repeated here - they live in the family definitions above.
+na_category_semantics:
+  "NA::a":
+    semantic_meaning: "Not applicable"
+    statistical_treatment: "Exclude from denominators and percentage calculations"
+  "NA::b":
+    semantic_meaning: "Missing data"
+    statistical_treatment: "Include in denominators, exclude from numerators"
+
+# ============================================================================
+# AUTHORING GUIDANCE (non-normative)
+# ============================================================================
+# How to choose a family when adding a variable to the worksheets. Judgment
+# guidance for authors, not machine-executed logic.
+authoring_guidance:
+  family_selection:
+    continuous_variables: "triple_digit_missing"
+    max_valid_over_5: "double_digit_missing (single-digit codes would collide with valid categories)"
+    max_valid_under_6: "single_digit_missing"
+  canonical_examples:
+    single_digit_missing: "SMK_005 (type of smoker, valid 1-3), ADL_01 (needs help, valid 1-2)"
+    double_digit_missing: "SMKDSTY 6-category smoking status - category 6 (never smoked) is VALID, not missing; SMKG203 (age started, valid 1-11)"
+    triple_digit_missing: "SMK_204 (cigarettes per day), HWTGHTM (height in metres)"
+  cycle_considerations:
+    stable_patterns: "Core missing codes (6,7,8,9 families) consistent since CCHS 2001"
+    decimal_variations: "Early cycles use 999.6-999.9 for some continuous variables; declared in triple_digit_missing and handled by the fallback pattern"
+
+# ============================================================================
+# METADATA AND VERSIONING
+# ============================================================================
+metadata:
+  schema_authority: "cchsflow development team"
+  last_reviewed: "2026-07-15"
+  next_review_due: "2027-01-15"
+  version_history:
+    "1.1.0": "Slimmed to one normative encoding per fact: removed transformation_map (R-code strings; redundant with priority_hierarchy), removed per-variable assignments (variable_details.csv is the per-variable source of truth; judgment preserved in authoring_guidance), removed stale implementation pointers (referenced never-merged functions), replaced with an accurate consumers list. Added applies_to: source_codes."
+    "1.0.0": "Initial comprehensive specification with standardized pattern names (single/double/triple_digit_missing)"
+  contact_information:
+    maintainer: "cchsflow development team"
+    issues: "https://github.com/Big-Life-Lab/cchsflow/issues"
+    documentation: "https://big-life-lab.github.io/cchsflow/"

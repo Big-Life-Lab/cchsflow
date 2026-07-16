@@ -40,19 +40,26 @@ fix_worksheet <- function(
     return(purrr::map(errors, ~ c(.x, fixed = FALSE)))
   }
 
-  initial_csv_data <- read.csv(
-    file_path,
-    stringsAsFactors = FALSE,
-    check.names = FALSE
+  initial_csv_data <- tryCatch(
+    read.csv(file_path, stringsAsFactors = FALSE, check.names = FALSE),
+    error = function(e) NULL
   )
+  if (is.null(initial_csv_data)) {
+    return(purrr::map(errors, ~ c(.x, fixed = FALSE)))
+  }
 
   empty_columns_fixed_data <- .fix_empty_column_errors(
     initial_csv_data,
     purrr::keep(errors, ~ .x$error_type == "empty_columns")
   )
 
-  column_order_fixed_data <- .fix_column_order_errors(
+  extra_columns_fixed_data <- .fix_extra_column_errors(
     empty_columns_fixed_data,
+    purrr::keep(errors, ~ .x$error_type == "extra_column")
+  )
+
+  column_order_fixed_data <- .fix_column_order_errors(
+    extra_columns_fixed_data,
     purrr::keep(errors, ~ .x$error_type == "column_order")
   )
 
@@ -61,18 +68,26 @@ fix_worksheet <- function(
     purrr::keep(errors, ~ .x$error_type == "unsorted_rows")
   )
 
-  # Write CSV content and also fix excessive quotting and line ending errors
-  readr::write_csv(
-    row_order_fixed_data, ,
-    file = file_path,
-    na = "",
-    quote = "needed",
-    escape = "double",
-    eol = "\n"
-  )
+  # Write CSV content and also fix excessive quoting and line ending errors
+  write_result <- tryCatch({
+    readr::write_csv(
+      row_order_fixed_data,
+      file = file_path,
+      na = "",
+      quote = "needed",
+      escape = "double",
+      eol = "\n"
+    )
+    TRUE
+  }, error = function(e) FALSE)
+
+  if (!write_result) {
+    return(purrr::map(errors, ~ c(.x, fixed = FALSE)))
+  }
 
   fixed_types <- c(
     if ("empty_columns" %in% error_types) "empty_columns",
+    if ("extra_column" %in% error_types) "extra_column",
     if ("column_order" %in% error_types) "column_order",
     if ("unsorted_rows" %in% error_types) "unsorted_rows",
     if ("line_ending_crlf" %in% error_types) "line_ending_crlf",
@@ -98,6 +113,23 @@ fix_worksheet <- function(
   empty_col_positions <- purrr::map_int(empty_column_errors, ~ .x$col_num)
   cols_to_keep <- colnames(csv_data)[-empty_col_positions]
   return(csv_data[, cols_to_keep])
+}
+
+#' Remove extra columns not defined in the schema
+#'
+#' @param csv_data A data frame containing the CSV data.
+#' @param extra_column_errors A list of extra column error objects from
+#'   \code{check_worksheet}.
+#'
+#' @return The data frame with extra columns removed.
+#'
+#' @keywords internal
+.fix_extra_column_errors <- function(csv_data, extra_column_errors) {
+  if (length(extra_column_errors) == 0) {
+    return(csv_data)
+  }
+  extra_col_names <- purrr::map_chr(extra_column_errors, ~ .x$column_name)
+  return(csv_data[, !colnames(csv_data) %in% extra_col_names, drop = FALSE])
 }
 
 #' Reorder columns to match expected order in a CSV worksheet
@@ -129,6 +161,8 @@ fix_worksheet <- function(
     .init = csv_data
   )
 
+  # Build corrected order: place expected columns at their positions, then
+  # deduplicate to avoid subsetting with repeated column names.
   corrected_column_order <- purrr::reduce2(
     expected_positions,
     expected_names,
@@ -138,6 +172,9 @@ fix_worksheet <- function(
     },
     .init = colnames(csv_data_with_missing_columns)
   )
+  corrected_column_order <- corrected_column_order[
+    !duplicated(corrected_column_order)
+  ]
 
   return(csv_data_with_missing_columns[, corrected_column_order])
 }

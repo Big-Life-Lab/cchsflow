@@ -133,7 +133,7 @@ bmi2011_2012 <- rec_with_table(
 
 tail(bmi2011_2012)
 
-combined_bmi <- bind_rows(bmi2001, bmi2011_2012)
+combined_bmi <- dplyr::bind_rows(bmi2001, bmi2011_2012)
 head(combined_bmi)
 tail(combined_bmi)
 }

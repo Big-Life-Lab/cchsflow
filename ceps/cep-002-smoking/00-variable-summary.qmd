@@ -1,0 +1,257 @@
+---
+title: "CEP-002: Smoking Variables"
+author: "Caitlin Kral, Maikol Diasparra, and Doug Manuel for the cchsflow development team"
+date: "2026-01-08"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    toc-title: "Contents"
+---
+
+::: {.callout-note collapse="true"}
+## CEP metadata
+
+| Field | Value |
+|-------|-------|
+| CEP | 2 |
+| Title | Smoking variable harmonisation |
+| Authors | Caitlin Kral, Maikol Diasparra, Doug Manuel |
+| Created | 2026-01-08 |
+| Status | Draft |
+| Requires | CEP-001 (CSV standardization tool) |
+:::
+
+## Background
+
+This CEP updates smoking variables in cchsflow from 35 (v2.1) to 56 variables. Updates include:
+
+1. Extending coverage from 2015 to 2023, spanning three eras of CCHS revisions
+2. Organising smoking variables into 5 subgroups: status, initiation, cessation, intensity, and pack-years
+3. Adding Master file support (2001-2023)
+4. Adding unified derived variables that route to the best available source across PUMF and Master
+
+See [Harmonisation decisions](cep-002-smoking.qmd) for details on three CCHS eras, era-specific variable mappings, and PUMF vs Master differences.
+
+## Variable count by subgroup
+
+```{r}
+#| label: tbl-variable-counts
+#| echo: false
+#| message: false
+#| warning: false
+
+source("../../R/table-generators.R")
+
+generate_subgroup_summary_table(".") |>
+  knitr::kable(
+    col.names = c("Subgroup", "Total", "PUMF+Master", "Master-only", "Description"),
+    align = c("l", "c", "c", "c", "l")
+  )
+```
+
+## Recommended variables
+
+### Primary recommendations by smoking subject
+
+```{r}
+#| label: tbl-primary-recommendations
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_smoking_summary_table(".") |>
+  knitr::kable(
+    col.names = c("Subject", "Variable", "Description", "PUMF", "Master"),
+    align = c("l", "l", "l", "c", "c")
+  )
+```
+
+**Note**: Coverage dates are extracted from worksheet `databaseStart` fields. Variables tagged with `{recommended:primary}` are included.
+
+::: callout-note
+## PUMF 2022-2023 status variables
+
+For 2022-2023 PUMF, use `SMKDSTY` (raw pass-through) instead of `SMKDSTY_A`. The 6-category derivation requires component variables not available in 2022+ PUMF.
+:::
+
+## All smoking variables
+
+### 01-status (10 variables)
+
+```{r}
+#| label: tbl-status-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_variable_list_table("01-status/variables_smk_status.csv") |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+### 02-initiation (16 variables)
+
+```{r}
+#| label: tbl-initiation-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+# Combine main initiation worksheet with unified derived variable
+main_vars <- generate_variable_list_table("02-initiation/variables_smk_initiation.csv")
+unified_vars <- generate_variable_list_table("02-initiation/age_start_smoking_variables.csv")
+rbind(unified_vars, main_vars) |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+### 03-cessation (21 variables)
+
+```{r}
+#| label: tbl-cessation-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_variable_list_table("03-cessation/variables_smk_cessation.csv") |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+### 04-intensity (5 variables)
+
+```{r}
+#| label: tbl-intensity-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_variable_list_table("04-intensity/variables_smk_intensity.csv") |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+### 05-pack-years (2 variables)
+
+```{r}
+#| label: tbl-packyears-variables
+#| echo: false
+#| message: false
+#| warning: false
+
+generate_variable_list_table("05-pack-years/variables_smk_packyears.csv") |>
+  knitr::kable(align = c("l", "l", "l", "c", "c", "l"))
+```
+
+## Variables by use case
+
+### Cross-cycle analysis (full 2001-2023 coverage)
+
+For analyses requiring all CCHS cycles:
+
+| Variable       | Description               | Notes                         |
+|----------------|---------------------------|-------------------------------|
+| SMKDSTY_cat3   | Current/former/never      | Recommended for most analyses |
+| SMKDSTY_cat5   | 5-category status         | More detail, still comparable |
+| SMK_202        | Current smoking frequency | Daily/occasional/not at all   |
+| cigs_per_day   | CPD - ever-daily (unified)| Routes SMK_204/SMK_208 by status |
+| pack_years_der | Pack-years                | PUMF \~15-20% error           |
+
+### Pack-years calculation inputs
+
+Pack-years requires these inputs:
+
+| Component      | PUMF variable              | Master variable           |
+|----------------|----------------------------|---------------------------|
+| Smoking status | SMKDSTY_cat3 or SMKDSTY_A  | Same                      |
+| Age started    | age_start_smoking          | Same (more precise)       |
+| CPD            | cigs_per_day               | Same (but not capped)     |
+| Time quit      | time_quit_smoking          | Same (but more precise)   |
+| Current age    | DHHGAGE (grouped)          | DHH_AGE (continuous)      |
+
+**Note**: The unified variables (`age_start_smoking`, `cigs_per_day`, `time_quit_smoking`) automatically route to the appropriate source variable based on smoking status.
+
+::: callout-warning
+## PUMF pack-years precision
+
+PUMF pack-years estimates have \~15-20% relative error due to:
+
+-   Grouped age (DHHGAGE)
+-   Midpoint estimation for age started (\~±3 years)
+-   CPD capped at 50
+-   Midpoint estimation for time quit (\~±1.5 years)
+
+This is acceptable for most epidemiological analyses but should be documented.
+:::
+
+### Simple smoking status
+
+For basic current/former/never classification:
+
+``` r
+# Recommended
+rec_with_table(data, "SMKDSTY_cat3")
+
+# Returns:
+# 1 = Current smoker (daily or occasional)
+# 2 = Former smoker (daily or occasional)
+# 3 = Never smoker
+```
+
+### Detailed smoking status
+
+For daily/occasional distinction:
+
+``` r
+# 5-category - recommended for cross-cycle
+rec_with_table(data, "SMKDSTY_cat5")
+
+# Returns:
+# 1 = Daily smoker
+# 2 = Occasional smoker
+# 3 = Former daily smoker
+# 4 = Former occasional smoker
+# 5 = Never smoker
+```
+
+## Master-only variables
+
+These variables require RDC or ICES Master file access:
+
+| Variable | Why Master-only       | PUMF alternative        |
+|----------|-----------------------|-------------------------|
+| SMK_203  | True continuous age   | SMKG203_cont (midpoint) |
+| SMK_207  | True continuous age   | SMKG207_cont (midpoint) |
+| SMK_040  | True continuous age   | SMKG040_cont (midpoint) |
+| SMK_01C  | True continuous age   | SMKG01C_cont (midpoint) |
+| SMK_01B  | True continuous count | No equivalent           |
+| SMK_06C  | True quit year        | SMKG06C (categorical)   |
+| SMK_09A  | True quit month       | SMK_09A_cont (midpoint) |
+| SMK_09C  | True quit year        | SMKG09C_cont (midpoint) |
+
+## Variable naming conventions
+
+### Database suffixes
+
+| Suffix | Meaning | Example         |
+|--------|---------|-----------------|
+| `_p`   | PUMF    | cchs2017_2018_p |
+| `_m`   | Master  | cchs2017_2018_m |
+
+### Variable suffixes
+
+| Suffix | Meaning | Example |
+|----------------------|-------------------------|-------------------------|
+| (none) | Original CCHS | SMK_204 |
+| `_cont` | Pseudo-continuous from PUMF | SMKG203_cont |
+| `_cat{n}` | Re-derived categorical (n categories) | SMKDSTY_cat3, SMKDSTY_cat5 |
+| `_A`, `_B` | Era-specific category sets | SMKG01C_A, SMKG01C_B |
+| `_der` | Derived variable | pack_years_der |
+
+**Note**: Do not use vanilla `_cat` without a number. Original CCHS categorical variables keep their names; `_cat{n}` is only for re-derived variables with collapsed/combined categories.
+
+## Related documentation
+
+-   [Harmonisation decisions](cep-002-smoking.qmd) - three CCHS eras, naming conventions, PUMF vs Master
+-   [01-status](01-status.qmd) - Smoking status classification
+-   [02-initiation](02-initiation.qmd) - Age started smoking
+-   [03-cessation](03-cessation.qmd) - Quit timing and duration
+-   [04-intensity](04-intensity.qmd) - Cigarettes per day
+-   [05-pack-years](05-pack-years.qmd) - Pack-years derivation

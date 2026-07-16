@@ -1,0 +1,6 @@
+- source: project
+  quarto-pub:
+    - id: ''
+      url: https://dmanuel.quarto.pub/cep-004-hearing-vision
+    - id: 7db42efb-bb85-4256-aae7-41a93d19207c
+      url: https://dmanuel.quarto.pub/cep-004-hearing-and-vision-variables

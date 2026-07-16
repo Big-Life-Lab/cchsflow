@@ -2,20 +2,22 @@ expected_column_order:
   - "variable"
   - "label"
   - "labelLong"
+  - "section"
+  - "subject"
   - "variableType"
+  - "units"
   - "databaseStart"
   - "variableStart"
-  - "subject"
-  - "section"
-  - "units"
-  - "notes"
   - "description"
-  - "version"
-  - "lastUpdated"
-  - "reviewNotes"
-  - "ICES.confirmation"
-  - "Observation..MD."
-  - "status"
-  - "versionNotes"
 
 id_column_name: "variable"
+
+# Controlled vocabularies - check_worksheet() flags any value outside these
+# lists. Extend deliberately; keep in sync with worksheet conventions.
+column_enums:
+  variableType:
+    - "Categorical"
+    - "Continuous"
+
+# Registry of valid databaseStart tokens (shared with variable_details)
+database_registry_file: "database_registry.yaml"

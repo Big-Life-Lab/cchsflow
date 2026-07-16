@@ -1,0 +1,101 @@
+---
+title: "Derived variable functions"
+author: "Caitlin Kral, Maikol Diasparra, and Doug Manuel for the cchsflow development team"
+date: "2026-01-09"
+date-modified: "2026-04-22"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    toc-title: "Contents"
+---
+
+## Overview
+
+This page is a map to the R functions that implement smoking derived variables. Function-level documentation (inputs, return values, examples) lives in the roxygen headers; see `?calculate_pack_years` etc. after loading the package.
+
+All smoking DVs follow a **unified, source-agnostic** pattern. A single function accepts semantic parameter names (`age`, `age_start_smoking`, `cigs_per_day`) and the worksheet routes PUMF or Master source variables to those parameters via `variable_details.csv`. There are no separate `_pumf` / `_master` function variants.
+
+### Output format
+
+All functions accept an `output_format` parameter:
+
+- `"tagged_na"` (default) — returns `haven::tagged_na()` values preserving missing-data provenance (e.g. `NA::a` for "valid skip", `NA::b` for "don't know").
+- `"numeric"` — returns standard R `NA`.
+
+`rec_with_table()` calls the DV functions with their defaults, so tagged-NA propagation is automatic through the harmonisation pipeline.
+
+## Unified derived variables
+
+The four unified feeders and one cumulative-exposure calculation that this PR introduces or rewrites:
+
+| Function | Output variable | Subgroup | Routing |
+|----------|-----------------|----------|---------|
+| `calculate_age_start_smoking()` | `age_start_smoking` | 02-initiation | Master `SMK_040` preferred; PUMF `SMKG040_cont` fallback |
+| `calculate_age_first_cigarette()` | `age_first_cigarette` | 02-initiation | Master `SMK_01C` preferred; PUMF `SMKG01C_cont` fallback |
+| `calculate_cigs_per_day()` | `cigs_per_day` | 04-intensity | Routes `SMK_204`/`SMK_208`/`SMK_05B` by `SMKDSTY_original` |
+| `calculate_time_quit_smoking()` | `time_quit_smoking` | 03-cessation | `SMK_09A_cont` (former daily), `SMK_06A_cont` (former occasional), `SMKDVSTP` (Master) |
+| `calculate_pack_years()` | `pack_years_der` | 05-pack-years | Consumes all four feeders + age |
+
+See the per-subgroup CEP pages ([status](01-status.qmd), [initiation](02-initiation.qmd), [cessation](03-cessation.qmd), [intensity](04-intensity.qmd), [pack-years](05-pack-years.qmd)) for how each variable is harmonised across cycles and the source-level justifications.
+
+### Full function inventory
+
+The smoking domain has **38 `calculate_*` functions** on this branch, including status categorisations (`calculate_SMKDSTY_cat3`, `_cat5`, `_cat6`), midpoint-continuous derivations (`calculate_SMKG040_cont`, `calculate_SMKG203_cont`, etc.), and era-specific calculations (`calculate_SMK_09A_2003plus`). The complete inventory is visible via:
+
+```r
+ls("package:cchsflow", pattern = "^calculate_")
+```
+
+Per-function specifications — parameters, return types, examples — are in each function's roxygen documentation. This file does not duplicate them.
+
+## 3-step architecture
+
+Every unified DV function follows the same three-step contract:
+
+**Step 1 — Clean inputs.** `clean_variables()` is called with `output_format = "tagged_na"` regardless of the caller's requested output format. This converts numeric missing codes (e.g. `96`, `99`) into `tagged_na()` values so that Step 2's `any_missing()` detection works uniformly.
+
+**Step 2 — Domain logic.** A `dplyr::case_when()` block routes by smoking status (or equivalent gate variable), with an `any_missing(...)` branch at the top that delegates to `get_priority_missing()` so the most informative missing code survives.
+
+**Step 3 — Clean output.** `clean_variables()` runs again with the caller's requested `output_format`, applying the variable's `recEnd` bounds from `variable_details.csv` and converting tagged NAs to numeric codes if requested.
+
+Reference implementation: [calculate_pack_years()](../../R/smoke-pack-years.R) — Steps 1/2/3 are each clearly labelled in comments.
+
+### Supporting functions
+
+Shared infrastructure used by the 3-step architecture:
+
+| Function | Step | Purpose |
+|----------|------|---------|
+| `clean_variables()` | 1, 3 | Standardises inputs, validates bounds, converts between missing-code formats |
+| `any_missing()` | 2 | Detects missing values across multiple inputs |
+| `get_priority_missing()` | 2 | Returns highest-priority missing code from inputs |
+| `assign_missing()` | 2 | Creates appropriate NA for the output format |
+| `get_missing_pattern()` | 1, 3 | Retrieves cached missing-code patterns for a variable |
+
+Worksheet-metadata helpers used indirectly:
+
+| Function | Purpose |
+|----------|---------|
+| `load_worksheet_metadata()` | Loads `variables.csv` or `variable_details.csv` |
+| `get_variable_bounds()` | Valid range for a variable |
+| `get_variable_type()` | Continuous vs Categorical |
+| `get_harmonized_variables()` | Filters worksheet by subject, type, or database |
+
+## Testing
+
+Each unified function has a dedicated test file under `tests/testthat/`:
+
+- `test-age_start_smoking.R`
+- `test-cigs_per_day.R`
+- `test-time_quit_smoking.R`
+- `test-pack_years.R`
+- `test-smoking-status.R`
+
+Tests cover every `case_when()` branch, scalar/vector/dataframe inputs, and tagged-NA propagation. See `.claude/skills/cchsflow-derive/SKILL.md` § "Done criteria" for the full checklist.
+
+## References
+
+- [CEP-002: Smoking variable harmonisation](cep-002-smoking.qmd) — design rationale
+- [Variable summary](00-variable-summary.qmd) — variable lists and cycle coverage
+- `.claude/skills/cchsflow-derive/SKILL.md` — authoring and review guidance for DV functions

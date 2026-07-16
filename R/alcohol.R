@@ -1,959 +1,363 @@
-#' @title Number of drinks consumed in the past week
-#'
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies
-#'  the amount of alcohol that is consumed in a week. This is calculated by
-#'  adding the number of drinks consumed each day in the past week.
-#'  Respondents of each CCHS cycle are asked how much alcohol they have
-#'  consumed each day in the past week (ie. how much alcohol did you consume on
-#'  Sunday, how much did you consume on Monday etc.). Each day is considered an
-#'  individual variable and ALWDWKY takes the sum of all daily variables.
-#'
-#' @details This variable is present in every CCHS cycle used in cchsflow, and
-#'  how it was derived remains consistent.
-#'
-#' @param ALWDWKY cchsflow variable name for number of drinks consumed in the
-#'  past week
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALWDWKY
-#'
-#' @export
-ALWDWKY <- function(ALWDWKY) {
-  # this is for documentation purposes only
-}
+# ==============================================================================
+# Alcohol consumption derived variables
+# ==============================================================================
+#
+# Canonical v3 3-step architecture:
+#   Step 1 - clean_variables() with output_format = "tagged_na" (metadata-driven
+#            missing-code conversion and out-of-range validation)
+#   Step 2 - dplyr::case_when() with any_missing() as the first arm
+#   Step 3 - clean_variables() on the derived variable with the user's format
+#
+# Worksheet derived variables: binge_drinker, ALWDVSTR_der, ALWDVLTR_der
+# Input validation bounds come from variable_details.csv via clean_variables().
+# The constants below are epidemiological thresholds (domain logic), not
+# data-cleaning bounds.
 
-#' @title Average daily alcohol consumption
-#'
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies
-#'  the mean daily consumption of alcohol. This takes the value of ALWDWKY and
-#'  divides it by 7.
-#'
-#' @details This variable is present in every CCHS cycle used in cchsflow, and
-#'  how it was derived remains consistent.
-#'
-#' @param ALWDDLY cchsflow variable name for average daily alcohol consumption
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALWDDLY
-#'
-#' @export
-ALWDDLY <- function(ALWDDLY) {
-  # this is for documentation purposes only
-}
+# Binge drinking thresholds by sex (drinks on a single day)
+BINGE_THRESHOLDS <- list(
+  male = 5,
+  female = 4
+)
 
-#' @title Type of drinker
-#'
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a categorical variable derived by Statistics Canada that uses
-#'  various intermediate alcohol variables to categorize individuals into 4
-#'  distinct groups:
-#'
-#'  \enumerate{
-#'   \item Regular Drinker
-#'   \item Occasional Drinker
-#'   \item Former Drinker
-#'   \item Never Drinker
-#'  }
-#'
-#' @details This variable is used in CCHS cycles from 2001 to 2007. How it was
-#'  derived remained consistent during these years.
-#'
-#'  Starting in 2007, Statistics Canada created a derived variable that looked
-#'  at drinking type in the last 12 months. This new derived variable did not
-#'  distinguish between former and never drinkers. If your research requires you
-#'  to differentiate between former and never drinkers, we recommend using
-#'  earlier cycles of the CCHS.
-#'
-#' @param ALCDTYP cchsflow variable name for type of drinker
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALCDTYP
-#'
-#' @export
-ALCDTYP <- function(ALCDTYP) {
-  # this is for documentation purposes only
-}
+# Canada's Low-Risk Alcohol Drinking Guidelines thresholds.
+# Short-term (acute) risk exceeds the low_risk values strictly (>);
+# long-term (chronic) risk reaches the high_risk values inclusively (>=).
+DRINKING_LIMITS <- list(
+  weekly = list(
+    male = list(low_risk = 15, high_risk = 20),
+    female = list(low_risk = 10, high_risk = 15)
+  ),
+  daily = list(
+    male = list(low_risk = 3, high_risk = 4),
+    female = list(low_risk = 2, high_risk = 3)
+  )
+)
 
-#' @title Type of drinker (12 months)
-#'
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a categorical variable derived by Statistics Canada that uses
-#'  various intermediate alcohol variables to categorize individuals into 3
-#'  distinct groups:
-#'
-#'  \enumerate{
-#'   \item Regular Drinker
-#'   \item Occasional Drinker
-#'   \item No drink in the last 12 months.
-#'   }
-#'
-#' @details This variable was introduced in the 2007-2008 cycle of the CCHS, and
-#'  became the sole derived variable that categorized people into various
-#'  drinker types from 2009 onwards. Unlike ALCDTYP, this variable does not
-#'  distinguish between former and never drinkers.
-#'
-#' @param ALCDTTM cchsflow variable name for type of drinker (12 months)
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALCDTTM
-#'
-#' @export
-ALCDTTM <- function(ALCDTTM) {
-  # this is for documentation purposes only
-}
+# ==============================================================================
+# Internal helpers
+# ==============================================================================
 
-#' @title Any alcohol past week
-#' 
-#' @description \strong{NOTE:} this is not a function.
+#' Drinking risk assessment shared by short- and long-term functions
 #'
-#'  This is a categorical variable derived by Statistics Canada that determines 
-#'  if alcohol was consumed in the past week. The variable is optional in 
-#'  selected provinces and territories.
-#' 
-#' @details This variable is present in every CCHS cycle used in cchsflow. In 
-#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
-#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
-#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
-#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
-#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
-#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
-#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
-#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
-#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
-#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
+#' Steps 2-3 of the 3-step pattern for the two risk functions, which differ
+#' only in thresholds (low_risk vs high_risk) and comparison strictness.
 #'
-#' @param ALW_1 cchsflow variable name for any alcohol past week
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALW_1
-#'
-#' @export
-ALW_1 <- function(ALW_1) {
-  # this is for documentation purposes only
-} 
+#' @param cleaned Named list of cleaned inputs from Step 1
+#' @param risk_type "short" (acute; strict > on low_risk thresholds) or
+#'   "long" (chronic; inclusive >= on high_risk thresholds)
+#' @param derived_var Worksheet name of the derived variable (Step 3 target)
+#' @param output_format Output missing data format
+#' @return Risk indicator vector in the requested format
+#' @noRd
+assess_drinking_risk <- function(cleaned, risk_type, derived_var,
+                                 output_format) {
+  max_daily <- pmax(
+    cleaned$ALW_2A1, cleaned$ALW_2A2, cleaned$ALW_2A3, cleaned$ALW_2A4,
+    cleaned$ALW_2A5, cleaned$ALW_2A6, cleaned$ALW_2A7
+  )
 
-#' @title Number of drinks - Sunday
-#' 
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies 
-#'  the number of alcoholic drinks consumed on Sunday. The variable is 
-#'  optional in selected provinces and territories.
-#' 
-#' @details This variable is present in every CCHS cycle used in cchsflow. In 
-#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
-#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
-#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
-#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
-#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
-#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
-#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
-#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
-#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
-#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
-#'
-#' @param ALW_2A1 cchsflow variable name for number of drinks on Sunday
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALW_2A1
-#'
-#' @export
-ALW_2A1 <- function(ALW_2A1) {
-  # this is for documentation purposes only
-}  
-
-#' @title Number of drinks - Monday
-#' 
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies 
-#'  the number of alcoholic drinks consumed on Monday. The variable is 
-#'  optional in selected provinces and territories.
-#' 
-#' @details This variable is present in every CCHS cycle used in cchsflow. In 
-#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
-#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
-#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
-#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
-#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
-#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
-#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
-#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
-#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
-#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
-#'
-#' @param ALW_2A2 cchsflow variable name for number of drinks on Monday
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALW_2A2
-#'
-#' @export
-ALW_2A2 <- function(ALW_2A2) {
-  # this is for documentation purposes only
-} 
-
-#' @title Number of drinks - Tuesday
-#' 
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies 
-#'  the number of alcoholic drinks consumed on Tuesday. The variable is 
-#'  optional in selected provinces and territories.
-#' 
-#' @details This variable is present in every CCHS cycle used in cchsflow. In 
-#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
-#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
-#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
-#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
-#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
-#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
-#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
-#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
-#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
-#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
-#'
-#' @param ALW_2A3 cchsflow variable name for number of drinks on Tuesday
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALW_2A3
-#'
-#' @export
-ALW_2A3 <- function(ALW_2A3) {
-  # this is for documentation purposes only
-} 
-
-#' @title Number of drinks - Wednesday
-#' 
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies 
-#'  the number of alcoholic drinks consumed on Wednesday. The variable is 
-#'  optional in selected provinces and territories.
-#' 
-#' @details This variable is present in every CCHS cycle used in cchsflow. In 
-#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
-#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
-#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
-#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
-#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
-#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
-#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
-#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
-#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
-#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
-#'
-#' @param ALW_2A4 cchsflow variable name for number of drinks on Wednesday
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALW_2A4
-#'
-#' @export
-ALW_2A4 <- function(ALW_2A4) {
-  # this is for documentation purposes only
-} 
-
-#' @title Number of drinks - Thursday
-#' 
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies 
-#'  the number of alcoholic drinks consumed on Thursday. The variable is 
-#'  optional in selected provinces and territories.
-#' 
-#' @details This variable is present in every CCHS cycle used in cchsflow. In 
-#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
-#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
-#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
-#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
-#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
-#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
-#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
-#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
-#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
-#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
-#'
-#' @param ALW_2A5 cchsflow variable name for number of drinks on Thursday
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALW_2A5
-#'
-#' @export
-ALW_2A5 <- function(ALW_2A5) {
-  # this is for documentation purposes only
-} 
-
-#' @title Number of drinks - Friday
-#' 
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies 
-#'  the number of alcoholic drinks consumed on Friday. The variable is 
-#'  optional in selected provinces and territories.
-#' 
-#' @details This variable is present in every CCHS cycle used in cchsflow. In 
-#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
-#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
-#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
-#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
-#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
-#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
-#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
-#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
-#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
-#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
-#'
-#' @param ALW_2A6 cchsflow variable name for number of drinks on Friday
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALW_2A6
-#'
-#' @export
-ALW_2A6 <- function(ALW_2A6) {
-  # this is for documentation purposes only
-}
-
-#' @title Number of drinks - Saturday
-#' 
-#' @description \strong{NOTE:} this is not a function.
-#'
-#'  This is a continuous variable derived by Statistics Canada that quantifies 
-#'  the number of alcoholic drinks consumed on Saturday. The variable is 
-#'  optional in selected provinces and territories.
-#' 
-#' @details This variable is present in every CCHS cycle used in cchsflow. In 
-#' 2007 and 2008, the variable is optional for Newfoundland and Labrador, Nova 
-#' Scotia, Ontario, British Columbia and Nunavut.In 2009 and 2010, the variable 
-#' is optional for Newfoundland and Labrador, Ontario, and Saskatchewan. In 
-#' 2011, the variable is optional for Newfoundland and Labrador, Quebec, 
-#' Ontario, Manitoba, and Saskatchewan. In 2012, the variable is optional for 
-#' Newfoundland and Labrador, Quebec, Ontario, Manitoba, Nunavut, and 
-#' Saskatchewan.In 2013, the variable is optional for Quebec, Ontario, Prince 
-#' Edward Island, Manitoba, Yukon, and Saskatchewan. In 2014, the variable is 
-#' optional for Nunavut, Quebec, Ontario, Prince Edward Island, Manitoba, 
-#' Newfoundland and Labrador, Saskatchewan, and British Columbia.
-#'
-#' @param ALW_2A7 cchsflow variable name for number of drinks on Saturday
-#'
-#' @examples
-#' library(cchsflow)
-#'  ?ALW_2A7
-#'
-#' @export
-ALW_2A7 <- function(ALW_2A7) {
-  # this is for documentation purposes only
-}
-
-#' @title Binge drinking
-#' 
-#' @description This function creates a derived categorical variable that
-#'  flags for binge drinking based on the number drinks consumed on a single
-#'  day.
-#'
-#' @details In health research, binge drinking is defined as having an excess
-#'  amount of alcohol in a single day. For males, this is defined as having five
-#'  or more drinks; and for females it is four or more drinks. In the CCHS,
-#'  respondents are asked to count the number of drinks they had during each
-#'  day of the last week.
-#' 
-#' @param DHH_SEX sex of respondent (1 - male, 2 - female)
-#' 
-#' @param ALW_1 Drinks in the last week (1 - yes, 2 - no)
-#' 
-#' @param ALW_2A1 Number of drinks on Sunday
-#' 
-#' @param ALW_2A2 Number of drinks on Monday
-#' 
-#' @param ALW_2A3 Number of drinks on Tuesday
-#' 
-#' @param ALW_2A4 Number of drinks on Wednesday
-#' 
-#' @param ALW_2A5 Number of drinks on Thursday
-#' 
-#' @param ALW_2A6 Number of drinks on Friday
-#' 
-#' @param ALW_2A7 Number of drinks on Saturday
-#' 
-#' @return Categorical variable (binge_drinker) with two categories:
-#' 
-#'  \enumerate{
-#'   \item 1 - binge drinker
-#'   \item 2 - non-binge drinker
-#'  }
-#' 
-#' @examples
-#'  
-#' # Using binge_drinker_fun() to create binge_drinker values across CCHS cycles
-#' # binge_drinker_fun() is specified in variable_details.csv along with the
-#' # CCHS variables and cycles included.
-#' 
-#' # To transform binge_drinker, use rec_with_table() for each CCHS cycle
-#' # and specify binge_drinker, along with the various alcohol and sex
-#' # variables. Then by using bind_rows() you can combine binge_drinker
-#' # across cycles.
-#' 
-#' library(cchsflow)
-#' binge2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
-#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "binge_drinker"
-#'   )
-#' )
-#' 
-#' head(binge2001)
-#' 
-#' binge2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
-#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "binge_drinker"
-#'   )
-#' )
-#' 
-#' tail(binge2009_2010)
-#' 
-#' combined_binge <- bind_rows(binge2001, binge2009_2010)
-#' 
-#' head(combined_binge)
-#' 
-#' tail(combined_binge)
-#' 
-#' # Using binge_drinker_fun() to generate binge_drinker with user-inputted
-#' # values.
-#' #
-#' # Let's say you are a male, and you had drinks in the last week. Let's say
-#' # you had 3 drinks on Sunday, 1 drink on
-#' # Monday, 6 drinks on Tuesday, 0 drinks on Wednesday, 3 drinks on Thurday,
-#' # 8 drinks on Friday, and 2 drinks on Saturday. Using binge_drinker_fun(),
-#' # we can check if you would be classified as a drinker.
-#' 
-#' binge <- binge_drinker_fun(DHH_SEX = 1, ALW_1 = 1, ALW_2A1 = 3, ALW_2A2 = 1,
-#'                           ALW_2A3 = 6, ALW_2A4 = 0, ALW_2A5 = 3,
-#'                           ALW_2A6 = 8, ALW_2A7 = 2)
-#' 
-#' print(binge)
-#' @export
-
-binge_drinker_fun <-
-  function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6,
-           ALW_2A7) {
-    # If respondents had alcohol in the last week
-    if_else2(ALW_1 == 1,
-      # Males with at least one day with 5 or more drinks
-      if_else2((DHH_SEX == 1 & (ALW_2A1 >= 5 | ALW_2A2 >= 5 | ALW_2A3 >=5 |
-                                ALW_2A4 >= 5 | ALW_2A5 >= 5 | ALW_2A6 >= 5 |
-                                ALW_2A7 >= 5)), 1,
-      # Males with no days with 5 or more drinks
-      if_else2((DHH_SEX == 1 & (ALW_2A1 %in% (0:4) & ALW_2A2 %in% (0:4) &
-                                ALW_2A3 %in% (0:4) & ALW_2A4 %in% (0:4) &
-                                ALW_2A5 %in% (0:4) & ALW_2A6 %in% (0:4) &
-                                ALW_2A7 %in% (0:4))), 2,
-      # Females with at least one day with 4 or more drinks
-      if_else2((DHH_SEX == 2 & (ALW_2A1 >= 4 | ALW_2A2 >= 4 | ALW_2A3 >= 4 |
-                                ALW_2A4 >= 4 | ALW_2A5 >= 4 | ALW_2A6 >= 4 |
-                                ALW_2A7 >= 4)), 1,
-      # Females with no days with 4 or more drinks
-      if_else2((DHH_SEX == 2 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
-                                ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
-                                ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
-                                ALW_2A7 %in% (0:3))), 2, "NA(b)")))),
-      # Respondents who didn't indicate they had alcohol in the last week
-      "NA(a)")
+  if (risk_type == "short") {
+    exceeds_male <- max_daily > DRINKING_LIMITS$daily$male$low_risk |
+      cleaned$ALWDWKY > DRINKING_LIMITS$weekly$male$low_risk
+    exceeds_female <- max_daily > DRINKING_LIMITS$daily$female$low_risk |
+      cleaned$ALWDWKY > DRINKING_LIMITS$weekly$female$low_risk
+  } else {
+    exceeds_male <- max_daily >= DRINKING_LIMITS$daily$male$high_risk |
+      cleaned$ALWDWKY >= DRINKING_LIMITS$weekly$male$high_risk
+    exceeds_female <- max_daily >= DRINKING_LIMITS$daily$female$high_risk |
+      cleaned$ALWDWKY >= DRINKING_LIMITS$weekly$female$high_risk
   }
 
-#' @title Short term risks due to drinking
-#' 
-#' @description This function creates a categorical variable that
-#'  flags for increased short term health risks due to their drinking habits,
-#'  according to Canada's Low-Risk Alcohol Drinking Guideline.
+  # Step 2: domain logic
+  result <- dplyr::case_when(
+    any_missing(
+      cleaned$DHH_SEX, cleaned$ALWDWKY, cleaned$ALC_1, cleaned$ALW_1,
+      cleaned$ALW_2A1, cleaned$ALW_2A2, cleaned$ALW_2A3, cleaned$ALW_2A4,
+      cleaned$ALW_2A5, cleaned$ALW_2A6, cleaned$ALW_2A7
+    ) ~
+      get_priority_missing(
+        cleaned$DHH_SEX, cleaned$ALWDWKY, cleaned$ALC_1, cleaned$ALW_1,
+        cleaned$ALW_2A1, cleaned$ALW_2A2, cleaned$ALW_2A3, cleaned$ALW_2A4,
+        cleaned$ALW_2A5, cleaned$ALW_2A6, cleaned$ALW_2A7
+      ),
+    # Non-drinkers (past year or past week) are not applicable
+    cleaned$ALC_1 == 2 | cleaned$ALW_1 == 2 ~
+      assign_missing("not_applicable", derived_var),
+    cleaned$DHH_SEX == 1 & exceeds_male ~ 1,
+    cleaned$DHH_SEX == 2 & exceeds_female ~ 1,
+    .default = 2
+  )
+
+  # Step 3: validate against derived-variable metadata, apply requested format
+  out <- clean_variables(
+    vars = stats::setNames(list(result), derived_var),
+    output_format = output_format
+  )
+  prep_cat_output(out[[derived_var]])
+}
+
+# ==============================================================================
+# Public API
+# ==============================================================================
+
+#' Binge drinking indicator with sex-specific thresholds
 #'
-#' @details The classification of drinkers according to their short term health 
-#' risks comes from guidelines in Alcohol and Health in Canada: A Summary of 
-#' Evidence and Guidelines for Low-risk Drinking, and is based on the alcohol 
-#' consumption reported over the past week. Short-term or acute risks include 
-#' injury and overdose.
-#' 
-#' Categories are based on CCHS 2015-2016's variable (ALWDVSTR) where short 
-#' term health risk are increased when drinking more than 3 drinks (for women) 
-#' or 4 drinks (for men) on any single occasion.
-#' 
-#' See \url{https://osf.io/ykau5/} for more details on the guideline. 
-#' See \url{https://osf.io/ycxaq/} for more details on derivation of the 
-#' function on page 9.
-#' 
-#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
-#' 
-#' @param ALW_1 Drinks in the last week (1 - yes, 2 - no)
-#' 
-#' @param ALC_1 Drinks in the past year (1 - yes, 2 - no)
-#' 
-#' @param ALW_2A1 Number of drinks on Sunday
-#' 
-#' @param ALW_2A2 Number of drinks on Monday
-#' 
-#' @param ALW_2A3 Number of drinks on Tuesday
-#' 
-#' @param ALW_2A4 Number of drinks on Wednesday
-#' 
-#' @param ALW_2A5 Number of drinks on Thursday
-#' 
-#' @param ALW_2A6 Number of drinks on Friday
-#' 
-#' @param ALW_2A7 Number of drinks on Saturday
-#' 
-#' @param ALWDWKY Number of drinks consumed in the past week
-#' 
-#' @return Categorical variable (ALWDVSTR_der) with two categories:
-#' 
-#'  \itemize{
-#'   \item 1 - Increased short term health risk
-#'   \item 2 - No increased short term health risk
-#'  }
-#' 
+#' @description
+#' Identifies binge drinking from daily consumption over the past week:
+#' 5 or more drinks on any single day for males, 4 or more for females.
+#'
+#' @details
+#' Only respondents who drank in the past week (\code{ALW_1} = 1) are
+#' assessed; non-drinkers receive \code{haven::tagged_na("a")} (not
+#' applicable). Missing-data handling follows the v3 3-step architecture:
+#' input codes (6-9 single-digit, 996-999 triple-digit) are converted using
+#' variable_details.csv metadata, with priority not applicable > not stated.
+#' Out-of-range inputs receive the worksheet's else rule
+#' (\code{haven::tagged_na("b")}).
+#'
+#' @param DHH_SEX Sex (1 = male, 2 = female). Accepts raw CCHS codes,
+#'   tagged NAs, or labelled strings.
+#' @param ALW_1 Had drinks in the past week (1 = yes, 2 = no).
+#' @param ALW_2A1 Number of drinks on Sunday.
+#' @param ALW_2A2 Number of drinks on Monday.
+#' @param ALW_2A3 Number of drinks on Tuesday.
+#' @param ALW_2A4 Number of drinks on Wednesday.
+#' @param ALW_2A5 Number of drinks on Thursday.
+#' @param ALW_2A6 Number of drinks on Friday.
+#' @param ALW_2A7 Number of drinks on Saturday.
+#' @param output_format Output missing data format: "tagged_na" (default)
+#'   or "original".
+#'
+#' @return Numeric vector: 1 = binge drinker, 2 = non-binge drinker.
+#'   Missing data: \code{haven::tagged_na("a")} (not applicable),
+#'   \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
-#'  
-#' # Using low_drink_short_fun() to create ALWDVSTR_der values across CCHS cycles
-#' # low_drink_short_fun() is specified in variable_details.csv along with the
-#' # CCHS variables and cycles included.
-#' 
-#' # To transform ALWDVSTR_der, use rec_with_table() for each CCHS cycle
-#' # and specify ALWDVSTR_der, along with the various alcohol and sex
-#' # variables. 
-#' # Using merge_rec_data(), you can combine ALWDVSTR_der across cycles.
-#' 
-#' library(cchsflow)
-#' short_low_drink2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
-#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVSTR_der"
-#'   )
-#' )
-#' 
-#' head(short_low_drink2001)
-#' 
-#' short_low_drink2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
-#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVSTR_der"
-#'   )
-#' )
-#' 
-#' tail(short_low_drink2009_2010)
-#' 
-#' combined_short_low_drink <- bind_rows(short_low_drink2001, 
-#' short_low_drink2009_2010)
-#' 
-#' head(combined_short_low_drink)
-#' 
-#' tail(combined_short_low_drink)
-#' 
-#' # Using low_drink_short_fun() to generate ALWDVSTR_der with user-inputted
-#' # values.
-#' #
-#' # Let's say you are a male, you had drinks in the last week and in the last 
-#' # year. Let's say you had 5 drinks on Sunday, 1 drink on Monday, 6 drinks on 
-#' # Tuesday, 4 drinks on Wednesday, 4 drinks on Thursday, 8 drinks on Friday, 
-#' # and 2 drinks on Saturday with a total of 30 drinks in a week. 
-#' # Using low_drink_short_fun(), we can check if you would be classified as
-#' # having an increased short term health risk due to drinking.
-#' 
-#' short_term_drink <- low_drink_short_fun(DHH_SEX = 1, ALWDWKY = 30, ALC_1 = 1,
-#'  ALW_1 = 1, ALW_2A1 = 5, ALW_2A2 = 1, ALW_2A3 = 6, ALW_2A4 = 4, ALW_2A5 = 4, 
-#'  ALW_2A6 = 8, ALW_2A7 = 2)
+#' # Scalar: male with 6 drinks on Tuesday
+#' calculate_binge_drinking(1, 1, 3, 1, 6, 0, 3, 2, 2) # 1 (binge)
 #'
-#' print(short_term_drink)
+#' # Scalar: female, at most 3 drinks on any day
+#' calculate_binge_drinking(2, 1, 1, 2, 2, 3, 0, 1, 2) # 2 (non-binge)
+#'
+#' # Vector: drinker, non-drinker
+#' calculate_binge_drinking(
+#'   c(1, 1), c(1, 2), c(6, 0), c(0, 0), c(0, 0), c(0, 0),
+#'   c(0, 0), c(0, 0), c(0, 0)
+#' ) # 1, tagged_na("a")
+#'
+#' # Dataframe
+#' library(dplyr)
+#' data.frame(
+#'   DHH_SEX = c(1, 2), ALW_1 = c(1, 1), ALW_2A1 = c(5, 2),
+#'   ALW_2A2 = c(0, 2), ALW_2A3 = c(0, 2), ALW_2A4 = c(0, 2),
+#'   ALW_2A5 = c(0, 2), ALW_2A6 = c(0, 2), ALW_2A7 = c(0, 2)
+#' ) %>%
+#'   mutate(binge = calculate_binge_drinking(
+#'     DHH_SEX, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4,
+#'     ALW_2A5, ALW_2A6, ALW_2A7
+#'   ))
+#'
+#' \dontrun{
+#' # Standard cchsflow workflow
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c(
+#'     "DHH_SEX", "ALW_1", "ALW_2A1", "ALW_2A2", "ALW_2A3",
+#'     "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "binge_drinker"
+#'   )
+#' )
+#' }
+#'
+#' @seealso \code{\link{calculate_drinking_risk_short}},
+#'   \code{\link{calculate_drinking_risk_long}}
+#'
 #' @export
-#' 
-low_drink_short_fun <-
-  function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, 
-           ALW_2A5, ALW_2A6, ALW_2A7){
-    # Test if inputs are in valid range
-    if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_1 %in% (1:2) &
-               ALW_1 %in% (1:2) & ALW_2A1 %in% (0:995) & ALW_2A2 %in% (0:995) &
-               ALW_2A3 %in% (0:995) & ALW_2A4 %in% (0:995) &
-               ALW_2A5 %in% (0:995) & ALW_2A6 %in% (0:995) &
-               ALW_2A7 %in% (0:995),
-    # Increased short term risk from due to drinking (1)
-    if_else2(DHH_SEX == 1 & (ALW_2A1 %in%(5:995) | ALW_2A2 %in%(5:995) | 
-                             ALW_2A3 %in%(5:995) | ALW_2A4 %in%(5:995) | 
-                             ALW_2A5 %in%(5:995) | ALW_2A6 %in%(5:995) |
-                             ALW_2A7 %in%(5:995) | ALWDWKY %in%(16:995)), 1,
-    if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(4:995) | ALW_2A2 %in%(4:995) | 
-                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) |
-                             ALW_2A5 %in%(4:995) | ALW_2A6 %in%(4:995) |
-                             ALW_2A7 %in%(4:995) | ALWDWKY %in%(11:995)), 1,
-    # No increased short term health risks due to drinking (2)
-    # Includes those who did not drink in past 7 days or past 12 months
-    if_else2(ALC_1 == 2 |ALW_1 ==2, 2,
-    if_else2(DHH_SEX == 1 & (ALW_2A1 %in% (0:4) & ALW_2A2 %in% (0:4) &
-                             ALW_2A3 %in% (0:4) & ALW_2A4 %in% (0:4) &
-                             ALW_2A5 %in% (0:4) & ALW_2A6 %in% (0:4) &
-                             ALW_2A7 %in% (0:4)) & ALWDWKY %in% (0:15), 2,
-    if_else2(DHH_SEX == 2 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
-                             ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
-                             ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
-                             ALW_2A7 %in% (0:3)) & ALWDWKY %in% (0:10), 2,
-                                                          "NA(b)"))))),
-    "NA(b)")
+calculate_binge_drinking <- function(DHH_SEX, ALW_1, ALW_2A1, ALW_2A2,
+                                     ALW_2A3, ALW_2A4, ALW_2A5, ALW_2A6,
+                                     ALW_2A7, output_format = "tagged_na") {
+  inputs <- normalize_input_lengths(list(
+    DHH_SEX = DHH_SEX, ALW_1 = ALW_1,
+    ALW_2A1 = ALW_2A1, ALW_2A2 = ALW_2A2, ALW_2A3 = ALW_2A3,
+    ALW_2A4 = ALW_2A4, ALW_2A5 = ALW_2A5, ALW_2A6 = ALW_2A6,
+    ALW_2A7 = ALW_2A7
+  ))
+  if (inputs$n == 0) {
+    return(numeric(0))
   }
 
-#' @title Long term risks due to drinking
-#' 
-#' @description This function creates a categorical variable that
-#'  flags for increased long term health risks due to their drinking habits,
-#'  according to Canada's Low-Risk Alcohol Drinking Guideline.
+  # Step 1: metadata-driven cleaning
+  cleaned <- clean_variables(vars = inputs$vars, output_format = "tagged_na")
+
+  max_daily <- pmax(
+    cleaned$ALW_2A1, cleaned$ALW_2A2, cleaned$ALW_2A3, cleaned$ALW_2A4,
+    cleaned$ALW_2A5, cleaned$ALW_2A6, cleaned$ALW_2A7
+  )
+
+  # Step 2: domain logic
+  result <- dplyr::case_when(
+    any_missing(
+      cleaned$DHH_SEX, cleaned$ALW_1,
+      cleaned$ALW_2A1, cleaned$ALW_2A2, cleaned$ALW_2A3, cleaned$ALW_2A4,
+      cleaned$ALW_2A5, cleaned$ALW_2A6, cleaned$ALW_2A7
+    ) ~
+      get_priority_missing(
+        cleaned$DHH_SEX, cleaned$ALW_1,
+        cleaned$ALW_2A1, cleaned$ALW_2A2, cleaned$ALW_2A3, cleaned$ALW_2A4,
+        cleaned$ALW_2A5, cleaned$ALW_2A6, cleaned$ALW_2A7
+      ),
+    # No drinks in the past week: not applicable
+    cleaned$ALW_1 == 2 ~ assign_missing("not_applicable", "binge_drinker"),
+    cleaned$DHH_SEX == 1 & max_daily >= BINGE_THRESHOLDS$male ~ 1,
+    cleaned$DHH_SEX == 2 & max_daily >= BINGE_THRESHOLDS$female ~ 1,
+    .default = 2
+  )
+
+  # Step 3: validate against binge_drinker metadata, apply requested format
+  out <- clean_variables(
+    vars = list(binge_drinker = result),
+    output_format = output_format
+  )
+  prep_cat_output(out$binge_drinker)
+}
+
+#' Short-term (acute) drinking risk under the Low-Risk Guidelines
 #'
-#' @details The classification of drinkers according to their long term health 
-#' risks comes from guidelines in Alcohol and Health in Canada: A Summary of 
-#' Evidence and Guidelines for Low-risk Drinking, and is based on the alcohol 
-#' consumption reported over the past week. Short-term or acute risks include 
-#' injury and overdose.
-#' 
-#' Categories are based on CCHS 2015-2016's variable (ALWDVLTR) where long 
-#' term health risk are increased when drinking more than 10 drinks a week for 
-#' women, with no more than 2 drinks a day most days, and more than 15 drinks a 
-#' week for men, with no more than 3 drinks a day most days.
-#' 
-#' See \url{https://osf.io/ykau5/} for more details on the guideline. 
-#' See \url{https://osf.io/ycxaq/} for more details on the derivation of the 
-#' function on page 8.
-#' 
-#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
-#' 
-#' @param ALW_1 Drinks in the last week (1 - yes, 2 - no)
-#' 
-#' @param ALC_1 Drinks in the past year (1 - yes, 2 - no)
-#' 
-#' @param ALW_2A1 Number of drinks on Sunday
-#' 
-#' @param ALW_2A2 Number of drinks on Monday
-#' 
-#' @param ALW_2A3 Number of drinks on Tuesday
-#' 
-#' @param ALW_2A4 Number of drinks on Wednesday
-#' 
-#' @param ALW_2A5 Number of drinks on Thursday
-#' 
-#' @param ALW_2A6 Number of drinks on Friday
-#' 
-#' @param ALW_2A7 Number of drinks on Saturday
-#' 
-#' @param ALWDWKY Number of drinks consumed in the past week
-#' 
-#' @return Categorical variable (ALWDVLTR_der) with two categories:
-#' 
-#'  \itemize{
-#'   \item 1 - Increased long term health risk
-#'   \item 2 - No increased long term health risk
-#'  }
-#' 
+#' @description
+#' Assesses short-term health risk from drinking patterns following Canada's
+#' Low-Risk Alcohol Drinking Guidelines: risk is flagged when daily
+#' consumption exceeds 3 drinks (males) / 2 drinks (females) on any day, or
+#' weekly consumption exceeds 15 drinks (males) / 10 drinks (females).
+#'
+#' @details
+#' Non-drinkers in the past year (\code{ALC_1} = 2) or past week
+#' (\code{ALW_1} = 2) receive \code{haven::tagged_na("a")} (not applicable).
+#' Thresholds are exceeded strictly (e.g. 4+ drinks on a day for males).
+#' Missing-data handling follows the v3 3-step architecture with priority
+#' not applicable > not stated; out-of-range inputs receive the worksheet's
+#' else rule.
+#'
+#' @inheritParams calculate_binge_drinking
+#' @param ALWDWKY Total drinks in the past week.
+#' @param ALC_1 Had drinks in the past year (1 = yes, 2 = no).
+#'
+#' @return Numeric vector: 1 = increased short-term risk, 2 = no increased
+#'   short-term risk. Missing data: \code{haven::tagged_na("a")} (not
+#'   applicable), \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
-#'  
-#' # Using low_drink_long_fun() to create ALWDVLTR_der values across CCHS cycles
-#' # low_drink_long_fun() is specified in variable_details.csv along with the
-#' # CCHS variables and cycles included.
-#' 
-#' # To transform ALWDVLTR_der, use rec_with_table() for each CCHS cycle
-#' # and specify ALWDVLTR_der, along with the various alcohol and sex
-#' # variables. 
-#' # Using merge_rec_data(), you can combine ALWDVLTR_der across cycles.
-#' 
-#' library(cchsflow)
-#' long_low_drink2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
-#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVLTR_der"
-#'   )
-#' )
-#' 
-#' head(long_low_drink2001)
-#' 
-#' long_low_drink2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "ALW_1", "DHH_SEX", "ALW_2A1", "ALW_2A2", "ALW_2A3", "ALW_2A4",
-#'     "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDWKY", "ALC_1","ALWDVLTR_der"
-#'   )
-#' )
-#' 
-#' tail(long_low_drink2009_2010)
-#' 
-#' combined_long_low_drink <- bind_rows(long_low_drink2001, 
-#' long_low_drink2009_2010)
-#' 
-#' head(combined_long_low_drink)
-#' 
-#' tail(combined_long_low_drink)
-#' 
-#' # Using low_drink_long_fun() to generate ALWDVLTR_der with user-inputted
-#' # values.
-#' #
-#' # Let's say you are a male, you had drinks in the last week and in the last 
-#' # year. Let's say you had 5 drinks on Sunday, 1 drink on Monday, 6 drinks on 
-#' # Tuesday, 4 drinks on Wednesday, 4 drinks on Thursday, 8 drinks on Friday, 
-#' # and 2 drinks on Saturday with a total of 30 drinks in a week. 
-#' # Using low_drink_long_fun(), we can check if you would be classified as
-#' # having an increased long term health risk due to drinking.
-#' 
-#' long_term_drink <- low_drink_long_fun(DHH_SEX = 1, ALWDWKY = 30, ALC_1 = 1,
-#'  ALW_1 = 1, ALW_2A1 = 5, ALW_2A2 = 1, ALW_2A3 = 6, ALW_2A4 = 4, ALW_2A5 = 4, 
-#'  ALW_2A6 = 8, ALW_2A7 = 2)
+#' # Scalar: male exceeding daily and weekly thresholds
+#' calculate_drinking_risk_short(1, 20, 1, 1, 0, 0, 5, 0, 0, 0, 0) # 1
 #'
-#' print(long_term_drink)
+#' # Scalar: female within thresholds
+#' calculate_drinking_risk_short(2, 8, 1, 1, 2, 1, 2, 1, 1, 1, 0) # 2
+#'
+#' # Vector: at-risk male, non-drinker
+#' calculate_drinking_risk_short(
+#'   c(1, 1), c(25, 0), c(1, 2), c(1, 2), c(5, 0), c(5, 0),
+#'   c(5, 0), c(5, 0), c(5, 0), c(0, 0), c(0, 0)
+#' ) # 1, tagged_na("a")
+#'
+#' \dontrun{
+#' # Standard cchsflow workflow
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c(
+#'     "DHH_SEX", "ALWDWKY", "ALC_1", "ALW_1", "ALW_2A1", "ALW_2A2",
+#'     "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDVSTR_der"
+#'   )
+#' )
+#' }
+#'
+#' @seealso \code{\link{calculate_binge_drinking}},
+#'   \code{\link{calculate_drinking_risk_long}}
+#'
 #' @export
-#' 
-low_drink_long_fun <-
-  function(DHH_SEX, ALWDWKY, ALC_1, ALW_1, ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4, 
-           ALW_2A5, ALW_2A6, ALW_2A7){
-    # Test if inputs are in valid range
-    if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_1 %in% (1:2) &
-               ALW_1 %in% (1:2) & ALW_2A1 %in% (0:995) & ALW_2A2 %in% (0:995) &
-               ALW_2A3 %in% (0:995) & ALW_2A4 %in% (0:995) &
-               ALW_2A5 %in% (0:995) & ALW_2A6 %in% (0:995) &
-               ALW_2A7 %in% (0:995),
-    # Increased long term risk from due to drinking (1)
-    if_else2(DHH_SEX == 1 & (ALW_2A1 %in%(4:995) | ALW_2A2 %in%(4:995) | 
-                             ALW_2A3 %in%(4:995) | ALW_2A4 %in%(4:995) |
-                             ALW_2A5 %in%(4:995) | ALW_2A6 %in%(4:995) |
-                             ALW_2A7 %in%(4:995) | ALWDWKY %in%(16:995)), 1,
-    if_else2(DHH_SEX == 2 & (ALW_2A1 %in%(3:995) | ALW_2A2 %in%(3:995) |
-                             ALW_2A3 %in%(3:995) | ALW_2A4 %in%(3:995) |
-                             ALW_2A5 %in%(3:995) | ALW_2A6 %in%(3:995) |
-                             ALW_2A7 %in%(3:995) | ALWDWKY %in%(11:995)), 1,
-    # No increased long term health risks due to drinking (2)
-    # Includes those who did not drink in past 7 days or past 12 months
-    if_else2(ALC_1 == 2 |ALW_1 ==2, 2,
-    if_else2(DHH_SEX == 1 & (ALW_2A1 %in% (0:3) & ALW_2A2 %in% (0:3) &
-                             ALW_2A3 %in% (0:3) & ALW_2A4 %in% (0:3) &
-                             ALW_2A5 %in% (0:3) & ALW_2A6 %in% (0:3) &
-                             ALW_2A7 %in% (0:3)) & ALWDWKY %in% (0:15), 2,
-    if_else2(DHH_SEX == 2 & (ALW_2A1 %in% (0:2) & ALW_2A2 %in% (0:2) &
-                             ALW_2A3 %in% (0:2) & ALW_2A4 %in% (0:2) &
-                             ALW_2A5 %in% (0:2) & ALW_2A6 %in% (0:2) &
-                             ALW_2A7 %in% (0:2)) & ALWDWKY %in% (0:10), 2,
-             "NA(b)"))))),
-    "NA(b)")
-    
-    
+calculate_drinking_risk_short <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1,
+                                          ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4,
+                                          ALW_2A5, ALW_2A6, ALW_2A7,
+                                          output_format = "tagged_na") {
+  inputs <- normalize_input_lengths(list(
+    DHH_SEX = DHH_SEX, ALWDWKY = ALWDWKY, ALC_1 = ALC_1, ALW_1 = ALW_1,
+    ALW_2A1 = ALW_2A1, ALW_2A2 = ALW_2A2, ALW_2A3 = ALW_2A3,
+    ALW_2A4 = ALW_2A4, ALW_2A5 = ALW_2A5, ALW_2A6 = ALW_2A6,
+    ALW_2A7 = ALW_2A7
+  ))
+  if (inputs$n == 0) {
+    return(numeric(0))
   }
 
-#' @title Low drinking score (all cycles)
-#' 
-#' @description This function creates a derived variable based on their drinking 
-#' habits and flags for health and social problems from their pattern of 
-#' alcohol use according to Canada's Low-Risk Alcohol Drinking Guideline.
+  # Step 1: metadata-driven cleaning
+  cleaned <- clean_variables(vars = inputs$vars, output_format = "tagged_na")
+
+  assess_drinking_risk(cleaned, "short", "ALWDVSTR_der", output_format)
+}
+
+#' Long-term (chronic) drinking risk under the Low-Risk Guidelines
 #'
-#' @details The low risk drinking score is based on the scoring system in 
-#' Canada's Low-Risk Alcohol Drinking Guideline. The score is divided into two 
-#' steps. Step 1 allocates points based on sex and the number of drinks 
-#' that you usually have each week. In step 2, one point will be awarded for 
-#' each item that is true related to drinking habits. The total score is 
-#' obtained from adding the points in step 1 and step 2.
-#' 
-#' @note Step 2 is not included in this function because the questions in 
-#' step 2 are not asked in any of the CCHS cycles. The score is only based on 
-#' step 1.
-#' 
-#' See \url{https://osf.io/eprg7/} for more details on the guideline and score. 
-#' 
-#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
-#' 
-#' @param ALWDWKY Number of drinks consumed in the past week 
-#' 
-#' @return Low risk drinking score (low_drink_score) with four categories:
-#' \itemize{
-#'   \item 1 - Low risk (0 points)
-#'   \item 2 - Marginal risk (1-2 points)
-#'   \item 3 - Medium risk (3-4 points)
-#'   \item 4 - High risk (5-9 points)
-#'  }
-#' 
+#' @description
+#' Assesses long-term health risk from drinking patterns following Canada's
+#' Low-Risk Alcohol Drinking Guidelines: risk is flagged when daily
+#' consumption reaches 4 drinks (males) / 3 drinks (females) on any day, or
+#' weekly consumption reaches 20 drinks (males) / 15 drinks (females).
+#'
+#' @details
+#' Non-drinkers in the past year (\code{ALC_1} = 2) or past week
+#' (\code{ALW_1} = 2) receive \code{haven::tagged_na("a")} (not applicable).
+#' Thresholds are reached inclusively (e.g. exactly 20 drinks/week flags a
+#' male respondent). Missing-data handling follows the v3 3-step
+#' architecture with priority not applicable > not stated; out-of-range
+#' inputs receive the worksheet's else rule.
+#'
+#' @inheritParams calculate_drinking_risk_short
+#'
+#' @return Numeric vector: 1 = increased long-term risk, 2 = no increased
+#'   long-term risk. Missing data: \code{haven::tagged_na("a")} (not
+#'   applicable), \code{haven::tagged_na("b")} (not stated/invalid).
+#'
 #' @examples
-#'  
-#' # Using low_drink_score_fun() to create low_drink_score values across 
-#' # CCHS cycles low_drink_score_fun() is specified in variable_details.csv 
-#' # along with the CCHS variables and cycles included.
-#' 
-#' # To transform low_drink_score, use rec_with_table() for each CCHS cycle
-#' # and specify low_drink_score, along with the various alcohol and sex
-#' # variables. 
-#' # Using merge_rec_data(), you can combine low_drink_score across cycles.
-#' 
-#' library(cchsflow)
-#' low_drink2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "DHH_SEX", "ALWDWKY", "low_risk_score"
+#' # Scalar: male reaching the weekly threshold
+#' calculate_drinking_risk_long(1, 20, 1, 1, 3, 3, 3, 3, 3, 3, 2) # 1
+#'
+#' # Scalar: female within thresholds
+#' calculate_drinking_risk_long(2, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1) # 2
+#'
+#' # Vector: at-risk male, non-drinker
+#' calculate_drinking_risk_long(
+#'   c(1, 1), c(20, 0), c(1, 2), c(1, 2), c(3, 0), c(3, 0),
+#'   c(3, 0), c(3, 0), c(3, 0), c(3, 0), c(2, 0)
+#' ) # 1, tagged_na("a")
+#'
+#' \dontrun{
+#' # Standard cchsflow workflow
+#' result <- rec_with_table(
+#'   cchs2013_2014_p,
+#'   c(
+#'     "DHH_SEX", "ALWDWKY", "ALC_1", "ALW_1", "ALW_2A1", "ALW_2A2",
+#'     "ALW_2A3", "ALW_2A4", "ALW_2A5", "ALW_2A6", "ALW_2A7", "ALWDVLTR_der"
 #'   )
 #' )
-#' 
-#' head(low_drink2001)
-#' 
-#' low_drink2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "DHH_SEX", "ALWDWKY", "low_risk_score"
-#'   )
-#' )
-#' 
-#' tail(low_drink2009_2010)
-#' 
-#' combined_low_drink <- bind_rows(low_drink2001, 
-#' low_drink2009_2010)
-#' 
-#' head(combined_low_drink)
-#' 
-#' tail(combined_low_drink)
-#' 
+#' }
+#'
+#' @seealso \code{\link{calculate_binge_drinking}},
+#'   \code{\link{calculate_drinking_risk_short}}
+#'
 #' @export
-#' 
-low_drink_score_fun <-
-  function(DHH_SEX, ALWDWKY){
-    ## Step 1
-    # How many standard drinks did you have in a week?
-    step1<- 
-      if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995),
-      if_else2(ALWDWKY %in% (0:10), 0,
-      if_else2(DHH_SEX == 1 & ALWDWKY > 10 & ALWDWKY <= 15, 0,
-      if_else2(DHH_SEX == 2 & ALWDWKY > 10 & ALWDWKY <= 15, 1,
-      if_else2(DHH_SEX == 1 & ALWDWKY > 15 & ALWDWKY <= 20, 1,
-      if_else2(DHH_SEX == 2 & ALWDWKY > 15 & ALWDWKY <= 20, 3,
-      if_else2(ALWDWKY >20, 3, NA)))))),
-      NA)
-    
-    ## Categorical score
-    low_drink_score <-
-      # Low risk
-      if_else2(step1 == 0, 1,
-      # Marginal risk
-      if_else2(step1 %in% (1:2), 2,
-      # Medium risk
-      if_else2(step1 %in% (3:4), 3,
-      # High risk
-      if_else2(step1 %in% (5:9), 4, "NA(b)"))))
-    
-    return(low_drink_score)
+calculate_drinking_risk_long <- function(DHH_SEX, ALWDWKY, ALC_1, ALW_1,
+                                         ALW_2A1, ALW_2A2, ALW_2A3, ALW_2A4,
+                                         ALW_2A5, ALW_2A6, ALW_2A7,
+                                         output_format = "tagged_na") {
+  inputs <- normalize_input_lengths(list(
+    DHH_SEX = DHH_SEX, ALWDWKY = ALWDWKY, ALC_1 = ALC_1, ALW_1 = ALW_1,
+    ALW_2A1 = ALW_2A1, ALW_2A2 = ALW_2A2, ALW_2A3 = ALW_2A3,
+    ALW_2A4 = ALW_2A4, ALW_2A5 = ALW_2A5, ALW_2A6 = ALW_2A6,
+    ALW_2A7 = ALW_2A7
+  ))
+  if (inputs$n == 0) {
+    return(numeric(0))
   }
 
-#' @title Low drinking score (select cycles)
-#' 
-#' @description This function creates a derived variable based on their drinking 
-#' habits and flags for health and social problems from their pattern of 
-#' alcohol use according to Canada's Low-Risk Alcohol Drinking Guideline.
-#'
-#' @details The low risk drinking score is based on the scoring system in 
-#' Canada's Low-Risk Alcohol Drinking Guideline. The score is divided into two 
-#' steps. Step 1 allocates points based on sex and the number of drinks 
-#' that you usually have each week. In step 2, one point will be awarded for 
-#' each item that is true related to drinking habits. The total score is 
-#' obtained from adding the points in step 1 and step 2.
-#' 
-#' This score has two 0 point categories: low risk (never drank) and low risk 
-#' (former drinker). The two drinking groups are derived from 'ever had a drink 
-#' in lifetime'. 'Ever had a drink in lifetime' is only available in CCHS 
-#' 2001-2008 and 2015-2018.
-#' 
-#' 
-#' @note Step 2 is not included in this function because the questions in 
-#' step 2 are not asked in any of the CCHS cycles. The score is only based on 
-#' step 1.
-#' 
-#' See \url{https://osf.io/eprg7/} for more details on the guideline and score. 
-#' 
-#' @param DHH_SEX Sex of respondent (1 - male, 2 - female)
-#' 
-#' @param ALWDWKY Number of drinks consumed in the past week 
-#' 
-#' @param ALC_005 In lifetime, ever had a drink? (1 - yes, 2 - no)
-#' 
-#' @param ALC_1 Past year, have you drank alcohol? (1 - yes, 2 - no)
-#' 
-#' @return Low risk drinking score (low_drink_score1) with four categories:
-#' \itemize{
-#'   \item 1 - Low risk - never drank (0 points)
-#'   \item 2 - Low risk - former drinker (0 points)
-#'   \item 3 - Marginal risk (1-2 points)
-#'   \item 4 - Medium risk (3-4 points)
-#'   \item 5 - High risk (5-9 points)
-#'  }
-#' 
-#' @examples
-#'  
-#' # Using low_drink_score_fun1() to create low_drink_score values across 
-#' # CCHS cycles low_drink_score_fun1() is specified in variable_details.csv 
-#' # along with the CCHS variables and cycles included.
-#' 
-#' # To transform low_drink_score1, use rec_with_table() for each CCHS cycle
-#' # and specify low_drink_score1, along with the various alcohol and sex
-#' # variables. 
-#' # Using merge_rec_data(), you can combine low_drink_score1 across cycles.
-#' 
-#' library(cchsflow)
-#' low_drink2001 <- rec_with_table(
-#'   cchs2001_p, c(
-#'     "DHH_SEX", "ALWDWKY", "ALC_005", "ALC_1", "low_risk_score"
-#'   )
-#' )
-#' 
-#' head(low_drink2001)
-#' 
-#' low_drink2009_2010 <- rec_with_table(
-#'   cchs2009_2010_p, c(
-#'     "DHH_SEX", "ALWDWKY", "ALC_005", "ALC_1", "low_risk_score"
-#'   )
-#' )
-#' 
-#' tail(low_drink2009_2010)
-#' 
-#' combined_low_drink1 <- bind_rows(low_drink2001, 
-#' low_drink2009_2010)
-#' 
-#' head(combined_low_drink1)
-#' 
-#' tail(combined_low_drink1)
-#' 
-#' @export
-#' 
-low_drink_score_fun1 <-
-  function(DHH_SEX, ALWDWKY, ALC_005, ALC_1){
-    ## Step 1
-    # How many standard drinks did you have in a week?
-    step1<- 
-     if_else2(DHH_SEX %in% (1:2) & ALWDWKY %in% (0:995) & ALC_005 %in% (1:2) &
-               ALC_1 %in% (1:2),
-     if_else2(ALWDWKY %in% (0:10), 0,
-     if_else2(DHH_SEX == 1 & ALWDWKY > 10 & ALWDWKY <= 15, 0,
-     if_else2(DHH_SEX == 2 & ALWDWKY > 10 & ALWDWKY <= 15, 1,
-     if_else2(DHH_SEX == 1 & ALWDWKY > 15 & ALWDWKY <= 20, 1,
-     if_else2(DHH_SEX == 2 & ALWDWKY > 15 & ALWDWKY <= 20, 3,
-     if_else2(ALWDWKY >20, 3, NA)))))),
-     NA)
-    
-    ## Categorical score
-    low_drink_score1 <-
-      # Low risk - never drank
-      if_else2(step1 == 0 & ALC_005 == 2 & ALC_1 ==2, 1,
-      # Low risk - former drinker
-      if_else2(step1 == 0 & ALC_005 == 1 & ALC_1 ==2, 2,
-      # Marginal risk
-      if_else2(step1 %in% (1:2), 3,
-      # Medium risk
-      if_else2(step1 %in% (3:4), 4,
-      # High risk
-      if_else2(step1 %in% (5:9), 5, "NA(b)")))))
-    
-    return(low_drink_score1)
-  }
+  # Step 1: metadata-driven cleaning
+  cleaned <- clean_variables(vars = inputs$vars, output_format = "tagged_na")
 
+  assess_drinking_risk(cleaned, "long", "ALWDVLTR_der", output_format)
+}

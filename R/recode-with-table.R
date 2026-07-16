@@ -1,5 +1,9 @@
-# Removing Note
+# Suppress R CMD check NOTEs for non-standard evaluation and utils functions
+#' @importFrom utils read.csv head
+#' @importFrom rlang enquos
+#' @importFrom stats setNames
 . <- NULL
+utils::globalVariables(c("variable", "data"))
 #' @title is equal
 #' @description Function to compare even with NA present
 #' This function returns TRUE wherever elements are the same, including NA's,
@@ -142,12 +146,12 @@ is_equal <- function(v1, v2) {
 #'
 #' tail(bmi2011_2012)
 #'
-#' combined_bmi <- bind_rows(bmi2001, bmi2011_2012)
+#' combined_bmi <- dplyr::bind_rows(bmi2001, bmi2011_2012)
 #' head(combined_bmi)
 #' tail(combined_bmi)
 #' @importFrom haven tagged_na
 #' @importFrom stringr str_match
-#' @importFrom dplyr rowwise select do
+#' @importFrom dplyr rowwise select do case_when
 #' @importFrom magrittr %>%
 #' @export
 
@@ -192,7 +196,7 @@ rec_with_table <-
           data[[data_name]] <- recode_call(
             variables = variables,
             data = data[[data_name]],
-            database_name = database_name,
+            database_name = data_name,
             print_note = notes,
             else_value = else_value,
             variable_details = variable_details,

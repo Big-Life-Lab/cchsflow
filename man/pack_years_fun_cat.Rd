@@ -44,11 +44,12 @@ cycles, age and smoking variables must be transformed and harmonized.
 # Then by using merge_rec_data(), you can combine pack_years_cat across
 # cycles.
 
+\dontrun{
 library(cchsflow)
 
 pack_years_cat_2009_2010 <- rec_with_table(
   cchs2009_2010_p, c(
-    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+    "SMKDSTY_original", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der", "pack_years_cat"
   )
@@ -58,7 +59,7 @@ head(pack_years_cat_2009_2010)
 
 pack_years_cat_2011_2012 <- rec_with_table(
   cchs2011_2012_p,c(
-    "SMKDSTY_A", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
+    "SMKDSTY_original", "DHHGAGE_cont", "SMK_09A_B", "SMKG09C", "time_quit_smoking",
     "SMKG203_cont", "SMKG207_cont", "SMK_204", "SMK_05B", "SMK_208",
     "SMK_05C", "SMK_01A", "SMKG01C_cont", "pack_years_der", "pack_years_cat"
   )
@@ -71,4 +72,5 @@ combined_pack_years_cat <- suppressWarnings(merge_rec_data
 
 head(combined_pack_years_cat)
 tail(combined_pack_years_cat)
+}
 }

@@ -29,7 +29,11 @@ jobs:
       - name: Install package dependencies
         uses: r-lib/actions/setup-r-dependencies@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
         with:
-          extra-packages: local::.
+          # devtools is required by exec/check-worksheets.R (load_all from a
+          # repo checkout); without it the job fails before any CSV check runs
+          extra-packages: |
+            local::.
+            any::devtools
 
       - name: Check CSV formatting
         run: Rscript exec/check-worksheets.R
@@ -37,4 +41,4 @@ jobs:
       - name: Suggest fix command on failure
         if: failure()
         run: |
-          echo "::error::CSV formatting violations detected. Run 'Rscript exec/fix-worksheets.R' locally to fix them."
+          echo "::error::CSV check failed. If the log above shows formatting violations, run 'Rscript exec/fix-worksheets.R' locally. If it shows a package/setup error, the worksheets were not actually checked - fix the workflow environment first."

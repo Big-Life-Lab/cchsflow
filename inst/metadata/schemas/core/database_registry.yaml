@@ -1,0 +1,48 @@
+schema_version: "1.0.0"
+schema_date: "2026-07-15"
+description: >
+  Registry of valid CCHS database identifiers for databaseStart tokens in
+  variables.csv and variable_details.csv. check_worksheet() validates every
+  databaseStart token against this list, so typos (e.g. a missing underscore)
+  fail at PR time instead of becoming silent dead rows. Adding support for a
+  new cycle requires adding its identifier here - a deliberate, reviewable act.
+  Naming follows the recodeflow database-metadata draft
+  (scope-docs/metadata-schema/database_metadata.yaml) so this registry can
+  merge into the recodeflow schema layer at the v4 refactor.
+
+# Canonical token pattern: cchs<YYYY>[_<YYYY>]_<p|m>
+#   _p = Public Use Microdata File (PUMF)
+#   _m = Master file (includes converted share/_s and ICES/_i identifiers)
+valid_databases:
+  - "cchs2001_p"
+  - "cchs2001_m"
+  - "cchs2003_p"
+  - "cchs2003_m"
+  - "cchs2005_p"
+  - "cchs2005_m"
+  - "cchs2007_2008_p"
+  - "cchs2007_2008_m"
+  - "cchs2009_2010_p"
+  - "cchs2009_2010_m"
+  - "cchs2009_m"
+  - "cchs2010_p"
+  - "cchs2010_m"
+  - "cchs2011_2012_p"
+  - "cchs2011_2012_m"
+  - "cchs2012_p"
+  - "cchs2012_m"
+  - "cchs2013_2014_p"
+  - "cchs2013_2014_m"
+  - "cchs2014_p"
+  - "cchs2014_m"
+  - "cchs2015_2016_p"
+  - "cchs2015_2016_m"
+  - "cchs2017_2018_p"
+  - "cchs2017_2018_m"
+  - "cchs2019_2020_p"
+  - "cchs2019_2020_m"
+  - "cchs2021_m"
+  - "cchs2022_p"
+  - "cchs2022_m"
+  - "cchs2023_p"
+  - "cchs2023_m"

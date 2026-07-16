@@ -30,3 +30,4 @@ comparison is true
 \description{
 Compare values on the scientific notation interval
 }
+\keyword{internal}
