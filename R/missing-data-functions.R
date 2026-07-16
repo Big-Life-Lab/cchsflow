@@ -82,7 +82,7 @@ any_missing <- function(..., auto_detect = TRUE, output_format = "tagged_na") {
 #' @return Vector with highest priority missing values
 #'
 #' @examples
-#' # CCHS priority: "Not Stated" (NA::b) > "Not Applicable" (NA::a)
+#' # CCHS priority: "Not Applicable" (NA::a) > "Not Stated" (NA::b)
 #' get_priority_missing(haven::tagged_na("a"), haven::tagged_na("b"))
 #'
 #' \dontrun{
