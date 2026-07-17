@@ -21,7 +21,7 @@ Returns missing values with highest priority based on configurable hierarchy
 defined in YAML configuration. Works element-wise with dplyr::case_when().
 }
 \examples{
-# CCHS priority: "Not Stated" (NA::b) > "Not Applicable" (NA::a)
+# CCHS priority: "Not Applicable" (NA::a) > "Not Stated" (NA::b)
 get_priority_missing(haven::tagged_na("a"), haven::tagged_na("b"))
 
 \dontrun{
