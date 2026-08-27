@@ -61,12 +61,15 @@ any_missing <- function(..., auto_detect = TRUE, output_format = "tagged_na") {
   if (auto_detect) {
     # Use Level 4 integration for pattern detection
     var_name <- extract_variable_name(vars)
-    config <- get_missing_config(var_name)
+    if (is.null(var_name)) {
+      config <- default_missing_config()
+    } else {
+      config <- get_missing_config(var_name)
+    }
   } else {
-    # Fallback to default CCHS pattern
-    config <- get_missing_config("HWTGBMI_der")  # Known variable with standard pattern
+    config <- default_missing_config()
   }
-  
+
   # Apply vectorized detection
   detect_missing_vectorized(vars, config)
 }
@@ -99,12 +102,15 @@ get_priority_missing <- function(..., auto_detect = TRUE, output_format = "tagge
   if (auto_detect) {
     # Use Level 4 integration for pattern detection
     var_name <- extract_variable_name(vars)
-    config <- get_missing_config(var_name)
+    if (is.null(var_name)) {
+      config <- default_missing_config()
+    } else {
+      config <- get_missing_config(var_name)
+    }
   } else {
-    # Fallback to default CCHS pattern
-    config <- get_missing_config("HWTGBMI_der")  # Known variable with standard pattern
+    config <- default_missing_config()
   }
-  
+
   # Apply priority hierarchy
   apply_priority_hierarchy(vars, config, output_format)
 }
@@ -128,9 +134,8 @@ get_missing_config <- function(variable_name, database = NULL) {
   pattern_data <- tryCatch({
     get_missing_pattern(variable_name, database)
   }, error = function(e) {
-    # Fallback to default BMI pattern if variable not found
-    warning("Could not get pattern for '", variable_name, "', using BMI fallback")
-    get_missing_pattern("HWTGBMI_der")
+    warning("Could not get pattern for '", variable_name, "', using default CCHS fallback")
+    default_missing_config(pattern_only = TRUE)
   })
   
   # Step 2: Load priority rules from YAML configuration
@@ -217,6 +222,51 @@ load_priority_rules <- function() {
   return(rules)
 }
 
+#' Default Missing Configuration from YAML Schema
+#'
+#' Builds a fallback missing-data config from the triple_digit_missing pattern
+#' in cchs_missing_data.yaml. This is database-agnostic (no worksheet lookup)
+#' and safe as a default because triple-digit codes (996, 999, etc.) never
+#' collide with valid response values.
+#'
+#' @param pattern_only If TRUE, return only the pattern data (na_a_codes,
+#'   na_b_codes) for use inside get_missing_config()'s error handler.
+#'   If FALSE (default), return the full config with priority rules.
+#' @return List with missing code config
+#' @noRd
+default_missing_config <- function(pattern_only = FALSE) {
+  # Try to read from YAML schema
+  pattern <- tryCatch({
+    schema <- load_cchs_missing_data()
+    triple <- schema$pattern_definitions$patterns$triple_digit_missing$priority_hierarchy
+    list(
+      na_a_codes = c(triple$not_applicable$original_codes,
+                     triple$not_applicable$decimal_codes),
+      na_b_codes = c(triple$missing_data$original_codes,
+                     triple$missing_data$decimal_codes)
+    )
+  }, error = function(e) {
+    # Hardcoded fallback if YAML can't be loaded
+    list(
+      na_a_codes = c(996, 999.6),
+      na_b_codes = c(997, 998, 999, 999.7, 999.8, 999.9)
+    )
+  })
+
+  if (pattern_only) {
+    return(pattern)
+  }
+
+  priority_rules <- load_priority_rules()
+
+  list(
+    na_a_codes = pattern$na_a_codes,
+    na_b_codes = pattern$na_b_codes,
+    na_a_priority = priority_rules$na_a,
+    na_b_priority = priority_rules$na_b
+  )
+}
+
 # ==============================================================================
 # HELPER FUNCTIONS
 # ==============================================================================
@@ -246,8 +296,8 @@ extract_variable_name <- function(vars) {
     # Silent failure - continue to fallback
   })
   
-  # Fallback: Use common CCHS variable for pattern (handles derived variables)
-  return("HWTGBMI_der")
+  # No variable name could be extracted from the call stack
+  return(NULL)
 }
 
 #' Vectorized Missing Data Detection
