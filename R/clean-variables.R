@@ -88,7 +88,7 @@ clean_variables <- function(vars, output_format = "tagged_na", check_length = TR
     if (is.null(var_data)) {
       next
     }
-    if (!is.vector(var_data) && !is.factor(var_data)) {
+    if (!is.atomic(var_data)) {
       stop("Variable '", var_name, "' must be a vector or factor, not ", class(var_data)[1])
     }
     if (length(var_data) == 0) {
