@@ -55,7 +55,7 @@ test_that("clean_variables accepts labelled numeric vectors", {
 
   expect_no_error(
     suppressWarnings(
-      clean_variables(list(SMK_09A_cont = x), output_format = "tagged_na")
+      clean_variables(list(SMK_09A_cont = x))
     )
   )
 })
