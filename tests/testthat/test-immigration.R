@@ -136,7 +136,7 @@ test_that("propagates NA(a) from years", {
 
 # All 8 categories — PUMF style (ethnicity 1/2, SDCGRES_cont midpoints 4.5/15)
 
-test_that("category 1: White Canada-born", {
+test_that("category 1: Not VM Canada-born", {
   expect_equal(categorize_immigration(2, 1, 1, 4.5), 1L)
 })
 
@@ -144,7 +144,7 @@ test_that("category 2: Visible minority Canada-born", {
   expect_equal(categorize_immigration(2, 1, 2, 4.5), 2L)
 })
 
-test_that("category 3: White immigrant, recent (<10 years)", {
+test_that("category 3: Not VM immigrant, recent (<10 years)", {
   expect_equal(categorize_immigration(1, 2, 1, 4.5), 3L)
 })
 
@@ -152,7 +152,7 @@ test_that("category 4: Visible minority immigrant, recent (<10 years)", {
   expect_equal(categorize_immigration(1, 2, 2, 4.5), 4L)
 })
 
-test_that("category 5: White immigrant, established (10+ years)", {
+test_that("category 5: Not VM immigrant, established (10+ years)", {
   expect_equal(categorize_immigration(1, 2, 1, 15), 5L)
 })
 
@@ -160,7 +160,7 @@ test_that("category 6: Visible minority immigrant, established (10+ years)", {
   expect_equal(categorize_immigration(1, 2, 2, 15), 6L)
 })
 
-test_that("category 7: White non-immigrant born outside Canada", {
+test_that("category 7: Not VM non-immigrant born outside Canada", {
   expect_equal(categorize_immigration(2, 2, 1, tagged_na("a")), 7L)
 })
 
@@ -194,4 +194,51 @@ test_that("category 6: Visible minority immigrant, established (master 7-cat)", 
 
 test_that("category 8: Visible minority non-immigrant born outside Canada (master 7-cat)", {
   expect_equal(categorize_immigration(2, 2, 5, tagged_na("a")), 8L)
+})
+
+# Worksheet regression tests — SDCFIMM (re issue #196 successor review)
+
+test_that("SDCFIMM 2022 PUMF feeder is SDCDGIMM, not SDCDVIMM", {
+  vd <- variable_details[variable_details$variable == "SDCFIMM" &
+    grepl("cchs2022_p", variable_details$databaseStart) &
+    !grepl("cchs2022_m", variable_details$databaseStart), ]
+  expect_true(nrow(vd) > 0)
+  expect_true(all(grepl("SDCDGIMM", vd$variableStart)))
+  expect_false(any(grepl("SDCDVIMM", vd$variableStart)))
+})
+
+test_that("SDCFIMM 2022 PUMF substantive codes: 2=Yes (immigrant), 1=No", {
+  vd <- variable_details[variable_details$variable == "SDCFIMM" &
+    grepl("cchs2022_p", variable_details$databaseStart) &
+    !grepl("cchs2022_m", variable_details$databaseStart), ]
+  row_yes <- vd[vd$recEnd == "1", ]
+  expect_equal(nrow(row_yes), 1)
+  expect_equal(row_yes$recStart, "2")
+  row_no <- vd[vd$recEnd == "2", ]
+  expect_equal(nrow(row_no), 1)
+  expect_equal(row_no$recStart, "1")
+})
+
+test_that("SDCFIMM 2022 PUMF missing codes are present", {
+  vd <- variable_details[variable_details$variable == "SDCFIMM" &
+    grepl("cchs2022_p", variable_details$databaseStart) &
+    !grepl("cchs2022_m", variable_details$databaseStart), ]
+  expect_true(any(vd$recEnd == "NA::a"))
+  expect_true(any(vd$recEnd == "NA::b"))
+})
+
+test_that("SDCFIMM variables.csv references SDCDGIMM for 2022 PUMF", {
+  v <- variables[variables$variable == "SDCFIMM", ]
+  expect_true(grepl("cchs2022_p::SDCDGIMM", v$variableStart))
+})
+
+# Worksheet regression tests — SDCDRES (re issue #196 successor review)
+
+test_that("SDCDRES documents construct break at 2022", {
+  vd <- variable_details[variable_details$variable == "SDCDRES" &
+    variable_details$recEnd == "copy", ]
+  expect_true(nrow(vd) >= 1)
+  expect_true(any(grepl("CONSTRUCT BREAK", vd$notes)))
+  expect_true(any(grepl("landed-immigrant", vd$notes)))
+  expect_true(any(grepl("first arrival", vd$notes)))
 })

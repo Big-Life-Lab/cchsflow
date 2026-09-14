@@ -18,7 +18,9 @@ categorize_immigration(
 
 \item{born_canada}{Country of birth (1 = Canada, 2 = outside Canada).}
 
-\item{ethnicity}{Ethnicity (1 = White, > 1 = visible minority).}
+\item{ethnicity}{Ethnicity (1 = not a visible minority, > 1 = visible
+minority). Pre-2019: 1 = White. 2019+: 1 = not a visible minority
+(includes White and Indigenous).}
 
 \item{years}{Time in Canada in years (continuous). Values < 10 are
 recent; values >= 10 are established.}
@@ -27,33 +29,37 @@ recent; values >= 10 are established.}
 or "original".}
 }
 \value{
-Integer vector: 1 = White Canada-born, 2 = visible minority
-  Canada-born, 3 = White immigrant recent, 4 = visible minority
-  immigrant recent, 5 = White immigrant established, 6 = visible
-  minority immigrant established, 7 = White non-immigrant foreign-born,
-  8 = visible minority non-immigrant foreign-born. Missing data:
-  \code{haven::tagged_na("a")} (not applicable),
-  \code{haven::tagged_na("b")} (not stated/invalid).
+Integer vector: 1 = not a visible minority, Canada-born;
+  2 = visible minority, Canada-born; 3 = not a visible minority,
+  immigrant, recent; 4 = visible minority, immigrant, recent;
+  5 = not a visible minority, immigrant, established; 6 = visible
+  minority, immigrant, established; 7 = not a visible minority,
+  non-immigrant, foreign-born; 8 = visible minority, non-immigrant,
+  foreign-born. Missing data: \code{haven::tagged_na("a")} (not
+  applicable), \code{haven::tagged_na("b")} (not stated/invalid).
 }
 \description{
 Derives an 8-category immigration classification combining immigrant
-status, country of birth, ethnicity (white / visible minority), and
-recency of arrival.
+status, country of birth, ethnicity (not a visible minority / visible
+minority), and recency of arrival.
 }
 \details{
 Works for both PUMF and Master CCHS files; the worksheet supplies
 database-appropriate feeder variables for each cycle block. Ethnicity
-uses 1 = White regardless of source granularity (PUMF 2-category or
-Master 7-category). Years in Canada splits immigrants into recent
-(< 10 years) and established (>= 10 years); this parameter is not
-used for Canada-born respondents. Ethnicity is intentionally not
+uses 1 = not a visible minority regardless of source granularity (PUMF
+2-category or Master 7-category). For pre-2019 cycles, category 1
+corresponds to "White"; for 2019+ cycles, SDCDVVM code 13 ("Not a
+visible minority") includes White, Indigenous, and some multiple
+population-group responses. Years in Canada splits immigrants into
+recent (< 10 years) and established (>= 10 years); this parameter is
+not used for Canada-born respondents. Ethnicity is intentionally not
 cleaned via \code{clean_variables()} because it can be either the PUMF
 2-category or Master 7-category variable.
 }
 \examples{
 # Scalar
 categorize_immigration(1, 2, 2, 4.5)  # 4 (VM immigrant, recent)
-categorize_immigration(2, 1, 1, 0)    # 1 (White, Canada-born)
+categorize_immigration(2, 1, 1, 0)    # 1 (not a visible minority, Canada-born)
 
 }
 \seealso{
