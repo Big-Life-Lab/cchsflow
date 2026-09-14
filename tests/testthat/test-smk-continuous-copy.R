@@ -7,13 +7,17 @@
 # Fixed in 405bf14 (column swap) and verified bounds against primary
 # dictionaries across all supported cycles (2003–2021).
 #
-# Bounds rationale: all three variables measure "years since quitting".
-# The theoretical max is bounded by DHH_AGE (observed up to 121 in 2021).
-# Using [0, 121] for all three, consistent with existing SMKG09C_cont.
+# Bounds rationale: each variable's range was verified against primary
+# CCHS data dictionaries (cchsflow-docs v2.1.0) across all supported
+# cycles. Per-variable bounds reflect observed min/max:
+#   SMK_09C: [3, 76]   (max 76 in 2019)
+#   SMK_06C: [3, 88]   (max 88 in 2015)
+#   SMK_10C: [3, 68]   (max 68 in 2015)
+# Min of 3 reflects survey routing (< 3 years goes through categorical).
 #
 # These tests verify:
 #   1. variable_details.csv has correct column placement (recEnd=copy,
-#      recStart=[0, 121]) for each Master continuous variable
+#      recStart=[min, max]) for each Master continuous variable
 #   2. Recoding engine produces correct output for valid durations,
 #      boundaries, valid skips, and non-response
 #   3. End-to-end SMK_09C -> time_quit_smoking_daily -> smoke_simple route
@@ -55,7 +59,7 @@ test_that("SMK_09C continuous copy row has correct recStart/recEnd columns", {
   row <- vd[vd$variable == "SMK_09C" & vd$recEnd == "copy", ]
   expect_true(nrow(row) >= 1, info = "No copy row found for SMK_09C")
   expect_equal(row$recEnd[1], "copy")
-  expect_match(row$recStart[1], "^\\[0,\\s*121\\]$")
+  expect_match(row$recStart[1], "^\\[3,\\s*76\\]$")
 })
 
 test_that("SMK_06C continuous copy row has correct recStart/recEnd columns", {
@@ -66,7 +70,7 @@ test_that("SMK_06C continuous copy row has correct recStart/recEnd columns", {
   row <- vd[vd$variable == "SMK_06C" & vd$recEnd == "copy", ]
   expect_true(nrow(row) >= 1, info = "No copy row found for SMK_06C")
   expect_equal(row$recEnd[1], "copy")
-  expect_match(row$recStart[1], "^\\[0,\\s*121\\]$")
+  expect_match(row$recStart[1], "^\\[3,\\s*88\\]$")
 })
 
 test_that("SMK_10C continuous copy row has correct recStart/recEnd columns", {
@@ -77,7 +81,7 @@ test_that("SMK_10C continuous copy row has correct recStart/recEnd columns", {
   row <- vd[vd$variable == "SMK_10C" & vd$recEnd == "copy", ]
   expect_true(nrow(row) >= 1, info = "No copy row found for SMK_10C")
   expect_equal(row$recEnd[1], "copy")
-  expect_match(row$recStart[1], "^\\[0,\\s*121\\]$")
+  expect_match(row$recStart[1], "^\\[3,\\s*68\\]$")
 })
 
 # =============================================================================
@@ -92,9 +96,9 @@ test_that("SMK_09C: ordinary valid durations are copied through", {
   expect_equal(out, c(8, 20, 45), ignore_attr = TRUE)
 })
 
-test_that("SMK_09C: boundary values 0 and 121 are accepted", {
-  out <- recode_smk("SMK_09C", c(0, 121))
-  expect_equal(out, c(0, 121), ignore_attr = TRUE)
+test_that("SMK_09C: boundary values 3 and 76 are accepted", {
+  out <- recode_smk("SMK_09C", c(3, 76))
+  expect_equal(out, c(3, 76), ignore_attr = TRUE)
 })
 
 test_that("SMK_09C: valid skip 996 maps to NA(a)", {
@@ -118,15 +122,15 @@ test_that("SMK_06C: ordinary valid durations are copied through", {
   expect_equal(out, c(5, 40, 83), ignore_attr = TRUE)
 })
 
-test_that("SMK_06C: value 88 accepted (within [0, 121], was rejected by old [0, 82])", {
+test_that("SMK_06C: value 88 accepted (boundary, was rejected by old [0, 82])", {
   # In 2015+, source variable is SMK_070 (not SMK_06C)
   out <- recode_smk("SMK_06C", 88, db = "cchs2015_2016_m", source_col = "SMK_070")
   expect_equal(out, 88, ignore_attr = TRUE)
 })
 
-test_that("SMK_06C: boundary values 0 and 121 are accepted", {
-  out <- recode_smk("SMK_06C", c(0, 121))
-  expect_equal(out, c(0, 121), ignore_attr = TRUE)
+test_that("SMK_06C: boundary values 3 and 88 are accepted", {
+  out <- recode_smk("SMK_06C", c(3, 88))
+  expect_equal(out, c(3, 88), ignore_attr = TRUE)
 })
 
 test_that("SMK_06C: valid skip 996 maps to NA(a)", {
@@ -150,9 +154,9 @@ test_that("SMK_10C: ordinary valid durations are copied through", {
   expect_equal(out, c(3, 30, 68), ignore_attr = TRUE)
 })
 
-test_that("SMK_10C: boundary values 0 and 121 are accepted", {
-  out <- recode_smk("SMK_10C", c(0, 121))
-  expect_equal(out, c(0, 121), ignore_attr = TRUE)
+test_that("SMK_10C: boundary values 3 and 68 are accepted", {
+  out <- recode_smk("SMK_10C", c(3, 68))
+  expect_equal(out, c(3, 68), ignore_attr = TRUE)
 })
 
 test_that("SMK_10C: valid skip 996 maps to NA(a)", {
@@ -184,11 +188,11 @@ test_that("Former daily smoker who quit 8 years ago reaches smoke_simple cat 3",
   expect_equal(as.numeric(result), 3)
 })
 
-test_that("Former daily smoker who quit 2 years ago reaches smoke_simple cat 2", {
+test_that("Former daily smoker who quit 4 years ago reaches smoke_simple cat 2", {
   tqsd <- calculate_time_quit_smoking_daily(
-    SMKDSTY_cat5 = 3, SMK_09A_cont = 1.5, SMK_09C = 2.0
+    SMKDSTY_cat5 = 3, SMK_09A_cont = 1.5, SMK_09C = 4.0
   )
-  expect_equal(tqsd, 2.0)
+  expect_equal(tqsd, 4.0)
 
   result <- smoke_simple_fun(SMKDSTY_cat5 = 3, time_quit_smoking = tqsd)
   expect_equal(as.numeric(result), 2)
