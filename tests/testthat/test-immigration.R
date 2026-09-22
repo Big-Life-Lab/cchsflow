@@ -136,7 +136,7 @@ test_that("propagates NA(a) from years", {
 
 # All 8 categories — PUMF style (ethnicity 1/2, SDCGRES_cont midpoints 4.5/15)
 
-test_that("category 1: Not VM Canada-born", {
+test_that("category 1: White Canada-born", {
   expect_equal(categorize_immigration(2, 1, 1, 4.5), 1L)
 })
 
@@ -144,7 +144,7 @@ test_that("category 2: Visible minority Canada-born", {
   expect_equal(categorize_immigration(2, 1, 2, 4.5), 2L)
 })
 
-test_that("category 3: Not VM immigrant, recent (<10 years)", {
+test_that("category 3: White immigrant, recent (<10 years)", {
   expect_equal(categorize_immigration(1, 2, 1, 4.5), 3L)
 })
 
@@ -152,7 +152,7 @@ test_that("category 4: Visible minority immigrant, recent (<10 years)", {
   expect_equal(categorize_immigration(1, 2, 2, 4.5), 4L)
 })
 
-test_that("category 5: Not VM immigrant, established (10+ years)", {
+test_that("category 5: White immigrant, established (10+ years)", {
   expect_equal(categorize_immigration(1, 2, 1, 15), 5L)
 })
 
@@ -160,7 +160,7 @@ test_that("category 6: Visible minority immigrant, established (10+ years)", {
   expect_equal(categorize_immigration(1, 2, 2, 15), 6L)
 })
 
-test_that("category 7: Not VM non-immigrant born outside Canada", {
+test_that("category 7: White non-immigrant born outside Canada", {
   expect_equal(categorize_immigration(2, 2, 1, tagged_na("a")), 7L)
 })
 
